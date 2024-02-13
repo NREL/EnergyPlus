@@ -3439,17 +3439,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
             << "Failed for vertice " << i << ", expected=" << expectedOriVertices[i] << ", got=" << vertices[i];
     }
 
-    auto const &lcsx(surface.lcsx);
-    auto const &lcsy(surface.lcsy);
-    auto const &lcsz(surface.lcsz);
+    Vector3<Real64> expected_lcsx(0.25881904510252079, -0.96592582628906831, 0.0);
+    Vector3<Real64> expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
+    Vector3<Real64> expected_lcsz(0.0, 0.0, 1.0);
 
-    Vector expected_lcsx(0.25881904510252079, -0.96592582628906831, 0.0);
-    Vector expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
-    Vector expected_lcsz(0.0, 0.0, 1.0);
-
-    EXPECT_EQ(expected_lcsx, lcsx);
-    EXPECT_EQ(expected_lcsy, lcsy);
-    EXPECT_EQ(expected_lcsz, lcsz);
+    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsx, surface.lcsx, 0.0000001));
+    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsy, surface.lcsy, 0.0000001));
+    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsz, surface.lcsz, 0.0000001));
 
     Array1D<Real64> xs(4, 0.0);
     Array1D<Real64> ys(4, 0.0);

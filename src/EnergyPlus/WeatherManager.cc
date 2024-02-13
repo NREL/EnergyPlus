@@ -310,15 +310,12 @@ namespace Weather {
                     surf.NewVertex(n).y = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
                     surf.NewVertex(n).z = surf.Vertex(n).z;
                 }
-                Vectors::CreateNewellSurfaceNormalVector(surf.NewVertex, surf.Sides, surf.NewellSurfaceNormalVector);
-                Real64 SurfWorldAz = 0.0;
-                Real64 SurfTilt = 0.0;
-                Vectors::DetermineAzimuthAndTilt(
-                    surf.NewVertex, SurfWorldAz, SurfTilt, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellSurfaceNormalVector);
-                surf.Azimuth = SurfWorldAz;
-                surf.SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
-                surf.CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
-                surf.OutNormVec = surf.NewellSurfaceNormalVector;
+
+                surf.NewellNormVec = Vectors::CreateNewellNormalVector(surf.NewVertex, surf.Sides);
+                std::tie(surf.Azimuth, surf.Tilt) = Vectors::DetermineAzimuthAndTilt(surf.NewVertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+                surf.SinAzim = std::sin(surf.Azimuth * Constant::DegToRadians);
+                surf.CosAzim = std::cos(surf.Azimuth * Constant::DegToRadians);
+                surf.OutNormVec = surf.NewellNormVec;
             }
         }
     }

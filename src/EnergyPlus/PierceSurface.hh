@@ -319,7 +319,7 @@ bool PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
     //  Jan 2016: Initial release
 
     // Find ray intersection with surface plane
-    DataSurfaces::SurfaceData::Plane const &plane(surface.plane);
+    Vector4<Real64> const &plane(surface.plane);
     Real64 const den((plane.x * rayDir.x) + (plane.y * rayDir.y) + (plane.z * rayDir.z));
     if (den == 0.0) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
         return false;
@@ -382,7 +382,7 @@ bool PierceSurface(DataSurfaces::SurfaceData const &surface, // Surface
     assert(dMax >= 0.0);                                // Distance must be nonnegative
 
     // Find ray intersection with surface plane
-    DataSurfaces::SurfaceData::Plane const &plane(surface.plane);
+    Vector4<Real64> const &plane(surface.plane);
     Real64 const den((plane.x * rayDir.x) + (plane.y * rayDir.y) + (plane.z * rayDir.z));
     if (den == 0.0) { // Ray is parallel to plane: This not treated as piercing even if ray lies in plane
         return false;

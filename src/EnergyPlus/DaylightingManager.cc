@@ -2342,7 +2342,7 @@ void InitializeCFSStateData(EnergyPlusData &state,
                     //  skip the base surface containing the window and any other subsurfaces of that surface
                     if (JSurf == surf.BaseSurf || surf2.BaseSurf == surf.BaseSurf) continue;
                     //  skip surfaces that face away from the window
-                    DotProd = dot(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), surf2.NewellSurfaceNormalVector);
+                    DotProd = dot(state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), surf2.NewellNormVec);
                     if (DotProd >= 0) continue;
                     hit = PierceSurface(state, JSurf, Centroid, state.dataBSDFWindow->ComplexWind(iWin).Geom(CurFenState).sInc(IRay), HitPt);
                     if (!hit) continue; // Miss: Try next surface

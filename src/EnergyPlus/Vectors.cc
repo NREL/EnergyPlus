@@ -106,9 +106,6 @@ using namespace DataVectorTypes;
 // MODULE PARAMETER DEFINITIONS
 
 // Object Data
-Vector const XUnit(1.0, 0.0, 0.0);
-Vector const YUnit(0.0, 1.0, 0.0);
-Vector const ZUnit(0.0, 0.0, 1.0);
 
 // DERIVED TYPE DEFINITIONS
 // na
@@ -292,13 +289,11 @@ void VecRound(Vector &vec, Real64 const roundto)
     vec.z = nint64(vec.z * roundto) / roundto;
 }
 
-void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
-                             Real64 &Azimuth,             // Outward Normal Azimuth Angle
-                             Real64 &Tilt,                // Tilt angle of surface
-                             Vector &lcsx,
-                             Vector &lcsy,
-                             Vector &lcsz,
-                             Vector const &NewellSurfaceNormalVector)
+std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const &Surf, // Surface Definition
+                                                  Vector3<Real64> &lcsx,
+                                                  Vector3<Real64> &lcsy,
+                                                  Vector3<Real64> &lcsz,
+                                                  Vector3<Real64> const &NewellSurfaceNormalVector)
 {
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -315,21 +310,22 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
     Real64 az;
     Real64 tlt;
 
-    lcsx = VecNormalize(Surf(3) - Surf(2));
+    lcsx = Surf(3) - Surf(2);
+    lcsx.normalize_zero();
     lcsz = NewellSurfaceNormalVector;
     lcsy = cross(lcsz, lcsx);
 
-    costheta = dot(lcsz, ZUnit);
+    costheta = lcsz.z;
 
     //    if ( fabs(costheta) < 1.0d0) { // normal cases
     if (std::abs(costheta) < 1.0 - 1.12e-16) { // Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in
                                                // release vs debug build due to slight precision differences: May want larger epsilon here
         // azimuth
-        Vector x2 = cross(ZUnit, lcsz);
-        rotang_0 = std::atan2(dot(x2, YUnit), dot(x2, XUnit));
+        Vector3<Real64> x2(-lcsz.y, lcsz.x, 0.0); // cross((0.0, 0.0, 1.0), lcsz);
+        rotang_0 = std::atan2(x2.y, x2.x);
     } else {
         // azimuth
-        rotang_0 = std::atan2(dot(lcsx, YUnit), dot(lcsx, XUnit));
+        rotang_0 = std::atan2(lcsx.y, lcsx.x);
     }
 
     tlt = std::acos(NewellSurfaceNormalVector.z);
@@ -353,11 +349,10 @@ void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
         tlt = 180.0;
     }
 
-    Azimuth = az;
-    Tilt = tlt;
+    return std::make_pair(az, tlt);
 }
 
-void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
+void PlaneEquation(Array1D<Vector3<Real64>> &verts, // Structure of the surface
                    int const nverts,       // Number of vertices in the surface
                    PlaneEq &plane,         // Equation of plane from inputs
                    bool &error             // returns true for degenerate surface
@@ -382,12 +377,10 @@ void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
     Real64 lenvec;
 
     // Object Data
-    Vector normal;
-    Vector refpt;
+    Vector3<Real64> normal(0.0, 0.0, 0.0);
+    Vector3<Real64> refpt(0.0, 0.0, 0.0);
 
     // - - - begin - - -
-    normal = Vector(0.0, 0.0, 0.0);
-    refpt = Vector(0.0, 0.0, 0.0);
     for (i = 0; i <= nverts - 1; ++i) {
         Vector const &u(verts[i]);
         Vector const &v(i < nverts - 1 ? verts[i + 1] : verts[0]);
@@ -398,7 +391,7 @@ void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
     }
     // normalize the polygon normal to obtain the first
     //  three coefficients of the plane equation
-    lenvec = VecLength(normal);
+    lenvec = length(normal);
     error = false;
     if (lenvec != 0.0) { // should this be >0
         plane.x = normal.x / lenvec;
@@ -412,7 +405,7 @@ void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
     }
 }
 
-Real64 Pt2Plane(Vector const &pt,   // Point for determining the distance
+Real64 Pt2Plane(Vector3<Real64> const &pt,   // Point for determining the distance
                 PlaneEq const &pleq // Equation of the plane
 )
 {
@@ -439,7 +432,7 @@ Real64 Pt2Plane(Vector const &pt,   // Point for determining the distance
     return PtDist;
 }
 
-void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector)
+Vector3<Real64> CreateNewellAreaVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
 {
 
     // SUBROUTINE INFORMATION:
@@ -478,10 +471,10 @@ void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vect
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
     // Object Data
-    Vector V1;
-    Vector V2;
+    Vector3<Real64> V1;
+    Vector3<Real64> V2;
 
-    OutNewellAreaVector = 0.0;
+    Vector3<Real64> OutNewellAreaVector(0.0, 0.0, 0.0);
 
     V1 = VList(2) - VList(1);
     for (int Vert = 3; Vert <= NSides; ++Vert) {
@@ -493,10 +486,10 @@ void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vect
     //       write(outputfiledebug,*) vlist(vert)
     //     enddo
 
-    OutNewellAreaVector /= 2.0;
+    return OutNewellAreaVector / 2.0;
 }
 
-void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector)
+Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
 {
 
     // SUBROUTINE INFORMATION:
@@ -553,7 +546,7 @@ void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSi
     Real64 yvalue;
     Real64 zvalue;
 
-    OutNewellSurfaceNormalVector = 0.0;
+    Vector3<Real64> NewellNormalVec(0.0, 0.0, 0.0);
     xvalue = 0.0;
     yvalue = 0.0;
     zvalue = 0.0;
@@ -575,16 +568,14 @@ void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSi
     //       zvalue=(U%x*V%y)-(U%y*V%x)
     //     ENDIF
 
-    OutNewellSurfaceNormalVector.x = xvalue;
-    OutNewellSurfaceNormalVector.y = yvalue;
-    OutNewellSurfaceNormalVector.z = zvalue;
-    OutNewellSurfaceNormalVector = VecNormalize(OutNewellSurfaceNormalVector);
+    NewellNormalVec = {xvalue, yvalue, zvalue};
+    NewellNormalVec.normalize_zero();
+    return NewellNormalVec;
 }
 
-void CompareTwoVectors(Vector const &vector1, // standard vector
-                       Vector const &vector2, // standard vector
-                       bool &areSame,         // true if the two vectors are the same within specified tolerance
-                       Real64 const tolerance // specified tolerance
+bool CompareTwoVectors(Vector3<Real64> const &v1, // standard vector
+                       Vector3<Real64> const &v2, // standard vector
+                       Real64 const tol // specified tolerance
 )
 {
 
@@ -621,10 +612,7 @@ void CompareTwoVectors(Vector const &vector1, // standard vector
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     // na
-    areSame = true;
-    if (std::abs(vector1.x - vector2.x) > tolerance) areSame = false;
-    if (std::abs(vector1.y - vector2.y) > tolerance) areSame = false;
-    if (std::abs(vector1.z - vector2.z) > tolerance) areSame = false;
+    return (std::abs(v1.x - v2.x) <= tol && std::abs(v1.y - v2.y) <= tol &&  std::abs(v1.z - v2.z) <= tol);
 }
 
 void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex)
@@ -735,7 +723,7 @@ Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly)
 
     for (int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace) {
         p3FaceOrigin = Poly.SurfaceFace(NFace).FacePoints(2);
-        PyramidVolume = dot(Poly.SurfaceFace(NFace).NewellAreaVector, (p3FaceOrigin - state.dataVectors->p0));
+        PyramidVolume = dot(Poly.SurfaceFace(NFace).NewellAreaVector, p3FaceOrigin);
         Volume += PyramidVolume / 3.0;
     }
     return Volume;

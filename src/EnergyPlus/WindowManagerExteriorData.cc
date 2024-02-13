@@ -72,7 +72,7 @@ namespace WindowManager {
 
     bool isSurfaceHit(EnergyPlusData &state, const int t_SurfNum, const Vector &t_Ray)
     {
-        Real64 DotProd = dot(t_Ray, state.dataSurface->Surface(t_SurfNum).NewellSurfaceNormalVector);
+        Real64 DotProd = dot(t_Ray, state.dataSurface->Surface(t_SurfNum).NewellNormVec);
         return (DotProd > 0);
     }
 

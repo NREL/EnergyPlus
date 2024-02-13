@@ -625,7 +625,7 @@ namespace WindowComplexManager {
                                 state.dataSurface->Surface(JSurf).ExtBoundCond != ExternalEnvironment)
                                 continue;
                             // skip surfaces that face away from the ground point
-                            if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
+                            if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellNormVec) >= 0.0) continue;
                             // Looking for surfaces between GndPt and sun
                             hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                             if (hit) {
@@ -678,7 +678,7 @@ namespace WindowComplexManager {
                     if (state.dataSurface->Surface(JSurf).HeatTransSurf && state.dataSurface->Surface(JSurf).ExtBoundCond != ExternalEnvironment)
                         continue;
                     // skip surfaces that face away from the ground point
-                    if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector) >= 0.0) continue;
+                    if (dot(SunDir, state.dataSurface->Surface(JSurf).NewellNormVec) >= 0.0) continue;
                     // Looking for surfaces between GndPt and sun
                     hit = PierceSurface(state, JSurf, gndPt, SunDir, HitPt);
                     if (hit) {
@@ -1373,7 +1373,7 @@ namespace WindowComplexManager {
                     state.dataSurface->Surface(JSurf).BaseSurf == state.dataSurface->Surface(ISurf).BaseSurf)
                     continue;
                 //  skip surfaces that face away from the window
-                DotProd = dot(Geom.sInc(IRay), state.dataSurface->Surface(JSurf).NewellSurfaceNormalVector);
+                DotProd = dot(Geom.sInc(IRay), state.dataSurface->Surface(JSurf).NewellNormVec);
                 if (DotProd >= 0.0) continue;
                 hit = PierceSurface(state, JSurf, state.dataSurface->Surface(ISurf).Centroid, Geom.sInc(IRay), HitPt);
                 if (!hit) continue; // Miss: Try next surface
@@ -2236,7 +2236,7 @@ namespace WindowComplexManager {
         Phi = 0.0;
 
         // Check if surface and vector are pointing in different directions
-        DotProd = dot(RayToFind, state.dataSurface->Surface(ISurf).NewellSurfaceNormalVector);
+        DotProd = dot(RayToFind, state.dataSurface->Surface(ISurf).NewellNormVec);
         if (DotProd <= 0.0) {
             RayIndex = 0;
             return RayIndex;

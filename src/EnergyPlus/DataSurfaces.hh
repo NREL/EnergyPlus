@@ -686,11 +686,6 @@ namespace DataSurfaces {
 
     struct SurfaceData
     {
-
-        // Types
-        using Vertices = Array1D<Vector>;
-        using Plane = Vector4<Real64>;
-
         // Members
         std::string Name; // User supplied name of the surface (must be unique)
         int Construction; // Pointer to the construction in the Construct derived type
@@ -724,18 +719,18 @@ namespace DataSurfaces {
 
         // Precomputed parameters for PierceSurface performance
         ShapeCat shapeCat;   // Shape category
-        Plane plane;         // Plane
+        Vector4<Real64> plane;         // Plane
         Surface2D surface2d; // 2D projected surface for efficient intersection testing
 
         // Vertices
-        Array1D<Vector> NewVertex;
-        Vertices Vertex;          // Surface Vertices are represented by Number of Sides and Vector (type)
+        Array1D<Vector3<Real64>> NewVertex;
+        Array1D<Vector3<Real64>> Vertex;          // Surface Vertices are represented by Number of Sides and Vector (type)
         Vector3<Real64> Centroid; // computed centroid (also known as center of mass or surface balance point)
         Vector3<Real64> lcsx;
         Vector3<Real64> lcsy;
         Vector3<Real64> lcsz;
-        Vector3<Real64> NewellAreaVector;
-        Vector3<Real64> NewellSurfaceNormalVector; // same as OutNormVec in vector notation
+        Vector3<Real64> NewellAreaVec;
+        Vector3<Real64> NewellNormVec; // same as OutNormVec in vector notation
         Vector3<Real64> OutNormVec;                // Direction cosines (outward normal vector) for surface
         Real64 SinAzim;                            // Sine of surface azimuth angle
         Real64 CosAzim;                            // Cosine of surface azimuth angle
@@ -832,7 +827,7 @@ namespace DataSurfaces {
             : Construction(0), RepresentativeCalcSurfNum(-1), ConstructionStoredInputValue(0), Class(SurfaceClass::None), Shape(SurfaceShape::None),
               Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0), Reveal(0.0), Tilt(0.0),
               Width(0.0), shapeCat(ShapeCat::Invalid), plane(0.0, 0.0, 0.0, 0.0), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
-              lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(0.0, 0.0, 0.0), SinAzim(0.0),
+              lcsz(0.0, 0.0, 0.0), NewellAreaVec(0.0, 0.0, 0.0), NewellNormVec(0.0, 0.0, 0.0), OutNormVec(0.0, 0.0, 0.0), SinAzim(0.0),
               CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
               HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel::Invalid), BaseSurf(0), NumSubSurfaces(0), Zone(0), spaceNum(0), ExtBoundCond(0),
@@ -872,7 +867,7 @@ namespace DataSurfaces {
         ShapeCat computed_shapeCat() const;
 
         // Computed Plane
-        Plane computed_plane() const;
+        Vector4<Real64> computed_plane() const;
 
         // Computed axis-projected 2D surface
         Surface2D computed_surface2d() const;

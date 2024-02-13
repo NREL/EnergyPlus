@@ -592,15 +592,11 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     surfaceError = false;
     BaseSurface.Azimuth = 0.;
     BaseSurface.Tilt = 0.;
-    BaseSurface.NewellSurfaceNormalVector.x = 0.;
-    BaseSurface.NewellSurfaceNormalVector.y = 0.;
-    BaseSurface.NewellSurfaceNormalVector.z = 1.;
+    BaseSurface.NewellNormVec = {0., 0., 1.};
 
     SubSurface.Azimuth = 0.;
     SubSurface.Tilt = 0.;
-    SubSurface.NewellSurfaceNormalVector.x = 0.;
-    SubSurface.NewellSurfaceNormalVector.y = 0.;
-    SubSurface.NewellSurfaceNormalVector.z = 1.;
+    SubSurface.NewellNormVec = {0., 0., 1.};
     checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_FALSE(has_err_output());
@@ -609,9 +605,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     surfaceError = false;
     SubSurface.Azimuth = 180.;
     SubSurface.Tilt = 180.;
-    SubSurface.NewellSurfaceNormalVector.x = 1.;
-    SubSurface.NewellSurfaceNormalVector.y = 0.;
-    SubSurface.NewellSurfaceNormalVector.z = 0.;
+    SubSurface.NewellNormVec = {1., 0., 0.};
     checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_TRUE(surfaceError);
     EXPECT_TRUE(has_err_output());
@@ -620,10 +614,7 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     surfaceError = false;
     SubSurface.Azimuth = 45.;
     SubSurface.Tilt = 0.;
-    SubSurface.NewellSurfaceNormalVector.x = 0.;
-    SubSurface.NewellSurfaceNormalVector.y =
-        1.; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
-    SubSurface.NewellSurfaceNormalVector.z = 1.;
+    SubSurface.NewellNormVec = {0., 1., 1.}; // This doesn't match the tilt and azimuth, but want it to be different so tilt and azimuth tests are executed
     checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_FALSE(has_err_output());
@@ -633,15 +624,11 @@ TEST_F(EnergyPlusFixture, ConfirmCheckSubSurfAzTiltNorm)
     surfaceError = false;
     BaseSurface.Azimuth = 90.;
     BaseSurface.Tilt = 90.;
-    BaseSurface.NewellSurfaceNormalVector.x = 1.;
-    BaseSurface.NewellSurfaceNormalVector.y = 0.;
-    BaseSurface.NewellSurfaceNormalVector.z = 0.;
+    BaseSurface.NewellNormVec = {1., 0., 0.};
 
     SubSurface.Azimuth = 45.;
     SubSurface.Tilt = 45.;
-    SubSurface.NewellSurfaceNormalVector.x = 1.;
-    SubSurface.NewellSurfaceNormalVector.y = 1.;
-    SubSurface.NewellSurfaceNormalVector.z = 1.;
+    SubSurface.NewellNormVec = {1., 1., 1.};
     checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
     EXPECT_FALSE(surfaceError);
     EXPECT_TRUE(has_err_output());
@@ -751,8 +738,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).y, 0.);
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Vertex(4).z, 2.4);
 
-    MakeMirrorSurface(
-        *state, state->dataSurface->TotSurfaces); // This call increments TotSurfaces so the references after this are for the created mirror surface
+    // This call increments TotSurfaces so the references after this are for the created mirror surface
+    state->dataSurface->TotSurfaces = MakeMirrorSurface(*state, state->dataSurface->TotSurfaces); 
 
     EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(state->dataSurface->TotSurfaces).Name, "Mir-FRONT-1");
 
@@ -993,8 +980,8 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_distance)
 {
 
-    DataVectorTypes::Vector a;
-    DataVectorTypes::Vector b;
+    Vector3<Real64> a;
+    Vector3<Real64> b;
 
     a.x = 0.;
     a.y = 0.;
@@ -1033,8 +1020,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_distance)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual3dPt)
 {
-    DataVectorTypes::Vector a;
-    DataVectorTypes::Vector b;
+    Vector3<Real64> a;
+    Vector3<Real64> b;
 
     a.x = 0.;
     a.y = 0.;
@@ -1125,9 +1112,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isAlmostEqual2dPt)
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints)
 {
-    DataVectorTypes::Vector a;
-    DataVectorTypes::Vector b;
-    DataVectorTypes::Vector t;
+    Vector3<Real64> a;
+    Vector3<Real64> b;
+    Vector3<Real64> t;
 
     a.x = 0.;
     a.y = 0.;
@@ -1188,9 +1175,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints_Fa
 {
     // cf #7383
 
-    DataVectorTypes::Vector a(0.0, 0.0, 0.0);
-    DataVectorTypes::Vector b(30.0, 0.0, 0.0);
-    DataVectorTypes::Vector t(15.0, 0.0, 0.3); // Notice wrong z, it's 30cm off!
+    Vector3<Real64> a(0.0, 0.0, 0.0);
+    Vector3<Real64> b(30.0, 0.0, 0.0);
+    Vector3<Real64> t(15.0, 0.0, 0.3); // Notice wrong z, it's 30cm off!
 
     EXPECT_FALSE(isPointOnLineBetweenPoints(a, b, t));
     EXPECT_EQ(0.3, distanceFromPointToLine(a, b, t));
@@ -1198,8 +1185,8 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_isPointOnLineBetweenPoints_Fa
 
 TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
 {
-    DataVectorTypes::Vector a;
-    std::vector<DataVectorTypes::Vector> list;
+    Vector3<Real64> a;
+    std::vector<Vector3<Real64>> list;
 
     a.x = 0.;
     a.y = 0.;
@@ -1211,10 +1198,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_findIndexOfVertex)
 
     EXPECT_EQ(0, findIndexOfVertex(a, list));
 
-    list.emplace_back(DataVectorTypes::Vector(3., 2., 4.));
-    list.emplace_back(DataVectorTypes::Vector(4., 3., 5.));
-    list.emplace_back(DataVectorTypes::Vector(8., 1., 2.));
-    list.emplace_back(DataVectorTypes::Vector(4., 7., 3.));
+    list.emplace_back(Vector3<Real64>(3., 2., 4.));
+    list.emplace_back(Vector3<Real64>(4., 3., 5.));
+    list.emplace_back(Vector3<Real64>(8., 1., 2.));
+    list.emplace_back(Vector3<Real64>(4., 7., 3.));
 
     EXPECT_EQ(0, findIndexOfVertex(a, list));
 
@@ -13444,13 +13431,13 @@ TEST_F(EnergyPlusFixture, Test_Rotational_Azimuth_Diffs)
     surfaceError = false;
     BaseSurface.Azimuth = 30.0;
     BaseSurface.Tilt = 90.0;
-    BaseSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(1, std::sqrt(3.0), 0));
+    BaseSurface.NewellNormVec = Vector3<Real64>(1, std::sqrt(3.0), 0).normalize();
 
     // Sub surface: Northwest
     // should be no error message and no surfaceError
     SubSurface.Azimuth = 330.0;
     SubSurface.Tilt = 90.0;
-    SubSurface.NewellSurfaceNormalVector = Vectors::VecNormalize(DataVectorTypes::Vector(-1, std::sqrt(3.0), 0));
+    SubSurface.NewellNormVec = Vector3<Real64>(-1, std::sqrt(3.0), 0).normalize();
 
     checkSubSurfAzTiltNorm(*state, BaseSurface, SubSurface, surfaceError);
 
@@ -14031,40 +14018,32 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Test)
 
     BaseSurface.Vertex.dimension(4);
 
-    BaseSurface.Vertex = {
-        DataVectorTypes::Vector(0, 0, 0), DataVectorTypes::Vector(1, 0, 0), DataVectorTypes::Vector(1, 1, 0), DataVectorTypes::Vector(0, 1, 0)};
-    Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
-                                     BaseSurface.Azimuth,
-                                     BaseSurface.Tilt,
-                                     BaseSurface.lcsx,
-                                     BaseSurface.lcsy,
-                                     BaseSurface.lcsz,
-                                     BaseSurface.NewellSurfaceNormalVector);
+    BaseSurface.Vertex = {Vector3<Real64>(0,0,0), Vector3<Real64>(1,0,0), Vector3<Real64>(1,1,0), Vector3<Real64>(0,1,0)};
+    BaseSurface.NewellNormVec = Vectors::CreateNewellNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size());
+    std::tie(BaseSurface.Azimuth, BaseSurface.Tilt) = Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
+                                                                                       BaseSurface.lcsx,
+                                                                                       BaseSurface.lcsy,
+                                                                                       BaseSurface.lcsz,
+                                                                                       BaseSurface.NewellNormVec);
 
     SubSurface.Vertex.dimension(4);
 
-    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 0),
-                         DataVectorTypes::Vector(1, 0, 0),
-                         DataVectorTypes::Vector(1, 1, 0.0003),
-                         DataVectorTypes::Vector(0, 1, 0.0003)};
-    Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
-                                     SubSurface.Azimuth,
-                                     SubSurface.Tilt,
-                                     SubSurface.lcsx,
-                                     SubSurface.lcsy,
-                                     SubSurface.lcsz,
-                                     SubSurface.NewellSurfaceNormalVector);
-
+    SubSurface.Vertex = {Vector3<Real64>(0, 0, 0), Vector3<Real64>(1, 0, 0), Vector3<Real64>(1, 1, 0.0003), Vector3<Real64>(0, 1, 0.0003)};
+    SubSurface.NewellNormVec = Vectors::CreateNewellNormalVector(SubSurface.Vertex, SubSurface.Vertex.size());
+    std::tie(SubSurface.Azimuth, SubSurface.Tilt) = Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
+                                                                                     SubSurface.lcsx,
+                                                                                     SubSurface.lcsy,
+                                                                                     SubSurface.lcsz,
+                                                                                     SubSurface.NewellNormVec);
+    
     bool sameSurfNormal(false);
 
     // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
-    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+    sameSurfNormal = Vectors::CompareTwoVectors(BaseSurface.NewellNormVec, SubSurface.NewellNormVec, 0.001);
 
     // The surface normals are not exactly the same
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface.NewellSurfaceNormalVector.y), 1e-5);
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface.NewellSurfaceNormalVector.z), 1e-10);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.y - SubSurface.NewellNormVec.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.z - SubSurface.NewellNormVec.z), 1e-10);
 
     // But should pass the sameSurfNormal test
     EXPECT_TRUE(sameSurfNormal);
@@ -14322,40 +14301,30 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Horizontal_Surf_Random)
 
     BaseSurface.Vertex.dimension(4);
 
-    BaseSurface.Vertex = {
-        DataVectorTypes::Vector(0, 0, 1), DataVectorTypes::Vector(1, 0, 1), DataVectorTypes::Vector(1, 1, 1), DataVectorTypes::Vector(0, 1, 1)};
-    Vectors::CreateNewellSurfaceNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size(), BaseSurface.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
-                                     BaseSurface.Azimuth,
-                                     BaseSurface.Tilt,
-                                     BaseSurface.lcsx,
-                                     BaseSurface.lcsy,
-                                     BaseSurface.lcsz,
-                                     BaseSurface.NewellSurfaceNormalVector);
-
+    BaseSurface.Vertex = {Vector3<Real64>(0, 0, 1), Vector3<Real64>(1, 0, 1), Vector3<Real64>(1, 1, 1), Vector3<Real64>(0, 1, 1)};
+    BaseSurface.NewellNormVec = Vectors::CreateNewellNormalVector(BaseSurface.Vertex, BaseSurface.Vertex.size());
+    std::tie(BaseSurface.Azimuth, BaseSurface.Tilt) = Vectors::DetermineAzimuthAndTilt(BaseSurface.Vertex,
+                                                                                       BaseSurface.lcsx,
+                                                                                       BaseSurface.lcsy,
+                                                                                       BaseSurface.lcsz,
+                                                                                       BaseSurface.NewellNormVec);
+    
     SubSurface.Vertex.dimension(4);
 
-    SubSurface.Vertex = {DataVectorTypes::Vector(0, 0, 1),
-                         DataVectorTypes::Vector(1, 0, 1),
-                         DataVectorTypes::Vector(1, 1, 1.0003),
-                         DataVectorTypes::Vector(0, 1, 1.0003)};
-    Vectors::CreateNewellSurfaceNormalVector(SubSurface.Vertex, SubSurface.Vertex.size(), SubSurface.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
-                                     SubSurface.Azimuth,
-                                     SubSurface.Tilt,
-                                     SubSurface.lcsx,
-                                     SubSurface.lcsy,
-                                     SubSurface.lcsz,
-                                     SubSurface.NewellSurfaceNormalVector);
-
-    bool sameSurfNormal(false);
-
+    SubSurface.Vertex = {Vector3<Real64>(0, 0, 1), Vector3<Real64>(1, 0, 1), Vector3<Real64>(1, 1, 1.0003), Vector3<Real64>(0, 1, 1.0003)};
+    SubSurface.NewellNormVec = Vectors::CreateNewellNormalVector(SubSurface.Vertex, SubSurface.Vertex.size());
+    std::tie(SubSurface.Azimuth, SubSurface.Tilt) = Vectors::DetermineAzimuthAndTilt(SubSurface.Vertex,
+                                                                                     SubSurface.lcsx,
+                                                                                     SubSurface.lcsy,
+                                                                                     SubSurface.lcsz,
+                                                                                     SubSurface.NewellNormVec);
+    
     // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
-    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+    bool sameSurfNormal = Vectors::CompareTwoVectors(BaseSurface.NewellNormVec, SubSurface.NewellNormVec, 0.001);
 
     // The surface normals are not exactly the same
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface.NewellSurfaceNormalVector.y), 1e-5);
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface.NewellSurfaceNormalVector.z), 1e-10);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.y - SubSurface.NewellNormVec.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.z - SubSurface.NewellNormVec.z), 1e-10);
 
     // But should pass the sameSurfNormal test
     EXPECT_TRUE(sameSurfNormal);
@@ -14375,27 +14344,20 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Horizontal_Surf_Random)
     // Then the same test should pass all the same with the PR 10104 fix
     // But it would expect to fail in the original develop branch without RP 10104 fix
     SubSurface_Same.Vertex.dimension(4);
-    SubSurface_Same.Vertex = {DataVectorTypes::Vector(1, 0, 1),
-                              DataVectorTypes::Vector(1, 1, 1.0003),
-                              DataVectorTypes::Vector(0, 1, 1.0003),
-                              DataVectorTypes::Vector(0, 0, 1)};
-    Vectors::CreateNewellSurfaceNormalVector(SubSurface_Same.Vertex, SubSurface_Same.Vertex.size(), SubSurface_Same.NewellSurfaceNormalVector);
-    Vectors::DetermineAzimuthAndTilt(SubSurface_Same.Vertex,
-                                     SubSurface_Same.Azimuth,
-                                     SubSurface_Same.Tilt,
-                                     SubSurface_Same.lcsx,
-                                     SubSurface_Same.lcsy,
-                                     SubSurface_Same.lcsz,
-                                     SubSurface_Same.NewellSurfaceNormalVector);
-
-    sameSurfNormal = false;
-
+    SubSurface_Same.Vertex = {Vector3<Real64>(1, 0, 1), Vector3<Real64>(1, 1, 1.0003), Vector3<Real64>(0, 1, 1.0003), Vector3<Real64>(0, 0, 1)};
+    SubSurface_Same.NewellNormVec = Vectors::CreateNewellNormalVector(SubSurface_Same.Vertex, SubSurface_Same.Vertex.size());
+    std::tie(SubSurface_Same.Azimuth, SubSurface_Same.Tilt) = Vectors::DetermineAzimuthAndTilt(SubSurface_Same.Vertex,
+                                                                                               SubSurface_Same.lcsx,
+                                                                                               SubSurface_Same.lcsy,
+                                                                                               SubSurface_Same.lcsz,
+                                                                                               SubSurface_Same.NewellNormVec);
+    
     // This is the sameSurfNormal test used in checkSubSurfAzTiltNorm()
-    Vectors::CompareTwoVectors(BaseSurface.NewellSurfaceNormalVector, SubSurface_Same.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+    sameSurfNormal = Vectors::CompareTwoVectors(BaseSurface.NewellNormVec, SubSurface_Same.NewellNormVec, 0.001);
 
     // The surface normals are not exactly the same
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.y - SubSurface_Same.NewellSurfaceNormalVector.y), 1e-5);
-    EXPECT_GE(std::abs(BaseSurface.NewellSurfaceNormalVector.z - SubSurface_Same.NewellSurfaceNormalVector.z), 1e-10);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.y - SubSurface_Same.NewellNormVec.y), 1e-5);
+    EXPECT_GE(std::abs(BaseSurface.NewellNormVec.z - SubSurface_Same.NewellNormVec.z), 1e-10);
 
     // But should pass the sameSurfNormal test
     EXPECT_TRUE(sameSurfNormal);

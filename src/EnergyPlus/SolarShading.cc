@@ -5271,7 +5271,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
 
                 if (state.dataSurface->Surface(GRSNR).Reveal > 0.0) {
                     Real64 R = state.dataSurface->Surface(GRSNR).Reveal;
-                    auto &norm = state.dataSurface->Surface(GRSNR).NewellSurfaceNormalVector;
+                    auto &norm = state.dataSurface->Surface(GRSNR).NewellNormVec;
                     auto &v = state.dataSurface->Surface(GRSNR).Vertex;
                     for (unsigned i = 0; i < v.size(); ++i) {
                         poly.push_back(v[i].x);
@@ -5324,7 +5324,7 @@ void DetermineShadowingCombinations(EnergyPlusData &state)
                         Penumbra::Polygon subPoly;
                         if (state.dataSurface->Surface(subSurface).Reveal > 0.0) {
                             Real64 R = state.dataSurface->Surface(subSurface).Reveal;
-                            auto &norm = state.dataSurface->Surface(subSurface).NewellSurfaceNormalVector;
+                            auto &norm = state.dataSurface->Surface(subSurface).NewellNormVec;
                             for (auto const &v : state.dataSurface->Surface(subSurface).Vertex) {
                                 subPoly.push_back(v.x + norm.x * R);
                                 subPoly.push_back(v.y + norm.y * R);

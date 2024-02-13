@@ -64,7 +64,7 @@ using namespace EnergyPlus::Vectors;
 
 TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
 {
-    Array1D<Vector> a(4); // 3 x 7 rectangle
+    Array1D<Vector3<Real64>> a(4); // 3 x 7 rectangle
     a(1).x = a(1).y = a(1).z = 0.0;
     a(2).x = 3.0;
     a(2).y = a(2).z = 0.0;
@@ -80,16 +80,16 @@ TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
 TEST_F(EnergyPlusFixture, VectorsTest_VecNormalize)
 {
     {
-        Vector const v(3.0, 3.0, 3.0);
-        Vector const n(VecNormalize(v));
+        Vector3<Real64> const v(3.0, 3.0, 3.0);
+        Vector3<Real64> const n(VecNormalize(v));
         Real64 const h(3.0 / std::sqrt(27.0));
         EXPECT_DOUBLE_EQ(h, n.x);
         EXPECT_DOUBLE_EQ(h, n.y);
         EXPECT_DOUBLE_EQ(h, n.z);
     }
     {
-        Vector const v(1.0, 3.0, 5.0);
-        Vector const n(VecNormalize(v));
+        Vector3<Real64> const v(1.0, 3.0, 5.0);
+        Vector3<Real64> const n(VecNormalize(v));
         Real64 const f(1.0 / std::sqrt(35.0));
         EXPECT_DOUBLE_EQ(f * v.x, n.x);
         EXPECT_DOUBLE_EQ(f * v.y, n.y);
@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, VectorsTest_VecNormalize)
 
 TEST_F(EnergyPlusFixture, VectorsTest_VecRound)
 {
-    Vector v(11.567, -33.602, 55.981);
+    Vector3<Real64> v(11.567, -33.602, 55.981);
     VecRound(v, 2.0);
     EXPECT_DOUBLE_EQ(11.5, v.x);
     EXPECT_DOUBLE_EQ(-33.5, v.y);
@@ -108,16 +108,14 @@ TEST_F(EnergyPlusFixture, VectorsTest_VecRound)
 
 TEST_F(EnergyPlusFixture, VectorsTest_CoplnarPoints)
 {
-    {
-        Array1D<Vector> base = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
-        std::vector<int> coplanarPoints;
-        bool ErrorsFound;
-
-        Array1D<Vector> query = {Vector(0, 0, 0), Vector(1, 1, 1), Vector(2, 0, 0), Vector(0, 0, -1)};
-        coplanarPoints = PointsInPlane(base, base.size(), query, query.size(), ErrorsFound);
-
-        EXPECT_EQ(coplanarPoints[0], 1);      // 1st point in query is coplanar with base
-        EXPECT_EQ(coplanarPoints[1], 3);      // 3rd point in query is coplanar with base
-        EXPECT_EQ(coplanarPoints.size(), 2u); // Only 2 points in query are coplanar with base
-    }
+    Array1D<Vector3<Real64>> base = {Vector3<Real64>(0, 0, 0), Vector3<Real64>(1, 0, 0), Vector3<Real64>(1, 1, 0), Vector3<Real64>(0, 1, 0)};
+    std::vector<int> coplanarPoints;
+    bool ErrorsFound;
+    
+    Array1D<Vector3<Real64>> query = {Vector3<Real64>(0, 0, 0), Vector3<Real64>(1, 1, 1), Vector3<Real64>(2, 0, 0), Vector3<Real64>(0, 0, -1)};
+    coplanarPoints = PointsInPlane(base, base.size(), query, query.size(), ErrorsFound);
+    
+    EXPECT_EQ(coplanarPoints[0], 1);      // 1st point in query is coplanar with base
+    EXPECT_EQ(coplanarPoints[1], 3);      // 3rd point in query is coplanar with base
+    EXPECT_EQ(coplanarPoints.size(), 2u); // Only 2 points in query are coplanar with base
 }

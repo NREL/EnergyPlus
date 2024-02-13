@@ -288,7 +288,7 @@ namespace SurfaceGeometry {
                                Real64 &SurfTilt     // Surface tilt (
     );
 
-    void MakeMirrorSurface(EnergyPlusData &state, int &SurfNum); // In=>Surface to Mirror, Out=>new Surface index
+    int MakeMirrorSurface(EnergyPlusData &state, int SurfNum); // In=>Surface to Mirror, Out=>new Surface index
 
     void GetWindowShadingControlData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
@@ -486,11 +486,8 @@ struct SurfaceGeometryData : BaseGlobalStruct
     int ErrCount4 = 0; // counts of interzone area mismatches.
     bool ShowZoneSurfaceHeaders = true;
     int ErrCount5 = 0;
-    Real64 OldAspectRatio = 0.0;
-    Real64 NewAspectRatio = 0.0;
-    std::string transformPlane;
-    Array1D<Vectors::Vector> Triangle1 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
-    Array1D<Vectors::Vector> Triangle2 = Array1D<Vectors::Vector>(3); // working struct for a 3-sided surface
+    Array1D<Vector3<Real64>> Triangle1 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
+    Array1D<Vector3<Real64>> Triangle2 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
     Array1D<Real64> X;                                                // containers for x,y,z vertices of the surface
     Array1D<Real64> Y;
     Array1D<Real64> Z;

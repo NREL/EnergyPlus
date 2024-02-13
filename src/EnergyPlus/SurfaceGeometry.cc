@@ -1106,8 +1106,6 @@ namespace SurfaceGeometry {
         int NVert;
         int Vert;
         int n;
-        Real64 SurfWorldAz;
-        Real64 SurfTilt;
 
         int MultFound;
         int MultSurfNum;
@@ -1294,6 +1292,7 @@ namespace SurfaceGeometry {
 
         // add the "need to add" surfaces
         // Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
+        // How is there not an unitialized variable warning/error on CurNewSurf?
         if (NeedToAddSurfaces + NeedToAddSubSurfaces > 0) CurNewSurf = FirstTotalSurfaces;
         for (int SurfNum = 1; SurfNum <= FirstTotalSurfaces; ++SurfNum) {
             if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond != UnenteredAdjacentZoneSurface) continue;
@@ -1305,51 +1304,42 @@ namespace SurfaceGeometry {
             Found = Util::FindItemInList(
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (Found == 0) continue;
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Zone = Found;
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ZoneName = state.dataHeatBal->Zone(Found).Name;
+
+            auto &newSurf = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf);
+            
+            newSurf.Zone = Found;
+            newSurf.ZoneName = state.dataHeatBal->Zone(Found).Name;
             // Reverse Construction
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Construction =
-                AssignReverseConstructionNumber(state, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction, SurfError);
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ConstructionStoredInputValue =
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Construction;
+            newSurf.Construction = AssignReverseConstructionNumber(state, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction, SurfError);
+            newSurf.ConstructionStoredInputValue = newSurf.Construction;
             // Reverse Vertices
             NVert = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
             for (Vert = 1; Vert <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++Vert) {
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Vertex(Vert) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NVert);
+                newSurf.Vertex(Vert) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NVert);
                 --NVert;
             }
-            if (state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Sides > 2) {
-                CreateNewellAreaVector(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Vertex,
-                                       state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Sides,
-                                       state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellAreaVector);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).GrossArea =
-                    VecLength(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellAreaVector);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Area = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).GrossArea;
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Area;
-                CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Vertex,
-                                                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Sides,
-                                                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
-                DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Vertex,
-                                        SurfWorldAz,
-                                        SurfTilt,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsx,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsy,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).lcsz,
-                                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Azimuth = SurfWorldAz;
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Tilt = SurfTilt;
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).convOrientation =
-                    Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Tilt);
+            if (newSurf.Sides > 2) {
+                newSurf.NewellAreaVec = CreateNewellAreaVector(newSurf.Vertex, newSurf.Sides);
+                newSurf.GrossArea = length(newSurf.NewellAreaVec);
+                newSurf.Area = newSurf.GrossArea;
+                newSurf.NetAreaShadowCalc = newSurf.Area;
+                newSurf.NewellNormVec = CreateNewellNormalVector(newSurf.Vertex, newSurf.Sides);
+                std::tie(newSurf.Azimuth, newSurf.Tilt) = DetermineAzimuthAndTilt(newSurf.Vertex,
+                                                                                  newSurf.lcsx,
+                                                                                  newSurf.lcsy,
+                                                                                  newSurf.lcsz,
+                                                                                  newSurf.NewellNormVec);
+                newSurf.convOrientation = Convect::GetSurfConvOrientation(newSurf.Tilt);
 
                 // Sine and cosine of azimuth and tilt
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
+                newSurf.SinAzim = std::sin(newSurf.Azimuth * Constant::DegToRadians);
+                newSurf.CosAzim = std::cos(newSurf.Azimuth * Constant::DegToRadians);
+                newSurf.SinTilt = std::sin(newSurf.Tilt * Constant::DegToRadians);
+                newSurf.CosTilt = std::cos(newSurf.Tilt * Constant::DegToRadians);
                 // Outward normal unit vector (pointing away from room)
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec =
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).NewellSurfaceNormalVector;
-                auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OutNormVec;
+                newSurf.OutNormVec = newSurf.NewellNormVec;
+                
+                auto &outNormVec = newSurf.OutNormVec;
                 if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
                 if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
                 if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
@@ -1361,39 +1351,36 @@ namespace SurfaceGeometry {
                 if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
                 // Can perform tests on this surface here
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorSky =
-                    0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt);
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorGround =
-                    0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt);
+                newSurf.ViewFactorSky = 0.5 * (1.0 + newSurf.CosTilt);
+                newSurf.ViewFactorGround = 0.5 * (1.0 - newSurf.CosTilt);
 
                 // The following IR view factors are modified in subr. SkyDifSolarShading if there are shadowing
                 // surfaces
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorSky;
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ViewFactorGroundIR =
-                    0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).CosTilt);
+                newSurf.ViewFactorSkyIR = newSurf.ViewFactorSky;
+                newSurf.ViewFactorGroundIR = 0.5 * (1.0 - newSurf.CosTilt);
             }
 
             // Change Name
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Name = "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
+            newSurf.Name = "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
             // Debug   write(outputfiledebug,*) ' new surf name=',TRIM(SurfaceTmp(CurNewSurf)%Name)
             // Debug   write(outputfiledebug,*) ' new surf in zone=',TRIM(surfacetmp(curnewsurf)%zoneName)
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCond = UnreconciledZoneSurface;
+            newSurf.ExtBoundCond = UnreconciledZoneSurface;
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Name;
-            if (state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::Roof ||
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::Wall ||
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::Floor) {
+            newSurf.ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
+            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName = newSurf.Name;
+            if (newSurf.Class == SurfaceClass::Roof ||
+                newSurf.Class == SurfaceClass::Wall ||
+                newSurf.Class == SurfaceClass::Floor) {
                 // base surface
                 if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof) {
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class = SurfaceClass::Floor;
+                    newSurf.Class = SurfaceClass::Floor;
                     // Debug          write(outputfiledebug,*) ' new surfaces is a floor'
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor) {
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class = SurfaceClass::Roof;
+                    newSurf.Class = SurfaceClass::Roof;
                     // Debug          write(outputfiledebug,*) ' new surfaces is a roof'
                 }
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).BaseSurf = CurNewSurf;
-                state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Name;
+                newSurf.BaseSurf = CurNewSurf;
+                newSurf.BaseSurfName = newSurf.Name;
                 // Debug        write(outputfiledebug,*) ' basesurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
             } else {
                 // subsurface
@@ -1401,24 +1388,22 @@ namespace SurfaceGeometry {
                                              state.dataSurfaceGeometry->SurfaceTmp,
                                              FirstTotalSurfaces + CurNewSurf - 1);
                 if (Found > 0) {
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).BaseSurfName =
-                        "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).BaseSurf = Found;
-                    state.dataSurfaceGeometry->SurfaceTmp(Found).Area -= state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Area;
-                    if (state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::Window ||
-                        state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Class == SurfaceClass::GlassDoor) {
-                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -=
-                            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Area / state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Multiplier;
+                    newSurf.BaseSurfName = "iz-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName;
+                    newSurf.BaseSurf = Found;
+                    state.dataSurfaceGeometry->SurfaceTmp(Found).Area -= newSurf.Area;
+                    if (newSurf.Class == SurfaceClass::Window ||
+                        newSurf.Class == SurfaceClass::GlassDoor) {
+                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -= newSurf.Area / newSurf.Multiplier;
                     } else { // Door, TDD:Diffuser, TDD:DOME
-                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -= state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Area;
+                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -= newSurf.Area;
                     }
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCond = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtSolar = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtSolar;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ExtWind = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtWind;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).Zone = state.dataSurfaceGeometry->SurfaceTmp(Found).Zone;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).ZoneName = state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName;
-                    state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf).OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(Found).OSCPtr;
+                    newSurf.ExtBoundCond = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond;
+                    newSurf.ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
+                    newSurf.ExtSolar = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtSolar;
+                    newSurf.ExtWind = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtWind;
+                    newSurf.Zone = state.dataSurfaceGeometry->SurfaceTmp(Found).Zone;
+                    newSurf.ZoneName = state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName;
+                    newSurf.OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(Found).OSCPtr;
                     // Debug        write(outputfiledebug,*) ' subsurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
                     // Debug        write(outputfiledebug,*) ' subsurf, basesurf=',TRIM('iz-'//SurfaceTmp(SurfNum)%BaseSurfName)
                 } else {
@@ -2975,7 +2960,7 @@ namespace SurfaceGeometry {
         surfaceError = false;
 
         // Check if base surface and subsurface have the same normal
-        Vectors::CompareTwoVectors(baseSurface.NewellSurfaceNormalVector, subSurface.NewellSurfaceNormalVector, sameSurfNormal, 0.001);
+        sameSurfNormal = Vectors::CompareTwoVectors(baseSurface.NewellNormVec, subSurface.NewellNormVec, 0.001);
         if (sameSurfNormal) { // copy lcs vectors
                               // Prior logic tested for azimuth difference < 30 and then skipped this - this caused large diffs in
                               // CmplxGlz_MeasuredDeflectionAndShading Restoring that check here but will require further investigation (MJW Dec 2015)
@@ -3466,12 +3451,12 @@ namespace SurfaceGeometry {
                 GetVertices(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, state.dataIPShortCut->rNumericArgs({2, _}));
                 CheckConvexity(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
                 if (state.dataReportFlag->MakeMirroredDetachedShading) {
-                    MakeMirrorSurface(state, SurfNum);
+                    SurfNum = MakeMirrorSurface(state, SurfNum);
                 }
             }
 
         } // Item Loop
-    }
+    } // GetDetShdSurfaceData()
 
     void GetRectDetShdSurfaceData(EnergyPlusData &state,
                                   bool &ErrorsFound,              // Error flag indicator (true if errors found)
@@ -3589,12 +3574,12 @@ namespace SurfaceGeometry {
                 }
 
                 if (state.dataReportFlag->MakeMirroredDetachedShading) {
-                    MakeMirrorSurface(state, SurfNum);
+                    SurfNum = MakeMirrorSurface(state, SurfNum);
                 }
             }
 
         } // Item Loop
-    }
+    } // GetRectDetShdSurfaceData()
 
     void GetHTSurfaceData(EnergyPlusData &state,
                           bool &ErrorsFound,                 // Error flag indicator (true if errors found)
@@ -4734,15 +4719,9 @@ namespace SurfaceGeometry {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 SurfAzimuth; // Surface Azimuth/Facing (same as Base Surface)
-        Real64 SurfTilt;    // Tilt (same as Base Surface)
         Real64 XLLC;
         Real64 YLLC;
         Real64 ZLLC;
-        Real64 CosSurfAzimuth;
-        Real64 SinSurfAzimuth;
-        Real64 CosSurfTilt;
-        Real64 SinSurfTilt;
         Array1D<Real64> XX(4);
         Array1D<Real64> YY(4);
         Real64 Xb;
@@ -4751,33 +4730,32 @@ namespace SurfaceGeometry {
         int n;
         int Vrt;
 
-        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone == 0 &&
-            (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F &&
-             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_B))
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        if (surf.Zone == 0 &&
+            (surf.Class != SurfaceClass::Detached_F &&
+             surf.Class != SurfaceClass::Detached_B))
             return;
 
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height = Height;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Width = Length;
+        surf.Height = Height;
+        surf.Width = Length;
 
-        SurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
-        SurfTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * Constant::DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * Constant::DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * Constant::DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * Constant::DegToRadians);
+        surf.CosAzim = std::cos(surf.Azimuth * Constant::DegToRadians);
+        surf.SinAzim = std::sin(surf.Azimuth * Constant::DegToRadians);
+        surf.CosTilt = std::cos(surf.Tilt * Constant::DegToRadians);
+        surf.SinTilt = std::sin(surf.Tilt * Constant::DegToRadians);
         if (!SurfWorldCoordSystem) {
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone > 0) {
-                Xb = XCoord * state.dataSurfaceGeometry->CosZoneRelNorth(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone) -
-                     YCoord * state.dataSurfaceGeometry->SinZoneRelNorth(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone) +
-                     state.dataHeatBal->Zone(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone).OriginX;
-                Yb = XCoord * state.dataSurfaceGeometry->SinZoneRelNorth(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone) +
-                     YCoord * state.dataSurfaceGeometry->CosZoneRelNorth(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone) +
-                     state.dataHeatBal->Zone(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone).OriginY;
+            if (surf.Zone > 0) {
+                Xb = XCoord * state.dataSurfaceGeometry->CosZoneRelNorth(surf.Zone) -
+                     YCoord * state.dataSurfaceGeometry->SinZoneRelNorth(surf.Zone) +
+                     state.dataHeatBal->Zone(surf.Zone).OriginX;
+                Yb = XCoord * state.dataSurfaceGeometry->SinZoneRelNorth(surf.Zone) +
+                     YCoord * state.dataSurfaceGeometry->CosZoneRelNorth(surf.Zone) +
+                     state.dataHeatBal->Zone(surf.Zone).OriginY;
                 XLLC = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
                 YLLC = Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
-                ZLLC = ZCoord + state.dataHeatBal->Zone(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone).OriginZ;
+                ZLLC = ZCoord + state.dataHeatBal->Zone(surf.Zone).OriginZ;
             } else {
-                if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
+                if (surf.Class == SurfaceClass::Detached_B) {
                     Xb = XCoord;
                     Yb = YCoord;
                     XLLC = Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
@@ -4794,7 +4772,7 @@ namespace SurfaceGeometry {
             Xb = XCoord;
             Yb = YCoord;
             ZLLC = ZCoord;
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Detached_F) {
+            if (surf.Class != SurfaceClass::Detached_F) {
                 XLLC = Xb * state.dataSurfaceGeometry->CosBldgRotAppGonly - Yb * state.dataSurfaceGeometry->SinBldgRotAppGonly;
                 YLLC = Xb * state.dataSurfaceGeometry->SinBldgRotAppGonly + Yb * state.dataSurfaceGeometry->CosBldgRotAppGonly;
             } else {
@@ -4812,42 +4790,25 @@ namespace SurfaceGeometry {
         YY(3) = 0.0;
         YY(2) = 0.0;
 
-        for (n = 1; n <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++n) {
+        for (n = 1; n <= surf.Sides; ++n) {
             Vrt = n;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).x = XLLC - XX(n) * CosSurfAzimuth - YY(n) * CosSurfTilt * SinSurfAzimuth;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).y = YLLC + XX(n) * SinSurfAzimuth - YY(n) * CosSurfTilt * CosSurfAzimuth;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).z = ZLLC + YY(n) * SinSurfTilt;
+            surf.Vertex(Vrt).x = XLLC - XX(n) * surf.CosAzim - YY(n) * surf.CosTilt * surf.SinAzim;
+            surf.Vertex(Vrt).y = YLLC + XX(n) * surf.SinAzim - YY(n) * surf.CosTilt * surf.CosAzim;
+            surf.Vertex(Vrt).z = ZLLC + YY(n) * surf.SinTilt;
         }
 
-        CreateNewellAreaVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea = VecLength(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-        CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                SurfAzimuth,
-                                SurfTilt,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).convOrientation =
-            Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
+        surf.NewellAreaVec = CreateNewellAreaVector(surf.Vertex, surf.Sides);
+        surf.GrossArea = length(surf.NewellAreaVec);
+        surf.Area = surf.GrossArea;
+        surf.NetAreaShadowCalc = surf.Area;
+        surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
+        std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
         // Sine and cosine of azimuth and tilt
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = SinSurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = CosSurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = SinSurfTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = CosSurfTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+        surf.ViewFactorGround = 0.5 * (1.0 - surf.CosTilt);
         // Outward normal unit vector (pointing away from room)
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-        auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+        surf.OutNormVec = surf.NewellNormVec;
+        auto &outNormVec = surf.OutNormVec;
 
         if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
         if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
@@ -4860,23 +4821,23 @@ namespace SurfaceGeometry {
         if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
         // Can perform tests on this surface here
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+        surf.ViewFactorSky = 0.5 * (1.0 + surf.CosTilt);
         // The following IR view factors are modified in subr. SkyDifSolarShading if there are shadowing
         // surfaces
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+        surf.ViewFactorSkyIR = surf.ViewFactorSky;
+        surf.ViewFactorGroundIR = 0.5 * (1.0 - surf.CosTilt);
 
-        Perimeter = distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides),
-                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1));
-        for (Vrt = 2; Vrt <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++Vrt) {
+        Perimeter = distance(surf.Vertex(surf.Sides),
+                             surf.Vertex(1));
+        for (Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
             Perimeter +=
-                distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt), state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1));
+                distance(surf.Vertex(Vrt), surf.Vertex(Vrt - 1));
         }
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
+        surf.Perimeter = Perimeter;
 
         // Call to transform vertices
 
-        TransformVertsByAspect(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
+        TransformVertsByAspect(state, SurfNum, surf.Sides);
     }
 
     void GetHTSubSurfaceData(EnergyPlusData &state,
@@ -6282,19 +6243,9 @@ namespace SurfaceGeometry {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 SurfAzimuth; // Surface Azimuth/Facing (same as Base Surface)
-        Real64 SurfTilt;    // Tilt (same as Base Surface)
         Real64 XLLC;
         Real64 YLLC;
         Real64 ZLLC;
-        Real64 CosSurfAzimuth;
-        Real64 SinSurfAzimuth;
-        Real64 CosSurfTilt;
-        Real64 SinSurfTilt;
-        Real64 BaseCosSurfAzimuth;
-        Real64 BaseSinSurfAzimuth;
-        Real64 BaseCosSurfTilt;
-        Real64 BaseSinSurfTilt;
         Array1D<Real64> XX(4);
         Array1D<Real64> YY(4);
         Real64 Perimeter;
@@ -6303,27 +6254,21 @@ namespace SurfaceGeometry {
 
         if (BaseSurfNum == 0) return; // invalid base surface, don't bother
 
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        auto &baseSurf = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum);
         // Tilt and Facing (Azimuth) will be same as the Base Surface
 
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height = Height;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Width = Length;
+        surf.Height = Height;
+        surf.Width = Length;
 
-        SurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
-        SurfTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        CosSurfAzimuth = std::cos(SurfAzimuth * Constant::DegToRadians);
-        SinSurfAzimuth = std::sin(SurfAzimuth * Constant::DegToRadians);
-        CosSurfTilt = std::cos(SurfTilt * Constant::DegToRadians);
-        SinSurfTilt = std::sin(SurfTilt * Constant::DegToRadians);
-        BaseCosSurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).CosAzim;
-        BaseSinSurfAzimuth = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).SinAzim;
-        BaseCosSurfTilt = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).CosTilt;
-        BaseSinSurfTilt = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).SinTilt;
+        surf.CosAzim = std::cos(surf.Azimuth * Constant::DegToRadians);
+        surf.SinAzim = std::sin(surf.Azimuth * Constant::DegToRadians);
+        surf.CosTilt = std::cos(surf.Tilt * Constant::DegToRadians);
+        surf.SinTilt = std::sin(surf.Tilt * Constant::DegToRadians);
 
-        XLLC = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).Vertex(2).x - XCoord * BaseCosSurfAzimuth -
-               ZCoord * BaseCosSurfTilt * BaseSinSurfAzimuth;
-        YLLC = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).Vertex(2).y + XCoord * BaseSinSurfAzimuth -
-               ZCoord * BaseCosSurfTilt * BaseCosSurfAzimuth;
-        ZLLC = state.dataSurfaceGeometry->SurfaceTmp(BaseSurfNum).Vertex(2).z + ZCoord * BaseSinSurfTilt;
+        XLLC = baseSurf.Vertex(2).x - XCoord * baseSurf.CosAzim - ZCoord * baseSurf.CosTilt * baseSurf.SinAzim;
+        YLLC = baseSurf.Vertex(2).y + XCoord * baseSurf.SinAzim - ZCoord * baseSurf.CosTilt * baseSurf.CosAzim;
+        ZLLC = baseSurf.Vertex(2).z + ZCoord * baseSurf.SinTilt;
 
         XX(1) = 0.0;
         XX(2) = 0.0;
@@ -6334,45 +6279,29 @@ namespace SurfaceGeometry {
         YY(3) = 0.0;
         YY(2) = 0.0;
 
-        for (n = 1; n <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++n) {
+        for (n = 1; n <= surf.Sides; ++n) {
             Vrt = n;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).x = XLLC - XX(n) * CosSurfAzimuth - YY(n) * CosSurfTilt * SinSurfAzimuth;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).y = YLLC + XX(n) * SinSurfAzimuth - YY(n) * CosSurfTilt * CosSurfAzimuth;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt).z = ZLLC + YY(n) * SinSurfTilt;
+            surf.Vertex(Vrt).x = XLLC - XX(n) * surf.CosAzim - YY(n) * surf.CosTilt * surf.SinAzim;
+            surf.Vertex(Vrt).y = YLLC + XX(n) * surf.SinAzim - YY(n) * surf.CosTilt * surf.CosAzim;
+            surf.Vertex(Vrt).z = ZLLC + YY(n) * surf.SinTilt;
         }
 
-        CreateNewellAreaVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea = VecLength(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-        CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                SurfAzimuth,
-                                SurfTilt,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).convOrientation =
-            Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
-        // Sine and cosine of azimuth and tilt
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = SinSurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = CosSurfAzimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = SinSurfTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = CosSurfTilt;
-        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Window &&
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::GlassDoor &&
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class != SurfaceClass::Door)
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+        surf.NewellAreaVec = CreateNewellAreaVector(surf.Vertex, surf.Sides);
+        surf.GrossArea = length(surf.NewellAreaVec);
+        surf.Area = surf.GrossArea;
+        surf.NetAreaShadowCalc = surf.Area;
+        surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
+
+        std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
+
+        if (surf.Class != SurfaceClass::Window &&
+            surf.Class != SurfaceClass::GlassDoor &&
+            surf.Class != SurfaceClass::Door)
+            surf.ViewFactorGround = 0.5 * (1.0 - surf.CosTilt);
         // Outward normal unit vector (pointing away from room)
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-        auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+        surf.OutNormVec = surf.NewellNormVec;
+        auto &outNormVec = surf.OutNormVec;
         if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
         if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
         if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
@@ -6403,20 +6332,20 @@ namespace SurfaceGeometry {
         //                          state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt));
         // The following IR view factors are modified in subr. SkyDifSolarShading if there are shadowing
         // surfaces
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+        surf.ViewFactorSkyIR = surf.ViewFactorSky;
+        surf.ViewFactorGroundIR = 0.5 * (1.0 - surf.CosTilt);
 
-        Perimeter = distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides),
-                             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1));
-        for (Vrt = 2; Vrt <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++Vrt) {
+        Perimeter = distance(surf.Vertex(surf.Sides),
+                             surf.Vertex(1));
+        for (Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
             Perimeter +=
-                distance(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt), state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(Vrt - 1));
+                distance(surf.Vertex(Vrt), surf.Vertex(Vrt - 1));
         }
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
+        surf.Perimeter = Perimeter;
 
         // Call to transform vertices
 
-        TransformVertsByAspect(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
+        TransformVertsByAspect(state, SurfNum, surf.Sides);
     }
 
     void GetAttShdSurfaceData(EnergyPlusData &state,
@@ -6632,10 +6561,10 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone = 0;
             // SurfaceTmp(SurfNum)%ZoneName='  '
             if (state.dataReportFlag->MakeMirroredAttachedShading) {
-                MakeMirrorSurface(state, SurfNum);
+                SurfNum = MakeMirrorSurface(state, SurfNum);
             }
         }
-    }
+    } // GetAttShdSurfaceData()
 
     void GetSimpleShdSurfaceData(EnergyPlusData &state,
                                  bool &ErrorsFound,                // Error flag indicator (true if errors found)
@@ -6723,6 +6652,8 @@ namespace SurfaceGeometry {
                 }
 
                 ++SurfNum;
+
+                auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Set the Surface Name in the Derived Type
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = SurfaceClass::Shading;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = false;
@@ -6855,7 +6786,7 @@ namespace SurfaceGeometry {
 
                     // and mirror
                     if (state.dataReportFlag->MakeMirroredAttachedShading) {
-                        MakeMirrorSurface(state, SurfNum);
+                        SurfNum = MakeMirrorSurface(state, SurfNum);
                     }
 
                 } else { // Fins
@@ -6955,7 +6886,7 @@ namespace SurfaceGeometry {
 
                         // and mirror
                         if (state.dataReportFlag->MakeMirroredAttachedShading) {
-                            MakeMirrorSurface(state, SurfNum);
+                            SurfNum = MakeMirrorSurface(state, SurfNum);
                         }
                     } else {
                         --SurfNum;
@@ -7070,15 +7001,15 @@ namespace SurfaceGeometry {
 
                         // and mirror
                         if (state.dataReportFlag->MakeMirroredAttachedShading) {
-                            MakeMirrorSurface(state, SurfNum);
+                            SurfNum = MakeMirrorSurface(state, SurfNum);
                         }
                     } else {
                         --SurfNum;
                     }
                 }
             }
-        }
-    }
+        } // for (Item)
+    } // GetSimpleShdSurfaceData()
 
     void GetIntMassSurfaceData(EnergyPlusData &state,
                                bool &ErrorsFound, // Error flag indicator (true if errors found)
@@ -7356,8 +7287,8 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = UnreconciledZoneSurface;
                 }
             }
-        }
-    }
+        } // if (NumIntMassSurfaces > 0)
+    } // GetIntMassSurfaceData()
 
     int GetNumIntMassSurfaces(EnergyPlusData &state) // Number of Internal Mass Surfaces to obtain
 
@@ -7419,7 +7350,7 @@ namespace SurfaceGeometry {
         }
         NumIntMassSurf = max(NumIntMassSurf, TotIntMass);
         return NumIntMassSurf;
-    }
+    } // GetNumIntMassSurfaces()
 
     void GetShadingSurfReflectanceData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
@@ -7576,8 +7507,8 @@ namespace SurfaceGeometry {
                       state.dataSurface->SurfShadowGlazingFrac(SurfNum),
                       "N/A");
             }
-        }
-    }
+        } // for (SurfNum)
+    } // GetShadingSurfReflectanceData()
 
     void GetHTSurfExtVentedCavityData(EnergyPlusData &state, bool &ErrorsFound) // Error flag indicator (true if errors found)
     {
@@ -7927,8 +7858,8 @@ namespace SurfaceGeometry {
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 state.dataHeatBal->ExtVentedCavity(Item).Name);
-        }
-    }
+        } // for (Item)
+    } // GetHTSurfExtVentedCavityData()
 
     void ExposedFoundationPerimeter::getData(EnergyPlusData &state, bool &ErrorsFound)
     {
@@ -9345,16 +9276,12 @@ namespace SurfaceGeometry {
         int n;    // Loop counter
         int NSrc; // Used for CW -> CCW transformation
         int NTar; // Used for CW -> CCW transformation
-        Real64 SurfWorldAz;
-        Real64 SurfTilt;
         Real64 Perimeter; // Perimeter length of the surface
         Real64 Xb;        // Intermediate calculation
         Real64 Yb;        // Intermediate calculation
         int ZoneNum;
         int ThisCorner;
         std::string TiltString;
-        Real64 ThisWidth;
-        Real64 ThisHeight;
         // unused    REAL(r64) :: ccwtest
         // unused    LOGICAL   :: SurfaceCCW
         Real64 dotp;
@@ -9363,14 +9290,15 @@ namespace SurfaceGeometry {
         Vector const TestVector(0.0, 0.0, 1.0);
         Vector temp;
 
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
         if (NSides > state.dataSurface->MaxVerticesPerSurface) state.dataSurface->MaxVerticesPerSurface = NSides;
         Ptr = 1;
         for (n = 1; n <= NSides; ++n) {
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x = Vertices(Ptr);
+            surf.Vertex(n).x = Vertices(Ptr);
             ++Ptr;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y = Vertices(Ptr);
+            surf.Vertex(n).y = Vertices(Ptr);
             ++Ptr;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).z = Vertices(Ptr);
+            surf.Vertex(n).z = Vertices(Ptr);
             ++Ptr;
         }
 
@@ -9381,9 +9309,9 @@ namespace SurfaceGeometry {
             NSrc = NSides;
             NTar = 2;
             for (n = 1; n <= (NSides - 1) / 2; ++n) {
-                temp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NSrc);
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NSrc) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NTar);
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NTar) = temp;
+                temp = surf.Vertex(NSrc);
+                surf.Vertex(NSrc) = surf.Vertex(NTar);
+                surf.Vertex(NTar) = temp;
                 --NSrc;
                 ++NTar;
             }
@@ -9404,9 +9332,9 @@ namespace SurfaceGeometry {
             NSrc = ThisCorner + 1;
             if (NSrc > NSides) NSrc = 1;
             for (n = 1; n <= NSides - 1; ++n) {
-                temp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NTar);
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NTar) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NSrc);
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NSrc) = temp;
+                temp = surf.Vertex(NTar);
+                surf.Vertex(NTar) = surf.Vertex(NSrc);
+                surf.Vertex(NSrc) = temp;
                 ++NTar;
                 ++NSrc;
                 if (NTar > NSides) NTar = 1;
@@ -9418,57 +9346,57 @@ namespace SurfaceGeometry {
         if (!state.dataSurface->WorldCoordSystem) {
             // Input in "relative" coordinates, use Building and Zone North Axes and Origins
             //                                  to translate each point (including rotation for Appendix G)
-            ZoneNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone;
+            ZoneNum = surf.Zone;
             if (ZoneNum > 0) {
                 for (n = 1; n <= NSides; ++n) {
-                    Xb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x * state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) -
-                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y * state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) +
+                    Xb = surf.Vertex(n).x * state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) -
+                         surf.Vertex(n).y * state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) +
                          state.dataHeatBal->Zone(ZoneNum).OriginX;
-                    Yb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x * state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) +
-                         state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y * state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) +
+                    Yb = surf.Vertex(n).x * state.dataSurfaceGeometry->SinZoneRelNorth(ZoneNum) +
+                         surf.Vertex(n).y * state.dataSurfaceGeometry->CosZoneRelNorth(ZoneNum) +
                          state.dataHeatBal->Zone(ZoneNum).OriginY;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
+                    surf.Vertex(n).x =
                         Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
+                    surf.Vertex(n).y =
                         Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).z += state.dataHeatBal->Zone(ZoneNum).OriginZ;
+                    surf.Vertex(n).z += state.dataHeatBal->Zone(ZoneNum).OriginZ;
                 }
-            } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
+            } else if (surf.Class == SurfaceClass::Detached_B) {
                 for (n = 1; n <= NSides; ++n) {
-                    Xb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x;
-                    Yb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
+                    Xb = surf.Vertex(n).x;
+                    Yb = surf.Vertex(n).y;
+                    surf.Vertex(n).x =
                         Xb * state.dataSurfaceGeometry->CosBldgRelNorth - Yb * state.dataSurfaceGeometry->SinBldgRelNorth;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
+                    surf.Vertex(n).y =
                         Xb * state.dataSurfaceGeometry->SinBldgRelNorth + Yb * state.dataSurfaceGeometry->CosBldgRelNorth;
                 }
             }
         } else {
             // if world coordinate only need to rotate for Appendix G
-            ZoneNum = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone;
+            ZoneNum = surf.Zone;
             if (ZoneNum > 0) {
                 for (n = 1; n <= NSides; ++n) {
-                    Xb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x;
-                    Yb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
+                    Xb = surf.Vertex(n).x;
+                    Yb = surf.Vertex(n).y;
+                    surf.Vertex(n).x =
                         Xb * state.dataSurfaceGeometry->CosBldgRotAppGonly - Yb * state.dataSurfaceGeometry->SinBldgRotAppGonly;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
+                    surf.Vertex(n).y =
                         Xb * state.dataSurfaceGeometry->SinBldgRotAppGonly + Yb * state.dataSurfaceGeometry->CosBldgRotAppGonly;
                 }
-            } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_B) {
+            } else if (surf.Class == SurfaceClass::Detached_B) {
                 for (n = 1; n <= NSides; ++n) {
-                    Xb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x;
-                    Yb = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
+                    Xb = surf.Vertex(n).x;
+                    Yb = surf.Vertex(n).y;
+                    surf.Vertex(n).x =
                         Xb * state.dataSurfaceGeometry->CosBldgRotAppGonly - Yb * state.dataSurfaceGeometry->SinBldgRotAppGonly;
-                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
+                    surf.Vertex(n).y =
                         Xb * state.dataSurfaceGeometry->SinBldgRotAppGonly + Yb * state.dataSurfaceGeometry->CosBldgRotAppGonly;
                 }
             }
         }
 
         if (NSides > 2) {
-            auto &surface = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+            auto &surface = surf;
             auto &vertices = surface.Vertex;
             auto &nSides = surface.Sides;
 
@@ -9493,8 +9421,8 @@ namespace SurfaceGeometry {
                     ShowWarningError(state,
                                      format("{}Distance between two vertices < .01, possibly coincident. for Surface={}, in Zone={}",
                                             RoutineName,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                                            surf.Name,
+                                            surf.ZoneName));
 
                     bool const printPoppedFirst = (poppedVertexIndex < keptVertexIndex) ? !(poppedVertexIndex == 1 && keptVertexIndex == nSides)
                                                                                         : (poppedVertexIndex == nSides && keptVertexIndex == 1);
@@ -9529,83 +9457,66 @@ namespace SurfaceGeometry {
                 // No need to recompute perimeter, because it'll be done in the next iteration, until no popping or degenerate happens
             }
 
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = Perimeter;
+            surf.Perimeter = Perimeter;
 
-            CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-            CreateNewellAreaVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
+            surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
+            surf.NewellAreaVec = CreateNewellAreaVector(surf.Vertex, surf.Sides);
             // For surfaces with subsurfaces, the following two areas are turned into net areas later by
             // subtracting subsurface areas
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea = VecLength(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-            DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                    SurfWorldAz,
-                                    SurfTilt,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-            dotp = dot(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector, TestVector);
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && dotp < -0.000001) {
-                TiltString = format("{:.1R}", SurfTilt);
+            surf.GrossArea = length(surf.NewellAreaVec);
+            surf.Area = surf.GrossArea;
+            surf.NetAreaShadowCalc = surf.Area;
+            std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+            dotp = dot(surf.NewellNormVec, TestVector);
+            if (surf.Class == SurfaceClass::Roof && dotp < -0.000001) {
                 ShowWarningError(state,
-                                 format("{}Roof/Ceiling is upside down! Tilt angle=[{}], should be near 0, Surface=\"{}\", in Zone=\"{}\".",
+                                 format("{}Roof/Ceiling is upside down! Tilt angle=[{:.1R}], should be near 0, Surface=\"{}\", in Zone=\"{}\".",
                                         RoutineName,
-                                        TiltString,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                                        surf.Tilt,
+                                        surf.Name,
+                                        surf.ZoneName));
                 ShowContinueError(state, "Automatic fix is attempted.");
-                ReverseAndRecalculate(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
-            } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
-                TiltString = format("{:.1R}", SurfTilt);
+                ReverseAndRecalculate(state, SurfNum, surf.Sides, surf.Azimuth, surf.Tilt);
+            } else if (surf.Class == SurfaceClass::Roof && surf.Tilt > 80.0) {
                 ShowWarningError(
                     state,
-                    format("{}Roof/Ceiling is not oriented correctly! Tilt angle=[{}], should be near 0, Surface=\"{}\", in Zone=\"{}\".",
+                    format("{}Roof/Ceiling is not oriented correctly! Tilt angle=[{:.1R}], should be near 0, Surface=\"{}\", in Zone=\"{}\".",
                            RoutineName,
-                           TiltString,
-                           state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                           state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                           surf.Tilt,
+                           surf.Name,
+                           surf.ZoneName));
             }
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && dotp > 0.000001) {
-                TiltString = format("{:.1R}", SurfTilt);
+            if (surf.Class == SurfaceClass::Floor && dotp > 0.000001) {
                 ShowWarningError(state,
-                                 format("{}Floor is upside down! Tilt angle=[{}], should be near 180, Surface=\"{}\", in Zone=\"{}\".",
+                                 format("{}Floor is upside down! Tilt angle=[{:.1R}], should be near 180, Surface=\"{}\", in Zone=\"{}\".",
                                         RoutineName,
-                                        TiltString,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                                        surf.Tilt,
+                                        surf.Name,
+                                        surf.ZoneName));
                 ShowContinueError(state, "Automatic fix is attempted.");
-                ReverseAndRecalculate(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides, SurfWorldAz, SurfTilt);
-            } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // slope/grade = 40%!
-                TiltString = format("{:.1R}", SurfTilt);
+                ReverseAndRecalculate(state, SurfNum, surf.Sides, surf.Azimuth, surf.Tilt);
+            } else if (surf.Class == SurfaceClass::Floor && surf.Tilt < 158.2) { // slope/grade = 40%!
                 ShowWarningError(state,
-                                 format("{}Floor is not oriented correctly! Tilt angle=[{}], should be near 180, Surface=\"{}\", in Zone=\"{}\".",
+                                 format("{}Floor is not oriented correctly! Tilt angle=[{:.1R}], should be near 180, Surface=\"{}\", in Zone=\"{}\".",
                                         RoutineName,
-                                        TiltString,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName));
+                                        surf.Tilt,
+                                        surf.Name,
+                                        surf.ZoneName));
             }
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfWorldAz;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).convOrientation =
-                Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
+            surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
 
             // Sine and cosine of azimuth and tilt
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround == Constant::AutoCalculate) {
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround =
-                    0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+            surf.SinAzim = std::sin(surf.Azimuth * Constant::DegToRadians);
+            surf.CosAzim = std::cos(surf.Azimuth * Constant::DegToRadians);
+            surf.SinTilt = std::sin(surf.Tilt * Constant::DegToRadians);
+            surf.CosTilt = std::cos(surf.Tilt * Constant::DegToRadians);
+            if (surf.ViewFactorGround == Constant::AutoCalculate) {
+                surf.ViewFactorGround =
+                    0.5 * (1.0 - surf.CosTilt);
             }
             // Outward normal unit vector (pointing away from room)
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-            auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+            surf.OutNormVec = surf.NewellNormVec;
+            auto &outNormVec = surf.OutNormVec;
             if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
             if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
             if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
@@ -9616,34 +9527,30 @@ namespace SurfaceGeometry {
             if (std::abs(outNormVec.z + 1.0) < 1.e-06) outNormVec.z = -1.0;
             if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Window ||
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::GlassDoor ||
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Door)
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area *= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
+            if (surf.Class == SurfaceClass::Window ||
+                surf.Class == SurfaceClass::GlassDoor ||
+                surf.Class == SurfaceClass::Door)
+                surf.Area *= surf.Multiplier;
             // Can perform tests on this surface here
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+            surf.ViewFactorSky = 0.5 * (1.0 + surf.CosTilt);
             // The following IR view factors are modified in subr. SkyDifSolarShading if there are shadowing
             // surfaces
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+            surf.ViewFactorSkyIR = surf.ViewFactorSky;
+            surf.ViewFactorGroundIR = 0.5 * (1.0 - surf.CosTilt);
 
             // Call to transform vertices
 
-            TransformVertsByAspect(state, SurfNum, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides);
+            TransformVertsByAspect(state, SurfNum, surf.Sides);
 
         } else {
             ShowFatalError(state,
-                           format("{}Called with less than 2 sides, Surface={}", RoutineName, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                           format("{}Called with less than 2 sides, Surface={}", RoutineName, surf.Name));
         }
 
         // Preliminary Height/Width
-        temp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(3) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2);
-        ThisWidth = VecLength(temp);
-        temp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1);
-        ThisHeight = VecLength(temp);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height = ThisHeight;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Width = ThisWidth;
-    }
+        surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+        surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
+    } // GetVertices()
 
     void ReverseAndRecalculate(EnergyPlusData &state,
                                int const SurfNum,   // Surface number for the surface
@@ -9688,51 +9595,39 @@ namespace SurfaceGeometry {
         int RevPtr; // pointer for reversing vertices
         std::string TiltString;
 
-        // Object Data
-        Array1D<Vector> Vertices(NSides); // Vertices, in specified order
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
 
-        for (n = 1; n <= NSides; ++n) {
-            Vertices(n) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n);
-        }
-        RevPtr = NSides;
-        for (n = 1; n <= NSides; ++n) {
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n) = Vertices(RevPtr);
-            --RevPtr;
+        // Reverse vertex order
+        for (n = 1; n <= NSides / 2; ++n) {
+            Vector3<Real64> tmp = surf.Vertex(n);
+            surf.Vertex(n) = surf.Vertex(NSides + 1 - n);
+            surf.Vertex(NSides + 1 - n) = tmp;
         }
 
-        print(state.files.debug, "Reversing Surface Name={}\n", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name);
+        print(state.files.debug, "Reversing Surface Name={}\n", surf.Name);
         for (n = 1; n <= NSides; ++n) {
             print(state.files.debug,
                   "side={:5} abs coord vertex= {:18.13F} {:18.13F} {:18.13F}\n",
                   n,
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x,
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y,
-                  state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).z);
+                  surf.Vertex(n).x,
+                  surf.Vertex(n).y,
+                  surf.Vertex(n).z);
         }
 
-        CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                SurfAzimuth,
-                                SurfTilt,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Roof && SurfTilt > 80.0) {
-            TiltString = format("{:.1R}", SurfTilt);
+        surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
+        std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        if (surf.Class == SurfaceClass::Roof && surf.Tilt > 80.0) {
             ShowWarningError(
                 state,
-                format("{}Roof/Ceiling is still upside down! Tilt angle=[{}], should be near 0, please fix manually.", RoutineName, TiltString));
+                format("{}Roof/Ceiling is still upside down! Tilt angle=[{:.1R}], should be near 0, please fix manually.", RoutineName, surf.Tilt));
         }
-        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Floor && SurfTilt < 158.2) { // 40% grade!
+        if (surf.Class == SurfaceClass::Floor && surf.Tilt < 158.2) { // 40% grade!
             ShowWarningError(
-                state, format("{}Floor is still upside down! Tilt angle=[{}], should be near 180, please fix manually.", RoutineName, TiltString));
+                state, format("{}Floor is still upside down! Tilt angle=[{:.1R}], should be near 180, please fix manually.", RoutineName, surf.Tilt));
         }
     }
 
-    void MakeMirrorSurface(EnergyPlusData &state, int &SurfNum) // In=>Surface to Mirror, Out=>new Surface index
+    int MakeMirrorSurface(EnergyPlusData &state, int SurfNum) // In=>Surface to Mirror, Out=>new Surface index
     {
 
         // SUBROUTINE INFORMATION:
@@ -9750,102 +9645,75 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // Reverse the vertices in the original surface.  Add "bi" to name.
 
-        using namespace Vectors;
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        auto &surf1 = state.dataSurfaceGeometry->SurfaceTmp(SurfNum+1);
 
-        int Vert;
-        int NVert;
-        Real64 SurfWorldAz;
-        Real64 SurfTilt;
-        int n;
-        //  TYPE(Vector) :: temp1
-
-        NVert = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Vertex.allocate(NVert);
+        surf1.Sides = surf.Sides;
+        surf1.Vertex.allocate(surf1.Sides);
         // doesn't work when Vertex are pointers  SurfaceTmp(SurfNum+1)=SurfaceTmp(SurfNum)
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Name = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Construction = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ConstructionStoredInputValue =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ConstructionStoredInputValue;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Class = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).GrossArea = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Azimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Height = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Reveal = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Reveal;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Shape = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Shape;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Sides = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Tilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).convOrientation =
-            Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Width = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Width;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).HeatTransSurf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).BaseSurfName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).BaseSurf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ZoneName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Zone = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ExtBoundCond = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ExtSolar = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ExtWind = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtWind;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorGround = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorSky = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorGroundIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).SchedShadowSurfIndex = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).SchedMinValue = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedMinValue;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).IsTransparent = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsTransparent;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).activeWindowShadingControl =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeWindowShadingControl;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).windowShadingControlList =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).HasShadeControl = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).activeShadedConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).FrameDivider = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Multiplier = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Perimeter = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter;
+        surf1.Name = "Mir-" + surf.Name;
+        surf1.Construction = surf.Construction;
+        surf1.ConstructionStoredInputValue = surf.ConstructionStoredInputValue;
+        surf1.Class = surf.Class;
+        surf1.GrossArea = surf.GrossArea;
+        surf1.Area = surf.Area;
+        surf1.Azimuth = surf.Azimuth;
+        surf1.Height = surf.Height;
+        surf1.Reveal = surf.Reveal;
+        surf1.Shape = surf.Shape;
+        surf1.Sides = surf.Sides;
+        surf1.Tilt = surf.Tilt;
+        surf1.convOrientation = Convect::GetSurfConvOrientation(surf1.Tilt);
+        surf1.Width = surf.Width;
+        surf1.HeatTransSurf = surf.HeatTransSurf;
+        surf1.BaseSurfName = surf.BaseSurfName;
+        surf1.BaseSurf = surf.BaseSurf;
+        surf1.ZoneName = surf.ZoneName;
+        surf1.Zone = surf.Zone;
+        surf1.ExtBoundCondName = surf.ExtBoundCondName;
+        surf1.ExtBoundCond = surf.ExtBoundCond;
+        surf1.ExtSolar = surf.ExtSolar;
+        surf1.ExtWind = surf.ExtWind;
+        surf1.ViewFactorGround = surf.ViewFactorGround;
+        surf1.ViewFactorSky = surf.ViewFactorSky;
+        surf1.ViewFactorGroundIR = surf.ViewFactorGroundIR;
+        surf1.ViewFactorSkyIR = surf.ViewFactorSkyIR;
+        surf1.SchedShadowSurfIndex = surf.SchedShadowSurfIndex;
+        surf1.SchedMinValue = surf.SchedMinValue;
+        surf1.IsTransparent = surf.IsTransparent;
+        surf1.activeWindowShadingControl = surf.activeWindowShadingControl;
+        surf1.windowShadingControlList = surf.windowShadingControlList;
+        surf1.HasShadeControl = surf.HasShadeControl;
+        surf1.activeShadedConstruction = surf.activeShadedConstruction;
+        surf1.FrameDivider = surf.FrameDivider;
+        surf1.Multiplier = surf.Multiplier;
+        surf1.NetAreaShadowCalc = surf.NetAreaShadowCalc;
+        surf1.Perimeter = surf.Perimeter;
 
-        for (Vert = 1; Vert <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++Vert) {
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Vertex(Vert) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NVert);
-            --NVert;
+        for (int i = 1; i <= surf.Sides; ++i) {
+            surf1.Vertex(surf.Sides + 1 - i) = surf.Vertex(i);
         }
-        ++SurfNum;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = "Mir-" + state.dataSurfaceGeometry->SurfaceTmp(SurfNum - 1).Name;
 
         // TH 3/26/2010
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).MirroredSurf = true;
+        surf1.MirroredSurf = true;
 
-        if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides > 2) {
-            CreateNewellAreaVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                   state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea = VecLength(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-            CreateNewellSurfaceNormalVector(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides,
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-            DetermineAzimuthAndTilt(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex,
-                                    SurfWorldAz,
-                                    SurfTilt,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz,
-                                    state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth = SurfWorldAz;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt = SurfTilt;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).convOrientation =
-                Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
+        if (surf1.Sides > 2) {
+            surf1.NewellAreaVec = Vectors::CreateNewellAreaVector(surf1.Vertex, surf1.Sides);
+            surf1.GrossArea = length(surf.NewellAreaVec);
+            surf1.Area = surf1.GrossArea;
+            surf1.NetAreaShadowCalc = surf1.Area;
+            surf1.NewellNormVec = Vectors::CreateNewellNormalVector(surf1.Vertex, surf1.Sides);
+            std::tie(surf1.Azimuth, surf1.Tilt) = Vectors::DetermineAzimuthAndTilt(surf1.Vertex, surf1.lcsx, surf1.lcsy, surf1.lcsz, surf1.NewellNormVec);
+            surf1.convOrientation = Convect::GetSurfConvOrientation(surf1.Tilt);
 
             // Sine and cosine of azimuth and tilt
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim = std::sin(SurfWorldAz * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim = std::cos(SurfWorldAz * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt = std::sin(SurfTilt * Constant::DegToRadians);
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt = std::cos(SurfTilt * Constant::DegToRadians);
+            surf1.SinAzim = std::sin(surf1.Azimuth * Constant::DegToRadians);
+            surf1.CosAzim = std::cos(surf1.Azimuth * Constant::DegToRadians);
+            surf1.SinTilt = std::sin(surf1.Tilt * Constant::DegToRadians);
+            surf1.CosTilt = std::cos(surf1.Tilt * Constant::DegToRadians);
             // Outward normal unit vector (pointing away from room)
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellSurfaceNormalVector;
-            auto &outNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
+            surf1.OutNormVec = surf1.NewellNormVec;
+            auto &outNormVec = surf1.OutNormVec;
             if (std::abs(outNormVec.x - 1.0) < 1.e-06) outNormVec.x = +1.0;
             if (std::abs(outNormVec.x + 1.0) < 1.e-06) outNormVec.x = -1.0;
             if (std::abs(outNormVec.x) < 1.e-06) outNormVec.x = 0.0;
@@ -9857,13 +9725,14 @@ namespace SurfaceGeometry {
             if (std::abs(outNormVec.z) < 1.e-06) outNormVec.z = 0.0;
 
             // Can perform tests on this surface here
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky = 0.5 * (1.0 + state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+            surf1.ViewFactorSky = 0.5 * (1.0 + surf1.CosTilt);
             // The following IR view factors are modified in subr. SkyDifSolarShading if there are shadowing
             // surfaces
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR = 0.5 * (1.0 - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt);
+            surf1.ViewFactorSkyIR = surf1.ViewFactorSky;
+            surf1.ViewFactorGroundIR = 0.5 * (1.0 - surf1.CosTilt);
         }
-    }
+        return SurfNum+1;
+    } // MakeMirrorSurface()
 
     void GetWindowShadingControlData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
@@ -10453,7 +10322,7 @@ namespace SurfaceGeometry {
                 }
             }
         } // End of loop over window shading controls
-    }
+    } // GetWindowShadingControlData()
 
     void InitialAssociateWindowShadingControlFenestration(EnergyPlusData &state, bool &ErrorsFound, int &SurfNum)
     {
@@ -12431,8 +12300,8 @@ namespace SurfaceGeometry {
                 thisFace.NSides = thisSurface.Sides;
                 thisFace.SurfNum = SurfNum;
                 thisFace.FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
-                Vectors::CreateNewellAreaVector(thisFace.FacePoints, thisFace.NSides, thisFace.NewellAreaVector);
-                SumAreas += Vectors::VecLength(thisFace.NewellAreaVector);
+                thisFace.NewellAreaVector = Vectors::CreateNewellAreaVector(thisFace.FacePoints, thisFace.NSides);
+                SumAreas += length(thisFace.NewellAreaVector);
             }
             ZoneStruct.NumSurfaceFaces = NActFaces;
 
@@ -13235,15 +13104,11 @@ namespace SurfaceGeometry {
         Real64 Xp;
         Real64 Yp;
         Real64 Zp;
-        Real64 SurfWorldAz; // Surface Azimuth (facing)
-        Real64 SurfTilt;    // Surface Tilt
         SurfaceShape ThisShape(SurfaceShape::None);
         bool BaseSurface; // True if a base surface or a detached shading surface
         Real64 ThisSurfAz;
         Real64 ThisSurfTilt;
         Real64 ThisReveal;
-        Real64 ThisWidth;
-        Real64 ThisHeight;
         int FrDivNum;        // Frame/divider number
         Real64 FrWidth;      // Frame width for exterior windows (m)
         Real64 FrArea;       // Frame area for exterior windows(m2)
@@ -13259,7 +13124,6 @@ namespace SurfaceGeometry {
 
         // Object Data
         PlaneEq BasePlane;
-        Vector TVect;
         Vector CoordinateTransVector;
 
         if (state.dataSurface->Surface(ThisSurf).VerticesProcessed) {
@@ -13315,19 +13179,13 @@ namespace SurfaceGeometry {
         }
 
         if (BaseSurface) {
-            SurfWorldAz = surf.Azimuth;
-            SurfTilt = surf.Tilt;
             for (n = 1; n <= surf.Sides; ++n) {
                 state.dataSurfaceGeometry->Xpsv(n) = surf.Vertex(n).x;
                 state.dataSurfaceGeometry->Ypsv(n) = surf.Vertex(n).y;
                 state.dataSurfaceGeometry->Zpsv(n) = surf.Vertex(n).z;
             }
-            TVect = surf.Vertex(3) - surf.Vertex(2);
-            ThisWidth = VecLength(TVect);
-            TVect = surf.Vertex(2) - surf.Vertex(1);
-            ThisHeight = VecLength(TVect);
-            surf.Width = ThisWidth;
-            surf.Height = ThisHeight; // For a horizontal surface this is actually length!
+            surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+            surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
             if (surf.Sides == 3) {
                 surf.Shape = SurfaceShape::Triangle;
             } else if (surf.Sides == 4) {
@@ -13339,11 +13197,9 @@ namespace SurfaceGeometry {
                 }
             } else { // Surface( ThisSurf ).Sides > 4
                 surf.Shape = SurfaceShape::Polygonal;
-                if (std::abs(ThisHeight * ThisWidth - surf.GrossArea) > 0.001) {
+                if (std::abs(surf.Height * surf.Width - surf.GrossArea) > 0.001) {
                     surf.Width = std::sqrt(surf.GrossArea);
                     surf.Height = surf.Width;
-                    ThisWidth = surf.Width;
-                    ThisHeight = surf.Height;
                 }
             }
 
@@ -13353,15 +13209,10 @@ namespace SurfaceGeometry {
             ThisSurfTilt = surf.Tilt;
 
             // Retrieve base surface info
-            Real64 const baseSurfWorldAz = state.dataSurface->Surface(ThisBaseSurface).Azimuth;
-            Real64 const baseSurfTilt = state.dataSurface->Surface(ThisBaseSurface).Tilt;
-            Real64 const BaseCosAzimuth = std::cos(baseSurfWorldAz * Constant::DegToRadians);
-            Real64 const BaseSinAzimuth = std::sin(baseSurfWorldAz * Constant::DegToRadians);
-            Real64 const BaseCosTilt = std::cos(baseSurfTilt * Constant::DegToRadians);
-            Real64 const BaseSinTilt = std::sin(baseSurfTilt * Constant::DegToRadians);
-            Real64 const BaseXLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).x;
-            Real64 const BaseYLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).y;
-            Real64 const BaseZLLC = state.dataSurface->Surface(ThisBaseSurface).Vertex(2).z;
+            auto const &baseSurf = state.dataSurface->Surface(ThisBaseSurface);
+            Real64 const BaseXLLC = baseSurf.Vertex(2).x;
+            Real64 const BaseYLLC = baseSurf.Vertex(2).y;
+            Real64 const BaseZLLC = baseSurf.Vertex(2).z;
 
             if (HeatTransSurf) {
 
@@ -13404,15 +13255,11 @@ namespace SurfaceGeometry {
                 Xp = surf.Vertex(2).x - BaseXLLC;
                 Yp = surf.Vertex(2).y - BaseYLLC;
                 Zp = surf.Vertex(2).z - BaseZLLC;
-                XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-                TVect = surf.Vertex(3) - surf.Vertex(2);
-                ThisWidth = VecLength(TVect);
-                TVect = surf.Vertex(2) - surf.Vertex(1);
-                ThisHeight = VecLength(TVect);
-                surf.Width = ThisWidth;
-                surf.Height = ThisHeight;
+                XLLC = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                YLLC = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                ZLLC = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
+                surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+                surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
 
                 // Processing of 4-sided but non-rectangular Window, Door or GlassDoor, for use in calc of convective air flow.
                 if (!isRectangle(state, ThisSurf)) {
@@ -13510,18 +13357,18 @@ namespace SurfaceGeometry {
                             if (FrWidth > 0.0) {
                                 state.dataSurface->SurfWinProjCorrFrOut(ThisSurf) =
                                     (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionOut / FrWidth) *
-                                    (ThisHeight + ThisWidth -
+                                    (surf.Height + surf.Width -
                                      (state.dataSurface->FrameDivider(FrDivNum).HorDividers +
                                       state.dataSurface->FrameDivider(FrDivNum).VertDividers) *
                                          DivWidth) /
-                                    (ThisHeight + ThisWidth + 2 * FrWidth);
+                                    (surf.Height + surf.Width + 2 * FrWidth);
                                 state.dataSurface->SurfWinProjCorrFrIn(ThisSurf) =
                                     (state.dataSurface->FrameDivider(FrDivNum).FrameProjectionIn / FrWidth) *
-                                    (ThisHeight + ThisWidth -
+                                    (surf.Height + surf.Width -
                                      (state.dataSurface->FrameDivider(FrDivNum).HorDividers +
                                       state.dataSurface->FrameDivider(FrDivNum).VertDividers) *
                                          DivWidth) /
-                                    (ThisHeight + ThisWidth + 2 * FrWidth);
+                                    (surf.Height + surf.Width + 2 * FrWidth);
                             }
                         }
                     }
@@ -13540,15 +13387,11 @@ namespace SurfaceGeometry {
                 Xp = surf.Vertex(2).x - BaseXLLC;
                 Yp = surf.Vertex(2).y - BaseYLLC;
                 Zp = surf.Vertex(2).z - BaseZLLC;
-                state.dataSurfaceGeometry->Xpsv(2) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                state.dataSurfaceGeometry->Ypsv(2) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                state.dataSurfaceGeometry->Zpsv(2) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-                TVect = surf.Vertex(3) - surf.Vertex(2);
-                ThisWidth = VecLength(TVect);
-                TVect = surf.Vertex(2) - surf.Vertex(1);
-                ThisHeight = VecLength(TVect);
-                surf.Width = ThisWidth;
-                surf.Height = ThisHeight;
+                state.dataSurfaceGeometry->Xpsv(2) = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                state.dataSurfaceGeometry->Ypsv(2) = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                state.dataSurfaceGeometry->Zpsv(2) = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
+                surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+                surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
                 // Effective height and width of a triangular window for use in calc of convective air flow
                 // in gap between glass and shading device when shading device is present
                 surf.Height = 4.0 * surf.Area / (3.0 * surf.Width);
@@ -13557,30 +13400,26 @@ namespace SurfaceGeometry {
                 Xp = surf.Vertex(1).x - BaseXLLC;
                 Yp = surf.Vertex(1).y - BaseYLLC;
                 Zp = surf.Vertex(1).z - BaseZLLC;
-                state.dataSurfaceGeometry->Xpsv(1) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                state.dataSurfaceGeometry->Ypsv(1) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                state.dataSurfaceGeometry->Zpsv(1) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+                state.dataSurfaceGeometry->Xpsv(1) = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                state.dataSurfaceGeometry->Ypsv(1) = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                state.dataSurfaceGeometry->Zpsv(1) = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
 
                 Xp = surf.Vertex(3).x - BaseXLLC;
                 Yp = surf.Vertex(3).y - BaseYLLC;
                 Zp = surf.Vertex(3).z - BaseZLLC;
-                state.dataSurfaceGeometry->Xpsv(3) = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                state.dataSurfaceGeometry->Ypsv(3) = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                state.dataSurfaceGeometry->Zpsv(3) = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+                state.dataSurfaceGeometry->Xpsv(3) = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                state.dataSurfaceGeometry->Ypsv(3) = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                state.dataSurfaceGeometry->Zpsv(3) = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
             } break;
             case SurfaceShape::RectangularOverhang: {
                 Xp = surf.Vertex(2).x - BaseXLLC;
                 Yp = surf.Vertex(2).y - BaseYLLC;
                 Zp = surf.Vertex(2).z - BaseZLLC;
-                XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-                TVect = surf.Vertex(3) - surf.Vertex(2);
-                ThisWidth = VecLength(TVect);
-                TVect = surf.Vertex(2) - surf.Vertex(1);
-                ThisHeight = VecLength(TVect);
-                surf.Width = ThisWidth;
-                surf.Height = ThisHeight;
+                XLLC = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                YLLC = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                ZLLC = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
+                surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+                surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
                 state.dataSurfaceGeometry->Xpsv(1) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(2) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(3) = XLLC + surf.Width;
@@ -13598,15 +13437,11 @@ namespace SurfaceGeometry {
                 Xp = surf.Vertex(2).x - BaseXLLC;
                 Yp = surf.Vertex(2).y - BaseYLLC;
                 Zp = surf.Vertex(2).z - BaseZLLC;
-                XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-                TVect = surf.Vertex(3) - surf.Vertex(2);
-                ThisWidth = VecLength(TVect);
-                TVect = surf.Vertex(2) - surf.Vertex(1);
-                ThisHeight = VecLength(TVect);
-                surf.Width = ThisWidth;
-                surf.Height = ThisHeight;
+                XLLC = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                YLLC = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                ZLLC = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
+                surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+                surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
                 state.dataSurfaceGeometry->Xpsv(1) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(2) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(3) = XLLC;
@@ -13624,15 +13459,11 @@ namespace SurfaceGeometry {
                 Xp = surf.Vertex(2).x - BaseXLLC;
                 Yp = surf.Vertex(2).y - BaseYLLC;
                 Zp = surf.Vertex(2).z - BaseZLLC;
-                XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
-                TVect = surf.Vertex(3) - surf.Vertex(2);
-                ThisWidth = VecLength(TVect);
-                TVect = surf.Vertex(2) - surf.Vertex(1);
-                ThisHeight = VecLength(TVect);
-                surf.Width = ThisWidth;
-                surf.Height = ThisHeight;
+                XLLC = -Xp * baseSurf.CosAzim + Yp * baseSurf.SinAzim;
+                YLLC = -Xp * baseSurf.SinAzim * baseSurf.CosTilt - Yp * baseSurf.CosAzim * baseSurf.CosTilt + Zp * baseSurf.SinTilt;
+                ZLLC = Xp * baseSurf.SinAzim * baseSurf.SinTilt + Yp * baseSurf.CosAzim * baseSurf.SinTilt + Zp * baseSurf.CosTilt;
+                surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
+                surf.Height = length(surf.Vertex(2) - surf.Vertex(1));
                 state.dataSurfaceGeometry->Xpsv(1) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(2) = XLLC;
                 state.dataSurfaceGeometry->Xpsv(3) = XLLC;
@@ -13744,7 +13575,7 @@ namespace SurfaceGeometry {
         if (ErrorInSurface) {
             ErrorsFound = true;
         }
-    }
+    } // distanceFromLineToLine()
 
     void CalcCoordinateTransformation(EnergyPlusData &state,
                                       int const SurfNum,            // Surface Number
@@ -14250,32 +14081,18 @@ namespace SurfaceGeometry {
         std::string Const2Name; // Name of construction of second glazing system
         // unused1208  REAL(r64)    :: AreaNew                         ! Sum of areas of the two glazing systems (m2)
 
-        struct rectangularwindow
-        {
-            // Members
-            Array1D<Vector> Vertex;
-
-            // Default Constructor
-            rectangularwindow() : Vertex(4)
-            {
-            }
-        };
-
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
         // Object Data
-        Vector TVect;
-        rectangularwindow OriginalCoord;
+        Array1D<Vector3<Real64>> OriginalCoord;
 
-        IConst = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
+        IConst = surf.Construction;
 
         // Height and width of original window
-        TVect = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(3) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2);
-        W = VecLength(TVect); // SQRT((X(3)-X(2))**2 + (Y(3)-Y(2))**2 + (Z(3)-Z(2))**2)
-        TVect = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1);
-        H = VecLength(TVect); // SQRT((X(1)-X(2))**2 + (Y(1)-Y(2))**2 + (Z(1)-Z(2))**2)
+        W = length(surf.Vertex(3) - surf.Vertex(2));
+        H = length(surf.Vertex(2) - surf.Vertex(1));
 
         // Save coordinates of original window in case Window 5 data overwrites.
-        OriginalCoord.Vertex({1, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides}) =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex({1, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides});
+        OriginalCoord({1, surf.Sides}) = surf.Vertex({1, surf.Sides});
 
         // Height and width of first glazing system
         h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
@@ -14294,7 +14111,7 @@ namespace SurfaceGeometry {
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state,
                                      format("SurfaceGeometry: ModifyWindow: Window {} uses the Window5 Data File Construction {}",
-                                            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                            surf.Name,
                                             state.dataConstruction->Construct(IConst).Name));
                     ShowContinueError(state, format("The height {:.3R}(m) or width  (m) of this window differs by more than 10%{:.3R}", H, W));
                     ShowContinueError(state,
@@ -14307,25 +14124,25 @@ namespace SurfaceGeometry {
             }
 
             // Calculate net area for base surface
-            state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area -=
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-            if (state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area <= 0.0) {
+            state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Area -=
+                surf.Area;
+            if (state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Area <= 0.0) {
                 ShowSevereError(state,
                                 format("Subsurfaces have too much area for base surface={}",
-                                       state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Name));
-                ShowContinueError(state, format("Subsurface creating error={}", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                                       state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Name));
+                ShowContinueError(state, format("Subsurface creating error={}", surf.Name));
                 ErrorsFound = true;
             }
 
             // Net area of base surface with unity window multipliers (used in shadowing checks)
-            state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).NetAreaShadowCalc -=
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area / state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
+            state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).NetAreaShadowCalc -=
+                surf.Area / surf.Multiplier;
 
         } else { // Two glazing systems on Window5 data file for this window
 
             // if exterior window, okay.
 
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == ExternalEnvironment) {
+            if (surf.ExtBoundCond == ExternalEnvironment) {
                 // There are two glazing systems (separated by a vertical or horizontal mullion) on the Window5 Data File.
                 // Fill in geometry data for the second window (corresponding to the second glazing system on the data file.
                 // The first glazing system is assumed to be at left for vertical mullion, at bottom for horizontal mullion.
@@ -14336,7 +14153,7 @@ namespace SurfaceGeometry {
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowMessage(state,
                                 format("SurfaceGeometry: ModifyWindow: Window {} has been replaced with the Window 5/6 two glazing system=\"{}\".",
-                                       state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                                       surf.Name,
                                        state.dataConstruction->Construct(IConst).Name));
                     ShowContinueError(state, "Note that originally entered dimensions are overridden.");
                 } else {
@@ -14346,13 +14163,13 @@ namespace SurfaceGeometry {
                 // Allocate another window
                 AddWindow(state, SurfNum, ErrorsFound, AddedSubSurfaces);
 
-            } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond > 0) { // Interior window, specified  ! not external environment
+            } else if (surf.ExtBoundCond > 0) { // Interior window, specified  ! not external environment
 
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(
                         state,
                         format("SurfaceGeometry: ModifyWindow: Interior Window {} has been replaced with the Window 5/6 two glazing system=\"{}\".",
-                               state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name,
+                               surf.Name,
                                state.dataConstruction->Construct(IConst).Name));
                     ShowContinueError(
                         state, "Please check to make sure interior window is correct. Note that originally entered dimensions are overridden.");
@@ -14366,7 +14183,7 @@ namespace SurfaceGeometry {
 
                 ShowSevereError(state,
                                 format("SurfaceGeometry: ModifyWindow: Interior Window {} is a window in an adjacent zone.",
-                                       state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                                       surf.Name));
                 ShowContinueError(
                     state,
                     format("Attempted to add/reverse Window 5/6 multiple glazing system=\"{}\".", state.dataConstruction->Construct(IConst).Name));
@@ -14427,33 +14244,19 @@ namespace SurfaceGeometry {
         std::string Const2Name; // Name of construction of second glazing system
         Real64 AreaNew;         // Sum of areas of the two glazing systems (m2)
 
-        struct rectangularwindow
-        {
-            // Members
-            Array1D<Vector> Vertex;
-
-            // Default Constructor
-            rectangularwindow() : Vertex(4)
-            {
-            }
-        };
-
         // Object Data
-        Vector TVect;
-        rectangularwindow NewCoord;
-        rectangularwindow OriginalCoord;
+        Array1D<Vector3<Real64>> NewCoord(4);
+        Array1D<Vector3<Real64>> OriginalCoord(4);
 
-        IConst = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Construction;
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        IConst = surf.Construction;
 
         // Height and width of original window
-        TVect = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(3) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2);
-        W = VecLength(TVect); // SQRT((X(3)-X(2))**2 + (Y(3)-Y(2))**2 + (Z(3)-Z(2))**2)
-        TVect = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(2) - state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(1);
-        H = VecLength(TVect); // SQRT((X(1)-X(2))**2 + (Y(1)-Y(2))**2 + (Z(1)-Z(2))**2)
+        W = length(surf.Vertex(3) - surf.Vertex(2));
+        H = length(surf.Vertex(2) - surf.Vertex(1));
 
         // Save coordinates of original window in case Window 5 data overwrites.
-        OriginalCoord.Vertex({1, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides}) =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex({1, state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides});
+        OriginalCoord({1, surf.Sides}) = surf.Vertex({1, surf.Sides});
 
         // Height and width of first glazing system
         h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
@@ -14465,73 +14268,55 @@ namespace SurfaceGeometry {
         ++AddedSubSurfaces;
         state.dataSurfaceGeometry->SurfaceTmp.redimension(++state.dataSurface->TotSurfaces);
 
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Vertex.allocate(4);
+        auto &newSurf = state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces);
+        newSurf.Vertex.allocate(4);
 
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Name = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name + ":2";
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Construction = IConst2;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ConstructionStoredInputValue = IConst2;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Class = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Azimuth = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Azimuth;
+        newSurf.Name = surf.Name + ":2";
+        newSurf.Construction = IConst2;
+        newSurf.ConstructionStoredInputValue = IConst2;
+        newSurf.Class = surf.Class;
+        newSurf.Azimuth = surf.Azimuth;
         // Sine and cosine of azimuth and tilt
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).SinAzim = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinAzim;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).CosAzim = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosAzim;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).SinTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SinTilt;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).CosTilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).CosTilt;
+        newSurf.SinAzim = surf.SinAzim;
+        newSurf.CosAzim = surf.CosAzim;
+        newSurf.SinTilt = surf.SinTilt;
+        newSurf.CosTilt = surf.CosTilt;
         // Outward normal unit vector (pointing away from room)
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Centroid = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Centroid;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).lcsx = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsx;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).lcsy = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsy;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).lcsz = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).lcsz;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).NewellAreaVector =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NewellAreaVector;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).OutNormVec = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OutNormVec;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Reveal = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Reveal;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Shape = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Shape;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Sides = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Tilt = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).convOrientation =
-            Convect::GetSurfConvOrientation(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Tilt);
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).HeatTransSurf =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).BaseSurfName =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurfName;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).BaseSurf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ZoneName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ZoneName;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Zone = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Zone;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ExtBoundCondName =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCondName;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ExtBoundCond =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ExtSolar = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ExtWind = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtWind;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ViewFactorGround =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGround;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ViewFactorSky =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSky;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ViewFactorGroundIR =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorGroundIR;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).ViewFactorSkyIR =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ViewFactorSkyIR;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).OSCPtr;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).SchedShadowSurfIndex =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).SchedShadowSurfIndex;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeWindowShadingControl =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeWindowShadingControl;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).windowShadingControlList =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).HasShadeControl =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HasShadeControl;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).activeShadedConstruction =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).activeShadedConstruction;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).windowShadingControlList =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).windowShadingControlList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).shadedStormWinConstructionList =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).shadedStormWinConstructionList;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).FrameDivider =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).FrameDivider;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Multiplier = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).NetAreaShadowCalc =
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc;
+        newSurf.Centroid = surf.Centroid;
+        newSurf.lcsx = surf.lcsx;
+        newSurf.lcsy = surf.lcsy;
+        newSurf.lcsz = surf.lcsz;
+        newSurf.NewellAreaVec = surf.NewellAreaVec;
+        newSurf.OutNormVec = surf.OutNormVec;
+        newSurf.Reveal = surf.Reveal;
+        newSurf.Shape = surf.Shape;
+        newSurf.Sides = surf.Sides;
+        newSurf.Tilt = surf.Tilt;
+        newSurf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
+        newSurf.HeatTransSurf = surf.HeatTransSurf;
+        newSurf.BaseSurfName = surf.BaseSurfName;
+        newSurf.BaseSurf = surf.BaseSurf;
+        newSurf.ZoneName = surf.ZoneName;
+        newSurf.Zone = surf.Zone;
+        newSurf.ExtBoundCondName = surf.ExtBoundCondName;
+        newSurf.ExtBoundCond = surf.ExtBoundCond;
+        newSurf.ExtSolar = surf.ExtSolar;
+        newSurf.ExtWind = surf.ExtWind;
+        newSurf.ViewFactorGround = surf.ViewFactorGround;
+        newSurf.ViewFactorSky = surf.ViewFactorSky;
+        newSurf.ViewFactorGroundIR = surf.ViewFactorGroundIR;
+        newSurf.ViewFactorSkyIR = surf.ViewFactorSkyIR;
+        newSurf.OSCPtr = surf.OSCPtr;
+        newSurf.SchedShadowSurfIndex = surf.SchedShadowSurfIndex;
+        newSurf.activeWindowShadingControl = surf.activeWindowShadingControl;
+        newSurf.windowShadingControlList = surf.windowShadingControlList;
+        newSurf.HasShadeControl = surf.HasShadeControl;
+        newSurf.activeShadedConstruction = surf.activeShadedConstruction;
+        newSurf.windowShadingControlList = surf.windowShadingControlList;
+        newSurf.shadedStormWinConstructionList = surf.shadedStormWinConstructionList;
+        newSurf.FrameDivider = surf.FrameDivider;
+        newSurf.Multiplier = surf.Multiplier;
+        newSurf.NetAreaShadowCalc = surf.NetAreaShadowCalc;
 
         MulWidth = state.dataConstruction->Construct(IConst).W5FileMullionWidth;
         w2 = state.dataConstruction->Construct(IConst2).W5FileGlazingSysWidth;
@@ -14541,36 +14326,33 @@ namespace SurfaceGeometry {
         // area of the two glazing systems. Note that for Surface(SurfNum)%Class = 'Window' the effect
         // of a window multiplier is included in the glazing area. Note that frame areas are subtracted later.
 
-        AreaNew = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier * (h1 * w1 + h2 * w2); // both glazing systems
+        AreaNew = surf.Multiplier * (h1 * w1 + h2 * w2); // both glazing systems
         // Adjust net area for base surface
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area -= AreaNew;
+        state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Area -= AreaNew;
 
         // Net area of base surface with unity window multipliers (used in shadowing checks)
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).NetAreaShadowCalc -=
-            AreaNew / state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
+        state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).NetAreaShadowCalc -= AreaNew / surf.Multiplier;
 
         // Reset area, etc. of original window
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier * (h1 * w1);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).GrossArea = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Area;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc = h1 * w1;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter = 2 * (h1 + w1);
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Height = h1;
-        state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Width = w1;
+        surf.Area = surf.Multiplier * (h1 * w1);
+        surf.GrossArea = surf.Area;
+        surf.NetAreaShadowCalc = h1 * w1;
+        surf.Perimeter = 2 * (h1 + w1);
+        surf.Height = h1;
+        surf.Width = w1;
         // Set area, etc. of new window
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Area =
-            state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Multiplier * (h2 * w2);
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).GrossArea =
-            state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Area;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).NetAreaShadowCalc = h2 * w2;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Perimeter = 2 * (h2 + w2);
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Height = h2;
-        state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Width = w2;
+        newSurf.Area = newSurf.Multiplier * (h2 * w2);
+        newSurf.GrossArea = newSurf.Area;
+        newSurf.NetAreaShadowCalc = h2 * w2;
+        newSurf.Perimeter = 2 * (h2 + w2);
+        newSurf.Height = h2;
+        newSurf.Width = w2;
 
-        if (state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Area <= 0.0) {
+        if (state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Area <= 0.0) {
             ShowSevereError(state,
                             format("SurfaceGeometry: ModifyWindow: Subsurfaces have too much area for base surface={}",
-                                   state.dataSurfaceGeometry->SurfaceTmp(state.dataSurfaceGeometry->SurfaceTmp(SurfNum).BaseSurf).Name));
-            ShowContinueError(state, format("Subsurface (window) creating error={}", state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name));
+                                   state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf).Name));
+            ShowContinueError(state, format("Subsurface (window) creating error={}", surf.Name));
             ShowContinueError(state,
                               format("This window has been replaced by two windows from the Window5 Data File of total area {:.2R} m2", AreaNew));
             ErrorsFound = true;
@@ -14579,67 +14361,83 @@ namespace SurfaceGeometry {
         // Assign vertices to the new window; modify vertices of original window.
         // In the following, vertices are numbered counter-clockwise with vertex #1 at the upper left.
 
+        Vector3<Real64> orig2minus1 = OriginalCoord(2) - OriginalCoord(1);
+        Vector3<Real64> orig3minus4 = OriginalCoord(3) - OriginalCoord(4);
+        Vector3<Real64> a, b;
+            
         if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
 
             // VERTICAL MULLION: original window is modified to become left-hand glazing (system #1);
             // new window is created to become right-hand glazing (system #2)
 
             // Left-hand glazing
-
+            
             // Vertex 1
             dx = 0.0;
             dy = H - h1;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(1).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(1).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(1).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(1) = a + (dx / W) * (b - a);
+            // NewCoord(1).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(1).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(1).z = za + (dx / W) * (zb - za);
 
             // Vertex 2
             dx = 0.0;
             dy = H;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(2).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(2).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(2).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(2) = a + (dx / W) * (b - a);
+            // NewCoord(2).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(2).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(2).z = za + (dx / W) * (zb - za);
 
             // Vertex 3
             dx = w1;
             dy = H;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(3).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(3).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(3).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(3) = a + (dx / W) * (b - a);
+            // NewCoord(3).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(3).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(3).z = za + (dx / W) * (zb - za);
 
             // Vertex 4
             dx = w1;
             dy = H - h1;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(4).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(4).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(4).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(4) = a + (dx / W) * (b - a);
+            // NewCoord(4).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(4).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++loop) {
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(loop) = NewCoord.Vertex(loop);
+            for (loop = 1; loop <= surf.Sides; ++loop) {
+                surf.Vertex(loop) = NewCoord(loop);
             }
 
             // Right-hand glazing
@@ -14647,57 +14445,69 @@ namespace SurfaceGeometry {
             // Vertex 1
             dx = w1 + MulWidth;
             dy = H - (h1 + h2) / 2.0;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(1).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(1).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(1).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(1) = a + (dx / W) * (b - a);
+            // NewCoord(1).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(1).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(1).z = za + (dx / W) * (zb - za);
 
             // Vertex 2
             dx = w1 + MulWidth;
             dy = H + (h2 - h1) / 2.0;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(2).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(2).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(2).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(2) = a + (dx / W) * (b - a);
+            // NewCoord(2).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(2).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(2).z = za + (dx / W) * (zb - za);
 
             // Vertex 3
             dx = w1 + MulWidth + w2;
             dy = H + (h2 - h1) / 2.0;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(3).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(3).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(3).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(3) = a + (dx / W) * (b - a);
+            // NewCoord(3).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(3).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(3).z = za + (dx / W) * (zb - za);
 
             // Vertex 4
             dx = w1 + MulWidth + w2;
             dy = H - (h1 + h2) / 2.0;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(4).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(4).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(4).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(4) = a + (dx / W) * (b - a);
+            // NewCoord(4).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(4).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Sides; ++loop) {
-                state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Vertex(loop) = NewCoord.Vertex(loop);
+            for (loop = 1; loop <= newSurf.Sides; ++loop) {
+                newSurf.Vertex(loop) = NewCoord(loop);
             }
 
         } else { // Horizontal mullion
@@ -14710,57 +14520,68 @@ namespace SurfaceGeometry {
             // Vertex 1
             dx = 0.0;
             dy = H - h1;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(1).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(1).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(1).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(1) = a + (dx / W) * (b - a);
+            // NewCoord(1).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(1).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(1).z = za + (dx / W) * (zb - za);
 
             // Vertex 2
             dx = 0.0;
             dy = H;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(2).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(2).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(2).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(2).x = xa + (dx / W) * (xb - xa);
+            NewCoord(2).y = ya + (dx / W) * (yb - ya);
+            NewCoord(2).z = za + (dx / W) * (zb - za);
 
             // Vertex 3
             dx = w1;
             dy = H;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(3).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(3).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(3).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(3) = a + (dx / W) * (b - a);
+            // NewCoord(3).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(3).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(3).z = za + (dx / W) * (zb - za);
 
             // Vertex 4
             dx = w1;
             dy = H - h1;
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(4).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(4).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(4).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(4) = a + (dx / W) * (b - a);
+            // NewCoord(4).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(4).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++loop) {
-                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(loop) = NewCoord.Vertex(loop);
+            for (loop = 1; loop <= surf.Sides; ++loop) {
+                surf.Vertex(loop) = NewCoord(loop);
             }
 
             // Top glazing
@@ -14768,61 +14589,73 @@ namespace SurfaceGeometry {
             // Vertex 1
             dx = (w1 - w2) / 2.0;
             dy = H - (h1 + h2 + MulWidth);
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(1).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(1).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(1).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(1) = a + (dx / W) * (b - a);
+            // NewCoord(1).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(1).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(1).z = za + (dx / W) * (zb - za);
 
             // Vertex 2
             dx = (w1 - w2) / 2.0;
             dy = H - (h1 + MulWidth);
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(2).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(2).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(2).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(2) = a + (dx / W) * (b - a);
+            // NewCoord(2).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(2).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(2).z = za + (dx / W) * (zb - za);
 
             // Vertex 3
             dx = (w1 + w2) / 2.0;
             dy = H - (h1 + MulWidth);
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(3).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(3).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(3).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(3) = a + (dx / W) * (b - a);
+            // NewCoord(3).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(3).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(3).z = za + (dx / W) * (zb - za);
 
             // Vertex 4
             dx = (w1 + w2) / 2.0;
             dy = H - (h1 + h2 + MulWidth);
-            xa = OriginalCoord.Vertex(1).x + (dy / H) * (OriginalCoord.Vertex(2).x - OriginalCoord.Vertex(1).x);
-            ya = OriginalCoord.Vertex(1).y + (dy / H) * (OriginalCoord.Vertex(2).y - OriginalCoord.Vertex(1).y);
-            za = OriginalCoord.Vertex(1).z + (dy / H) * (OriginalCoord.Vertex(2).z - OriginalCoord.Vertex(1).z);
-            xb = OriginalCoord.Vertex(4).x + (dy / H) * (OriginalCoord.Vertex(3).x - OriginalCoord.Vertex(4).x);
-            yb = OriginalCoord.Vertex(4).y + (dy / H) * (OriginalCoord.Vertex(3).y - OriginalCoord.Vertex(4).y);
-            zb = OriginalCoord.Vertex(4).z + (dy / H) * (OriginalCoord.Vertex(3).z - OriginalCoord.Vertex(4).z);
-            NewCoord.Vertex(4).x = xa + (dx / W) * (xb - xa);
-            NewCoord.Vertex(4).y = ya + (dx / W) * (yb - ya);
-            NewCoord.Vertex(4).z = za + (dx / W) * (zb - za);
+            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
+            // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
+            // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
+            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
+            // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
+            // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
+            NewCoord(4) = a + (dx / W) * (b - a);
+            // NewCoord(4).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(4).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Sides; ++loop) {
-                state.dataSurfaceGeometry->SurfaceTmp(state.dataSurface->TotSurfaces).Vertex(loop) = NewCoord.Vertex(loop);
+            for (loop = 1; loop <= newSurf.Sides; ++loop) {
+                newSurf.Vertex(loop) = NewCoord(loop);
             }
 
         } // End of check if vertical or horizontal mullion
-    }
+    } // AddWindow()
 
     void TransformVertsByAspect(EnergyPlusData &state,
                                 int const SurfNum, // Current surface number
@@ -14857,9 +14690,8 @@ namespace SurfaceGeometry {
         int NAlphas;
         int NNum;
         int IOStat;
-        auto &OldAspectRatio = state.dataSurfaceGeometry->OldAspectRatio;
-        auto &NewAspectRatio = state.dataSurfaceGeometry->NewAspectRatio;
-        auto &transformPlane = state.dataSurfaceGeometry->transformPlane;
+        Real64 OldAspectRatio;
+        Real64 NewAspectRatio;
         int n;
         Real64 Xo;
         Real64 XnoRot;
@@ -14870,6 +14702,8 @@ namespace SurfaceGeometry {
         // begin execution
         // get user input...
 
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+        
         if (state.dataSurfaceGeometry->firstTime) {
             if (state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject) == 1) {
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -14886,8 +14720,7 @@ namespace SurfaceGeometry {
                                                                          state.dataIPShortCut->cNumericFieldNames);
                 OldAspectRatio = rNumerics(1);
                 NewAspectRatio = rNumerics(2);
-                transformPlane = cAlphas(1);
-                if (transformPlane != "XY") {
+                if (cAlphas(1) != "XY") {
                     ShowWarningError(
                         state, format("{}: invalid {}=\"{}...ignored.", CurrentModuleObject, state.dataIPShortCut->cAlphaFieldNames(1), cAlphas(1)));
                 }
@@ -14906,9 +14739,9 @@ namespace SurfaceGeometry {
         if (state.dataSurfaceGeometry->noTransform) return;
 
         // check surface type.
-        if (!state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf) {
+        if (!surf.HeatTransSurf) {
             // Site Shading do not get transformed.
-            if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class == SurfaceClass::Detached_F) return;
+            if (surf.Class == SurfaceClass::Detached_F) return;
         }
 
         // testing method of transforming  x and y coordinates as follows
@@ -14917,8 +14750,8 @@ namespace SurfaceGeometry {
         // try to first derotate it , transform by aspect and then rotate back.
 
         for (n = 1; n <= NSides; ++n) {
-            Xo = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x; // world coordinates.... shifted by relative north angle...
-            Yo = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y;
+            Xo = surf.Vertex(n).x; // world coordinates.... shifted by relative north angle...
+            Yo = surf.Vertex(n).y;
             // next derotate the building
             XnoRot = Xo * state.dataSurfaceGeometry->CosBldgRelNorth + Yo * state.dataSurfaceGeometry->SinBldgRelNorth;
             YnoRot = Yo * state.dataSurfaceGeometry->CosBldgRelNorth - Xo * state.dataSurfaceGeometry->SinBldgRelNorth;
@@ -14926,10 +14759,10 @@ namespace SurfaceGeometry {
             Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
             Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
             // rerotate
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).x =
+            surf.Vertex(n).x =
                 Xtrans * state.dataSurfaceGeometry->CosBldgRelNorth - Ytrans * state.dataSurfaceGeometry->SinBldgRelNorth;
 
-            state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(n).y =
+            surf.Vertex(n).y =
                 Xtrans * state.dataSurfaceGeometry->SinBldgRelNorth + Ytrans * state.dataSurfaceGeometry->CosBldgRelNorth;
         }
     }
@@ -15082,7 +14915,7 @@ namespace SurfaceGeometry {
                                      state.dataEnvrn->WeatherFileTempModCoeff));
             ShowContinueError(state, "...that is, these surfaces will have conditions as though at ground level.");
         }
-    }
+    } // CalcSurfaceCentroid()
 
     void SetupShadeSurfacesForSolarCalcs(EnergyPlusData &state)
     {
@@ -15857,8 +15690,8 @@ namespace SurfaceGeometry {
         Vector Vect21;                                                   // normalized vector from vertex 2 to vertex 1
 
         auto &surf = state.dataSurface->Surface(ThisSurf);
-        Diagonal1 = VecLength(surf.Vertex(1) - surf.Vertex(3));
-        Diagonal2 = VecLength(surf.Vertex(2) - surf.Vertex(4));
+        Diagonal1 = length(surf.Vertex(1) - surf.Vertex(3));
+        Diagonal2 = length(surf.Vertex(2) - surf.Vertex(4));
         // Test for rectangularity
         if (std::abs(Diagonal1 - Diagonal2) < 0.020) { // This tolerance based on coincident vertex tolerance of 0.01
             Vect32 = VecNormalize(surf.Vertex(3) - surf.Vertex(2));
@@ -15892,12 +15725,6 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 
-        Real64 BaseCosAzimuth;
-        Real64 BaseCosTilt;
-        Real64 BaseSinAzimuth;
-        Real64 BaseSinTilt;
-        Real64 SurfWorldAz;
-        Real64 SurfTilt;
         Real64 AspectRatio;  // Aspect ratio
         Real64 NumSurfSides; // Number of surface sides
         Real64 WidthEff;     // Effective width of the surface
@@ -15926,12 +15753,6 @@ namespace SurfaceGeometry {
             return;
         }
 
-        SurfWorldAz = surf.Azimuth;
-        SurfTilt = surf.Tilt;
-        BaseCosAzimuth = std::cos(SurfWorldAz * Constant::DegToRadians);
-        BaseSinAzimuth = std::sin(SurfWorldAz * Constant::DegToRadians);
-        BaseCosTilt = std::cos(SurfTilt * Constant::DegToRadians);
-        BaseSinTilt = std::sin(SurfTilt * Constant::DegToRadians);
         NumSurfSides = surf.Sides;
 
         // Calculate WidthMax and HeightMax
@@ -15944,9 +15765,9 @@ namespace SurfaceGeometry {
                 Yp = surf.Vertex(j).y - surf.Vertex(i).y;
                 Zp = surf.Vertex(j).z - surf.Vertex(i).z;
 
-                XLLC = -Xp * BaseCosAzimuth + Yp * BaseSinAzimuth;
-                YLLC = -Xp * BaseSinAzimuth * BaseCosTilt - Yp * BaseCosAzimuth * BaseCosTilt + Zp * BaseSinTilt;
-                ZLLC = Xp * BaseSinAzimuth * BaseSinTilt + Yp * BaseCosAzimuth * BaseSinTilt + Zp * BaseCosTilt;
+                XLLC = -Xp * surf.CosAzim + Yp * surf.SinAzim;
+                YLLC = -Xp * surf.SinAzim * surf.CosTilt - Yp * surf.CosAzim * surf.CosTilt + Zp * surf.SinTilt;
+                ZLLC = Xp * surf.SinAzim * surf.SinTilt + Yp * surf.CosAzim * surf.SinTilt + Zp * surf.CosTilt;
 
                 if (std::abs(XLLC) > WidthMax) WidthMax = std::abs(XLLC);
                 if (std::abs(YLLC) > WidthMax) HeightMax = std::abs(YLLC);

@@ -66,62 +66,53 @@ namespace Vectors {
     // Using/Aliasing
     using DataVectorTypes::PlaneEq;
     using DataVectorTypes::Polyhedron;
-    using DataVectorTypes::Vector;
-    using DataVectorTypes::Vector_2d;
 
     // MODULE PARAMETER DEFINITIONS
 
-    // Object Data
-    extern Vector const XUnit;
-    extern Vector const YUnit;
-    extern Vector const ZUnit;
-
     // Functions
 
-    Real64 AreaPolygon(int const n, Array1D<Vector> &p);
+    Real64 AreaPolygon(int const n, Array1D<Vector3<Real64>> &p);
 
-    Real64 VecSquaredLength(Vector const &vec);
+    // Many of these are redundant with ObjexxFCL::Vector3 functions
+    Real64 VecSquaredLength(Vector3<Real64> const &vec);
 
-    Real64 VecLength(Vector const &vec);
+    Real64 VecLength(Vector3<Real64> const &vec);
 
-    Vector VecNegate(Vector const &vec);
+    Vector3<Real64> VecNegate(Vector3<Real64> const &vec);
 
-    Vector VecNormalize(Vector const &vec);
+    Vector3<Real64> VecNormalize(Vector3<Real64> const &vec);
 
-    void VecRound(Vector &vec, Real64 const roundto);
+    void VecRound(Vector3<Real64> &vec, Real64 const roundto);
 
-    void DetermineAzimuthAndTilt(Array1D<Vector> const &Surf, // Surface Definition
-                                 Real64 &Azimuth,             // Outward Normal Azimuth Angle
-                                 Real64 &Tilt,                // Tilt angle of surface
-                                 Vector &lcsx,
-                                 Vector &lcsy,
-                                 Vector &lcsz,
-                                 Vector const &NewellSurfaceNormalVector);
-
-    void PlaneEquation(Array1D<Vector> &verts, // Structure of the surface
+    std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const &Surf, // Surface Definition
+                                                      Vector3<Real64> &lcsx,
+                                                      Vector3<Real64> &lcsy,
+                                                      Vector3<Real64> &lcsz,
+                                                      Vector3<Real64> const &NewellSurfaceNormalVector);
+        
+    void PlaneEquation(Array1D<Vector3<Real64>> &verts, // Structure of the surface
                        int const nverts,       // Number of vertices in the surface
                        PlaneEq &plane,         // Equation of plane from inputs
                        bool &error             // returns true for degenerate surface
     );
 
-    Real64 Pt2Plane(Vector const &pt,   // Point for determining the distance
+    Real64 Pt2Plane(Vector3<Real64> const &pt,   // Point for determining the distance
                     PlaneEq const &pleq // Equation of the plane
     );
 
-    void CreateNewellAreaVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellAreaVector);
+    Vector3<Real64> CreateNewellAreaVector(Array1D<Vector3<Real64>> const &VList, int const NSides);
 
-    void CreateNewellSurfaceNormalVector(Array1D<Vector> const &VList, int const NSides, Vector &OutNewellSurfaceNormalVector);
+    Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, int const NSides);
 
-    void CompareTwoVectors(Vector const &vector1, // standard vector
-                           Vector const &vector2, // standard vector
-                           bool &areSame,         // true if the two vectors are the same within specified tolerance
+    bool CompareTwoVectors(Vector3<Real64> const &vector1, // standard vector
+                           Vector3<Real64> const &vector2, // standard vector
                            Real64 const tolerance // specified tolerance
     );
 
-    void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
+    void CalcCoPlanarNess(Array1D<Vector3<Real64>> &Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex);
 
     std::vector<int>
-    PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, Array1D<Vector> &QuerySurf, int const QuerySides, bool &ErrorFound);
+    PointsInPlane(Array1D<Vector3<Real64>> &BaseSurf, int const BaseSides, Array1D<Vector3<Real64>> &QuerySurf, int const QuerySides, bool &ErrorFound);
 
     Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly);
 
@@ -129,12 +120,7 @@ namespace Vectors {
 
 struct VectorsData : BaseGlobalStruct
 {
-    Vectors::Vector p0 = Vectors::Vector(0.0, 0.0, 0.0);
-
-    void clear_state() override
-    {
-        this->p0 = Vectors::Vector(0.0, 0.0, 0.0);
-    }
+    void clear_state() override {} 
 };
 
 } // namespace EnergyPlus

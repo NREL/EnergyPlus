@@ -97,7 +97,7 @@ Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", 
 // why aren't these sequential (LKL - 13 Aug 2007)
 
 // Constructor
-Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
+Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2<Real64> const &vl, Vector2<Real64> const &vu)
     : axis(axis), vertices(v), vl(vl), vu(vu)
 {
     size_type const n(vertices.size());
@@ -106,16 +106,16 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
     // Reverse vertices order if clockwise
     // If sorting by y for slab method can detect clockwise faster by just comparing edges at bottom or top-most vertex
     Real64 area(0.0); // Actually 2x the signed area
-    for (Vertices::size_type i = 0; i < n; ++i) {
-        Vector2D const &v(vertices[i]);
-        Vector2D const &w(vertices[(i + 1) % n]);
+    for (int i = 0; i < n; ++i) {
+        Vector2<Real64> const &v(vertices[i]);
+        Vector2<Real64> const &w(vertices[(i + 1) % n]);
         area += (v.x * w.y) - (w.x * v.y);
     }
     if (area < 0.0) std::reverse(vertices.begin() + 1, vertices.end()); // Vertices in clockwise order: Reverse all but first
 
     // Set up edge vectors for ray--surface intersection tests
     edges.reserve(n);
-    for (Vertices::size_type i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
         edges.push_back(vertices[(i + 1) % n] - vertices[i]);
     }
     if (shapeCat == ShapeCat::Rectangular) { // Set side length squared for ray--surface intersection tests
@@ -125,7 +125,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
     } else if ((shapeCat == ShapeCat::Nonconvex) || (n >= nVerticesBig)) { // Set up slabs
         assert(n >= 4u);
         slabYs.reserve(n);
-        for (size_type i = 0; i < n; ++i)
+        for (int i = 0; i < n; ++i)
             slabYs.push_back(vertices[i].y);
         std::sort(slabYs.begin(), slabYs.end());                     // Sort the vertex y coordinates
         auto const iClip(std::unique(slabYs.begin(), slabYs.end())); // Remove duplicate y-coordinate elements
@@ -142,8 +142,8 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
             using CrossEdges = std::vector<CrossEdge>;
             CrossEdges crossEdges;
             for (size_type i = 0; i < n; ++i) { // Find edges crossing slab
-                Vector2D const &v(vertices[i]);
-                Vector2D const &w(vertices[(i + 1) % n]);
+                Vector2<Real64> const &v(vertices[i]);
+                Vector2<Real64> const &w(vertices[(i + 1) % n]);
                 if (((v.y <= yl) && (yu <= w.y)) || // Crosses upward
                     ((yu <= v.y) && (w.y <= yl)))   // Crosses downward
                 {
@@ -182,9 +182,9 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
 #endif
             assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2));
             for (auto const &edge : crossEdges) {
-                size_type const iEdge(std::get<2>(edge));
+                int const iEdge(std::get<2>(edge));
                 slab.edges.push_back(iEdge); // Add edge to slab
-                Vector2D const &e(edges[iEdge]);
+                Vector2<Real64> const &e(edges[iEdge]);
                 assert(e.y != 0.0);                                   // Constant y edge can't be a crossing edge
                 slab.edgesXY.push_back(e.y != 0.0 ? e.x / e.y : 0.0); // Edge inverse slope
             }
@@ -392,13 +392,13 @@ ShapeCat SurfaceData::computed_shapeCat() const
 }
 
 // Computed Plane
-SurfaceData::Plane SurfaceData::computed_plane() const
+Vector4<Real64> SurfaceData::computed_plane() const
 {
-    Vertices::size_type const n(Vertex.size());
+    int const n(Vertex.size());
     assert(n >= 3);
     Vector center(0.0);                           // Center (vertex average) point (not mass centroid)
     Real64 a(0.0), b(0.0), c(0.0), d(0.0);        // Plane coefficients
-    for (Vertices::size_type i = 0; i < n; ++i) { // Newell's method for robustness (not speed)
+    for (int i = 0; i < n; ++i) { // Newell's method for robustness (not speed)
         Vector const &v(Vertex[i]);
         Vector const &w(Vertex[(i + 1) % n]);
         a += (v.y - w.y) * (v.z + w.z);
@@ -407,14 +407,14 @@ SurfaceData::Plane SurfaceData::computed_plane() const
         center += v;
     }
     d = -(dot(center, Vector(a, b, c)) / n); // center/n is the center point
-    return Plane(a, b, c, d);                // a*x + b*y + c*z + d = 0
+    return Vector4<Real64>(a, b, c, d);                // a*x + b*y + c*z + d = 0
 }
 
 // Computed axis-projected 2D surface
 Surface2D SurfaceData::computed_surface2d() const
 {
     // Project along axis of min surface range for 2D intersection use
-    Vertices::size_type const n(Vertex.size());
+    int const n(Vertex.size());
     assert(n >= 3);
     assert(plane == computed_plane()); // Set plane first
     using Vertex2D = ObjexxFCL::Vector2<Real64>;
@@ -432,7 +432,7 @@ Surface2D SurfaceData::computed_surface2d() const
     if (axis == 0) {               // Use y,z for 2D surface
         Real64 yl(v0.y), yu(v0.y); // y coordinate ranges
         Real64 zl(v0.z), zu(v0.z); // z coordinate ranges
-        for (Vertices::size_type i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
             v2d[i] = Vertex2D(v.y, v.z);
             yl = std::min(yl, v.y);
@@ -444,7 +444,7 @@ Surface2D SurfaceData::computed_surface2d() const
     } else if (axis == 1) {        // Use x,z for 2D surface
         Real64 xl(v0.x), xu(v0.x); // x coordinate ranges
         Real64 zl(v0.z), zu(v0.z); // z coordinate ranges
-        for (Vertices::size_type i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
             v2d[i] = Vertex2D(v.x, v.z);
             xl = std::min(xl, v.x);
@@ -456,9 +456,9 @@ Surface2D SurfaceData::computed_surface2d() const
     } else {                       // Use x,y for 2D surface
         Real64 xl(v0.x), xu(v0.x); // x coordinate ranges
         Real64 yl(v0.y), yu(v0.y); // y coordinate ranges
-        for (Vertices::size_type i = 0; i < n; ++i) {
-            Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D(v.x, v.y);
+        for (int i = 0; i < n; ++i) {
+            Vector3<Real64> const &v(Vertex[i]);
+            v2d[i] = {v.x, v.y};
             xl = std::min(xl, v.x);
             xu = std::max(xu, v.x);
             yl = std::min(yl, v.y);
@@ -475,7 +475,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     }
     using Vertex2D = ObjexxFCL::Vector2<Real64>;
     using Vertices2D = ObjexxFCL::Array1D<Vertex2D>;
-    Vertices::size_type const n(Vertex.size());
+    int const n(Vertex.size());
     assert(n >= 3);
 
     Vertices2D v2d(n);
@@ -485,7 +485,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     Real64 yRef = Vertex[0].y;
     Real64 const &saz(SinAzim);
     Real64 const &caz(CosAzim);
-    for (Vertices::size_type i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
         Vector const &v(Vertex[i]);
         v2d[i] = Vertex2D(-(v.x - xRef) * caz + (v.y - yRef) * saz, v.z);
     }
@@ -494,7 +494,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
 
     // Get total width of polygon
     Real64 minX(v2d[0].x), maxX(v2d[0].x);
-    for (Vertices::size_type i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {
         Vertex2D const &v(v2d[i]);
         minX = std::min(minX, v.x);
         maxX = std::max(maxX, v.x);
@@ -508,10 +508,10 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     }
 
     Real64 averageHeight = 0.0;
-    for (Vertices::size_type i = 0; i < n; ++i) {
-        Vertex2D const &v(v2d[i]);
+    for (int i = 0; i < n; ++i) {
+        Vector2<Real64> const &v(v2d[i]);
 
-        Vertex2D *v2;
+        Vector2<Real64> *v2;
         if (i == n - 1) {
             v2 = &v2d[0];
         } else {
