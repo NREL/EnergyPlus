@@ -7,7 +7,7 @@ Air-To-Water Heat Pump Heat Recovery Mode
 
  - First draft: January 26, 2024
  - Modified Date: February 01, 2024
- - Added Design Document: NA
+ - Added Design Document: February 13, 2024
  
 
 ## Justification for New Feature ##
@@ -20,11 +20,11 @@ Modern air-to-water heat pumps for commercial applications often include heat re
 
 * technicalities call, Feb 07, 2024 *
 
-  Brent: you may run into supply side temperature control problem if you have lower setpoint temperature than the temperature limits (e.g., HW Recover).
+  Brent: you may run into supply side temperature control problem if you have lower setpoint temperature than the temperature limits (e.g., HW Recovery).
 
   Bereket: may be we should check the minimum of these temperatures. This will be investigated during implementation.
   
-  Brent: are we going to use the same air source performance curves for heat recover?
+  Brent: are we going to use the same air source performance curves for heat recovery?
 
   Bereket: I have to think about it. Brent said he will check with Trane engineers for curves
 
@@ -419,6 +419,217 @@ Transition is required to handle the two node input fields.
 
 Add output variables as needed.
 
+* Heat Pump Heat Recovery Mass Flow Rate *
+
+* Heat Pump Heat Recovery Heat Transfer Rate *
+
+* Heat Pump Heat Recovery Heat Transfer Energy *
+
+* Heat Pump Heat Recovery Inlet Temperature *
+
+* Heat Pump Heat Recovery Outlet Temperature *
+   
 
 ## References ##
 NA
+## Design Documentation ##
+
+The new feature may modify the following modules:
+
+   ** PlantLoopHeatPumpEIR.cc, PlantLoopHeatPumpEIR.hh, PlantCondLoopOperation.cc **
+   
+   
+The following changes are required to implement the new feature
+
+   PlantLoopHeatPumpEIR.hh,
+	** add the following new member variables **
+		 
+	   Module Member Variables:
+	   // simulation variables
+	   Real64 heatRecoveryInletTemp = 0.0;    // heat recovery fluid inlet node temperature
+	   Real64 heatRecoveryOutletTemp = 0.0;   // heat recovery fluid outlet node temperature 
+       Real64 heatRecoveryRate = 0.0;         // heat recovery heat transfer rate
+	   Real64 heatRecoveryEnergy = 0.0;       // heat recovery heat transfer energy
+	
+	   // topology variables
+	   PlantLocation heatRecoveryPlantLoc;    // heat recovery plant loop location
+	   InOutNodePair heatRecoveryNodes;       // heat recovery inlet and outlet node pairs
+
+	   // flow rate terms
+	   Real64 heatRecoveryDesignVolFlowRate = 0.0;
+	   bool heatRecoveryDesignVolFlowRateWasAutoSized = false;
+	   Real64 heatRecoveryDesignMassFlowRate = 0.0;
+	   Real64 heatRecoveryMassFlowRate = 0.0;   
+	   bool heatRecoveryIsActive = false;
+		
+		
+   EIRPlantLoopHeatPump::resetReportingVariables()
+    ** reset the heat recovery new member variables **
+    void EIRPlantLoopHeatPump::resetReportingVariables()
+    {   
+	 * reset new member variables of the heat recovery *
+
+     `this->heatRecoveryRate = 0.0;`
+     `this->heatRecoveryEnergy = 0.0;`
+	 `this->heatRecoveryMassFlowRate = 0.0;`
+     `this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;`
+	 `this->heatRecoveryIsActive = false;`
+    }
+	
+	
+   Get Input Function:
+   EIRPlantLoopHeatPump::processInputForEIRPLHP()
+   	** Update the get input function to read the four new input fields **
+   
+   EIRPlantLoopHeatPump::onInitLoopEquip()
+   
+   Sizing Functions:
+   EIRPlantLoopHeatPump::sizeLoadSide()
+   EIRPlantLoopHeatPump::sizeSrcSideASHP()
+   
+    ** add heat recovery sizing procedure to sizeSrcSideASHP() function **
+   
+    if (this->heatRecoveryDesignVolFlowRateWasAutoSized) {
+	
+    ** add sizing for `Heat Recovery Reference Flow Rate` new input field **
+	
+	   `*equations are described in the approach section above*` 
+    
+	}
+      
+   Simulate and Calc Functions:
+   EIRPlantLoopHeatPump::simulate()
+   
+    * set heat recovery inlet temperature * 
+    
+	this->heatRecoveryInletTemp = state.dataLoopNodes->Node(this->heatRecoveryNodes.inlet).Temp;
+	
+   EIRPlantLoopHeatPump::doPhysics()
+   
+	** Refactor defrost calculation part of the doPhysics() function ** 
+	EIRPlantLoopHeatPump::doDefrost()
+
+	* Create doDefrost() new function for defrost calculation. *
+	* Defrost is not required for Water-to-Water Heat Pump *
+   
+    ** Refactor available capacity calculation part of the doPhysics() function ** 
+	
+	* create a new calcAvailableCapacity() functions for capacity calculation *
+    EIRPlantLoopHeatPump::calcAvailableCapacity()
+   
+    ** Refactor curve checks part of the doPhysics() function *
+	
+	* create a new CurveCheck() functions that wraps the cruve checks *
+	EIRPlantLoopHeatPump::CapModFTCurveCheck()
+    EIRPlantLoopHeatPump::EIRModCurveCheck()
+
+    * create a new functions for load side, power and source side calcultion *
+	EIRPlantLoopHeatPump::calcLoadSideHeatTransfer()
+	EIRPlantLoopHeatPump::calcPowerUsage()
+	
+	* refactor source side heat transfer calculation for ASHP and WSHP *
+	EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()
+	EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP()
+	
+	* create a new function that updates report variables and nodes information *
+	EIRPlantLoopHeatPump::report()
+	
+	
+    ** Refactor ASHP and WSHP part of the doPhysics function **
+	
+	* create one for ASHP and another for WSHP functions **
+
+    * the existing dPhysics() function will be used as a wrapper function *
+
+	EIRPlantLoopHeatPump::doPhysicsWSHP()
+	EIRPlantLoopHeatPump::doPhysicsASHP()
+	
+    
+	** modify the new dPhysicsASHP() function to support heat recovery calculation **
+	
+	if (this->heatRecoveryIsActive) {
+	
+	   ** heat recovery loop connected **
+	   
+	   * do the heatrecovery side heat transfer calculation *
+	   	   
+	   * account for the HR effect on the load side heat transfer *
+	   
+	   * capacity modifier curve calculation must use HR entering temperature instead of outside air *
+	   
+	   * do the outlet temperature calculation *
+	   
+	   * check heat reovery outlet temperature limit *
+	   
+	   * calculate the heat recovery actual heat transfer rate if the temperature limit is exceeded *
+	   
+	   * report the balance heat recovery heat transfer rate *
+	   	   
+	} else {
+	  
+	  ** no heat recovery loop connected **
+	  
+	  * do the existing calculation *	  
+	
+	}
+	
+
+	** Calculate heat recovery outlet temperature **
+    
+	if (this->heatRecoveryIsActive) {
+	
+	   * HR side outlet temperature calculation*
+
+	   * the load side heat transfer must include the effect of HR operation *
+
+	   * the effect of heat recovery operation on the Heat Pump is accounted for via performance curves *
+	   
+		 `this->sourceSideHeatTransfer = 0.0;`
+
+	} else {
+	
+	   * No HR, use existing source side outlet temperature calculation *
+	   
+	   * No HR, set the heat recovery mass flow rate to zero *`
+	       `this->heatRecoveryMassFlowRate = 0.0;`
+		   
+       * No HR, set the heat recovery heat transfer rate to zero *`
+	       `this->heatRecoveryRate = 0.0;`
+	   
+	   * No HR, set the outlet temperature to the inlet temperature *`
+           `this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;`
+	   
+	}
+   
+   
+   EIRPlantLoopHeatPump::setOperatingFlowRatesASHP()
+   
+   ** if heat recovery is active then set operating flow rate for heat recovery side **
+
+    `* set heat recovery flow rates for ON and OFF modes *`
+	
+    `this->heatRecoveryMassFlowRate = 0.0;`
+    `if (!this->running) {`
+	    `* reset the HR flow to zero if the heat pump is off *`
+        `this->heatRecoveryMassFlowRate = 0.0;`
+        `PlantUtilities::SetComponentFlowRate(state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);`
+    `} else {`
+		`* check if the HR is active *`
+	    `* set Heat Recovery flows if the heat pump is running *`
+        `this->heatRecoveryMassFlowRate = this->heatRecoveryDesignMassFlowRate;`
+	}
+
+    * if there's no flow in the load side turn off the HR side as well*
+    `if (this->loadSideMassFlowRate <= 0.0) {`
+    `   this->heatRecoveryMassFlowRate = 0.0;`
+    `}`
+
+   EIRPlantLoopHeatPump::oneTimeInit()
+   
+   ** add the following five new report variables for heat recovery **
+   
+   `* Heat Pump Heat Recovery Mass Flow Rate *`
+   `* Heat Pump Heat Recovery Heat Transfer Rate *`
+   `* Heat Pump Heat Recovery Heat Transfer Energy *`
+   `* Heat Pump Heat Recovery Inlet Temperature *`
+   `* Heat Pump Heat Recovery Outlet Temperature *`
