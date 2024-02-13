@@ -206,6 +206,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 defrostEnergy = 0.0;
         Real64 fractionalDefrostTime = 0.0;
         Real64 maxOutdoorTemperatureDefrost = 0.0;
+        Real64 defrostPowerMultiplier = 1.0; // defrost power adjustment factor
 
         // a couple worker functions to easily allow merging of cooling and heating operations
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
@@ -239,7 +240,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity);
 
-        void calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier);
+        void calcPowerUsage(EnergyPlusData &state);
 
         void calcSourceSideHeatTransferWSHP(EnergyPlusData &state);
 
@@ -253,7 +254,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void sizeSrcSideASHP(EnergyPlusData &state);
 
-        void doDefrost(EnergyPlusData &state, Real64 &AvailableCapacity, Real64 &InputPowerMultiplier);
+        void doDefrost(EnergyPlusData &state, Real64 &AvailableCapacity);
        
         void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
 

@@ -194,6 +194,7 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
     this->fractionalDefrostTime = 0.0;
     this->partLoadRatio = 0.0;
     this->cyclingRatio = 0.0;
+    this->defrostPowerMultiplier = 1.0;
 }
 
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
@@ -341,10 +342,9 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     // evaluate the actual current operating load side heat transfer rate
     calcLoadSideHeatTransfer(state, availableCapacity);
 
-    // no do defrost calculation for WSHP
-    Real64 InputPowerMultiplier = 1.0;
+    // no defrost calculation for WSHP
     // calculate power usage from EIR curves
-    calcPowerUsage(state, InputPowerMultiplier);
+    calcPowerUsage(state);
 
     // evaluate the source side heat transfer rate
     calcSourceSideHeatTransferWSHP(state);
@@ -362,15 +362,13 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // do defrost calculation if applicable
-    // Init defrost power adjustment factors
-    Real64 InputPowerMultiplier = 1.0;
-    this->doDefrost(state, availableCapacity, InputPowerMultiplier);
+    this->doDefrost(state, availableCapacity);
 
     // evaluate the actual current operating load side heat transfer rate
     calcLoadSideHeatTransfer(state, availableCapacity);
 
     //  calculate power usage from EIR curves
-    calcPowerUsage(state, InputPowerMultiplier);
+    calcPowerUsage(state);
 
     // evaluate the source side heat transfer rate
     calcSourceSideHeatTransferASHP(state);
@@ -482,7 +480,7 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
     // currentLoad will be met and there should? be some adjustment based on outlet water temp limit?
 }
 
-void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const InputPowerMultiplier)
+void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
 {
 
     // calculate power usage from EIR curves
@@ -490,8 +488,8 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state, Real64 const In
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
     // check curves value
     this->eirModCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
-    this->powerUsage =
-        (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * InputPowerMultiplier * this->cyclingRatio;
+    this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * this->defrostPowerMultiplier *
+                       this->cyclingRatio;
 }
 
 void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
@@ -600,11 +598,11 @@ void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirMo
     }
 }
 
-void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCapacity, Real64 &InputPowerMultiplier)
+void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCapacity)
 {
     // Initializing defrost adjustment factors
+    Real64 InputPowerMultiplier = 1.0;
     Real64 HeatingCapacityMultiplier = 1.0;
-    Real64 const operatingPLR = this->partLoadRatio * this->cyclingRatio;
 
     // Check outdoor temperature to determine of defrost is active
     if (this->defrostAvailable && state.dataEnvrn->OutDryBulbTemp <= this->maxOutdoorTemperatureDefrost) {
@@ -647,6 +645,7 @@ void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCap
             // cycles of defrost per hour
             Real64 thisHourDefrostCycles = Curve::CurveValue(state, this->defrostFreqCurveIndex, state.dataEnvrn->OutDryBulbTemp);
             // is directly proportional to the ratio of capacity used for that hour (PLR)
+            Real64 const operatingPLR = this->partLoadRatio * this->cyclingRatio;
             thisHourDefrostCycles *= operatingPLR;
             // fraction of heat load per cycle of defrost
             Real64 thisHourDefrostHeatLoad = 0.0;
@@ -680,6 +679,7 @@ void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCap
         this->fractionalDefrostTime = 0.0;
     }
     availableCapacity *= HeatingCapacityMultiplier;
+    this->defrostPowerMultiplier = InputPowerMultiplier;
 }
 
 void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused]] const PlantLocation &calledFromLocation)
