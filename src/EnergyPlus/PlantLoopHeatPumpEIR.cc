@@ -340,14 +340,14 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
     this->setPartLoadAndCyclingRatio(state, partLoadRatio);
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity);
+    this->calcLoadSideHeatTransfer(state, availableCapacity);
 
     // no defrost calculation for WSHP
     // calculate power usage from EIR curves
-    calcPowerUsage(state);
+    this->calcPowerUsage(state);
 
     // evaluate the source side heat transfer rate
-    calcSourceSideHeatTransferWSHP(state);
+    this->calcSourceSideHeatTransferWSHP(state);
 }
 
 void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad)
@@ -365,13 +365,13 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     this->doDefrost(state, availableCapacity);
 
     // evaluate the actual current operating load side heat transfer rate
-    calcLoadSideHeatTransfer(state, availableCapacity);
+    this->calcLoadSideHeatTransfer(state, availableCapacity);
 
     //  calculate power usage from EIR curves
-    calcPowerUsage(state);
+    this->calcPowerUsage(state);
 
     // evaluate the source side heat transfer rate
-    calcSourceSideHeatTransferASHP(state);
+    this->calcSourceSideHeatTransferASHP(state);
 }
 
 void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
