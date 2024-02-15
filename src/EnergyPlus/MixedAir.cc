@@ -2792,6 +2792,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                                                          state.dataOutRptPredefined->pdchDCVMethod,
                                                          zoneName,
                                                          OAFlowCalcMethodNames[static_cast<int>(thisMechVentZone.ZoneOAFlowMethod)]);
+                OutputReportPredefined::PreDefTableEntry(state, 
+                    state.dataOutRptPredefined->pdchDCVType, zoneName, static_cast<int>(vent_mech.SystemOAMethod), 6);
                 if (thisMechVentZone.ZoneOASchPtr > 0) {
                     OutputReportPredefined::PreDefTableEntry(
                         state, state.dataOutRptPredefined->pdchDCVOASchName, zoneName, GetScheduleName(state, thisMechVentZone.ZoneOASchPtr));
