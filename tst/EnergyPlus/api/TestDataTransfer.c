@@ -70,7 +70,7 @@ void afterZoneTimeStepHandler(EnergyPlusState state)
 
         unsigned int arraySize;
         struct APIDataEntry *data = getAPIData(state, &arraySize); // inspect this to see what's available to exchange
-        const char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
+        char **surfaceNames = getObjectNames(state, "BuildingSurface:Detailed", &arraySize);
 
         if (arraySize == 0) {
             printf("Encountered a file with no BuildingSurface:Detailed, can't run this script on that file! Aborting!");

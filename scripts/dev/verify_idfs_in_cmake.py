@@ -69,22 +69,27 @@ with open(cmake_lists_file) as f:
     contents = f.read()
     matches = re.findall(r'\(([^)]+)\)', contents, re.MULTILINE)
     for match in matches:
-        if 'IDF_FILE' not in match:
-            continue
-        cleaned_match = match.replace('\n', '')
-        tokens = cleaned_match.split()  # special case that allows multiple whitespace delimiters
-        filename = tokens[1]
-        cmake_list_idf_files.add(filename)
+        if 'IDF_FILE' in match:
+            cleaned_match = match.replace('\n', '')
+            tokens = cleaned_match.split()  # special case that allows multiple whitespace delimiters
+            filename = tokens[1]
+            cmake_list_idf_files.add(filename)
+        elif 'PYTHON_FILE' in match:  # API-based IDF runs
+            cleaned_match = match.replace('\n', '')
+            tokens = cleaned_match.split()  # special case that allows multiple whitespace delimiters
+            filename = tokens[1]
+            filename = 'API/' + filename.replace('.py', '.idf')  # assuming the file is named the same as the py file
+            cmake_list_idf_files.add(filename)
 
 found_idf_files = set()
 for root, dirs, files in os.walk(test_files_dir):
-    for sfile in files:
-        if sfile.endswith('.idf') or sfile.endswith('.imf'):
+    for s_file in files:
+        if s_file.endswith('.idf') or s_file.endswith('.imf'):
             if root == test_files_dir:
-                found_idf_files.add(sfile)
+                found_idf_files.add(s_file)
             else:
                 folder = os.path.basename(os.path.normpath(root))
-                found_idf_files.add(os.path.join(folder, sfile))
+                found_idf_files.add(os.path.join(folder, s_file))
 
 # there are a few files we purposely skip
 files_to_skip = {"_1a-Long0.0.idf", "_ExternalInterface-actuator.idf", "_ExternalInterface-schedule.idf",
@@ -92,8 +97,8 @@ files_to_skip = {"_1a-Long0.0.idf", "_ExternalInterface-actuator.idf", "_Externa
                  "HVAC3ZoneGeometry.imf", "HVAC3ZoneMat-Const.imf"}
 found_idf_files_trimmed = found_idf_files - files_to_skip
 
-# the CMakeLists file will always have forward slashes
-# on Linux and Mac, the found_idfs will also have forward slashes
+# the CMakeLists file will always have "forward" slashes
+# on Linux and Mac, the list of found IDFs will also have "forward" slashes
 # but on Windows, the path delimiter will be a backslash
 # so replace all backslashes here before comparing anything.
 found_idf_files_refined = set()
