@@ -1447,7 +1447,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
                                              fan.FanName,
                                              fan.MaxAirFlowRateIsAutosizable ? "Yes" : "No"); // autosizable vs. autosized equivalent?
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, fan.FanName, fan.MotEff);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, fan.MotInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, fan.FanName, 0.0);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, fan.FanName, "n/a");
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAirLoopName,
                                              fan.FanName,

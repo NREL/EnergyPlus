@@ -314,10 +314,10 @@ namespace HVACFan {
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchFanAutosized, name, m_designAirVolFlowRateWasAutosized ? "Yes" : "No");
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, name, m_motorEff);
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, name, m_motorInAirFrac);
-//        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
-//            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, name, state.dataHeatBal->Zone(m_zoneNum).Name);
-//        }
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, name, 1- m_motorInAirFrac);
+        if (m_heatLossesDestination == ThermalLossDestination::ZoneGains) {
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, name, state.dataHeatBal->Zone(m_zoneNum).Name);
+        }
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchFanAirLoopName,
                                                  name,
