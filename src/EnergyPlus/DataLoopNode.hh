@@ -154,6 +154,7 @@ namespace DataLoopNode {
         AirLoopHVACOutdoorAirsystem,
         AirLoopHVACReturnPath,
         AirLoopHVACReturnPlenum,
+        AirLoopHVACSplitter,
         AirLoopHVACSupplyPath,
         AirLoopHVACSupplyPlenum,
         AirLoopHVACUnitaryFurnaceHeatCool,
