@@ -79,7 +79,35 @@ namespace PlantManager {
 
     void SetupReports(EnergyPlusData &state);
 
-    void InitializeLoops(EnergyPlusData &state, bool FirstHVACIteration); // true if first iteration of the simulation
+    void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData &thisLoop, int &rowCounter);
+
+    // void fillPlantToplogyRow(EnergyPlusData &state,
+    //                          const std::string_view &compName,
+    //                          const std::string_view &compType,
+    //                          const std::string_view &side,
+    //                          const std::string_view &parentType,
+    //                          const std::string_view &parentName,
+    //                          const std::string_view &fluidName,
+    //                          const int reportOffset);
+
+    void fillPlantToplogySplitterMixerRow2(EnergyPlusData &state,
+                                           const std::string_view &loopType,
+                                           const std::string_view &loopName,
+                                           const std::string_view &side,
+                                           const std::string_view &splitterMixerName,
+                                           int &rowCounter);
+
+    void fillPlantToplogyComponentRow2(EnergyPlusData &state,
+                                       const std::string_view &loopType,
+                                       const std::string_view &loopName,
+                                       const std::string_view &side,
+                                       const std::string_view &branchName,
+                                       const std::string_view &compType,
+                                       const std::string_view &compName,
+                                       int &rowCounter);
+
+    void InitializeLoops(EnergyPlusData &state,
+                         bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration(EnergyPlusData &state);
 

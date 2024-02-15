@@ -331,6 +331,20 @@ namespace SystemReports {
 
     void ReportAirLoopConnections(EnergyPlusData &state);
 
+    void reportAirLoopToplogy(EnergyPlusData &state);
+
+    void fillAirloopToplogyComponentRow(EnergyPlusData &state,
+                                        const std::string_view &loopName,
+                                        const std::string_view &branchName,
+                                        const std::string_view &compType,
+                                        const std::string_view &compName,
+                                        int &rowCounter);
+
+    void reportZoneEquipmentToplogy(EnergyPlusData &state);
+
+    void fillZoneEquipToplogyComponentRow(
+        EnergyPlusData &state, const std::string_view &zoneName, const std::string_view &compType, const std::string_view &compName, int &rowCounter);
+
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 

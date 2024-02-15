@@ -1874,24 +1874,13 @@ void SetupReports(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   July 2001
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine initializes the plant supply side reports.
     // It was created during the splitting of supply and demand side functions.
 
-    // Using/Aliasing
+    int MaxBranches = 0; // Maximum number of branches on any plant loop (used for allocating arrays)
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopNum; // DO loop counter (plant supply sides)
-    int BranchNum;
-    int CompNum;
-    int MaxBranches;                 // Maximum number of branches on any plant loop (used for allocating arrays)
-    std::string CurrentModuleObject; // for ease in renaming.
-    int FluidIndex;
-
-    MaxBranches = 0;
     for (auto &loop : state.dataPlnt->PlantLoop) {
         MaxBranches = max(MaxBranches, loop.LoopSide(LoopSideLocation::Demand).TotalBranches);
         MaxBranches = max(MaxBranches, loop.LoopSide(LoopSideLocation::Supply).TotalBranches);
@@ -1907,14 +1896,8 @@ void SetupReports(EnergyPlusData &state)
         loop.OutletNodeFlowrate = 0.0;
     }
 
-    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+    for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
         auto &loop = state.dataPlnt->PlantLoop(LoopNum);
-        if (LoopNum <= state.dataHVACGlobal->NumPlantLoops) {
-            CurrentModuleObject = "Plant Loop";
-        } else {
-            CurrentModuleObject = "Cond Loop";
-        }
-        // CurrentModuleObject='Plant/Condenser Loop'
         SetupOutputVariable(state,
                             "Plant Supply Side Cooling Demand Rate",
                             Constant::Units::W,
@@ -1983,9 +1966,8 @@ void SetupReports(EnergyPlusData &state)
     }
 
     // setup more variables inside plant data structure
-    // CurrentModuleObject='Plant/Condenser Loop(Advanced)'
     if (state.dataGlobal->DisplayAdvancedReportVariables) {
-        for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             SetupOutputVariable(state,
                                 "Plant Demand Side Lumped Capacitance Temperature",
                                 Constant::Units::C,
@@ -2043,8 +2025,8 @@ void SetupReports(EnergyPlusData &state)
                                 OutputProcessor::SOVStoreType::Summed,
                                 state.dataPlnt->PlantLoop(LoopNum).Name);
             for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
-                for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                    for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+                for (int BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                    for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
                          ++CompNum) {
                         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).CurOpSchemeType !=
                             OpScheme::Demand) {
@@ -2063,13 +2045,14 @@ void SetupReports(EnergyPlusData &state)
     }
 
     // now traverse plant loops and set fluid type index in all nodes on the loop
-    for (LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
-        FluidIndex = state.dataPlnt->PlantLoop(LoopNum).FluidIndex;
+    for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
+        int FluidIndex = state.dataPlnt->PlantLoop(LoopNum).FluidIndex;
         for (DataPlant::LoopSideLocation LoopSideNum : DataPlant::LoopSideKeys) {
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).FluidIndex = FluidIndex;
             state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).FluidIndex = FluidIndex;
-            for (BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
-                for (CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+            for (int BranchNum = 1; BranchNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                for (int CompNum = 1; CompNum <= state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+                     ++CompNum) {
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumIn)
                         .FluidIndex = FluidIndex;
                     state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut)
@@ -2078,6 +2061,159 @@ void SetupReports(EnergyPlusData &state)
             }
         }
     } // plant loops
+
+    // Plant topology report
+    // auto &orp = state.dataOutRptPredefined;
+    // MJW ToDo: Tabular report inputs haven't been read yet - move that or just skip checking if the report is requested?
+    // if (orp->reportName(orp->pdrTopology).show) {
+
+    // constexpr std::string_view plantLoop = "PlantLoop";
+    int rowCounter = 1;
+    for (int loopNum = 1; loopNum <= state.dataPlnt->TotNumLoops; ++loopNum) {
+        fillPlantCondenserTopology(state, state.dataPlnt->PlantLoop(loopNum), rowCounter);
+    }
+
+    // constexpr std::string_view condenserLoop = "CondenserLoop";
+    // for (int loopNum = state.dataHVACGlobal->NumPlantLoops + 1; loopNum <= (state.dataHVACGlobal->NumPlantLoops +
+    // state.dataHVACGlobal->NumCondLoops);
+    //      ++loopNum) {
+    //     fillPlantCondenserTopology(state, condenserLoop, state.dataPlnt->PlantLoop(loopNum));
+    // }
+    // }
+}
+
+void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData &thisLoop, int &rowCounter)
+{
+    auto &orp = state.dataOutRptPredefined;
+    // int repOffset = 0;
+    // if (thisLoop.TypeOfLoop == DataPlant::LoopType::Condenser) {
+    //     // Shift column pointers for condenser loop subtable
+    //     repOffset = orp->pdchTopCondCompType - orp->pdchTopPlantCompType;
+    // }
+    std::string_view const loopType = DataPlant::loopTypeNames[static_cast<int>(thisLoop.TypeOfLoop)];
+    for (DataPlant::LoopSideLocation LoopSideNum : {DataPlant::LoopSideLocation::Supply, DataPlant::LoopSideLocation::Demand}) {
+        auto &thisLoopSide = thisLoop.LoopSide(LoopSideNum);
+        std::string_view const loopSide = DataPlant::DemandSupplyNames[static_cast<int>(LoopSideNum)];
+
+        // OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompType + repOffset, thisLoopSide.loopSideDescription, loopType);
+        // OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide + repOffset, thisLoopSide.loopSideDescription, loopSide);
+
+        // s->pdstTopPlantLoop2 = newPreDefSubTable(state, s->pdrTopology, "Plant Loop Component Arrangement 2");
+        // s->pdchTopPlantLoopType2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Loop Type");
+        // s->pdchTopPlantLoopName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Loop Name");
+        // s->pdchTopPlantSide2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Side");
+        // s->pdchTopPlantSplitMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter/Mixer Name");
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), thisLoop.Name);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), loopSide);
+        ++rowCounter;
+
+        // Report for first branch
+        auto &thisBranch = thisLoopSide.Branch(1);
+        constexpr std::string_view branch = "Branch";
+        // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
+        // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
+
+        for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
+            auto &thisComp = thisBranch.Comp(compNum);
+            // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
+            fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
+        }
+
+        if (thisLoopSide.TotalBranches >= 3) {
+            // splitter
+            if (thisLoopSide.Splitter.Exists) {
+                constexpr std::string_view splitter = "Splitter";
+                // fillPlantToplogyRow(state, thisLoopSide.Splitter.Name, splitter, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
+                fillPlantToplogySplitterMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Splitter.Name, rowCounter);
+            }
+
+            // parallel branches
+            for (int branchNum = 2; branchNum <= thisLoopSide.TotalBranches - 1; ++branchNum) {
+                auto &thisBranch = thisLoopSide.Branch(branchNum);
+                // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
+                // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
+
+                for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
+                    auto &thisComp = thisBranch.Comp(compNum);
+                    // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
+                    fillPlantToplogyComponentRow2(
+                        state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
+                }
+            }
+
+            // mixer
+            if (thisLoopSide.Mixer.Exists) {
+                constexpr std::string_view mixer = "Mixer";
+                // fillPlantToplogyRow(state, thisLoopSide.Mixer.Name, mixer, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
+                fillPlantToplogySplitterMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Mixer.Name, rowCounter);
+            }
+
+            // Outlet Branch
+            auto &thisBranch = thisLoopSide.Branch(thisLoopSide.TotalBranches);
+            // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
+            // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
+            for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
+                auto &thisComp = thisBranch.Comp(compNum);
+                // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
+                fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
+            }
+        }
+    }
+}
+
+// void fillPlantToplogyRow(EnergyPlusData &state,
+//                          const std::string_view &compName,
+//                          const std::string_view &compType,
+//                          const std::string_view &side,
+//                          const std::string_view &parentType,
+//                          const std::string_view &parentName,
+//                          const std::string_view &fluidName,
+//                          const int reportOffset)
+//{
+//     auto &orp = state.dataOutRptPredefined;
+//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompType + reportOffset, compName, compType);
+//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide + reportOffset, compName, side);
+//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantParType + reportOffset, compName, parentType);
+//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantParName + reportOffset, compName, parentName);
+//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantConType + reportOffset, compName, fluidName);
+// }
+
+void fillPlantToplogySplitterMixerRow2(EnergyPlusData &state,
+                                       const std::string_view &loopType,
+                                       const std::string_view &loopName,
+                                       const std::string_view &side,
+                                       const std::string_view &splitterMixerName,
+                                       int &rowCounter)
+{
+    auto &orp = state.dataOutRptPredefined;
+    // s->pdchTopPlantSplitMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter/Mixer Name");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), loopName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), side);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSplitMixName2, format("{}", rowCounter), splitterMixerName);
+    ++rowCounter;
+}
+void fillPlantToplogyComponentRow2(EnergyPlusData &state,
+                                   const std::string_view &loopType,
+                                   const std::string_view &loopName,
+                                   const std::string_view &side,
+                                   const std::string_view &branchName,
+                                   const std::string_view &compType,
+                                   const std::string_view &compName,
+                                   int &rowCounter)
+{
+    auto &orp = state.dataOutRptPredefined;
+    // s->pdchTopPlantBranchName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Branch Name");
+    // s->pdchTopPlantCompType2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Component Type");
+    // s->pdchTopPlantCompName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Component Name");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), loopName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), side);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantBranchName2, format("{}", rowCounter), branchName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompType2, format("{}", rowCounter), compType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompName2, format("{}", rowCounter), compName);
+    ++rowCounter;
 }
 
 void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // true if first iteration of the simulation
