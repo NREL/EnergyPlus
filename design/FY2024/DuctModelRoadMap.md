@@ -5,6 +5,10 @@ Duct model road map
 
 ** Florida Solar Energy Center**
 
+ - Third draft, 2/15/24
+
+	After Technicalities on 2/7/24
+
  - Second draft, 2/7/24
 
 	After Technicalities on 2/7/24
@@ -119,10 +123,29 @@ Gu: I agree not to use AirflowNetwork:SimulationControl to trigger the simplifie
 
 The trigger option using AirflowNetwork:SimulationControl in the Roadmap will be removed.
 
-Mike: May use duplcated objects as two sets. The first set for the AFN model, while the second set is used for the simplified duct model.
+### Discussion in the conference call on 2/15/24 ###
 
-Gu: I have no objection. The advantages are that different fields in different object sets can be applied. For example, some fields in the AFN model are used for pressure calculation, so that these fields may not be applied to the simplified duct model.
+A group of team members attanded the conference call for further discussion: Mike, Jason, Edwin and Gu. Scott missed the call and will get a chance to review the thrid draft.
 
+#### General agreement ####
+
+The group is OK with the proposed inputs.
+
+#### Undecided items ####
+
+The group have different opinions for the new object of Duct:Lose
+
+1. Keep a single object as Duct:Loss and A4 field with 3 choice as Conduction, Leakage and MakeupAir
+2. Use 3 new objects wihtout A4 field
+
+The detailed approaches are provided below.
+
+#### Suggestion ####
+
+When the makeup air is introduced, it is better to investigate the ZoneAirMassFlowConservation to see possible connection.
+
+Gu: There are two types of makeup air. The first type is that the makeup aie flows from outdoor to a zone, equivalent to Infiltration. The second type is that the makeup air flows from a zone to another zone, equivalent to Mixing object. It is possible to assign makeup air into Infiltration and Mixing airflows and call ZoneAirMassFlowConservation to perform mass conservation. 
+ 
 
 ## Roadmap ##
 
@@ -137,6 +160,8 @@ Note: Any air movement from a zone to outdoors is not presented in the figure, b
 ### General inputs ###
 
 This section presents inputs used in both losses of conduction and leakage.
+
+The group has not finalized the new objects. There are two choices. The first has a new object with A4 field with 3 choices. The second has 3 new objects: Duct:Loss:Conduction, Duct:Loss:Leakage, and Duct:Loss:MakeupAir.
 
 #### A new object ####
 
@@ -162,6 +187,7 @@ An optional field may help users to understand the object function:
       \type choice
       \key Conduction
       \key Leakage
+      \key MakeupAir
       \default Conduction
 
  <span style="color:red">
@@ -182,6 +208,28 @@ An optional field may help users to understand the object function:
 Note:
 
 1. Additional 3 optional fields will be added to allow user to specify duct exterior enviroment for conduction loss calculation.
+
+#### 3 new objects ####
+
+An alternative approach is to have 3 new obejcts. Each object represents each loss type explicitly. 
+
+	Duct:Loss:Conduction,
+   	A1,  \field Name
+   	A2,  \field AirLoopHAVC Name
+   	A3,  \field AirflowNetwork:Distribution:Linkage Name
+    A4,  \field Environment Type
+   	A5,  \field Ambient Temperature Zone Name
+   	A6;  \field Ambient Temperature Schedule Name
+
+	Duct:Loss:Leakage,
+   	A1,  \field Name
+   	A2,  \field AirLoopHAVC Name
+   	A3;  \field AirflowNetwork:Distribution:Linkage Name
+
+	Duct:Loss:MakeupAir,
+   	A1,  \field Name
+   	A2,  \field AirLoopHAVC Name
+   	A3;  \field AirflowNetwork:Distribution:Linkage Name
  
 #### Existing object AirflowNetwork:Distribution:Node ####
 
