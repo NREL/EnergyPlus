@@ -672,6 +672,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                              bool const singleMode,
                              Real64 const LoadSHR)
 {
+    assert(speedNum != 0);
+
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
         this->myOneTimeInitFlag = false;
@@ -777,7 +779,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->wasteHeatEnergyRate = this->performance.wasteHeatRate;
     this->wasteHeatEnergy = this->performance.wasteHeatRate * reportingConstant;
 
-    this->partLoadRatioReport = speedNum == 1 ? 1.0 : speedRatio;
+    this->partLoadRatioReport = speedNum > 1 ? 1.0 : speedRatio;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
