@@ -805,7 +805,7 @@ def next_token(data):
             return TOKEN_UNITS
 
         return TOKEN_NONE
-    elif c.isalpha() or c in '-:.#/\[]{}_@$%^&*()|+=<>?\'"~':
+    elif c.isalpha() or c in r'-:.#/\[]{}_@$%^&*()|+=<>?\'"~':
         if c == 'A':
             if parse_number(data) is not None:
                 return TOKEN_A
