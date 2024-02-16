@@ -6971,17 +6971,18 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_checkVarSpeedCoilCoolCapTest)
     Real64 totalCoolingCapacity;
     Real64 highestSpeedCoolingCapacity;
     Real64 const closeEnough = 0.00001;
-    Real64 expectedAnswer;
+    Real64 expectedAnswer1;
     Real64 expectedAnswer2;
     std::string error_string;
 
     // Test 1: both capacities zero or less
     totalCoolingCapacity = 0.0;
     highestSpeedCoolingCapacity = -1.0;
-    expectedAnswer = 0.0;
+    expectedAnswer1 = 0.0;
+    expectedAnswer2 = -1.0;
     VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
-    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer, closeEnough);
-    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer, closeEnough);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
     error_string = delimited_string({
         "   ** Warning ** Variable Speed DX Coil: zero cooling capacity and zero cooling capacity for highest speed",
         "   **   ~~~   ** This occurs for Variable Speed DX Coil DXCoil1.",
@@ -6992,10 +6993,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_checkVarSpeedCoilCoolCapTest)
     // Test 2: total capacity is zero but highest speed capacity is positive (this generated the infinite loop problem in the code)
     totalCoolingCapacity = 0.0;
     highestSpeedCoolingCapacity = 23.0;
-    expectedAnswer = 23.0;
+    expectedAnswer1 = 23.0;
+    expectedAnswer2 = 23.0;
     VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
-    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer, closeEnough);
-    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer, closeEnough);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
     error_string = delimited_string({
         "   ** Warning ** Variable Speed DX Coil: zero cooling capacity with a non-zero cooling capacity for highest speed",
         "   **   ~~~   ** This occurs for Variable Speed DX Coil DXCoil1.",
@@ -7003,28 +7005,14 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_checkVarSpeedCoilCoolCapTest)
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    // Test 3: both are positive but total is less than highest speed capacity
-    totalCoolingCapacity = 12.0;
-    highestSpeedCoolingCapacity = 23.0;
-    expectedAnswer = 23.0;
-    expectedAnswer2 = 12.0;
-    VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
-    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer, closeEnough);
-    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer2, closeEnough);
-    error_string = delimited_string({
-        "   ** Warning ** Variable Speed DX Coil: cooling capacity for highest speed is greater than the total capacity",
-        "   **   ~~~   ** This occurs for Variable Speed DX Coil DXCoil1.",
-        "   **   ~~~   ** Verify that this is correct for the coil in question.",
-    });
-    EXPECT_TRUE(compare_err_stream(error_string, true));
-
-    // Test 4: both are positive and total is greater than or equal to highest speed capacity
+    // Test 3: total capacity is positive so no changes
     totalCoolingCapacity = 23.0;
-    highestSpeedCoolingCapacity = 23.0;
-    expectedAnswer = 23.0;
+    highestSpeedCoolingCapacity = 22.0;
+    expectedAnswer1 = 23.0;
+    expectedAnswer2 = 22.0;
     VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
-    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer, closeEnough);
-    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer, closeEnough);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
     EXPECT_TRUE(compare_err_stream("", true));
 }
 

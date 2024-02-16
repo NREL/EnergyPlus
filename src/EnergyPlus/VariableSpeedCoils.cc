@@ -3289,27 +3289,21 @@ namespace VariableSpeedCoils {
         }
     }
 
-    void checkVarSpeedCoilCoolCap(EnergyPlusData &state, std::string coilName, Real64 &highestSpeedCoolCap, Real64 &totalCoolCap)
+    void checkVarSpeedCoilCoolCap(EnergyPlusData &state, std::string coilName, Real64 const highestSpeedCoolCap, Real64 &totalCoolCap)
     {
         if ((totalCoolCap <= 0.0) && (highestSpeedCoolCap <= 0.0)) {
-            // There may be cases where the coil has no heating but still let the user know that this was input.
-            totalCoolCap = 0.0;
-            highestSpeedCoolCap = 0.0;
+            // There may be cases where the coil has no cooling but still let the user know that this was input.
             ShowWarningError(state, format("Variable Speed DX Coil: zero cooling capacity and zero cooling capacity for highest speed"));
             ShowContinueError(state, format("This occurs for Variable Speed DX Coil {}.", coilName));
             ShowContinueError(state, format("Ignore this warning if the DX Coil has no cooling capabilities."));
-        } else if ((totalCoolCap <= 0.0) && (totalCoolCap < highestSpeedCoolCap)) {
+        } else if ((totalCoolCap <= 0.0) && (highestSpeedCoolCap > 0.0)) {
             // totalCoolCap is zero which will cause a problem (divide by zero), reassign to highest speed capacity from user input
+            // This was the case that caused an issue (divide by zero and infinite loop)
             totalCoolCap = highestSpeedCoolCap;
             ShowWarningError(state, format("Variable Speed DX Coil: zero cooling capacity with a non-zero cooling capacity for highest speed"));
             ShowContinueError(state, format("This occurs for Variable Speed DX Coil {}.", coilName));
             ShowContinueError(state, format("The cooling capacity was reset to the highest speed cooling capacity."));
-        } else if ((totalCoolCap > 0.0) && (highestSpeedCoolCap > 0.0) && (highestSpeedCoolCap > totalCoolCap)) {
-            // Not going to cause a problem by this may need to be looked at by the user
-            ShowWarningError(state, format("Variable Speed DX Coil: cooling capacity for highest speed is greater than the total capacity"));
-            ShowContinueError(state, format("This occurs for Variable Speed DX Coil {}.", coilName));
-            ShowContinueError(state, format("Verify that this is correct for the coil in question."));
-        } // otherwise totalCoolCap is non-zero and greater than or equal to highestSpeedCoolCap-->OK
+        } // otherwise totalCoolCap is non-zero-->OK
     }
 
     // Beginning Initialization Section of the Module
