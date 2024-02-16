@@ -157,7 +157,10 @@ The existing Air-to-Water Heat Pump model supports heat-only and cool-only mode 
 	 {Sizing_Factor_{cool}} = sizing factor of the chiller, (-)
 	 {Sizing_Factor_{heat}} = sizing factor of the heater (heat pump), (-)
 
-	 
+    * sizing output variable *
+    
+    * Design Size Heat Recovery Side Volume Flow Rate [m3/s] *
+	
 *(6) Schematic diagram of cooling and heating dominated heat recovery operating modes:
 
 ![chiller_with_heat_recovery](chiller_with_heat_recovery.png)
@@ -170,10 +173,11 @@ The existing Air-to-Water Heat Pump model supports heat-only and cool-only mode 
 
 ### Existing Object HeatPump:PlantLoop:EIR:Cooling ###
 
-
+    * added four new input fields and increased the min-fields to 18 from 15 *
+	
 HeatPump:PlantLoop:EIR:Cooling,
         \memo An EIR formulated water to water heat pump model, cooling operation.
-        \min-fields 15 (18)
+        \min-fields 18
    A1,  \field Name
         \type alpha
         \reference PLHPCoolingNames
@@ -199,29 +203,104 @@ HeatPump:PlantLoop:EIR:Cooling,
    A6,  \field Source Side Outlet Node Name
         \required-field
         \type node
-
-<span style="color:red">
-
    A7,  \field Heat Recovery Inlet Node Name
-        \required-field
         \type node
+		\note Not available with water source condenser type
    A8,  \field Heat Recovery Outlet Node Name
-        \required-field
         \type node
-		
-        ... 
-		
-   N6,  \field Heat Recovery Reference Flow Rate
+		\note Not available with water source condenser type
+   A9,  \field Companion Heat Pump Name
+        \note This field allows the user to specify a companion heating
+        \note object for this cooling object. The companion is used in
+        \note sizing the heat pump as well as to allow checks for unexpected
+        \note simultaneous operation of the two objects.
+        \type object-list
+        \object-list PLHPHeatingNames
+   N1,  \field Load Side Reference Flow Rate
+        \note This component is currently a constant-flow device, meaning it will always
+        \note try to request the full design flow from the central plant manager.
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-        \default autosize		
-</span>
-
-        ...
-
+        \default autosize
+   N2,  \field Source Side Reference Flow Rate
+        \type real
+        \minimum> 0.0
+        \units m3/s
+        \ip-units gal/min
+        \autosizable
+        \default autosize
+   N3,  \field Heat Recovery Reference Flow Rate
+        \type real
+        \minimum> 0.0
+        \units m3/s
+        \ip-units gal/min
+        \autosizable
+        \default autosize
+		\note Not available with water source condenser type
+   N4,  \field Reference Capacity
+        \type real
+        \minimum> 0.0
+        \units W
+        \autosizable
+        \default autosize
+   N5,  \field Reference Coefficient of Performance
+        \type real
+        \minimum> 0.0
+        \units W/W
+        \default 3.0
+   N6,  \field Sizing Factor
+        \note Multiplies the autosized load side reference flow rate which is then used to autosize the capacity
+        \type real
+        \minimum> 0.0
+        \default 1.0
+   A10, \field Capacity Modifier Function of Temperature Curve Name
+        \note Cooling capacity modifier as a function of CW supply temp and entering condenser temp
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) chilled water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+   A11, \field Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of temperature
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) chilled water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+   A12, \field Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of Part Load Ratio (PLR)
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list UniVariateFunctions
+        \note quadratic curve = a + b*PLR + c*PLR**2 is typical, other univariate curves may be used
+        \note PLR = part load ratio (cooling load/steady state capacity)
+   A13, \field Control Type
+        \note Heat pump can be controlled on leaving water temperature set point or plant load
+        \type choice
+        \key Setpoint
+        \key Load
+        \default Load
+   A14, \field Flow Mode
+        \note Select operating mode for fluid flow through the chiller. "ConstantFlow" is for
+        \note constant pumping with flow controlled by chiller to operate at full design
+        \note flow rate. "VariableSpeedPumping" is for variable pumping with flow proportional
+        \note to chiller operating part load ratio.
+        \type choice
+        \key ConstantFlow
+        \key VariableSpeedPumping
+        \default ConstantFlow
+   N7,  \field Minimum Part Load Ratio
+        \note Below this operating limit compressor cycling will occur
+        \type real
+        \minimum 0.0
+        \default 0.0
    N8,  \field Minimum Source Inlet Temperature
         \type real
         \units C
@@ -236,33 +315,31 @@ HeatPump:PlantLoop:EIR:Cooling,
         \note Enter the maximum inlet outdoor air dry-bulb temperature
         \note for air-cooled units or maximum inlet water temperature for water-cooled units.
         \note The unit is disabled above this temperature.
-   N10,  \field Minimum Supply Water Temperature Curve Name
+   N10, \field Minimum Supply Water Temperature Curve Name
         \type object-list
         \object-list UniVariateFunctions
         \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
         \note OAT = Outdoor Dry-Bulb Temperature
-   N11; \field Maximum Supply Water Temperature Curve Name
+   N11, \field Maximum Supply Water Temperature Curve Name
         \type object-list
         \object-list UniVariateFunctions
         \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
         \note OAT = Outdoor Dry-Bulb Temperature
-		
-<span style="color:red">
-		
    N12; \field Maximum Heat Recovery Outlet Temperature
         \type real
         \units C
         \default 60.0
         \note Enter the maximum heat recovery leaving water temperature limit
-        \note The hot water temperature is not allowed to exceed this value.
-</span>
+        \note The hot water temperature is not allowed to exceed this value
+	    \note Not available with water source condenser type
 
 ### Existing Object HeatPump:PlantLoop:EIR:Heating ###
 
+    * added four new input fields and increased the min-fields to 18 from 15 *
 
 HeatPump:PlantLoop:EIR:Heating,
         \memo An EIR formulated water to water heat pump model, heating operation
-        \min-fields 15 (18)
+        \min-fields 18
    A1,  \field Name
         \type alpha
         \reference PLHPHeatingNames
@@ -288,28 +365,175 @@ HeatPump:PlantLoop:EIR:Heating,
    A6,  \field Source Side Outlet Node Name
         \required-field
         \type node
-		
-<span style="color:red">
-
    A7,  \field Heat Recovery Inlet Node Name
-        \required-field
         \type node
+		\note Not available with water source condenser type
    A8,  \field Heat Recovery Outlet Node Name
-        \required-field
         \type node
-		
-        ... 		
-	
-   N6,  \field Heat Recovery Reference Flow Rate
+		\note Not available with water source condenser type
+   A9,  \field Companion Heat Pump Name
+        \note This field allows the user to specify a companion cooling
+        \note object for this heating object. The companion is used in
+        \note sizing the heat pump as well as to allow checks for unexpected
+        \note simultaneous operation of the two objects.
+        \type object-list
+        \object-list PLHPCoolingNames
+   N1,  \field Load Side Reference Flow Rate
+        \note This component is currently a constant-flow device, meaning it will always
+        \note try to request the full design flow from the central plant manager.
         \type real
         \minimum> 0.0
         \units m3/s
         \ip-units gal/min
         \autosizable
-        \default autosize			
-</span>		
-        ...
-
+        \default autosize
+   N2,  \field Source Side Reference Flow Rate
+        \type real
+        \minimum> 0.0
+        \units m3/s
+        \ip-units gal/min
+        \autosizable
+        \default autosize
+   N3,  \field Heat Recovery Reference Flow Rate
+        \type real
+        \minimum> 0.0
+        \units m3/s
+        \ip-units gal/min
+        \autosizable
+        \default autosize
+		\note Not available with water source condenser type
+   N4,  \field Reference Capacity
+        \type real
+        \minimum> 0.0
+        \units W
+        \autosizable
+        \default autosize
+   N5,  \field Reference Coefficient of Performance
+        \type real
+        \minimum> 0.0
+        \units W/W
+        \default 3.0
+   N6,  \field Sizing Factor
+        \note Multiplies the autosized load side reference flow rate which is then used to autosize the capacity
+        \type real
+        \minimum> 0.0
+        \default 1.0
+   A10,  \field Capacity Modifier Function of Temperature Curve Name
+        \note Heating capacity modifier as a function of CW supply temp and entering condenser temp
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) hot water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+   A11, \field Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of temperature
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list BiVariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) hot water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+   A12, \field Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of Part Load Ratio (PLR)
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list UnivariateFunctions
+        \note quadratic curve = a + b*PLR + c*PLR**2 is typical, other univariate curves may be used
+        \note PLR = part load ratio (hot load/steady state capacity)
+   N7,  \field Heating To Cooling Capacity Sizing Ratio
+        \note Multiplies the autosized heating capacity
+        \type real
+        \minimum 0.0
+        \default 1.0
+   A13, \field Heat Pump Sizing Method
+        \note Specifies sizing method when companion coil exists
+        \type choice
+        \key CoolingCapacity
+        \key HeatingCapacity
+        \key GreaterOfHeatingOrCooling
+        \default CoolingCapacity
+   A14, \field Control Type
+        \note Heat pump can be controlled on leaving water temperature set point or plant load
+        \type choice
+        \key Setpoint
+        \key Load
+        \default Load
+   A15, \field Flow Mode
+        \note Select operating mode for fluid flow through the chiller. "ConstantFlow" is for
+        \note constant pumping with flow controlled by chiller to operate at full design
+        \note flow rate. "VariableSpeedPumping" is for variable pumping with flow proportional
+        \note to chiller operating part load ratio.
+        \type choice
+        \key ConstantFlow
+        \key VariableSpeedPumping
+        \default ConstantFlow
+   N8,  \field Minimum Part Load Ratio
+        \note Below this operating limit compressor cycling will occur
+        \type real
+        \minimum 0.0
+        \default 0.0
+   N9,  \field Minimum Source Inlet Temperature
+        \type real
+        \units C
+        \default -100.0
+        \note Enter the minimum inlet outdoor air dry-bulb temperature
+        \note for air-cooled units or minimum inlet water temperature for water-cooled units.
+        \note The unit is disabled below this temperature.
+   N10, \field Maximum Source Inlet Temperature
+        \type real
+        \units C
+        \default 100.0
+        \note Enter the maximum inlet outdoor air dry-bulb temperature
+        \note for air-cooled units or maximum inlet water temperature for water-cooled units.
+        \note The unit is disabled above this temperature.
+   A16, \field Minimum Supply Water Temperature Curve Name
+        \type object-list
+        \object-list UniVariateFunctions
+        \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
+        \note OAT = Outdoor Dry-Bulb Temperature
+   A17, \field Maximum Supply Water Temperature Curve Name
+        \type object-list
+        \object-list UniVariateFunctions
+        \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
+        \note OAT = Outdoor Dry-Bulb Temperature
+   A18, \field Dry Outdoor Correction Factor Curve Name
+        \type object-list
+        \object-list UniVariateFunctions
+   N11, \field Maximum Outdoor Dry Bulb Temperature For Defrost Operation
+        \type real
+        \default 10.0
+        \note defrost operation will not be active above this outdoor temperature
+   A19, \field Heat Pump Defrost Control
+        \type choice
+        \key None
+        \key Timed
+        \key OnDemand
+        \key TimedEmpirical
+        \note A blank field is the same as None.
+   N12, \field Heat Pump Defrost Time Period Fraction
+        \type real
+        \minimum 0.0
+        \default 0.058333
+        \note Nominal fraction of time in defrost mode
+        \note only applicable if Timed or TimedEmpirical heat pump defrost control is specified
+   A20, \field Defrost Energy Input Ratio Function of Temperature Curve Name
+        \type object-list
+        \object-list BivariateFunctions
+        \note univariate curve = a + b*OAT is typical, other univariate curves may be used
+        \note bivariate curve = a + b*WB + c*WB**2 + d*OAT + e*OAT**2 + f*WB*OAT
+        \note OAT = outdoor air dry-bulb temperature (C)
+        \note WB = wet-bulb temperature (C) of air entering the indoor coil
+        \note only required if Timed or OnDemand defrost strategy is specified
+   A21, \field Timed Empirical Defrost Frequency Curve Name
+        \type object-list
+        \object-list UniVariateFunctions
+        \note univariate curve = a + b*OAT is typical, other univariate curves may be used
+        \note OAT = outdoor air dry-bulb temperature (C)
+        \note Timed Empirical Defrost Frequency fraction in hours = curve output
+        \note only applicable if TimedEmpirical defrost control is specified
    A22, \field Timed Empirical Defrost Heat Load Penalty Curve Name
         \type object-list
         \object-list UniVariateFunctions
@@ -320,7 +544,7 @@ HeatPump:PlantLoop:EIR:Heating,
         \note WB = wet-bulb temperature (C) of air entering the indoor coil
         \note Timed Empirical Defrost Heat Load Penalty in watts = hot load * curve output
         \note only applicable if TimedEmpirical defrost control is specified
-   A23; \field Timed Empirical Defrost Heat Input Energy Fraction Curve Name
+   A23, \field Timed Empirical Defrost Heat Input Energy Fraction Curve Name
         \type object-list
         \object-list UniVariateFunctions
         \object-list BivariateFunctions
@@ -330,16 +554,13 @@ HeatPump:PlantLoop:EIR:Heating,
         \note WB = wet-bulb temperature (C) of air entering the indoor coil
         \note Timed Empirical Defrost Heat Input Energy in watts = rated hot load * curve output
         \note only applicable if TimedEmpirical defrost control is specified
-		
-<span style="color:red">
-	
    N13; \field Minimum Heat Recovery Outlet Temperature
         \type real
         \units C
         \default 4.5
         \note Enter the minimum heat recovery leaving water temperature limit
-        \note The chilled water temperature is not allowed to drop below this value.		
-</span>	
+        \note The chilled water temperature is not allowed to drop below this value
+	    \note Not available with water source condenser type
 
 	   
 ## Testing/Validation/Data Source(s): ##
@@ -417,18 +638,46 @@ Transition is required to handle the two node input fields.
 
 ## Proposed Report Variables: ##
 
-Add output variables as needed.
+Adds five output variables.
 
-* Heat Pump Heat Recovery Mass Flow Rate *
+\subsubsection{Outputs}\label{outputs-12-004}
 
-* Heat Pump Heat Recovery Heat Transfer Rate *
+\begin{itemize}
+    ...
+    \item
+    HVAC,Sum,Heat Pump Heat Recovery Heat Transfer Energy {[}J{]}
+    \item
+    HVAC,Average,Heat Pump Heat Recovery Heat Transfer Rate {[}W{]}
+    \item
+    HVAC,Average,Heat Pump Heat Recovery Outlet Temperaturee {[}$^\circ$C{]}
+    \item
+    HVAC,Average,Heat Pump Heat Recovery Inlet Temperature {[}$^\circ$C{]}
+    \item
+    HVAC,Average,Heat Pump Heat Recovery Mass Flow Rate {[}kg/s{]}
+\end{itemize}
 
-* Heat Pump Heat Recovery Heat Transfer Energy *
+...
 
-* Heat Pump Heat Recovery Inlet Temperature *
+\paragraph{Heat Pump Heat Recovery Heat Transfer Energy {[}J{]}}\label{water-to-water-heat-pump-heat-recovery-heat-transfer-energy-j}
 
-* Heat Pump Heat Recovery Outlet Temperature *
+This output variable represents the cumulative heat transfer across the heat recovery coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
+
+\paragraph{Heat Pump Heat Recovery Heat Transfer Rate {[}W{]}}\label{water-to-water-heat-pump-heat-recovery-heat-transfer-rate-w}
+
+This output variable represents the heat transfer across the heat recovery coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
    
+\paragraph{Heat Pump Heat Recovery Outlet Temperature {[}C{]}}\label{water-to-water-heat-pump-heat-recovery-outlet-temperature-c}
+
+This output variable represents the average fluid temperature leaving the heat recovery coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Heat Pump Source Side Inlet Temperature {[}C{]}}\label{water-to-water-heat-pump-source-side-inlet-temperature-c}
+
+This output variable represents the average fluid temperature entering the heat recovery coil.~ The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
+\paragraph{Heat Pump Heat Recovery Mass Flow Rate {[}kg/s{]}}\label{water-to-water-heat-pump-heat-recovery-mass-flow-rate-kgs}
+
+This output variable represents the average fluid flow rate through the heat recovery coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
+
 
 ## References ##
 NA
@@ -461,6 +710,7 @@ The following changes are required to implement the new feature
 	   Real64 heatRecoveryDesignMassFlowRate = 0.0;
 	   Real64 heatRecoveryMassFlowRate = 0.0;   
 	   bool heatRecoveryIsActive = false;
+	   bool heatRecoveryAvailable = false;
 		
 		
    EIRPlantLoopHeatPump::resetReportingVariables()
@@ -483,13 +733,11 @@ The following changes are required to implement the new feature
    
    EIRPlantLoopHeatPump::onInitLoopEquip()
    
-   Sizing Functions:
-   EIRPlantLoopHeatPump::sizeLoadSide()
-   EIRPlantLoopHeatPump::sizeSrcSideASHP()
-   
-    ** add heat recovery sizing procedure to sizeSrcSideASHP() function **
-   
-    if (this->heatRecoveryDesignVolFlowRateWasAutoSized) {
+   New Sizing Functions:
+   EIRPlantLoopHeatPump::sizeHeatRecoveryASHP()   
+    ** add heat recovery sizing procedure to new sizeHeatRecoveryASHP() function **
+
+    if (this->heatRecoveryAvailable) {
 	
     ** add sizing for `Heat Recovery Reference Flow Rate` new input field **
 	
@@ -504,9 +752,13 @@ The following changes are required to implement the new feature
     
 	this->heatRecoveryInletTemp = state.dataLoopNodes->Node(this->heatRecoveryNodes.inlet).Temp;
 	
+	* init heat recovery plant loop flows *
+	
    EIRPlantLoopHeatPump::doPhysics()
    
 	** Refactor defrost calculation part of the doPhysics() function ** 
+	
+	* defrost calculation is used with air-source heat pump only *
 	EIRPlantLoopHeatPump::doDefrost()
 
 	* Create doDefrost() new function for defrost calculation. *
@@ -516,6 +768,7 @@ The following changes are required to implement the new feature
 	
 	* create a new calcAvailableCapacity() functions for capacity calculation *
     EIRPlantLoopHeatPump::calcAvailableCapacity()
+    * refactor the capacity modifier applied for dry-air as a source used with heating coil *
    
     ** Refactor curve checks part of the doPhysics() function *
 	
