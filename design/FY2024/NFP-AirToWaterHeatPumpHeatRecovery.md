@@ -767,8 +767,8 @@ The following changes are required to implement the new feature
     ** Refactor available capacity calculation part of the doPhysics() function ** 
 	
 	* create a new calcAvailableCapacity() functions for capacity calculation *
-    EIRPlantLoopHeatPump::calcAvailableCapacity()
     * refactor the capacity modifier applied for dry-air as a source used with heating coil *
+	EIRPlantLoopHeatPump::calcAvailableCapacity()  
    
     ** Refactor curve checks part of the doPhysics() function *
 	
