@@ -250,7 +250,7 @@ void LinesOut(EnergyPlusData &state, std::string const &option)
             if (thisSurface.Class == DataSurfaces::SurfaceClass::IntMass) continue;
             if (thisSurface.Sides == 0) continue;
             // process heat transfer surfaces
-            print(slnfile, " Surface={}, Name={}, Azimuth={:.1R}\n", cSurfaceClass(thisSurface.Class), thisSurface.Name, thisSurface.Azimuth);
+            print(slnfile, " Surface={}, Name={}, Azimuth={:.1R}\n", DataSurfaces::surfaceClassStrings[(int)thisSurface.Class], thisSurface.Name, thisSurface.Azimuth);
             print<FormatSyntax::FMT>(slnfile, "  {},  !- Number of (X,Y,Z) groups in this surface\n", thisSurface.Sides);
             for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
                 std::string optcommasemi = ",";
@@ -1040,7 +1040,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
             auto &thisSurface = state.dataSurface->Surface(surf);
             if (thisSurface.Zone != 0) break;
             AlgoName = "None";
-            *eiostream << "Shading Surface," << thisSurface.Name << "," << cSurfaceClass(thisSurface.Class) << "," << thisSurface.BaseSurfName << ","
+            *eiostream << "Shading Surface," << thisSurface.Name << "," << DataSurfaces::surfaceClassStrings[(int)thisSurface.Class] << "," << thisSurface.BaseSurfName << ","
                        << AlgoName << ",";
             if (RptType == 10) {
                 if (thisSurface.SchedShadowSurfIndex > 0) {
@@ -1108,10 +1108,10 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
 
                 // Default Convection Coefficient Calculation Algorithms
                 // This doulbe lookup is a screwed up way to do this, but ...
-                IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[static_cast<int>(state.dataHeatBal->Zone(ZoneNum).IntConvAlgo)] - 1];
-                ExtConvCoeffCalc = ConvCoeffCalcs[Convect::HcExtReportVals[static_cast<int>(state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo)] - 1];
+                IntConvCoeffCalc = ConvCoeffCalcs[Convect::HcIntReportVals[(int)state.dataHeatBal->Zone(ZoneNum).IntConvAlgo] - 1];
+                ExtConvCoeffCalc = ConvCoeffCalcs[Convect::HcExtReportVals[(int)state.dataHeatBal->Zone(ZoneNum).ExtConvAlgo] - 1];
 
-                *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << cSurfaceClass(thisSurface.Class) << "," << BaseSurfName << ","
+                *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << DataSurfaces::surfaceClassStrings[(int)thisSurface.Class] << "," << BaseSurfName << ","
                            << AlgoName << ",";
 
                 // NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
@@ -1303,7 +1303,7 @@ void DetailsForSurfaces(EnergyPlusData &state, int const RptType) // (1=Vertices
 
                 AlgoName = DataSurfaces::HeatTransAlgoStrs[(int)thisSurface.HeatTransferAlgorithm];
 
-                *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << cSurfaceClass(thisSurface.Class) << "," << BaseSurfName << ","
+                *eiostream << "HeatTransfer Surface," << thisSurface.Name << "," << DataSurfaces::surfaceClassStrings[(int)thisSurface.Class] << "," << BaseSurfName << ","
                            << AlgoName << ",";
                 *eiostream << fmt::to_string(thisSurface.Sides) << ",";
                 for (int vert = 1; vert <= thisSurface.Sides; ++vert) {
@@ -1382,7 +1382,7 @@ void CostInfoOut(EnergyPlusData &state)
                                             surf,
                                             thisSurface.Name,
                                             state.dataConstruction->Construct(thisSurface.Construction).Name,
-                                            cSurfaceClass(thisSurface.Class),
+                                            DataSurfaces::surfaceClassStrings[(int)thisSurface.Class],
                                             thisSurface.Area,
                                             thisSurface.GrossArea);
         }

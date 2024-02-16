@@ -499,12 +499,12 @@ namespace SurfaceGroundHeatExchanger {
                     auto const *thisMaterialLayer = dynamic_cast<Material::MaterialChild *>(
                         state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(LayerNum)));
                     assert(thisMaterialLayer != nullptr);
-                    this->BtmRoughness = thisMaterialLayer->Roughness;
+                    this->BtmRoughness = thisMaterialLayer->roughness;
                     this->TopThermAbs = thisMaterialLayer->AbsorpThermal;
                     auto const *thisMaterial1 =
                         dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(state.dataConstruction->Construct(Cons).LayerPoint(1)));
                     assert(thisMaterial1 != nullptr);
-                    this->TopRoughness = thisMaterial1->Roughness;
+                    this->TopRoughness = thisMaterial1->roughness;
                     this->TopThermAbs = thisMaterial1->AbsorpThermal;
                     this->TopSolarAbs = thisMaterial1->AbsorpSolar;
                 }

@@ -167,6 +167,23 @@ namespace DataSurfaces {
         Num // The counter representing the total number of surface class, always stays at the bottom
     };
 
+    constexpr std::array<std::string_view, (int)SurfaceClass::Num> surfaceClassStrings = {
+        "None",
+        "Wall",
+        "Floor",
+        "Roof",
+        "Internal Mass",
+        "Detached Shading:Building",
+        "Detached Shading:Fixed",
+        "Window",
+        "Glass Door",
+        "Door",
+        "Shading",
+        "Overhang",
+        "Fin",
+        "TubularDaylightDome",
+        "TubularDaylightDiffuser"};
+        
     // A coarse grain version of SurfaceClass
     enum class FWC
     {
@@ -195,20 +212,23 @@ namespace DataSurfaces {
         AllInteriorRoofs,
         AllInteriorCeilings,
         AllInteriorFloors,
+        AllGroundContactSurfaces,
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceFilter::Num)> SurfaceFilterNamesUC = {"ALLEXTERIORSURFACES",
-                                                                                                         "ALLEXTERIORWINDOWS",
-                                                                                                         "ALLEXTERIORWALLS",
-                                                                                                         "ALLEXTERIORROOFS",
-                                                                                                         "ALLEXTERIORFLOORS",
-                                                                                                         "ALLINTERIORSURFACES",
-                                                                                                         "ALLINTERIORWINDOWS",
-                                                                                                         "ALLINTERIORWALLS",
-                                                                                                         "ALLINTERIORROOFS",
-                                                                                                         "ALLINTERIORCEILINGS",
-                                                                                                         "ALLINTERIORFLOORS"};
+    constexpr std::array<std::string_view, (int)SurfaceFilter::Num> SurfaceFilterNamesUC = {
+        "ALLEXTERIORSURFACES",
+        "ALLEXTERIORWINDOWS",
+        "ALLEXTERIORWALLS",
+        "ALLEXTERIORROOFS",
+        "ALLEXTERIORFLOORS",
+        "ALLINTERIORSURFACES",
+        "ALLINTERIORWINDOWS",
+        "ALLINTERIORWALLS",
+        "ALLINTERIORROOFS",
+        "ALLINTERIORCEILINGS",
+        "ALLINTERIORFLOORS",
+        "ALLGROUNDCONTACTSURFACES"};
 
     enum class WinCover
     {
@@ -333,6 +353,19 @@ namespace DataSurfaces {
         Num                  // count, always the final element
     };
 
+    constexpr std::array<std::string_view, (int)HeatTransferModel::Num> heatTransferModelNamesUC = {
+        "NONE",
+        "CONDUCTIONTRANSFERFUNCTION",
+        "MOISTUREPENETRATIONDEPTHCONDUCTIONTRANSFERFUNCTION", // Seriously?
+        "CONDUCTIONFINITEDIFFERENCE", 
+        "COMBINEDHEATANDMOISTUREFINITEELEMENT",
+        "WINDOW5",
+        "COMPLEXFENESTRATION",
+        "TDD",
+        "KIVA",
+        "AIRBOUNDARY"
+    };
+        
     constexpr std::array<std::string_view, static_cast<int>(DataSurfaces::HeatTransferModel::Num)> HeatTransAlgoStrs = {
         "None",
         "CTF - ConductionTransferFunction",
@@ -877,7 +910,7 @@ namespace DataSurfaces {
     {
         Real64 solidAng = 0.0;    // Solid angle subtended by window from daylit ref points 1 and 2
         Real64 solidAngWtd = 0.0; // Solid angle subtended by window from ref pts weighted by glare pos factor
-        std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{0.0, 0.0}};
+        std::array<std::array<Real64, (int)WinCover::Num>, (int)Lum::Num> lums = {{{0.0, 0.0}}};
         Real64 illumFromWinRep = 0.0; // Illuminance from window at reference point N [lux]
         Real64 lumWinRep = 0.0;       // Window luminance as viewed from reference point N [cd/m2]
     };
@@ -1421,8 +1454,6 @@ namespace DataSurfaces {
     Real64 AbsBackSide(EnergyPlusData &state, int SurfNum);
 
     void GetVariableAbsorptanceSurfaceList(EnergyPlusData &state);
-
-    std::string cSurfaceClass(SurfaceClass ClassNo);
 
 } // namespace DataSurfaces
 

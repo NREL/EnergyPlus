@@ -639,7 +639,7 @@ namespace HeatBalanceIntRadExchange {
                         print(state.files.eio,
                               "Surface View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}",
                               state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
-                              cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
+                              DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Class],
                               thisEnclosure.Area(SurfNum),
                               thisEnclosure.Azimuth(SurfNum),
                               thisEnclosure.Tilt(SurfNum),
@@ -664,7 +664,7 @@ namespace HeatBalanceIntRadExchange {
                               "{},{},{},{:.4R}",
                               "View Factor",
                               state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Name,
-                              cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                              DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class],
                               RowSum);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                             print(state.files.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
@@ -684,7 +684,7 @@ namespace HeatBalanceIntRadExchange {
                               "{},{},{},{:.4R}",
                               "View Factor",
                               state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Name,
-                              cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                              DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class],
                               RowSum);
                         for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                             print(state.files.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
@@ -941,7 +941,7 @@ namespace HeatBalanceIntRadExchange {
                     print(state.files.eio,
                           "Solar View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}",
                           state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
-                          cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
+                          DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(SurfNum)).Class],
                           thisEnclosure.Area(SurfNum),
                           thisEnclosure.Azimuth(SurfNum),
                           thisEnclosure.Tilt(SurfNum),
@@ -966,7 +966,7 @@ namespace HeatBalanceIntRadExchange {
                     print(state.files.eio,
                           "Solar View Factor,{},{},{:.4R}",
                           state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Name,
-                          cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                          DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class],
                           RowSum);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                         print(state.files.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
@@ -986,7 +986,7 @@ namespace HeatBalanceIntRadExchange {
                           "{},{},{},{:.4R}",
                           "Solar View Factor",
                           state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Name,
-                          cSurfaceClass(state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                          DataSurfaces::surfaceClassStrings[(int)state.dataSurface->Surface(thisEnclosure.SurfacePtr(Findex)).Class],
                           RowSum);
                     for (int SurfNum : thisEnclosure.SurfaceReportNums) {
                         print(state.files.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));

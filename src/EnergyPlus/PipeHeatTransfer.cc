@@ -662,7 +662,7 @@ void GetPipesHeatTransfer(EnergyPlusData &state)
             state.dataPipeHT->PipeHT(Item).SoilConductivity = thisMaterialSoil->Conductivity;
             state.dataPipeHT->PipeHT(Item).SoilThermAbs = thisMaterialSoil->AbsorpThermal;
             state.dataPipeHT->PipeHT(Item).SoilSolarAbs = thisMaterialSoil->AbsorpSolar;
-            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialSoil->Roughness;
+            state.dataPipeHT->PipeHT(Item).SoilRoughness = thisMaterialSoil->roughness;
             state.dataPipeHT->PipeHT(Item).PipeDepth = state.dataPipeHT->PipeHT(Item).SoilDepth + state.dataPipeHT->PipeHT(Item).PipeID / 2.0;
             state.dataPipeHT->PipeHT(Item).DomainDepth = state.dataPipeHT->PipeHT(Item).PipeDepth * 2.0;
             state.dataPipeHT->PipeHT(Item).SoilDiffusivity = state.dataPipeHT->PipeHT(Item).SoilConductivity /
@@ -1375,7 +1375,7 @@ void PipeHTData::CalcBuriedPipeSoil(EnergyPlusData &state) // Current Simulation
     Real64 PastNodeTempAbs(0.0);                                                  // Placeholder for absolute temperature (K) version of NodePast
     Real64 Ttemp(0.0);                                                            // Placeholder for a current temperature node in convergence check
     Real64 SkyTempAbs(0.0);                                                       // Placeholder for current sky temperature in Kelvin
-    Material::SurfaceRoughness TopRoughness(Material::SurfaceRoughness::Invalid); // Placeholder for soil surface roughness
+    Material::Roughness TopRoughness(Material::Roughness::Invalid); // Placeholder for soil surface roughness
     Real64 TopThermAbs(0.0);                                                      // Placeholder for soil thermal radiation absorptivity
     Real64 TopSolarAbs(0.0);                                                      // Placeholder for soil solar radiation absorptivity
     Real64 kSoil(0.0);                                                            // Placeholder for soil conductivity

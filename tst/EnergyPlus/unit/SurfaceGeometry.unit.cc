@@ -2980,8 +2980,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
-        delimited_string({"   ** Severe  ** BuildingSurface:Detailed=\"016W88_WATERMETER - FLOOR : A\", invalid Construction Name=\"TYPICAL\".",
-                          "   ** Severe  ** BuildingSurface:Detailed=\"006W27_RESTROOMS - ROOFCEILING : A\", invalid Construction Name=\"TYPICAL\".",
+        delimited_string({"   ** Severe  ** GetHTSurfaceData: BuildingSurface:Detailed = 016W88_WATERMETER - FLOOR : A",
+                          "   **   ~~~   ** Construction Name = TYPICAL, item not found.",
+                          "   ** Severe  ** GetHTSurfaceData: BuildingSurface:Detailed = 006W27_RESTROOMS - ROOFCEILING : A",
+                          "   **   ~~~   ** Construction Name = TYPICAL, item not found.",
                           "   ** Severe  ** RoofCeiling:Detailed=\"016W88_WATERMETER - FLOOR : A\", Vertex size mismatch between base surface "
                           ":016W88_WATERMETER - FLOOR : A and outside boundary surface: 006W27_RESTROOMS - ROOFCEILING : A",
                           "   **   ~~~   ** The vertex sizes are 5 for base surface and 4 for outside boundary surface. Please check inputs.",
@@ -12954,11 +12956,12 @@ TEST_F(EnergyPlusFixture, Wrong_Window_Construction)
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
-        "   ** Severe  ** FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+        "   ** Severe  ** GetHTSubSurfaceData: FenestrationSurface:Detailed = SURFACE 8 - TRIANGULARWINDOW",
+        "   **   ~~~   ** Construction Name = WRONG CONSTRUCTION, item not found.",
         "   **  Fatal  ** GetSurfaceData: Errors discovered, program terminates.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=FenestrationSurface:Detailed=\"SURFACE 8 - TRIANGULARWINDOW\", invalid Construction Name=\"WRONG CONSTRUCTION\".",
+        "   ..... Last severe error=GetHTSubSurfaceData: FenestrationSurface:Detailed = SURFACE 8 - TRIANGULARWINDOW"
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

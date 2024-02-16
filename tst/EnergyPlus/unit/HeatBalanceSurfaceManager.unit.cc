@@ -1926,8 +1926,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
         state->dataSurface->surfExtConv(SurfNum).model = Convect::HcExt::ASHRAESimple;
     }
     CalcHeatBalanceOutsideSurf(*state);
-    Real64 HExt_Expect_Surf1 = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::Smooth, 1.5);
-    Real64 HExt_Expect_Surf2 = Convect::CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness::Smooth, 0.0);
+    Real64 HExt_Expect_Surf1 = Convect::CalcASHRAESimpExtConvCoeff(Material::Roughness::Smooth, 1.5);
+    Real64 HExt_Expect_Surf2 = Convect::CalcASHRAESimpExtConvCoeff(Material::Roughness::Smooth, 0.0);
     EXPECT_EQ(HExt_Expect_Surf1, state->dataHeatBalSurf->SurfHConvExt(1));
     EXPECT_EQ(HExt_Expect_Surf2, state->dataHeatBalSurf->SurfHConvExt(2));
 }

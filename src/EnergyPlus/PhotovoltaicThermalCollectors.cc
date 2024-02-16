@@ -1117,7 +1117,7 @@ namespace PhotovoltaicThermalCollectors {
             Convect::InitExtConvCoeff(state,
                                       this->SurfNum,
                                       0.0,
-                                      Material::SurfaceRoughness::VerySmooth,
+                                      Material::Roughness::VerySmooth,
                                       this->Simple.SurfEmissivity,
                                       this->Simple.LastCollectorTemp,
                                       HcExt,

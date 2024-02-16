@@ -539,18 +539,18 @@ namespace TranspiredCollector {
             Roughness = Alphas(11);
             // Select the correct Number for the associated ascii name for the roughness type
             if (Util::SameString(Roughness, "VeryRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VeryRough;
-            if (Util::SameString(Roughness, "Rough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Rough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::VeryRough;
+            if (Util::SameString(Roughness, "Rough")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::Rough;
             if (Util::SameString(Roughness, "MediumRough"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumRough;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::MediumRough;
             if (Util::SameString(Roughness, "MediumSmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::MediumSmooth;
-            if (Util::SameString(Roughness, "Smooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::Smooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::MediumSmooth;
+            if (Util::SameString(Roughness, "Smooth")) state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::Smooth;
             if (Util::SameString(Roughness, "VerySmooth"))
-                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::SurfaceRoughness::VerySmooth;
+                state.dataTranspiredCollector->UTSC(Item).CollRoughness = Material::Roughness::VerySmooth;
 
             // Was it set?
-            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == Material::SurfaceRoughness::Invalid) {
+            if (state.dataTranspiredCollector->UTSC(Item).CollRoughness == Material::Roughness::Invalid) {
                 ShowSevereError(state,
                                 format("{} has incorrect entry of {} in {} ={}",
                                        state.dataIPShortCut->cAlphaFieldNames(11),
@@ -637,33 +637,32 @@ namespace TranspiredCollector {
             // now that we should have all the surfaces, do some preperations and checks.
 
             // are they all similar tilt and azimuth? Issue warnings so people can do it if they really want
-            Real64 const surfaceArea(sum_sub(state.dataSurface->Surface, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs));
-            //            AvgAzimuth = sum( Surface( UTSC( Item ).SurfPtrs ).Azimuth * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface(
-            // UTSC(  Item
-            //).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            AvgAzimuth =
-                sum_product_sub(
-                    state.dataSurface->Surface, &SurfaceData::Azimuth, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
-                surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            //            AvgTilt = sum( Surface( UTSC( Item ).SurfPtrs ).Tilt * Surface( UTSC( Item ).SurfPtrs ).Area ) / sum( Surface( UTSC(
-            // Item
-            //).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            AvgTilt = sum_product_sub(
-                          state.dataSurface->Surface, &SurfaceData::Tilt, &SurfaceData::Area, state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
-                      surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
-            for (ThisSurf = 1; ThisSurf <= state.dataTranspiredCollector->UTSC(Item).NumSurfs; ++ThisSurf) {
-                SurfID = state.dataTranspiredCollector->UTSC(Item).SurfPtrs(ThisSurf);
-                if (General::rotAzmDiffDeg(state.dataSurface->Surface(SurfID).Azimuth, AvgAzimuth) > 15.0) {
+            Real64 area = 0.0, areaWeightedAzimuth = 0.0, areaWeightedTilt = 0.0, areaWeightedCentroidZ = 0.0;
+            
+            for (int surfNum : state.dataTranspiredCollector->UTSC(Item).SurfPtrs) {
+                auto const &surf = state.dataSurface->Surface(surfNum);
+                area += surf.Area;
+                areaWeightedAzimuth += surf.Area * surf.Azimuth;
+                areaWeightedTilt += surf.Area * surf.Tilt;
+                areaWeightedCentroidZ += surf.Area * surf.Centroid.z;
+            }
+            
+            state.dataTranspiredCollector->UTSC(Item).Tilt = areaWeightedTilt / area;
+            state.dataTranspiredCollector->UTSC(Item).Azimuth = areaWeightedAzimuth / area;
+
+            for (int surfNum : state.dataTranspiredCollector->UTSC(Item).SurfPtrs) {
+                auto const &surf = state.dataSurface->Surface(surfNum);
+                if (General::rotAzmDiffDeg(surf.Azimuth, state.dataTranspiredCollector->UTSC(Item).Azimuth) > 15.0) {
                     ShowWarningError(state,
                                      format("Surface {} has Azimuth different from others in the group associated with {} ={}",
-                                            state.dataSurface->Surface(SurfID).Name,
+                                            surf.Name,
                                             CurrentModuleObject,
                                             state.dataTranspiredCollector->UTSC(Item).Name));
                 }
-                if (std::abs(state.dataSurface->Surface(SurfID).Tilt - AvgTilt) > 10.0) {
+                if (std::abs(surf.Tilt - state.dataTranspiredCollector->UTSC(Item).Tilt) > 10.0) {
                     ShowWarningError(state,
                                      format("Surface {} has Tilt different from others in the group associated with {} ={}",
-                                            state.dataSurface->Surface(SurfID).Name,
+                                            surf.Name,
                                             CurrentModuleObject,
                                             state.dataTranspiredCollector->UTSC(Item).Name));
                 }
@@ -674,9 +673,6 @@ namespace TranspiredCollector {
                 //         //'subtracted in the group of surfaces associated with '//TRIM(UTSC(Item)%Name))
                 // endif
             }
-            state.dataTranspiredCollector->UTSC(Item).Tilt = AvgTilt;
-            state.dataTranspiredCollector->UTSC(Item).Azimuth = AvgAzimuth;
-
             // find area weighted centroid.
             //    UTSC(Item)%Centroid%x = SUM(Surface(UTSC(Item)%SurfPtrs)%Centroid%x*Surface(UTSC(Item)%SurfPtrs)%Area) &
             //                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
@@ -684,13 +680,7 @@ namespace TranspiredCollector {
             //                            /SUM(Surface(UTSC(Item)%SurfPtrs)%Area)
             //            UTSC( Item ).Centroid.z = sum( Surface( UTSC( Item ).SurfPtrs ).Centroid.z * Surface( UTSC( Item ).SurfPtrs ).Area ) /
             // sum(  Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
-            state.dataTranspiredCollector->UTSC(Item).Centroid.z = sum_product_sub(state.dataSurface->Surface,
-                                                                                   &SurfaceData::Centroid,
-                                                                                   &Vector::z,
-                                                                                   state.dataSurface->Surface,
-                                                                                   &SurfaceData::Area,
-                                                                                   state.dataTranspiredCollector->UTSC(Item).SurfPtrs) /
-                                                                   surfaceArea; // Autodesk:F2C++ Functions handle array subscript usage
+            state.dataTranspiredCollector->UTSC(Item).Centroid.z = areaWeightedCentroidZ / area;
 
             // now handle numbers from input object
             state.dataTranspiredCollector->UTSC(Item).HoleDia = Numbers(1);
@@ -715,7 +705,7 @@ namespace TranspiredCollector {
             // sum areas of HT surface areas
             //            UTSC( Item ).ProjArea = sum( Surface( UTSC( Item ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced
             // by  below
-            state.dataTranspiredCollector->UTSC(Item).ProjArea = surfaceArea;
+            state.dataTranspiredCollector->UTSC(Item).ProjArea = area;
             if (state.dataTranspiredCollector->UTSC(Item).ProjArea == 0) {
                 ShowSevereError(state,
                                 format("Gross area of underlying surfaces is zero in {} ={}",
@@ -980,10 +970,11 @@ namespace TranspiredCollector {
         // inits for each iteration
         //        UTSC( UTSCNum ).InletMDot = sum( Node( UTSC( UTSCNum ).InletNode ).MassFlowRate ); //Autodesk:F2C++ Array subscript usage:
         // Replaced by below
-        state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot =
-            sum_sub(state.dataLoopNodes->Node,
-                    &DataLoopNode::NodeData::MassFlowRate,
-                    state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
+        state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot = 0.0;
+        for (int inletNode : state.dataTranspiredCollector->UTSC(UTSCNum).InletNode) {
+            state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot += state.dataLoopNodes->Node(inletNode).MassFlowRate;
+        }
+
         state.dataTranspiredCollector->UTSC(UTSCNum).IsOn = false;           // intialize then turn on if appropriate
         state.dataTranspiredCollector->UTSC(UTSCNum).Tplen = state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast;
         state.dataTranspiredCollector->UTSC(UTSCNum).Tcoll = state.dataTranspiredCollector->UTSC(UTSCNum).TcollLast;
@@ -1046,7 +1037,7 @@ namespace TranspiredCollector {
         Real64 QdotSource;                    // energy flux for source/sink inside collector surface (for hybrid PV UTSC)
         int ThisSurf;                         // do loop counter
         int NumSurfs;                         // number of underlying HT surfaces associated with UTSC
-        Material::SurfaceRoughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
+        Material::Roughness Roughness; // parameters for surface roughness, defined in DataHeatBalance
         Real64 SolAbs;                        // solar absorptivity of collector
         Real64 AbsExt;                        // thermal emmittance of collector
         Real64 TempExt;                       // collector temperature
@@ -1225,20 +1216,14 @@ namespace TranspiredCollector {
         HrPlen = sum(HPlenARR * Area) / AreaSum;
         HPlenARR.deallocate();
 
-        //        Isc = sum( SurfQRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
-        ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident,
-                              state.dataSurface->Surface,
-                              &SurfaceData::Area,
-                              state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-              AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
-        //        Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
-        // subscript usage: Replaced by below
-        Tso = sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1),
-                              state.dataSurface->Surface,
-                              &SurfaceData::Area,
-                              state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) /
-              AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
+        Real64 areaWeightedIsc = 0.0, areaWeightedTso = 0.0;
+        for (int surfNum : state.dataTranspiredCollector->UTSC(UTSCNum).SurfPtrs) {
+            areaWeightedIsc += state.dataHeatBal->SurfQRadSWOutIncident(surfNum) * state.dataSurface->Surface(surfNum).Area;
+            areaWeightedTso += state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) * state.dataSurface->Surface(surfNum).Area;
+        }
+
+        Isc = areaWeightedIsc / AreaSum; 
+        Tso = areaWeightedTso / AreaSum;
 
         if (Vwind > 5.0) {
             HcWind = 5.62 + 3.9 * (Vwind - 5.0); // McAdams forced convection correlation
@@ -1692,7 +1677,7 @@ namespace TranspiredCollector {
                                       Real64 const Tilt,             // Tilt of gap [Degrees]
                                       Real64 const AspRat,           // aspect ratio of gap  Height/gap [--]
                                       Real64 const GapThick,         // Thickness of air space between baffle and underlying heat transfer surface
-                                      Material::SurfaceRoughness const Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                                      Material::Roughness const roughness, // Roughness index (1-6), see DataHeatBalance parameters
                                       Real64 const QdotSource,                    // Source/sink term, e.g. electricity exported from solar cell [W]
                                       Real64 &TsBaffle,                           // Temperature of baffle (both sides) use lagged value on input [C]
                                       Real64 &TaGap, // Temperature of air gap (assumed mixed) use lagged value on input [C]
@@ -1794,7 +1779,7 @@ namespace TranspiredCollector {
             Convect::InitExtConvCoeff(state,
                                       SurfPtr,
                                       HMovInsul,
-                                      Roughness,
+                                      roughness,
                                       AbsExt,
                                       TmpTsBaf,
                                       HExtARR(ThisSurf),
@@ -1862,12 +1847,15 @@ namespace TranspiredCollector {
         if (state.dataEnvrn->IsRain) HExt = 1000.0;
 
         // temperature of underlying surface, area-weighted average
-        Real64 Tso =
-            sum_product_sub(state.dataHeatBalSurf->SurfOutsideTempHist(1), state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) /
-            A;
-        // Incoming combined solar radiation, area-weighted average
-        Real64 Isc =
-            sum_product_sub(state.dataHeatBal->SurfQRadSWOutIncident, state.dataSurface->Surface, &DataSurfaces::SurfaceData::Area, SurfPtrARR) / A;
+        Real64 areaWeightedTso = 0.0, areaWeightedIsc = 0.0;
+        for (int surfNum : SurfPtrARR) {
+            areaWeightedTso += state.dataHeatBalSurf->SurfOutsideTempHist(1)(surfNum) * state.dataSurface->Surface(surfNum).Area;
+            areaWeightedIsc += state.dataHeatBal->SurfQRadSWOutIncident(surfNum) * state.dataSurface->Surface(surfNum).Area;
+        }
+
+        Real64 Tso = areaWeightedTso / A;
+        Real64 Isc = areaWeightedIsc / A;
+
         // average of surface temps , for Beta in Grashoff no.
         Real64 TmeanK = 0.5 * (TmpTsBaf + Tso) + Constant::Kelvin;
         // Grasshof number for natural convection calc

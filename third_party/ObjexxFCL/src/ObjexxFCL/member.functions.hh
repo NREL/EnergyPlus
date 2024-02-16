@@ -62,6 +62,7 @@ sum( Array1S< Element > const & a, Member Element::* pmem )
 	return s;
 }
 
+#ifdef GET_OUT       
 // Sum of Members of an Array at Subscripts
 template< class Array, typename Member, class SubArray >
 inline
@@ -116,7 +117,8 @@ sum_product_sub( Array1 const & a, OuterMember Array1::value_type::* pmemo, Memb
 	}
 	return s;
 }
-
+#endif // GET_OUT
+        
 // Array of Array Members at Subscripts
 template< class Array, typename Member, class SubArray >
 inline

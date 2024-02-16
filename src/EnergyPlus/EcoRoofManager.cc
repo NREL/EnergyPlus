@@ -124,7 +124,7 @@ namespace EcoRoofManager {
         Real64 constexpr Cpa(1005.6);       // Specific heat of Water Vapor. (J/Kg.K)
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Material::SurfaceRoughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
+        Material::Roughness RoughSurf; // Roughness index of the exterior (ecoroof) surface.
         Real64 Tgk;                           // Ground temperature in Kelvin
         Real64 Ta;                            // current air temperature
         Real64 Waf;                           // Windspeed within canopy (m/s)
@@ -194,7 +194,7 @@ namespace EcoRoofManager {
         auto const &thisConstruct = state.dataConstruction->Construct(ConstrNum);
         auto const *thisMaterial = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(thisConstruct.LayerPoint(1)));
         assert(thisMaterial != nullptr);
-        RoughSurf = thisMaterial->Roughness;
+        RoughSurf = thisMaterial->roughness;
         Real64 AbsThermSurf = thisMaterial->AbsorpThermal; // Thermal absoptance of the exterior surface
         Real64 HMovInsul = 0.0;                            // "Convection" coefficient of movable insulation
 
@@ -390,7 +390,7 @@ namespace EcoRoofManager {
             }
 
             // "VeryRough, Rough, MediumRough, MediumSmooth, Smooth, VerySmooth"
-            std::array<Real64, static_cast<int>(Material::SurfaceRoughness::Num)> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
+            std::array<Real64, (int)Material::Roughness::Num> zogLookup = {0.005, 0.0030, 0.0020, 0.0015, 0.0010, 0.0008};
             state.dataEcoRoofMgr->Zog = zogLookup[static_cast<int>(RoughSurf)];
 
             Chng = pow_2(Kv / std::log(state.dataEcoRoofMgr->Za / state.dataEcoRoofMgr->Zog)) / rch; // bulk transfer coefficient near ground

@@ -657,65 +657,6 @@ void SetSurfaceWindDirAt(EnergyPlusData &state)
     }
 }
 
-std::string cSurfaceClass(SurfaceClass const ClassNo)
-{
-
-    // FUNCTION INFORMATION:
-    //       AUTHOR         Linda Lawrie
-    //       DATE WRITTEN   May 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS FUNCTION:
-    // This function returns a string based on class number.
-
-    // Return value
-    std::string ClassName;
-
-    switch (ClassNo) {
-    case SurfaceClass::Wall: {
-        ClassName = "Wall";
-    } break;
-    case SurfaceClass::Floor: {
-        ClassName = "Floor";
-    } break;
-    case SurfaceClass::Roof: {
-        ClassName = "Roof";
-    } break;
-    case SurfaceClass::Window: {
-        ClassName = "Window";
-    } break;
-    case SurfaceClass::GlassDoor: {
-        ClassName = "Glass Door";
-    } break;
-    case SurfaceClass::Door: {
-        ClassName = "Door";
-    } break;
-    case SurfaceClass::TDD_Dome: {
-        ClassName = "TubularDaylightDome";
-    } break;
-    case SurfaceClass::TDD_Diffuser: {
-        ClassName = "TubularDaylightDiffuser";
-    } break;
-    case SurfaceClass::IntMass: {
-        ClassName = "Internal Mass";
-    } break;
-    case SurfaceClass::Shading: {
-        ClassName = "Shading";
-    } break;
-    case SurfaceClass::Detached_B: {
-        ClassName = "Detached Shading:Building";
-    } break;
-    case SurfaceClass::Detached_F: {
-        ClassName = "Detached Shading:Fixed";
-    } break;
-    default: {
-        ClassName = "Invalid/Unknown";
-    } break;
-    }
-
-    return ClassName;
-}
 Real64 AbsFrontSide(EnergyPlusData &state, int SurfNum)
 {
     Real64 AbsorptanceFromExteriorFrontSide =

@@ -116,6 +116,7 @@ namespace DataZoneEnergyDemands {
         void reportSensibleLoadsZoneMultiplier(
             EnergyPlusData &state, int zoneNum, Real64 totalLoad, Real64 loadToHeatingSetPoint, Real64 loadToCoolingSetPoint);
     };
+        
     struct ZoneSystemMoistureDemand : ZoneSystemDemandData // Humidification/dehumidification loads to be met (kg water per second)
     {
         Real64 OutputRequiredToHumidifyingSP = 0.0; // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s] (multiplied)

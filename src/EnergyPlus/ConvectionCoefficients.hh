@@ -228,7 +228,7 @@ namespace Convect {
     void InitExtConvCoeff(EnergyPlusData &state,
                           int SurfNum,                          // Surface number (in Surface derived type)
                           Real64 HMovInsul,                     // Equivalent convection coefficient of movable insulation
-                          Material::SurfaceRoughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
+                          Material::Roughness Roughness, // Roughness index (1-6), see DataHeatBalance parameters
                           Real64 AbsExt,                        // Exterior thermal absorptance
                           Real64 TempExt,                       // Exterior surface temperature (C)
                           Real64 &HExt,                         // Convection coefficient to exterior air
@@ -249,7 +249,7 @@ namespace Convect {
                                  Real64 Perimeter,                     // Surface perimeter length {m}
                                  Real64 CosTilt,                       // Cosine of the Surface Tilt Angle
                                  Real64 Azimuth,                       // Facing angle (degrees) of the surface outward normal
-                                 Material::SurfaceRoughness Roughness, // Surface roughness index
+                                 Material::Roughness roughness, // Surface roughness index
                                  Real64 WindDirection                  // Wind (compass) direction (degrees)
     );
 
@@ -265,7 +265,7 @@ namespace Convect {
     void ApplyIntConvValueMulti(EnergyPlusData &state, DataSurfaces::SurfaceFilter surfaceFilter, HcInt model, int userNum);
     void ApplyExtConvValueMulti(EnergyPlusData &state, DataSurfaces::SurfaceFilter surfaceFilter, HcExt model, int userNum);
 
-    Real64 CalcASHRAESimpExtConvCoeff(Material::SurfaceRoughness Roughness, // Integer index for roughness, relates to parameter array indices
+    Real64 CalcASHRAESimpExtConvCoeff(Material::Roughness Roughness, // Integer index for roughness, relates to parameter array indices
                                       Real64 SurfWindSpeed                  // Current wind speed, m/s
     );
 
@@ -666,15 +666,13 @@ namespace Convect {
                                                       int ZoneNum                // for messages
     );
 
-    Real64 CalcSparrowWindward(Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowWindward(Material::Roughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowWindward(
-        EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowWindward(EnergyPlusData &state, Material::Roughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
-    Real64 CalcSparrowLeeward(Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
+    Real64 CalcSparrowLeeward(Material::Roughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowLeeward(
-        EnergyPlusData &state, Material::SurfaceRoughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowLeeward(EnergyPlusData &state, Material::Roughness roughness, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
@@ -686,11 +684,11 @@ namespace Convect {
 
     Real64 CalcMoWITTLeeward(Real64 DeltaTemp, Real64 WindAtZ);
 
-    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, Material::SurfaceRoughness roughness);
+    Real64 CalcDOE2Forced(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 HfSmooth, Material::Roughness roughness);
 
-    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::SurfaceRoughness roughness);
+    Real64 CalcDOE2Windward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::Roughness roughness);
 
-    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::SurfaceRoughness roughness);
+    Real64 CalcDOE2Leeward(Real64 SurfaceTemp, Real64 AirTemp, Real64 CosineTilt, Real64 WindAtZ, Material::Roughness roughness);
 
     Real64 CalcNusseltJurges(Real64 WindAtZ);
 
@@ -722,7 +720,7 @@ namespace Convect {
                          Real64 WindDirect, // Wind direction measured clockwise from geographic North
                          Real64 RoofArea,
                          Real64 RoofPerimeter,
-                         Material::SurfaceRoughness roughness);
+                         Material::Roughness roughness);
 
     Real64 CalcClearRoof(EnergyPlusData &state,
                          int SurfNum,

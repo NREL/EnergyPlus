@@ -163,7 +163,7 @@ namespace Material {
 
     // Parameters to indicate surface roughness for use with the Material
     // derived type:
-    enum class SurfaceRoughness
+    enum class Roughness
     {
         Invalid = -1,
         VeryRough,
@@ -175,10 +175,10 @@ namespace Material {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> SurfaceRoughnessUC{
-        "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
+    constexpr std::array<std::string_view, (int)Roughness::Num> roughnessNamesUC = {
+       "VERYROUGH", "ROUGH", "MEDIUMROUGH", "MEDIUMSMOOTH", "SMOOTH", "VERYSMOOTH"};
 
-    extern const std::array<std::string_view, static_cast<int>(SurfaceRoughness::Num)> RoughnessNames;
+    extern const std::array<std::string_view, (int)Roughness::Num> roughnessNames;
 
     struct MaterialBase
     {
@@ -189,7 +189,7 @@ namespace Material {
         // active: RegularMaterial, Shade, Air, WindowGlass,
         // WindowGas, WindowBlind, WindowGasMixture, Screen, EcoRoof,
         // IRTMaterial, WindowSimpleGlazing, ComplexWindowShade, ComplexWindowGap)
-        SurfaceRoughness Roughness = SurfaceRoughness::Invalid; // Surface roughness index (See Surface Roughness parameters
+        Roughness roughness = Roughness::Invalid; // Surface roughness index (See Surface Roughness parameters
         // above.  Current: VerySmooth, Smooth, MediumSmooth,
         // MediumRough, Rough, VeryRough)
         // Thermo-physical material properties

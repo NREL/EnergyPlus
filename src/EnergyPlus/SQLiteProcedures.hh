@@ -569,7 +569,7 @@ private:
                  int const materialNumber,
                  EnergyPlus::Material::MaterialChild const *materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData->Name), group(materialData->group),
-              roughness(materialData->Roughness), conductivity(materialData->Conductivity), density(materialData->Density),
+              roughness(materialData->roughness), conductivity(materialData->Conductivity), density(materialData->Density),
               isoMoistCap(materialData->IsoMoistCap), porosity(materialData->Porosity), resistance(materialData->Resistance),
               rOnly(materialData->ROnly), specHeat(materialData->SpecHeat), thermGradCoef(materialData->ThermGradCoef),
               thickness(materialData->Thickness), vaporDiffus(materialData->VaporDiffus)
@@ -582,7 +582,7 @@ private:
         int const number;
         std::string const &name;
         EnergyPlus::Material::Group const &group;
-        EnergyPlus::Material::SurfaceRoughness const &roughness;
+        EnergyPlus::Material::Roughness const &roughness;
         double const &conductivity;
         double const &density;
         double const &isoMoistCap;
@@ -633,7 +633,7 @@ private:
         double const &outsideAbsorpSolar;
         double const &insideAbsorpThermal;
         double const &outsideAbsorpThermal;
-        EnergyPlus::Material::SurfaceRoughness const &outsideRoughness;
+        EnergyPlus::Material::Roughness const &outsideRoughness;
         bool const &typeIsWindow;
         double const &uValue;
 

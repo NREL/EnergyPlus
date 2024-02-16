@@ -606,7 +606,7 @@ TEST_F(ConvectionCoefficientsFixture, initExtConvCoeffAdjRatio)
     EXPECT_FALSE(ErrorsFound);
 
     Real64 HMovInsul = 1.0;
-    Material::SurfaceRoughness RoughSurf = Material::SurfaceRoughness::VerySmooth;
+    Material::Roughness RoughSurf = Material::Roughness::VerySmooth;
     Real64 AbsThermSurf = 0.84;
     Real64 TempExt = -20.0;
     Real64 HExt;
@@ -3774,7 +3774,7 @@ TEST_F(ConvectionCoefficientsFixture, RoofExtConvectionCoefficient)
     state->dataMaterial->Material.push_back(mat);
     auto *thisMaterial_1 = dynamic_cast<Material::MaterialChild *>(state->dataMaterial->Material(1));
     thisMaterial_1->AbsorpThermalFront = 0.1;
-    thisMaterial_1->Roughness = Material::SurfaceRoughness::Rough;
+    thisMaterial_1->roughness = Material::Roughness::Rough;
     thisMaterial_1->Name = "Roof_Material";
     thisMaterial_1->group = Material::Group::Regular;
 

@@ -699,7 +699,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
         thisConstruct.OutsideAbsorpThermal = thisMaterialOutside->AbsorpThermal;
     }
 
-    thisConstruct.OutsideRoughness = thisMaterialOutside->Roughness;
+    thisConstruct.OutsideRoughness = thisMaterialOutside->roughness;
 
     if (thisMaterialOutside->group == Material::Group::Air) {
         ShowSevereError(state, format("CheckAndSetConstructionProperties: Outside Layer is Air for construction {}", thisConstruct.Name));

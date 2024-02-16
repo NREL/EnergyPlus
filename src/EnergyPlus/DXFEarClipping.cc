@@ -233,14 +233,14 @@ namespace DXFEarClipping {
             if (!any_gt(ears, 0)) {
                 ShowWarningError(state,
                                  format("DXFOut: Could not triangulate surface=\"{}\", type=\"{}\", check surface vertex order(entry)",
-                                        surfname,
-                                        DataSurfaces::cSurfaceClass(surfclass)));
+                                        surfname, 
+                                        DataSurfaces::surfaceClassStrings[(int)surfclass]));
                 ++state.dataDXFEarClipping->errcount;
                 if (state.dataDXFEarClipping->errcount == 1 && !state.dataGlobal->DisplayExtraWarnings) {
                     ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowMessage(state, format(" surface={} class={}", surfname, DataSurfaces::cSurfaceClass(surfclass)));
+                        ShowMessage(state, format(" surface={} class={}", surfname, DataSurfaces::surfaceClassStrings[(int)surfclass]));
 
                     for (int j = 1; j <= nsides; ++j) {
                         ShowMessage(state, format(" side={} ({:.1R},{:.1R},{:.1R})", j, polygon(j).x, polygon(j).y, polygon(j).z));

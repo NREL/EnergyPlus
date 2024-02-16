@@ -466,7 +466,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> Zpsv;
 
     bool GetSurfaceDataOneTimeFlag = false;
-    std::unordered_map<std::string, std::string> UniqueSurfaceNames;
+    std::map<std::string, int> surfaceMap;
     bool firstTime = true;
     bool noTransform = true;
     bool CheckConvexityFirstTime = true;
@@ -517,7 +517,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
         Warning3Count = 0;
         SurfaceTmp.deallocate();
         GetSurfaceDataOneTimeFlag = false;
-        UniqueSurfaceNames.clear();
+        surfaceMap.clear();
         kivaManager = HeatBalanceKivaManager::KivaManager();
         firstTime = true;
         noTransform = true;

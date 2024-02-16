@@ -156,7 +156,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 constexpr Tilt(0.283);    // Tilt of gap [Degrees]
     Real64 constexpr AspRat(0.9);    // aspect ratio of gap  Height/gap [--]
     Real64 constexpr GapThick(0.05); // Thickness of air space between baffle and underlying heat transfer surface
-    Material::SurfaceRoughness Roughness(Material::SurfaceRoughness::VeryRough); // Roughness index (1-6), see DataHeatBalance parameters
+    Material::Roughness roughness(Material::Roughness::VeryRough); // Roughness index (1-6), see DataHeatBalance parameters
     Real64 QdotSource(0.0);                                                      // Source/sink term, e.g. electricity exported from solar cell [W]
     Real64 TsBaffle(20.0);                                                       // Temperature of baffle (both sides) use lagged value on input [C]
     Real64 TaGap(22.0); // Temperature of air gap (assumed mixed) use lagged value on input [C]
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
                                                       Tilt,
                                                       AspRat,
                                                       GapThick,
-                                                      Roughness,
+                                                      roughness,
                                                       QdotSource,
                                                       TsBaffle,
                                                       TaGap,

@@ -89,7 +89,7 @@ namespace Construction {
         Real64 InsideAbsorpThermal = 0.0; // Inside Layer Thermal absorptance for opaque surfaces or windows;
         // for windows, applies to innermost glass layer
         Real64 OutsideAbsorpThermal = 0.0;                                                 // Outside Layer Thermal absorptance
-        Material::SurfaceRoughness OutsideRoughness = Material::SurfaceRoughness::Invalid; // Outside Surface roughness index
+        Material::Roughness OutsideRoughness = Material::Roughness::Invalid; // Outside Surface roughness index
         int DayltPropPtr = 0;                                                              // Pointer to Daylight Construction Properties
         int W5FrameDivider = 0; // FrameDivider number for window construction from Window5 data file;
         //  zero is construction not from Window5 file or Window5 construction has no frame.
