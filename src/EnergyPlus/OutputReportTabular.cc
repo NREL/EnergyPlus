@@ -17551,12 +17551,12 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
             s += "&lt;";
         } else if (c == '>') {
             s += "&gt;";
-        } else if (c == char(176)) {
+        } else if (c == char(176) && !isXML) {
             s += "&deg;";
-        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(164)) { // ≤
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(164) && !isXML) { // ≤
             s += "&le;";
             index += 2;
-        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(165)) { // ≥
+        } else if (c == char(226) && char(inString[index]) == char(137) && char(inString[index + 1]) == char(165) && !isXML) { // ≥
             s += "&ge;";
             index += 2;
         } else if (c == '\xC2') {
@@ -17564,14 +17564,14 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
                 s += '\xC2';
             } else {
                 c = inString[index++];
-                if (c == '\xB0') {
+                if (c == '\xB0' && !isXML) {
                     s += "&deg;";
                 } else {
                     s += '\xC2';
                     s += c;
                 }
             }
-        } else if (c == '\xB0') {
+        } else if (c == '\xB0' && !isXML) {
             s += "&deg;";
         } else if (c == '\\') {
             if (index == inputSize) {
@@ -17593,7 +17593,7 @@ std::string ConvertToEscaped(std::string const &inString, bool isXML) // Input S
                     index += 2;
                 }
                 std::string const unicodeString = ConvertUnicodeToUTF8(codePoint);
-                if (unicodeString == "\xC2\xB0") { // only check for degree at this point
+                if (unicodeString == "\xC2\xB0" && !isXML) { // only check for degree at this point
                     s += "&deg;";
                 } else {
                     s += unicodeString;
