@@ -6970,7 +6970,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_checkVarSpeedCoilCoolCapTest)
     std::string coilName = "DXCoil1";
     Real64 totalCoolingCapacity;
     Real64 highestSpeedCoolingCapacity;
-    Real64 const closeEnough = 0.00001;
+    Real64 constexpr closeEnough = 0.00001;
     Real64 expectedAnswer1;
     Real64 expectedAnswer2;
     std::string error_string;
