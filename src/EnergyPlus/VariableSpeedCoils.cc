@@ -3293,16 +3293,16 @@ namespace VariableSpeedCoils {
     {
         if ((totalCoolCap <= 0.0) && (highestSpeedCoolCap <= 0.0)) {
             // There may be cases where the coil has no cooling but still let the user know that this was input.
-            ShowWarningError(state, format("Variable Speed DX Coil: zero cooling capacity and zero cooling capacity for highest speed"));
+            ShowWarningError(state, "Variable Speed DX Coil: zero cooling capacity and zero cooling capacity for highest speed");
             ShowContinueError(state, format("This occurs for Variable Speed DX Coil {}.", coilName));
-            ShowContinueError(state, format("Ignore this warning if the DX Coil has no cooling capabilities."));
+            ShowContinueError(state, "Ignore this warning if the DX Coil has no cooling capabilities.");
         } else if ((totalCoolCap <= 0.0) && (highestSpeedCoolCap > 0.0)) {
             // totalCoolCap is zero which will cause a problem (divide by zero), reassign to highest speed capacity from user input
             // This was the case that caused an issue (divide by zero and infinite loop)
             totalCoolCap = highestSpeedCoolCap;
-            ShowWarningError(state, format("Variable Speed DX Coil: zero cooling capacity with a non-zero cooling capacity for highest speed"));
+            ShowWarningError(state, "Variable Speed DX Coil: zero cooling capacity with a non-zero cooling capacity for highest speed");
             ShowContinueError(state, format("This occurs for Variable Speed DX Coil {}.", coilName));
-            ShowContinueError(state, format("The cooling capacity was reset to the highest speed cooling capacity."));
+            ShowContinueError(state, "The cooling capacity was reset to the highest speed cooling capacity.");
         } // otherwise totalCoolCap is non-zero-->OK
     }
 
