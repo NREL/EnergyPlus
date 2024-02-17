@@ -13980,20 +13980,14 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleOutOfRange)
     // EXPECT_THROW(GetSurfaceData(*state, ErrorsFound), std::runtime_error);
     EXPECT_TRUE(ErrorsFound);
     std::string const error_string = delimited_string(
-        {"   ** Severe  ** Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", values not in "
-         "range [0,1].",
-         "   ** Severe  ** Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", "
+        {"   ** Severe  ** Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", "
          "has schedule values < 0.",
          "   **   ~~~   ** ...Schedule values < 0 have no meaning for shading elements.",
          "   ** Severe  ** "
          "Shading:Building:Detailed=\"BUILDINGSHADE:TILTEDSHADESURFACE\", Transmittance Schedule Name=\"OUTOFRANGE\", has schedule values > 1.",
          "   **   ~~~   ** ...Schedule values > 1 have no meaning for shading elements.",
-         "   ** Severe  ** "
-         "Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Transmittance Schedule Name=\"OUTOFRANGE\", values not in range [0,1].",
-         "   ** "
-         "Severe  ** Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule values < 0.",
-         "   **  "
-         " ~~~   ** ...Schedule values < 0 have no meaning for shading elements.",
+         "   ** Severe  ** Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule values < 0.",
+         "   **   ~~~   ** ...Schedule values < 0 have no meaning for shading elements.",
          "   ** Severe  ** "
          "Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule values > 1.",
          "   **   ~~~   ** "
@@ -14001,7 +13995,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_ShadingSurfaceScheduleOutOfRange)
          "   **  Fatal  ** GetSurfaceData: Errors discovered, program terminates.",
          "   "
          "...Summary of Errors that led to program termination:",
-         "   ..... Reference severe error count=6",
+         "   ..... Reference severe error count=4",
          "   ..... Last severe error=Shading:Zone:Detailed=\"ZONESHADE:LIVING:SOUTH:SHADE001\", Base Surface Name=\"LIVING:SOUTH\", has schedule "
          "values > 1."});
 

@@ -432,7 +432,7 @@ void KivaInstanceMap::setBoundaryConditions(EnergyPlusData &state)
 
 KivaManager::Settings::Settings()
     : soilK(0.864), soilRho(1510), soilCp(1260), groundSolarAbs(0.9), groundThermalAbs(0.9), groundRoughness(0.9), farFieldWidth(40.0),
-      deepGroundBoundary(AUTO), deepGroundDepth(40.0), autocalculateDeepGroundDepth(true), minCellDim(0.02), maxGrowthCoeff(1.5), timestepType(HOURLY)
+      deepGroundBoundary(DGType::AUTO), deepGroundDepth(40.0), autocalculateDeepGroundDepth(true), minCellDim(0.02), maxGrowthCoeff(1.5), timestepType(TSType::HOURLY)
 {
 }
 
@@ -1120,7 +1120,7 @@ Real64 KivaManager::getDeepGroundDepth(Kiva::Foundation fnd)
         if (block.depth == 0.0) {
             block.depth = fnd.foundationDepth;
         }
-        if (settings.deepGroundBoundary == Settings::AUTO) {
+        if (settings.deepGroundBoundary == DGType::AUTO) {
             // Ensure automatically set deep ground depth is at least 1 meter below lowest block
             if (block.z + block.depth + 1.0 > fnd.deepGroundDepth) {
                 fnd.deepGroundDepth = block.z + block.depth + 1.0;
@@ -1193,7 +1193,7 @@ void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
 
     Real64 waterTableDepth = 0.1022 * state.dataEnvrn->Elevation;
 
-    if (settings.deepGroundBoundary == Settings::AUTO) {
+    if (settings.deepGroundBoundary == DGType::AUTO) {
         if (waterTableDepth <= 40.) {
             defFnd.deepGroundDepth = waterTableDepth;
             defFnd.deepGroundBoundary = Kiva::Foundation::DGB_FIXED_TEMPERATURE;
@@ -1208,7 +1208,7 @@ void KivaManager::defineDefaultFoundation(EnergyPlusData &state)
                 ShowContinueError(state, format("will be overridden with the Autoselected depth ({:.1R} m)", defFnd.deepGroundDepth));
             }
         }
-    } else if (settings.deepGroundBoundary == Settings::ZERO_FLUX) {
+    } else if (settings.deepGroundBoundary == DGType::ZERO_FLUX) {
         defFnd.deepGroundDepth = settings.deepGroundDepth;
         defFnd.deepGroundBoundary = Kiva::Foundation::DGB_ZERO_FLUX;
     } else { // if (settings.deepGroundBoundary == Settings::GROUNDWATER)

@@ -91,6 +91,28 @@ namespace Material {
         Num
     };
 
+    static constexpr std::array<std::string_view, (int)Group::Num> groupNames = {
+        "Material/Material:NoMass",
+        "Material:AirGap",
+        "WindowMaterial:Shade",
+        "WindowMaterial:Glazing*",
+        "WindowMaterial:Gas",
+        "WindowMaterial:Blind",
+        "WindowMaterial:GasMixture",
+        "WindowMaterial:Screen",
+        "Material:RoofVegetation",
+        "Material:InfraredTransparent",
+        "WindowMaterial:SimpleGlazingSystem",
+        "WindowMaterial:ComplexShade",
+        "WindowMaterial:Gap",
+        "WindowMaterial:Glazing:EquivalentLayer",
+        "WindowMaterial:Shade:EquivalentLayer",
+        "WindowMaterial:Drape:EquivalentLayer",
+        "WindowMaterial:Blind:EquivalentLayer",
+        "WindowMaterial:Screen:EquivalentLayer",
+        "WindowMaterial:Gap:EquivalentLayer"
+    };
+
     enum class GasType
     {
         Invalid = -1,

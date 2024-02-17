@@ -72,7 +72,6 @@ namespace SurfaceGeometry {
     // Using/Aliasing
     using DataSurfaces::SurfaceClass;
     using DataSurfaces::SurfaceData;
-    using DataVectorTypes::Vector;
 
     enum enclosureType
     {
@@ -317,32 +316,29 @@ namespace SurfaceGeometry {
     struct EdgeOfSurf
     {
         int surfNum = 0;
-        Vector start;
-        Vector end;
+        Vector3<Real64> start = Vector3<Real64>(0.,0.,0.);
+        Vector3<Real64> end = Vector3<Real64>(0.,0.,0.);
         std::vector<int> otherSurfNums;
         int count = 0;
-        EdgeOfSurf() : start(Vector(0., 0., 0.)), end(Vector(0., 0., 0.))
-        {
-        }
 
         bool operator==(const EdgeOfSurf &other) const;
         bool operator!=(const EdgeOfSurf &other) const;
-        bool containsPoints(const Vector &vertex) const;
+        bool containsPoints(const Vector3<Real64> &vertex) const;
         double length() const;
     };
 
     bool isEnclosedVolume(DataVectorTypes::Polyhedron const &zonePoly, std::vector<EdgeOfSurf> &edgeNot2);
 
-    std::vector<EdgeOfSurf> edgesInBoth(std::vector<EdgeOfSurf> edges1, std::vector<EdgeOfSurf> edges2);
+    std::vector<EdgeOfSurf> edgesInBoth(std::vector<EdgeOfSurf> const &edges1, std::vector<EdgeOfSurf> const &edges2);
 
-    bool edgesEqualOnSameSurface(EdgeOfSurf a, EdgeOfSurf b);
+    bool edgesEqualOnSameSurface(EdgeOfSurf const &a, EdgeOfSurf const &b);
 
-    std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector> const &uniqueVertices);
+    std::vector<EdgeOfSurf> edgesNotTwoForEnclosedVolumeTest(DataVectorTypes::Polyhedron const &zonePoly, std::vector<Vector3<Real64>> const &uniqueVertices);
 
-    std::vector<Vector> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly);
+    std::vector<Vector3<Real64>> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly);
 
     DataVectorTypes::Polyhedron updateZonePolygonsForMissingColinearPoints(DataVectorTypes::Polyhedron const &zonePoly,
-                                                                           std::vector<Vector> const &uniqVertices);
+                                                                           std::vector<Vector3<Real64>> const &uniqVertices);
 
     bool areFloorAndCeilingSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly);
 
@@ -361,23 +357,21 @@ namespace SurfaceGeometry {
 
     bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int faceIndex, int opFaceIndex, Real64 &distanceBetween);
 
-    bool isAlmostEqual3dPt(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+    bool isAlmostEqual3dPt(Vector3<Real64> const &v1, Vector3<Real64> const &v2);
 
-    bool isAlmostEqual2dPt(DataVectorTypes::Vector_2d v1, DataVectorTypes::Vector_2d v2);
+    bool isAlmostEqual2dPt(Vector2<Real64> const &v1, Vector2<Real64> const &v2);
 
-    int findIndexOfVertex(DataVectorTypes::Vector vertexToFind, std::vector<DataVectorTypes::Vector> listOfVertices);
+    int findIndexOfVertex(Vector3<Real64> const &vertexToFind, std::vector<Vector3<Real64>> const &listOfVertices);
 
-    Real64 distance(DataVectorTypes::Vector v1, DataVectorTypes::Vector v2);
+    Real64 distanceFromPointToLine(Vector3<Real64> const &start, Vector3<Real64> const &end, Vector3<Real64> const &test);
 
-    Real64 distanceFromPointToLine(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
-
-    bool isPointOnLineBetweenPoints(DataVectorTypes::Vector start, DataVectorTypes::Vector end, DataVectorTypes::Vector test);
+    bool isPointOnLineBetweenPoints(Vector3<Real64> const &start, Vector3<Real64> const &end, Vector3<Real64> const &test);
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound);
 
     void CalcCoordinateTransformation(EnergyPlusData &state,
                                       int const SurfNum,            // Surface Number
-                                      Vector &CompCoordTranslVector // Coordinate Translation Vector
+                                      Vector3<Real64> &CompCoordTranslVector // Coordinate Translation Vector
     );
 
     void CreateShadedWindowConstruction(EnergyPlusData &state,
@@ -393,7 +387,7 @@ namespace SurfaceGeometry {
     int createAirMaterialFromDistance(EnergyPlusData &state, Real64 distance, std::string_view namePrefix); // return new material number
 
     // create a new construction with storm based on an old construction and storm and gap materials
-    int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string name, int stormMaterial, int gapMaterial);
+    int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string const &name, int stormMaterial, int gapMaterial);
 
     void ModifyWindow(EnergyPlusData &state,
                       int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
@@ -461,9 +455,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
 
     bool ProcessSurfaceVerticesOneTimeFlag = true;
     int checkSubSurfAzTiltNormErrCount = 0;
-    Array1D<Real64> Xpsv;
-    Array1D<Real64> Ypsv;
-    Array1D<Real64> Zpsv;
+    Array1D<Vector3<Real64>> psv;
 
     bool GetSurfaceDataOneTimeFlag = false;
     std::map<std::string, int> surfaceMap;
@@ -499,9 +491,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     {
         ProcessSurfaceVerticesOneTimeFlag = true;
         checkSubSurfAzTiltNormErrCount = 0;
-        Xpsv.deallocate();
-        Ypsv.deallocate();
-        Zpsv.deallocate();
+        psv.deallocate();
         // Following are used only during getting vertices, so are module variables here.
         CosBldgRelNorth = 0.0;
         SinBldgRelNorth = 0.0;

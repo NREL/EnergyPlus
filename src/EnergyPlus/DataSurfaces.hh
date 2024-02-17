@@ -817,6 +817,7 @@ namespace DataSurfaces {
         int SchedShadowSurfIndex; // Schedule for a shadowing (sub)surface
         bool IsTransparent;       // True if the schedule values are always 1.0 (or the minimum is 1.0)
         Real64 SchedMinValue;     // Schedule minimum value.
+        Real64 SchedMaxValue;
 
         // Window Parameters (when surface is Window)
         int activeWindowShadingControl;            // Active window shading control (windows only)

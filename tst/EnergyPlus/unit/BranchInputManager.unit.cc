@@ -129,15 +129,13 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
                                                                       lAlphaBlanks,
                                                                       cAlphaFields,
                                                                       cNumericFields);
-            IsNotOK = false;
-            IsBlank = false;
-            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
-            if (IsNotOK) {
-                if (IsBlank) {
-                    continue;
-                } else {
-                    Alphas(1) = Alphas(1) + "--dup";
-                }
+
+            if (lAlphaBlanks(1)) {
+                continue;
+            }
+
+            if (Util::FindItemInList(Alphas(1), state->dataBranchInputManager->Branch) > 0) { 
+                Alphas(1) = Alphas(1) + "--dup";
             }
             ++BCount;
 
@@ -294,15 +292,13 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
                                                                       lAlphaBlanks,
                                                                       cAlphaFields,
                                                                       cNumericFields);
-            IsNotOK = false;
-            IsBlank = false;
-            Util::VerifyName(*state, Alphas(1), state->dataBranchInputManager->Branch, BCount, IsNotOK, IsBlank, CurrentModuleObject + " Name");
-            if (IsNotOK) {
-                if (IsBlank) {
-                    continue;
-                } else {
-                    Alphas(1) = Alphas(1) + "--dup";
-                }
+
+            if (lAlphaBlanks(1)) {
+                continue;
+            }
+
+            if (Util::FindItemInList(Alphas(1), state->dataBranchInputManager->Branch) > 0) {
+                Alphas(1) = Alphas(1) + "--dup";
             }
             ++BCount;
 

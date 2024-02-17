@@ -307,85 +307,6 @@ namespace Util {
         return 0; // Not found
     }
 
-    void VerifyName(EnergyPlusData &state,
-                    std::string const &NameToVerify,
-                    Array1D_string const &NamesList,
-                    int const NumOfNames,
-                    bool &ErrorFound,
-                    bool &IsBlank,
-                    std::string const &StringToDisplay)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name can be added to the
-        // list of names for this item (i.e., that there isn't one of that
-        // name already and that this name is not blank).
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Found;
-
-        ErrorFound = false;
-        if (NumOfNames > 0) {
-            Found = FindItem(NameToVerify, NamesList, NumOfNames);
-            if (Found != 0) {
-                ShowSevereError(state, format("{}, duplicate name={}", StringToDisplay, NameToVerify));
-                ErrorFound = true;
-            }
-        }
-
-        if (NameToVerify.empty()) {
-            ShowSevereError(state, format("{}, cannot be blank", StringToDisplay));
-            ErrorFound = true;
-            IsBlank = true;
-        } else {
-            IsBlank = false;
-        }
-    }
-
-    void VerifyName(EnergyPlusData &state,
-                    std::string const &NameToVerify,
-                    Array1S_string const NamesList,
-                    int const NumOfNames,
-                    bool &ErrorFound,
-                    bool &IsBlank,
-                    std::string const &StringToDisplay)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda Lawrie
-        //       DATE WRITTEN   February 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine verifys that a new name can be added to the
-        // list of names for this item (i.e., that there isn't one of that
-        // name already and that this name is not blank).
-
-        ErrorFound = false;
-        if (NumOfNames > 0) {
-            int Found = FindItem(NameToVerify, NamesList, NumOfNames);
-            if (Found != 0) {
-                ShowSevereError(state, format("{}, duplicate name={}", StringToDisplay, NameToVerify));
-                ErrorFound = true;
-            }
-        }
-
-        if (NameToVerify.empty()) {
-            ShowSevereError(state, format("{}, cannot be blank", StringToDisplay));
-            ErrorFound = true;
-            IsBlank = true;
-        } else {
-            IsBlank = false;
-        }
-    }
-
     bool IsNameEmpty(EnergyPlusData &state, std::string &NameToVerify, std::string_view StringToDisplay, bool &ErrorFound)
     {
         if (NameToVerify.empty()) {
@@ -1685,6 +1606,12 @@ void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh
     ShowContinueError(state, format("{}", msg));
 }
 
+void ShowSevereFieldCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, {}", fieldName, fieldValue, msg));
+}
+        
 void ShowWarningItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal)
 {
     ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
@@ -1731,6 +1658,12 @@ void ShowWarningItemNotFound(
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, item not found, {} will be used.", fieldName, fieldVal, defaultVal));
+}
+
+void ShowWarningFieldCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("{} = {}, {}", fieldName, fieldValue, msg));
 }
 
 } // namespace EnergyPlus

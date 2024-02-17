@@ -218,7 +218,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_SurfaceScheduledSolarInc)
 TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
 {
     unsigned int numSides = 4;
-    Array1D<Vector> Rectangle3d;
+    Array1D<Vector3<Real64>> Rectangle3d;
 
     Rectangle3d.allocate(numSides);
 
@@ -238,13 +238,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_polygon_contains_point)
     Rectangle3d(4).y = 10.;
     Rectangle3d(4).z = 0.;
 
-    Vector PointInside;
+    Vector3<Real64> PointInside;
 
     PointInside.x = 5.;
     PointInside.y = 5.;
     PointInside.z = 0.;
 
-    Vector PointOutside;
+    Vector3<Real64> PointOutside;
 
     PointOutside.x = 20.;
     PointOutside.y = 20.;
@@ -1894,17 +1894,17 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
     int numofsurface;
     numofsurface = 4;
     state->dataSurface->Surface.allocate(numofsurface);
-    Vector VtxA1(0.0, 0.0, 5.0);
-    Vector VtxA2(0.0, 0.0, 0.0);
-    Vector VtxA3(5.0, 0.0, 0.0);
-    Vector VtxA4(5.0, 0.0, 5.0);
+    Vector3<Real64> VtxA1(0.0, 0.0, 5.0);
+    Vector3<Real64> VtxA2(0.0, 0.0, 0.0);
+    Vector3<Real64> VtxA3(5.0, 0.0, 0.0);
+    Vector3<Real64> VtxA4(5.0, 0.0, 5.0);
 
-    Vector VtxB1(0.0, -10.0, 5.0);
-    Vector VtxB2(0.0, -10.0, 2.5);
-    Vector VtxB3(0.0, -5.0, 2.5);
-    Vector VtxB4(0.0, -5.0, 0.0);
-    Vector VtxB5(0.0, 0.0, 0.0);
-    Vector VtxB6(0.0, 0.0, 5.0);
+    Vector3<Real64> VtxB1(0.0, -10.0, 5.0);
+    Vector3<Real64> VtxB2(0.0, -10.0, 2.5);
+    Vector3<Real64> VtxB3(0.0, -5.0, 2.5);
+    Vector3<Real64> VtxB4(0.0, -5.0, 0.0);
+    Vector3<Real64> VtxB5(0.0, 0.0, 0.0);
+    Vector3<Real64> VtxB6(0.0, 0.0, 5.0);
 
     state->dataSurface->Surface(1).Sides = 4;
 
@@ -3472,11 +3472,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
         if (itnext == std::end(transformedVertices)) {
             itnext = std::begin(transformedVertices);
         }
-        perimeter += SurfaceGeometry::distance(*it, *itnext);
+        perimeter += distance(*it, *itnext);
     }
     EXPECT_DOUBLE_EQ(expected_perimeter, perimeter);
 
-    std::vector<Vector> expectedVertices{
+    std::vector<Vector3<Real64>> expectedVertices{
         {+0.0000, +20.0000, +0.0000},
         {+0.0000, +0.0000, +0.0000},
         {+20.0000, +0.0000, +0.0000},

@@ -339,6 +339,8 @@ namespace ScheduleManager {
 
     Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
+    std::pair<Real64, Real64> GetScheduleMinMaxValues(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
+
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
     void ReportScheduleValues(EnergyPlusData &state);

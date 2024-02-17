@@ -7666,14 +7666,14 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
     // Calculate heat extract due to additional heat flux source term as the surface boundary condition
     for (int surfNum : state.dataSurface->allInsideSourceSurfaceList) {
         state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(surfNum) =
-            EnergyPlus::ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->Surface(surfNum).InsideHeatSourceTermSchedule);
+            ScheduleManager::GetCurrentScheduleValue(state, state.dataSurface->Surface(surfNum).InsideHeatSourceTermSchedule);
     }
 
     // Calculate Kiva instances
     if (state.dataHeatBal->AnyKiva) {
-        if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::HOURLY &&
+        if (((state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::TSType::HOURLY &&
               state.dataGlobal->TimeStep == 1) ||
-             state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::KivaManager::Settings::TIMESTEP) &&
+             state.dataSurfaceGeometry->kivaManager.settings.timestepType == HeatBalanceKivaManager::TSType::TIMESTEP) &&
             !state.dataGlobal->WarmupFlag) {
             state.dataSurfaceGeometry->kivaManager.calcKivaInstances(state);
         }

@@ -465,8 +465,6 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     int NumFields;                    // Total number of fields in object
     int IOStatus;                     // Used in GetObjectItem
     bool ErrorsFound(false);          // Set to true if errors in input, fatal at end of routine
-    bool IsNotOK;                     // Flag to verify name
-    bool IsBlank;                     // Flag for blank name
     int UnitLoop;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -504,17 +502,20 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
-            IsNotOK = false;
-            IsBlank = false;
-            Util::VerifyName(state,
-                             Alphas(1),
-                             state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner,
-                             UnitLoop - 1,
-                             IsNotOK,
-                             IsBlank,
-                             cCurrentModuleObject + " Name");
-
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, Alphas(1)};
+
+            if (lAlphaBlanks(1)) {
+                ShowSevereEmptyField(state, eoh, cAlphaFields(1));
+                ErrorsFound = true;
+                continue;
+            }
+
+            if (Util::FindItemInList(Alphas(1), state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner)) {
+                ShowSevereDuplicateName(state, eoh);
+                ErrorsFound = true;
+                continue;
+            }
+
             auto &hybridUnitaryAC = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop);
 
             // A1, \field Name

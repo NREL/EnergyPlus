@@ -70,6 +70,27 @@ namespace HeatBalanceKivaManager {
     constexpr int KIVAZONE_COMFORTCONTROL = 2;
     constexpr int KIVAZONE_STAGEDCONTROL = 3;
 
+    enum class DGType
+    {
+        Invalid = -1,
+        ZERO_FLUX,
+        GROUNDWATER,
+        AUTO,
+        Num
+    };
+
+    static constexpr std::array<std::string_view, (int)DGType::Num> dgTypeNamesUC = {"ZEROFLUX", "GROUNDWATER", "AUTOSELECT"};
+        
+    enum class TSType
+    {
+        Invalid = -1,
+        HOURLY,
+        TIMESTEP,
+        Num
+    };
+
+    static constexpr std::array<std::string_view, (int)TSType::Num> tsTypeNamesUC = {"HOURLY", "TIMESTEP"};
+
     class KivaWeatherData
     {
     public:
@@ -176,24 +197,11 @@ namespace HeatBalanceKivaManager {
             Real64 groundRoughness;
             Real64 farFieldWidth;
 
-            enum DGType
-            {
-                ZERO_FLUX,
-                GROUNDWATER,
-                AUTO
-            };
-
             DGType deepGroundBoundary;
             Real64 deepGroundDepth;
             bool autocalculateDeepGroundDepth;
             Real64 minCellDim;
             Real64 maxGrowthCoeff;
-
-            enum TSType
-            {
-                HOURLY,
-                TIMESTEP
-            };
 
             TSType timestepType;
         };
