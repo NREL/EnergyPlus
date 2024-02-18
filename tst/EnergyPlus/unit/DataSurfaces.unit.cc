@@ -252,8 +252,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         s.Shape = SurfaceShape::Rectangle;
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -261,8 +261,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.0);
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 1, 0), Vector(1, 1, 1), Vector(0, 0, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -270,8 +270,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 1), Vector(0, 1, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -279,8 +279,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0 / s.SinTilt);
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 1, 0), Vector(0, 1, 1), Vector(0, 0, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -288,8 +288,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 1.0);
 
         s.Vertex = {Vector(1, -1, 0), Vector(1, -1, -1), Vector(0, 0, -1), Vector(0, 0, 0)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -306,8 +306,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         s.Shape = SurfaceShape::Triangle;
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 0, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -315,8 +315,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.5);
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 0)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -333,8 +333,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         s.Shape = SurfaceShape::Polygonal;
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(0.5, 0, 1), Vector(0.5, 0, 0.5), Vector(1, 0, 0.5), Vector(1, 0, 0)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -342,8 +342,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
         EXPECT_DOUBLE_EQ(s.get_average_height(*state), 0.75);
 
         s.Vertex = {Vector(0, 0, 0), Vector(0, 0, 1), Vector(1, 0, 1), Vector(1, 0, 0.5), Vector(0.5, 0, 0.5), Vector(0.5, 0, 0)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
         s.SinAzim = std::sin(s.Azimuth * Constant::DegToRadians);
         s.CosAzim = std::cos(s.Azimuth * Constant::DegToRadians);
         s.SinTilt = std::sin(s.Tilt * Constant::DegToRadians);
@@ -417,8 +417,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Azimuth_non_conv)
         s.Shape = SurfaceShape::Polygonal;
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 0, -1), Vector(2, 0, -1), Vector(2, 0, 1), Vector(0, 0, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
 
         EXPECT_DOUBLE_EQ(s.Azimuth, 180.0); // Orignal code without PR 9907 fix would fail this one by getting an s.Azimuth of 0.0
         EXPECT_DOUBLE_EQ(s.Tilt, 90.0);
@@ -439,8 +439,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Azimuth_non_conv)
         s.Shape = SurfaceShape::Polygonal;
 
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, -1), Vector(2, 0, -1), Vector(2, 0, 1), Vector(0, 0, 1)};
-        s.NewellNormVec = Vectors::CreateNewellNormalVector(s.Vertex, s.Vertex.size());
-        std::tie(s.Azimuth, s.Tilt) = Vectors::DetermineAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
+        s.NewellNormVec = Vectors::CalcNewellNormalVector(s.Vertex, s.Vertex.size());
+        std::tie(s.Azimuth, s.Tilt) = Vectors::CalcAzimuthAndTilt(s.Vertex, s.lcsx, s.lcsy, s.lcsz, s.NewellNormVec);
 
         // Orignal code should get the same result in this case
         EXPECT_DOUBLE_EQ(s.Azimuth, 180.0);

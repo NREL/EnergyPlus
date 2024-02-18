@@ -837,9 +837,7 @@ namespace SurfaceGeometry {
         for (auto &e : state.dataSurface->ShadeV)
             e.NVert = 0;
         // Individual components (XV,YV,ZV) allocated in routine ProcessSurfaceVertices
-        state.dataSurface->X0.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->Y0.dimension(state.dataSurface->TotSurfaces, 0.0);
-        state.dataSurface->Z0.dimension(state.dataSurface->TotSurfaces, 0.0);
+        state.dataSurface->T0.dimension(state.dataSurface->TotSurfaces, Vector3<Real64>(0.0, 0.0, 0.0));
 
         // Surface EMS arrays
         state.dataSurface->SurfEMSConstructionOverrideON.allocate(state.dataSurface->TotSurfaces);
@@ -1099,7 +1097,6 @@ namespace SurfaceGeometry {
         int NeedToAddSubSurfaces; // SubSurfaces that will be added due to "unentered" other zone surface
         int CurNewSurf;
         int FirstTotalSurfaces;
-        int NVert;
         int Vert;
         int n;
 
@@ -1121,6 +1118,8 @@ namespace SurfaceGeometry {
 
         // Get the total number of surfaces to allocate derived type and for surface loops
 
+        auto &sg = state.dataSurfaceGeometry;
+        
         if (state.dataSurfaceGeometry->GetSurfaceDataOneTimeFlag) {
             return;
         } else {
@@ -1295,12 +1294,12 @@ namespace SurfaceGeometry {
             // Need to add surface
             ++CurNewSurf;
             // Debug    write(outputfiledebug,*) ' adding surface=',curnewsurf
-            state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
+            sg->SurfaceTmp(CurNewSurf) = sg->SurfaceTmp(SurfNum);
             //  Basic parameters are the same for both surfaces.
             Found = Util::FindItemInList(surf.ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
             if (Found == 0) continue;
 
-            auto &newSurf = state.dataSurfaceGeometry->SurfaceTmp(CurNewSurf);
+            auto &newSurf = sg->SurfaceTmp(CurNewSurf);
             
             newSurf.Zone = Found;
             newSurf.ZoneName = state.dataHeatBal->Zone(Found).Name;
@@ -1308,17 +1307,16 @@ namespace SurfaceGeometry {
             newSurf.Construction = AssignReverseConstructionNumber(state, surf.Construction, SurfError);
             newSurf.ConstructionStoredInputValue = newSurf.Construction;
             // Reverse Vertices
-            NVert = surf.Sides;
-            for (Vert = 1; Vert <= surf.Sides; ++Vert) {
+            for (int Vert = 1; Vert <= surf.Sides; ++Vert) {
                 newSurf.Vertex(Vert) = surf.Vertex(surf.Sides + 1 - Vert);
             }
             if (newSurf.Sides > 2) {
-                newSurf.NewellAreaVec = CreateNewellAreaVector(newSurf.Vertex, newSurf.Sides);
+                newSurf.NewellAreaVec = CalcNewellAreaVector(newSurf.Vertex, newSurf.Sides);
                 newSurf.GrossArea = length(newSurf.NewellAreaVec);
                 newSurf.Area = newSurf.GrossArea;
                 newSurf.NetAreaShadowCalc = newSurf.Area;
-                newSurf.NewellNormVec = CreateNewellNormalVector(newSurf.Vertex, newSurf.Sides);
-                std::tie(newSurf.Azimuth, newSurf.Tilt) = DetermineAzimuthAndTilt(newSurf.Vertex, newSurf.lcsx, newSurf.lcsy, newSurf.lcsz, newSurf.NewellNormVec);
+                newSurf.NewellNormVec = CalcNewellNormalVector(newSurf.Vertex, newSurf.Sides);
+                std::tie(newSurf.Azimuth, newSurf.Tilt) = CalcAzimuthAndTilt(newSurf.Vertex, newSurf.lcsx, newSurf.lcsy, newSurf.lcsz, newSurf.NewellNormVec);
                 newSurf.convOrientation = Convect::GetSurfConvOrientation(newSurf.Tilt);
 
                 // Sine and cosine of azimuth and tilt
@@ -1358,9 +1356,7 @@ namespace SurfaceGeometry {
             surf.ExtBoundCond = UnreconciledZoneSurface;
             newSurf.ExtBoundCondName = surf.Name;
             surf.ExtBoundCondName = newSurf.Name;
-            if (newSurf.Class == SurfaceClass::Roof ||
-                newSurf.Class == SurfaceClass::Wall ||
-                newSurf.Class == SurfaceClass::Floor) {
+            if (newSurf.Class == SurfaceClass::Roof || newSurf.Class == SurfaceClass::Wall || newSurf.Class == SurfaceClass::Floor) {
                 // base surface
                 if (surf.Class == SurfaceClass::Roof) {
                     newSurf.Class = SurfaceClass::Floor;
@@ -1374,33 +1370,29 @@ namespace SurfaceGeometry {
                 // Debug        write(outputfiledebug,*) ' basesurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
             } else {
                 // subsurface
-                Found = Util::FindItemInList("iz-" + surf.BaseSurfName,
-                                             state.dataSurfaceGeometry->SurfaceTmp,
-                                             FirstTotalSurfaces + CurNewSurf - 1);
+                Found = Util::FindItemInList("iz-" + surf.BaseSurfName, state.dataSurfaceGeometry->SurfaceTmp, FirstTotalSurfaces + CurNewSurf - 1);
                 if (Found > 0) {
                     newSurf.BaseSurfName = "iz-" + surf.BaseSurfName;
                     newSurf.BaseSurf = Found;
-                    state.dataSurfaceGeometry->SurfaceTmp(Found).Area -= newSurf.Area;
-                    if (newSurf.Class == SurfaceClass::Window ||
-                        newSurf.Class == SurfaceClass::GlassDoor) {
-                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -= newSurf.Area / newSurf.Multiplier;
+
+                    auto &baseSurf = sg->SurfaceTmp(Found);
+                    baseSurf.Area -= newSurf.Area;
+                    if (newSurf.Class == SurfaceClass::Window || newSurf.Class == SurfaceClass::GlassDoor) {
+                        baseSurf.NetAreaShadowCalc -= newSurf.Area / newSurf.Multiplier;
                     } else { // Door, TDD:Diffuser, TDD:DOME
-                        state.dataSurfaceGeometry->SurfaceTmp(Found).NetAreaShadowCalc -= newSurf.Area;
+                        baseSurf.NetAreaShadowCalc -= newSurf.Area;
                     }
-                    newSurf.ExtBoundCond = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtBoundCond;
-                    newSurf.ExtBoundCondName = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name;
-                    newSurf.ExtSolar = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtSolar;
-                    newSurf.ExtWind = state.dataSurfaceGeometry->SurfaceTmp(Found).ExtWind;
-                    newSurf.Zone = state.dataSurfaceGeometry->SurfaceTmp(Found).Zone;
-                    newSurf.ZoneName = state.dataSurfaceGeometry->SurfaceTmp(Found).ZoneName;
-                    newSurf.OSCPtr = state.dataSurfaceGeometry->SurfaceTmp(Found).OSCPtr;
+                    newSurf.ExtBoundCond = baseSurf.ExtBoundCond;
+                    newSurf.ExtBoundCondName = surf.Name;
+                    newSurf.ExtSolar = baseSurf.ExtSolar;
+                    newSurf.ExtWind = baseSurf.ExtWind;
+                    newSurf.Zone = baseSurf.Zone;
+                    newSurf.ZoneName = baseSurf.ZoneName;
+                    newSurf.OSCPtr = baseSurf.OSCPtr;
                     // Debug        write(outputfiledebug,*) ' subsurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
                     // Debug        write(outputfiledebug,*) ' subsurf, basesurf=',TRIM('iz-'//SurfaceTmp(SurfNum)%BaseSurfName)
                 } else {
-                    ShowSevereError(state,
-                                    format("{}Adding unentered subsurface, could not find base surface=iz-{}",
-                                           RoutineName,
-                                           surf.BaseSurfName));
+                    ShowSevereError(state, format("{}Adding unentered subsurface, could not find base surface=iz-{}", RoutineName, surf.BaseSurfName));
                     SurfError = true;
                 }
             }
@@ -2847,7 +2839,7 @@ namespace SurfaceGeometry {
         surfaceError = false;
 
         // Check if base surface and subsurface have the same normal
-        sameSurfNormal = Vectors::CompareTwoVectors(surf.NewellNormVec, subSurf.NewellNormVec, 0.001);
+        sameSurfNormal = Vectors::VecEqualTol(surf.NewellNormVec, subSurf.NewellNormVec, 0.001);
         if (sameSurfNormal) { // copy lcs vectors
                               // Prior logic tested for azimuth difference < 30 and then skipped this - this caused large diffs in
                               // CmplxGlz_MeasuredDeflectionAndShading Restoring that check here but will require further investigation (MJW Dec 2015)
@@ -4574,12 +4566,12 @@ namespace SurfaceGeometry {
             surf.Vertex(Vrt).z = LLC.z + VV(n).y * surf.SinTilt;
         }
 
-        surf.NewellAreaVec = Vectors::CreateNewellAreaVector(surf.Vertex, surf.Sides);
+        surf.NewellAreaVec = Vectors::CalcNewellAreaVector(surf.Vertex, surf.Sides);
         surf.GrossArea = length(surf.NewellAreaVec);
         surf.Area = surf.GrossArea;
         surf.NetAreaShadowCalc = surf.Area;
-        surf.NewellNormVec = Vectors::CreateNewellNormalVector(surf.Vertex, surf.Sides);
-        std::tie(surf.Azimuth, surf.Tilt) = Vectors::DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        surf.NewellNormVec = Vectors::CalcNewellNormalVector(surf.Vertex, surf.Sides);
+        std::tie(surf.Azimuth, surf.Tilt) = Vectors::CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
         surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
         // Sine and cosine of azimuth and tilt
         surf.ViewFactorGround = 0.5 * (1.0 - surf.CosTilt);
@@ -6038,20 +6030,20 @@ namespace SurfaceGeometry {
         VV(3) = {Length, 0.0};
         VV(4) = {Length, Height};
 
-        for (n = 1; n <= surf.Sides; ++n) {
+        for (int n = 1; n <= surf.Sides; ++n) {
             Vrt = n;
             surf.Vertex(Vrt).x = LLC.x - VV(n).x * surf.CosAzim - VV(n).y * surf.CosTilt * surf.SinAzim;
             surf.Vertex(Vrt).y = LLC.y + VV(n).x * surf.SinAzim - VV(n).y * surf.CosTilt * surf.CosAzim;
             surf.Vertex(Vrt).z = LLC.z + VV(n).y * surf.SinTilt;
         }
 
-        surf.NewellAreaVec = CreateNewellAreaVector(surf.Vertex, surf.Sides);
+        surf.NewellAreaVec = CalcNewellAreaVector(surf.Vertex, surf.Sides);
         surf.GrossArea = length(surf.NewellAreaVec);
         surf.Area = surf.GrossArea;
         surf.NetAreaShadowCalc = surf.Area;
-        surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
+        surf.NewellNormVec = CalcNewellNormalVector(surf.Vertex, surf.Sides);
 
-        std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        std::tie(surf.Azimuth, surf.Tilt) = CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
         surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
 
         if (surf.Class != SurfaceClass::Window &&
@@ -8943,14 +8935,14 @@ namespace SurfaceGeometry {
 
             surf.Perimeter = Perimeter;
 
-            surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
-            surf.NewellAreaVec = CreateNewellAreaVector(surf.Vertex, surf.Sides);
+            surf.NewellNormVec = CalcNewellNormalVector(surf.Vertex, surf.Sides);
+            surf.NewellAreaVec = CalcNewellAreaVector(surf.Vertex, surf.Sides);
             // For surfaces with subsurfaces, the following two areas are turned into net areas later by
             // subtracting subsurface areas
             surf.GrossArea = length(surf.NewellAreaVec);
             surf.Area = surf.GrossArea;
             surf.NetAreaShadowCalc = surf.Area;
-            std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+            std::tie(surf.Azimuth, surf.Tilt) = CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
             dotp = dot(surf.NewellNormVec, TestVector);
             if (surf.Class == SurfaceClass::Roof && dotp < -0.000001) {
                 ShowWarningError(state,
@@ -9093,8 +9085,8 @@ namespace SurfaceGeometry {
                   surf.Vertex(n).z);
         }
 
-        surf.NewellNormVec = CreateNewellNormalVector(surf.Vertex, surf.Sides);
-        std::tie(surf.Azimuth, surf.Tilt) = DetermineAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        surf.NewellNormVec = CalcNewellNormalVector(surf.Vertex, surf.Sides);
+        std::tie(surf.Azimuth, surf.Tilt) = CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
         if (surf.Class == SurfaceClass::Roof && surf.Tilt > 80.0) {
             ShowWarningError(
                 state,
@@ -9178,12 +9170,12 @@ namespace SurfaceGeometry {
         surf1.MirroredSurf = true;
 
         if (surf1.Sides > 2) {
-            surf1.NewellAreaVec = Vectors::CreateNewellAreaVector(surf1.Vertex, surf1.Sides);
+            surf1.NewellAreaVec = Vectors::CalcNewellAreaVector(surf1.Vertex, surf1.Sides);
             surf1.GrossArea = length(surf.NewellAreaVec);
             surf1.Area = surf1.GrossArea;
             surf1.NetAreaShadowCalc = surf1.Area;
-            surf1.NewellNormVec = Vectors::CreateNewellNormalVector(surf1.Vertex, surf1.Sides);
-            std::tie(surf1.Azimuth, surf1.Tilt) = Vectors::DetermineAzimuthAndTilt(surf1.Vertex, surf1.lcsx, surf1.lcsy, surf1.lcsz, surf1.NewellNormVec);
+            surf1.NewellNormVec = Vectors::CalcNewellNormalVector(surf1.Vertex, surf1.Sides);
+            std::tie(surf1.Azimuth, surf1.Tilt) = Vectors::CalcAzimuthAndTilt(surf1.Vertex, surf1.lcsx, surf1.lcsy, surf1.lcsz, surf1.NewellNormVec);
             surf1.convOrientation = Convect::GetSurfConvOrientation(surf1.Tilt);
 
             // Sine and cosine of azimuth and tilt
@@ -11550,8 +11542,8 @@ namespace SurfaceGeometry {
             // Use AllSurfaceFirst which includes air boundaries
             int NFaces = thisZone.AllSurfaceLast - thisZone.AllSurfaceFirst + 1;
             int notused = 0;
-            ZoneStruct.NumSurfaceFaces = NFaces;
-            ZoneStruct.SurfaceFace.allocate(NFaces);
+            ZoneStruct.NumFaces = NFaces;
+            ZoneStruct.Faces.allocate(NFaces);
             int NActFaces = 0;
             surfacenotused.dimension(NFaces, 0);
 
@@ -11566,15 +11558,15 @@ namespace SurfaceGeometry {
                 }
 
                 ++NActFaces;
-                auto &thisFace = ZoneStruct.SurfaceFace(NActFaces);
-                thisFace.FacePoints.allocate(thisSurface.Sides);
-                thisFace.NSides = thisSurface.Sides;
+                auto &thisFace = ZoneStruct.Faces(NActFaces);
+                thisFace.Points.allocate(thisSurface.Sides);
+                thisFace.NumSides = thisSurface.Sides;
                 thisFace.SurfNum = SurfNum;
-                thisFace.FacePoints({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
-                thisFace.NewellAreaVector = Vectors::CreateNewellAreaVector(thisFace.FacePoints, thisFace.NSides);
+                thisFace.Points({1, thisSurface.Sides}) = thisSurface.Vertex({1, thisSurface.Sides});
+                thisFace.NewellAreaVector = Vectors::CalcNewellAreaVector(thisFace.Points, thisFace.NumSides);
                 SumAreas += length(thisFace.NewellAreaVector);
             }
-            ZoneStruct.NumSurfaceFaces = NActFaces;
+            ZoneStruct.NumFaces = NActFaces;
 
             bool isFloorHorizontal = false;
             bool isCeilingHorizontal = false;
@@ -11765,21 +11757,20 @@ namespace SurfaceGeometry {
                 print(state.files.debug, "zone={} calc volume={}\n", thisZone.Name, CalcVolume);
                 print(state.files.debug, " nsurfaces={} nactual={}\n", NFaces, NActFaces);
             }
-            for (int faceNum = 1; faceNum <= ZoneStruct.NumSurfaceFaces; ++faceNum) {
-                auto &thisFace = ZoneStruct.SurfaceFace(faceNum);
+            for (int faceNum = 1; faceNum <= ZoneStruct.NumFaces; ++faceNum) {
+                auto &thisFace = ZoneStruct.Faces(faceNum);
                 if (ShowZoneSurfaces) {
                     if (faceNum <= NActFaces) {
                         auto &thisSurface = state.dataSurface->Surface(thisFace.SurfNum);
-                        print(state.files.debug, "surface={} nsides={}\n", thisFace.SurfNum, thisFace.NSides);
+                        print(state.files.debug, "surface={} nsides={}\n", thisFace.SurfNum, thisFace.NumSides);
                         print(state.files.debug, "surface name={} class={}\n", thisSurface.Name, thisSurface.Class);
                         print(state.files.debug, "area={}\n", thisSurface.GrossArea);
-                        for (int iside = 1; iside <= thisFace.NSides; ++iside) {
-                            auto const &FacePoint(thisFace.FacePoints(iside));
+                        for (auto const &FacePoint : thisFace.Points) {
                             print(state.files.debug, "{} {} {}\n", FacePoint.x, FacePoint.y, FacePoint.z);
                         }
                     }
                 }
-                thisFace.FacePoints.deallocate();
+                thisFace.Points.deallocate();
             }
             if (ShowZoneSurfaces) {
                 for (int SurfNum = 1; SurfNum <= notused; ++SurfNum) {
@@ -11791,7 +11782,7 @@ namespace SurfaceGeometry {
                 }
             }
 
-            ZoneStruct.SurfaceFace.deallocate();
+            ZoneStruct.Faces.deallocate();
             surfacenotused.deallocate();
 
         } // zone loop
@@ -11886,23 +11877,23 @@ namespace SurfaceGeometry {
             }
         };
         std::vector<EdgeByPts> uniqueEdges;
-        uniqueEdges.reserve(zonePoly.NumSurfaceFaces * 6);
+        uniqueEdges.reserve(zonePoly.NumFaces * 6);
 
         // construct list of unique edges
         Vector3<Real64> curVertex;
         int curVertexIndex;
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
+        for (auto const &face : zonePoly.Faces) {
             Vector3<Real64> prevVertex;
             int prevVertexIndex;
-            for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
+            for (int jVertex = 1; jVertex <= face.NumSides; ++jVertex) {
                 if (jVertex == 1) {
-                    prevVertex = zonePoly.SurfaceFace(iFace).FacePoints(zonePoly.SurfaceFace(iFace).NSides); // the last point
+                    prevVertex = face.Points(face.NumSides); // the last point
                     prevVertexIndex = findIndexOfVertex(prevVertex, uniqueVertices);
                 } else {
                     prevVertex = curVertex;
                     prevVertexIndex = curVertexIndex;
                 }
-                curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
+                curVertex = face.Points(jVertex);
                 curVertexIndex = findIndexOfVertex(curVertex, uniqueVertices); // uses isAlmostEqual3dPt
                 auto it = std::find_if(uniqueEdges.begin(), uniqueEdges.end(), [&curVertexIndex, &prevVertexIndex](const auto &edge) {
                     return ((edge.start == curVertexIndex && edge.end == prevVertexIndex) ||
@@ -11913,11 +11904,11 @@ namespace SurfaceGeometry {
                     curEdge.start = prevVertexIndex;
                     curEdge.end = curVertexIndex;
                     curEdge.count = 1;
-                    curEdge.firstSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
+                    curEdge.firstSurfNum = face.SurfNum;
                     uniqueEdges.emplace_back(curEdge);
                 } else {
                     ++(it->count);
-                    it->otherSurfNums.push_back(zonePoly.SurfaceFace(iFace).SurfNum);
+                    it->otherSurfNums.push_back(face.SurfNum);
                 }
             }
         }
@@ -11942,19 +11933,17 @@ namespace SurfaceGeometry {
     std::vector<Vector3<Real64>> makeListOfUniqueVertices(DataVectorTypes::Polyhedron const &zonePoly)
     {
         // J. Glazer - March 2017
-
         std::vector<Vector3<Real64>> uniqVertices;
-        uniqVertices.reserve(zonePoly.NumSurfaceFaces * 6);
+        uniqVertices.reserve(zonePoly.NumFaces * 6);
 
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
-                Vector curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
+        for (auto const &face : zonePoly.Faces) { 
+            for (Vector3<Real64> curVertex : face.Points) { 
                 if (uniqVertices.size() == 0) {
                     uniqVertices.emplace_back(curVertex);
                 } else {
                     bool found = false;
                     for (const auto &unqV : uniqVertices) {
-                        if (isAlmostEqual3dPt(curVertex, unqV)) {
+                        if (Vectors::VecEqualTol(curVertex, unqV, 0.0127)) { // 0.0127 m == 1/2 in
                             found = true;
                             break;
                         }
@@ -11966,7 +11955,7 @@ namespace SurfaceGeometry {
             }
         }
         return uniqVertices;
-    }
+    } // makeListOfUniqueVertices()
 
     // updates the polyhedron used to describe a zone to include points on an edge that are between and collinear to points already describing
     // the edge
@@ -11974,16 +11963,13 @@ namespace SurfaceGeometry {
                                                                            std::vector<Vector3<Real64>> const &uniqVertices)
     {
         // J. Glazer - March 2017
-
-        using DataVectorTypes::Vector;
-
         DataVectorTypes::Polyhedron updZonePoly = zonePoly; // set the return value to the original polyhedron describing the zone
 
-        for (auto &updFace : updZonePoly.SurfaceFace) {
+        for (auto &updFace : updZonePoly.Faces) {
             bool insertedVertext = true;
             while (insertedVertext) {
                 insertedVertext = false;
-                auto &vertices = updFace.FacePoints;
+                auto &vertices = updFace.Points;
                 for (auto it = vertices.begin(); it != vertices.end(); ++it) {
 
                     auto itnext = std::next(it);
@@ -11996,10 +11982,10 @@ namespace SurfaceGeometry {
 
                     // now go through all the vertices and see if they are colinear with start and end vertices
                     for (const auto &testVertex : uniqVertices) {
-                        if (!isAlmostEqual3dPt(curVertex, testVertex) && !isAlmostEqual3dPt(nextVertex, testVertex)) {
+                        if (!Vectors::VecEqualTol(curVertex, testVertex, 0.0127) && !Vectors::VecEqualTol(nextVertex, testVertex, 0.0127)) {
                             if (isPointOnLineBetweenPoints(curVertex, nextVertex, testVertex)) {
                                 vertices.insert(itnext, testVertex);
-                                ++updFace.NSides;
+                                ++updFace.NumSides;
                                 insertedVertext = true;
                                 break;
                             }
@@ -12025,25 +12011,28 @@ namespace SurfaceGeometry {
         // so if you could all the unique vertices of the floor and ceiling, ignoring the z-coordinate, they
         // should always be even (they would be two but you might define multiple surfaces that meet in a corner)
 
-        using DataVectorTypes::Vector2dCount;
+        struct Vector2Count : Vector2<Real64> {
+            int count = 0;
+        };
 
-        std::vector<Vector2dCount> floorCeilingXY;
-        floorCeilingXY.reserve(zonePoly.NumSurfaceFaces * 6);
+        std::vector<Vector2Count> floorCeilingXY;
+        floorCeilingXY.reserve(zonePoly.NumFaces * 6);
 
         // make list of x and y coordinates for all faces that are on the floor or ceiling
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
+        for (int iFace = 1; iFace <= zonePoly.NumFaces; ++iFace) {
+            auto const &face = zonePoly.Faces(iFace);
+            int curSurfNum = face.SurfNum;
             if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Floor ||
                 state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Roof) {
-                for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
-                    Vector3<Real64> curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
-                    Vector2dCount curXYc;
+                for (int jVertex = 1; jVertex <= face.NumSides; ++jVertex) {
+                    Vector3<Real64> curVertex = face.Points(jVertex);
+                    Vector2Count curXYc;
                     curXYc.x = curVertex.x;
                     curXYc.y = curVertex.y;
                     curXYc.count = 1;
                     bool found = false;
-                    for (Vector2dCount &curFloorCeiling : floorCeilingXY) { // can't use just "auto" because updating floorCeilingXY
-                        if (isAlmostEqual2dPt(curXYc, curFloorCeiling)) {   // count ignored in comparison
+                    for (Vector2Count &curFloorCeiling : floorCeilingXY) { // can't use just "auto" because updating floorCeilingXY
+                        if (Vectors::VecEqualTol(curXYc, curFloorCeiling, 0.0127)) {   // 0.0127 m == 1/2 in 
                             ++curFloorCeiling.count;
                             found = true;
                             break;
@@ -12081,14 +12070,14 @@ namespace SurfaceGeometry {
         bool areWlHgtSame = true;
         Real64 wallHeightZ = -1.0E50;
         bool foundWallHeight = false;
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Wall) {
+        // Can't use iterator loop because zonePoly.NumFaces can be less than zonePoly.Faces.size()
+        for (int iFace = 1; iFace <= zonePoly.NumFaces; ++iFace) {
+            auto const &face = zonePoly.Faces(iFace);
+            if (state.dataSurface->Surface(face.SurfNum).Class == SurfaceClass::Wall) {
                 Real64 maxZ = -1.0E50;
-                for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
-                    Vector curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
-                    if (maxZ < curVertex.z) {
-                        maxZ = curVertex.z;
+                for (auto const &vertex : face.Points) {
+                    if (maxZ < vertex.z) {
+                        maxZ = vertex.z;
                     }
                 }
                 if (foundWallHeight) {
@@ -12103,7 +12092,7 @@ namespace SurfaceGeometry {
             }
         }
         return areWlHgtSame;
-    }
+    } // areWallHeightsSame()
 
     // tests if the floor is horizontal, ceiling is horizontal, and walls are vertical and returns all three as a tuple of booleans
     std::tuple<bool, bool, bool> areSurfaceHorizAndVert(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly)
@@ -12114,24 +12103,26 @@ namespace SurfaceGeometry {
         bool isFlrHoriz = true;
         bool isClgHoriz = true;
         bool areWlVert = true;
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Floor) {
-                if (std::abs(state.dataSurface->Surface(curSurfNum).Tilt - 180.) > 1.) { // with 1 degree angle
+        // Can't use iterator loop because NumFaces may be smaller than Faces.size()
+        for (int iFace = 1; iFace < zonePoly.NumFaces; ++iFace) { 
+            auto const &face = zonePoly.Faces(iFace);
+            auto const &surf = state.dataSurface->Surface(face.SurfNum);
+            if (surf.Class == SurfaceClass::Floor) {
+                if (std::abs(surf.Tilt - 180.) > 1.) { // with 1 degree angle
                     isFlrHoriz = false;
                 }
-            } else if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Roof) { // includes ceilings
-                if (std::abs(state.dataSurface->Surface(curSurfNum).Tilt) > 1.) {            // with 1 degree angle of
+            } else if (surf.Class == SurfaceClass::Roof) { // includes ceilings
+                if (std::abs(surf.Tilt) > 1.) {            // with 1 degree angle of
                     isClgHoriz = false;
                 }
-            } else if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Wall) {
-                if (std::abs(state.dataSurface->Surface(curSurfNum).Tilt - 90) > 1.) { // with 1 degree angle
+            } else if (surf.Class == SurfaceClass::Wall) {
+                if (std::abs(surf.Tilt - 90) > 1.) { // with 1 degree angle
                     areWlVert = false;
                 }
             }
         }
         return std::make_tuple(isFlrHoriz, isClgHoriz, areWlVert);
-    }
+    } // areSurfaceHorizAndVert()
 
     // tests whether a pair of walls in the zone are the same except offset from one another and facing the opposite direction and also
     // returns the wall area and distance between
@@ -12145,10 +12136,10 @@ namespace SurfaceGeometry {
 
         // approach: if opposite surfaces have opposite azimuth and same area, then check the distance between the
         // vertices( one counting backwards ) and if it is the same distance than assume that it is the same.
-        using DataVectorTypes::Vector;
         bool foundOppEqual = false;
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
+        for (int iFace = 1; iFace <= zonePoly.NumFaces; ++iFace) {
+            auto const &face = zonePoly.Faces(iFace);
+            int curSurfNum = face.SurfNum;
             if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Wall) {
                 std::vector<int> facesAtAz = listOfFacesFacingAzimuth(state, zonePoly, state.dataSurface->Surface(curSurfNum).Azimuth);
                 bool allFacesEquidistant = true;
@@ -12156,7 +12147,7 @@ namespace SurfaceGeometry {
                 for (int curFace : facesAtAz) {
                     int possOppFace = findPossibleOppositeFace(state, zonePoly, curFace);
                     if (possOppFace > 0) { // an opposite fact was found
-                        oppositeWallArea += state.dataSurface->Surface(zonePoly.SurfaceFace(curFace).SurfNum).Area;
+                        oppositeWallArea += state.dataSurface->Surface(zonePoly.Faces(curFace).SurfNum).Area;
                         if (!areCornersEquidistant(zonePoly, curFace, possOppFace, distanceBetweenOppositeWalls)) {
                             allFacesEquidistant = false;
                             break;
@@ -12181,109 +12172,78 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
 
         std::vector<int> facingAzimuth;
-        facingAzimuth.reserve(zonePoly.NumSurfaceFaces);
+        facingAzimuth.reserve(zonePoly.NumFaces);
 
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if (General::rotAzmDiffDeg(state.dataSurface->Surface(curSurfNum).Azimuth, azimuth) < 1.) {
+        for (int iFace = 1; iFace <= zonePoly.NumFaces; ++iFace) {
+            if (General::rotAzmDiffDeg(state.dataSurface->Surface(zonePoly.Faces(iFace).SurfNum).Azimuth, azimuth) < 1.) {
                 facingAzimuth.emplace_back(iFace);
             }
         }
         return facingAzimuth;
-    }
+    } // listOfFacesFacingAzimuth
 
     // returns the index of the face of a polyhedron that is probably opposite of the face index provided
     int findPossibleOppositeFace(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, int const faceIndex)
     {
         // J. Glazer - March 2017
 
-        int selectedSurNum = zonePoly.SurfaceFace(faceIndex).SurfNum;
+        int selectedSurNum = zonePoly.Faces(faceIndex).SurfNum;
         Real64 selectedAzimuth = state.dataSurface->Surface(selectedSurNum).Azimuth;
         Real64 oppositeAzimuth = fmod(selectedAzimuth + 180., 360.);
         Real64 selectedArea = state.dataSurface->Surface(selectedSurNum).Area;
-        int selectedNumCorners = zonePoly.SurfaceFace(faceIndex).NSides;
-        int found = -1;
+        int selectedNumCorners = zonePoly.Faces(faceIndex).NumSides;
 
-        for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
-            int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
-            if ((zonePoly.SurfaceFace(iFace).NSides == selectedNumCorners) &&
+        for (int iFace = 1; iFace <= zonePoly.NumFaces; ++iFace) {
+            int curSurfNum = zonePoly.Faces(iFace).SurfNum;
+            if ((zonePoly.Faces(iFace).NumSides == selectedNumCorners) &&
                 (std::abs(state.dataSurface->Surface(curSurfNum).Area - selectedArea) < 0.01) &&
                 (std::abs(state.dataSurface->Surface(curSurfNum).Azimuth - oppositeAzimuth) < 1.)) {
-                found = iFace;
-                break;
+                return iFace;
             }
         }
-        return found;
-    }
+        return -1;
+    } // findPossibleOppositeFace()
 
     // tests if the corners of one face of the polyhedron are the same distance from corners of another face
-    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const faceIndex, int const opFaceIndex, Real64 &distanceBetween)
+    bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int const faceIndex, int const opFaceIndex, Real64 &dist)
     {
         // J. Glazer - March 2017
 
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
+        constexpr Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
         bool allAreEquidistant = true;
-        Real64 firstDistance = -99.;
-        if (zonePoly.SurfaceFace(faceIndex).NSides == zonePoly.SurfaceFace(opFaceIndex).NSides) { // double check that the number of sides match
-            for (int iVertex = 1; iVertex <= zonePoly.SurfaceFace(faceIndex).NSides; ++iVertex) {
-                int iVertexOpp = 1 + zonePoly.SurfaceFace(faceIndex).NSides - iVertex; // count backwards for opposite face
-                Real64 curDistBetwCorners =
-                    distance(zonePoly.SurfaceFace(faceIndex).FacePoints(iVertex), zonePoly.SurfaceFace(opFaceIndex).FacePoints(iVertexOpp));
-                if (iVertex == 1) {
-                    firstDistance = curDistBetwCorners;
-                } else {
-                    if (std::abs(curDistBetwCorners - firstDistance) > tol) {
-                        allAreEquidistant = false;
-                        break;
-                    }
-                }
+
+        dist = -99.;
+
+        auto const &face = zonePoly.Faces(faceIndex);
+        auto const &opFace = zonePoly.Faces(opFaceIndex);
+        
+        if (face.NumSides != opFace.NumSides) // double check that the number of sides match
+            return false;
+        
+        for (int iVertex = 1; iVertex <= face.NumSides; ++iVertex) {
+            int iVertexOpp = 1 + face.NumSides - iVertex; // count backwards for opposite face
+            Real64 curDistBetwCorners = distance(face.Points(iVertex), opFace.Points(iVertexOpp));
+            if (iVertex == 1) {
+                dist = curDistBetwCorners;
+            } else if (std::abs(curDistBetwCorners - dist) > tol) {
+                return false;
             }
-        } else {
-            allAreEquidistant = false;
         }
-        if (allAreEquidistant) distanceBetween = firstDistance;
-        return allAreEquidistant;
-    }
 
-    // test if two points in space are in the same position based on a small tolerance
-    bool isAlmostEqual3dPt(Vector3<Real64> const &v1, Vector3<Real64> const &v2)
-    {
-        // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol) && (std::abs(v1.z - v2.z) < tol));
-    }
-
-    // test if two points on a plane are in the same position based on a small tolerance
-    bool isAlmostEqual2dPt(Vector2<Real64> const &v1, Vector2<Real64> const &v2)
-    {
-        // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
-    }
-
-    // test if two points on a plane are in the same position based on a small tolerance (based on Vector2dCount comparison)
-    bool isAlmostEqual2dPt(DataVectorTypes::Vector2dCount const &v1, DataVectorTypes::Vector2dCount const &v2)
-    {
-        // J. Glazer - March 2017
-
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
-    }
+        return true;
+    } // areCornersEquidistant()
 
     // returns the index of vertex in a list that is in the same position in space as the given vertex
     int findIndexOfVertex(Vector3<Real64> const &vertexToFind, std::vector<Vector3<Real64>> const &listOfVertices)
     {
         // J. Glazer - March 2017
-
         for (std::size_t i = 0; i < listOfVertices.size(); i++) {
-            if (isAlmostEqual3dPt(listOfVertices[i], vertexToFind)) {
+            if (Vectors::VecEqualTol(listOfVertices[i], vertexToFind, 0.0127)) {
                 return i;
             }
         }
         return -1;
-    }
+    } // findIndexOfVertex()
 
     Real64 distanceFromPointToLine(Vector3<Real64> const &start, Vector3<Real64> const &end, Vector3<Real64> const &test)
     {
@@ -12312,8 +12272,8 @@ namespace SurfaceGeometry {
 
     bool EdgeOfSurf::operator==(const EdgeOfSurf &other) const
     {
-        return ((isAlmostEqual3dPt(this->start, other.start) && isAlmostEqual3dPt(this->end, other.end)) ||
-                (isAlmostEqual3dPt(this->start, other.end) && isAlmostEqual3dPt(this->end, other.start)));
+        return ((Vectors::VecEqualTol(this->start, other.start, 0.0127) && Vectors::VecEqualTol(this->end, other.end, 0.0127)) ||
+                (Vectors::VecEqualTol(this->start, other.end, 0.0127) && Vectors::VecEqualTol(this->end, other.start, 0.0127)));
     }
 
     bool EdgeOfSurf::operator!=(const EdgeOfSurf &other) const
@@ -12323,7 +12283,7 @@ namespace SurfaceGeometry {
 
     bool EdgeOfSurf::containsPoints(const Vector3<Real64> &vertex) const
     {
-        return (!isAlmostEqual3dPt(this->start, vertex) && !isAlmostEqual3dPt(this->end, vertex) &&
+        return (!Vectors::VecEqualTol(this->start, vertex, 0.0127) && !Vectors::VecEqualTol(this->end, vertex, 0.0127) &&
                 isPointOnLineBetweenPoints(this->start, this->end, vertex));
     }
 
@@ -12374,8 +12334,8 @@ namespace SurfaceGeometry {
         int LastVertexInError;
 
         // Object Data
-        Vectors::PlaneEq BasePlane;
-        Vector CoordinateTransVector;
+        Vector4<Real64> BasePlane;
+        Vector3<Real64> CoordinateTransVector;
 
         auto &sg = state.dataSurfaceGeometry;
         if (state.dataSurface->Surface(ThisSurf).VerticesProcessed) {
@@ -12405,7 +12365,7 @@ namespace SurfaceGeometry {
 
         // IF (Surface(ThisSurf)%Name(1:3) /= 'Mir') THEN
         if (!surf.MirroredSurf) {
-            Vectors::CalcCoPlanarNess(surf.Vertex, surf.Sides, IsCoPlanar, OutOfLine, LastVertexInError);
+            std::tie(IsCoPlanar, OutOfLine) = Vectors::CalcCoPlanarNess(surf.Vertex, surf.Sides, LastVertexInError);
             if (!IsCoPlanar) {
                 if (OutOfLine > 0.01) {
                     ShowSevereError(state,
@@ -12488,7 +12448,7 @@ namespace SurfaceGeometry {
             // Setting relative coordinates for shadowing calculations for subsurfaces
             switch (ThisShape) {
             case SurfaceShape::RectangularDoorWindow: { // Rectangular heat transfer subsurface
-                Vectors::PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, BasePlane, SError);
+                BasePlane = Vectors::CalcPlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, SError);
                 if (SError) {
                     ShowSevereError(state, format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
                     ErrorInSurface = true;
@@ -12612,7 +12572,7 @@ namespace SurfaceGeometry {
             } break;
             case SurfaceShape::TriangularWindow:
             case SurfaceShape::TriangularDoor: {
-                Vectors::PlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, BasePlane, SError);
+                BasePlane = Vectors::CalcPlaneEquation(state.dataSurface->Surface(surf.BaseSurf).Vertex, state.dataSurface->Surface(surf.BaseSurf).Sides, SError);
                 if (SError) {
                     ShowSevereError(state, format("{}Degenerate surface (likely two vertices equal):\"{}\".", RoutineName, surf.Name));
                     ErrorInSurface = true;
@@ -12646,9 +12606,7 @@ namespace SurfaceGeometry {
                 sg->psv(3).z = p.x * baseSurf.SinAzim * baseSurf.SinTilt + p.y * baseSurf.CosAzim * baseSurf.SinTilt + p.z * baseSurf.CosTilt;
             } break;
             case SurfaceShape::RectangularOverhang: {
-
                 Vector3<Real64> p = surf.Vertex(2) - BaseLLC;
-
                 LLC.x = -p.x * baseSurf.CosAzim + p.y * baseSurf.SinAzim;
                 LLC.y = -p.x * baseSurf.SinAzim * baseSurf.CosTilt - p.y * baseSurf.CosAzim * baseSurf.CosTilt + p.z * baseSurf.SinTilt;
                 LLC.z = p.x * baseSurf.SinAzim * baseSurf.SinTilt + p.y * baseSurf.CosAzim * baseSurf.SinTilt + p.z * baseSurf.CosTilt;
@@ -12713,17 +12671,13 @@ namespace SurfaceGeometry {
         }
 
         // Transfer to XV,YV,ZV arrays
+        auto &shadeV = state.dataSurface->ShadeV(ThisSurf);
+        
+        shadeV.NVert = surf.Sides;
+        shadeV.V.allocate(surf.Sides);
 
-        state.dataSurface->ShadeV(ThisSurf).NVert = surf.Sides;
-        state.dataSurface->ShadeV(ThisSurf).XV.allocate(surf.Sides);
-        state.dataSurface->ShadeV(ThisSurf).YV.allocate(surf.Sides);
-        state.dataSurface->ShadeV(ThisSurf).ZV.allocate(surf.Sides);
-
-        for (n = 1; n <= surf.Sides; ++n) {
-            // if less than 1/10 inch
-            state.dataSurface->ShadeV(ThisSurf).XV(n) = sg->psv(n).x;
-            state.dataSurface->ShadeV(ThisSurf).YV(n) = sg->psv(n).y;
-            state.dataSurface->ShadeV(ThisSurf).ZV(n) = sg->psv(n).z;
+        for (int n = 1; n <= surf.Sides; ++n) {
+            shadeV.V(n) = sg->psv(n);
         }
 
         // Process Surfaces According to Type of Coordinate Origin.
@@ -12735,27 +12689,26 @@ namespace SurfaceGeometry {
             // RECORD DIRECTION COSINES.
             if (HeatTransSurf) { // This is a general surface but not detached shading surface
 
+                auto &baseSurf = state.dataSurface->Surface(ThisBaseSurface);
                 // RECORD COORDINATE TRANSFORMATION FOR BASE SURFACES.
-                state.dataSurface->X0(ThisBaseSurface) = CoordinateTransVector.x;
-                state.dataSurface->Y0(ThisBaseSurface) = CoordinateTransVector.y;
-                state.dataSurface->Z0(ThisBaseSurface) = CoordinateTransVector.z;
-
+                state.dataSurface->T0(ThisBaseSurface) = CoordinateTransVector;
                 // COMPUTE INVERSE TRANSFORMATION.
                 Vector3<Real64> p1 = sg->psv(2) - CoordinateTransVector;
 
                 // Store the relative coordinate shift values for later use by any subsurfaces
-                state.dataSurface->Surface(ThisBaseSurface).XShift = dot(state.dataSurface->Surface(ThisBaseSurface).lcsx, p1);
-                state.dataSurface->Surface(ThisBaseSurface).YShift = dot(state.dataSurface->Surface(ThisBaseSurface).lcsy, p1);
-                state.dataSurface->Surface(ThisBaseSurface).VerticesProcessed = true;
+                baseSurf.XShift = dot(baseSurf.lcsx, p1);
+                baseSurf.YShift = dot(baseSurf.lcsy, p1);
+                baseSurf.VerticesProcessed = true;
             }
 
             // SUBSURFACES: (Surface(ThisSurf)%BaseSurf /= ThisSurf)
         } else {
             // WINDOWS OR DOORS:
-
+            auto &baseSurf = state.dataSurface->Surface(ThisBaseSurface);
+                
             // SHIFT RELATIVE COORDINATES FROM LOWER LEFT CORNER TO ORIGIN DEFINED
             // BY CTRAN AND SET DIRECTION COSINES SAME AS BASE SURFACE.
-            if (!state.dataSurface->Surface(ThisBaseSurface).VerticesProcessed) {
+            if (!baseSurf.VerticesProcessed) {
 
                 if (surf.IsAirBoundarySurf) {
                     ProcessSurfaceVertices(state, ThisBaseSurface, ErrorsFound);
@@ -12764,21 +12717,21 @@ namespace SurfaceGeometry {
                     ShowSevereError(state, format("{}Developer error for Subsurface={}", RoutineName, surf.Name));
                     ShowContinueError(state,
                                       format("Base surface={} vertices must be processed before any subsurfaces.",
-                                             state.dataSurface->Surface(ThisBaseSurface).Name));
-                    ShowFatalError(state, std::string{RoutineName});
+                                             baseSurf.Name));
+                    ShowFatalError(state, std::string(RoutineName));
                 }
             }
 
-            for (n = 1; n <= surf.Sides; ++n) {
-                state.dataSurface->ShadeV(ThisSurf).XV(n) += state.dataSurface->Surface(ThisBaseSurface).XShift;
-                state.dataSurface->ShadeV(ThisSurf).YV(n) += state.dataSurface->Surface(ThisBaseSurface).YShift;
+            for (int n = 1; n <= surf.Sides; ++n) {
+                shadeV.V(n).x += baseSurf.XShift;
+                shadeV.V(n).y += baseSurf.YShift;
             }
         }
 
         if (ErrorInSurface) {
             ErrorsFound = true;
         }
-    } // distanceFromLineToLine()
+    } // ProcessSurfaceVertices()
 
     void CalcCoordinateTransformation(EnergyPlusData &state,
                                       int const SurfNum,            // Surface Number
@@ -12806,25 +12759,18 @@ namespace SurfaceGeometry {
         using namespace Vectors;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int I;        // Loop Control
-        Real64 Gamma; // Intermediate Result
-        Real64 DotSelfX23;
-
-        // Object Data
-        Vector3<Real64> x21;
-        Vector3<Real64> x23;
 
         // Determine Components of the Coordinate Translation Vector.
         auto const &surf = state.dataSurface->Surface(SurfNum);
 
-        x21 = surf.Vertex(2) - surf.Vertex(1);
-        x23 = surf.Vertex(2) - surf.Vertex(3);
+        Vector3<Real64> x21 = surf.Vertex(2) - surf.Vertex(1);
+        Vector3<Real64> x23 = surf.Vertex(2) - surf.Vertex(3);
 
-        DotSelfX23 = magnitude_squared(x23);
+        Real64 DotSelfX23 = magnitude_squared(x23);
 
         if (DotSelfX23 <= .1e-6) {
             ShowSevereError(state, format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", surf.Name));
-            for (I = 1; I <= surf.Sides; ++I) {
+            for (int I = 1; I <= surf.Sides; ++I) {
                 auto const &point = surf.Vertex(I);
                 ShowContinueError(state, format(" ({:8.3F},{:8.3F},{:8.3F})", point.x, point.y, point.z));
             }
@@ -12833,7 +12779,7 @@ namespace SurfaceGeometry {
             return;
         }
 
-        Gamma = dot(x21, x23) / magnitude_squared(x23);
+        Real64 Gamma = dot(x21, x23) / magnitude_squared(x23);
 
         CompCoordTranslVector = surf.Vertex(2) + Gamma * (surf.Vertex(3) - surf.Vertex(2));
     }
@@ -12857,10 +12803,7 @@ namespace SurfaceGeometry {
         // has a shading device specified instead of a shaded construction
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int ConstrNum;            // Number of unshaded construction
-        int ConstrNewSh;          // Number of shaded construction that is created
         std::string ShDevName;    // Shading device material name
-        std::string ConstrName;   // Unshaded construction name
         std::string ConstrNameSh; // Shaded construction name
         int TotLayersOld;         // Total layers in old (unshaded) construction
         int TotLayersNew;         // Total layers in new (shaded) construction
@@ -12869,25 +12812,24 @@ namespace SurfaceGeometry {
         auto &sg = state.dataSurfaceGeometry;
         auto &surf = sg->SurfaceTmp(SurfNum);
         ShDevName = state.dataMaterial->Material(ShDevNum)->Name;
-        ConstrNum = surf.Construction;
-        ConstrName = state.dataConstruction->Construct(ConstrNum).Name;
+        int ConstrNum = surf.Construction;
+        auto const &constr = state.dataConstruction->Construct(ConstrNum);
+
         if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
-            ConstrNameSh = ConstrName + ':' + ShDevName + ":INT";
+            ConstrNameSh = format("{}:{}:INT", constr.Name, ShDevName);
         } else {
-            ConstrNameSh = ConstrName + ':' + ShDevName + ":EXT";
+            ConstrNameSh = format("{}:{}:EXT", constr.Name, ShDevName);
         }
 
         // If this construction name already exists, set the surface's shaded construction number to it
 
-        ConstrNewSh = Util::FindItemInList(ConstrNameSh, state.dataConstruction->Construct);
+        int ConstrNewSh = Util::FindItemInList(ConstrNameSh, state.dataConstruction->Construct);
 
         if (ConstrNewSh > 0) {
             surf.shadedConstructionList[shadeControlIndex] = ConstrNewSh;
             surf.activeShadedConstruction = ConstrNewSh; // set the active to the current for now
         } else {
-
             // Create new construction
-
             ConstrNewSh = state.dataHeatBal->TotConstructs + 1;
             surf.shadedConstructionList[shadeControlIndex] = ConstrNewSh;
             surf.activeShadedConstruction = ConstrNewSh; // set the active to the current for now
@@ -12902,7 +12844,7 @@ namespace SurfaceGeometry {
 
             state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
 
-            TotLayersOld = state.dataConstruction->Construct(ConstrNum).TotLayers;
+            TotLayersOld = constr.TotLayers;
             TotLayersNew = TotLayersOld + 1;
 
             state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
@@ -12922,7 +12864,7 @@ namespace SurfaceGeometry {
             } else {
                 // Exterior shading device
                 thisConstructNewSh.LayerPoint(1) = ShDevNum;
-                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
+                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = constr.LayerPoint({1, TotLayersOld});
                 auto const *thisMaterialShInside = dynamic_cast<const Material::MaterialChild *>(
                     state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew)));
                 thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolar;
@@ -12932,9 +12874,7 @@ namespace SurfaceGeometry {
             // The following InsideAbsorpThermal applies only to inside glass; it is corrected
             //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
             thisConstructNewSh.InsideAbsorpThermal =
-                dynamic_cast<Material::MaterialChild *>(
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNum).LayerPoint(TotLayersOld)))
-                    ->AbsorpThermalBack;
+                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(constr.LayerPoint(TotLayersOld)))->AbsorpThermalBack;
             thisConstructNewSh.OutsideRoughness = Material::Roughness::VerySmooth;
             thisConstructNewSh.DayltPropPtr = 0;
             thisConstructNewSh.CTFCross.fill(0.0);
@@ -12979,8 +12919,8 @@ namespace SurfaceGeometry {
 
             thisConstructNewSh.Name = ConstrNameSh;
             thisConstructNewSh.TotLayers = TotLayersNew;
-            thisConstructNewSh.TotSolidLayers = state.dataConstruction->Construct(ConstrNum).TotSolidLayers + 1;
-            thisConstructNewSh.TotGlassLayers = state.dataConstruction->Construct(ConstrNum).TotGlassLayers;
+            thisConstructNewSh.TotSolidLayers = constr.TotSolidLayers + 1;
+            thisConstructNewSh.TotGlassLayers = constr.TotGlassLayers;
             thisConstructNewSh.TypeIsWindow = true;
             thisConstructNewSh.IsUsed = true;
 
@@ -12991,7 +12931,7 @@ namespace SurfaceGeometry {
                 }
             }
         }
-    }
+    } // CreateShadedWindowConstruction()
 
     void CreateStormWindowConstructions(EnergyPlusData &state)
     {
@@ -13002,7 +12942,9 @@ namespace SurfaceGeometry {
         DisplayString(state, "Creating Storm Window Constructions");
 
         for (int StormWinNum = 1; StormWinNum <= state.dataSurface->TotStormWin; ++StormWinNum) {
-            int SurfNum = state.dataSurface->StormWindow(StormWinNum).BaseWindowNum; // Surface number
+            auto &stormWin = state.dataSurface->StormWindow(StormWinNum);
+                
+            int SurfNum = stormWin.BaseWindowNum; // Surface number
             auto &surf = state.dataSurface->Surface(SurfNum);
             int ConstrNum = surf.Construction; // Number of unshaded construction
             // Fatal error if base construction has more than three glass layers
@@ -13011,17 +12953,15 @@ namespace SurfaceGeometry {
             }
 
             // create unshaded construction with storm window
-            const std::string ChrNum = fmt::to_string(StormWinNum);
-            std::string ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum; // Name of unshaded construction with storm window
+            std::string ConstrNameSt = format("BARECONSTRUCTIONWITHSTORMWIN:{}", StormWinNum); // Name of unshaded construction with storm window
             // If this construction name already exists, set the surface's storm window construction number to it
             int ConstrNewSt = Util::FindItemInList(ConstrNameSt,
                                                    state.dataConstruction->Construct,
                                                    state.dataHeatBal->TotConstructs); // Number of unshaded storm window construction that is created
             // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
-            int MatNewStAir = createAirMaterialFromDistance(state, state.dataSurface->StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
+            int MatNewStAir = createAirMaterialFromDistance(state, stormWin.StormWinDistance, "AIR:STORMWIN:");
             if (ConstrNewSt == 0) {
-                ConstrNewSt = createConstructionWithStorm(
-                    state, ConstrNum, ConstrNameSt, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
+                ConstrNewSt = createConstructionWithStorm(state, ConstrNum, ConstrNameSt, stormWin.StormWinMaterialNum, MatNewStAir);
             }
             state.dataSurface->SurfWinStormWinConstr(SurfNum) = ConstrNewSt;
 
@@ -13029,17 +12969,18 @@ namespace SurfaceGeometry {
             surf.shadedStormWinConstructionList.resize(surf.shadedConstructionList.size(),
                                                        0); // make the shaded storm window size the same size as the number of shaded constructions
             for (std::size_t iConstruction = 0; iConstruction < surf.shadedConstructionList.size(); ++iConstruction) {
-                int curConstruction = surf.shadedConstructionList[iConstruction];
+                int curConstrNum = surf.shadedConstructionList[iConstruction];
+                auto &curConstr = state.dataConstruction->Construct(curConstrNum);
                 // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
                 // can be added. (A storm window can be added if there is an interior shade or blind and up to three
                 // glass layers, or there is a between-glass shade or blind and two glass layers.)
                 bool ShAndSt = false; // True if unshaded and shaded window can have a storm window
-                std::string ConstrNameSh = state.dataConstruction->Construct(curConstruction).Name; // Name of original shaded window construction
-                int TotLayers = state.dataConstruction->Construct(curConstruction).TotLayers;       // Total layers in a construction
-                int MatIntSh = state.dataConstruction->Construct(curConstruction).LayerPoint(TotLayers); // Material number of interior shade or blind
+                std::string ConstrNameSh = curConstr.Name; // Name of original shaded window construction
+                int TotLayers = curConstr.TotLayers;       // Total layers in a construction
+                int MatIntSh = curConstr.LayerPoint(TotLayers); // Material number of interior shade or blind
                 int MatBetweenGlassSh = 0; // Material number of between-glass shade or blind
-                if (TotLayers == 5) MatBetweenGlassSh = state.dataConstruction->Construct(curConstruction).LayerPoint(3);
-                if (state.dataConstruction->Construct(curConstruction).TotGlassLayers <= 3 &&
+                if (TotLayers == 5) MatBetweenGlassSh = curConstr.LayerPoint(3);
+                if (curConstr.TotGlassLayers <= 3 &&
                     (state.dataMaterial->Material(MatIntSh)->group == Material::Group::Shade ||
                      state.dataMaterial->Material(MatIntSh)->group == Material::Group::WindowBlind))
                     ShAndSt = true;
@@ -13057,10 +12998,9 @@ namespace SurfaceGeometry {
                 }
                 if (ShAndSt) {
                     auto &surf = state.dataSurface->Surface(SurfNum);
-                    std::string ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + state.dataConstruction->Construct(iConstruction).Name + ":" +
-                                                 ChrNum; // Name of shaded construction with storm window
-                    int ConstrNewStSh = createConstructionWithStorm(
-                        state, ConstrNum, ConstrNameStSh, state.dataSurface->StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
+                    // Shouldn't this be curConstrNum instead of iConstruction?
+                    std::string ConstrNameStSh = format("SHADEDCONSTRUCTIONWITHSTORMWIN:{}:{}", state.dataConstruction->Construct(iConstruction).Name, StormWinNum); // Name of shaded construction with storm window
+                    int ConstrNewStSh = createConstructionWithStorm(state, ConstrNum, ConstrNameStSh, stormWin.StormWinMaterialNum, MatNewStAir);
                     surf.shadedStormWinConstructionList[iConstruction] = ConstrNewStSh; // put in same index as the shaded constuction
                 }
             } // end of loop for shaded constructions
@@ -13138,14 +13078,12 @@ namespace SurfaceGeometry {
             thisMaterial->WinShadeAirFlowPermeability = 0.0;
         }
         return (newAirMaterial);
-    }
+    } // createAirMaterialFromDistance()
 
     // create a new construction with storm based on an old construction and storm and gap materials
     int createConstructionWithStorm(EnergyPlusData &state, int oldConstruction, std::string const &name, int stormMaterial, int gapMaterial)
     {
-        int newConstruct = Util::FindItemInList(name,
-                                                state.dataConstruction->Construct,
-                                                state.dataHeatBal->TotConstructs); // Number of shaded storm window construction that is created
+        int newConstruct = Util::FindItemInList(name, state.dataConstruction->Construct); // Number of shaded storm window construction that is created
         if (newConstruct == 0) {
             state.dataHeatBal->TotConstructs = state.dataHeatBal->TotConstructs + 1;
             newConstruct = state.dataHeatBal->TotConstructs;
@@ -13231,7 +13169,7 @@ namespace SurfaceGeometry {
             }
         }
         return (newConstruct);
-    }
+    } // createConstructionWithStorm()
 
     void ModifyWindow(EnergyPlusData &state,
                       int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
@@ -13260,52 +13198,32 @@ namespace SurfaceGeometry {
         // on the Data File and the width and orientation of the mullion that separates
         // the glazing systems.
 
-        // Using/Aliasing
-
-        using namespace Vectors;
-
-        // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // If there is a second glazing systme on the Data File, SurfNum+1
         // has the construction of the second glazing system.
 
         // 2-glazing system Window5 data file entry
-
-        // DERIVED TYPE DEFINITIONS:
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 H; // Height and width of original window (m)
-        Real64 W;
-        // unused1208  REAL(r64)    :: MulWidth                        ! Mullion width (m)
-        Real64 h1; // height and width of first glazing system (m)
-        Real64 w1;
-        // unused1208  REAL(r64)    :: h2,w2                           ! height and width of second glazing system (m)
-        // unused1208  type (rectangularwindow) :: NewCoord
-        int IConst;             // Construction number of first glazing system
-        int IConst2;            // Construction number of second glazing system
-        std::string Const2Name; // Name of construction of second glazing system
-        // unused1208  REAL(r64)    :: AreaNew                         ! Sum of areas of the two glazing systems (m2)
-
         auto &sg = state.dataSurfaceGeometry;
         auto &surf = sg->SurfaceTmp(SurfNum);
         // Object Data
         Array1D<Vector3<Real64>> OriginalCoord;
 
-        IConst = surf.Construction;
+        int IConst = surf.Construction;
 
         // Height and width of original window
-        W = length(surf.Vertex(3) - surf.Vertex(2));
-        H = length(surf.Vertex(2) - surf.Vertex(1));
+        Real64 W = length(surf.Vertex(3) - surf.Vertex(2));
+        Real64 H = length(surf.Vertex(2) - surf.Vertex(1));
 
         // Save coordinates of original window in case Window 5 data overwrites.
         OriginalCoord({1, surf.Sides}) = surf.Vertex({1, surf.Sides});
 
+        auto const &constr = state.dataConstruction->Construct(IConst);
         // Height and width of first glazing system
-        h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
-        w1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysWidth;
+        Real64 h1 = constr.W5FileGlazingSysHeight;
+        Real64 w1 = constr.W5FileGlazingSysWidth;
 
-        Const2Name = state.dataConstruction->Construct(IConst).Name + ":2";
-        IConst2 = Util::FindItemInList(Const2Name, state.dataConstruction->Construct);
+        std::string Const2Name = constr.Name + ":2";
+        int IConst2 = Util::FindItemInList(Const2Name, state.dataConstruction->Construct);
 
         if (IConst2 == 0) { // Only one glazing system on Window5 Data File for this window.
 
@@ -13318,7 +13236,7 @@ namespace SurfaceGeometry {
                     ShowWarningError(state,
                                      format("SurfaceGeometry: ModifyWindow: Window {} uses the Window5 Data File Construction {}",
                                             surf.Name,
-                                            state.dataConstruction->Construct(IConst).Name));
+                                            constr.Name));
                     ShowContinueError(state, format("The height {:.3R}(m) or width  (m) of this window differs by more than 10%{:.3R}", H, W));
                     ShowContinueError(state,
                                       format("from the corresponding height {:.3R} (m) or width  (m) on the Window5 Data file.{:.3R}", h1, w1));
@@ -13329,18 +13247,17 @@ namespace SurfaceGeometry {
                 }
             }
 
+            auto &baseSurf = sg->SurfaceTmp(surf.BaseSurf);
             // Calculate net area for base surface
-            sg->SurfaceTmp(surf.BaseSurf).Area -= surf.Area;
-            if (sg->SurfaceTmp(surf.BaseSurf).Area <= 0.0) {
-                ShowSevereError(state,
-                                format("Subsurfaces have too much area for base surface={}",
-                                       sg->SurfaceTmp(surf.BaseSurf).Name));
+            baseSurf.Area -= surf.Area;
+            if (baseSurf.Area <= 0.0) {
+                ShowSevereError(state, format("Subsurfaces have too much area for base surface={}", baseSurf.Name));
                 ShowContinueError(state, format("Subsurface creating error={}", surf.Name));
                 ErrorsFound = true;
             }
 
             // Net area of base surface with unity window multipliers (used in shadowing checks)
-            sg->SurfaceTmp(surf.BaseSurf).NetAreaShadowCalc -= surf.Area / surf.Multiplier;
+            baseSurf.NetAreaShadowCalc -= surf.Area / surf.Multiplier;
 
         } else { // Two glazing systems on Window5 data file for this window
 
@@ -13358,7 +13275,7 @@ namespace SurfaceGeometry {
                     ShowMessage(state,
                                 format("SurfaceGeometry: ModifyWindow: Window {} has been replaced with the Window 5/6 two glazing system=\"{}\".",
                                        surf.Name,
-                                       state.dataConstruction->Construct(IConst).Name));
+                                       constr.Name));
                     ShowContinueError(state, "Note that originally entered dimensions are overridden.");
                 } else {
                     ++sg->Warning2Count;
@@ -13374,7 +13291,7 @@ namespace SurfaceGeometry {
                         state,
                         format("SurfaceGeometry: ModifyWindow: Interior Window {} has been replaced with the Window 5/6 two glazing system=\"{}\".",
                                surf.Name,
-                               state.dataConstruction->Construct(IConst).Name));
+                               constr.Name));
                     ShowContinueError(
                         state, "Please check to make sure interior window is correct. Note that originally entered dimensions are overridden.");
                 } else {
@@ -13388,15 +13305,13 @@ namespace SurfaceGeometry {
                 ShowSevereError(state,
                                 format("SurfaceGeometry: ModifyWindow: Interior Window {} is a window in an adjacent zone.",
                                        surf.Name));
-                ShowContinueError(
-                    state,
-                    format("Attempted to add/reverse Window 5/6 multiple glazing system=\"{}\".", state.dataConstruction->Construct(IConst).Name));
+                ShowContinueError(state, format("Attempted to add/reverse Window 5/6 multiple glazing system=\"{}\".", constr.Name));
                 ShowContinueError(state, "Cannot use these Window 5/6 constructs for these Interior Windows. Program will terminate.");
                 ErrorsFound = true;
             }
 
         } // End of check if one or two glazing systems are on the Window5 Data File
-    }
+    } // ModifyWindow()
 
     void AddWindow(EnergyPlusData &state,
                    int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
@@ -13426,50 +13341,29 @@ namespace SurfaceGeometry {
 
         // 2-glazing system Window5 data file entry
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int loop; // DO loop index
-        Real64 H; // Height and width of original window (m)
-        Real64 W;
-        Real64 MulWidth; // Mullion width (m)
-        Real64 h1;       // height and width of first glazing system (m)
-        Real64 w1;
-        Real64 h2; // height and width of second glazing system (m)
-        Real64 w2;
-        Real64 xa; // Vertex intermediate variables (m)
-        Real64 ya;
-        Real64 za;
-        Real64 xb;
-        Real64 yb;
-        Real64 zb;
-        Real64 dx; // Vertex displacements from original window (m)
-        Real64 dy;
-        int IConst;             // Construction number of first glazing system
-        int IConst2;            // Construction number of second glazing system
-        std::string Const2Name; // Name of construction of second glazing system
-        Real64 AreaNew;         // Sum of areas of the two glazing systems (m2)
-
-        auto &sg = state.dataSurfaceGeometry;
-
         // Object Data
         Array1D<Vector3<Real64>> NewCoord(4);
         Array1D<Vector3<Real64>> OriginalCoord(4);
 
-        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-        IConst = surf.Construction;
+        auto &sg = state.dataSurfaceGeometry;
+        auto &surf = sg->SurfaceTmp(SurfNum);
+
+        int IConst = surf.Construction;
 
         // Height and width of original window
-        W = length(surf.Vertex(3) - surf.Vertex(2));
-        H = length(surf.Vertex(2) - surf.Vertex(1));
+        Real64 W = length(surf.Vertex(3) - surf.Vertex(2));
+        Real64 H = length(surf.Vertex(2) - surf.Vertex(1));
 
         // Save coordinates of original window in case Window 5 data overwrites.
         OriginalCoord({1, surf.Sides}) = surf.Vertex({1, surf.Sides});
 
         // Height and width of first glazing system
-        h1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysHeight;
-        w1 = state.dataConstruction->Construct(IConst).W5FileGlazingSysWidth;
+        auto const &constr = state.dataConstruction->Construct(IConst);
+        Real64 h1 = constr.W5FileGlazingSysHeight;
+        Real64 w1 = constr.W5FileGlazingSysWidth;
 
-        Const2Name = state.dataConstruction->Construct(IConst).Name + ":2";
-        IConst2 = Util::FindItemInList(Const2Name, state.dataConstruction->Construct);
+        std::string Const2Name = constr.Name + ":2";
+        int IConst2 = Util::FindItemInList(Const2Name, state.dataConstruction->Construct);
 
         ++AddedSubSurfaces;
         sg->SurfaceTmp.redimension(++state.dataSurface->TotSurfaces);
@@ -13524,20 +13418,23 @@ namespace SurfaceGeometry {
         newSurf.Multiplier = surf.Multiplier;
         newSurf.NetAreaShadowCalc = surf.NetAreaShadowCalc;
 
-        MulWidth = state.dataConstruction->Construct(IConst).W5FileMullionWidth;
-        w2 = state.dataConstruction->Construct(IConst2).W5FileGlazingSysWidth;
-        h2 = state.dataConstruction->Construct(IConst2).W5FileGlazingSysHeight;
+        Real64 MulWidth = constr.W5FileMullionWidth;
+        Real64 w2 = state.dataConstruction->Construct(IConst2).W5FileGlazingSysWidth;
+        Real64 h2 = state.dataConstruction->Construct(IConst2).W5FileGlazingSysHeight;
 
         // Correction to net area of base surface. Add back in the original glazing area and subtract the
         // area of the two glazing systems. Note that for Surface(SurfNum)%Class = 'Window' the effect
         // of a window multiplier is included in the glazing area. Note that frame areas are subtracted later.
 
-        AreaNew = surf.Multiplier * (h1 * w1 + h2 * w2); // both glazing systems
+        Real64 AreaNew = surf.Multiplier * (h1 * w1 + h2 * w2); // both glazing systems
+
+
+        auto &baseSurf = sg->SurfaceTmp(surf.BaseSurf);
         // Adjust net area for base surface
-        sg->SurfaceTmp(surf.BaseSurf).Area -= AreaNew;
+        baseSurf.Area -= AreaNew;
 
         // Net area of base surface with unity window multipliers (used in shadowing checks)
-        sg->SurfaceTmp(surf.BaseSurf).NetAreaShadowCalc -= AreaNew / surf.Multiplier;
+        baseSurf.NetAreaShadowCalc -= AreaNew / surf.Multiplier;
 
         // Reset area, etc. of original window
         surf.Area = surf.Multiplier * (h1 * w1);
@@ -13554,13 +13451,10 @@ namespace SurfaceGeometry {
         newSurf.Height = h2;
         newSurf.Width = w2;
 
-        if (sg->SurfaceTmp(surf.BaseSurf).Area <= 0.0) {
-            ShowSevereError(state,
-                            format("SurfaceGeometry: ModifyWindow: Subsurfaces have too much area for base surface={}",
-                                   sg->SurfaceTmp(surf.BaseSurf).Name));
+        if (baseSurf.Area <= 0.0) {
+            ShowSevereError(state, format("SurfaceGeometry: ModifyWindow: Subsurfaces have too much area for base surface={}", baseSurf.Name));
             ShowContinueError(state, format("Subsurface (window) creating error={}", surf.Name));
-            ShowContinueError(state,
-                              format("This window has been replaced by two windows from the Window5 Data File of total area {:.2R} m2", AreaNew));
+            ShowContinueError(state, format("This window has been replaced by two windows from the Window5 Data File of total area {:.2R} m2", AreaNew));
             ErrorsFound = true;
         }
 
@@ -13571,7 +13465,7 @@ namespace SurfaceGeometry {
         Vector3<Real64> orig3minus4 = OriginalCoord(3) - OriginalCoord(4);
         Vector3<Real64> a, b;
             
-        if (state.dataConstruction->Construct(IConst).W5FileMullionOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
+        if (constr.W5FileMullionOrientation == DataWindowEquivalentLayer::Orientation::Vertical) {
 
             // VERTICAL MULLION: original window is modified to become left-hand glazing (system #1);
             // new window is created to become right-hand glazing (system #2)
@@ -13579,13 +13473,13 @@ namespace SurfaceGeometry {
             // Left-hand glazing
             
             // Vertex 1
-            dx = 0.0;
-            dy = H - h1;
-            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            Real64 dx = 0.0;
+            Real64 dy = H - h1;
+            Vector3<Real64> a = OriginalCoord(1) + (dy / H) * orig2minus1;
             // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
             // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
             // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
-            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            Vector3<Real64> b = OriginalCoord(4) + (dy / H) * orig3minus4;
             // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
             // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
             // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
@@ -13642,7 +13536,7 @@ namespace SurfaceGeometry {
             // NewCoord(4).y = ya + (dx / W) * (yb - ya);
             // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= surf.Sides; ++loop) {
+            for (int loop = 1; loop <= surf.Sides; ++loop) {
                 surf.Vertex(loop) = NewCoord(loop);
             }
 
@@ -13712,7 +13606,7 @@ namespace SurfaceGeometry {
             // NewCoord(4).y = ya + (dx / W) * (yb - ya);
             // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= newSurf.Sides; ++loop) {
+            for (int loop = 1; loop <= newSurf.Sides; ++loop) {
                 newSurf.Vertex(loop) = NewCoord(loop);
             }
 
@@ -13724,13 +13618,13 @@ namespace SurfaceGeometry {
             // Bottom glazing
 
             // Vertex 1
-            dx = 0.0;
-            dy = H - h1;
-            a = OriginalCoord(1) + (dy / H) * orig2minus1;
+            Real64 dx = 0.0;
+            Real64 dy = H - h1;
+            Vector3<Real64> a = OriginalCoord(1) + (dy / H) * orig2minus1;
             // xa = OriginalCoord(1).x + (dy / H) * (OriginalCoord(2).x - OriginalCoord(1).x);
             // ya = OriginalCoord(1).y + (dy / H) * (OriginalCoord(2).y - OriginalCoord(1).y);
             // za = OriginalCoord(1).z + (dy / H) * (OriginalCoord(2).z - OriginalCoord(1).z);
-            b = OriginalCoord(4) + (dy / H) * orig3minus4;
+            Vector3<Real64> b = OriginalCoord(4) + (dy / H) * orig3minus4;
             // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
             // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
             // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
@@ -13750,9 +13644,10 @@ namespace SurfaceGeometry {
             // xb = OriginalCoord(4).x + (dy / H) * (OriginalCoord(3).x - OriginalCoord(4).x);
             // yb = OriginalCoord(4).y + (dy / H) * (OriginalCoord(3).y - OriginalCoord(4).y);
             // zb = OriginalCoord(4).z + (dy / H) * (OriginalCoord(3).z - OriginalCoord(4).z);
-            NewCoord(2).x = xa + (dx / W) * (xb - xa);
-            NewCoord(2).y = ya + (dx / W) * (yb - ya);
-            NewCoord(2).z = za + (dx / W) * (zb - za);
+            NewCoord(2) = a + (dx / W) * (b - a);
+            // NewCoord(2).x = xa + (dx / W) * (xb - xa);
+            // NewCoord(2).y = ya + (dx / W) * (yb - ya);
+            // NewCoord(2).z = za + (dx / W) * (zb - za);
 
             // Vertex 3
             dx = w1;
@@ -13786,7 +13681,7 @@ namespace SurfaceGeometry {
             // NewCoord(4).y = ya + (dx / W) * (yb - ya);
             // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= surf.Sides; ++loop) {
+            for (int loop = 1; loop <= surf.Sides; ++loop) {
                 surf.Vertex(loop) = NewCoord(loop);
             }
 
@@ -13856,7 +13751,7 @@ namespace SurfaceGeometry {
             // NewCoord(4).y = ya + (dx / W) * (yb - ya);
             // NewCoord(4).z = za + (dx / W) * (zb - za);
 
-            for (loop = 1; loop <= newSurf.Sides; ++loop) {
+            for (int loop = 1; loop <= newSurf.Sides; ++loop) {
                 newSurf.Vertex(loop) = NewCoord(loop);
             }
 
@@ -13896,13 +13791,6 @@ namespace SurfaceGeometry {
         int IOStat;
         Real64 OldAspectRatio;
         Real64 NewAspectRatio;
-        int n;
-        Real64 Xo;
-        Real64 XnoRot;
-        Real64 Xtrans;
-        Real64 Yo;
-        Real64 YnoRot;
-        Real64 Ytrans;
         // begin execution
         // get user input...
 
@@ -13959,23 +13847,20 @@ namespace SurfaceGeometry {
         // this works if not rotated wrt north axis ... but if it is, then trouble
         // try to first derotate it , transform by aspect and then rotate back.
 
-        for (n = 1; n <= NSides; ++n) {
-            Xo = surf.Vertex(n).x; // world coordinates.... shifted by relative north angle...
-            Yo = surf.Vertex(n).y;
+        for (int n = 1; n <= NSides; ++n) {
+            Real64 Xo = surf.Vertex(n).x; // world coordinates.... shifted by relative north angle...
+            Real64 Yo = surf.Vertex(n).y;
             // next derotate the building
-            XnoRot = Xo * sg->CosBldgRelNorth + Yo * sg->SinBldgRelNorth;
-            YnoRot = Yo * sg->CosBldgRelNorth - Xo * sg->SinBldgRelNorth;
+            Real64 XnoRot = Xo * sg->CosBldgRelNorth + Yo * sg->SinBldgRelNorth;
+            Real64 YnoRot = Yo * sg->CosBldgRelNorth - Xo * sg->SinBldgRelNorth;
             // translate
-            Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
-            Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+            Real64 Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
+            Real64 Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
             // rerotate
-            surf.Vertex(n).x =
-                Xtrans * sg->CosBldgRelNorth - Ytrans * sg->SinBldgRelNorth;
-
-            surf.Vertex(n).y =
-                Xtrans * sg->SinBldgRelNorth + Ytrans * sg->CosBldgRelNorth;
+            surf.Vertex(n).x = Xtrans * sg->CosBldgRelNorth - Ytrans * sg->SinBldgRelNorth;
+            surf.Vertex(n).y = Xtrans * sg->SinBldgRelNorth + Ytrans * sg->CosBldgRelNorth;
         }
-    }
+    } // TransformVertsByAspect()
 
     void CalcSurfaceCentroid(EnergyPlusData &state)
     {
@@ -14036,8 +13921,8 @@ namespace SurfaceGeometry {
                 }
 
                 // get area fraction of triangles.
-                Real64 Tri1Area(Vectors::AreaPolygon(3, sg->Triangle1) / TotalArea);
-                Real64 Tri2Area(Vectors::AreaPolygon(3, sg->Triangle2) / TotalArea);
+                Real64 Tri1Area(Vectors::CalcPolygonArea(sg->Triangle1, 3) / TotalArea);
+                Real64 Tri2Area(Vectors::CalcPolygonArea(sg->Triangle2, 3) / TotalArea);
 
                 // check if sum of fractions are slightly greater than 1.0 which is a symptom of the triangles for a non-convex
                 // quadralateral using the wrong two triangles
@@ -14053,8 +13938,8 @@ namespace SurfaceGeometry {
                     sg->Triangle2(3) = vertex(4);
 
                     // get area fraction of triangles.
-                    Real64 AreaTriangle1 = Vectors::AreaPolygon(3, sg->Triangle1);
-                    Real64 AreaTriangle2 = Vectors::AreaPolygon(3, sg->Triangle2);
+                    Real64 AreaTriangle1 = Vectors::CalcPolygonArea(sg->Triangle1, 3);
+                    Real64 AreaTriangle2 = Vectors::CalcPolygonArea(sg->Triangle2, 3);
                     TotalArea = AreaTriangle1 + AreaTriangle2;
                     Tri1Area = AreaTriangle1 / TotalArea;
                     Tri2Area = AreaTriangle2 / TotalArea;
@@ -14670,89 +14555,59 @@ namespace SurfaceGeometry {
 
         constexpr Real64 TurnThreshold(0.000001); // Sensitivity of convexity test, in radians
 
+        enum class Axis { Invalid = -1, X, Y, Z };
+
         Real64 LastTheta = 0.0;                 // Angle between edge vectors
         bool SignFlag;                          // Direction of edge turn : true is right, false is left
         bool PrevSignFlag(false);               // Container for the sign of the previous iteration's edge turn
         bool PrevSignFlagInitialized(false);    // Whether we picked a PrevSignFlag already or not
-        auto &X = state.dataSurfaceGeometry->X; // containers for x,y,z vertices of the surface
-        auto &Y = state.dataSurfaceGeometry->Y;
-        auto &Z = state.dataSurfaceGeometry->Z;
-        auto &A = state.dataSurfaceGeometry->A; // containers for convexity test
-        auto &B = state.dataSurfaceGeometry->B;
-        auto &VertSize = state.dataSurfaceGeometry->VertSize; // size of X,Y,Z,A,B arrays
 
+        Array1D<Vector3<Real64>> V(NSides+2);
+        Axis axisA = Axis::Invalid;
+        Axis axisB = Axis::Invalid;
+        
         std::vector<int> surfCollinearVerts; // index of vertices to remove, 1-indexed
         surfCollinearVerts.reserve(NSides + 2);
 
-        if (state.dataSurfaceGeometry->CheckConvexityFirstTime) {
-            X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            VertSize = state.dataSurface->MaxVerticesPerSurface;
-            state.dataSurfaceGeometry->CheckConvexityFirstTime = false;
-        }
-
-        if (NSides > VertSize) {
-            X.deallocate();
-            Y.deallocate();
-            Z.deallocate();
-            A.deallocate();
-            B.deallocate();
-            X.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            Y.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            Z.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            A.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            B.allocate(state.dataSurface->MaxVerticesPerSurface + 2);
-            VertSize = state.dataSurface->MaxVerticesPerSurface;
-        }
-
-        auto &surfaceTmp = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
-        auto &vertices = surfaceTmp.Vertex;
+        auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
 
         for (int n = 1; n <= NSides; ++n) {
-            X(n) = vertices(n).x;
-            Y(n) = vertices(n).y;
-            Z(n) = vertices(n).z;
+            V(n) = surf.Vertex(n);
         }
-        X(NSides + 1) = vertices(1).x;
-        Y(NSides + 1) = vertices(1).y;
-        Z(NSides + 1) = vertices(1).z;
-        X(NSides + 2) = vertices(2).x;
-        Y(NSides + 2) = vertices(2).y;
-        Z(NSides + 2) = vertices(2).z;
+        
+        V(NSides + 1) = surf.Vertex(1);
+        V(NSides + 2) = surf.Vertex(2);
 
         // Determine a suitable plane in which to do the tests
         Real64 Det = 0.0;
         for (int n = 1; n <= NSides; ++n) {
-            Det += X(n) * Y(n + 1) - X(n + 1) * Y(n);
+            Det += V(n).x * V(n + 1).y - V(n + 1).x * V(n).y;
         }
         if (std::abs(Det) > 1.e-4) {
-            A = X;
-            B = Y;
+            axisA = Axis::X;
+            axisB = Axis::Y;
         } else {
             Det = 0.0;
             for (int n = 1; n <= NSides; ++n) {
-                Det += X(n) * Z(n + 1) - X(n + 1) * Z(n);
+                Det += V(n).x * V(n + 1).z - V(n + 1).x * V(n).z;
             }
             if (std::abs(Det) > 1.e-4) {
-                A = X;
-                B = Z;
+                axisA = Axis::X;
+                axisB = Axis::Z;
             } else {
                 Det = 0.0;
                 for (int n = 1; n <= NSides; ++n) {
-                    Det += Y(n) * Z(n + 1) - Y(n + 1) * Z(n);
+                    Det += V(n).y * V(n + 1).z - V(n + 1).y * V(n).z;
                 }
                 if (std::abs(Det) > 1.e-4) {
-                    A = Y;
-                    B = Z;
+                    axisA = Axis::Y;
+                    axisB = Axis::Z;
                 } else {
                     // This condition should not be reached if the surfaces are guaranteed to be planar already
-                    ShowSevereError(state, format("CheckConvexity: Surface=\"{}\" is non-planar.", surfaceTmp.Name));
+                    ShowSevereError(state, format("CheckConvexity: Surface=\"{}\" is non-planar.", surf.Name));
                     ShowContinueError(state, "Coincident Vertices will be removed as possible.");
-                    for (int n = 1; n <= surfaceTmp.Sides; ++n) {
-                        auto const &point = vertices(n);
+                    for (int n = 1; n <= surf.Sides; ++n) {
+                        auto const &point = surf.Vertex(n);
                         static constexpr std::string_view ErrFmt = " ({:8.3F},{:8.3F},{:8.3F})";
                         ShowContinueError(state, format(ErrFmt, point.x, point.y, point.z));
                     }
@@ -14762,9 +14617,12 @@ namespace SurfaceGeometry {
 
         for (int n = 1; n <= NSides; ++n) { // perform convexity test in the plane determined above.
 
-            DataVectorTypes::Vector_2d pt0(A(n), B(n));
-            DataVectorTypes::Vector_2d pt1(A(n + 1), B(n + 1));
-            DataVectorTypes::Vector_2d pt2(A(n + 2), B(n + 2));
+            Vector2<Real64> pt0, pt1, pt2;
+            if (axisA == Axis::X) { pt0.x = V(n).x; pt1.x = V(n+1).x; pt2.x = V(n+2).x; }
+            else { pt0.x = V(n).y, pt1.x = V(n+1).y; pt2.x = V(n+2).y; }
+            
+            if (axisB == Axis::Y) { pt0.y = V(n).y; pt1.y = V(n+1).y; pt2.y = V(n+2).y; }
+            else { pt0.y = V(n).z, pt1.y = V(n+1).z; pt2.y = V(n+2).z; }
 
             Vector2<Real64> V1 = pt1 - pt0;
             Vector2<Real64> V2 = pt2 - pt1;
@@ -14796,7 +14654,7 @@ namespace SurfaceGeometry {
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(
                         state,
-                        format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surfaceTmp.Name, colinearIndex));
+                        format("CheckConvexity: Surface=\"{}\", vertex {} is colinear with previous and next.", surf.Name, colinearIndex));
                 }
                 ++state.dataErrTracking->TotalCoincidentVertices;
                 surfCollinearVerts.push_back(colinearIndex);
@@ -14811,14 +14669,14 @@ namespace SurfaceGeometry {
             }
 
             if (SignFlag != PrevSignFlag) {
-                if (state.dataGlobal->DisplayExtraWarnings && surfaceTmp.ExtSolar &&
+                if (state.dataGlobal->DisplayExtraWarnings && surf.ExtSolar &&
                     (state.dataHeatBal->SolarDistribution != DataHeatBalance::Shadowing::Minimal) &&
                     // Warn only once
-                    surfaceTmp.IsConvex) {
+                    surf.IsConvex) {
                     ShowWarningError(state,
                                      format("CheckConvexity: Zone=\"{}\", Surface=\"{}\" is non-convex.",
-                                            state.dataHeatBal->Zone(surfaceTmp.Zone).Name,
-                                            surfaceTmp.Name));
+                                            state.dataHeatBal->Zone(surf.Zone).Name,
+                                            surf.Name));
                     int Np1 = n + 1;
                     if (Np1 > NSides) {
                         Np1 -= NSides;
@@ -14828,13 +14686,13 @@ namespace SurfaceGeometry {
                         Np2 -= NSides;
                     }
                     ShowContinueError(state, format("...vertex {} to vertex {} to vertex {}", n, Np1, Np2));
-                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", n, X(n), Y(n), Z(n)));
-                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np1, X(n + 1), Y(n + 1), Z(n + 1)));
-                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np2, X(n + 2), Y(n + 2), Z(n + 2)));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", n, V(n).x, V(n).y, V(n).z));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np1, V(n + 1).x, V(n + 1).y, V(n + 1).z));
+                    ShowContinueError(state, format("...vertex {}=[{:.2R},{:.2R},{:.2R}]", Np2, V(n + 2).x, V(n + 2).y, V(n + 2).z));
                     // ShowContinueError(state, format("...theta angle=[{:.6R}]", Theta));
                     // ShowContinueError(state, format("...last theta angle=[{:.6R}]", LastTheta));
                 }
-                surfaceTmp.IsConvex = false;
+                surf.IsConvex = false;
                 // #10103 - We do not want to break early, because we do want to consistently remove colinear vertices
                 // to avoid potential vertex size mismatch fatal errors
                 // break;
@@ -14847,42 +14705,42 @@ namespace SurfaceGeometry {
         int M = surfCollinearVerts.size();
         if (M > 0) { // Remove the collinear points determined above
             if (NSides - M >= 3) {
-                surfaceTmp.Sides = NSides - M;
+                surf.Sides = NSides - M;
                 if (state.dataGlobal->DisplayExtraWarnings) {
                     ShowWarningError(state,
-                                     format("CheckConvexity: Surface=\"{}\" has [{}] collinear points that have been removed.", surfaceTmp.Name, M));
+                                     format("CheckConvexity: Surface=\"{}\" has [{}] collinear points that have been removed.", surf.Name, M));
                 }
             } else { // too many
                 if (state.dataGlobal->DisplayExtraWarnings) {
-                    ShowWarningError(state, format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", surfaceTmp.Name, M));
+                    ShowWarningError(state, format("CheckConvexity: Surface=\"{}\" has [{}] collinear points.", surf.Name, M));
                     ShowContinueError(state, "...too many to remove all.  Will leave the surface with 3 sides. But this is now a degenerate surface");
                 }
                 ++state.dataErrTracking->TotalDegenerateSurfaces;
-                surfaceTmp.Sides = 3; // max(NSides - M, 3) = 3 since NSide - M is < 3;
+                surf.Sides = 3; // max(NSides - M, 3) = 3 since NSide - M is < 3;
                 surfCollinearVerts.resize(NSides - 3);
             }
 
             // remove duplicated points: For that we construct a new array of vertices, only copying indices that aren't in SurfCollinearVerts
             // Then we move that array into the original one
             Array1D<Vector3<Real64>> newVertices;
-            newVertices.allocate(surfaceTmp.Sides);
+            newVertices.allocate(surf.Sides);
 
             int n = 0;
             for (int i = 1; i <= NSides; ++i) {
                 if (std::find(surfCollinearVerts.cbegin(), surfCollinearVerts.cend(), i) == surfCollinearVerts.cend()) {
-                    newVertices(++n) = vertices(i);
+                    newVertices(++n) = surf.Vertex(i);
                 }
             }
-            vertices = std::move(newVertices);
+            surf.Vertex = std::move(newVertices);
 
             if (state.dataGlobal->DisplayExtraWarnings) {
                 ShowWarningError(state,
                                  format("CheckConvexity: Surface=\"{}\": The vertex points has been reprocessed as Sides = {}",
-                                        surfaceTmp.Name,
-                                        surfaceTmp.Sides));
+                                        surf.Name,
+                                        surf.Sides));
             }
         }
-    }
+    } // CheckConvexity()
 
     bool isRectangle(EnergyPlusData &state, int const ThisSurf // Surface number
     )
@@ -14892,33 +14750,22 @@ namespace SurfaceGeometry {
         //       DATE WRITTEN   October 2015
 
         // PURPOSE: Check if a 4-sided surface is a rectangle
-
-        using namespace Vectors;
-
-        Real64 Diagonal1;                                                // Length of diagonal of 4-sided figure from vertex 1 to vertex 3 (m)
-        Real64 Diagonal2;                                                // Length of diagonal of 4-sided figure from vertex 2 to vertex 4 (m)
-        Real64 DotProd;                                                  // Dot product of two adjacent sides - to test for right angle
         Real64 const cos89deg = std::cos(89.0 * Constant::DegToRadians); // tolerance for right angle
-        Vector3<Real64> Vect32;                                                   // normalized vector from vertex 3 to vertex 2
-        Vector3<Real64> Vect21;                                                   // normalized vector from vertex 2 to vertex 1
 
         auto &surf = state.dataSurface->Surface(ThisSurf);
-        Diagonal1 = length(surf.Vertex(1) - surf.Vertex(3));
-        Diagonal2 = length(surf.Vertex(2) - surf.Vertex(4));
+        Real64 Diagonal1 = length(surf.Vertex(1) - surf.Vertex(3));
+        Real64 Diagonal2 = length(surf.Vertex(2) - surf.Vertex(4));
         // Test for rectangularity
-        if (std::abs(Diagonal1 - Diagonal2) < 0.020) { // This tolerance based on coincident vertex tolerance of 0.01
-            Vect32 = VecNormalize(surf.Vertex(3) - surf.Vertex(2));
-            Vect21 = VecNormalize(surf.Vertex(2) - surf.Vertex(1));
-            DotProd = dot(Vect32, Vect21);
-            if (std::abs(DotProd) <= cos89deg) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
+        if (std::abs(Diagonal1 - Diagonal2) >= 0.020)  // This tolerance based on coincident vertex tolerance of 0.01
             return false;
-        }
-    }
+        
+        Vector3<Real64> Vect32 = surf.Vertex(3) - surf.Vertex(2);
+        Vector3<Real64> Vect21 = surf.Vertex(2) - surf.Vertex(1);
+        Vect32.normalize_zero();
+        Vect21.normalize_zero();
+        Real64 DotProd = dot(Vect32, Vect21);
+        return (std::abs(DotProd) <= cos89deg);
+    } // isRectangle()
 
     void MakeEquivalentRectangle(EnergyPlusData &state,
                                  int const SurfNum, // Surface number
@@ -14938,14 +14785,6 @@ namespace SurfaceGeometry {
         // METHODOLOGY EMPLOYED:
         // Transform the surface into an equivalent rectangular surface with the same area and aspect ratio.
 
-        Real64 AspectRatio;  // Aspect ratio
-        Real64 NumSurfSides; // Number of surface sides
-        Real64 WidthEff;     // Effective width of the surface
-        Real64 WidthMax;     // X difference between the vertex on the most left and the one on the most right
-        Real64 HeightEff;    // Effective height of the surface
-        Real64 HeightMax;    // Y difference between the lowest and toppest vertices
-        Vector3<Real64> LLC;
-
         if (SurfNum == 0) {
             // invalid surface
             ErrorsFound = true;
@@ -14953,23 +14792,18 @@ namespace SurfaceGeometry {
         }
 
         auto &surf = state.dataSurface->Surface(SurfNum);
-        if (surf.Sides != 4) {
-            // the method is designed for 4-sided surface
-            return;
-        } else if (isRectangle(state, SurfNum)) {
+        if (surf.Sides != 4 || isRectangle(state, SurfNum)) 
             // no need to transform
             return;
-        }
-
-        NumSurfSides = surf.Sides;
-
+ 
         // Calculate WidthMax and HeightMax
-        WidthMax = 0.0;
-        HeightMax = 0.0;
-        for (int i = 1; i < NumSurfSides; ++i) {
-            for (int j = i + 1; j <= NumSurfSides; ++j) {
+        Real64 WidthMax = 0.0;
+        Real64 HeightMax = 0.0;
+        for (int i = 1; i < surf.Sides; ++i) {
+            for (int j = i + 1; j <= surf.Sides; ++j) {
 
                 Vector3<Real64> p = surf.Vertex(j) - surf.Vertex(i);
+                Vector3<Real64> LLC;
 
                 LLC.x = -p.x * surf.CosAzim + p.y * surf.SinAzim;
                 LLC.y = -p.x * surf.SinAzim * surf.CosTilt - p.y * surf.CosAzim * surf.CosTilt + p.z * surf.SinTilt;
@@ -14981,18 +14815,11 @@ namespace SurfaceGeometry {
         }
 
         // Perform transformation by calculating WidthEff and HeightEff
-        if ((WidthMax > 0) && (HeightMax > 0)) {
-            AspectRatio = WidthMax / HeightMax;
-        } else {
-            AspectRatio = 1;
-        }
-        WidthEff = std::sqrt(surf.Area * AspectRatio);
-        HeightEff = std::sqrt(surf.Area / AspectRatio);
+        Real64 AspectRatio = ((WidthMax > 0) && (HeightMax > 0)) ? WidthMax / HeightMax : 1;
 
-        // Assign the effective width and length to the surface
-        surf.Width = WidthEff;
-        surf.Height = HeightEff;
-    }
+        surf.Width = std::sqrt(surf.Area * AspectRatio);
+        surf.Height = std::sqrt(surf.Area / AspectRatio);
+    } // MakeEquivalentRectangle()
 
     void CheckForReversedLayers(EnergyPlusData &state,
                                 bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
@@ -15114,7 +14941,7 @@ namespace SurfaceGeometry {
                 auto &curVertex = *it;
                 auto &nextVertex = *itnext;
                 auto it2 = std::find_if(uniqueRoofVertices.begin(), uniqueRoofVertices.end(), [&curVertex](const auto &unqV) {
-                    return SurfaceGeometry::isAlmostEqual3dPt(curVertex, unqV);
+                    return Vectors::VecEqualTol(curVertex, unqV, 0.0127);
                 });
                 if (it2 == std::end(uniqueRoofVertices)) {
                     uniqueRoofVertices.emplace_back(curVertex);

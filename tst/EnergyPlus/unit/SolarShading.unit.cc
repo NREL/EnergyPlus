@@ -3422,9 +3422,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     const auto &surface = *it;
     const int surfNum = std::distance(surfaces.begin(), it) + 1;
     EXPECT_EQ(6, surfNum);
-    EXPECT_DOUBLE_EQ(-12.247448713915899, state->dataSurface->X0(surfNum));
-    EXPECT_DOUBLE_EQ(7.0710678118654799, state->dataSurface->Y0(surfNum));
-    EXPECT_DOUBLE_EQ(3.0, state->dataSurface->Z0(surfNum));
+    EXPECT_DOUBLE_EQ(-12.247448713915899, state->dataSurface->T0(surfNum).x);
+    EXPECT_DOUBLE_EQ(7.0710678118654799, state->dataSurface->T0(surfNum).y);
+    EXPECT_DOUBLE_EQ(3.0, state->dataSurface->T0(surfNum).z);
 
     const auto &vertices = surface.Vertex;
     std::vector<Vector> expectedOriVertices{
@@ -3435,7 +3435,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     };
     for (size_t i = 0; i < 4; ++i) {
 
-        EXPECT_TRUE(SurfaceGeometry::isAlmostEqual3dPt(expectedOriVertices[i], vertices[i]))
+        EXPECT_TRUE(Vectors::VecEqualTol(expectedOriVertices[i], vertices[i], 0.0127))
             << "Failed for vertice " << i << ", expected=" << expectedOriVertices[i] << ", got=" << vertices[i];
     }
 
@@ -3443,9 +3443,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
     Vector3<Real64> expected_lcsy(0.96592582628906831, 0.25881904510252079, -0.0);
     Vector3<Real64> expected_lcsz(0.0, 0.0, 1.0);
 
-    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsx, surface.lcsx, 0.0000001));
-    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsy, surface.lcsy, 0.0000001));
-    EXPECT_TRUE(Vectors::CompareTwoVectors(expected_lcsz, surface.lcsz, 0.0000001));
+    EXPECT_TRUE(Vectors::VecEqualTol(expected_lcsx, surface.lcsx, 0.0000001));
+    EXPECT_TRUE(Vectors::VecEqualTol(expected_lcsy, surface.lcsy, 0.0000001));
+    EXPECT_TRUE(Vectors::VecEqualTol(expected_lcsz, surface.lcsz, 0.0000001));
 
     Array1D<Real64> xs(4, 0.0);
     Array1D<Real64> ys(4, 0.0);
@@ -3483,7 +3483,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CTRANS)
         {+20.0000, +20.0000, +0.0000},
     };
     for (size_t i = 0; i < 4; ++i) {
-        EXPECT_TRUE(SurfaceGeometry::isAlmostEqual3dPt(expectedVertices[i], transformedVertices[i])) << "Failed for vertice " << i;
+        EXPECT_TRUE(Vectors::VecEqualTol(expectedVertices[i], transformedVertices[i], 0.0127)) << "Failed for vertice " << i;
     }
 }
 

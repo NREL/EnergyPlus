@@ -311,8 +311,8 @@ namespace Weather {
                     surf.NewVertex(n).z = surf.Vertex(n).z;
                 }
 
-                surf.NewellNormVec = Vectors::CreateNewellNormalVector(surf.NewVertex, surf.Sides);
-                std::tie(surf.Azimuth, surf.Tilt) = Vectors::DetermineAzimuthAndTilt(surf.NewVertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+                surf.NewellNormVec = Vectors::CalcNewellNormalVector(surf.NewVertex, surf.Sides);
+                std::tie(surf.Azimuth, surf.Tilt) = Vectors::CalcAzimuthAndTilt(surf.NewVertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
                 surf.SinAzim = std::sin(surf.Azimuth * Constant::DegToRadians);
                 surf.CosAzim = std::cos(surf.Azimuth * Constant::DegToRadians);
                 surf.OutNormVec = surf.NewellNormVec;

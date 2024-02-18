@@ -1263,28 +1263,16 @@ namespace DataSurfaces {
     {
         // Members
         int NVert = 0;
-        Array1D<Real64> XV;
-        Array1D<Real64> YV;
-        Array1D<Real64> ZV;
-
-        // Default Constructor
-        ShadingVertexData()
-        {
-        }
+        Array1D<Vector3<Real64>> V;
     };
 
     struct SurfaceSolarIncident
     {
         // Members
         std::string Name;
-        int SurfPtr;   // surface pointer
-        int ConstrPtr; // construction pointer
-        int SchedPtr;  // schedule pointer
-
-        // Default Constructor
-        SurfaceSolarIncident() : SurfPtr(0), ConstrPtr(0), SchedPtr(0)
-        {
-        }
+        int SurfPtr = 0;   // surface pointer
+        int ConstrPtr = 0; // construction pointer
+        int SchedPtr = 0;  // schedule pointer
     };
 
     struct SurfaceIncidentSolarMultiplier
@@ -1300,15 +1288,10 @@ namespace DataSurfaces {
     {
         // Members
         std::string Name;
-        int SurfPtr;           // surface pointer
-        int ConstrPtr;         // construction pointer
-        int NumOfSched;        // number of scheduled layers
+        int SurfPtr = 0;           // surface pointer
+        int ConstrPtr = 0;         // construction pointer
+        int NumOfSched = 0;        // number of scheduled layers
         Array1D_int SchedPtrs; // pointer to schedules for each layer in construction
-
-        // Default Constructor
-        FenestrationSolarAbsorbed() : SurfPtr(0), ConstrPtr(0), NumOfSched(0)
-        {
-        }
     };
 
     struct GroundSurfacesData
@@ -1496,9 +1479,7 @@ struct SurfacesData : BaseGlobalStruct
     bool AnyMovableSlat = false;                       // True if there are any movable slats for window blinds presented
 
     Array1D_int SurfAdjacentZone; // Array of adjacent zones to each surface
-    Array1D<Real64> X0;           // X-component of translation vector
-    Array1D<Real64> Y0;           // Y-component of translation vector
-    Array1D<Real64> Z0;           // Z-component of translation vector
+    Array1D<Vector3<Real64>> T0;  // X-component of translation vector
 
     std::unordered_map<DataSurfaces::SurfaceCalcHashKey, int, DataSurfaces::SurfaceCalcHasher>
         RepresentativeSurfaceMap; // A map that categorizes similar surfaces with

@@ -74,9 +74,11 @@ TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
     a(4).x = 0.0;
     a(4).y = 7.0;
     a(4).z = 0.0;
-    EXPECT_EQ(21.0, AreaPolygon(4, a));
+    EXPECT_EQ(21.0, CalcPolygonArea(a, 4));
 }
 
+#ifdef GET_OUT
+// These functions are not used
 TEST_F(EnergyPlusFixture, VectorsTest_VecNormalize)
 {
     {
@@ -105,6 +107,7 @@ TEST_F(EnergyPlusFixture, VectorsTest_VecRound)
     EXPECT_DOUBLE_EQ(-33.5, v.y);
     EXPECT_DOUBLE_EQ(56.0, v.z);
 }
+#endif // GET_OUT
 
 TEST_F(EnergyPlusFixture, VectorsTest_CoplnarPoints)
 {

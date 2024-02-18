@@ -574,7 +574,7 @@ void DXFOut(EnergyPlusData &state,
                 }
                 print(dxffile, Format_717, ShadeType);
             } else {
-                Array1D<DataVectorTypes::dTriangle> mytriangles;
+                Array1D<Vector3<int>> mytriangles;
 
                 const int ntri = DXFEarClipping::Triangulate(state,
                                                              thisSurface.Sides,
@@ -585,9 +585,9 @@ void DXFOut(EnergyPlusData &state,
                                                              thisSurface.Name,
                                                              thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const int vv0 = mytriangles(svert).vv0;
-                    const int vv1 = mytriangles(svert).vv1;
-                    const int vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).x;
+                    const int vv1 = mytriangles(svert).y;
+                    const int vv2 = mytriangles(svert).z;
                     print(dxffile,
                           Format_704,
                           ShadeType,
@@ -652,7 +652,7 @@ void DXFOut(EnergyPlusData &state,
                     }
                     print(dxffile, Format_717, TempZoneName);
                 } else {
-                    Array1D<DataVectorTypes::dTriangle> mytriangles;
+                    Array1D<Vector3<int>> mytriangles;
 
                     const int ntri = DXFEarClipping::Triangulate(state,
                                                                  thisSurface.Sides,
@@ -663,9 +663,9 @@ void DXFOut(EnergyPlusData &state,
                                                                  thisSurface.Name,
                                                                  thisSurface.Class);
                     for (int svert = 1; svert <= ntri; ++svert) {
-                        const int vv0 = mytriangles(svert).vv0;
-                        const int vv1 = mytriangles(svert).vv1;
-                        const int vv2 = mytriangles(svert).vv2;
+                        const int vv0 = mytriangles(svert).x;
+                        const int vv1 = mytriangles(svert).y;
+                        const int vv2 = mytriangles(svert).z;
                         print(dxffile,
                               Format_704,
                               TempZoneName,
@@ -717,7 +717,7 @@ void DXFOut(EnergyPlusData &state,
                     }
                     print(dxffile, Format_717, TempZoneName);
                 } else {
-                    Array1D<DataVectorTypes::dTriangle> mytriangles;
+                    Array1D<Vector3<int>> mytriangles;
                     int ntri = 0;
                     if (thisSurface.Shape == DataSurfaces::SurfaceShape::RectangularOverhang) {
                         ntri = DXFEarClipping::Triangulate(state,
@@ -739,9 +739,9 @@ void DXFOut(EnergyPlusData &state,
                                                            DataSurfaces::SurfaceClass::Fin);
                     }
                     for (int svert = 1; svert <= ntri; ++svert) {
-                        const int vv0 = mytriangles(svert).vv0;
-                        const int vv1 = mytriangles(svert).vv1;
-                        const int vv2 = mytriangles(svert).vv2;
+                        const int vv0 = mytriangles(svert).x;
+                        const int vv1 = mytriangles(svert).y;
+                        const int vv2 = mytriangles(svert).z;
                         print(dxffile,
                               Format_704,
                               TempZoneName,
@@ -1520,7 +1520,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
             }
             print<check_syntax(Format_805)>(wrlfile, Format_805);
         } else { // will be >4 sided polygon with triangulate option
-            Array1D<DataVectorTypes::dTriangle> mytriangles;
+            Array1D<Vector3<int>> mytriangles;
             const int ntri = DXFEarClipping::Triangulate(state,
                                                          thisSurface.Sides,
                                                          thisSurface.Vertex,
@@ -1530,9 +1530,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                                                          thisSurface.Name,
                                                          thisSurface.Class);
             for (int svert = 1; svert <= ntri; ++svert) {
-                const int vv0 = mytriangles(svert).vv0;
-                const int vv1 = mytriangles(svert).vv1;
-                const int vv2 = mytriangles(svert).vv2;
+                const int vv0 = mytriangles(svert).x;
+                const int vv1 = mytriangles(svert).y;
+                const int vv2 = mytriangles(svert).z;
                 print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
             }
             print(wrlfile, Format_805);
@@ -1568,7 +1568,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                 }
                 print<check_syntax(Format_805)>(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
-                Array1D<DataVectorTypes::dTriangle> mytriangles;
+                Array1D<Vector3<int>> mytriangles;
                 const int ntri = DXFEarClipping::Triangulate(state,
                                                              thisSurface.Sides,
                                                              thisSurface.Vertex,
@@ -1578,9 +1578,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                                                              thisSurface.Name,
                                                              thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const int vv0 = mytriangles(svert).vv0;
-                    const int vv1 = mytriangles(svert).vv1;
-                    const int vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).x;
+                    const int vv1 = mytriangles(svert).y;
+                    const int vv2 = mytriangles(svert).z;
                     print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
                 }
                 print(wrlfile, Format_805);
@@ -1608,7 +1608,7 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                 }
                 print(wrlfile, Format_805);
             } else { // will be >4 sided polygon with triangulate option
-                Array1D<DataVectorTypes::dTriangle> mytriangles;
+                Array1D<Vector3<int>> mytriangles;
                 const int ntri = DXFEarClipping::Triangulate(state,
                                                              thisSurface.Sides,
                                                              thisSurface.Vertex,
@@ -1618,9 +1618,9 @@ void VRMLOut(EnergyPlusData &state, const std::string &PolygonAction, const std:
                                                              thisSurface.Name,
                                                              thisSurface.Class);
                 for (int svert = 1; svert <= ntri; ++svert) {
-                    const int vv0 = mytriangles(svert).vv0;
-                    const int vv1 = mytriangles(svert).vv1;
-                    const int vv2 = mytriangles(svert).vv2;
+                    const int vv0 = mytriangles(svert).x;
+                    const int vv1 = mytriangles(svert).y;
+                    const int vv2 = mytriangles(svert).z;
                     print(wrlfile, " {} {} {} -1\n", vv0 - 1, vv1 - 1, vv2 - 1);
                 }
                 print(wrlfile, Format_805);

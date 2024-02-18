@@ -61,30 +61,12 @@ struct EnergyPlusData;
 
 namespace DXFEarClipping {
 
-    // Using/Aliasing
-    using DataVectorTypes::dTriangle;
-    using DataVectorTypes::Vector;
-    using DataVectorTypes::Vector_2d;
-
-    // Data
-
-    // Derived type definitions:
-    // na
-
-    // Module variable declarations:
-    // na
-    // Subroutine specifications for module <module_name>:
-
-    // Functions
-
-    bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides);
-
-    Real64 Modulus(Vector const &point);
+    bool InPolygon(Vector3<Real64> const &point, Array1D<Vector3<Real64>> &poly, int const nsides);
 
     int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
-                    Array1D<Vector> &polygon,
-                    Array1D<dTriangle> &outtriangles,
+                    Array1D<Vector3<Real64>> const &polygon,
+                    Array1D<Vector3<int>> &outtriangles,
                     Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,               // surface tilt angle
                     std::string const &surfname,         // surface name (for error messages)
@@ -100,13 +82,13 @@ namespace DXFEarClipping {
     );
 
     bool polygon_contains_point_2d(int const nsides,            // number of sides (vertices)
-                                   Array1D<Vector_2d> &polygon, // points of polygon
-                                   Vector_2d const &point       // point to be tested
+                                   Array1D<Vector2<Real64>> const &polygon, // points of polygon
+                                   Vector2<Real64> const &point       // point to be tested
     );
 
     void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
-                       Array1D<Vector_2d> &vertex,
+                       Array1D<Vector2<Real64>> const &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
                        Array1D_int &r_vertices, // number of reflex vertices (>180) possible
@@ -118,20 +100,16 @@ namespace DXFEarClipping {
                        Array1D<Real64> &rangles);
 
     void CalcWallCoordinateTransformation(int const nsides,
-                                          Array1D<Vector> &polygon,
+                                          Array1D<Vector3<Real64>> const &polygon,
                                           Real64 const surfazimuth,
                                           Real64 const surftilt, // unused1208
-                                          Array1D<Real64> &xvt,
-                                          Array1D<Real64> &yvt,
-                                          Array1D<Real64> &zvt);
+                                          Array1D<Vector3<Real64>> &vt);
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
-                                           Array1D<Vector> &polygon,
+                                           Array1D<Vector3<Real64>> const &polygon,
                                            Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
-                                           Array1D<Real64> &xvt,
-                                           Array1D<Real64> &yvt,
-                                           Array1D<Real64> &zvt);
+                                           Array1D<Vector3<Real64>> &vt);
 
     // void reorder(int &nvert); // unused1208
 

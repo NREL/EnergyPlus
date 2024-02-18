@@ -103,21 +103,7 @@ namespace EnergyPlus::Vectors {
 // Using/Aliasing
 using namespace DataVectorTypes;
 
-// MODULE PARAMETER DEFINITIONS
-
-// Object Data
-
-// DERIVED TYPE DEFINITIONS
-// na
-
-// MODULE VARIABLE DECLARATIONS:
-// na
-
-// SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>
-
-// Functions
-
-Real64 AreaPolygon(int const n, Array1D<Vector> &p)
+Real64 CalcPolygonArea(Array1D<Vector> const &p, int n)
 {
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -133,141 +119,22 @@ Real64 AreaPolygon(int const n, Array1D<Vector> &p)
     // Argument array dimensioning
     EP_SIZE_CHECK(p, n);
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
+    Vector3<Real64> edge0 = p[1] - p[0];
+    Vector3<Real64> edge1 = p[2] - p[0];
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i;
-
-    // Object Data
-    Vector edge0;
-    Vector edge1;
-    Vector nor;
-    Vector edgex;
-    Vector csum;
-
-    edge0 = p[1] - p[0];
-    edge1 = p[2] - p[0];
-
-    edgex = cross(edge0, edge1);
-    nor = VecNormalize(edgex);
+    Vector3<Real64> edgex = cross(edge0, edge1);
+    Vector3<Real64> nor = edgex.normalize_zero();
 
     //  Initialize csum
-    csum = 0.0;
+    Vector3<Real64> csum(0.0, 0.0, 0.0);
 
-    for (i = 0; i <= n - 2; ++i) {
+    for (int i = 0; i <= n - 2; ++i) {
         csum += cross(p[i], p[i + 1]);
     }
     csum += cross(p[n - 1], p[0]);
 
-    areap = 0.5 * std::abs(dot(nor, csum));
-
-    return areap;
-}
-
-Real64 VecSquaredLength(Vector const &vec)
-{
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculates the squared length of the input vector.
-
-    // REFERENCE:
-    // Graphic Gems.
-
-    // Return value
-    Real64 vecsqlen;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    vecsqlen = (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-
-    return vecsqlen;
-}
-
-Real64 VecLength(Vector const &vec)
-{
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine calculates the length of the input vector.
-
-    // REFERENCE:
-    // Graphic Gems.
-
-    // Return value
-    Real64 veclen;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    veclen = std::sqrt(VecSquaredLength(vec));
-
-    return veclen;
-}
-
-Vector VecNegate(Vector const &vec)
-{
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine negates the input vector and returns that vector.
-
-    // REFERENCE:
-    // Graphic Gems.
-
-    // Return value
-    Vector VecNegate;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    VecNegate.x = -vec.x;
-    VecNegate.y = -vec.y;
-    VecNegate.z = -vec.z;
-
-    return VecNegate;
-}
-
-Vector VecNormalize(Vector const &vec)
-{
-
-    // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine normalizes the input vector and returns the normalized
-    // vector
-
-    // REFERENCE:
-    // Graphic Gems.
-
-    // Return value
-    Vector VecNormalize;
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 veclen;
-
-    veclen = VecLength(vec);
-    if (veclen != 0.0) {
-        VecNormalize.x = vec.x / veclen;
-        VecNormalize.y = vec.y / veclen;
-        VecNormalize.z = vec.z / veclen;
-    } else {
-        VecNormalize.x = 0.0;
-        VecNormalize.y = 0.0;
-        VecNormalize.z = 0.0;
-    }
-
-    return VecNormalize;
-}
+    return 0.5 * std::abs(dot(nor, csum));
+} // CalcPolygonArea()
 
 void VecRound(Vector &vec, Real64 const roundto)
 {
@@ -277,23 +144,16 @@ void VecRound(Vector &vec, Real64 const roundto)
 
     // REFERENCE:
     // Graphic Gems.
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
     vec.x = nint64(vec.x * roundto) / roundto;
     vec.y = nint64(vec.y * roundto) / roundto;
     vec.z = nint64(vec.z * roundto) / roundto;
 }
 
-std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const &Surf, // Surface Definition
-                                                  Vector3<Real64> &lcsx,
-                                                  Vector3<Real64> &lcsy,
-                                                  Vector3<Real64> &lcsz,
-                                                  Vector3<Real64> const &NewellSurfaceNormalVector)
+std::pair<Real64, Real64> CalcAzimuthAndTilt(Array1D<Vector3<Real64>> const &Surf, // Surface Definition
+                                             Vector3<Real64> &lcsx,
+                                             Vector3<Real64> &lcsy,
+                                             Vector3<Real64> &lcsz,
+                                             Vector3<Real64> const &NewellSurfaceNormalVector)
 {
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -304,18 +164,14 @@ std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const
     // Discussions and examples from Bill Carroll, LBNL.
 
     // LOCAL VARIABLE DECLARATIONS:
-    Real64 costheta;
     Real64 rotang_0;
-
-    Real64 az;
-    Real64 tlt;
 
     lcsx = Surf(3) - Surf(2);
     lcsx.normalize_zero();
     lcsz = NewellSurfaceNormalVector;
     lcsy = cross(lcsz, lcsx);
 
-    costheta = lcsz.z;
+    Real64 costheta = lcsz.z;
 
     //    if ( fabs(costheta) < 1.0d0) { // normal cases
     if (std::abs(costheta) < 1.0 - 1.12e-16) { // Autodesk Added - 1.12e-16 to treat 1 bit from 1.0 as 1.0 to correct different behavior seen in
@@ -328,10 +184,10 @@ std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const
         rotang_0 = std::atan2(lcsx.y, lcsx.x);
     }
 
-    tlt = std::acos(NewellSurfaceNormalVector.z);
+    Real64 tlt = std::acos(NewellSurfaceNormalVector.z);
     tlt /= Constant::DegToRadians;
 
-    az = rotang_0;
+    Real64 az = rotang_0;
 
     az /= Constant::DegToRadians;
     az = mod(450.0 - az, 360.0);
@@ -350,12 +206,11 @@ std::pair<Real64, Real64> DetermineAzimuthAndTilt(Array1D<Vector3<Real64>> const
     }
 
     return std::make_pair(az, tlt);
-}
+} // CalcAzimuthAndTilt()
 
-void PlaneEquation(Array1D<Vector3<Real64>> &verts, // Structure of the surface
-                   int const nverts,       // Number of vertices in the surface
-                   PlaneEq &plane,         // Equation of plane from inputs
-                   bool &error             // returns true for degenerate surface
+Vector4<Real64> CalcPlaneEquation(Array1D<Vector3<Real64>> const &verts, // Structure of the surface
+                                  int const nverts,       // Number of vertices in the surface
+                                  bool &error             // returns true for degenerate surface
 )
 {
 
@@ -369,21 +224,12 @@ void PlaneEquation(Array1D<Vector3<Real64>> &verts, // Structure of the surface
     // Argument array dimensioning
     EP_SIZE_CHECK(verts, nverts);
 
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int i;
-    Real64 lenvec;
-
-    // Object Data
     Vector3<Real64> normal(0.0, 0.0, 0.0);
     Vector3<Real64> refpt(0.0, 0.0, 0.0);
 
-    // - - - begin - - -
-    for (i = 0; i <= nverts - 1; ++i) {
-        Vector const &u(verts[i]);
-        Vector const &v(i < nverts - 1 ? verts[i + 1] : verts[0]);
+    for (int i = 0; i <= nverts - 1; ++i) {
+        Vector3<Real64> const &u = verts[i];
+        Vector3<Real64> const &v = (i < nverts - 1) ? verts[i + 1] : verts[0];
         normal.x += (u.y - v.y) * (u.z + v.z);
         normal.y += (u.z - v.z) * (u.x + v.x);
         normal.z += (u.x - v.x) * (u.y + v.y);
@@ -391,22 +237,19 @@ void PlaneEquation(Array1D<Vector3<Real64>> &verts, // Structure of the surface
     }
     // normalize the polygon normal to obtain the first
     //  three coefficients of the plane equation
-    lenvec = length(normal);
-    error = false;
+    Real64 lenvec = length(normal);
+
     if (lenvec != 0.0) { // should this be >0
-        plane.x = normal.x / lenvec;
-        plane.y = normal.y / lenvec;
-        plane.z = normal.z / lenvec;
-        // compute the last coefficient of the plane equation
-        lenvec *= nverts;
-        plane.w = -dot(refpt, normal) / lenvec;
+        error = false;
+        return Vector4<Real64>(normal.x / lenvec, normal.y / lenvec, normal.z / lenvec, -dot(refpt, normal) / (lenvec * nverts));
     } else {
         error = true;
+        return Vector4<Real64>(0.0, 0.0, 0.0, 0.0);
     }
-}
+} // CalcPlaneEquation()
 
 Real64 Pt2Plane(Vector3<Real64> const &pt,   // Point for determining the distance
-                PlaneEq const &pleq // Equation of the plane
+                Vector4<Real64> const &pleq // Equation of the plane
 )
 {
 
@@ -417,22 +260,10 @@ Real64 Pt2Plane(Vector3<Real64> const &pt,   // Point for determining the distan
 
     // REFERENCE:
     // Graphic Gems
+    return (pleq.x * pt.x) + (pleq.y * pt.y) + (pleq.z * pt.z) + pleq.w;
+} // Pt2Plane()
 
-    // Return value
-    Real64 PtDist; // Distance of the point to the plane
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-
-    PtDist = (pleq.x * pt.x) + (pleq.y * pt.y) + (pleq.z * pt.z) + pleq.w;
-
-    return PtDist;
-}
-
-Vector3<Real64> CreateNewellAreaVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
+Vector3<Real64> CalcNewellAreaVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
 {
 
     // SUBROUTINE INFORMATION:
@@ -445,51 +276,24 @@ Vector3<Real64> CreateNewellAreaVector(Array1D<Vector3<Real64>> const &VList, in
     // This subroutine creates a "Newell" vector from the vector list for a surface
     // face.  Also the Newell Area vector.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Collaboration with Bill Carroll, LBNL.
+    Vector3<Real64> vec(0.0, 0.0, 0.0);
 
-    // USE STATEMENTS:
-    // na
-
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    // Object Data
-    Vector3<Real64> V1;
-    Vector3<Real64> V2;
-
-    Vector3<Real64> OutNewellAreaVector(0.0, 0.0, 0.0);
-
-    V1 = VList(2) - VList(1);
+    Vector3<Real64> V1 = VList(2) - VList(1);
     for (int Vert = 3; Vert <= NSides; ++Vert) {
-        V2 = VList(Vert) - VList(1);
-        OutNewellAreaVector += cross(V1, V2);
+        Vector3<Real64> V2 = VList(Vert) - VList(1);
+        vec += cross(V1, V2);
         V1 = V2;
     }
     //     do vert=1,nsides
     //       write(outputfiledebug,*) vlist(vert)
     //     enddo
 
-    return OutNewellAreaVector / 2.0;
-}
+    return vec / 2.0;
+} // CalcNewellAreaVector()
 
-Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
+Vector3<Real64> CalcNewellNormalVector(Array1D<Vector3<Real64>> const &VList, int const NSides)
 {
 
     // SUBROUTINE INFORMATION:
@@ -501,9 +305,6 @@ Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine creates a "Newell" surface normal vector from the vector list
     // for a surface face.
-
-    // METHODOLOGY EMPLOYED:
-    // na
 
     // REFERENCES:
     // September 2010: from OpenGL.org
@@ -519,46 +320,18 @@ Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, 
     //    Returning Normalize(Normal)
     // End Function
 
-    // USE STATEMENTS:
-    // na
+    Vector3<Real64> vec(0.0, 0.0, 0.0);
 
-    // Argument array dimensioning
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    //     TYPE(Vector) :: U
-    //     TYPE(Vector) :: V
-    int Side;
-    int curVert;
-    int nextVert;
-    Real64 xvalue;
-    Real64 yvalue;
-    Real64 zvalue;
-
-    Vector3<Real64> NewellNormalVec(0.0, 0.0, 0.0);
-    xvalue = 0.0;
-    yvalue = 0.0;
-    zvalue = 0.0;
-
-    //     IF (NSides > 3) THEN
-    for (Side = 1; Side <= NSides; ++Side) {
-        curVert = Side;
-        nextVert = Side + 1;
+    for (int Side = 1; Side <= NSides; ++Side) {
+        int curVert = Side;
+        int nextVert = Side + 1;
         if (nextVert > NSides) nextVert = 1;
-        xvalue += (VList(curVert).y - VList(nextVert).y) * (VList(curVert).z + VList(nextVert).z);
-        yvalue += (VList(curVert).z - VList(nextVert).z) * (VList(curVert).x + VList(nextVert).x);
-        zvalue += (VList(curVert).x - VList(nextVert).x) * (VList(curVert).y + VList(nextVert).y);
+
+        auto const &v1 = VList(curVert);
+        auto const &v2 = VList(nextVert);
+        vec.x += (v1.y - v2.y) * (v1.z + v2.z);
+        vec.y += (v1.z - v2.z) * (v1.x + v2.x);
+        vec.z += (v1.x - v2.x) * (v1.y + v2.y);
     }
     //     ELSE  ! Triangle
     //       U=VList(2)-VList(1)
@@ -568,14 +341,13 @@ Vector3<Real64> CreateNewellNormalVector(Array1D<Vector3<Real64>> const &VList, 
     //       zvalue=(U%x*V%y)-(U%y*V%x)
     //     ENDIF
 
-    NewellNormalVec = {xvalue, yvalue, zvalue};
-    NewellNormalVec.normalize_zero();
-    return NewellNormalVec;
-}
+    vec.normalize_zero();
+    return vec;
+} // CalcNewellNormVector()
 
-bool CompareTwoVectors(Vector3<Real64> const &v1, // standard vector
-                       Vector3<Real64> const &v2, // standard vector
-                       Real64 const tol // specified tolerance
+bool VecEqualTol(Vector3<Real64> const &v1, // standard vector
+                 Vector3<Real64> const &v2, // standard vector
+                 Real64 const tol // specified tolerance
 )
 {
 
@@ -588,34 +360,27 @@ bool CompareTwoVectors(Vector3<Real64> const &v1, // standard vector
     // PURPOSE OF THIS SUBROUTINE:
     // This routine will provide the ability to compare two vectors (e.g. surface normals)
     // to be the same within a specified tolerance.
+    return (std::abs(v1.x - v2.x) <= tol && std::abs(v1.y - v2.y) <= tol && std::abs(v1.z - v2.z) <= tol);
+} // VecEqualTol()
 
-    // METHODOLOGY EMPLOYED:
-    // compare each element (x,y,z)
+bool VecEqualTol(Vector2<Real64> const &v1, // standard vector
+                 Vector2<Real64> const &v2, // standard vector
+                 Real64 const tol // specified tolerance
+)
+{
 
-    // REFERENCES:
-    // na
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   February 2012
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
 
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
-    // SUBROUTINE PARAMETER DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    // na
-    return (std::abs(v1.x - v2.x) <= tol && std::abs(v1.y - v2.y) <= tol &&  std::abs(v1.z - v2.z) <= tol);
-}
-
-void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar, Real64 &MaxDist, int &ErrorVertex)
+    // PURPOSE OF THIS SUBROUTINE:
+    // Compare two vectors (e.g. surface normals) within a specified tolerance.
+    return (std::abs(v1.x - v2.x) <= tol && std::abs(v1.y - v2.y) <= tol);
+} // VecEqualTol()
+        
+std::pair<bool, Real64> CalcCoPlanarNess(Array1D<Vector3<Real64>> const &Surf, int const NSides, int &ErrorVertex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -628,62 +393,46 @@ void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar,
     // This subroutine provides the calculation to determine if the
     // surface is planar or not.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Eric W. Weisstein. "Coplanar." From MathWorld--A Wolfram Web Resource.
     //   http://mathworld.wolfram.com/Coplanar.html
 
-    // USE STATEMENTS:
-    // na
-
     // Argument array dimensioning
     EP_SIZE_CHECK(Surf, NSides);
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr DistTooSmall(1.e-4);
 
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool plerror;
-    Real64 dist;
 
-    // Object Data
-    PlaneEq NewellPlane;
-
-    IsCoPlanar = true;
-    MaxDist = 0.0;
+    Real64 maxDist = 0.0;
     ErrorVertex = 0;
 
     // Use first three to determine plane
-    PlaneEquation(Surf, NSides, NewellPlane, plerror);
+    Vector4<Real64> NewellPlane = CalcPlaneEquation(Surf, NSides, plerror);
 
     for (int vert = 1; vert <= NSides; ++vert) {
-        dist = Pt2Plane(Surf(vert), NewellPlane);
-        if (std::abs(dist) > MaxDist) {
-            MaxDist = std::abs(dist);
+        Real64 dist = Pt2Plane(Surf(vert), NewellPlane);
+        if (std::abs(dist) > maxDist) {
+            maxDist = std::abs(dist);
             ErrorVertex = vert;
         }
     }
 
-    if (std::abs(MaxDist) > DistTooSmall) IsCoPlanar = false;
-}
+    return std::make_pair(std::abs(maxDist) <= DistTooSmall, maxDist);
+} // CalcCoPlanarNess()
 
-std::vector<int> PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, Array1D<Vector> &QuerySurf, int const QuerySides, bool &ErrorFound)
+std::vector<int>
+PointsInPlane(Array1D<Vector3<Real64>> const &BaseSurf,
+              int const BaseSides,
+              Array1D<Vector3<Real64>> const &QuerySurf,
+              int const QuerySides,
+              bool &ErrorFound)
 {
     std::vector<int> pointIndices;
 
-    PlaneEq NewellPlane;
-    PlaneEquation(BaseSurf, BaseSides, NewellPlane, ErrorFound);
+    Vector4<Real64> NewellPlane = CalcPlaneEquation(BaseSurf, BaseSides, ErrorFound);
 
     for (int vert = 1; vert <= QuerySides; ++vert) {
         Real64 dist = Pt2Plane(QuerySurf(vert), NewellPlane);
@@ -692,7 +441,7 @@ std::vector<int> PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, A
         }
     }
     return pointIndices;
-}
+} // PointsInPlane()
 
 Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly)
 {
@@ -707,26 +456,16 @@ Real64 CalcPolyhedronVolume(EnergyPlusData &state, Polyhedron const &Poly)
     // This subroutine provides the volume calculation for a polyhedron
     // (i.e. Zone).
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
     // REFERENCES:
     // Conversations with Bill Carroll, LBNL.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 PyramidVolume;
-
-    // Object Data
-    Vector p3FaceOrigin;
-
     Real64 Volume = 0.0;
 
-    for (int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace) {
-        p3FaceOrigin = Poly.SurfaceFace(NFace).FacePoints(2);
-        PyramidVolume = dot(Poly.SurfaceFace(NFace).NewellAreaVector, p3FaceOrigin);
-        Volume += PyramidVolume / 3.0;
+    for (int NFace = 1; NFace <= Poly.NumFaces; ++NFace) {
+        Vector3<Real64> p3FaceOrigin = Poly.Faces(NFace).Points(2);
+        Volume += dot(Poly.Faces(NFace).NewellAreaVector, p3FaceOrigin) / 3.0;
     }
     return Volume;
-}
+} // CalcPolyhedronVolume()
 
 } // namespace EnergyPlus::Vectors

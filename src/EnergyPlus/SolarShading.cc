@@ -2933,8 +2933,8 @@ void CHKSBS(EnergyPlusData &state,
 
     state.dataSolarShading->NVS = state.dataSurface->Surface(SBSNR).Sides;
     for (N = 1; N <= state.dataSolarShading->NVS; ++N) {
-        state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
-        state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
+        state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).V(state.dataSolarShading->NVS + 1 - N).x;
+        state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).V(state.dataSolarShading->NVS + 1 - N).y;
     }
     HTRANS1(state, NS1, state.dataSolarShading->NVS);
 
@@ -3464,9 +3464,9 @@ void CTRANS(EnergyPlusData &state,
     auto const &base_lcsx = base_surface.lcsx;
     auto const &base_lcsy = base_surface.lcsy;
     auto const &base_lcsz = base_surface.lcsz;
-    Real64 const base_X0 = state.dataSurface->X0(NGRS);
-    Real64 const base_Y0 = state.dataSurface->Y0(NGRS);
-    Real64 const base_Z0 = state.dataSurface->Z0(NGRS);
+    Real64 const base_X0 = state.dataSurface->T0(NGRS).x;
+    Real64 const base_Y0 = state.dataSurface->T0(NGRS).y;
+    Real64 const base_Z0 = state.dataSurface->T0(NGRS).z;
 
     NVT = surface.Sides;
 
@@ -6025,12 +6025,10 @@ void SHDGSS(EnergyPlusData &state,
                 // project shadow to the receiving surface
 
                 state.dataSolarShading->NVS = surface.Sides;
-                auto const &XV = state.dataSurface->ShadeV(GSSNR).XV;
-                auto const &YV = state.dataSurface->ShadeV(GSSNR).YV;
-                auto const &ZV = state.dataSurface->ShadeV(GSSNR).ZV;
+                auto const &shadeV = state.dataSurface->ShadeV(GSSNR);
                 for (int N = 1; N <= state.dataSolarShading->NVS; ++N) {
-                    state.dataSolarShading->XVS(N) = XV(N) - state.dataSolarShading->XShadowProjection * ZV(N);
-                    state.dataSolarShading->YVS(N) = YV(N) - state.dataSolarShading->YShadowProjection * ZV(N);
+                    state.dataSolarShading->XVS(N) = shadeV.V(N).x - state.dataSolarShading->XShadowProjection * shadeV.V(N).z;
+                    state.dataSolarShading->YVS(N) = shadeV.V(N).y - state.dataSolarShading->YShadowProjection * shadeV.V(N).z;
                 }
 
             } else {
@@ -9031,14 +9029,14 @@ void SHDRVL(EnergyPlusData &state,
             // Determine vertices of reveal.
             // Project the subsurface up to the plane of the wall.
 
-            XVT(1) = state.dataSurface->ShadeV(SBSNR).XV(1) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
-            XVT(2) = state.dataSurface->ShadeV(SBSNR).XV(2) + R * max(state.dataSolarShading->XShadowProjection, 0.0);
-            XVT(3) = state.dataSurface->ShadeV(SBSNR).XV(3) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
-            XVT(4) = state.dataSurface->ShadeV(SBSNR).XV(4) + R * min(state.dataSolarShading->XShadowProjection, 0.0);
-            YVT(1) = state.dataSurface->ShadeV(SBSNR).YV(1) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
-            YVT(2) = state.dataSurface->ShadeV(SBSNR).YV(2) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
-            YVT(3) = state.dataSurface->ShadeV(SBSNR).YV(3) + R * max(state.dataSolarShading->YShadowProjection, 0.0);
-            YVT(4) = state.dataSurface->ShadeV(SBSNR).YV(4) + R * min(state.dataSolarShading->YShadowProjection, 0.0);
+            XVT(1) = state.dataSurface->ShadeV(SBSNR).V(1).x + R * max(state.dataSolarShading->XShadowProjection, 0.0);
+            XVT(2) = state.dataSurface->ShadeV(SBSNR).V(2).x + R * max(state.dataSolarShading->XShadowProjection, 0.0);
+            XVT(3) = state.dataSurface->ShadeV(SBSNR).V(3).x + R * min(state.dataSolarShading->XShadowProjection, 0.0);
+            XVT(4) = state.dataSurface->ShadeV(SBSNR).V(4).x + R * min(state.dataSolarShading->XShadowProjection, 0.0);
+            YVT(1) = state.dataSurface->ShadeV(SBSNR).V(1).y + R * min(state.dataSolarShading->YShadowProjection, 0.0);
+            YVT(2) = state.dataSurface->ShadeV(SBSNR).V(2).y + R * max(state.dataSolarShading->YShadowProjection, 0.0);
+            YVT(3) = state.dataSurface->ShadeV(SBSNR).V(3).y + R * max(state.dataSolarShading->YShadowProjection, 0.0);
+            YVT(4) = state.dataSurface->ShadeV(SBSNR).V(4).y + R * min(state.dataSolarShading->YShadowProjection, 0.0);
 
             // Check for complete shadowing.
 
@@ -9072,8 +9070,8 @@ void SHDRVL(EnergyPlusData &state,
             // Project window to outside plane of parent surface
 
             for (N = 1; N <= 3; ++N) {
-                XVT(N) = state.dataSurface->ShadeV(SBSNR).XV(N) + R * state.dataSolarShading->XShadowProjection;
-                YVT(N) = state.dataSurface->ShadeV(SBSNR).YV(N) + R * state.dataSolarShading->YShadowProjection;
+                XVT(N) = state.dataSurface->ShadeV(SBSNR).V(N).x + R * state.dataSolarShading->XShadowProjection;
+                YVT(N) = state.dataSurface->ShadeV(SBSNR).V(N).y + R * state.dataSolarShading->YShadowProjection;
             }
 
             // Find the overlap between the original window and the projected window
@@ -9093,8 +9091,8 @@ void SHDRVL(EnergyPlusData &state,
             // Put XV,YV in clockwise order
 
             for (N = 1; N <= NVS; ++N) {
-                state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(NVS + 1 - N);
-                state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(NVS + 1 - N);
+                state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).V(NVS + 1 - N).x;
+                state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).V(NVS + 1 - N).y;
             }
 
             // Transform to homogenous coordinates
@@ -9219,8 +9217,8 @@ void SHDSBS(EnergyPlusData &state,
                     // Re-order vertices to clockwise sequential; compute homogeneous coordinates.
                     state.dataSolarShading->NVS = state.dataSurface->Surface(SBSNR).Sides;
                     for (N = 1; N <= state.dataSolarShading->NVS; ++N) {
-                        state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).XV(state.dataSolarShading->NVS + 1 - N);
-                        state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).YV(state.dataSolarShading->NVS + 1 - N);
+                        state.dataSolarShading->XVS(N) = state.dataSurface->ShadeV(SBSNR).V(state.dataSolarShading->NVS + 1 - N).x;
+                        state.dataSolarShading->YVS(N) = state.dataSurface->ShadeV(SBSNR).V(state.dataSolarShading->NVS + 1 - N).y;
                     }
                     state.dataSolarShading->LOCHCA = state.dataSolarShading->FSBSHC;
                     HTRANS1(state, state.dataSolarShading->LOCHCA, state.dataSolarShading->NVS);

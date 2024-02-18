@@ -89,12 +89,6 @@ namespace DataVectorTypes {
     using Vector_2d = ObjexxFCL::Vector2<Real64>;
     using ObjexxFCL::cross;
 
-    struct Vector2dCount : Vector_2d
-    {
-        int count{};
-        Vector2dCount() = default;
-    };
-
     //    struct Vector // This is used to specify a point in 3D space
     //    {
     //        // Members
@@ -543,81 +537,33 @@ namespace DataVectorTypes {
     //
     //    };
 
-    struct PlaneEq // This is used to specify a plane based on vectors in that plane
-    {
-        // Members
-        Real64 x{};
-        Real64 y{};
-        Real64 z{};
-        Real64 w{};
-
-        // Default Constructor
-        PlaneEq() = default;
-    };
-
     struct Face // Used to specify the face of a polyhedron
     {
         // Members
-        int NSides{};  // Number of Sides for this Face
-        int SurfNum{}; // ALLOCATABLE to actual surface number
-        Array1D<Vector> FacePoints;
-        Vector NewellAreaVector;
-
-        // Default Constructor
-        Face() = default;
+        int NumSides = 0;  // Number of Sides for this Face
+        int SurfNum = 0.0; // ALLOCATABLE to actual surface number
+        Array1D<Vector3<Real64>> Points;
+        Vector3<Real64> NewellAreaVector;
     };
 
     struct Polyhedron // This is used to specify a polyhedron based on the vectors that comprise it (a zone).
     {
         // Members
-        int NumSurfaceFaces{};
-        Array1D<Face> SurfaceFace;
-
-        // Default Constructor
-        Polyhedron() = default;
+        int NumFaces = 0;
+        Array1D<Face> Faces;
     };
 
-    //    struct Vector_2d
-    //    {
-    //        // Members
-    //        Real64 x;
-    //        Real64 y;
-    //
-    //        // Default Constructor
-    //        Vector_2d()
-    //        {}
-    //
-    //
-    //        // Dot Product
-    //        inline
-    //        friend
-    //        Real64
-    //        dot( Vector_2d const & a, Vector_2d const & b )
-    //        {
-    //            return ( a.x * b.x ) + ( a.y * b.y );
-    //        }
-    //
-    //        // Cross Product
-    //        inline
-    //        friend
-    //        Real64
-    //        cross( Vector_2d const & a, Vector_2d const & b )
-    //        {
-    //            return ( a.x * b.y ) - ( a.y * b.x );
-    //        }
-    //
-    //    };
 
-    struct dTriangle
-    {
+        //    struct dTriangle
+        // {
         // Members
-        int vv0{};
-        int vv1{};
-        int vv2{};
+        // int vv0{};
+        // int vv1{};
+        // int vv2{};
 
         // Default Constructor
-        dTriangle() = default;
-    };
+        // dTriangle() = default;
+        // };
 
 } // namespace DataVectorTypes
 

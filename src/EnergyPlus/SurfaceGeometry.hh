@@ -357,10 +357,6 @@ namespace SurfaceGeometry {
 
     bool areCornersEquidistant(DataVectorTypes::Polyhedron const &zonePoly, int faceIndex, int opFaceIndex, Real64 &distanceBetween);
 
-    bool isAlmostEqual3dPt(Vector3<Real64> const &v1, Vector3<Real64> const &v2);
-
-    bool isAlmostEqual2dPt(Vector2<Real64> const &v1, Vector2<Real64> const &v2);
-
     int findIndexOfVertex(Vector3<Real64> const &vertexToFind, std::vector<Vector3<Real64>> const &listOfVertices);
 
     Real64 distanceFromPointToLine(Vector3<Real64> const &start, Vector3<Real64> const &end, Vector3<Real64> const &test);
@@ -480,12 +476,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     int ErrCount5 = 0;
     Array1D<Vector3<Real64>> Triangle1 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
     Array1D<Vector3<Real64>> Triangle2 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
-    Array1D<Real64> X;                                                // containers for x,y,z vertices of the surface
-    Array1D<Real64> Y;
-    Array1D<Real64> Z;
-    Array1D<Real64> A; // containers for convexity test
-    Array1D<Real64> B;
-    int VertSize = 0; // size of X,Y,Z,A,B arrays
 
     void clear_state() override
     {

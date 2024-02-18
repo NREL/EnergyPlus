@@ -75,7 +75,7 @@ namespace DXFEarClipping {
     // Methodology employed:
     // Ear clipping has turned out to be the simplest, most robust technique.
 
-    bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides)
+    bool InPolygon(Vector3<Real64> const &point, Array1D<Vector3<Real64>> const &poly, int const nsides)
     {
         // this routine is not used in the current scheme
 
@@ -97,60 +97,36 @@ namespace DXFEarClipping {
         Real64 m2;
         Real64 acosval;
 
-        // Object Data
-        Vector p1;
-        Vector p2;
-
-        InPolygon = false;
-
         Real64 anglesum = 0.0;
 
         for (int vert = 1; vert <= nsides - 1; ++vert) {
 
-            p1.x = poly(vert).x - point.x;
-            p1.y = poly(vert).y - point.y;
-            p1.z = poly(vert).z - point.z;
+            Vector3<Real64> p1 = poly(vert) - point;
+            Vector3<Real64> p2 = poly(vert + 1) - point;
 
-            p2.x = poly(vert + 1).x - point.x;
-            p2.y = poly(vert + 1).y - point.y;
-            p2.z = poly(vert + 1).z - point.z;
-
-            m1 = Modulus(p1);
-            m2 = Modulus(p2);
+            Real64 m1 = length(p1);
+            Real64 m2 = length(p2);
 
             if (m1 * m2 <= epsilon) {
-                InPolygon = true;
-                break;
+                return true;
             } else {
-                costheta = (p1.x * p2.x + p1.y * p2.y + p1.z * p2.z) / (m1 * m2);
-                acosval = std::acos(costheta);
+                Real64 costheta = dot(p1, p2) / (m1 * m2);
+                Real64 acosval = std::acos(costheta);
                 anglesum += acosval;
             }
         }
 
         if (std::abs(anglesum - Constant::TwoPi) <= epsilon) {
-            InPolygon = true;
+           return true;
         }
 
-        return InPolygon;
-    }
-
-    Real64 Modulus(Vector const &point)
-    {
-        // this routine is not used in the current scheme
-
-        // Return value
-        Real64 rModulus;
-
-        rModulus = std::sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-
-        return rModulus;
+        return false;
     }
 
     int Triangulate(EnergyPlusData &state,
                     int const nsides, // number of sides to polygon
-                    Array1D<Vector> &polygon,
-                    Array1D<dTriangle> &outtriangles,
+                    Array1D<Vector3<Real64>> const &polygon,
+                    Array1D<Vector3<int>> &outtriangles,
                     Real64 const surfazimuth,            // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,               // surface tilt angle
                     std::string const &surfname,         // surface name (for error messages)
@@ -181,43 +157,41 @@ namespace DXFEarClipping {
         Array2D_int earvert(nsides, 3);
         Array1D_bool removed(nsides);
         Array1D_int earverts(3);
-        Array1D<Real64> xvt(nsides);
-        Array1D<Real64> yvt(nsides);
-        Array1D<Real64> zvt(nsides);
+        Array1D<Vector3<Real64>> vt(nsides);
 
         int nears;
         int nrangles;
         int ncverts;
 
         // Object Data
-        Array1D<Vector_2d> vertex(nsides);
-        Array1D<dTriangle> Triangle(nsides);
+        Array1D<Vector2<Real64>> vertex(nsides);
+        Array1D<Vector3<int>> Triangle(nsides);
 
         if (surfclass == DataSurfaces::SurfaceClass::Floor || surfclass == DataSurfaces::SurfaceClass::Roof ||
             surfclass == DataSurfaces::SurfaceClass::Overhang) {
-            CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
+            CalcRfFlrCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, vt);
             for (int svert = 1; svert <= nsides; ++svert) {
                 for (int mvert = svert + 1; mvert <= nsides; ++mvert) {
-                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
-                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
+                    if (std::abs(vt(svert).x - vt(mvert).x) <= point_tolerance) vt(svert).x = vt(mvert).x;
+                    if (std::abs(vt(svert).z - vt(mvert).z) <= point_tolerance) vt(svert).z = vt(mvert).z;
                 }
             }
             for (int svert = 1; svert <= nsides; ++svert) {
-                vertex(svert).x = xvt(svert);
-                vertex(svert).y = zvt(svert);
+                vertex(svert).x = vt(svert).x;
+                vertex(svert).y = vt(svert).z;
                 //      if (trackit) write(outputfiledebug,*) 'x=',xvt(svert),' y=',zvt(svert)
             }
         } else {
-            CalcWallCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, xvt, yvt, zvt);
+            CalcWallCoordinateTransformation(nsides, polygon, surfazimuth, surftilt, vt);
             for (int svert = 1; svert <= nsides; ++svert) {
                 for (int mvert = svert + 1; mvert <= nsides; ++mvert) {
-                    if (std::abs(xvt(svert) - xvt(mvert)) <= point_tolerance) xvt(svert) = xvt(mvert);
-                    if (std::abs(zvt(svert) - zvt(mvert)) <= point_tolerance) zvt(svert) = zvt(mvert);
+                    if (std::abs(vt(svert).x - vt(mvert).x) <= point_tolerance) vt(svert).x = vt(mvert).x;
+                    if (std::abs(vt(svert).z - vt(mvert).z) <= point_tolerance) vt(svert).z = vt(mvert).z;
                 }
             }
             for (int svert = 1; svert <= nsides; ++svert) {
-                vertex(svert).x = xvt(svert);
-                vertex(svert).y = zvt(svert);
+                vertex(svert).x = vt(svert).x;
+                vertex(svert).y = vt(svert).y;
             }
         }
 
@@ -278,9 +252,9 @@ namespace DXFEarClipping {
         int ntri = ncount;
 
         for (int i = 1; i <= ntri; ++i) {
-            Triangle(i).vv0 = earvert(i, 1);
-            Triangle(i).vv1 = earvert(i, 2);
-            Triangle(i).vv2 = earvert(i, 3);
+            Triangle(i).x = earvert(i, 1);
+            Triangle(i).y = earvert(i, 2);
+            Triangle(i).z = earvert(i, 3);
         }
 
         outtriangles.allocate(ntri);
@@ -346,8 +320,8 @@ namespace DXFEarClipping {
     }
 
     bool polygon_contains_point_2d(int const nsides,            // number of sides (vertices)
-                                   Array1D<Vector_2d> &polygon, // points of polygon
-                                   Vector_2d const &point       // point to be tested
+                                   Array1D<Vector2<Real64>> const &polygon, // points of polygon
+                                   Vector2<Real64> const &point       // point to be tested
     )
     {
 
@@ -394,7 +368,7 @@ namespace DXFEarClipping {
 
     void generate_ears(EnergyPlusData &state,
                        int const nvert, // number of vertices in polygon
-                       Array1D<Vector_2d> &vertex,
+                       Array1D<Vector2<Real64>> const &vertex,
                        Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
                        Array1D_int &r_vertices, // number of reflex vertices (>180) possible
@@ -435,8 +409,8 @@ namespace DXFEarClipping {
         bool inpoly; // in polygon or not
 
         // Object Data
-        Vector_2d point;               // structure for point
-        Array1D<Vector_2d> testtri(3); // structure for triangle
+        Vector2<Real64> point;               // structure for point
+        Array1D<Vector2<Real64>> testtri(3); // structure for triangle
 
         // initialize, always recalculate
         ears = 0;
@@ -523,12 +497,10 @@ namespace DXFEarClipping {
     }
 
     void CalcWallCoordinateTransformation(int const nsides,
-                                          Array1D<Vector> &polygon,
+                                          Array1D<Vector3<Real64>> const &polygon,
                                           Real64 const surfazimuth,
                                           [[maybe_unused]] Real64 const surftilt, // unused1208
-                                          Array1D<Real64> &xvt,
-                                          Array1D<Real64> &yvt,
-                                          Array1D<Real64> &zvt)
+                                          Array1D<Vector3<Real64>> &vt)
     {
 
         // Subroutine information:
@@ -544,9 +516,7 @@ namespace DXFEarClipping {
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-        EP_SIZE_CHECK(xvt, nsides);
-        EP_SIZE_CHECK(yvt, nsides);
-        EP_SIZE_CHECK(zvt, nsides);
+        EP_SIZE_CHECK(vt, nsides);
 
         // convert surface (wall) to facing 180 (outward normal)
 
@@ -558,19 +528,17 @@ namespace DXFEarClipping {
         Real64 const sin_alphrad = std::sin(alphrad);
 
         for (int i = 1; i <= nsides; ++i) {
-            xvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
-            yvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
-            zvt(i) = polygon(i).z;
+            vt(i).x = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
+            vt(i).y = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
+            vt(i).z = polygon(i).z;
         }
-    }
+    } // CalcWallCoordianteTransformation()
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
-                                           Array1D<Vector> &polygon,
+                                           Array1D<Vector3<Real64>> const &polygon,
                                            [[maybe_unused]] Real64 const surfazimuth, // unused1208
                                            Real64 const surftilt,
-                                           Array1D<Real64> &xvt,
-                                           Array1D<Real64> &yvt,
-                                           Array1D<Real64> &zvt)
+                                           Array1D<Vector3<Real64>> &vt)
     {
 
         // Subroutine information:
@@ -585,9 +553,7 @@ namespace DXFEarClipping {
 
         // Argument array dimensioning
         EP_SIZE_CHECK(polygon, nsides);
-        EP_SIZE_CHECK(xvt, nsides);
-        EP_SIZE_CHECK(yvt, nsides);
-        EP_SIZE_CHECK(zvt, nsides);
+        EP_SIZE_CHECK(vt, nsides);
 
         // Subroutine local variable declarations:
 
@@ -597,11 +563,11 @@ namespace DXFEarClipping {
         Real64 const sin_alphrad = std::sin(alphrad);
 
         for (int i = 1; i <= nsides; ++i) {
-            xvt(i) = polygon(i).x;
-            yvt(i) = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
-            zvt(i) = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
+            vt(i).x = polygon(i).x;
+            vt(i).y = cos_alphrad * polygon(i).x + sin_alphrad * polygon(i).y;
+            vt(i).z = -sin_alphrad * polygon(i).x + cos_alphrad * polygon(i).y;
         }
-    }
+    } // CalcRfFlrCoordinateTransformation()
 
     // void reorder([[maybe_unused]] int &nvert) // unused1208
     //{
