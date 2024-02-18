@@ -451,7 +451,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
 
     this->selectSizerOutput(state, errorsFound);
 
-    if (this->isCoilReportObject && this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+    if (this->isCoilReportObject) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
                 state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
@@ -461,6 +461,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
         }
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, DesVolFlow, this->wasAutoSized);
         Real64 constexpr FanCoolLoad = 0.0;
         Real64 constexpr TotCapTempModFac = 1.0;
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,
