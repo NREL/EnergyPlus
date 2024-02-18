@@ -5184,6 +5184,7 @@ namespace SurfaceGeometry {
             }
 
             for (int Loop = 1; Loop <= ItemsToGet; ++Loop) {
+                ipsc->cCurrentModuleObject = cModuleObjects(Item);
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ipsc->cCurrentModuleObject,
                                                                          Loop,
