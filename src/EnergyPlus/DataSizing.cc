@@ -105,16 +105,6 @@ Real64 TermUnitSizingData::applyTermUnitSizingHeatFlow(Real64 const heatFlowWith
     return adjustedFlow;
 }
 
-Real64 TermUnitSizingData::applyTermUnitSizingCoolLoad(Real64 const coolLoad)
-{
-    return coolLoad * this->SpecDesSensCoolingFrac; // Apply DesignSpecification:AirTerminal:Sizing to cooling load
-}
-
-Real64 TermUnitSizingData::applyTermUnitSizingHeatLoad(Real64 const heatLoad)
-{
-    return heatLoad * this->SpecDesSensHeatingFrac; // Apply DesignSpecification:AirTerminal:Sizing to heating load
-}
-
 void TermUnitZoneSizingData::scaleZoneCooling(Real64 const ratio)
 {
     // Apply scaling ratio to TermUnitFinalZoneSizing cooling flow and load
