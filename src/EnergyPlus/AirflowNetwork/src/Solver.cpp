@@ -10302,7 +10302,11 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     } else {
                         NodeFound(i) = true;
-                        AirflowNetworkNodeData(zoneNum).EPlusNodeNum = i;
+                        for (int iZone = 1; iZone <= AirflowNetworkNumOfZones; iZone++) {
+                            if (MultizoneZoneData(iZone).ZoneNum == zoneNum) {
+                                AirflowNetworkNodeData(iZone).EPlusNodeNum = i;
+                            }
+                        }
                     }
                     break;
                 }

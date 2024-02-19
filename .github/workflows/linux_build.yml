@@ -81,4 +81,4 @@ jobs:
       - name: Build EnergyPlus
         working-directory: ./build/
         shell: bash
-        run: cmake --build . --target energyplus -j 2
+        run: cmake --build . --target energyplus -j 4

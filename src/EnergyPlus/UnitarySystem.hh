@@ -124,6 +124,7 @@ namespace UnitarySystems {
         Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
         Real64 no_load_supply_air_flow_rate = -999.0;
+        std::string no_load_supply_air_flow_rate_low_speed;
         Real64 no_load_supply_air_flow_rate_per_floor_area = -999.0;
         Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
         Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
@@ -328,6 +329,7 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum = 0;
         int m_DesignSpecMSHPIndex = -1;
         Real64 m_NoLoadAirFlowRateRatio = 1.0;
+        bool m_useNoLoadLowSpeedAirFlow = true;
         int m_SingleMode = 0;
         bool m_MultiOrVarSpeedHeatCoil = false;
         bool m_MultiOrVarSpeedCoolCoil = false;

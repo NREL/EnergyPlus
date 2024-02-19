@@ -136,6 +136,8 @@ bool ParseSQLiteInput(EnergyPlusData &state, bool &writeOutputToSQLite, bool &wr
                 sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::JtoGJ;
             } else if ("InchPound" == tabularDataUnitConversion) {
                 sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPound;
+            } else if ("InchPoundExceptElectricity" == tabularDataUnitConversion) {
+                sql_ort->unitsStyle_SQLite = OutputReportTabular::UnitsStyle::InchPoundExceptElectricity;
             }
         }
         return true;
