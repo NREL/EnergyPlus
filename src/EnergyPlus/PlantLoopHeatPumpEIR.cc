@@ -312,7 +312,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
 
 void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 {
-
     // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
     // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
     if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling && currentLoad >= 0.0) ||
@@ -321,6 +320,7 @@ void EIRPlantLoopHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
         return;
     }
 
+    // dispatch to specific physics calculations based on the heat pump type
     if (this->waterSource) {
         this->doPhysicsWSHP(state, currentLoad);
     } else if (this->airSource) {
@@ -352,7 +352,6 @@ void EIRPlantLoopHeatPump::doPhysicsWSHP(EnergyPlusData &state, Real64 currentLo
 
 void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad)
 {
-
     // add free cooling at some point, compressor is off during free cooling, temp limits restrict free cooling range
 
     Real64 availableCapacity = this->referenceCapacity;
@@ -376,7 +375,6 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
 
 void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
 {
-
     // get setpoint on the load side outlet
     Real64 loadSideOutletSetpointTemp = this->getLoadSideOutletSetPointTemp(state);
     Real64 originalLoadSideOutletSPTemp = loadSideOutletSetpointTemp;
@@ -392,7 +390,8 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
         capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
 
         availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-        // air source HP dry air heating capacity correction 
+        
+        // apply air source HP dry air heating capacity correction 
         availableCapacity *= heatingCapacityModifierASHP(state);
 
         if (availableCapacity > 0) {
@@ -431,6 +430,8 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
             break;
         }
     }
+
+    // check the curve values, reset to zero if negative
     this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
 }
 
@@ -452,17 +453,24 @@ Real64 EIRPlantLoopHeatPump::heatingCapacityModifierASHP(EnergyPlusData &state) 
             return semiDryFactor;
         }
     } else {
+        // no correction needed, use full capacity
         return 1.0;
     }
 }
 
-void EIRPlantLoopHeatPump::setPartLoadAndCyclingRatio(EnergyPlusData& state, Real64& partLoadRatio)
+void EIRPlantLoopHeatPump::setPartLoadAndCyclingRatio(EnergyPlusData &state, Real64 &partLoadRatio)
 {
+    // Initialize cycling ratio to 1.0
     Real64 cyclingRatio = 1.0;
+
+    // Check if part load ratio is below the minimum threshold
     if (partLoadRatio < this->minimumPLR) {
+        // Adjust cycling ratio and set part load ratio to minimum
         cyclingRatio = partLoadRatio / this->minimumPLR;
         partLoadRatio = this->minimumPLR;
     }
+
+    // update class member variables
     this->partLoadRatio = partLoadRatio;
     this->cyclingRatio = cyclingRatio;
 }
@@ -494,8 +502,11 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-    // check curves value
+    
+    // check curves value and resets to zero if negative
     this->eirModCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
+
+    // compute power usage
     this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * this->defrostPowerMultiplier *
                        this->cyclingRatio;
 }
@@ -505,13 +516,11 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
 
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
-    // calculate source side outlet conditions
-    Real64 CpSrc;
-    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
-    CpSrc = FluidProperties::GetSpecificHeatGlycol(
-        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()");
 
-    // this->sourceSideCp = CpSrc; // debuging variable
+    // calculate source side outlet conditions
+    auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
+    Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
+        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()");
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 
@@ -535,9 +544,9 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
 {
     // energy balance on heat pump
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
+
     // calculate source side outlet conditions
-    Real64 CpSrc;
-    CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+    Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 }
@@ -687,6 +696,7 @@ void EIRPlantLoopHeatPump::doDefrost(EnergyPlusData &state, Real64 &availableCap
         this->fractionalDefrostTime = 0.0;
     }
     availableCapacity *= HeatingCapacityMultiplier;
+    // update class member variables
     this->defrostPowerMultiplier = InputPowerMultiplier;
 }
 
