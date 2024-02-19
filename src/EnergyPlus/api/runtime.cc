@@ -340,13 +340,17 @@ void callbackEndOfAfterComponentGetInput(EnergyPlusState state, void (*f)(Energy
     EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ComponentGetInput, f);
 }
 
-// void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void ()> f) {
-//    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
-//}
-//
-// void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)()) {
-//    callbackUserDefinedComponentModel(std::function<void ()>(f));
-//}
+void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f, const char *programNameInInputFile)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    EnergyPlus::PluginManagement::registerUserDefinedCallback(*thisState, f, programNameInInputFile);
+}
+
+void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)(EnergyPlusState), const char *programNameInInputFile)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    EnergyPlus::PluginManagement::registerUserDefinedCallback(*thisState, f, programNameInInputFile);
+}
 
 void callbackUnitarySystemSizing(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f)
 {

@@ -877,7 +877,6 @@ namespace AirLoopHVACDOAS {
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             bool ErrorsFound = false;
             Real64 rho;
-            state.dataSize->CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
                 std::string CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);
