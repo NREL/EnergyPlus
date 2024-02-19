@@ -59,11 +59,10 @@
 # should result in something like `/usr/lib/python3.7`
 
 # this script must be called with two args:
-# 1 - the path to the EnergyPlus executable in the install tree, which is be used to determine where to copy the library
-#     since this is in the install tree, you'll need to use a cmake generator expression
+# 1 - the path to the EnergyPlus executable in the install-tree, which is used to determine where to copy the library
+#     since this is in the install-tree, you'll need to use a cmake generator expression
 # 2 - name of the folder to create to store the copied in python standard library, usually python_standard_library
 import ctypes
-from distutils.dir_util import copy_tree
 import os
 import platform
 import shutil
@@ -90,27 +89,25 @@ if os.path.exists(target_dir):
     # Let's check the library files to see if the ABI matches
     # Otherwise if you build with say python 3.8 initially, and then switch to
     # python 3.9, your lib-dynload will still have the 38 .so files
-    std_lib_ctypes_sos = gb.glob(os.path.join(standard_lib_dir, "**/_ctypes.*"), recursive=True)
-    this_lib_ctypes_sos = gb.glob(os.path.join(target_dir, "**/_ctypes.*"), recursive=True)
 
-    def find_libs(dirPath):
+    def find_libs(dir_path):
         sos = []
         for ext in ['a', 'so', 'lib']:
-            sos += gb.glob(os.path.join(dirPath, "**/*.{}*".format(ext)),
+            sos += gb.glob(os.path.join(dir_path, "**/*.{}*".format(ext)),
                            recursive=True)
         return [os.path.basename(f) for f in sos]
+
 
     std_lib_ctypes_sos = find_libs(standard_lib_dir)
     this_lib_ctypes_sos = find_libs(target_dir)
 
     if ((set(std_lib_ctypes_sos) - set(this_lib_ctypes_sos)) or
-        (set(this_lib_ctypes_sos) - set(std_lib_ctypes_sos))):
+            (set(this_lib_ctypes_sos) - set(std_lib_ctypes_sos))):
         print("Detected changes in the python libs, wiping and recopying")
         shutil.rmtree(target_dir)
     else:
         # File names match
         sys.exit(0)
-
 
 shutil.copytree(standard_lib_dir, target_dir)
 
@@ -118,7 +115,7 @@ shutil.copytree(standard_lib_dir, target_dir)
 if platform.system() == 'Windows':
     python_root_dir = os.path.dirname(standard_lib_dir)
     dll_dir = os.path.join(python_root_dir, 'DLLs')
-    copy_tree(dll_dir, target_dir)
+    shutil.copytree(dll_dir, target_dir, dirs_exist_ok=True)
 
 # then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
 for root, dirs, _ in os.walk(target_dir):
