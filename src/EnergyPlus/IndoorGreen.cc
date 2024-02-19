@@ -76,8 +76,8 @@ namespace EnergyPlus {
 
 namespace IndoorGreen {
     // Module containing the routines dealing with the Indoor Living Walls
-    static constexpr std::array<std::string_view, static_cast<int>(ETCalculationMethod::Num)> etCalculationMethodsUC = {
-        "PENMAN-MONTEITH", "STANGHELLINI", "DATA-DRIVEN"};
+    static constexpr std::array<std::string_view, static_cast<int>(ETCalculationMethod::Num)> etCalculationMethodsUC = {"PENMAN-MONTEITH",
+                                                                                                                        "STANGHELLINI"};
     static constexpr std::array<std::string_view, static_cast<int>(LightingMethod::Num)> lightingMethodsUC = {"LED", "DAYLIGHT", "LED-DAYLIGHT"};
     void SimIndoorGreen(EnergyPlusData &state)
     {
@@ -97,7 +97,6 @@ namespace IndoorGreen {
         }
         if (lw->NumIndoorGreen > 0) {
             InitIndoorGreen(state);
-
             // Simulate evapotranspiration from indoor living walls
             ETModel(state);
         }
@@ -108,23 +107,18 @@ namespace IndoorGreen {
         // PURPOSE OF THIS SUBROUTINE:
         // Get the input for the indoor living wall objects and store the input data in the indoorGreens array.
 
-        // METHODOLOGY EMPLOYED:
-        // Use the Get routines from the InputProcessor module.
         auto &lw = state.dataIndoorGreen;
         auto &ip = state.dataInputProcessing->inputProcessor;
         static constexpr std::string_view RoutineName("GetIndoorLivingWallInput: ");
         std::string_view cCurrentModuleObject = "IndoorLivingWall"; // match the idd
         int NumNums;                                                // Number of real numbers returned by GetObjectItem
         int NumAlphas;                                              // Number of alphanumerics returned by GetObjectItem
-        // int IndoorGreenNum; // Indoor Green index
-        int IOStat; // Status flag from GetObjectItem
+        int IOStat;                                                 // Status flag from GetObjectItem
         Real64 SchMin;
         Real64 SchMax;
 
         lw->NumIndoorGreen = ip->getNumObjectsFound(state, cCurrentModuleObject);
-        // Get input for IndoorLivingWall objects
         if (lw->NumIndoorGreen > 0) lw->indoorGreens.allocate(lw->NumIndoorGreen); // Allocate the IndoorGreen input data array
-        // Input the data for each Indoor Living Wall Object
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
             ip->getObjectItem(state,
@@ -148,7 +142,6 @@ namespace IndoorGreen {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2));
                 ErrorsFound = true;
             } else {
-                // check for SurfaceProperty:HeatBalanceSourceTerm
                 if (state.dataSurface->Surface(ig.SurfPtr).InsideHeatSourceTermSchedule > 0) {
                     ShowSevereError(state,
                                     format("The indoor green surface {} has an Inside Face Heat Source Term Schedule defined. This surface cannot "
@@ -156,7 +149,6 @@ namespace IndoorGreen {
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ErrorsFound = true;
                 }
-                // get zone pointer and space pointer
                 ig.ZonePtr = state.dataSurface->Surface(ig.SurfPtr).Zone;
                 ig.SpacePtr = state.dataSurface->Surface(ig.SurfPtr).spaceNum;
 
@@ -215,29 +207,8 @@ namespace IndoorGreen {
 
             ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
             ig.etCalculationMethod = static_cast<ETCalculationMethod>(getEnumValue(etCalculationMethodsUC, state.dataIPShortCut->cAlphaArgs(4)));
-            // if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "PENMAN-MONTEITH")) {
-            //     ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
-            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "STANGHELLINI")) {
-            //     ig.etCalculationMethod = ETCalculationMethod::Stanghellini;
-            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4)), "DATA-DRIVEN")) {
-            //     ig.etCalculationMethod = ETCalculationMethod::DataDriven;
-            // } else {
-            //     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(4), state.dataIPShortCut->cAlphaArgs(4));
-            //     ErrorsFound = true;
-            // }
-            //  read lighting method (LED=1; Daylight=2; LED-Daylight=3)
             ig.lightingMethod = LightingMethod::LED; // default
             ig.lightingMethod = static_cast<LightingMethod>(getEnumValue(lightingMethodsUC, state.dataIPShortCut->cAlphaArgs(5)));
-            // if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED")) {
-            //     ig.lightingMethod = LightingMethod::LED; // default
-            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "DAYLIGHT")) {
-            //     ig.lightingMethod = LightingMethod::Daylighting;
-            // } else if (Util::SameString(Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5)), "LED-DAYLIGHT")) {
-            //     ig.lightingMethod = LightingMethod::LEDDaylighting;
-            // } else {
-            //     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(5), state.dataIPShortCut->cAlphaArgs(5));
-            //     ErrorsFound = true;
-            // }
             switch (ig.lightingMethod) {
             case LightingMethod::LED: {
                 ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
@@ -274,7 +245,6 @@ namespace IndoorGreen {
                 }
             } break;
             case LightingMethod::Daylighting: {
-                //(ig.LightingMethod == 2 || ig.LightingMethod == 3) {
                 ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
                                                       state.dataDayltg->DaylRefPt,
                                                       &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
@@ -377,7 +347,7 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "ETCaldatadriven", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
+                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "ET Rate", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
             } // EMS and API
         }
     }
@@ -533,7 +503,6 @@ namespace IndoorGreen {
         Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
         std::string_view cCurrentModuleObject = "IndoorLivingWall";
         Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
-        // Method for ET calculation: Penman-Monteith=1, Stanghellini=2, Data-driven=3
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
             ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ig.ZonePtr).ZT;
@@ -550,7 +519,6 @@ namespace IndoorGreen {
                 LAI = 2.0; // maximum LAI=2.0 in the surface heat balance
                 ShowSevereError(state, format("Maximum indoor living wall leaf area index (LAI) =2.0 is used,calculated LAI is {}", LAI_Cal));
             }
-            // ZonePPFD
             switch (ig.lightingMethod) {
             case LightingMethod::LED: {
                 ig.ZPPFD = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDPtr) * ig.LEDNominalPPFD; // PPFD
@@ -594,21 +562,20 @@ namespace IndoorGreen {
             // ET Calculation
             switch (ig.etCalculationMethod) {
             case ETCalculationMethod::PenmanMonteith: {
-                ig.ETRate = ETPenmanMonteith(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
+                Real64 SwitchF = 1.0;
+                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI, SwitchF);
             } break;
             case ETCalculationMethod::Stanghellini: {
-                ig.ETRate = ETStanghellini(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI);
-            } break;
-            case ETCalculationMethod::DataDriven: {
-                // set with EMS value if being called for.
-                if (ig.EMSETCalOverrideOn) {
-                    ig.ETRate = ig.EMSET;
-                } else {
-                    ShowSevereError(state, format("EMS/Python Plugin for ET Data Driven Model not find in {}={}", cCurrentModuleObject, ig.Name));
-                }
+                Real64 SwitchF = 2 * LAI;
+                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI, SwitchF);
             } break;
             default:
                 break;
+            }
+            if (ig.EMSETCalOverrideOn) {
+                ig.ETRate = ig.EMSET;
+            } else {
+                ShowSevereError(state, format("EMS/Python Plugin for ET Data Driven Model not find in {}={}", cCurrentModuleObject, ig.Name));
             }
             Real64 effectivearea = std::min(ig.LeafArea, LAI * state.dataSurface->Surface(ig.SurfPtr).Area);
             ETTotal =
@@ -636,15 +603,17 @@ namespace IndoorGreen {
         }
     }
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI)
+    Real64 ETBaseFunction(
+        EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI, Real64 SwitchF)
     {
         // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for using Penman-Monteith ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
+        // This subroutine provides calculation for Penman-Monteith model and Stanghellini models to predict evapotranspiration rates of plants.
         // Reference: Monteith, J.L. Evaporation and environment. in Symposia of the society for experimental biology. 1965. Cambridge University
         // Press (CUP) Cambridge
+        // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
+        // Wageningen, The Netherlands
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ETPenmanMonteith: ");
+        static constexpr std::string_view RoutineName("ETBaseFunction: ");
         Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
         Real64 slopepat =
             0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
@@ -660,36 +629,8 @@ namespace IndoorGreen {
         Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
         rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
         ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / (LAI + 1e-10));
-        ETRate =
-            (1 / hfg) * (slopepat * (In - G) + (rhoair * CpAir * ZoneVPD) / ra) / (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
-        return ETRate;                                                                                                   // mm/s; kg/(m2s)
-    }
-    Real64 ETStanghellini(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI)
-    {
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for using Stanghellini ET model to calculate evapotranspiration rates from the Indoor Greenery System objects.
-        // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
-        // Wageningen, The Netherlands
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr std::string_view RoutineName("ETStanghellini: ");
-        Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
-        Real64 slopepat =
-            0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
-        Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
-        Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
-        Real64 constexpr mw(0.622);                                               // ratio molecular weight of water vapor / dry air = 0.622.
-        Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
-        Real64 rs = 0.0;                                                          // stomatal resistance s/m
-        Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
-        Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
-        Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
-        Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
-        Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
-        rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
-        ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / LAI);
-        ETRate = (1 / hfg) * (slopepat * (In - G) + (2 * LAI * rhoair * CpAir * ZoneVPD) / ra) /
-                 (slopepat + psyconst * (1 + rs / ra)); // Stanghellini ET model
+        ETRate = (1 / hfg) * (slopepat * (In - G) + (SwitchF * rhoair * CpAir * ZoneVPD) / ra) /
+                 (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
         return ETRate;                                  // mm/s; kg/(m2s)
     }
 

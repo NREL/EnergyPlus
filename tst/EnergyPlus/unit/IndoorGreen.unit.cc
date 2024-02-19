@@ -210,16 +210,13 @@ TEST_F(EnergyPlusFixture, IndoorGreen_CheckETFunction)
     Real64 ZonePreTemp = 0.0; // C
     Real64 ZonePreHum = 0.001;
     Real64 LAI = 1.0;
+    Real64 SwithF = 1.0;
     state->dataIndoorGreen->indoorGreens.allocate(IndoorGreenNum);
     auto &thisindoorgreen = state->dataIndoorGreen->indoorGreens(IndoorGreenNum);
     thisindoorgreen.ZCO2 = 400;  // ppm
     thisindoorgreen.ZPPFD = 0;   // umol/(m2s)
     thisindoorgreen.ZVPD = 2000; // Pa
     thisindoorgreen.ETRate =
-        IndoorGreen::ETPenmanMonteith(*state, ZonePreTemp, ZonePreHum, thisindoorgreen.ZCO2, thisindoorgreen.ZPPFD, thisindoorgreen.ZVPD, LAI);
-    EXPECT_EQ(thisindoorgreen.ETRate, 0.0);
-
-    thisindoorgreen.ETRate =
-        IndoorGreen::ETStanghellini(*state, ZonePreTemp, ZonePreHum, thisindoorgreen.ZCO2, thisindoorgreen.ZPPFD, thisindoorgreen.ZVPD, LAI);
+        IndoorGreen::ETBaseFunction(*state, ZonePreTemp, ZonePreHum, thisindoorgreen.ZCO2, thisindoorgreen.ZPPFD, thisindoorgreen.ZVPD, LAI, SwithF);
     EXPECT_EQ(thisindoorgreen.ETRate, 0.0);
 }

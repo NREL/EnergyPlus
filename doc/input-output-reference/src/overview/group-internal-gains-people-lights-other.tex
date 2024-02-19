@@ -2350,7 +2350,7 @@ The total heat gain from equipment. It is the sum of the following components: T
 
 \subsection{IndoorLivingWall}\label{indoorlivingwall}
 
-Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or from substrates. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus. 
+Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or soil-based. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus. 
 
 \subsubsection{Inputs}\label{inputs-indoorlivingwall}
 
@@ -2364,7 +2364,7 @@ This field is the name of the schedule (ref: Schedules) that modifies the presen
 
 \paragraph{Field: ET Calculation Method}\label{field-et-calculation-method}
 
-This field lists three choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model, Stanghellini model, and a data-driven approach. The choice of data-driven method gives users the capability to customize an ET model using a machine learning method. This option links the ET calculation to Energy Management System (EMS) objects, Python PlugIns objects, and Python API. 
+This field lists two choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model and Stanghellini model. Users can also develop a customize ET function to override ET rates of indoor living walls through Energy Management System (EMS) objects, Python PlugIns objects, and Python API. 
 
 \paragraph{Field: Lighting Method}\label{field-lighting-method}
 

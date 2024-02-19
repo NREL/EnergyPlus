@@ -247,7 +247,6 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-    // LW to do check and test for the right position
     IndoorGreen::SimIndoorGreen(state);
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 

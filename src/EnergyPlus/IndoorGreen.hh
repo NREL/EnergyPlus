@@ -69,7 +69,7 @@ namespace IndoorGreen {
         Invalid = -1,
         PenmanMonteith,
         Stanghellini,
-        DataDriven,
+        //DataDriven,
         Num
     };
     enum class LightingMethod
@@ -129,9 +129,8 @@ namespace IndoorGreen {
 
     void ETModel(EnergyPlusData &state);
 
-    Real64 ETPenmanMonteith(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI);
-
-    Real64 ETStanghellini(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI);
+    Real64
+    ETBaseFunction(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI, Real64 SwitchF);
 
 } // namespace IndoorGreen
 
