@@ -161,7 +161,7 @@ reformat them.
 EnergyPlus produces a number of files that are unique to
 EnergyPlus, including:
 
-#. **ESO** (**E** nergyPlus **S** tandard **O** utput): raw report variable ourput in text form.
+#. **ESO** (**E** nergyPlus **S** tandard **O** utput): raw report variable output in text form.
 #. **SQL**: if requested in the input file, the output variables stored in SQLite format.
    This format is most often by interfaces as it is convenient for automatic use.
 #. **RDD** (**R** eport variable **D** ata **D** ictionary): list of output variables available from the run.
@@ -447,7 +447,7 @@ features, and the following documents are installed in
 features:
 
 EnergyPlus Essentials
-     A longer introduction to the use of EnergyPlus,
+     This is a longer introduction to the use of EnergyPlus,
      including more background on the program itself and
      the ecosystem. It also provides some guidance as to
      how to determine what potential sources of errors
@@ -465,7 +465,7 @@ Input Output Reference
      This document is a thorough description of the
      various input and output files related to
      EnergyPlus, the format of these files, and how the
-     files interact and interrelate
+     files interact and interrelate.
 
 Output Details and Examples
      While the Input Output Reference document touches
