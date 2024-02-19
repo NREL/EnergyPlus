@@ -206,18 +206,16 @@ namespace DataSizing {
         Num
     };
 
-    constexpr std::array<std::string_view, static_cast<int>(SysOAMethod::Num)> SysOAMethodNames{
-        "Zone Sum",
-        "Ventilation Rate Procedure",
-        "IAQ Proc",
-        "Proportional - Sch Occupancy",
-        "IAQ Proc - Generic Contaminant",
-        "IAQ Proc - Max Gen Cont or CO2.",
-        "Proportional - Des Occupancy",
-        "Proportional - Des OA Rate",
-        "Simplified Procure",
-        "Ventilation Rate Procedure Level"};
-
+    constexpr std::array<std::string_view, static_cast<int>(SysOAMethod::Num)> SysOAMethodNames{"Zone Sum",
+                                                                                                "Ventilation Rate Procedure",
+                                                                                                "IAQ Proc",
+                                                                                                "Proportional - Sch Occupancy",
+                                                                                                "IAQ Proc - Generic Contaminant",
+                                                                                                "IAQ Proc - Max Gen Cont or CO2.",
+                                                                                                "Proportional - Des Occupancy",
+                                                                                                "Proportional - Des OA Rate",
+                                                                                                "Simplified Procure",
+                                                                                                "Ventilation Rate Procedure Level"};
 
     // Zone HVAC Equipment Sizing Option
     enum class DesignSizingType
