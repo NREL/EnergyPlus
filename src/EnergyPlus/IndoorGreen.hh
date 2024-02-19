@@ -47,10 +47,8 @@
 
 #ifndef IndoorGreen_hh_INCLUDED
 #define IndoorGreen_hh_INCLUDED
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -59,7 +57,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
 struct EnergyPlusData;
 
 namespace IndoorGreen {
@@ -69,7 +66,6 @@ namespace IndoorGreen {
         Invalid = -1,
         PenmanMonteith,
         Stanghellini,
-        //DataDriven,
         Num
     };
     enum class LightingMethod
@@ -95,8 +91,6 @@ namespace IndoorGreen {
         Real64 LEDNominalPPFD = 0.0;       // nominal PPFD for LED grow light (PPFD)
         Real64 LEDNominalEleP = 0.0;       // nominal power for total LED grow light (W)
         Real64 LEDRadFraction = 0.0;       // radiant fraction of LED grow light (0-1)
-        // Real64 ZPreTemp = 0.0;
-        // Real64 ZPreHum = 0.0;
         Real64 ZCO2 = 400;
         Real64 ZVPD = 0.0;            // vapor pressure deficit (pa)
         Real64 ZPPFD = 0;             // PPFD
@@ -120,17 +114,12 @@ namespace IndoorGreen {
     };
 
     void SimIndoorGreen(EnergyPlusData &state);
-
     void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound);
-
     void SetIndoorGreenOutput(EnergyPlusData &state);
-
     void InitIndoorGreen(EnergyPlusData &state);
-
     void ETModel(EnergyPlusData &state);
-
-    Real64
-    ETBaseFunction(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI, Real64 SwitchF);
+    Real64 ETBaseFunction(
+        EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 VPD, Real64 LAI, Real64 SwitchF);
 
 } // namespace IndoorGreen
 
@@ -138,7 +127,6 @@ struct IndoorGreenData : BaseGlobalStruct
 {
     int NumIndoorGreen = 0; // Number of Indoor Greenery Systems found in input
     bool getInputFlag = true;
-    // Object Data
     Array1D<IndoorGreen::IndoorGreenParams> indoorGreens;
     void clear_state() override
     {
