@@ -1501,9 +1501,7 @@ namespace SurfaceGeometry {
                     ++MovedSurfs;
                     state.dataSurface->Surface(MovedSurfs) = surf;
                     //  If base Surface Type (Wall, Floor, Roof/Ceiling)
-                    if ((surf.Class == state.dataSurfaceGeometry->BaseSurfIDs(1)) ||
-                        (surf.Class == state.dataSurfaceGeometry->BaseSurfIDs(2)) ||
-                        (surf.Class == state.dataSurfaceGeometry->BaseSurfIDs(3))) {
+                    if (surf.Class == SurfaceClass::Wall || surf.Class == SurfaceClass::Floor || surf.Class == SurfaceClass::Ceiling) {
                         // Store list of moved surface numbers in reporting order. We use the old position, we'll reconcile later
                         // We don't do it for Air Door/Air Windows yet, we want them listed below each base surf they belong to
                         state.dataSurface->AllSurfaceListReportOrder.push_back(SurfNum);
@@ -1514,7 +1512,7 @@ namespace SurfaceGeometry {
 
                 //  For each Base Surface Type (Wall, Floor, Roof/Ceiling) - put these first
 
-                for (const DataSurfaces::SurfaceClass Loop : state.dataSurfaceGeometry->BaseSurfIDs) {
+                for (SurfaceClass Loop : {SurfaceClass::Wall, SurfaceClass::Floor, SurfaceClass::Ceiling}) {
 
                     for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
                         auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
@@ -3338,6 +3336,7 @@ namespace SurfaceGeometry {
             }
 
             for (int Loop = 1; Loop <= ItemsToGet; ++Loop) {
+                ipsc->cCurrentModuleObject = cModuleObjects(Item);
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ipsc->cCurrentModuleObject,
                                                                          Loop,
@@ -4184,6 +4183,7 @@ namespace SurfaceGeometry {
             }
 
             for (Loop = 1; Loop <= ItemsToGet; ++Loop) {
+                ipsc->cCurrentModuleObject = cModuleObjects(Item);
                 state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                          ipsc->cCurrentModuleObject,
                                                                          Loop,
@@ -6517,6 +6517,7 @@ namespace SurfaceGeometry {
                     surf.Name = ipsc->cAlphaArgs(1) + " Right"; // Set the Surface Name in the Derived Type
                     surf.Class = SurfaceClass::Shading;
                     surf.HeatTransSurf = false;
+                    surf.BaseSurf = winSurf.BaseSurf;
                     surf.BaseSurfName = winSurf.BaseSurfName;
                     surf.ExtBoundCond = winSurf.ExtBoundCond;
                     surf.ExtSolar = winSurf.ExtSolar;
