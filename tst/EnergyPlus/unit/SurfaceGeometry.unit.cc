@@ -2976,7 +2976,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -4233,7 +4233,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -12686,7 +12686,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates)
 
     state->dataGlobal->DisplayExtraWarnings = true;
 
-    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, NeedToAddSurfaces);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(2, SurfNum);
@@ -12830,7 +12830,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_GetVerticesDropDuplicates_Once)
 
     state->dataGlobal->DisplayExtraWarnings = true;
 
-    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(*state, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, NeedToAddSurfaces);
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(2, SurfNum);

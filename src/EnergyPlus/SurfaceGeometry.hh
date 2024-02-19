@@ -122,8 +122,6 @@ namespace SurfaceGeometry {
                           int const TotDetailedWalls,        // Number of Wall:Detailed items to obtain
                           int const TotDetailedRoofs,        // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,       // Number of Floor:Detailed items to obtain
-                          const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
-                          const Array1D<SurfaceClass> &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -140,7 +138,6 @@ namespace SurfaceGeometry {
                          int const TotRectGCFloors,                // Number of Floors with Ground Contact to obtain
                          int const TotRectIntFloors,               // Number of Adiabatic Walls to obtain
                          int const TotRectIZFloors,                // Number of Interzone Floors to obtain
-                         const Array1D<SurfaceClass> &BaseSurfIDs, // ID Assignments for valid surface classes
                          int &NeedToAddSurfaces                    // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -157,8 +154,6 @@ namespace SurfaceGeometry {
                              bool &ErrorsFound,                       // Error flag indicator (true if errors found)
                              int &SurfNum,                            // Count of Current SurfaceNumber
                              int const TotHTSubs,                     // Number of Heat Transfer SubSurfaces to obtain
-                             const Array1D_string &SubSurfCls,        // Valid Classes for Sub Surfaces
-                             const Array1D<SurfaceClass> &SubSurfIDs, // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,                   // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces                   // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -172,7 +167,6 @@ namespace SurfaceGeometry {
                             int const TotIZWindows,                  // Number of Interzone Window SubSurfaces to obtain
                             int const TotIZDoors,                    // Number of Interzone Door SubSurfaces to obtain
                             int const TotIZGlazedDoors,              // Number of Interzone Glass Door SubSurfaces to obtain
-                            const Array1D<SurfaceClass> &SubSurfIDs, // ID Assignments for valid sub surface classes
                             int &AddedSubSurfaces,                   // Subsurfaces added when windows reference Window5
                             int &NeedToAddSubSurfaces                // Number of surfaces to add, based on unentered IZ surfaces
     );
