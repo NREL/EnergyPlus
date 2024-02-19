@@ -120,6 +120,7 @@ namespace DataSizing {
     // parameters for sizing
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
+    constexpr int Combination(3);
 
     // parameters for Cooling Peak Load Type
     enum class PeakLoad
