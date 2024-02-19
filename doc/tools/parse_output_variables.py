@@ -213,13 +213,13 @@ def main():
             file_contents = f.read()
 
             # first warn about commented lines
-            p = re.compile('//\s*SetupOutputVariable')
+            p = re.compile(r'//\s*SetupOutputVariable')
             matches = p.findall(file_contents)
 
             if len(matches) > 0:
                 print("File %s contains commented SetupOutputVariable calls; output may be flawed" % file_name)
 
-            p = re.compile('SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
+            p = re.compile(r'SetupOutputVariable\([^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^,]*,[^;]*;')
             matches = p.findall(file_contents)
 
             for match in matches:

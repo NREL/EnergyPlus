@@ -4725,10 +4725,16 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckSysSizing(state, format("COIL:{}{}", varSpeedCoil.CoolHeatType, CurrentObjSubfix), varSpeedCoil.Name);
-                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                    RatedAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                if (state.dataSize->CurOASysNum > 0 && state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum > -1) {
+                    auto &thisAirloopDOAS =
+                        state.dataAirLoopHVACDOAS->airloopDOAS[state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum];
+                    RatedAirVolFlowRateDes = thisAirloopDOAS.SizingMassFlow / state.dataEnvrn->StdRhoAir;
                 } else {
-                    RatedAirVolFlowRateDes = 0.0;
+                    if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
+                        RatedAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
+                    } else {
+                        RatedAirVolFlowRateDes = 0.0;
+                    }
                 }
             }
         }
@@ -4777,72 +4783,95 @@ namespace VariableSpeedCoils {
                 }
             } else {
                 CheckSysSizing(state, format("COIL:{}{}", varSpeedCoil.CoolHeatType, CurrentObjSubfix), varSpeedCoil.Name);
-                auto &finalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
-                VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
-                if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
-                    if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
-                        MixTemp = finalSysSizing.OutTempAtCoolPeak;
-                        MixHumRat = finalSysSizing.OutHumRatAtCoolPeak;
-                        SupTemp = finalSysSizing.PrecoolTemp;
-                        SupHumRat = finalSysSizing.PrecoolHumRat;
-                    } else { // coil is on the main air loop
-                        SupTemp = finalSysSizing.CoolSupTemp;
-                        SupHumRat = finalSysSizing.CoolSupHumRat;
-                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
-                            0) { // there is no precooling of the OA stream
-                            MixTemp = finalSysSizing.MixTempAtCoolPeak;
-                            MixHumRat = finalSysSizing.MixHumRatAtCoolPeak;
-                        } else { // there is precooling of OA stream
-                            if (VolFlowRate > 0.0) {
-                                OutAirFrac = finalSysSizing.DesOutAirVolFlow / VolFlowRate;
-                            } else {
-                                OutAirFrac = 1.0;
-                            }
-                            OutAirFrac = min(1.0, max(0.0, OutAirFrac));
-                            MixTemp = OutAirFrac * finalSysSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalSysSizing.RetTempAtCoolPeak;
-                            MixHumRat = OutAirFrac * finalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
+                if (state.dataSize->CurOASysNum > 0 && state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum > -1) {
+                    auto &thisAirloopDOAS =
+                        state.dataAirLoopHVACDOAS->airloopDOAS[state.dataAirLoop->OutsideAirSys(state.dataSize->CurOASysNum).AirLoopDOASNum];
+                    VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
+                    MixTemp = thisAirloopDOAS.SizingCoolOATemp;
+                    SupTemp = thisAirloopDOAS.PrecoolTemp;
+                    MixHumRat = thisAirloopDOAS.SizingCoolOAHumRat;
+                    SupHumRat = thisAirloopDOAS.PrecoolHumRat;
+                    RatedCapCoolTotalDes = VolFlowRate * state.dataEnvrn->StdRhoAir *
+                                           (Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat) - Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat));
+                    if (varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel) > 0) {
+                        MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
+                        if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                            RatedSourceTempCool = thisAirloopDOAS.SizingCoolOATemp;
+                        } else {
+                            RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
                         }
-                    }
-                    OutTemp = finalSysSizing.OutTempAtCoolPeak;
-                    MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
-                    SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
-
-                    // design fan heat will be added to coil load
-                    Real64 FanCoolLoad =
-                        DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
-                    // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
-                    Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                    if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                        DataAirSystems::FanPlacement::BlowThru) {
-                        MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                               DataAirSystems::FanPlacement::DrawThru) {
-                        SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                    }
-                    MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
-                    if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
-                        RatedSourceTempCool = OutTemp;
-                    } else {
-                        RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
-                    }
-                    TotCapTempModFac =
-                        Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
-
-                    //       The mixed air temp for zone equipment without an OA mixer is 0.
-                    //       This test avoids a negative capacity until a solution can be found.
-                    if (MixEnth > SupEnth) {
-                        CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
-                    } else {
-                        CoolCapAtPeak = (rhoair * VolFlowRate * (48000.0 - SupEnth)) + FanCoolLoad;
-                    }
-                    CoolCapAtPeak = max(0.0, CoolCapAtPeak);
-                    if (TotCapTempModFac > 0.0) {
-                        RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
-                    } else {
-                        RatedCapCoolTotalDes = CoolCapAtPeak;
+                        TotCapTempModFac =
+                            Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
+                        RatedCapCoolTotalDes /= TotCapTempModFac;
                     }
                 } else {
-                    RatedCapCoolTotalDes = 0.0;
+                    auto &finalSysSizing = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum);
+                    VolFlowRate = varSpeedCoil.RatedAirVolFlowRate;
+                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                        if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
+                            MixTemp = finalSysSizing.OutTempAtCoolPeak;
+                            MixHumRat = finalSysSizing.OutHumRatAtCoolPeak;
+                            SupTemp = finalSysSizing.PrecoolTemp;
+                            SupHumRat = finalSysSizing.PrecoolHumRat;
+                        } else { // coil is on the main air loop
+                            SupTemp = finalSysSizing.CoolSupTemp;
+                            SupHumRat = finalSysSizing.CoolSupHumRat;
+                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).NumOACoolCoils ==
+                                0) { // there is no precooling of the OA stream
+                                MixTemp = finalSysSizing.MixTempAtCoolPeak;
+                                MixHumRat = finalSysSizing.MixHumRatAtCoolPeak;
+                            } else { // there is precooling of OA stream
+                                if (VolFlowRate > 0.0) {
+                                    OutAirFrac = finalSysSizing.DesOutAirVolFlow / VolFlowRate;
+                                } else {
+                                    OutAirFrac = 1.0;
+                                }
+                                OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+                                MixTemp = OutAirFrac * finalSysSizing.PrecoolTemp + (1.0 - OutAirFrac) * finalSysSizing.RetTempAtCoolPeak;
+                                MixHumRat = OutAirFrac * finalSysSizing.PrecoolHumRat + (1.0 - OutAirFrac) * finalSysSizing.RetHumRatAtCoolPeak;
+                            }
+                        }
+                        OutTemp = finalSysSizing.OutTempAtCoolPeak;
+                        MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
+                        SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
+
+                        // design fan heat will be added to coil load
+                        Real64 FanCoolLoad =
+                            DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
+                        // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
+                        Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
+                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
+                            DataAirSystems::FanPlacement::BlowThru) {
+                            MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                        } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
+                                   DataAirSystems::FanPlacement::DrawThru) {
+                            SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
+                        }
+                        MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
+                        if (varSpeedCoil.CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                            RatedSourceTempCool = OutTemp;
+                        } else {
+                            RatedSourceTempCool = GetVSCoilRatedSourceTemp(state, DXCoilNum);
+                        }
+                        TotCapTempModFac =
+                            Curve::CurveValue(state, varSpeedCoil.MSCCapFTemp(varSpeedCoil.NormSpedLevel), MixWetBulb, RatedSourceTempCool);
+
+                        //       The mixed air temp for zone equipment without an OA mixer is 0.
+                        //       This test avoids a negative capacity until a solution can be found.
+                        if (MixEnth > SupEnth) {
+                            CoolCapAtPeak = (rhoair * VolFlowRate * (MixEnth - SupEnth)) + FanCoolLoad;
+                        } else {
+                            CoolCapAtPeak = (rhoair * VolFlowRate * (48000.0 - SupEnth)) + FanCoolLoad;
+                        }
+                        CoolCapAtPeak = max(0.0, CoolCapAtPeak);
+                        if (TotCapTempModFac > 0.0) {
+                            RatedCapCoolTotalDes = CoolCapAtPeak / TotCapTempModFac;
+                        } else {
+                            RatedCapCoolTotalDes = CoolCapAtPeak;
+                        }
+                    } else {
+                        RatedCapCoolTotalDes = 0.0;
+                    }
                 }
             }
 
@@ -4991,6 +5020,8 @@ namespace VariableSpeedCoils {
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, varSpeedCoil.Name, varSpeedCoil.VarSpeedCoilType, SupTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(
                 state, varSpeedCoil.Name, varSpeedCoil.VarSpeedCoilType, SupHumRat);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(
+                state, varSpeedCoil.Name, varSpeedCoil.VarSpeedCoilType, varSpeedCoil.RatedAirVolFlowRate, RatedAirFlowAutoSized);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilCoolingCapacity(state,
                                                                                        varSpeedCoil.Name,
                                                                                        varSpeedCoil.VarSpeedCoilType,
