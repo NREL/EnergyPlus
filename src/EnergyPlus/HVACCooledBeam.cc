@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -141,7 +141,7 @@ namespace HVACCooledBeam {
 
         // Get the  unit index
         if (CompIndex == 0) {
-            CBNum = UtilityRoutines::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
+            CBNum = Util::FindItemInList(CompName, state.dataHVACCooledBeam->CoolBeam);
             if (CBNum == 0) {
                 ShowFatalError(state, format("SimCoolBeam: Cool Beam Unit not found={}", CompName));
             }
@@ -272,9 +272,9 @@ namespace HVACCooledBeam {
             CoolBeam(CBNum).UnitType = CurrentModuleObject;
             CoolBeam(CBNum).UnitType_Num = 1;
             CoolBeam(CBNum).CBTypeString = Alphas(3);
-            if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
+            if (Util::SameString(CoolBeam(CBNum).CBTypeString, "Passive")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Passive;
-            } else if (UtilityRoutines::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
+            } else if (Util::SameString(CoolBeam(CBNum).CBTypeString, "Active")) {
                 CoolBeam(CBNum).CBType = CooledBeamType::Active;
             } else {
                 ShowSevereError(state, format("Illegal {} = {}.", cAlphaFields(3), CoolBeam(CBNum).CBTypeString));
@@ -373,59 +373,57 @@ namespace HVACCooledBeam {
             // CurrentModuleObject = "AirTerminal:SingleDuct:ConstantVolume:CooledBeam"
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 CoolBeam(CBNum).BeamCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Chilled Water Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 CoolBeam(CBNum).BeamCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name,
+                                Constant::eResource::PlantLoopCoolingDemand,
+                                OutputProcessor::SOVEndUseCat::CoolingCoils,
                                 {},
-                                "PLANTLOOPCOOLINGDEMAND",
-                                "COOLINGCOILS",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 CoolBeam(CBNum).BeamCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 CoolBeam(CBNum).SupAirCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 CoolBeam(CBNum).SupAirCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 CoolBeam(CBNum).SupAirHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 CoolBeam(CBNum).Name);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Supply Air Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 CoolBeam(CBNum).SupAirHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -433,7 +431,7 @@ namespace HVACCooledBeam {
 
             SetupOutputVariable(state,
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 CoolBeam(CBNum).OutdoorAirFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,

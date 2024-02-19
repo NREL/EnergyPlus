@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -126,6 +126,10 @@ def time_step_handler(state):
     print("Actuated Dew Point temp value is: %s" % dp_temp)
     sim_time = api.exchange.current_sim_time(state)
     print("Current sim time is: %f" % sim_time)
+    epwYear = api.exchange.year(state)
+    runPeriodYear = api.exchange.calendar_year(state)
+    print("year: %i, calendarYear: %i\n", epwYear, runPeriodYear)
+
     if api.exchange.zone_time_step_number(state) == 1:
         n = api.exchange.num_time_steps_in_hour(state)
         tomorrow_db = api.exchange.tomorrow_weather_outdoor_dry_bulb_at_time(state, 3, 2)

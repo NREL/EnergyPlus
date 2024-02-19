@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,7 +140,7 @@ namespace HeatRecovery {
         // Find the correct unit index
         int HeatExchNum; // index of unit being simulated
         if (CompIndex == 0) {
-            HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
+            HeatExchNum = Util::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
                 ShowFatalError(state, format("SimHeatRecovery: Unit not found={}", CompName));
             }
@@ -166,8 +166,8 @@ namespace HeatRecovery {
             }
         }
 
-        int CompanionCoilNum = present(CompanionCoilIndex) ? int(CompanionCoilIndex) : 0; // Index to companion cooling coil
-        int companionCoilType = present(CompanionCoilType_Num) ? int(CompanionCoilType_Num) : 0;
+        int CompanionCoilNum = present(CompanionCoilIndex) ? int(CompanionCoilIndex) : -1; // Index to companion cooling coil
+        int companionCoilType = present(CompanionCoilType_Num) ? int(CompanionCoilType_Num) : -1;
 
         bool HXUnitOn; // flag to enable heat exchanger
         if (present(HXUnitEnable)) {
@@ -179,7 +179,11 @@ namespace HeatRecovery {
         } else {
             //   HX is placed on a BRANCH, optional arguments are not passed in from SimAirServingZones.
             //   HX will calculate its own part-load ratio if optional HXUnitEnable flag is not present
-            HXUnitOn = true;
+            if (present(HXPartLoadRatio)) {
+                HXUnitOn = (HXPartLoadRatio > 0.0);
+            } else {
+                HXUnitOn = true;
+            }
             state.dataHeatRecovery->CalledFromParentObject = false;
         }
 
@@ -200,8 +204,16 @@ namespace HeatRecovery {
         case DataHVACGlobals::HX_DESICCANT_BALANCED:
             Real64 PartLoadRatio = present(HXPartLoadRatio) ? Real64(HXPartLoadRatio) : 1.0; // Part load ratio requested of DX compressor
             bool RegInIsOANode = present(RegenInletIsOANode) && bool(RegenInletIsOANode);
-            thisExch.CalcDesiccantBalancedHeatExch(
-                state, HXUnitOn, FirstHVACIteration, FanOpMode, PartLoadRatio, CompanionCoilNum, RegInIsOANode, EconomizerFlag, HighHumCtrlFlag);
+            thisExch.CalcDesiccantBalancedHeatExch(state,
+                                                   HXUnitOn,
+                                                   FirstHVACIteration,
+                                                   FanOpMode,
+                                                   PartLoadRatio,
+                                                   CompanionCoilNum,
+                                                   companionCoilType,
+                                                   RegInIsOANode,
+                                                   EconomizerFlag,
+                                                   HighHumCtrlFlag);
             break;
         }
 
@@ -489,19 +501,19 @@ namespace HeatRecovery {
 
             thisExchanger.NomElecPower = state.dataIPShortCut->rNumericArgs(10);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
                 thisExchanger.ControlToTemperatureSetPoint = true;
             } else {
-                if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
+                if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
                     ShowContinueError(state, format("{} must be set to Yes or No", thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Plate;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Rotary;
             } else {
                 ShowSevereError(state, format("{} configuration not found= {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(8)));
@@ -516,7 +528,7 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
+            if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
                 thisExchanger.ThresholdTemperature = state.dataIPShortCut->rNumericArgs(11);
                 thisExchanger.InitialDefrostTime = state.dataIPShortCut->rNumericArgs(12);
                 thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
@@ -1022,7 +1034,7 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             for (int PerfDataNum = 1; PerfDataNum <= NumDesBalExchsPerfDataType1; ++PerfDataNum) {
-                if (UtilityRoutines::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
+                if (Util::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
                     thisExchanger.PerfDataIndex = PerfDataNum;
                     break;
                 }
@@ -1047,118 +1059,115 @@ namespace HeatRecovery {
             // CurrentModuleObject='HeatExchanger:AirToAir:FlatPlate/AirToAir:SensibleAndLatent/Desiccant:BalancedFlow')
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.SensHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.SensHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.LatHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.LatHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.TotHeatingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.TotHeatingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEAT RECOVERY FOR HEATING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.SensCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.SensCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.LatCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.LatCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.TotCoolingRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.TotCoolingEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling,
                                 {},
-                                "ENERGYTRANSFER",
-                                "HEAT RECOVERY FOR COOLING",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
 
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.ElecUseRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.ElecUseEnergy,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Summed,
                                 thisExchanger.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::HeatRecovery,
                                 {},
-                                "ELECTRICITY",
-                                "HEATRECOVERY",
-                                {},
-                                "System");
+                                OutputProcessor::SOVGroup::HVAC);
         }
 
         // setup additional report variables for generic heat exchangers
@@ -1169,35 +1178,35 @@ namespace HeatRecovery {
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Effectiveness",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.SensEffectiveness,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Effectiveness",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.LatEffectiveness,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Supply Air Bypass Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisExchanger.SupBypassMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisExchanger.SecBypassMassFlow,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Defrost Time Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.DefrostFraction,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
@@ -1495,10 +1504,9 @@ namespace HeatRecovery {
                 }
             }
 
-            if ((((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                  (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed)) &&
-                 (CompanionCoilIndex > 0)) ||
-                ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) && (CompanionCoilIndex > -1))) {
+            if ((CompanionCoilIndex > -1) && ((CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
+                                              (CompanionCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) ||
+                                              (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling))) {
 
                 if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                     CompanionCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl) {
@@ -2414,6 +2422,7 @@ namespace HeatRecovery {
         int const FanOpMode,                           // Supply air fan operating mode (1=cycling, 2=constant)
         Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
         int const CompanionCoilIndex,                  // index of companion cooling coil
+        int const CompanionCoilType,                   // type of cooling coil
         bool const RegenInletIsOANode,                 // Flag to determine if regen side inlet is OANode, if so this air stream cycles
         ObjexxFCL::Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
         ObjexxFCL::Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
@@ -2640,9 +2649,14 @@ namespace HeatRecovery {
                 HXPartLoadRatio = max(0.0, HXPartLoadRatio);
                 HXPartLoadRatio = min(1.0, HXPartLoadRatio);
 
-            } else if (CompanionCoilIndex > 0) {
-                // VS coil issue here?
-                HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
+            } else if (CompanionCoilType > 0 && CompanionCoilIndex > -1) {
+                if (CompanionCoilType == DataHVACGlobals::CoilDX_Cooling) {
+                    HXPartLoadRatio = state.dataCoilCooingDX->coilCoolingDXs[CompanionCoilIndex].partLoadRatioReport;
+                } else if (CompanionCoilType == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    HXPartLoadRatio = state.dataVariableSpeedCoils->VarSpeedCoil(CompanionCoilIndex).PartLoadRatio;
+                } else {
+                    HXPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(CompanionCoilIndex);
+                }
             }
 
             Real64 constexpr lowerLimit = 1.e-5;
@@ -4802,7 +4816,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupInletNode;
         } else {
@@ -4834,7 +4848,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupOutletNode;
         } else {
@@ -4866,7 +4880,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecInletNode;
         } else {
@@ -4898,7 +4912,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecOutletNode;
         } else {
@@ -4930,7 +4944,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow;
         } else {
@@ -4963,7 +4977,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).ExchType;
         } else {

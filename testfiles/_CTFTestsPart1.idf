@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,23.2;
+  Version,24.1;
 
   Timestep,4;
 

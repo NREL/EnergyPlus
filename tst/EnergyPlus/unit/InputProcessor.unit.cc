@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
 
 #include <map>
 #include <sstream>
@@ -2077,7 +2076,7 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"SIMPLEANDTABULAR", "USEOUTPUTCONTROLTABLESTYLE"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Option Type", "Unit Conversion for Tabular Data"}), cAlphaFields));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({}), cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({}), lNumericBlanks));
@@ -2136,9 +2135,14 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "THERMALEFFICIENCYFPLR", "MIXED AIR NODE 1", "MAIN HUMIDIFIER OUTLET NODE", "", ""}),
-        Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER",
+                                                             "",
+                                                             "THERMALEFFICIENCYFPLR",
+                                                             "MIXED AIR NODE 1",
+                                                             "MAIN HUMIDIFIER OUTLET NODE",
+                                                             "",
+                                                             "FIXEDINLETWATERTEMPERATURE"}),
+                                   Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
                                                              "Availability Schedule Name",
                                                              "Thermal Efficiency Modifier Curve Name",
@@ -2521,7 +2525,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"HPACCOOLEIRFT SPEED", "DIMENSIONLESS", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({
                                        "Name",
                                        "Input Unit Type for X",
@@ -2643,8 +2647,8 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, true, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(26, NumNumbers);
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0, 0,
-                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, 0}),
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0.4, 7, 0.0085, 11.0, 0.0085, 12.8,   16.7, 0.0085, 0.0085, 0, 0, 0,     0,
+                                                        0,      0,   0, 0,      0,    1,      -99999, 0,    0,      -99999, 0, 0, -99999}),
                                    Numbers));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, true, true, true, true,
                                                       true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true, true}),
@@ -2785,7 +2789,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
                                                               cNumericFields);
 
     EXPECT_EQ(2, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"MAIN GAS HUMIDIFIER", "", "", "", "", "", "FIXEDINLETWATERTEMPERATURE"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"Name",
                                                              "Availability Schedule Name",
                                                              "Thermal Efficiency Modifier Curve Name",
@@ -2801,7 +2805,7 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
         std::vector<std::string>({"Rated Capacity", "Rated Gas Use Rate", "Thermal Efficiency", "Rated Fan Power", "Auxiliary Electric Power"}),
         cNumericFields));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({-99999, 0, 0.8, 0, 0}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -2847,6 +2851,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed ",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
     });
 
@@ -2884,7 +2889,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                               cAlphaFields,
                                                               cNumericFields);
 
-    EXPECT_EQ(22, NumAlphas);
+    EXPECT_EQ(23, NumAlphas);
     EXPECT_TRUE(compare_containers(std::vector<std::string>({"GASHEAT DXAC FURNACE 1",
                                                              "LOAD",
                                                              "EAST ZONE",
@@ -2907,6 +2912,7 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
                                                              "SUPPLYAIRFLOWRATE",
+                                                             "YES",
                                                              "",
                                                              "",
                                                              "",
@@ -2915,14 +2921,14 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
                                    Alphas));
     EXPECT_TRUE(
         compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true}),
+                                              false, true,  true,  false, false, false, false, false, true,  true,  true,  true,  true,  true}),
                            lAlphaBlanks));
 
     EXPECT_EQ(17, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<bool>({true, true, false, true, true, true,  false, true, true, true, false,
                                                       true, true, true,  true, true, false, true,  true, true, true, true}),
                                    lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 0, 0, 0, 0, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({1, 2, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 1.6, 0, 0, 0, 0, 0, 80, 21, 0, 0, 0, 80}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3033,12 +3039,12 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"EAST ZONE", "", "", "YES"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(8, NumNumbers);
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false, false, true}), lNumericBlanks));
-    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, 0}), Numbers));
+    EXPECT_TRUE(compare_containers(std::vector<Real64>({0, 0, 0, 0, 1, 1, -99999, -99999, -99999}), Numbers));
     EXPECT_EQ(1, IOStatus);
 }
 
@@ -3313,7 +3319,7 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
                                                               cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"ANY NUMBER", "", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(0, NumNumbers);
@@ -3416,7 +3422,7 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
 
     EXPECT_EQ(4, NumAlphas);
     EXPECT_TRUE(compare_containers(
-        std::vector<std::string>({"SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE", "", "", ""}),
+        std::vector<std::string>({"SUPPLY FAN 1", "FANANDCOILAVAILSCHED", "ZONE EXHAUST NODE", "DX COOLING COIL AIR INLET NODE", "", "", "General"}),
         Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, true, true, true}), lAlphaBlanks));
 
@@ -3479,7 +3485,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
         *state, CurrentModuleObject, 1, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields);
 
     EXPECT_EQ(1, NumAlphas);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "", ""}), Alphas));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLCAPFFF", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks));
 
     EXPECT_EQ(5, NumNumbers);
@@ -3513,7 +3519,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
                                                               cNumericFields2);
 
     EXPECT_EQ(1, NumAlphas2);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "", ""}), Alphas2));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"COOLEIRFFF", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks2));
 
     EXPECT_EQ(5, NumNumbers2);
@@ -3547,7 +3553,7 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
                                                               cNumericFields3);
 
     EXPECT_EQ(1, NumAlphas3);
-    EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "", ""}), Alphas3));
+    EXPECT_TRUE(compare_containers(std::vector<std::string>({"PLFFPLR", "DIMENSIONLESS", "DIMENSIONLESS"}), Alphas3));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, true, true}), lAlphaBlanks3));
 
     EXPECT_EQ(5, NumNumbers3);
@@ -4449,14 +4455,14 @@ TEST_F(InputProcessorFixture, epJSONgetObjectItem_minfields)
 
     // User inputs from above
     // Note even though choice keys are case-sensitive during epJSON processing, getObjectItem pushes Alphas to UPPERcase
-    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), UtilityRoutines::makeUPPER(name2)); // Material Name field is NOT tagged with /retaincase
+    EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(1), Util::makeUPPER(name2)); // Material Name field is NOT tagged with /retaincase
     EXPECT_EQ(state->dataIPShortCut->cAlphaArgs(2), "MEDIUMROUGH");
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(1), 2.0, 0.0001);
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(3), 0.5, 0.0001);
     // Defaults from schema
     EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(2), 0.9, 0.0001);
-    // Fields beyond min-fields come back as blank or zero, even if they have a default
-    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.0, 0.0001);
+    // Fields beyond min-fields come back as the default value
+    EXPECT_NEAR(state->dataIPShortCut->rNumericArgs(4), 0.7, 0.0001);
 }
 
 TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromJSON)
@@ -4632,10 +4638,10 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_fromIDF)
             EXPECT_EQ(numericFieldValue, -99999);
             // Check an alpha field
             alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "on_cycle_parasitic_fuel_type");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Electricity"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "Electricity"));
             // Check a defaulted alpha field
             alphaFieldValue = ip->getAlphaFieldValue(fields, objectSchemaProps, "heater_control_type");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "Cycle"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "Cycle"));
         }
     }
 }
@@ -4683,11 +4689,11 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &objectFields = instance.value();
-            std::string const &thisObjectName = UtilityRoutines::makeUPPER(instance.key());
+            std::string const &thisObjectName = Util::makeUPPER(instance.key());
             EXPECT_EQ(thisObjectName, "SPACE EQUIPMENT");
             // Fields before extensibles
             alphaFieldValue = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "load_distribution_scheme");
-            EXPECT_TRUE(UtilityRoutines::SameString(alphaFieldValue, "UniformPLR"));
+            EXPECT_TRUE(Util::SameString(alphaFieldValue, "UniformPLR"));
 
             // Extensibles
 
@@ -4726,25 +4732,25 @@ TEST_F(InputProcessorFixture, epJSONgetFieldValue_extensiblesFromIDF)
                 }
                 EXPECT_EQ(counter, 3);
             }
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[0], "Baseboard Heat"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[0], ""));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[0], ""));
+            EXPECT_TRUE(Util::SameString(equipmentNames[0], "Baseboard Heat"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[0], "ZoneHVAC:Baseboard:RadiantConvective:Electric"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[0], ""));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[0], ""));
             EXPECT_EQ(coolSeqNums[0], 0);
             EXPECT_EQ(heatSeqNums[0], 3);
 
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[1], "Air Terminal ADU"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
+            EXPECT_TRUE(Util::SameString(equipmentNames[1], "Air Terminal ADU"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[1], "ZoneHVAC:AirDistributionUnit"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[1], "ADU Cooling Fraction Schedule"));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[1], "ADU Heating Fraction Schedule"));
             // Note the input values above are 1.9 and 2.1, the should round to the nearest integer
             EXPECT_EQ(coolSeqNums[1], 2);
             EXPECT_EQ(heatSeqNums[1], 2);
 
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentNames[2], "Exhaust Fan"));
-            EXPECT_TRUE(UtilityRoutines::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
-            EXPECT_TRUE(UtilityRoutines::SameString(coolFracSchedNames[2], ""));
-            EXPECT_TRUE(UtilityRoutines::SameString(heatFracSchedNames[2], ""));
+            EXPECT_TRUE(Util::SameString(equipmentNames[2], "Exhaust Fan"));
+            EXPECT_TRUE(Util::SameString(equipmentTypes[2], "Fan:ZoneExhaust"));
+            EXPECT_TRUE(Util::SameString(coolFracSchedNames[2], ""));
+            EXPECT_TRUE(Util::SameString(heatFracSchedNames[2], ""));
             EXPECT_EQ(coolSeqNums[2], 1);
             EXPECT_EQ(heatSeqNums[2], 1);
         }

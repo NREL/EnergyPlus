@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, SortAndStringUtilitiesTest_findItemInSortedListUndersc
     iListOfObjects.allocate(NumObjectDefs);
     SetupAndSort(ListOfObjects, iListOfObjects); // list is resorted
 
-    auto index = UtilityRoutines::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
+    auto index = Util::FindItemInSortedList("SYSTEM NODE TEMPERATURE", ListOfObjects, NumObjectDefs);
 
     EXPECT_EQ(3, index);
 }

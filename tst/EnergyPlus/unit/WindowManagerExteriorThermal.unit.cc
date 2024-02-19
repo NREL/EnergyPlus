@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -739,9 +739,9 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     double shgcRep{0.};
     double vtRep{0.};
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_TRUE(windowSurfNum > 0);
-    int constructNum = UtilityRoutines::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
+    int constructNum = Util::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
     EXPECT_TRUE(constructNum > 0);
 
     GetWindowAssemblyNfrcForReport(

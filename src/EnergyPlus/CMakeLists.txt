@@ -254,6 +254,8 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
+    EnergyPlusLogger.cc 
+    EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
@@ -563,8 +565,6 @@ set(SRC
     SolarReflectionManager.hh
     SolarShading.cc
     SolarShading.hh
-    SortAndStringUtilities.cc
-    SortAndStringUtilities.hh
     SplitterComponent.cc
     SplitterComponent.hh
     StandardRatings.cc
@@ -729,7 +729,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source nlohmann_json re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -739,16 +739,23 @@ if ((CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1) O
     ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)))
   target_link_libraries(energyplusparser PRIVATE stdc++fs)
 endif()
+if(ENABLE_UNITY)
+  set_target_properties(energyplusparser PROPERTIES UNITY_BUILD ON)
+endif()
 
 # first we will create a static library of EnergyPlus this will be linked
 # statically to create the DLL and also the unit tests
 add_library(energypluslib STATIC ${SRC})
 
+if(ENABLE_UNITY)
+  set_target_properties(energypluslib PROPERTIES UNITY_BUILD ON)
+endif()
+
 target_link_libraries(
   energypluslib
   PUBLIC embedded_epjson_source
          fmt::fmt
-         ModernJSON
+         nlohmann_json
          objexx
          sqlite
          bcvtb
@@ -827,6 +834,9 @@ target_link_libraries(energyplusapi PRIVATE energypluslib)
 target_link_libraries(energyplusapi PRIVATE project_options project_fp_options project_warnings)
 
 set_target_properties(energyplusapi PROPERTIES INSTALL_NAME_DIR "@executable_path")
+if(ENABLE_UNITY)
+  set_target_properties(energyplusapi PROPERTIES UNITY_BUILD ON)
+endif()
 
 
 # now the actual E+ executable
@@ -1101,16 +1111,17 @@ if(BUILD_TESTING)
   set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
   configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
-  )
+  if(LINK_WITH_PYTHON)
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+    )
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
-  )
-
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+    )
+  endif()
 endif()
 
 if(UNIX AND NOT APPLE)

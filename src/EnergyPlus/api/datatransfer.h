@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -143,14 +143,13 @@ ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int array
 /// \param[in] objectType The object type from the input schema, such as "Chiller:Electric", or "Zone" -- casing should match input schema!
 /// \param[out] resultingSize An integer which will be set to the size of the array upon return
 /// \return Const char * pointing to an array of const char * with the size set in the by-ref argument.  When done, pass to freeObjectNames to clear.
-ENERGYPLUSLIB_API const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
+ENERGYPLUSLIB_API char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
 /// \brief Clears an object names array allocation
 /// \details This function frees an instance of the object names array, which is returned from getObjectNames
 /// \param[in] data An array (pointer) of const char * as returned from the getObjectNames function
 /// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
 /// \return Nothing, this simply frees the memory
-ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int arraySize);
-
+ENERGYPLUSLIB_API void freeObjectNames(char **objectNames, unsigned int arraySize);
 // ----- FUNCTIONS RELATED TO VARIABLES
 
 /// \brief Gets the number of nodes for a particular CondFD surface layer
@@ -423,13 +422,21 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(EnergyPlusState state, 
 
 // ----- FUNCTIONS RELATED TO MISC CURRENT SIMULATION STATE
 
-/// \brief Returns the current year of the simulation.
+/// \brief Returns the current year of the simulation, taken from the EPW.
+/// \details This is directly read from the EPW, and as such, if the EPW is for example a TMY3 file
+///          the year could be set to an abritrary number and change from one timestep to the next. See calendarYear for an alternative
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int year(EnergyPlusState state);
+
+/// \brief Returns the Calendar Year of the simulation (based on the RunPeriod object). Only valid for weather file run periods.
 /// \details A simulation can span multiple years and will always have a "meaningful" year that is either user-defined explicitly,
 ///          determined based on other inputs in the input file, or chosen as the current year.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-ENERGYPLUSLIB_API int year(EnergyPlusState state);
+ENERGYPLUSLIB_API int calendarYear(EnergyPlusState state);
 
 /// \brief Returns the current month of the simulation, from 1 for January to 12 for December.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -160,7 +160,7 @@ Real64 SiteShallowGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusData &stat
 
     // USE STATEMENTS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * Constant::SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeather->NumDaysInYear * Constant::SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

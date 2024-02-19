@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -180,13 +180,13 @@ namespace InternalHeatGains {
                                      gsl::span<const DataHeatBalance::IntGainType> GainTypeARR, // variable length 1-d array of enum valued gain types
                                      int const spaceIndex = 0);                                 // space index pointer, sum gains only for this space
 
-    Real64 SumAllInternalLatentGains(EnergyPlusData &state,
-                                     int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGains(EnergyPlusData &state,
+                                   int const ZoneNum // zone index pointer for which zone to sum gains for
     );
 
     // Added for hybrid model -- calculate the latent gain from all sources except for people
-    Real64 SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
-                                                 int const ZoneNum // zone index pointer for which zone to sum gains for
+    void SumAllInternalLatentGainsExceptPeople(EnergyPlusData &state,
+                                               int const ZoneNum // zone index pointer for which zone to sum gains for
     );
 
     Real64

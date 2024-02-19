@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -93,8 +93,8 @@ public:
 
     // default constructor
     AnnualFieldSet()
-        : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(OutputProcessor::Unit::None),
-          m_typeOfVar(OutputProcessor::VariableType::NotFound), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
+        : m_variMeter(""), m_colHead(""), m_aggregate(sumOrAvg), m_varUnits(Constant::Units::None),
+          m_typeOfVar(OutputProcessor::VariableType::Invalid), m_keyCount(0), m_varAvgSum(OutputProcessor::StoreType::Averaged), m_bottomBinValue(0),
           m_topBinValue(0)
     {
     }
@@ -119,7 +119,7 @@ public:
                                             OutputProcessor::VariableType &typeVar,
                                             OutputProcessor::StoreType &avgSumVar,
                                             OutputProcessor::TimeStepType &stepTypeVar,
-                                            OutputProcessor::Unit &unitsVar);
+                                            Constant::Units &unitsVar);
 
     void getVariableKeysFromFldSt(EnergyPlusData &state,
                                   OutputProcessor::VariableType &typeVar,
@@ -131,7 +131,7 @@ public:
     std::string m_colHead;                     // the column header to use instead of the variable name (only for predefined)
     AggregationKind m_aggregate;               // the type of aggregation for the variable (see aggType parameters)
     int m_showDigits;                          // the number of digits to be shown
-    OutputProcessor::Unit m_varUnits;          // Units sting, may be blank
+    Constant::Units m_varUnits;                // Units sting, may be blank
     OutputProcessor::VariableType m_typeOfVar; // 0=not found, 1=integer, 2=real, 3=meter
     int m_keyCount;
     OutputProcessor::StoreType m_varAvgSum;      // Variable  is Averaged=1 or Summed=2

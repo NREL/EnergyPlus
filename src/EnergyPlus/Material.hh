@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -201,9 +201,8 @@ namespace Material {
         Real64 SpecHeat = 0.0;  // Layer specific heat (J/kgK)
         Real64 Thickness = 0.0; // Layer thickness (m)
 
-        virtual bool dummy()
+        virtual ~MaterialBase()
         {
-            return true;
         }
     };
 
@@ -388,10 +387,7 @@ namespace Material {
         // material
         int GlassSpecAngBRefleDataPtr = 0; // Data set index of back reflectance as a function of spectral and angle associated with a window glass
         // material
-        virtual bool dummy()
-        {
-            return true;
-        }
+        virtual ~MaterialChild(){};
     };
 
     struct WindowBlindProperties

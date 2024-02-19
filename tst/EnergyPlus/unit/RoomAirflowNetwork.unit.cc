@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -298,21 +298,21 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
 
     auto &thisZoneHB = state->dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
     thisZoneHB.MAT = 20.0;
-    thisZoneHB.ZoneAirHumRat = 0.001;
+    thisZoneHB.airHumRat = 0.001;
     state->dataHeatBalSurf->SurfHConvInt(1) = 1.0;
     state->dataHeatBalSurf->SurfHConvInt(2) = 1.0;
     state->dataHeatBalSurf->SurfTempInTmp(1) = 25.0;
     state->dataHeatBalSurf->SurfTempInTmp(2) = 30.0;
-    state->dataMstBal->RhoVaporAirIn(1) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state->dataEnvrn->OutBaroPress);
-    state->dataMstBal->RhoVaporAirIn(2) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->RhoVaporAirIn(1) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.airHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataMstBal->RhoVaporAirIn(2) = PsyRhovFnTdbWPb(thisZoneHB.MAT, thisZoneHB.airHumRat, state->dataEnvrn->OutBaroPress);
     state->dataMstBal->HMassConvInFD(1) =
         state->dataHeatBalSurf->SurfHConvInt(1) /
-        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) + state->dataMstBal->RhoVaporAirIn(1)) *
-         PsyCpAirFnW(thisZoneHB.ZoneAirHumRat));
+        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRat) + state->dataMstBal->RhoVaporAirIn(1)) *
+         PsyCpAirFnW(thisZoneHB.airHumRat));
     state->dataMstBal->HMassConvInFD(2) =
         state->dataHeatBalSurf->SurfHConvInt(2) /
-        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.ZoneAirHumRat) + state->dataMstBal->RhoVaporAirIn(2)) *
-         PsyCpAirFnW(thisZoneHB.ZoneAirHumRat));
+        ((PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, thisZoneHB.MAT, thisZoneHB.airHumRat) + state->dataMstBal->RhoVaporAirIn(2)) *
+         PsyCpAirFnW(thisZoneHB.airHumRat));
 
     RoomAirNode = 1;
     InitRoomAirModelAFN(*state, ZoneNum, RoomAirNode);

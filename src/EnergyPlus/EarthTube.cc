@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -180,7 +180,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
         thisEarthTubePars.nameParameters = state.dataIPShortCut->cAlphaArgs(1);
         // Check to make sure name is unique
         for (int otherParams = 1; otherParams < Loop; ++otherParams) {
-            if (UtilityRoutines::SameString(thisEarthTubePars.nameParameters, state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
+            if (Util::SameString(thisEarthTubePars.nameParameters, state.dataEarthTube->EarthTubePars(otherParams).nameParameters)) {
                 ShowSevereError(state,
                                 format("{}: {} = {} is not a unique name.",
                                        cCurrentModuleObject,
@@ -219,7 +219,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         // First Alpha is Zone Name
-        thisEarthTube.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
+        thisEarthTube.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(1), state.dataHeatBal->Zone);
         if (thisEarthTube.ZonePtr == 0) {
             ShowSevereError(
                 state,
@@ -453,7 +453,7 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
             // Process the parameters based on the name (link via index)
             thisEarthTube.vertParametersPtr = 0;
             for (int parIndex = 1; parIndex <= totEarthTubePars; ++parIndex) {
-                if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
+                if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), state.dataEarthTube->EarthTubePars(parIndex).nameParameters)) {
                     thisEarthTube.vertParametersPtr = parIndex;
                     break;
                 }
@@ -478,124 +478,123 @@ void GetEarthTube(EnergyPlusData &state, bool &ErrorsFound) // If errors found i
 
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Sensible Cooling Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     thisZnRptET.EarthTubeHeatLoss,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Sensible Cooling Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     thisZnRptET.EarthTubeHeatLossRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Sensible Heating Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     thisZnRptET.EarthTubeHeatGain,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Sensible Heating Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     thisZnRptET.EarthTubeHeatGainRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Air Flow Volume",
-                                    OutputProcessor::Unit::m3,
+                                    Constant::Units::m3,
                                     thisZnRptET.EarthTubeVolume,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Current Density Air Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     thisZnRptET.EarthTubeVolFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Standard Density Air Volume Flow Rate",
-                                    OutputProcessor::Unit::m3_s,
+                                    Constant::Units::m3_s,
                                     thisZnRptET.EarthTubeVolFlowRateStd,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Air Flow Mass",
-                                    OutputProcessor::Unit::kg,
+                                    Constant::Units::kg,
                                     thisZnRptET.EarthTubeMass,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Air Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     thisZnRptET.EarthTubeMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Water Mass Flow Rate",
-                                    OutputProcessor::Unit::kg_s,
+                                    Constant::Units::kg_s,
                                     thisZnRptET.EarthTubeWaterMassFlowRate,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Fan Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     thisZnRptET.EarthTubeFanElec,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::NonState,
                                     zone.Name,
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::SOVEndUseCat::Invalid,
                                     {},
-                                    "Electricity",
-                                    {},
-                                    {},
-                                    "Building");
+                                    OutputProcessor::SOVGroup::Building);
                 SetupOutputVariable(state,
                                     "Earth Tube Fan Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     thisZnRptET.EarthTubeFanElecPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Inlet Air Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     thisZnRptET.EarthTubeAirTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Ground Interface Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     thisEarthTube.GroundTempt,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Outdoor Air Heat Transfer Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     thisZnRptET.EarthTubeOATreatmentPower,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Inlet Wet Bulb Temperature",
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     thisZnRptET.EarthTubeWetBulbTemp,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     "Earth Tube Zone Inlet Humidity Ratio",
-                                    OutputProcessor::Unit::kgWater_kgDryAir,
+                                    Constant::Units::kgWater_kgDryAir,
                                     thisZnRptET.EarthTubeHumRat,
                                     OutputProcessor::SOVTimeStepType::System,
                                     OutputProcessor::SOVStoreType::State,
@@ -739,14 +738,14 @@ void initEarthTubeVertical(EnergyPlusData &state)
             for (int nodeNum = 1; nodeNum <= thisEarthTube.totNodes; ++nodeNum) {
                 SetupOutputVariable(state,
                                     format("Earth Tube Node Temperature {}", nodeNum),
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     thisEarthTube.tCurrent[nodeNum - 1],
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
                                     zone.Name);
                 SetupOutputVariable(state,
                                     format("Earth Tube Undisturbed Ground Temperature {}", nodeNum),
-                                    OutputProcessor::Unit::C,
+                                    Constant::Units::C,
                                     thisEarthTube.tUndist[nodeNum - 1],
                                     OutputProcessor::SOVTimeStepType::Zone,
                                     OutputProcessor::SOVStoreType::State,
@@ -754,14 +753,14 @@ void initEarthTubeVertical(EnergyPlusData &state)
             }
             SetupOutputVariable(state,
                                 "Earth Tube Upper Boundary Ground Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisEarthTube.tUpperBound,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,
                                 zone.Name);
             SetupOutputVariable(state,
                                 "Earth Tube Lower Boundary Ground Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisEarthTube.tLowerBound,
                                 OutputProcessor::SOVTimeStepType::Zone,
                                 OutputProcessor::SOVStoreType::State,

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -340,13 +340,17 @@ void callbackEndOfAfterComponentGetInput(EnergyPlusState state, void (*f)(Energy
     EnergyPlus::PluginManagement::registerNewCallback(*thisState, EnergyPlus::EMSManager::EMSCallFrom::ComponentGetInput, f);
 }
 
-// void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void ()> f) {
-//    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
-//}
-//
-// void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)()) {
-//    callbackUserDefinedComponentModel(std::function<void ()>(f));
-//}
+void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f, const char *programNameInInputFile)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    EnergyPlus::PluginManagement::registerUserDefinedCallback(*thisState, f, programNameInInputFile);
+}
+
+void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)(EnergyPlusState), const char *programNameInInputFile)
+{
+    auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    EnergyPlus::PluginManagement::registerUserDefinedCallback(*thisState, f, programNameInInputFile);
+}
 
 void callbackUnitarySystemSizing(EnergyPlusState state, std::function<void(EnergyPlusState)> const &f)
 {

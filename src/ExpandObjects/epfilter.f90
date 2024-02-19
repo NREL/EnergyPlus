@@ -1507,7 +1507,7 @@ INTEGER,PARAMETER :: gndTempSurfDecOff = 12
 INTEGER,PARAMETER :: blrhwNameOff = 1
 INTEGER,PARAMETER :: blrhwInletNodeOff = 11
 INTEGER,PARAMETER :: blrhwOutletNodeOff = 12
-INTEGER,PARAMETER :: blrhwLastFieldOff = 17
+INTEGER,PARAMETER :: blrhwLastFieldOff = 18
 
   ! Chiller:Electric:EIR (for use with HVACTemplate:Plant:Chiller:ObjectReference)
 INTEGER,PARAMETER :: chleirNameOff = 1
@@ -2305,7 +2305,7 @@ CALL AddObjToProcess('HVACTemplate:Zone:WaterToAirHeatPump',.TRUE., wahpTStatNam
 CALL AddObjToProcess('HVACTemplate:Plant:MixedWaterLoop',.TRUE.,    mwpNameOff,                  mwpLdDistSchmOff,          17)
 CALL AddObjToProcess('HVACTemplate:System:DedicatedOutdoorAir',.TRUE.,doasNameOff,              doasHumidSetPtSchedNameOff, 46)
 ! Detailed Plant Objects
-CALL AddObjToProcess('Boiler:HotWater',.FALSE.,                     blrhwOutletNodeOff,          blrhwLastFieldOff,         17)
+CALL AddObjToProcess('Boiler:HotWater',.FALSE.,                     blrhwOutletNodeOff,          blrhwLastFieldOff,         18)
 CALL AddObjToProcess('Chiller:Electric:EIR',.FALSE.,                chleirCondTypeOff,           chleirLastFieldOff,        30)
 CALL AddObjToProcess('Chiller:Electric:ReformulatedEIR',.FALSE.,    chlreirCondOutletNodeOff,    chlreirLastFieldOff,       26)
 CALL AddObjToProcess('CoolingTower:SingleSpeed',.FALSE.,            twrssOutletNodeOff,          twrssLastFieldOff,         29)
@@ -16103,6 +16103,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('No Load Fraction of Autosized Heating Supply Air Flow Rate','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   CALL AddToObjStr('Maximum Supply Air Temperature {C}', 'Autosize')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}', base + ussSuppReHeatMaxODBOff,'')
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature Sensor Node Name', '')
@@ -25050,6 +25051,7 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + ptaczSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -25657,6 +25659,7 @@ DO iZone = 1, numCompactPTHP
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + pthpzSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -30025,6 +30028,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
   CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + wahpSupplyNoLoadFlowRateOff,'')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')

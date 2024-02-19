@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -148,6 +148,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "    ,                     !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
 
         "  CoilSystem:Cooling:DX:HeatExchangerAssisted,",
@@ -531,8 +532,8 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_VStest1)
     // coil system delta T > 0, coil system inlet node = 8, outlet node = 4
     int coilSystemInletNode = thisSys->CoolCoilInletNodeNum;
     int coilSystemOutletNode = thisSys->CoolCoilOutletNodeNum;
-    int coolCoilInletHXSupplyOutlet = UtilityRoutines::FindItemInList("HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID);
-    int coolCoilOutletHXExhaustInlet = UtilityRoutines::FindItemInList("HEAT RECOVERY EXHUAST INLET NODE", state->dataLoopNodes->NodeID);
+    int coolCoilInletHXSupplyOutlet = Util::FindItemInList("HEAT RECOVERY SUPPLY OUTLET", state->dataLoopNodes->NodeID);
+    int coolCoilOutletHXExhaustInlet = Util::FindItemInList("HEAT RECOVERY EXHUAST INLET NODE", state->dataLoopNodes->NodeID);
     EXPECT_LT(state->dataLoopNodes->Node(coilSystemOutletNode).Temp, state->dataLoopNodes->Node(coilSystemInletNode).Temp);
     // coil delta T > 0, cooling coil inlet node = 6, cooling coil outlet node = 7
     EXPECT_LT(state->dataLoopNodes->Node(coolCoilOutletHXExhaustInlet).Temp, state->dataLoopNodes->Node(coolCoilInletHXSupplyOutlet).Temp);
@@ -758,6 +759,7 @@ TEST_F(EnergyPlusFixture, HXAssistCCUnitarySystem_NewDXCoil_Processing_Test)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  80;                     !- Maximum Supply Air Temperature{ C }",
 
         "  CoilSystem:Cooling:DX:HeatExchangerAssisted,",

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2207,13 +2207,13 @@ TEST_F(EnergyPlusFixture, HVACMSHP_UnitarySystemElectricityRateTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     // set zone air conditions
     auto &zoneAirNode =
-        state->dataLoopNodes->Node(UtilityRoutines::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        state->dataLoopNodes->Node(Util::FindItemInList("Z401 AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 21.1;
     zoneAirNode.HumRat = 0.0035;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set maixed air node conditions
-    auto &mixedAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &mixedAirNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("AC-24 SF INLET AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.005;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);

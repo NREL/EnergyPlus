@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.2;
+  Version,24.1;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2189,6 +2189,7 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
     0,                       !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2307,6 +2308,7 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
     0,                       !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2348,6 +2350,7 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
     0,                       !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2389,6 +2392,7 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
     0,                       !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2430,6 +2434,7 @@
     Autosize,                !- Cooling Supply Air Flow Rate {m3/s}
     Autosize,                !- Heating Supply Air Flow Rate {m3/s}
     ,                        !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     0,                       !- Cooling Outdoor Air Flow Rate {m3/s}
     0,                       !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}

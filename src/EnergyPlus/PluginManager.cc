@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -56,23 +57,62 @@
 #include <algorithm>
 #include <nlohmann/json.hpp>
 
+#if LINK_WITH_PYTHON
+#include <fmt/format.h>
+namespace fmt {
+template <> struct formatter<PyStatus>
+{
+    // parse is inherited from formatter<string_view>.
+    constexpr auto parse(format_parse_context &ctx) -> format_parse_context::iterator
+    {
+        return ctx.begin();
+    }
+
+    auto format(const PyStatus &status, format_context &ctx) const -> format_context::iterator
+    {
+        if (!PyStatus_Exception(status)) {
+            return ctx.out();
+        }
+        if (PyStatus_IsExit(status)) {
+            return fmt::format_to(ctx.out(), "Exited with code {}", status.exitcode);
+        }
+        if (PyStatus_IsError(status)) {
+            auto it = ctx.out();
+            it = fmt::format_to(it, "Fatal Python error: ");
+            if (status.func) {
+                it = fmt::format_to(it, "{}: ", status.func);
+            }
+            it = fmt::format_to(it, "{}", status.err_msg);
+            return it;
+        }
+        return ctx.out();
+    }
+};
+} // namespace fmt
+#endif
+
 namespace EnergyPlus::PluginManagement {
 
 PluginTrendVariable::PluginTrendVariable(EnergyPlusData &state, std::string _name, int _numValues, int _indexOfPluginVariable)
     : name(std::move(_name)), numValues(_numValues), indexOfPluginVariable(_indexOfPluginVariable)
 {
-    // initialize the deque so it can be queried immediately, even with just zeroes
+    // initialize the deque, so it can be queried immediately, even with just zeroes
     for (int i = 1; i <= this->numValues; i++) {
         this->values.push_back(0);
-    }
-    for (int loop = 1; loop <= _numValues; ++loop) {
-        this->times.push_back(-loop * state.dataGlobal->TimeStepZone);
+        this->times.push_back(-i * state.dataGlobal->TimeStepZone);
     }
 }
 
 void registerNewCallback(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, const std::function<void(void *)> &f)
 {
     state.dataPluginManager->callbacks[iCalledFrom].push_back(f);
+}
+
+void registerUserDefinedCallback(EnergyPlusData &state, const std::function<void(void *)> &f, const std::string &programNameInInputFile)
+{
+    // internally, E+ will UPPER the program name; we should upper the passed in registration name so it matches
+    state.dataPluginManager->userDefinedCallbackNames.push_back(Util::makeUPPER(programNameInInputFile));
+    state.dataPluginManager->userDefinedCallbacks.push_back(f);
 }
 
 void onBeginEnvironment(EnergyPlusData &state)
@@ -89,13 +129,16 @@ void onBeginEnvironment(EnergyPlusData &state)
 
 int PluginManager::numActiveCallbacks(EnergyPlusData &state)
 {
-    return (int)state.dataPluginManager->callbacks.size();
+    return (int)state.dataPluginManager->callbacks.size() + (int)state.dataPluginManager->userDefinedCallbacks.size();
 }
 
 void runAnyRegisteredCallbacks(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledFrom, bool &anyRan)
 {
     if (state.dataGlobal->KickOffSimulation) return;
     for (auto const &cb : state.dataPluginManager->callbacks[iCalledFrom]) {
+        if (iCalledFrom == EMSManager::EMSCallFrom::UserDefinedComponentModel) {
+            continue; // these are called -intentionally- using the runSingleUserDefinedCallback method
+        }
         cb((void *)&state);
         anyRan = true;
     }
@@ -143,12 +186,12 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
             std::string const &thisObjectName = instance.key();
-            std::string const objNameUC = UtilityRoutines::makeUPPER(thisObjectName);
+            std::string const objNameUC = Util::makeUPPER(thisObjectName);
             // no need to validate name, the JSON will validate that.
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sOutputVariable, thisObjectName);
             std::string varName = fields.at("python_plugin_variable_name").get<std::string>();
-            std::string avgOrSum = UtilityRoutines::makeUPPER(fields.at("type_of_data_in_variable").get<std::string>());
-            std::string updateFreq = UtilityRoutines::makeUPPER(fields.at("update_frequency").get<std::string>());
+            std::string avgOrSum = Util::makeUPPER(fields.at("type_of_data_in_variable").get<std::string>());
+            std::string updateFreq = Util::makeUPPER(fields.at("update_frequency").get<std::string>());
             std::string units;
             if (fields.find("units") != fields.end()) {
                 units = fields.at("units").get<std::string>();
@@ -175,16 +218,16 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
             if (updateFreq == "SYSTEMTIMESTEP") {
                 sUpdateFreq = OutputProcessor::SOVTimeStepType::System;
             }
-            OutputProcessor::Unit thisUnit = OutputProcessor::Unit::None;
+            Constant::Units thisUnit = Constant::Units::None;
             if (!units.empty()) {
-                thisUnit = OutputProcessor::unitStringToEnum(units);
-                if (thisUnit == OutputProcessor::Unit::unknown) {
-                    thisUnit = OutputProcessor::Unit::customEMS;
+                thisUnit = static_cast<Constant::Units>(getEnumValue(Constant::unitNamesUC, Util::makeUPPER(units)));
+                if (thisUnit == Constant::Units::Invalid) {
+                    thisUnit = Constant::Units::customEMS;
                 }
             }
             if (!isMetered) {
                 // regular output variable, ignore the meter/resource stuff and register the variable
-                if (thisUnit != OutputProcessor::Unit::customEMS) {
+                if (thisUnit != Constant::Units::customEMS) {
                     SetupOutputVariable(state,
                                         sOutputVariable,
                                         thisUnit,
@@ -200,12 +243,11 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
-                                        {},
+                                        Constant::eResource::Invalid,
+                                        OutputProcessor::SOVEndUseCat::Invalid,
+                                        {}, // EndUseSub
+                                        OutputProcessor::SOVGroup::Invalid,
+                                        {}, // Zone
                                         1,
                                         1,
                                         -999,
@@ -221,57 +263,28 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const resourceType = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("resource_type").get<std::string>());
-                std::string sResourceType;
-                if (resourceType == "ELECTRICITY") {
-                    sResourceType = "Electricity";
-                } else if (resourceType == "NATURALGAS") {
-                    sResourceType = "NaturalGas";
-                } else if (resourceType == "GASOLINE") {
-                    sResourceType = "Gasoline";
-                } else if (resourceType == "DIESEL") {
-                    sResourceType = "Diesel";
-                } else if (resourceType == "COAL") {
-                    sResourceType = "Coal";
-                } else if (resourceType == "FUELOILNO1") {
-                    sResourceType = "FuelOilNo1";
-                } else if (resourceType == "FUELOILNO2") {
-                    sResourceType = "FuelOilNo2";
-                } else if (resourceType == "OTHERFUEL1") {
-                    sResourceType = "OtherFuel1";
-                } else if (resourceType == "OTHERFUEL2") {
-                    sResourceType = "OtherFuel2";
-                } else if (resourceType == "PROPANE") {
-                    sResourceType = "Propane";
-                } else if (resourceType == "WATERUSE") {
-                    sResourceType = "Water";
+                std::string const resourceType = EnergyPlus::Util::makeUPPER(fields.at("resource_type").get<std::string>());
+                Constant::eResource resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType));
+                if (resourceType == "WATERUSE") {
+                    resource = Constant::eResource::Water;
                 } else if (resourceType == "ONSITEWATERPRODUCED") {
-                    sResourceType = "OnSiteWater";
+                    resource = Constant::eResource::OnSiteWater;
                 } else if (resourceType == "MAINSWATERSUPPLY") {
-                    sResourceType = "MainsWater";
+                    resource = Constant::eResource::MainsWater;
                 } else if (resourceType == "RAINWATERCOLLECTED") {
-                    sResourceType = "RainWater";
+                    resource = Constant::eResource::RainWater;
                 } else if (resourceType == "WELLWATERDRAWN") {
-                    sResourceType = "WellWater";
+                    resource = Constant::eResource::WellWater;
                 } else if (resourceType == "CONDENSATEWATERCOLLECTED") {
-                    sResourceType = "Condensate";
-                } else if (resourceType == "ENERGYTRANSFER") {
-                    sResourceType = "EnergyTransfer";
-                } else if (resourceType == "STEAM") {
-                    sResourceType = "Steam";
-                } else if (resourceType == "DISTRICTCOOLING") {
-                    sResourceType = "DistrictCooling";
-                } else if (resourceType == "DISTRICTHEATINGWATER") {
-                    sResourceType = "DistrictHeatingWater";
-                } else if (resourceType == "DISTRICTHEATINGSTEAM") {
-                    sResourceType = "DistrictHeatingSteam";
+                    resource = Constant::eResource::Condensate;
                 } else if (resourceType == "ELECTRICITYPRODUCEDONSITE") {
-                    sResourceType = "ElectricityProduced";
+                    resource = Constant::eResource::ElectricityProduced;
                 } else if (resourceType == "SOLARWATERHEATING") {
-                    sResourceType = "SolarWater";
+                    resource = Constant::eResource::SolarWater;
                 } else if (resourceType == "SOLARAIRHEATING") {
-                    sResourceType = "SolarAir";
-                } else {
+                    resource = Constant::eResource::SolarAir;
+                } else if ((resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, resourceType))) ==
+                           Constant::eResource::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Resource Type = {}", resourceType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
@@ -284,17 +297,10 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const groupType = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("group_type").get<std::string>());
-                std::string sGroupType;
-                if (groupType == "BUILDING") {
-                    sGroupType = "Building";
-                } else if (groupType == "HVAC") {
-                    sGroupType = "HVAC";
-                } else if (groupType == "PLANT") {
-                    sGroupType = "Plant";
-                } else if (groupType == "SYSTEM") {
-                    sGroupType = "System";
-                } else {
+                std::string const groupType = EnergyPlus::Util::makeUPPER(fields.at("group_type").get<std::string>());
+                OutputProcessor::SOVGroup sovGroup =
+                    static_cast<OutputProcessor::SOVGroup>(getEnumValue(OutputProcessor::sovGroupNamesUC, groupType));
+                if (sovGroup == OutputProcessor::SOVGroup::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Group Type = {}", groupType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
@@ -307,63 +313,26 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                                   "For metered variables, the resource type, group type, and end use category must be defined");
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
-                std::string const endUse = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("end_use_category").get<std::string>());
-                std::string sEndUse;
-                if (endUse == "HEATING") {
-                    sEndUse = "Heating";
-                } else if (endUse == "COOLING") {
-                    sEndUse = "Cooling";
-                } else if (endUse == "INTERIORLIGHTS") {
-                    sEndUse = "InteriorLights";
-                } else if (endUse == "EXTERIORLIGHTS") {
-                    sEndUse = "ExteriorLights";
-                } else if (endUse == "INTERIOREQUIPMENT") {
-                    sEndUse = "InteriorEquipment";
-                } else if (endUse == "EXTERIOREQUIPMENT") {
-                    sEndUse = "ExteriorEquipment";
-                } else if (endUse == "FANS") {
-                    sEndUse = "Fans";
-                } else if (endUse == "PUMPS") {
-                    sEndUse = "Pumps";
-                } else if (endUse == "HEATREJECTION") {
-                    sEndUse = "HeatRejection";
-                } else if (endUse == "HUMIDIFIER") {
-                    sEndUse = "Humidifier";
-                } else if (endUse == "HEATRECOVERY") {
-                    sEndUse = "HeatRecovery";
-                } else if (endUse == "WATERSYSTEMS") {
-                    sEndUse = "WaterSystems";
-                } else if (endUse == "REFRIGERATION") {
-                    sEndUse = "Refrigeration";
-                } else if (endUse == "ONSITEGENERATION") {
-                    sEndUse = "Cogeneration";
-                } else if (endUse == "HEATINGCOILS") {
-                    sEndUse = "HeatingCoils";
-                } else if (endUse == "COOLINGCOILS") {
-                    sEndUse = "CoolingCoils";
-                } else if (endUse == "CHILLERS") {
-                    sEndUse = "Chillers";
-                } else if (endUse == "BOILERS") {
-                    sEndUse = "Boilers";
-                } else if (endUse == "BASEBOARD") {
-                    sEndUse = "Baseboard";
-                } else if (endUse == "HEATRECOVERYFORCOOLING") {
-                    sEndUse = "HeatRecoveryForCooling";
-                } else if (endUse == "HEATRECOVERYFORHEATING") {
-                    sEndUse = "HeatRecoveryForHeating";
-                } else {
-                    ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = {}", groupType));
+                std::string const endUse = EnergyPlus::Util::makeUPPER(fields.at("end_use_category").get<std::string>());
+                OutputProcessor::SOVEndUseCat sovEndUseCat =
+                    static_cast<OutputProcessor::SOVEndUseCat>(getEnumValue(OutputProcessor::sovEndUseCatNamesUC, endUse));
+
+                if (sovEndUseCat == OutputProcessor::SOVEndUseCat::Invalid) {
+                    ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = {}", endUse));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
                 }
 
                 // Additional End Use Types Only Used for EnergyTransfer
-                if ((sResourceType != "EnergyTransfer") &&
-                    (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" || sEndUse == "Chillers" || sEndUse == "Boilers" ||
-                     sEndUse == "Baseboard" || sEndUse == "HeatRecoveryForCooling" || sEndUse == "HeatRecoveryForHeating")) {
+                if ((resource != Constant::eResource::EnergyTransfer) &&
+                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("Inconsistent resource type input for PythonPlugin:OutputVariable = {}", thisObjectName));
-                    ShowContinueError(state, format("For end use subcategory = {}, resource type must be EnergyTransfer", sEndUse));
+                    ShowContinueError(state, format("For end use subcategory = {}, resource type must be EnergyTransfer", endUse));
                     ShowContinueError(state, "Resource type is being reset to EnergyTransfer and the simulation continues...");
-                    sResourceType = "EnergyTransfer";
+                    resource = Constant::eResource::EnergyTransfer;
                 }
 
                 std::string sEndUseSubcategory;
@@ -379,11 +348,10 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
+                                        resource,
+                                        sovEndUseCat,
                                         {},
-                                        sResourceType,
-                                        sEndUse,
-                                        {},
-                                        sGroupType);
+                                        sovGroup);
                 } else { // has subcategory
                     SetupOutputVariable(state,
                                         sOutputVariable,
@@ -392,17 +360,92 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                                         sUpdateFreq,
                                         sAvgOrSum,
                                         thisObjectName,
-                                        {},
-                                        sResourceType,
-                                        sEndUse,
+                                        resource,
+                                        sovEndUseCat,
                                         sEndUseSubcategory,
-                                        sGroupType);
+                                        sovGroup);
                 }
             }
-        }
-    }
+        } // for (instance)
+    }     // if (OutputVarInstances > 0)
 #endif
+} // setupOutputVariables()
+
+#if LINK_WITH_PYTHON
+void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
+{
+    PyStatus status;
+
+    // first pre-config Python so that it can speak UTF-8
+    PyPreConfig preConfig;
+    PyPreConfig_InitPythonConfig(&preConfig);
+    preConfig.utf8_mode = 1;
+    status = Py_PreInitialize(&preConfig);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, fmt::format("Could not pre-initialize Python to speak UTF-8... {}", status));
+    }
+
+    PyConfig config;
+    PyConfig_InitIsolatedConfig(&config);
+    config.isolated = 1;
+
+    status = PyConfig_SetBytesString(&config, &config.program_name, PluginManagement::programName);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, fmt::format("Could not initialize program_name on PyConfig... {}", status));
+    }
+
+    status = PyConfig_Read(&config);
+    if (PyStatus_Exception(status)) {
+        ShowFatalError(state, fmt::format("Could not read back the PyConfig... {}", status));
+    }
+
+    if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
+        // PyConfig_SetString copies the wide character string str into *config_str.
+        std::wstring const ws = pathToPythonPackages.generic_wstring();
+        const wchar_t *wcharPath = ws.c_str();
+
+        status = PyConfig_SetString(&config, &config.home, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state, fmt::format("Could not set home to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+        status = PyConfig_SetString(&config, &config.base_prefix, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state, fmt::format("Could not set base_prefix to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+        config.module_search_paths_set = 1;
+        status = PyWideStringList_Append(&config.module_search_paths, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state,
+                           fmt::format("Could not add {} to module_search_paths on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+
+    } else {
+        // PyConfig_SetBytesString takes a `const char * str` and decodes str using Py_DecodeLocale() and set the result into *config_str
+        // But we want to avoid doing it three times, so we PyDecodeLocale manually
+        // Py_DecodeLocale can be called because Python has been PreInitialized.
+        wchar_t *wcharPath = Py_DecodeLocale(pathToPythonPackages.generic_string().c_str(), nullptr); // This allocates!
+
+        status = PyConfig_SetString(&config, &config.home, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state, fmt::format("Could not set home to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+        status = PyConfig_SetString(&config, &config.base_prefix, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state, fmt::format("Could not set base_prefix to {} on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+        config.module_search_paths_set = 1;
+        status = PyWideStringList_Append(&config.module_search_paths, wcharPath);
+        if (PyStatus_Exception(status)) {
+            ShowFatalError(state,
+                           fmt::format("Could not add {} to module_search_paths on PyConfig... {}", pathToPythonPackages.generic_string(), status));
+        }
+
+        PyMem_RawFree(wcharPath);
+    }
+
+    Py_InitializeFromConfig(&config);
 }
+#endif // LINK_WITH_PYTHON
 
 PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(state.dataPluginManager->eplusRunningViaPythonAPI)
 {
@@ -415,9 +458,6 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     }
 
 #if LINK_WITH_PYTHON
-    // this frozen flag tells Python that the package and library have been frozen for embedding, so it shouldn't warn about missing prefixes
-    Py_FrozenFlag = 1;
-
     // we'll need the program directory for a few things so get it once here at the top and sanitize it
     fs::path programDir;
     if (state.dataGlobal->installRootOverride) {
@@ -425,34 +465,9 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
     } else {
         programDir = FileSystem::getParentDirectoryPath(FileSystem::getAbsolutePath(FileSystem::getProgramPath()));
     }
-
-    // I think we need to set the python path before initializing the library
-    // make this relative to the binary
     fs::path const pathToPythonPackages = programDir / "python_standard_lib";
-    if constexpr (std::is_same_v<typename fs::path::value_type, wchar_t>) {
-        std::wstring const ws = pathToPythonPackages.generic_wstring();
-        Py_SetPath(ws.c_str());
-        Py_SetPythonHome(ws.c_str());
-    } else {
-        // TODO: Py_DecodeLocale shouldn't be called before Python is PreInitialized. Also, this should be replaced by PyConfig
-        wchar_t *a = Py_DecodeLocale(pathToPythonPackages.generic_string().c_str(), nullptr); // This allocates!
-        Py_SetPath(a);
-        Py_SetPythonHome(a);
-        PyMem_RawFree(a);
-    }
 
-    // must be called before Py_Initialize
-    // tells the interpreter the value of argv[0] to the main() function
-    // used by some functions to find run-time libraries relative to the interpreter executable
-    Py_SetProgramName((wchar_t *)programName);
-
-    // now that we have set the path, we can initialize python
-    // from https://docs.python.org/3/c-api/init.html
-    // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-    bool alreadyInitialized = (Py_IsInitialized() != 0);
-    if (!alreadyInitialized) {
-        Py_InitializeEx(0);
-    }
+    initPython(state, pathToPythonPackages);
 
     // Take control of the global interpreter lock while we are here, make sure to release it...
     PyGILState_STATE gil = PyGILState_Ensure();
@@ -489,8 +504,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
             std::string workingDirFlagUC = "YES";
             try {
-                workingDirFlagUC =
-                    EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_current_working_directory_to_search_path").get<std::string>());
+                workingDirFlagUC = EnergyPlus::Util::makeUPPER(fields.at("add_current_working_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -499,7 +513,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             }
             std::string inputFileDirFlagUC = "YES";
             try {
-                inputFileDirFlagUC = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_input_file_directory_to_search_path").get<std::string>());
+                inputFileDirFlagUC = EnergyPlus::Util::makeUPPER(fields.at("add_input_file_directory_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -509,7 +523,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
 
             std::string epInDirFlagUC = "YES";
             try {
-                epInDirFlagUC = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
+                epInDirFlagUC = EnergyPlus::Util::makeUPPER(fields.at("add_epin_environment_variable_to_search_path").get<std::string>());
             } catch (nlohmann::json::out_of_range &e) {
                 // defaulted to YES
             }
@@ -578,7 +592,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
             fs::path modulePath(fields.at("python_module_name").get<std::string>());
             std::string className = fields.at("plugin_class_name").get<std::string>();
-            std::string const sWarmup = EnergyPlus::UtilityRoutines::makeUPPER(fields.at("run_during_warmup_days").get<std::string>());
+            std::string const sWarmup = EnergyPlus::Util::makeUPPER(fields.at("run_during_warmup_days").get<std::string>());
             bool const warmup = (sWarmup == "YES");
             state.dataPluginManager->plugins.emplace_back(modulePath, className, thisObjectName, warmup);
         }
@@ -640,7 +654,7 @@ PluginManager::PluginManager(EnergyPlusData &state) : eplusRunningViaPythonAPI(s
         auto &instancesValue = instances.value();
         for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
             auto const &fields = instance.value();
-            std::string const &thisObjectName = EnergyPlus::UtilityRoutines::makeUPPER(instance.key());
+            std::string const &thisObjectName = EnergyPlus::Util::makeUPPER(instance.key());
             state.dataInputProcessing->inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
             std::string variableName = fields.at("name_of_a_python_plugin_variable").get<std::string>();
             int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(state, variableName);
@@ -716,7 +730,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
             return;
         }
 
-        unsigned long numVals = PyList_Size(pyth_val);
+        Py_ssize_t numVals = PyList_Size(pyth_val);
         if (numVals == 0) {
             EnergyPlus::ShowContinueError(state, "No traceback available");
             return;
@@ -726,7 +740,7 @@ void PluginInstance::reportPythonError([[maybe_unused]] EnergyPlusData &state)
 
         EnergyPlus::ShowContinueError(state, "```");
 
-        for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+        for (Py_ssize_t itemNum = 0; itemNum < numVals; itemNum++) {
             PyObject *item = PyList_GetItem(pyth_val, itemNum);
             if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
                 std::string traceback_line = PyUnicode_AsUTF8(item);
@@ -795,16 +809,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
         // import from database or something
         ShowFatalError(state, "Could not get full path");
     } else {
-        PyObject *pStrObj = PyUnicode_AsUTF8String(pFullPath);
-        char *zStr = PyBytes_AsString(pStrObj);
-        std::string s(zStr);
-        Py_DECREF(pStrObj); // PyUnicode_AsUTF8String returns a new reference, decrement it
-        ShowMessage(state, format("PythonPlugin: Class {} imported from: {}", className, s));
+        const char *zStr = PyUnicode_AsUTF8(pFullPath);
+        std::string sHere(zStr);
+        ShowMessage(state, format("PythonPlugin: Class {} imported from: {}", className, sHere));
     }
     PyObject *pClass = PyDict_GetItemString(pModuleDict, className.c_str());
     // Py_DECREF(pModuleDict);  // PyModule_GetDict returns a borrowed reference, DO NOT decrement
     if (!pClass) {
-        EnergyPlus::ShowSevereError(state, format("Failed to get class type \"{}\" from module \"{}\"", className, modulePath.generic_string()));
+        EnergyPlus::ShowSevereError(state, format(R"(Failed to get class type "{}" from module "{}")", className, modulePath.generic_string()));
         if (PyErr_Occurred()) {
             PluginInstance::reportPythonError(state);
         } else {
@@ -842,7 +854,7 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
     if (!detectFunction || !PyCallable_Check(detectFunction)) {
         EnergyPlus::ShowSevereError(state,
-                                    format("Could not find or call function \"{}\" on class \"{}.{}\"",
+                                    format(R"(Could not find or call function "{}" on class "{}.{}")",
                                            detectOverriddenFunctionName,
                                            this->modulePath.generic_string(),
                                            this->className));
@@ -867,14 +879,14 @@ void PluginInstance::setup([[maybe_unused]] EnergyPlusData &state)
     if (!PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowFatalError(state, format("Invalid return from _detect_overridden() on class \"{}\", this is weird", this->stringIdentifier));
     }
-    unsigned long numVals = PyList_Size(pFunctionResponse);
+    Py_ssize_t numVals = PyList_Size(pFunctionResponse);
     // at this point we know which base class methods are being overridden by the derived class
     // we can loop over them and based on the name check the appropriate flag and assign the function pointer
     if (numVals == 0) {
         EnergyPlus::ShowFatalError(
             state, format("Python plugin \"{}\" did not override any base class methods; must override at least one", this->stringIdentifier));
     }
-    for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+    for (Py_ssize_t itemNum = 0; itemNum < numVals; itemNum++) {
         PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
         if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
             std::string functionName = PyUnicode_AsUTF8(item);
@@ -1093,7 +1105,7 @@ bool PluginInstance::run(EnergyPlusData &state, EMSManager::EMSCallFrom iCalledF
                                    format("Program terminates after call to {}() on {} failed!", functionNameAsString, this->stringIdentifier));
     }
     if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-        int exitCode = PyLong_AsLong(pFunctionResponse);
+        long exitCode = PyLong_AsLong(pFunctionResponse);
         if (exitCode == 0) {
             // success
         } else if (exitCode == 1) {
@@ -1128,9 +1140,9 @@ bool PluginInstance::run([[maybe_unused]] EnergyPlusData &state, [[maybe_unused]
 std::vector<std::string> PluginManager::currentPythonPath()
 {
     PyObject *sysPath = PySys_GetObject("path"); // Borrowed reference
-    size_t const n = PyList_Size(sysPath);       // Py_ssize_t
+    Py_ssize_t const n = PyList_Size(sysPath);   // Py_ssize_t
     std::vector<std::string> pathLibs(n);
-    for (size_t i = 0; i < n; ++i) {
+    for (Py_ssize_t i = 0; i < n; ++i) {
         PyObject *element = PyList_GetItem(sysPath, i); // Borrowed reference
         pathLibs[i] = std::string{PyUnicode_AsUTF8(element)};
     }
@@ -1191,7 +1203,7 @@ void PluginManager::addToPythonPath([[maybe_unused]] EnergyPlusData &state,
 #if LINK_WITH_PYTHON
 void PluginManager::addGlobalVariable(EnergyPlusData &state, const std::string &name)
 {
-    std::string const varNameUC = EnergyPlus::UtilityRoutines::makeUPPER(name);
+    std::string const varNameUC = EnergyPlus::Util::makeUPPER(name);
     state.dataPluginManager->globalVariableNames.push_back(varNameUC);
     state.dataPluginManager->globalVariableValues.push_back(Real64());
     this->maxGlobalVariableIndex++;
@@ -1205,17 +1217,18 @@ void PluginManager::addGlobalVariable([[maybe_unused]] EnergyPlusData &state, [[
 #if LINK_WITH_PYTHON
 int PluginManager::getGlobalVariableHandle(EnergyPlusData &state, const std::string &name, bool const suppress_warning)
 { // note zero is a valid handle
-    std::string const varNameUC = EnergyPlus::UtilityRoutines::makeUPPER(name);
-    auto const it = std::find(state.dataPluginManager->globalVariableNames.begin(), state.dataPluginManager->globalVariableNames.end(), varNameUC);
-    if (it != state.dataPluginManager->globalVariableNames.end()) {
-        return std::distance(state.dataPluginManager->globalVariableNames.begin(), it);
+    std::string const varNameUC = EnergyPlus::Util::makeUPPER(name);
+    auto const &gVarNames = state.dataPluginManager->globalVariableNames;
+    auto const it = std::find(gVarNames.begin(), gVarNames.end(), varNameUC);
+    if (it != gVarNames.end()) {
+        return static_cast<int>(std::distance(gVarNames.begin(), it));
     } else {
         if (suppress_warning) {
             return -1;
         } else {
             EnergyPlus::ShowSevereError(state, "Tried to retrieve handle for a nonexistent plugin global variable");
             EnergyPlus::ShowContinueError(state, format("Name looked up: \"{}\", available names: ", varNameUC));
-            for (auto const &gvName : state.dataPluginManager->globalVariableNames) {
+            for (auto const &gvName : gVarNames) {
                 EnergyPlus::ShowContinueError(state, format("    \"{}\"", gvName));
             }
             EnergyPlus::ShowFatalError(state, "Plugin global variable problem causes program termination");
@@ -1235,11 +1248,11 @@ int PluginManager::getGlobalVariableHandle([[maybe_unused]] EnergyPlusData &stat
 #if LINK_WITH_PYTHON
 int PluginManager::getTrendVariableHandle(EnergyPlusData &state, const std::string &name)
 {
-    std::string const varNameUC = EnergyPlus::UtilityRoutines::makeUPPER(name);
+    std::string const varNameUC = EnergyPlus::Util::makeUPPER(name);
     for (size_t i = 0; i < state.dataPluginManager->trends.size(); i++) {
         auto &thisTrend = state.dataPluginManager->trends[i];
         if (thisTrend.name == varNameUC) {
-            return i;
+            return static_cast<int>(i);
         }
     }
     return -1;
@@ -1432,8 +1445,8 @@ int PluginManager::getLocationOfUserDefinedPlugin(EnergyPlusData &state, std::st
 {
     for (size_t handle = 0; handle < state.dataPluginManager->plugins.size(); handle++) {
         auto const &thisPlugin = state.dataPluginManager->plugins[handle];
-        if (UtilityRoutines::makeUPPER(thisPlugin.emsAlias) == UtilityRoutines::makeUPPER(_programName)) {
-            return handle;
+        if (Util::makeUPPER(thisPlugin.emsAlias) == Util::makeUPPER(_programName)) {
+            return static_cast<int>(handle);
         }
     }
     return -1;
@@ -1455,6 +1468,22 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 {
 }
 #endif
+
+int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName)
+{
+    for (int i = 0; i < state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
+        if (state.dataPluginManager->userDefinedCallbackNames[i] == callbackProgramName) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void PluginManager::runSingleUserDefinedCallback(EnergyPlusData &state, int index)
+{
+    if (state.dataGlobal->KickOffSimulation) return;                      // Maybe?
+    state.dataPluginManager->userDefinedCallbacks[index]((void *)&state); // Check Index first
+}
 
 #if LINK_WITH_PYTHON
 bool PluginManager::anyUnexpectedPluginObjects(EnergyPlusData &state)

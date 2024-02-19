@@ -8,7 +8,7 @@
 !                          which results in both spaces being in the same enclosure. Zone 3 is divided into 3 spaces, one
 !                          fully enclosed space (this is one enclosure) and two spaces joined by an air boundary (this is another enclosure).
 !
-! Highlights:              Illustrates various uses of Space. Electric chiller with air cooled condenser; autosized preheating and
+! Highlights:              Illustrates various uses of Space sizing and Space HVAC. Electric chiller with air cooled condenser; autosized preheating and
 !                          precooling water coils in the outside air stream controlled to preheat and precool setpoints.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,23.2;
+  Version,24.1;
 
   Building,
     Building,                !- Name
@@ -1884,7 +1884,7 @@ ZoneAirHeatBalanceAlgorithm,
     ActSchd,                 !- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     ,                        !- Work Efficiency Schedule Name
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
@@ -2517,17 +2517,17 @@ ZoneAirHeatBalanceAlgorithm,
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment Object Type
     Zone 5 ATU,              !- Zone Equipment Name
     Zone 5 In Node,          !- Zone Equipment Outlet Node Name
-    Ideal,                   !- Thermostat Control Method
-    ,                        !- Control Space Name
-    ,                        !- Space Fraction Method
+    SingleSpace,                   !- Thermostat Control Method
+    Space 5 Office,                        !- Control Space Name
+    DesignCoolingLoad,                        !- Space Fraction Method
     Space 5 Office,          !- Space 1 Name
-    0.6,                     !- Space 1 Fraction {dimensionless}
+    autosize,                     !- Space 1 Fraction {dimensionless}
     Space 5 Office In Node,  !- Space 1 Supply Node Name
     Space 5 Conference,      !- Space 2 Name
-    0.2,                     !- Space 2 Fraction {dimensionless}
+    autosize,                     !- Space 2 Fraction {dimensionless}
     Space 5 Conference In Node,  !- Space 2 Supply Node Name
     Zone 5-Remainder,        !- Space 3 Name
-    0.2,                     !- Space 3 Fraction {dimensionless}
+    autosize,                     !- Space 3 Fraction {dimensionless}
     Zone 5-Remainder In Node;  !- Space 3 Supply Node Name
 
   SpaceHVAC:ZoneEquipmentMixer,
@@ -2536,7 +2536,7 @@ ZoneAirHeatBalanceAlgorithm,
     Zone 5 Exhaust Fan Inlet,!- Zone Equipment Inlet Node Name
     DesignCoolingLoad,       !- Space Fraction Method
     Space 5 Conference,      !- Space 1 Name
-    1,                       !- Space 1 Fraction {dimensionless}
+    autosize,                       !- Space 1 Fraction {dimensionless}
     Space 5 Conference Exhaust Fan Inlet;  !- Space 1 Node Name
 
   SpaceHVAC:EquipmentConnections,
@@ -3801,9 +3801,11 @@ ZoneAirHeatBalanceAlgorithm,
 
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
 
   Output:Variable,*,Space Air System Sensible Heating Rate,hourly;
   Output:Variable,*,Space Air System Sensible Cooling Rate,hourly;
+Output:Variable,*,Space Predicted Sensible Load to Setpoint Heat Transfer Rate,hourly; !- HVAC Average [W]
 
   Output:Variable,Zone 5 In Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
   Output:Variable,Space 5 Office In Node,System Node Mass Flow Rate,hourly; !- HVAC Average [kg/s]
