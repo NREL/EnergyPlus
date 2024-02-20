@@ -1609,6 +1609,58 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                                                       condenserNodeConnectionType_Outlet,
                                                                                       NodeInputManager::CompFluidStream::Secondary,
                                                                                       DataLoopNode::ObjectIsNotParent);
+
+                // heat recovery inputs
+                std::string heatRecoveryInletNodeName;
+                std::string heatRecoveryOutletNodeName;
+                auto const hrInletNodeName = fields.find("heat_recovery_inlet_node_name");
+                auto const hrOutletNodeName = fields.find("heat_recovery_outlet_node_name");
+                if (hrInletNodeName != fields.end() && hrOutletNodeName != fields.end()) {
+                    heatRecoveryInletNodeName = Util::makeUPPER(fields.at("heat_recovery_inlet_node_name").get<std::string>());
+                    heatRecoveryOutletNodeName = Util::makeUPPER(fields.at("heat_recovery_outlet_node_name").get<std::string>());
+                    thisPLHP.heatRecoveryAvailable = true;
+                } else {
+                    thisPLHP.heatRecoveryAvailable = false;
+                }
+
+                if (thisPLHP.heatRecoveryAvailable) {
+                    thisPLHP.heatRecoveryNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                                           heatRecoveryInletNodeName,
+                                                                                           nodeErrorsFound,
+                                                                                           objType,
+                                                                                           thisPLHP.name,
+                                                                                           DataLoopNode::NodeFluidType::Water,
+                                                                                           DataLoopNode::ConnectionType::Inlet,
+                                                                                           NodeInputManager::CompFluidStream::Tertiary,
+                                                                                           DataLoopNode::ObjectIsNotParent);
+                    thisPLHP.heatRecoveryNodes.outlet = NodeInputManager::GetOnlySingleNode(state,
+                                                                                            heatRecoveryOutletNodeName,
+                                                                                            nodeErrorsFound,
+                                                                                            objType,
+                                                                                            thisPLHP.name,
+                                                                                            DataLoopNode::NodeFluidType::Water,
+                                                                                            DataLoopNode::ConnectionType::Outlet,
+                                                                                            NodeInputManager::CompFluidStream::Tertiary,
+                                                                                            DataLoopNode::ObjectIsNotParent);
+
+                    thisPLHP.heatRecoveryDesignVolFlowRate =
+                        state.dataInputProcessing->inputProcessor->getRealFieldValue(fields, schemaProps, "heat_recovery_reference_flow_rate");
+                    if (thisPLHP.heatRecoveryDesignVolFlowRate == DataSizing::AutoSize) {
+                        thisPLHP.heatRecoveryDesignVolFlowRateWasAutoSized = true;
+                    }
+
+                    // fields only in cooling object
+                    if (thisPLHP.heatRecoveryAvailable && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) {
+                        thisPLHP.maxHeatRecoveryTempLimit = state.dataInputProcessing->inputProcessor->getRealFieldValue(
+                            fields, schemaProps, "maximum_heat_recovery_outlet_temperature");
+                    }
+                    // fields only in heating object
+                    if (thisPLHP.heatRecoveryAvailable && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+                        thisPLHP.minHeatRecoveryTempLimit = state.dataInputProcessing->inputProcessor->getRealFieldValue(
+                            fields, schemaProps, "minimum_heat_recovery_outlet_temperature");
+                    }
+                }
+
                 if (nodeErrorsFound) errorsFound = true;
                 BranchNodeConnections::TestCompSet(
                     state, cCurrentModuleObject, thisPLHP.name, loadSideInletNodeName, loadSideOutletNodeName, classToInput.nodesType);
@@ -1616,6 +1668,15 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 if (thisPLHP.waterSource) {
                     BranchNodeConnections::TestCompSet(
                         state, cCurrentModuleObject, thisPLHP.name, sourceSideInletNodeName, sourceSideOutletNodeName, "Condenser Water Nodes");
+                }
+
+                if (thisPLHP.airSource && thisPLHP.heatRecoveryAvailable) {
+                    BranchNodeConnections::TestCompSet(state,
+                                                       cCurrentModuleObject,
+                                                       thisPLHP.name,
+                                                       heatRecoveryInletNodeName,
+                                                       heatRecoveryOutletNodeName,
+                                                       "Heat Recovery Water Nodes");
                 }
 
                 if (thisPLHP.airSource && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&
