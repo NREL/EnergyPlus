@@ -144,9 +144,10 @@ class EnergyPlusBuild(build_ext):
     @staticmethod
     def cmake_build_command() -> list[str]:
         cmake_build_cmd = ["cmake", "--build", "."]
-        if system() == "Windows":
+        if system() == "Windows":  # VS builds require specifying the build config
             cmake_build_cmd.extend(["--config", "Release"])
-        cmake_build_cmd.extend(['--', '-j', f"{cpu_count() - 1}"])
+        else:  # MSBuild doesn't like the -j passed in, so only do this on Non-Windows
+            cmake_build_cmd.extend(['--', '-j', f"{cpu_count() - 1}"])
         return cmake_build_cmd
 
     @staticmethod
