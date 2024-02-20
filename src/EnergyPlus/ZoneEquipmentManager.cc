@@ -2265,6 +2265,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
             zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
         }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.CoolFlowSeqNoOA = zoneSizing.CoolFlowSeq;
+            zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
+            zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
+        }
     }
     // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
     {
@@ -2297,7 +2305,6 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
             }
             for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = zoneSizing.CoolFlowSeq(TimeStepIndex);
                 if (MaxOfMinCoolMassFlowNoOA > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
                     zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
                 }
@@ -2445,6 +2452,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizingDD.HeatFlowSeqNoOA = zoneSizingDD.HeatFlowSeq;
             zoneSizingDD.DesHeatVolFlowNoOA = zoneSizingDD.DesHeatVolFlow;
             zoneSizingDD.DesHeatMassFlowNoOA = zoneSizingDD.DesHeatMassFlow;
+        }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.HeatFlowSeqNoOA = zoneSizing.HeatFlowSeq;
+            zoneSizing.DesHeatVolFlowNoOA = zoneSizing.DesHeatVolFlow;
+            zoneSizing.DesHeatMassFlowNoOA = zoneSizing.DesHeatMassFlow;
         }
     }
 
