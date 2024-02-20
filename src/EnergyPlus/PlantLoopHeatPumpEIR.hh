@@ -225,6 +225,8 @@ namespace EIRPlantLoopHeatPumps {
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
         std::function<Real64(Real64, Real64)> calcQsource;
         std::function<Real64(Real64, Real64)> calcSourceOutletTemp;
+        std::function<Real64(Real64, Real64)> calcQheatRecovery;
+        std::function<Real64(Real64, Real64)> calcHROutletTemp;
 
         virtual ~EIRPlantLoopHeatPump() = default;
 
@@ -260,6 +262,8 @@ namespace EIRPlantLoopHeatPumps {
         void calcSourceSideHeatTransferWSHP(EnergyPlusData &state);
 
         void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
+
+        void calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state);
 
         virtual void report(EnergyPlusData &state);
 

@@ -399,8 +399,13 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     //  calculate power usage from EIR curves
     this->calcPowerUsage(state);
 
-    // evaluate the source side heat transfer rate
-    this->calcSourceSideHeatTransferASHP(state);
+    if (heatRecoveryAvailable) {
+        // evaluate the heat recovery side heat transfer rate
+        this->calcHeatRecoveryHeatTransferASHP(state);
+    } else {
+        // evaluate the source side heat transfer rate
+        this->calcSourceSideHeatTransferASHP(state);
+    }
 }
 
 void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio)
@@ -420,14 +425,13 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
 
         if (this->heatRecoveryAvailable) {
             capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
+            availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
         } else {
             capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
+            availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
+            // apply air source HP dry air heating capacity correction
+            availableCapacity *= heatingCapacityModifierASHP(state);
         }
-
-        availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-
-        // apply air source HP dry air heating capacity correction
-        availableCapacity *= heatingCapacityModifierASHP(state);
 
         if (availableCapacity > 0) {
             partLoadRatio = std::clamp(std::abs(currentLoad) / availableCapacity, 0.0, 1.0);
@@ -587,6 +591,23 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
     Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+}
+
+void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state)
+{
+
+    // energy balance on heat pump
+    this->heatRecoveryRate = this->calcQheatRecovery(this->loadSideHeatTransfer, this->powerUsage);
+
+    // calculate heat recovery side outlet conditions
+    auto &thisHeatRecoveryPlantLoop = state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum);
+    Real64 const CpHR = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               thisHeatRecoveryPlantLoop.FluidName,
+                                                               this->heatRecoveryInletTemp,
+                                                               thisHeatRecoveryPlantLoop.FluidIndex,
+                                                               "EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP()");
+    Real64 const hRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
+    this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
 }
 
 void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
@@ -1410,7 +1431,6 @@ void EIRPlantLoopHeatPump::sizeHeatRecoveryASHP(EnergyPlusData &state)
     }
 }
 
-
 PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name)
 {
     if (state.dataEIRPlantLoopHeatPump->getInputsPLHP) {
@@ -1473,14 +1493,18 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
         std::function<Real64(Real64, Real64)> calcQsource;
         std::function<Real64(Real64, Real64)> calcSourceOutletTemp;
+        std::function<Real64(Real64, Real64)> calcQheatRecovery;
+        std::function<Real64(Real64, Real64)> calcHROutletTemp;
 
         ClassType(DataPlant::PlantEquipmentType _thisType,
                   std::string _nodesType,
                   std::function<Real64(Real64, Real64)> _tLoadOutFunc,
                   std::function<Real64(Real64, Real64)> _qSrcFunc,
-                  std::function<Real64(Real64, Real64)> _tSrcOutFunc)
+                  std::function<Real64(Real64, Real64)> _tSrcOutFunc,
+                  std::function<Real64(Real64, Real64)> _qHeatRecovery,
+                  std::function<Real64(Real64, Real64)> _tHROutFunc)
             : thisType(_thisType), nodesType(std::move(_nodesType)), calcLoadOutletTemp(_tLoadOutFunc), calcQsource(_qSrcFunc),
-              calcSourceOutletTemp(_tSrcOutFunc)
+              calcSourceOutletTemp(_tSrcOutFunc), calcQheatRecovery(_qHeatRecovery), calcHROutletTemp(_tHROutFunc)
         {
         }
     };
@@ -1488,10 +1512,14 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                          "Chilled Water Nodes",
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add},
                                                ClassType{DataPlant::PlantEquipmentType::HeatPumpEIRHeating,
                                                          "Hot Water Nodes",
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::add,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
+                                                         EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract,
                                                          EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::subtract}};
 
@@ -1823,6 +1851,9 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                 thisPLHP.calcLoadOutletTemp = classToInput.calcLoadOutletTemp;
                 thisPLHP.calcQsource = classToInput.calcQsource;
                 thisPLHP.calcSourceOutletTemp = classToInput.calcSourceOutletTemp;
+                // heat recovery
+                thisPLHP.calcQheatRecovery = classToInput.calcQheatRecovery;
+                thisPLHP.calcHROutletTemp = classToInput.calcHROutletTemp;
 
                 if (!errorsFound) {
                     state.dataEIRPlantLoopHeatPump->heatPumps.push_back(thisPLHP);
