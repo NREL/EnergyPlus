@@ -248,7 +248,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
 
-        void report(EnergyPlusData &state);
+        virtual void report(EnergyPlusData &state);
 
         void sizeLoadSide(EnergyPlusData &state);
 
@@ -257,7 +257,7 @@ namespace EIRPlantLoopHeatPumps {
         void sizeSrcSideASHP(EnergyPlusData &state);
 
         void doDefrost(EnergyPlusData &state, Real64 &AvailableCapacity);
-       
+
         void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
 
         void eirModCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
