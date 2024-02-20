@@ -2085,7 +2085,43 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                 PlantUtilities::InterConnectTwoPlantLoopSides(state, this->loadSidePlantLoc, this->sourceSidePlantLoc, this->EIRHPType, true);
             }
         } else if (this->airSource) {
-            // nothing to do here ?
+            // nothing to do here ? not any more
+            if (this->heatRecoveryAvailable) {
+                PlantUtilities::ScanPlantLoopsForObject(
+                    state, this->name, this->EIRHPType, this->heatRecoveryPlantLoc, thisErrFlag, _, _, _, this->heatRecoveryNodes.inlet, _);
+
+                if (thisErrFlag) {
+                    ShowSevereError(state,
+                                    format("{}: Plant topology problem for {} name = \"{}\"",
+                                           routineName,
+                                           DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                           this->name));
+                    ShowContinueError(state, "Could not locate component's heat recovery side connections on a plant loop.");
+                    errFlag = true;
+                } else if (this->heatRecoveryPlantLoc.loopSideNum != DataPlant::LoopSideLocation::Demand) { // only check if !thisErrFlag
+                    ShowSevereError(state,
+                                    format("{}: Invalid connections for {} name = \"{}\"",
+                                           routineName,
+                                           DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                           this->name));
+                    ShowContinueError(state, "The heat recovery side connections are not on the Demand Side of a plant loop.");
+                    errFlag = true;
+                }
+
+                // make sure it is not the same loop on both sides.
+                if (this->loadSidePlantLoc.loopNum == this->heatRecoveryPlantLoc.loopNum) { // user is being too tricky, don't allow
+                    ShowSevereError(state,
+                                    format("{}: Invalid connections for {} name = \"{}\"",
+                                           routineName,
+                                           DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                           this->name));
+                    ShowContinueError(state, "The load and heat recovery sides need to be on different loops.");
+                    errFlag = true;
+                } else {
+
+                    PlantUtilities::InterConnectTwoPlantLoopSides(state, this->loadSidePlantLoc, this->heatRecoveryPlantLoc, this->EIRHPType, true);
+                }
+            }
         }
 
         if (errFlag) {
