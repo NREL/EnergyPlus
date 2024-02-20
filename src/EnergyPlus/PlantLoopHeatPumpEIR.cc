@@ -718,6 +718,7 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
             this->sizeSrcSideWSHP(state);
         } else if (this->airSource) {
             this->sizeSrcSideASHP(state);
+            this->sizeHeatRecoveryASHP(state);
         }
     }
 
@@ -1274,6 +1275,107 @@ void EIRPlantLoopHeatPump::sizeSrcSideASHP(EnergyPlusData &state)
         ShowFatalError(state, "Preceding sizing errors cause program termination"); // LCOV_EXCL_LINE
     }
 }
+
+void EIRPlantLoopHeatPump::sizeHeatRecoveryASHP(EnergyPlusData &state)
+{
+    // size heat recovery side volume flow rate for air-source HP
+    if (!this->heatRecoveryAvailable) {
+        return;
+    }
+
+    // these variables will be used throughout this function as a temporary value
+    Real64 tmpCapacity = this->referenceCapacity;
+    Real64 tmpLoadVolFlow = this->loadSideDesignVolFlowRate;
+    Real64 tmpHeatRecoveryVolFlow = 0.0;
+    // size the heat-recovery flow rate
+    std::string_view const typeName = DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)];
+    Real64 heatRecoveryInitTemp =
+        (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRCooling) ? Constant::HWInitConvTemp : Constant::CWInitConvTemp;
+    Real64 const rhoHR = FluidProperties::GetDensityGlycol(state,
+                                                           state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidName,
+                                                           heatRecoveryInitTemp,
+                                                           state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidIndex,
+                                                           "EIRPlantLoopHeatPump::sizeHeatRecoveryASHP()");
+    Real64 const CpHR = FluidProperties::GetSpecificHeatGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidName,
+                                                               heatRecoveryInitTemp,
+                                                               state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidIndex,
+                                                               "EIRPlantLoopHeatPump::sizeHeatRecoveryASHP()");
+
+    // calculate an auto-sized value for heat recovery design flow regardless of whether it was auto-sized or not
+    int plantHRSizingIndex = state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).PlantSizNum;
+    if (plantHRSizingIndex > 0) {
+        // Definition of COP:           COP = Qload/Power, therefore Power = Qload/COP
+        // Energy balance:              Qhr = Qload + Power = Qload(1 + 1/COP), cooling mode (recovers hot water)
+        //                              Qhr = Qload - Power = Qload(1 - 1/COP), heating mode (recovers chilled water)
+        Real64 designHeatRecoveryHeatTransfer = 0.0;
+        if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating) {
+            designHeatRecoveryHeatTransfer = tmpCapacity * (1 - 1 / this->referenceCOP);
+        } else {
+            designHeatRecoveryHeatTransfer = tmpCapacity * (1 + 1 / this->referenceCOP);
+        }
+        // calculate the design heat recovery flow rate, by applying the sensible heat rate equation:
+        tmpHeatRecoveryVolFlow = designHeatRecoveryHeatTransfer / (state.dataSize->PlantSizData(plantHRSizingIndex).DeltaT * CpHR * rhoHR);
+        // not sure about this
+        // if (this->airSource && this->heatRecoveryHeatPump) {
+        //    // If component is on plant outlet branch, use plant flow rate
+        //    tmpHeatRecoveryVolFlow = state.dataSize->PlantSizData(plantHRSizingIndex).DesVolFlowRate;
+        //}
+    } else {
+        // set it to the load side if there is plant sizing information
+        tmpHeatRecoveryVolFlow = tmpLoadVolFlow;
+    }
+    // check if the sizing ratio is based on the this->EIRHPType
+    if (this->companionHeatPumpCoil) {
+        tmpHeatRecoveryVolFlow *= this->companionHeatPumpCoil->heatSizingRatio;
+    } else {
+        tmpHeatRecoveryVolFlow *= this->heatSizingRatio;
+    }
+
+    if (this->heatRecoveryDesignVolFlowRateWasAutoSized) {
+        this->heatRecoveryDesignVolFlowRate = tmpHeatRecoveryVolFlow;
+        if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(
+                state, typeName, this->name, "Design Size Heat Recovery Side Volume Flow Rate [m3/s]", tmpHeatRecoveryVolFlow);
+        }
+        if (state.dataPlnt->PlantFirstSizesOkayToReport) {
+            BaseSizer::reportSizerOutput(
+                state, typeName, this->name, "Initial Design Size Heat Recovery Side Volume Flow Rate [m3/s]", tmpHeatRecoveryVolFlow);
+        }
+    } else {
+        // heat recovery design volume flow rate was hard-sized
+        if (this->heatRecoveryDesignVolFlowRate > 0.0 && tmpHeatRecoveryVolFlow > 0.0) {
+            Real64 const hardSizedHeatRecoveryFlow = this->heatRecoveryDesignVolFlowRate;
+            if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+                if (state.dataGlobal->DoPlantSizing) {
+                    BaseSizer::reportSizerOutput(state,
+                                                 typeName,
+                                                 this->name,
+                                                 "Design Size Heat Recovery Side Volume Flow Rate [m3/s]",
+                                                 tmpHeatRecoveryVolFlow,
+                                                 "User-Specified Heat Recovery Side Volume Flow Rate [m3/s]",
+                                                 hardSizedHeatRecoveryFlow);
+                } else {
+                    BaseSizer::reportSizerOutput(
+                        state, typeName, this->name, "User-Specified Heat Recovery Side Volume Flow Rate [m3/s]", hardSizedHeatRecoveryFlow);
+                }
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    if ((std::abs(tmpHeatRecoveryVolFlow - hardSizedHeatRecoveryFlow) / hardSizedHeatRecoveryFlow) >
+                        state.dataSize->AutoVsHardSizingThreshold) {
+                        ShowMessage(state, format("EIRPlantLoopHeatPump::size(): Potential issue with equipment sizing for {}", this->name));
+                        ShowContinueError(state,
+                                          format("User-Specified Heat Recovery Side Volume Flow Rate of {:.2R} [m3/s]", hardSizedHeatRecoveryFlow));
+                        ShowContinueError(
+                            state, format("differs from Design Size Heat Recovery Side Volume Flow Rate of {:.2R} [m3/s]", tmpHeatRecoveryVolFlow));
+                        ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
+                        ShowContinueError(state, "Verify that the value entered is intended and is consistent with other components.");
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 PlantComponent *EIRPlantLoopHeatPump::factory(EnergyPlusData &state, DataPlant::PlantEquipmentType hp_type, const std::string &hp_name)
 {
@@ -2010,6 +2112,9 @@ void EIRPlantLoopHeatPump::report(EnergyPlusData &state)
         PlantUtilities::SafeCopyPlantNode(state, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet);
     }
     state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
+    if (this->airSource && this->heatRecoveryAvailable) {
+        PlantUtilities::SafeCopyPlantNode(state, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet);
+    }
 }
 
 // From here on, the Fuel Fired Heat Pump module EIRFuelFiredHeatPump
