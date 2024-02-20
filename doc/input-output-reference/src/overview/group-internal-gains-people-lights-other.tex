@@ -2348,6 +2348,168 @@ The amount of energy input to the equipment that is removed (exhausted) and does
 
 The total heat gain from equipment. It is the sum of the following components: Total Heat Gain = Radiant Heat Gain + Convective Heat Gain + Latent Heat Gain. It is also equal to the power input to the equipment minus any Lost Heat.
 
+\subsection{IndoorLivingWall}\label{indoorlivingwall}
+
+Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or soil-based. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus. 
+
+\subsubsection{Inputs}\label{inputs-indoorlivingwall}
+
+\paragraph{Field: Name}\label{field-name-indoorlivingwall}
+
+The name of the IndoorLivingWall object, which must be unique across all IndoorLivingWall objects.
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-indoorlivingwall}
+
+This field is the name of the schedule (ref: Schedules) that modifies the presence of indoor living walls. The schedule values can be zero or one. Zero represents the scenario that the indoor living wall was removed from the thermal zone while one represents the scenario that the indoor living wall is in the presence of the thermal zone. 
+
+\paragraph{Field: ET Calculation Method}\label{field-et-calculation-method}
+
+This field lists two choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model and Stanghellini model. Users can also develop a customize ET function to override ET rates of indoor living walls through Energy Management System (EMS) objects, Python PlugIns objects, and Python API. 
+
+\paragraph{Field: Lighting Method}\label{field-lighting-method}
+
+This field lists three different methods to obtain net radiation for indoor living walls. They are artificial grow lights only (LED), daylighting only (Daylight), and artificial lights and daylight (LED-Daylight). If the LED lighting method is selected,  the field LED Intensity Schedule Name should be used to define the LED lighting intensity level. If the Daylight or LED-Daylight method is selected, the field Daylighting Reference Point Name should be used to determine the daylighting sensor location. If the LED-Daylight method is selected, a targeted lighting intensity schedule should be defined. Based on the available daylighting, the required LED lighting level and power will be automatically adjusted to meet the targeted LED intensity level. 
+
+\paragraph{Field: LED Schedule Name}\label{field-LED-schedule-name}
+
+This field is the name of the schedule (ref: Schedules) that defines the fraction of LED nominal intensity level for indoor living walls. The scheduled value can be any fractional value between 0 and 1. 
+
+\paragraph{Field: Daylighting Control Name}\label{field-daylighting-control-name}
+
+If daylighting is used in the selected lighting methods (Daylight or LED-Daylight), users should define an object of Daylighting:Control to obtain the daylighting illuminance level and an object for Daylighing:ReferencePoint for the daylighting sensor location in the thermal zone. The name of the object of Daylighting:Controls should be specified in this field.       
+
+\paragraph{Field: LED-Daylight Targeted Lighting Intensity Schedule Name}\label{field-led-daylight-targeted-lighting-intensity-schedule-name}
+
+This field defines targeted LED intensity levels the photosynthetic photon flux density (PPFD) in the unit of \unit{\micro\mole\per\square\meter\per\second} for indoor living wall systems. The schedule values can be any positive number representing the targeted PPFD.
+
+\paragraph{Field: Total Leaf Area}\label{field-total-leaf-area}
+
+This field is the estimated one-sided leaf area {[}\unit{\square\meter}{]} of an indoor living wall. Based on the users’ input, leaf area index (LAI) is calculated as the ratio of the total leaf area and the partition wall area. Typical LAIs are 1.0 for grass and 3.0 for bushes and shrubs. The maximum LAI is 2.0 for the IndoorLivingWall module in EnergyPlus. If the calculated LAI is greater than 2.0, the maximum value of 2.0 is used for LAI in the simulation. 
+
+\paragraph{Field: LED Nominal Intensity}\label{field-led-nominal-intensity}
+
+This field defines the nominal LED intensity level for indoor living wall systems. The value represents the photosynthetic photon flux density (PPFD) of LED grow light. PPFD is measured in \unit{\micro\mole\per\square\meter\per\second} which establishes exactly how many photosynthetically active radiation (PAR) photons are landing on a specific area.
+
+\paragraph{Field: LED Nominal Power}\label{field-led-nominal-power}
+
+This field defines nominal total LED power {[}\unit{\W}{]} for an indoor living wall system.  
+
+\paragraph{Field: Radiant Fraction of LED Lights}\label{field-radiant-fraction-of-led-lights}
+
+This field defines the fraction of LED lights (radiant fraction) supporting plant photosynthesis. 
+
+An IDF example:
+
+\begin{lstlisting}
+IndoorLivingWall,
+  Space1-1IndoorLivingWall,   !-Name
+  SPACE1-1SouthPartition,     !-Surface Name
+  AlwaysOn,                   !-Schedule Name
+  Penman-Monteith,            !-ET Calculation Method
+  LED,                        !-Lighting Method
+  AlwaysOff,                  !-LED Intensity Schedule Name
+  ,                           !-Daylighting Control Name
+  ,                           !-LED - Daylight Targeted Lighting Intensity Schedule Name
+  30,                         !- Total Leaf Area {m2}
+  32.5,                       !- LED Nominal Intensity {umol/(m2s)}
+  640,                        !- LED Nominal Power {W}
+  0.6;                        !- Radiant Fraction of LED Lights
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-indoorlivingwall}
+
+IndoorLivingWall objects have output variables for individual objects. The following outputs are available:
+
+\begin{itemize}
+\tightlist
+\item
+  Zone,Average,Indoor Living Wall Plant Surface Temperature {[}C{]}
+\item
+  Zone,Average,Indoor Living Wall Sensible Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall Latent Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall Evapotranspiration Rate {[}\unit{\kilo\gram\per\square\meter\per\second}{]}
+\item
+  Zone,Average,Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area {[}\unit{W/m^2}{]}
+\item
+  Zone,Average,Indoor Living Wall LED Operational PPFD {[}\unit{\micro\mole\per\square\meter\per\second}{]}
+\item
+  Zone,Average,Indoor Living Wall PPFD {[}\unit{\micro\mole\per\square\meter\per\second}{]}
+\item
+  Zone,Average,Indoor Living Wall Vapor Pressure Deficit {[}Pa{]}
+\item
+  Zone,Average,Indoor Living Wall LED Sensible Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall LED Operational Power {[}W{]}
+\item
+  Zone,Sum,Indoor Living Wall LED Electricity Energy {[}J{]}
+\end{itemize}
+
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
+
+This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
+
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
+
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. This energy is included in the following meters:
+\begin{lstlisting}
+Electricity:Facility
+Electricity:Building
+Electricity:Zone:<Zone Name>
+Electricity:SpaceType:<Space Type Name>
+InteriorEquipment:Electricity
+InteriorEquipment:Electricity:Zone:<Zone Name>
+InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity
+<End-Use Subcategory>:InteriorEquipment:Electricity:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
+\end{lstlisting}
+
+\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
+
+\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
+
+These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+
+\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
+
+\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
+
+These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
+
+\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
+
+\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
+
+These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+
+\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
+
+This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts.
+
+\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. 
+
+\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
+
+\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
+
+These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
+
+\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
+
+\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
+
+These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the space or zone air heat balance directly.
+
+\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
+
+\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
+
+These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
+
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
 

@@ -185,6 +185,7 @@ struct HysteresisPhaseChangeData;
 struct ICEngineElectricGeneratorData;
 struct IPShortCutsData;
 struct IceThermalStorageData;
+struct IndoorGreenData;
 struct IntegratedHeatPumpGlobalData;
 struct InternalHeatGainsData;
 struct LoopNodeData;
@@ -441,6 +442,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ICEngineElectricGeneratorData> dataICEngElectGen;
     std::unique_ptr<IPShortCutsData> dataIPShortCut;
     std::unique_ptr<IceThermalStorageData> dataIceThermalStorage;
+    std::unique_ptr<IndoorGreenData> dataIndoorGreen;
     std::unique_ptr<IntegratedHeatPumpGlobalData> dataIntegratedHP;
     std::unique_ptr<InternalHeatGainsData> dataInternalHeatGains;
     std::unique_ptr<LoopNodeData> dataLoopNodes;
