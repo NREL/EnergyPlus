@@ -195,6 +195,10 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
     this->partLoadRatio = 0.0;
     this->cyclingRatio = 0.0;
     this->defrostPowerMultiplier = 1.0;
+    this->heatRecoveryRate = 0.0;
+    this->heatRecoveryEnergy = 0.0;
+    this->heatRecoveryMassFlowRate = 0.0;
+    this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
 }
 
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
