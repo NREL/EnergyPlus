@@ -506,7 +506,7 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-    
+
     // check curves value and resets to zero if negative
     this->eirModCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
 
@@ -523,8 +523,11 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP(EnergyPlusData &state)
 
     // calculate source side outlet conditions
     auto &thisSourcePlantLoop = state.dataPlnt->PlantLoop(this->sourceSidePlantLoc.loopNum);
-    Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(
-        state, thisSourcePlantLoop.FluidName, this->sourceSideInletTemp, thisSourcePlantLoop.FluidIndex, "EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()");
+    Real64 const CpSrc = FluidProperties::GetSpecificHeatGlycol(state,
+                                                                thisSourcePlantLoop.FluidName,
+                                                                this->sourceSideInletTemp,
+                                                                thisSourcePlantLoop.FluidIndex,
+                                                                "EIRPlantLoopHeatPump::calcSourceSideHeatTransferWSHP()");
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
 
