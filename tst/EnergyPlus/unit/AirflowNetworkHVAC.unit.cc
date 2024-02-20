@@ -71,6 +71,7 @@
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/Material.hh>
@@ -16303,6 +16304,132 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     EXPECT_NEAR(state->afn->DisSysCompDuctData(3).A, 0.335458, 0.0001);
 }
 
+TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultistageHeatingCoil)
+{
+    // #10389
+    std::string const idf_objects = delimited_string({
+        "Coil:Heating:Electric:MultiStage,",
+        " ElectricCoil, !-Name",
+        " always_avail, !-Availability Schedule Name",
+        " heating coil air inlet node_unit1, !-Air Inlet Node Name",
+        " Supp Heating Coil Air Inlet Node_unit1, !-Air Outlet Node Name,",
+        " !-Temperature Setpoint Node Name",
+        " 2, !-Number of Stages ",
+        " 1.00, !-Stage 1 Efficiency{W / W}",
+        " 4000.0, !-Stage 1 Nominal Capacity {W}",
+        " 1.00, !-Stage 2 Efficiency{W / W}",
+        " 6000.0; !-Stage 2 Nominal Capacity {W}",
+
+        "Coil:Heating:Gas:MultiStage,",
+        " GasCoil, !-Name",
+        " always_avail, !-Availability Schedule Name",
+        " heating coil air inlet node_unit1-1, !-Air Inlet Node Name",
+        " Supp Heating Coil Air Inlet Node_unit1-1, !-Air Outlet Node Name,",
+        " , !-Temperature Setpoint Node Name",
+        " , !-Part Load Fraction Correlation Curve Name",
+        " 20.0, !-Off Cycle Parasitic Gas Load",
+        " 2, !-Number of Stages ",
+        " 0.9, !-Stage 1 Gas Efficiency{W / W}",
+        " 4000.0, !-Stage 1 Nominal Capacity {W}",
+        " , !-Stage 1 On Cycle Parasitic Electric Load",
+        " 0.8, !-Stage 2 Efficiency{W / W}",
+        " 6000.0, !-Stage 2 Nominal Capacity {W}",
+        " ; !-Stage 2 On Cycle Parasitic Electric Load",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ATTIC ZONE";
+
+    state->dataSurface->Surface.allocate(1);
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF001";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+    state->dataSurface->Surface(1).Name = "ZN004:ROOF002";
+    state->dataSurface->Surface(1).Zone = 1;
+    state->dataSurface->Surface(1).ZoneName = "ATTIC ZONE";
+    state->dataSurface->Surface(1).Azimuth = 0.0;
+    state->dataSurface->Surface(1).ExtBoundCond = 0;
+    state->dataSurface->Surface(1).HeatTransSurf = true;
+    state->dataSurface->Surface(1).Tilt = 180.0;
+    state->dataSurface->Surface(1).Sides = 4;
+
+    state->dataSurface->Surface(1).OriginalClass = DataSurfaces::SurfaceClass::Window;
+
+    state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).NumBranches = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).TotalComponents = 1;
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp.allocate(1);
+    state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
+
+    state->dataLoopNodes->NumOfNodes = 1;
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(1).FluidType = DataLoopNode::NodeFluidType::Air;
+    state->dataLoopNodes->NodeID.allocate(1);
+    state->dataLoopNodes->NodeID(1) = "ATTIC ZONE AIR NODE";
+    bool errFlag{false};
+    BranchNodeConnections::RegisterNodeConnection(*state,
+                                                  1,
+                                                  "ATTIC ZONE AIR NODE",
+                                                  DataLoopNode::ConnectionObjectType::FanOnOff,
+                                                  "Object1",
+                                                  DataLoopNode::ConnectionType::ZoneNode,
+                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  false,
+                                                  errFlag);
+    EXPECT_FALSE(errFlag);
+
+    state->dataZoneEquip->ZoneEquipConfig.allocate(1);
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneName = "ATTIC ZONE";
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).NumReturnNodes = 0;
+    state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
+
+    // One AirflowNetwork:MultiZone:Zone object
+    state->afn->AirflowNetworkNumOfZones = 1;
+    state->afn->MultizoneZoneData.allocate(1);
+    state->afn->MultizoneZoneData(1).ZoneNum = 1;
+    state->afn->MultizoneZoneData(1).ZoneName = "ATTIC ZONE";
+
+    // Assume only one AirflowNetwork:Distribution:Node object is set for the Zone Air Node
+    state->afn->AirflowNetworkNumOfNodes = 1;
+    state->afn->AirflowNetworkNodeData.allocate(1);
+    state->afn->AirflowNetworkNodeData(1).Name = "ATTIC ZONE";
+    state->afn->AirflowNetworkNodeData(1).EPlusZoneNum = 1;
+
+    state->afn->SplitterNodeNumbers.allocate(2);
+    state->afn->SplitterNodeNumbers(1) = 0;
+    state->afn->SplitterNodeNumbers(2) = 0;
+
+    state->afn->DisSysNumOfCoils = 2;
+    state->afn->DisSysCompCoilData.allocate(2);
+    state->afn->DisSysCompCoilData(1).name = "ElectricCoil";
+    state->afn->DisSysCompCoilData(2).name = "GasCoil";
+    state->afn->DisSysCompCoilData(1).EPlusType = "Coil:Heating:Electric:MultiStage";
+    state->afn->DisSysCompCoilData(2).EPlusType = "Coil:Heating:Gas:MultiStage";
+    state->afn->DisSysCompCoilData(1).AirLoopNum = 1;
+    state->afn->DisSysCompCoilData(2).AirLoopNum = 2;
+
+    state->dataHeatingCoils->GetCoilsInputFlag = false;
+    state->dataHeatingCoils->HeatingCoil.allocate(2);
+    state->dataHeatingCoils->HeatingCoil(1).Name = "ElectricCoil";
+    state->dataHeatingCoils->HeatingCoil(2).Name = "GasCoil";
+
+    // MixedAir::NumOAMixers.allocate(1);
+    state->afn->validate_distribution();
+
+    EXPECT_TRUE(compare_err_stream("", true));
+}
 TEST_F(EnergyPlusFixture, AirflowNetwork_ZoneOrderTest)
 {
 
