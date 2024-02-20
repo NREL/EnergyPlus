@@ -8,13 +8,11 @@ on:
   #  tags:
   #    - "*"
 
-  # run this workflow manually from the Actions tab for now
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version'
-        required: false
-
+      ref:
+        description: 'The branch, tag, or SHA for which to run (eg: v22.1.0 or develop)'
+        required: true
 
 jobs:
   build_wheel:
@@ -28,8 +26,10 @@ jobs:
         os: [ubuntu-22.04, macos-13, windows-2019]
 
     steps:
-    - name: Checkout pyenergyplus
+    - name: Checkout EnergyPlus
       uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.ref }}
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
