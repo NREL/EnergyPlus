@@ -2090,6 +2090,45 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
         //                   OutputProcessor::SOVStoreType::Average,
         //                   this->name);
 
+        if (this->heatRecoveryAvailable) {
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Heat Transfer Rate",
+                                Constant::Units::W,
+                                this->heatRecoveryRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->name);
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Heat Transfer Energy",
+                                Constant::Units::J,
+                                this->heatRecoveryEnergy,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Summed,
+                                this->name);
+
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Inlet Temperature",
+                                Constant::Units::C,
+                                this->heatRecoveryInletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->name);
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Outlet Temperature",
+                                Constant::Units::C,
+                                this->heatRecoveryOutletTemp,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->name);
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Mass Flow Rate",
+                                Constant::Units::kg_s,
+                                this->heatRecoveryDesignMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->name);
+        }
+
         // find this component on the plant
         bool thisErrFlag = false;
         PlantUtilities::ScanPlantLoopsForObject(
