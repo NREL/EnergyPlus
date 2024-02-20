@@ -390,8 +390,8 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
         capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
 
         availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
-        
-        // apply air source HP dry air heating capacity correction 
+
+        // apply air source HP dry air heating capacity correction
         availableCapacity *= heatingCapacityModifierASHP(state);
 
         if (availableCapacity > 0) {
