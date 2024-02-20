@@ -2150,6 +2150,7 @@ void EIRPlantLoopHeatPump::report(EnergyPlusData &state)
     state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
     if (this->airSource && this->heatRecoveryAvailable) {
         PlantUtilities::SafeCopyPlantNode(state, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet);
+        state.dataLoopNodes->Node(this->heatRecoveryNodes.outlet).Temp = this->heatRecoveryOutletTemp;
     }
 }
 
