@@ -261,7 +261,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
 
-        void report(EnergyPlusData &state);
+        virtual void report(EnergyPlusData &state);
 
         void sizeLoadSide(EnergyPlusData &state);
 
