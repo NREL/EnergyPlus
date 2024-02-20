@@ -377,6 +377,7 @@ namespace EIRPlantLoopHeatPumps {
         static void pairUpCompanionCoils(EnergyPlusData &state);
         static void processInputForEIRPLHP(EnergyPlusData &state);
         void oneTimeInit(EnergyPlusData &state);
+        void report(EnergyPlusData &state);
 
         // New or specialized functions for derived struct
         virtual ~EIRFuelFiredHeatPump() = default;

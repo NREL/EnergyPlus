@@ -2198,7 +2198,6 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
 
     // this->loadSideHeatTransfer = availableCapacity * partLoadRatio;
     this->loadSideHeatTransfer = availableCapacity * partLoadRatio; // (partLoadRatio >= this->minPLR ? partLoadRatio : 0.0);
-    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
 
     // calculate load side outlet conditions
     Real64 const loadMCp = this->loadSideMassFlowRate * CpLoad;
@@ -2364,13 +2363,9 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     }
     this->powerUsage += this->standbyElecPower;
 
-    this->fuelEnergy = this->fuelRate * reportingInterval;
-    this->powerEnergy = this->powerEnergy * reportingInterval;
-
     // energy balance on heat pump
     // this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
     this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->fuelRate + this->powerUsage - this->standbyElecPower);
-    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
 
     // calculate source side outlet conditions
     Real64 CpSrc = 0.0;
@@ -3171,6 +3166,21 @@ void EIRFuelFiredHeatPump::oneTimeInit(EnergyPlusData &state)
         }
         this->oneTimeInitFlag = false;
     }
+}
+
+void EIRFuelFiredHeatPump::report(EnergyPlusData &state)
+{
+    Real64 const reportingInterval = state.dataHVACGlobal->TimeStepSysSec;
+
+    this->fuelEnergy = this->fuelRate * reportingInterval;
+    this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
+    this->powerEnergy = this->powerUsage * reportingInterval;
+    this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+
+    // update nodes
+    PlantUtilities::SafeCopyPlantNode(state, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
+    state.dataLoopNodes->Node(this->loadSideNodes.outlet).Temp = this->loadSideOutletTemp;
+    state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
 }
 
 } // namespace EnergyPlus::EIRPlantLoopHeatPumps
