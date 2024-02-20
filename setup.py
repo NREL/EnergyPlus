@@ -60,7 +60,6 @@ Bare-bones library, no pre- or post-processing tools.
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
-from setuptools.errors import CompileError
 from shutil import rmtree, copy
 from platform import machine, system
 from os import cpu_count
@@ -145,9 +144,10 @@ class EnergyPlusBuild(build_ext):
     @staticmethod
     def cmake_build_command() -> list[str]:
         cmake_build_cmd = ["cmake", "--build", "."]
-        if system() == "Windows":
+        if system() == "Windows":  # VS builds require specifying the build config
             cmake_build_cmd.extend(["--config", "Release"])
-        cmake_build_cmd.extend(['--', '-j', f"{cpu_count() - 1}"])
+        else:  # MSBuild doesn't like the -j passed in, so only do this on Non-Windows
+            cmake_build_cmd.extend(['--', '-j', f"{cpu_count() - 1}"])
         return cmake_build_cmd
 
     @staticmethod
@@ -167,13 +167,17 @@ class EnergyPlusBuild(build_ext):
             cmake_cmd = self.cmake_configure_command()
             check_call(cmake_cmd, cwd=build_root_directory)
         except CalledProcessError as cpe:
-            raise CompileError(f"CMake failed to configure EnergyPlus, check error logs, raw error message: {cpe}")
+            raise Exception(
+                f"CMake failed to configure EnergyPlus, check error logs, raw error message: {cpe}"
+            ) from None
 
         try:
             cmake_build_cmd = self.cmake_build_command()
             check_call(cmake_build_cmd, cwd=build_root_directory)
         except CalledProcessError as cpe:
-            raise CompileError(f"CMake failed to build EnergyPlus, check error logs, raw error message: {cpe}")
+            raise Exception(
+                f"CMake failed to build EnergyPlus, check error logs, raw error message: {cpe}"
+            ) from None
 
         # while EnergyPlus is built in the repo/build-wheel folder, set up the path to the actual wheel build
         # this will be in repo/build-wheel/build/energyplus to avoid conflicting with dev's normal repo/build folders
