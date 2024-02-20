@@ -116,6 +116,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 sizingFactor = 1.0;
         bool waterSource = false;
         bool airSource = false;
+        bool heatRecoveryAvailable = false;
         ControlType sysControlType = ControlType::Invalid;
         DataPlant::FlowMode flowControl = DataPlant::FlowMode::Invalid;
 
@@ -132,6 +133,8 @@ namespace EIRPlantLoopHeatPumps {
         Real64 cyclingRatio = 0.0;
         Real64 minSourceTempLimit = -999.0;
         Real64 maxSourceTempLimit = 999.0;
+        Real64 minHeatRecoveryTempLimit = 4.5;
+        Real64 maxHeatRecoveryTempLimit = 60.0;
 
         // curve references
         int capFuncTempCurveIndex = 0;
@@ -156,6 +159,10 @@ namespace EIRPlantLoopHeatPumps {
         bool loadVSLoopPump = false;
         bool sourceVSBranchPump = false;
         bool sourceVSLoopPump = false;
+        bool heatRecoveryDesignVolFlowRateWasAutoSized = false;
+        Real64 heatRecoveryDesignVolFlowRate = 0.0;
+        Real64 heatRecoveryDesignMassFlowRate = 0.0;
+        Real64 heatRecoveryMassFlowRate = 0.0;
 
         // simulation variables
         Real64 loadSideHeatTransfer = 0.0;
@@ -164,10 +171,14 @@ namespace EIRPlantLoopHeatPumps {
         Real64 loadSideOutletTemp = 0.0;
         Real64 sourceSideInletTemp = 0.0;
         Real64 sourceSideOutletTemp = 0.0;
+        Real64 heatRecoveryInletTemp = 0.0;
+        Real64 heatRecoveryOutletTemp = 0.0;
         Real64 powerUsage = 0.0;
         Real64 loadSideEnergy = 0.0;
         Real64 sourceSideEnergy = 0.0;
         Real64 powerEnergy = 0.0;
+        Real64 heatRecoveryRate = 0.0;
+        Real64 heatRecoveryEnergy = 0.0;
         // Real64 sourceSideCp = 0.0; // debugging variable
         bool running = false;
 
@@ -176,6 +187,8 @@ namespace EIRPlantLoopHeatPumps {
         PlantLocation sourceSidePlantLoc;
         InOutNodePair loadSideNodes;
         InOutNodePair sourceSideNodes;
+        PlantLocation heatRecoveryPlantLoc;
+        InOutNodePair heatRecoveryNodes;
         bool heatRecoveryHeatPump = false; // HP that transfers heat between plants and should not increase plant size
 
         // counters and indexes
