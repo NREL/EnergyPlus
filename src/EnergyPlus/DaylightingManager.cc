@@ -2113,7 +2113,7 @@ void InitializeCFSDaylighting(EnergyPlusData &state,
 
     // Object Data
     DataBSDFWindow::BSDFDaylghtPosition elPos; // altitude and azimuth of intersection element
-    Vector Vec;                                // temporary vector variable
+    Vector3<Real64> Vec;                                // temporary vector variable
 
     int NumOfWinEl = NWX * NWY; // Number of window elements
 
@@ -2501,7 +2501,7 @@ void AllocateForCFSRefPointsState(
 
     if (!allocated(StateRefPoint.GndPt)) {
         StateRefPoint.GndPt.allocate(NBasis, NumOfWinEl);
-        StateRefPoint.GndPt = Vector(0.0, 0.0, 0.0);
+        StateRefPoint.GndPt = Vector3<Real64>(0.0, 0.0, 0.0);
     }
 
     if (!allocated(StateRefPoint.GndObstrMultiplier)) {
@@ -2541,7 +2541,7 @@ void AllocateForCFSRefPointsState(
 
     if (!allocated(StateRefPoint.HitPt)) {
         StateRefPoint.HitPt.allocate(state.dataSurface->TotSurfaces, NBasis, NumOfWinEl);
-        StateRefPoint.HitPt = Vector(0.0, 0.0, 0.0);
+        StateRefPoint.HitPt = Vector3<Real64>(0.0, 0.0, 0.0);
     }
 
     if (!allocated(StateRefPoint.RefPointIndex)) {
@@ -2578,7 +2578,7 @@ void AllocateForCFSRefPointsGeometry(DataBSDFWindow::BSDFRefPointsGeomDescr &Ref
 
     if (!allocated(RefPointsGeomDescr.SolidAngleVec)) {
         RefPointsGeomDescr.SolidAngleVec.allocate(NumOfWinEl);
-        RefPointsGeomDescr.SolidAngleVec = Vector(0.0, 0.0, 0.0);
+        RefPointsGeomDescr.SolidAngleVec = Vector3<Real64>(0.0, 0.0, 0.0);
     }
 }
 

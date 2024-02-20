@@ -78,7 +78,6 @@ namespace DataSurfaces {
 
     // Using/Aliasing
     using DataBSDFWindow::BSDFWindowDescript;
-    using DataVectorTypes::Vector;
 
     // MODULE PARAMETER DEFINITIONS:
     constexpr int MaxPolyCoeff(6);
@@ -167,6 +166,24 @@ namespace DataSurfaces {
         Num // The counter representing the total number of surface class, always stays at the bottom
     };
 
+    constexpr std::array<std::string_view, (int)SurfaceClass::Num> surfaceClassNamesUC = {
+        "NONE",
+        "WALL",
+        "FLOOR",
+        "ROOF",
+        "INTERNALMASS",
+        "DETACHEDSHADINGBUILDING",
+        "DETACHEDSHADINGFIXED",
+        "WINDOW",
+        "GLASSDOOR",
+        "DOOR",
+        "SHADING",
+        "OVERHANG",
+        "FIN",
+        "TUBULARDAYLIGHTDOME",
+        "TUBULARDAYLIGHTDIFFUSER"
+    };
+                
     constexpr std::array<std::string_view, (int)SurfaceClass::Num> surfaceClassStrings = {
         "None",
         "Wall",
@@ -467,6 +484,8 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, (int)WindowAirFlowSource::Num> windowAirFlowSourceNamesUC = {"INDOOR", "OUTDOOR"};
+        
     // Parameters for air flow window destination
     enum class WindowAirFlowDestination
     {
@@ -477,6 +496,8 @@ namespace DataSurfaces {
         Num
     };
 
+    constexpr std::array<std::string_view, (int)WindowAirFlowDestination::Num> windowAirFlowDestinationNamesUC = {"INDOOR", "OUTDOOR", "RETURN"};
+
     // Parameters for air flow window control
     enum class WindowAirFlowControlType
     {
@@ -485,6 +506,12 @@ namespace DataSurfaces {
         AlwaysOff,
         Schedule,
         Num
+    };
+
+    constexpr std::array<std::string_view, (int)WindowAirFlowControlType::Num> windowAirFlowControlTypeNamesUC = {
+        "ALWAYSONATMAXIMUMFLOW",
+        "ALWAYSOFF",
+        "SCHEDULEDONLY"
     };
 
     // Parameters for window model selection
@@ -503,15 +530,6 @@ namespace DataSurfaces {
     // Y Slab for Surface2D for PierceSurface support of Nonconvex and Many-Vertex Surfaces
     struct Surface2DSlab
     {
-
-    public: // Types
-        using Vertex = ObjexxFCL::Vector2<Real64>;
-        using Vertices = ObjexxFCL::Array1D<Vertex>;
-        using Edge = Vertices::size_type; // The Surface2D vertex and edge index
-        using EdgeXY = Real64;            // The edge x/y inverse slope
-        using Edges = std::vector<Edge>;
-        using EdgesXY = std::vector<EdgeXY>;
-
     public: // Creation
             // Constructor
         Surface2DSlab(Real64 const yl, Real64 const yu) : xl(0.0), xu(0.0), yl(yl), yu(yu)
@@ -521,38 +539,23 @@ namespace DataSurfaces {
     public:              // Data
         Real64 xl, xu;   // Lower and upper x coordinates of slab bounding box
         Real64 yl, yu;   // Lower and upper y coordinates of slab
-        Edges edges;     // Left-to-right ordered edges crossing the slab
-        EdgesXY edgesXY; // Edge x/y inverse slopes
+        std::vector<int> edges;     // Left-to-right ordered edges crossing the slab
+        std::vector<Real64> edgesXY; // Edge x/y inverse slopes
 
     }; // Surface2DSlab
 
     // Projected 2D Surface Representation for Fast Computational Geometry Operations
     struct Surface2D
     {
-
-    public: // Types
-        using Vector2D = Vector2<Real64>;
-        using Edge = Vector2D;
-        using Vertices = Array1D<Vector2D>;
-        using Vectors = Array1D<Vector2D>;
-        using Edges = Vectors;
-        using Slab = Surface2DSlab;
-        using Slabs = std::vector<Surface2DSlab>;
-        using SlabYs = std::vector<Real64>;
-        using size_type = Vertices::size_type;
-
     public: // Creation
-        // Default constructor
-        Surface2D()
-        {
-        }
-
         // Constructor
-        Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu);
+        Surface2D() {};
+            
+        Surface2D(ShapeCat const shapeCat, int const axis, Array1D<Vector2<Real64>> const &v, Vector2<Real64> const &vl, Vector2<Real64> const &vu);
 
     public: // Predicates
             // Bounding box contains a point?
-        bool bb_contains(Vector2D const &v) const
+        bool bb_contains(Vector2<Real64> const &v) const
         {
             return (vl.x <= v.x) && (v.x <= vu.x) && (vl.y <= v.y) && (v.y <= vu.y);
         }
@@ -574,12 +577,13 @@ namespace DataSurfaces {
 
     public:                                              // Data
         int axis = 0;                                    // Axis of projection (0=x, 1=y, 2=z)
-        Vertices vertices;                               // Vertices
-        Vector2D vl = Vector2D(0.0), vu = Vector2D(0.0); // Bounding box lower and upper corner vertices
-        Vectors edges;                                   // Edge vectors around the vertices
+        Array1D<Vector2<Real64>> vertices;                               // Vertices
+        Vector2<Real64> vl = Vector2<Real64>(0.0), vu = Vector2<Real64>(0.0); // Bounding box lower and upper corner vertices
+        Array1D<Vector2<Real64>> edges;                                   // Edge vectors around the vertices
         Real64 s1 = 0.0, s3 = 0.0;                       // Rectangle side widths squared
-        SlabYs slabYs;                                   // Y coordinates of slabs
-        Slabs slabs;                                     // Y slice slabs for fast nonconvex and many vertex intersections
+        std::vector<Real64> slabYs;                      // Y coordinates of slabs
+        std::vector<Surface2DSlab> slabs;                 // Y slice slabs for fast nonconvex and many vertex intersections
+        // A Surface2D contains a vector of Surface2DSlab? Why?
 
     }; // Surface2D
 

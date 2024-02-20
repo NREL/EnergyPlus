@@ -73,11 +73,14 @@ namespace SurfaceGeometry {
     using DataSurfaces::SurfaceClass;
     using DataSurfaces::SurfaceData;
 
-    enum enclosureType
+    enum class EnclosureType
     {
-        RadiantEnclosures,
-        SolarEnclosures
+        Radiant,
+        Solar,
+        Num
     };
+
+    constexpr std::array<std::string_view, (int)EnclosureType::Num> enclosureTypeNames = {"Radiant", "Solar"};
 
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
@@ -87,7 +90,7 @@ namespace SurfaceGeometry {
 
     void GetSurfaceData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
-    void CreateMissingSpaces(EnergyPlusData &state, Array1D<SurfaceGeometry::SurfaceData> &Surfaces);
+    void CreateMissingSpaces(EnergyPlusData &state);
 
     void createSpaceSurfaceLists(EnergyPlusData &state);
 
@@ -265,7 +268,7 @@ namespace SurfaceGeometry {
             std::vector<bool> isExposedPerimeter;
             bool useDetailedExposedPerimeter;
         };
-        std::map<int, Data> surfaceMap;
+        std::map<int, Data> surfaceMap; // What is this int? 
     };
 
     void GetVertices(EnergyPlusData &state,
@@ -359,9 +362,8 @@ namespace SurfaceGeometry {
 
     void ProcessSurfaceVertices(EnergyPlusData &state, int const ThisSurf, bool &ErrorsFound);
 
-    void CalcCoordinateTransformation(EnergyPlusData &state,
-                                      int const SurfNum,            // Surface Number
-                                      Vector3<Real64> &CompCoordTranslVector // Coordinate Translation Vector
+    Vector3<Real64> CalcCoordinateTransformation(EnergyPlusData &state,
+                                                 int const SurfNum            // Surface Number
     );
 
     void CreateShadedWindowConstruction(EnergyPlusData &state,
@@ -403,7 +405,7 @@ namespace SurfaceGeometry {
     void
     SetupEnclosuresAndAirBoundaries(EnergyPlusData &state,
                                     EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
-                                    SurfaceGeometry::enclosureType EnclosureType,                                    // Radiant or Solar
+                                    SurfaceGeometry::EnclosureType enclosureType,                                    // Radiant or Solar
                                     bool &ErrorsFound);                                                              // Set to true if errors found
 
     void CheckConvexity(EnergyPlusData &state,
@@ -425,7 +427,6 @@ namespace SurfaceGeometry {
 
 struct SurfaceGeometryData : BaseGlobalStruct
 {
-
     Real64 CosBldgRelNorth = 0.0;    // Cosine of the building rotation (relative north) (includes appendix G rotation)
     Real64 SinBldgRelNorth = 0.0;    // Sine of the building rotation (relative north)   (includes appendix G rotation)
     Real64 CosBldgRotAppGonly = 0.0; // Cosine of the building rotation for appendix G only(relative north)
@@ -453,10 +454,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     bool noTransform = true;
     bool CheckConvexityFirstTime = true;
 
-    Array1D_string const BaseSurfCls;
-    Array1D_string const SubSurfCls;
-    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs;
-    Array1D<DataSurfaces::SurfaceClass> const SubSurfIDs;
     Array1D<SurfaceGeometry::SurfaceData> SurfaceTmp; // Allocated/Deallocated during input processing
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
@@ -468,8 +465,6 @@ struct SurfaceGeometryData : BaseGlobalStruct
     int ErrCount4 = 0; // counts of interzone area mismatches.
     bool ShowZoneSurfaceHeaders = true;
     int ErrCount5 = 0;
-    Array1D<Vector3<Real64>> Triangle1 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
-    Array1D<Vector3<Real64>> Triangle2 = Array1D<Vector3<Real64>>(3); // working struct for a 3-sided surface
 
     void clear_state() override
     {
@@ -506,19 +501,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     }
 
     // Default Constructor
-    SurfaceGeometryData()
-        : BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"}),
-          SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"}),
-          BaseSurfIDs(3, {DataSurfaces::SurfaceClass::Wall, DataSurfaces::SurfaceClass::Floor, DataSurfaces::SurfaceClass::Roof}),
-          SubSurfIDs(6,
-                     {DataSurfaces::SurfaceClass::Window,
-                      DataSurfaces::SurfaceClass::Door,
-                      DataSurfaces::SurfaceClass::GlassDoor,
-                      DataSurfaces::SurfaceClass::Shading,
-                      DataSurfaces::SurfaceClass::TDD_Dome,
-                      DataSurfaces::SurfaceClass::TDD_Diffuser})
-    {
-    }
+    SurfaceGeometryData() {};
 };
 } // namespace EnergyPlus
 

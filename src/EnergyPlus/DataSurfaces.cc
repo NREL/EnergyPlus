@@ -97,10 +97,10 @@ Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", 
 // why aren't these sequential (LKL - 13 Aug 2007)
 
 // Constructor
-Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2<Real64> const &vl, Vector2<Real64> const &vu)
+Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Array1D<Vector2<Real64>> const &v, Vector2<Real64> const &vl, Vector2<Real64> const &vu)
     : axis(axis), vertices(v), vl(vl), vu(vu)
 {
-    size_type const n(vertices.size());
+    int const n = vertices.size();
     assert(n >= 3);
 
     // Reverse vertices order if clockwise
@@ -131,23 +131,23 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
         auto const iClip(std::unique(slabYs.begin(), slabYs.end())); // Remove duplicate y-coordinate elements
         slabYs.erase(iClip, slabYs.end());
         slabYs.shrink_to_fit();
-        for (size_type iSlab = 0, iSlab_end = slabYs.size() - 1; iSlab < iSlab_end; ++iSlab) { // Create slabs
+        for (int iSlab = 0, iSlab_end = (int)slabYs.size() - 1; iSlab < iSlab_end; ++iSlab) { // Create slabs
             Real64 xl(std::numeric_limits<Real64>::max());
             Real64 xu(std::numeric_limits<Real64>::lowest());
             Real64 const yl(slabYs[iSlab]);
             Real64 const yu(slabYs[iSlab + 1]);
-            slabs.push_back(Slab(yl, yu));
-            Slab &slab(slabs.back());
-            using CrossEdge = std::tuple<Real64, Real64, size_type>;
-            using CrossEdges = std::vector<CrossEdge>;
-            CrossEdges crossEdges;
-            for (size_type i = 0; i < n; ++i) { // Find edges crossing slab
+            slabs.push_back(Surface2DSlab(yl, yu));
+            Surface2DSlab &slab(slabs.back());
+
+            std::vector<std::tuple<Real64, Real64, int>> crossEdges;
+            
+            for (int i = 0; i < n; ++i) { // Find edges crossing slab
                 Vector2<Real64> const &v(vertices[i]);
                 Vector2<Real64> const &w(vertices[(i + 1) % n]);
                 if (((v.y <= yl) && (yu <= w.y)) || // Crosses upward
                     ((yu <= v.y) && (w.y <= yl)))   // Crosses downward
                 {
-                    Edge const &e(edges[i]);
+                    Vector2<Real64> const &e(edges[i]);
                     assert(e.y != 0.0);
                     Real64 const exy(e.x / e.y);
                     Real64 const xb(v.x + (yl - v.y) * exy); // x_bot coordinate where edge intersects yl
@@ -162,7 +162,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
             assert(crossEdges.size() >= 2u);
             std::sort(crossEdges.begin(),
                       crossEdges.end(),
-                      [](CrossEdge const &e1, CrossEdge const &e2) -> bool // Lambda to sort by x_mid
+                      [](std::tuple<Real64, Real64, int> const &e1, std::tuple<Real64, Real64, int> const &e2) -> bool // Lambda to sort by x_mid
                       {
                           return std::get<0>(e1) + std::get<1>(e1) <
                                  std::get<0>(e2) + std::get<1>(e2); // Sort edges by x_mid: x_bot or x_top could have repeats with shared vertex
@@ -417,8 +417,6 @@ Surface2D SurfaceData::computed_surface2d() const
     int const n(Vertex.size());
     assert(n >= 3);
     assert(plane == computed_plane()); // Set plane first
-    using Vertex2D = ObjexxFCL::Vector2<Real64>;
-    using Vertices2D = ObjexxFCL::Array1D<Vertex2D>;
 
     // Select axis to project along
     Real64 const a(std::abs(plane.x));                                       // Plane normal x coordinate magnitude
@@ -427,32 +425,32 @@ Surface2D SurfaceData::computed_surface2d() const
     int const axis(a >= std::max(b, c) ? 0 : (b >= std::max(a, c) ? 1 : 2)); // Project along plane's normal's largest magnitude coordinate
 
     // Set up 2D surface
-    Vertices2D v2d(n);
-    Vector const &v0(Vertex[0]);
+    Array1D<Vector2<Real64>> v2d(n);
+    Vector3<Real64> const &v0(Vertex[0]);
     if (axis == 0) {               // Use y,z for 2D surface
         Real64 yl(v0.y), yu(v0.y); // y coordinate ranges
         Real64 zl(v0.z), zu(v0.z); // z coordinate ranges
         for (int i = 0; i < n; ++i) {
-            Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D(v.y, v.z);
+            Vector3<Real64> const &v(Vertex[i]);
+            v2d[i] = Vector2<Real64>(v.y, v.z);
             yl = std::min(yl, v.y);
             yu = std::max(yu, v.y);
             zl = std::min(zl, v.z);
             zu = std::max(zu, v.z);
         }
-        return Surface2D(shapeCat, axis, v2d, Vertex2D(yl, zl), Vertex2D(yu, zu));
+        return Surface2D(shapeCat, axis, v2d, Vector2<Real64>(yl, zl), Vector2<Real64>(yu, zu));
     } else if (axis == 1) {        // Use x,z for 2D surface
         Real64 xl(v0.x), xu(v0.x); // x coordinate ranges
         Real64 zl(v0.z), zu(v0.z); // z coordinate ranges
         for (int i = 0; i < n; ++i) {
             Vector const &v(Vertex[i]);
-            v2d[i] = Vertex2D(v.x, v.z);
+            v2d[i] = Vector2<Real64>(v.x, v.z);
             xl = std::min(xl, v.x);
             xu = std::max(xu, v.x);
             zl = std::min(zl, v.z);
             zu = std::max(zu, v.z);
         }
-        return Surface2D(shapeCat, axis, v2d, Vertex2D(xl, zl), Vertex2D(xu, zu));
+        return Surface2D(shapeCat, axis, v2d, Vector2<Real64>(xl, zl), Vector2<Real64>(xu, zu));
     } else {                       // Use x,y for 2D surface
         Real64 xl(v0.x), xu(v0.x); // x coordinate ranges
         Real64 yl(v0.y), yu(v0.y); // y coordinate ranges
@@ -464,7 +462,7 @@ Surface2D SurfaceData::computed_surface2d() const
             yl = std::min(yl, v.y);
             yu = std::max(yu, v.y);
         }
-        return Surface2D(shapeCat, axis, v2d, Vertex2D(xl, yl), Vertex2D(xu, yu));
+        return Surface2D(shapeCat, axis, v2d, Vector2<Real64>(xl, yl), Vector2<Real64>(xu, yu));
     }
 }
 
@@ -473,12 +471,10 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     if (std::abs(SinTilt) < 1.e-4) {
         return 0.0;
     }
-    using Vertex2D = ObjexxFCL::Vector2<Real64>;
-    using Vertices2D = ObjexxFCL::Array1D<Vertex2D>;
     int const n(Vertex.size());
     assert(n >= 3);
 
-    Vertices2D v2d(n);
+    Array1D<Vector2<Real64>> v2d(n);
 
     // project onto 2D vertical plane
     Real64 xRef = Vertex[0].x;
@@ -486,8 +482,8 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     Real64 const &saz(SinAzim);
     Real64 const &caz(CosAzim);
     for (int i = 0; i < n; ++i) {
-        Vector const &v(Vertex[i]);
-        v2d[i] = Vertex2D(-(v.x - xRef) * caz + (v.y - yRef) * saz, v.z);
+        Vector3<Real64> const &v(Vertex[i]);
+        v2d[i] = Vector2<Real64>(-(v.x - xRef) * caz + (v.y - yRef) * saz, v.z);
     }
 
     // piecewise linear integration
@@ -495,7 +491,7 @@ Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
     // Get total width of polygon
     Real64 minX(v2d[0].x), maxX(v2d[0].x);
     for (int i = 0; i < n; ++i) {
-        Vertex2D const &v(v2d[i]);
+        Vector2<Real64> const &v(v2d[i]);
         minX = std::min(minX, v.x);
         maxX = std::max(maxX, v.x);
     }

@@ -224,7 +224,6 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Plane)
 TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D)
 {
     {
-        using Vector2D = Surface2D::Vector2D;
         SurfaceData s;
         s.Vertex.dimension(4);
         s.Vertex = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
@@ -233,10 +232,10 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D)
 
         Surface2D const &s2d(s.surface2d);
         EXPECT_EQ(2, s2d.axis); // Projection along z axis
-        EXPECT_EQ(Vector2D(0, 0), s2d.vertices[0]);
-        EXPECT_EQ(Vector2D(1, 0), s2d.vertices[1]);
-        EXPECT_EQ(Vector2D(1, 1), s2d.vertices[2]);
-        EXPECT_EQ(Vector2D(0, 1), s2d.vertices[3]);
+        EXPECT_EQ(Vector2<Real64>(0, 0), s2d.vertices[0]);
+        EXPECT_EQ(Vector2<Real64>(1, 0), s2d.vertices[1]);
+        EXPECT_EQ(Vector2<Real64>(1, 1), s2d.vertices[2]);
+        EXPECT_EQ(Vector2<Real64>(0, 1), s2d.vertices[3]);
         EXPECT_DOUBLE_EQ(0.0, s2d.vl.x);
         EXPECT_DOUBLE_EQ(0.0, s2d.vl.y);
         EXPECT_DOUBLE_EQ(1.0, s2d.vu.x);

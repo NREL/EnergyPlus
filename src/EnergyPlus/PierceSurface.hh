@@ -99,9 +99,8 @@ inline bool PierceSurface_Triangular(DataSurfaces::Surface2D const &s2d, // 2D s
     // Notes:
     //  Pulled this case out into separate function to facilitate inlining
 
-    using DataSurfaces::Surface2D;
-    Surface2D::Vertices const &vs(s2d.vertices); // 2D surface vertices
-    Surface2D::Vectors const &es(s2d.edges);     // 2D surface edge vectors
+    Array1D<Vector2<Real64>> const &vs(s2d.vertices); // 2D surface vertices
+    Array1D<Vector2<Real64>> const &es(s2d.edges);     // 2D surface edge vectors
     if (es[0].cross(h2d - vs[0]) < 0.0) return false;
     if (es[1].cross(h2d - vs[1]) < 0.0) return false;
     if (es[2].cross(h2d - vs[2]) < 0.0) return false;
@@ -122,11 +121,9 @@ inline bool PierceSurface_Convex(DataSurfaces::Surface2D const &s2d, // 2D surfa
     // Notes:
     //  Pulled this rare case out into separate function to facilitate inlining
     //  This is O( n ) complexity so it is isn't used for many-vertex surfaces
-
-    using DataSurfaces::Surface2D;
-    Surface2D::Vertices const &vs(s2d.vertices); // 2D surface vertices
-    Surface2D::Vectors const &es(s2d.edges);     // 2D surface edge vectors
-    Surface2D::Vertices::size_type const n(vs.size());
+    Array1D<Vector2<Real64>> const &vs(s2d.vertices); // 2D surface vertices
+    Array1D<Vector2<Real64>> const &es(s2d.edges);     // 2D surface edge vectors
+    int const n(vs.size());
     assert(n >= 3u);
     switch (n) {
     case 8:
@@ -166,7 +163,7 @@ inline bool PierceSurface_Convex(DataSurfaces::Surface2D const &s2d, // 2D surfa
         }
         return true;
     default:
-        for (Surface2D::Vertices::size_type i = 0; i < n; ++i) {
+        for (int i = 0; i < n; ++i) {
             if (es[i].cross(h2d - vs[i]) < 0.0) return false;
         }
         return true;
@@ -189,13 +186,10 @@ inline bool PierceSurface_Nonconvex(DataSurfaces::Surface2D const &s2d, // 2D su
     //  This works for nonconvex "simple" (no edge crossings) polygons
     //  This is also a fast O( log n ) algorithm for many-vertex convex surfaces
 
-    using DataSurfaces::Surface2D;
-    using size_type = Surface2D::Vertices::size_type;
-    using Slab = DataSurfaces::Surface2DSlab;
-    using Vertex2D = Vector2<Real64>;
+
     assert(s2d.vertices.size() >= 3u);
-    Surface2D::Slabs const &slabs(s2d.slabs);    // 2D surface y slice slabs
-    Surface2D::SlabYs const &slabYs(s2d.slabYs); // 2D surface slab y coordinates
+    std::vector<DataSurfaces::Surface2DSlab> const &slabs(s2d.slabs);    // 2D surface y slice slabs
+    std::vector<Real64> const &slabYs(s2d.slabYs); // 2D surface slab y coordinates
     assert(slabYs.size() > 0u);
     Real64 const yHit(h2d.y); // Hit point y coordinate
 
@@ -203,53 +197,53 @@ inline bool PierceSurface_Nonconvex(DataSurfaces::Surface2D const &s2d, // 2D su
     auto const iHit(std::lower_bound(slabYs.begin(), slabYs.end(), yHit));
     assert((yHit >= slabYs.front()) && (yHit <= slabYs.back())); // Passed bounding box check so hit point in slabs y range
     assert(iHit != slabYs.end());                                // Hit point can't be above all slabs: passed bounding box check
-    size_type const iSlab(std::min(static_cast<size_type>(iHit - 1 - slabYs.begin()), slabs.size())); // Hit slab index
-    Slab const &slab(slabs[iSlab]);
+    int const iSlab(std::min((int)(iHit - 1 - slabYs.begin()), (int)slabs.size())); // Hit slab index
+    DataSurfaces::Surface2DSlab const &slab(slabs[iSlab]);
 
     // Check hit point within slab bounding box x range
     Real64 const xHit(h2d.x);                               // Hit point x coordinate
     if ((xHit < slab.xl) || (xHit > slab.xu)) return false; // Hit point outside slab bounding box
 
     // Find edge pair surrounding hit point
-    Slab::Edges const &slabEdges(slab.edges);
-    Slab::EdgesXY const &slabEdgesXY(slab.edgesXY);
-    size_type const nEdges(slabEdges.size());
+    std::vector<int> const &slabEdges(slab.edges);
+    std::vector<Real64> const &slabEdgesXY(slab.edgesXY);
+    int const nEdges(slabEdges.size());
     assert(nEdges >= 2u);
     if (nEdges == 2) { // 2 edges
-        Slab::Edge const se0(slabEdges[0]);
-        Slab::EdgeXY const eXY0(slabEdgesXY[0]);
-        Vertex2D v0(s2d.vertices[se0]);
-        Surface2D::Edge e0(s2d.edges[se0]);
+        int const se0(slabEdges[0]);
+        Real64 const eXY0(slabEdgesXY[0]);
+        Vector2<Real64> v0(s2d.vertices[se0]);
+        Vector2<Real64> e0(s2d.edges[se0]);
         Real64 const x0(v0.x + (yHit - v0.y) * eXY0);
         if (xHit < x0) return false; // Hit point x is left of left edge
-        Slab::Edge const se1(slabEdges[1]);
-        Slab::EdgeXY const eXY1(slabEdgesXY[1]);
-        Vertex2D v1(s2d.vertices[se1]);
-        Surface2D::Edge e1(s2d.edges[se1]);
+        int const se1(slabEdges[1]);
+        Real64 const eXY1(slabEdgesXY[1]);
+        Vector2<Real64> v1(s2d.vertices[se1]);
+        Vector2<Real64> e1(s2d.edges[se1]);
         Real64 const x1(v1.x + (yHit - v1.y) * eXY1);
         if (x1 < xHit) return false; // Hit point is right of right edge
     } else {                         // 4+ edges: Binary search for edges surrounding hit point
         assert(nEdges >= 4u);
         assert(nEdges % 2 == 0u);
-        size_type l(0u), u(nEdges - 1);
-        Slab::Edge const il(slabEdges[l]);
-        Slab::EdgeXY const eXYl(slabEdgesXY[l]);
-        Vertex2D const &vl(s2d.vertices[il]);
-        Surface2D::Edge const el(s2d.edges[il]);
+        int l(0u), u(nEdges - 1);
+        int const il(slabEdges[l]);
+        Real64 const eXYl(slabEdgesXY[l]);
+        Vector2<Real64> const &vl(s2d.vertices[il]);
+        Vector2<Real64> const el(s2d.edges[il]);
         Real64 const xl(vl.x + (yHit - vl.y) * eXYl);
         if (xHit < xl) return false; // Hit point x is left of leftmost edge
-        Slab::Edge const iu(slabEdges[u]);
-        Slab::EdgeXY const eXYu(slabEdgesXY[u]);
-        Vertex2D const &vu(s2d.vertices[iu]);
-        Surface2D::Edge const eu(s2d.edges[iu]);
+        int const iu(slabEdges[u]);
+        Real64 const eXYu(slabEdgesXY[u]);
+        Vector2<Real64> const &vu(s2d.vertices[iu]);
+        Vector2<Real64> const eu(s2d.edges[iu]);
         Real64 const xu(vu.x + (yHit - vu.y) * eXYu);
         if (xu < xHit) return false; // Hit point is right of rightmost edge
         while (u - l > 1u) {
-            size_type const m((l + u) / 2);
-            Slab::Edge const im(slabEdges[m]);
-            Slab::EdgeXY const eXYm(slabEdgesXY[m]);
-            Vertex2D const &vm(s2d.vertices[im]);
-            Surface2D::Edge const em(s2d.edges[im]);
+            int const m((l + u) / 2);
+            int const im(slabEdges[m]);
+            Real64 const eXYm(slabEdgesXY[m]);
+            Vector2<Real64> const &vm(s2d.vertices[im]);
+            Vector2<Real64> const em(s2d.edges[im]);
             Real64 xm(vm.x + (yHit - vm.y) * eXYm);
             if (xHit <= xm) {
                 u = m;
@@ -277,14 +271,13 @@ bool PierceSurface_polygon(DataSurfaces::SurfaceData const &surface, // Surface
 
     using DataSurfaces::nVerticesBig;
     using DataSurfaces::Surface2D;
-    using Vertex2D = Vector2<Real64>;
     Surface2D const &s2d(surface.surface2d);
     int const axis(s2d.axis);
-    Vertex2D const h2d(axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z);                       // Hit point in 2D surface's plane
+    Vector2<Real64> const h2d(axis == 0 ? hitPt.y : hitPt.x, axis == 2 ? hitPt.y : hitPt.z);                       // Hit point in 2D surface's plane
     if ((h2d.x < s2d.vl.x) || (s2d.vu.x < h2d.x) || (h2d.y < s2d.vl.y) || (s2d.vu.y < h2d.y)) return false; // Misses 2D surface bounding box
     ShapeCat const shapeCat(surface.shapeCat);
     if (shapeCat == ShapeCat::Rectangular) { // Rectangular is most common: Special case algorithm is faster but assumes these are really rectangular
-        Vertex2D const v0h(h2d - s2d.vertices[0]);
+        Vector2<Real64> const v0h(h2d - s2d.vertices[0]);
         Real64 const he1(v0h.dot(s2d.edges[0]));
         if ((he1 < 0.0) || (he1 > s2d.s1)) return false;
         Real64 const he3(-v0h.dot(s2d.edges[3]));

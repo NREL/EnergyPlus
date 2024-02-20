@@ -1600,6 +1600,12 @@ void ShowSevereInvalidBool(EnergyPlusData &state, ErrorObjectHeader const &eoh, 
     ShowContinueError(state, format("{} = {}, invalid boolean (\"Yes\"/\"No\").", fieldName, fieldVal));
 }
 
+void ShowSevereInvalidCombination(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view fieldName2, std::string_view fieldVal2)
+{
+    ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("Invalid combination {} = {} and {} = {}.", fieldName, fieldVal, fieldName2, fieldVal2));
+}
+
 void ShowSevereCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view msg)
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
@@ -1658,6 +1664,12 @@ void ShowWarningItemNotFound(
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, item not found, {} will be used.", fieldName, fieldVal, defaultVal));
+}
+
+void ShowWarningInvalidCombination(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view fieldName2, std::string_view fieldVal2)
+{
+    ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
+    ShowContinueError(state, format("Invalid combination {} = {} and {} = {}.", fieldName, fieldVal, fieldName2, fieldVal2));
 }
 
 void ShowWarningFieldCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldValue, std::string_view msg)
