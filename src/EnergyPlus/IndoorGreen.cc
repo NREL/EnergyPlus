@@ -79,6 +79,7 @@ namespace IndoorGreen {
     static constexpr std::array<std::string_view, static_cast<int>(ETCalculationMethod::Num)> etCalculationMethodsUC = {"PENMAN-MONTEITH",
                                                                                                                         "STANGHELLINI"};
     static constexpr std::array<std::string_view, static_cast<int>(LightingMethod::Num)> lightingMethodsUC = {"LED", "DAYLIGHT", "LED-DAYLIGHT"};
+
     void SimIndoorGreen(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
@@ -347,10 +348,11 @@ namespace IndoorGreen {
                 ErrorsFound = true;
             }
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "ET Rate", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
+                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "Evapotranspiration Rate", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
             } // EMS and API
         }
     }
+
     void SetIndoorGreenOutput(EnergyPlusData &state)
     {
         // Set up output variables
@@ -461,18 +463,15 @@ namespace IndoorGreen {
 
     void InitIndoorGreen(EnergyPlusData &state)
     {
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine is for initializations of the Indoor Living Wall objects.
-        auto &lw = state.dataIndoorGreen;
-        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
-            auto &ig = lw->indoorGreens(IndoorGreenNum);
-            // Set the reporting variables to zero at each timestep.
+        // Set the reporting variables to zero at each timestep.
+        for (auto &ig : state.dataIndoorGreen->indoorGreens) {
             ig.SensibleRate = 0.0;
             ig.LatentRate = 0.0;
             ig.ZCO2 = 400;
             ig.ZPPFD = 0;
         }
     }
+
     void ETModel(EnergyPlusData &state)
     {
         // PURPOSE OF THIS SUBROUTINE:
@@ -560,22 +559,11 @@ namespace IndoorGreen {
             ZonePPFD = ig.ZPPFD;
             ZoneVPD = ig.ZVPD / 1000; // kPa
             // ET Calculation
-            switch (ig.etCalculationMethod) {
-            case ETCalculationMethod::PenmanMonteith: {
-                Real64 SwitchF = 1.0;
-                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI, SwitchF);
-            } break;
-            case ETCalculationMethod::Stanghellini: {
-                Real64 SwitchF = 2 * LAI;
-                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZoneCO2, ZonePPFD, ZoneVPD, LAI, SwitchF);
-            } break;
-            default:
-                break;
-            }
             if (ig.EMSETCalOverrideOn) {
                 ig.ETRate = ig.EMSET;
             } else {
-                ShowSevereError(state, format("EMS/Python Plugin for ET Data Driven Model not find in {}={}", cCurrentModuleObject, ig.Name));
+                Real64 SwitchF = ig.etCalculationMethod == ETCalculationMethod::PenmanMonteith ? 1.0 : 2 * LAI;
+                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZonePPFD, ZoneVPD, LAI, SwitchF);
             }
             Real64 effectivearea = std::min(ig.LeafArea, LAI * state.dataSurface->Surface(ig.SurfPtr).Area);
             ETTotal =
@@ -603,10 +591,8 @@ namespace IndoorGreen {
         }
     }
 
-    Real64 ETBaseFunction(
-        EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZoneCO2, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI, Real64 SwitchF)
+    Real64 ETBaseFunction(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI, Real64 SwitchF)
     {
-        // PURPOSE OF THIS SUBROUTINE:
         // This subroutine provides calculation for Penman-Monteith model and Stanghellini models to predict evapotranspiration rates of plants.
         // Reference: Monteith, J.L. Evaporation and environment. in Symposia of the society for experimental biology. 1965. Cambridge University
         // Press (CUP) Cambridge
@@ -621,14 +607,12 @@ namespace IndoorGreen {
         Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
         Real64 constexpr mw(0.622);                                               // ratio molecular weight of water vapor / dry air = 0.622.
         Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
-        Real64 rs = 0.0;                                                          // stomatal resistance s/m
-        Real64 ra = 0.0;                                                          // aerodynamic resistance s/m
         Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
         Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
         Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
         Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
-        rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);
-        ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / (LAI + 1e-10));
+        Real64 rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);                                           // stomatal resistance s/m
+        Real64 ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / (LAI + 1e-10));                              // aerodynamic resistance s/m
         ETRate = (1 / hfg) * (slopepat * (In - G) + (SwitchF * rhoair * CpAir * ZoneVPD) / ra) /
                  (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
         return ETRate;                                  // mm/s; kg/(m2s)
