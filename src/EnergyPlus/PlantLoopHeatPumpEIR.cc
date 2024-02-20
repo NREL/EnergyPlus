@@ -92,6 +92,9 @@ void EIRPlantLoopHeatPump::simulate(
 
     this->loadSideInletTemp = state.dataLoopNodes->Node(this->loadSideNodes.inlet).Temp;
     this->sourceSideInletTemp = state.dataLoopNodes->Node(this->sourceSideNodes.inlet).Temp;
+    if (this->heatRecoveryAvailable) {
+        this->heatRecoveryInletTemp = state.dataLoopNodes->Node(this->heatRecoveryNodes.inlet).Temp;
+    }
 
     if (this->waterSource) {
         this->setOperatingFlowRatesWSHP(state, FirstHVACIteration);
@@ -277,6 +280,12 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
         this->sourceSideMassFlowRate = 0.0;
         PlantUtilities::SetComponentFlowRate(
             state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+        if (this->heatRecoveryAvailable) {
+            // set the HR flow to zero if the heat pump is off
+            this->heatRecoveryMassFlowRate = 0.0;
+            PlantUtilities::SetComponentFlowRate(
+                state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
+        }
         // Set flows if the heat pump is running
     } else { // the heat pump must run
         // apply min/max operating limits based on source side entering fluid temperature
@@ -286,6 +295,11 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
             this->running = false;
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            if (this->heatRecoveryAvailable) {
+                this->heatRecoveryMassFlowRate = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
+            }
         } else {
             this->loadSideMassFlowRate = this->loadSideDesignMassFlowRate;
             this->sourceSideMassFlowRate = this->sourceSideDesignMassFlowRate;
@@ -301,6 +315,12 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
 
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+
+            if (this->heatRecoveryAvailable) {
+                this->heatRecoveryMassFlowRate = this->heatRecoveryDesignMassFlowRate;
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
+            }
         }
 
         // if there's no flow in one, try to turn the entire heat pump off
@@ -310,6 +330,12 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
             this->running = false;
             PlantUtilities::SetComponentFlowRate(
                 state, this->loadSideMassFlowRate, this->loadSideNodes.inlet, this->loadSideNodes.outlet, this->loadSidePlantLoc);
+            // if heat recovery is connected to plant loop
+            if (this->heatRecoveryAvailable) {
+                this->heatRecoveryMassFlowRate = 0.0;
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
+            }
         }
     }
 }
