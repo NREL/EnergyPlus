@@ -216,7 +216,6 @@ TEST_F(EnergyPlusFixture, IndoorGreen_CheckETFunction)
     thisindoorgreen.ZCO2 = 400;  // ppm
     thisindoorgreen.ZPPFD = 0;   // umol/(m2s)
     thisindoorgreen.ZVPD = 2000; // Pa
-    thisindoorgreen.ETRate =
-        IndoorGreen::ETBaseFunction(*state, ZonePreTemp, ZonePreHum, thisindoorgreen.ZCO2, thisindoorgreen.ZPPFD, thisindoorgreen.ZVPD, LAI, SwithF);
+    thisindoorgreen.ETRate = IndoorGreen::ETBaseFunction(*state, ZonePreTemp, ZonePreHum, thisindoorgreen.ZPPFD, thisindoorgreen.ZVPD, LAI, SwithF);
     EXPECT_EQ(thisindoorgreen.ETRate, 0.0);
 }
