@@ -120,6 +120,22 @@ void EIRPlantLoopHeatPump::simulate(
         }
     } else if (this->airSource) {
         this->setOperatingFlowRatesASHP(state, FirstHVACIteration);
+
+        if (calledFromLocation.loopNum == this->heatRecoveryPlantLoc.loopNum) {
+            if (this->heatRecoveryAvailable) {
+                PlantUtilities::UpdateChillerComponentCondenserSide(state,
+                                                                    this->heatRecoveryPlantLoc.loopNum,
+                                                                    this->heatRecoveryPlantLoc.loopSideNum,
+                                                                    this->EIRHPType,
+                                                                    this->heatRecoveryNodes.inlet,
+                                                                    this->heatRecoveryNodes.outlet,
+                                                                    this->heatRecoveryRate,
+                                                                    this->heatRecoveryInletTemp,
+                                                                    this->heatRecoveryOutletTemp,
+                                                                    this->heatRecoveryMassFlowRate,
+                                                                    FirstHVACIteration);
+            }
+        }
     }
 
     if (this->running) {
@@ -336,6 +352,14 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
                 PlantUtilities::SetComponentFlowRate(
                     state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
             }
+        }
+        if (this->heatRecoveryAvailable) {
+            PlantUtilities::PullCompInterconnectTrigger(state,
+                                                        this->loadSidePlantLoc,
+                                                        this->condMassFlowRateTriggerIndex,
+                                                        this->heatRecoveryPlantLoc,
+                                                        DataPlant::CriteriaType::MassFlowRate,
+                                                        this->heatRecoveryMassFlowRate);
         }
     }
 }
@@ -607,7 +631,12 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
                                                                thisHeatRecoveryPlantLoop.FluidIndex,
                                                                "EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP()");
     Real64 const hRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
-    this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
+    if (hRecoveryMCp > 0.0) {
+        this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
+    } else {
+        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+    }
+    
 }
 
 void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
@@ -799,6 +828,17 @@ void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, [[maybe_unused
         } else if (this->airSource) {
             rho = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, state.dataEnvrn->OutDryBulbTemp, 0.0, routineName);
             this->sourceSideDesignMassFlowRate = rho * this->sourceSideDesignVolFlowRate;
+            // heat recovery
+            if (this->heatRecoveryAvailable) {
+                rho = FluidProperties::GetDensityGlycol(state,
+                                                        state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidName,
+                                                        Constant::InitConvTemp,
+                                                        state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum).FluidIndex,
+                                                        routineName);
+                this->heatRecoveryDesignMassFlowRate = rho * this->heatRecoveryDesignVolFlowRate;
+                PlantUtilities::InitComponentNodes(
+                    state, 0.0, this->heatRecoveryDesignMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet);
+            }
         }
 
         if (this->flowControl == DataPlant::FlowMode::VariableSpeedPump) {
@@ -1386,6 +1426,7 @@ void EIRPlantLoopHeatPump::sizeHeatRecoveryASHP(EnergyPlusData &state)
     } else {
         tmpHeatRecoveryVolFlow *= this->heatSizingRatio;
     }
+    this->heatRecoveryDesignMassFlowRate = rhoHR * this->heatRecoveryDesignVolFlowRate;
 
     if (this->heatRecoveryDesignVolFlowRateWasAutoSized) {
         this->heatRecoveryDesignVolFlowRate = tmpHeatRecoveryVolFlow;
@@ -2123,7 +2164,7 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
             SetupOutputVariable(state,
                                 "Heat Pump Heat Recovery Mass Flow Rate",
                                 Constant::Units::kg_s,
-                                this->heatRecoveryDesignMassFlowRate,
+                                this->heatRecoveryMassFlowRate,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 this->name);
