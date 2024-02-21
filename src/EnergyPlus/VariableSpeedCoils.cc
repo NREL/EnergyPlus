@@ -5871,7 +5871,9 @@ namespace VariableSpeedCoils {
                                                       varSpeedCoil.OATempCompressorOn,
                                                       false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
                                                       DefrostControl,
-                                                      ObjexxFCL::Optional_bool_const());
+                                                      ObjexxFCL::Optional_bool_const(),
+                                                      varSpeedCoil.RatedCapCoolTotal,
+                                                      varSpeedCoil.RatedAirVolFlowRate);
             break;
         default:
             break;

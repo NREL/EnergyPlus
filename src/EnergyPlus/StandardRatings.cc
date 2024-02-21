@@ -64,6 +64,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -920,8 +921,10 @@ namespace StandardRatings {
         ObjexxFCL::Optional_bool_const
             OATempCompressorOnOffBlank, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
         ObjexxFCL::Optional<HPdefrostControl const>
-            DefrostControl,                             // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
-        ObjexxFCL::Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
+            DefrostControl,                              // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+        ObjexxFCL::Optional_bool_const ASHRAE127StdRprt, // true if user wishes to report ASHRAE 127 standard ratings
+        ObjexxFCL::Optional<Real64 const> GrossRatedTotalCoolingCapacityVS, // Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+        ObjexxFCL::Optional<Real64 const> RatedVolumetricAirFlowRateVS      //  Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     )
     {
 
@@ -1074,12 +1077,13 @@ namespace StandardRatings {
         // Calculated and reported to the EIO file
         Real64 SEER_User(0.0);     // Seasonal Energy Efficiency Ratio using user PLF curve in SI [W/W]
         Real64 SEER_Standard(0.0); // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
-        Real64 EER(0.0);           // Energy Efficiency Ratio in SI [W/W]
+        Real64 EER(0.0);           // Energy Efficiency Ratio using AHRI 210-240 2017 in SI [W/W]
         Real64 IEER(0.0);          // Integerated Energy Efficiency Ratio in SI [W/W]
 
         // SEER2 ANSI/AHRI 210/240 Standard 2023 Ratings
         Real64 SEER2_User(0.0);     // Seasonal Energy Efficiency Ratio using user PLF curve in SI [W/W]
         Real64 SEER2_Standard(0.0); // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
+        Real64 EER2(0.0);           // Energy Efficiency Ratio using AHRI 210/140 - 2023
         Real64 EER_2022(0.0);       // Energy Efficiency Ratio in SI [W/W]
         Real64 IEER_2022(0.0);      // Integerated Energy Efficiency Ratio in SI [W/W]
         Real64 NetCoolingCapRated2022(0.0);
@@ -1288,6 +1292,7 @@ namespace StandardRatings {
             }
             // Calculate the standard ratings for multispeed DX cooling coil
             std::map<std::string, Real64> StandardRatingsResult = MultiSpeedDXCoolingCoilStandardRatings(state,
+                                                                                                         DXCoilName,
                                                                                                          DXCoilType,
                                                                                                          CapFTempCurveIndex,
                                                                                                          CapFFlowCurveIndex,
@@ -1304,13 +1309,16 @@ namespace StandardRatings {
             NetCoolingCapRated(ns) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed"];
             SEER_User = StandardRatingsResult["SEER_User"];
             SEER_Standard = StandardRatingsResult["SEER_Standard"];
+            EER = StandardRatingsResult["EER"];
 
             NetCoolingCapRated_2023(ns) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"];
             SEER2_User = StandardRatingsResult["SEER2_User"];
             SEER2_Standard = StandardRatingsResult["SEER2_Standard"];
+            EER2 = StandardRatingsResult["EER2"];
 
             IEER_2022 = StandardRatingsResult["IEER_2022"];
             EER_2022 = StandardRatingsResult["EER_2022"];
+
             // Writes the SEER value to the EIO file and standard tabular output tables
             ReportDXCoilRating(state,
                                DXCoilType,
@@ -1319,8 +1327,8 @@ namespace StandardRatings {
                                NetCoolingCapRated(ns),
                                SEER_User * ConvFromSIToIP,
                                SEER_Standard * ConvFromSIToIP,
-                               0.0,
-                               0.0,
+                               EER,
+                               EER * ConvFromSIToIP,
                                0.0,
                                0.0,
                                0.0,
@@ -1328,6 +1336,12 @@ namespace StandardRatings {
                                0,
                                false);
 
+            Real64 EER_Report(0.0);
+            if (SEER2_Standard > 0.0) {
+                EER_Report = EER;
+            } else if (IEER_2022 > 0.0) {
+                EER_Report = EER_2022;
+            }
             // Writes the SEER value to the EIO file and standard tabular output tables
             ReportDXCoilRating(state,
                                DXCoilType,
@@ -1336,8 +1350,8 @@ namespace StandardRatings {
                                NetCoolingCapRated_2023(ns),
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
-                               EER_2022,
-                               EER_2022 * ConvFromSIToIP,
+                               EER_Report,
+                               EER_Report * ConvFromSIToIP,
                                IEER_2022 * ConvFromSIToIP,
                                0.0,
                                0.0,
@@ -1428,8 +1442,7 @@ namespace StandardRatings {
 
             break;
         }
-        case Coil_CoolingAirToAirVariableSpeed:
-
+        case Coil_CoolingAirToAirVariableSpeed: {
             for (spnum = 1; spnum <= ns; ++spnum) {
                 CheckCurveLimitsForStandardRatings(state,
                                                    DXCoilName,
@@ -1442,22 +1455,44 @@ namespace StandardRatings {
                                                    PLFFPLRCurveIndex(spnum));
             }
 
-            std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationVariableSpeed(state,
-                                                                                                 DXCoilType,
-                                                                                                 ns,
-                                                                                                 CapFTempCurveIndex,
-                                                                                                 RatedTotalCapacity,
-                                                                                                 CapFFlowCurveIndex,
-                                                                                                 FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                                                 RatedAirVolFlowRate,
-                                                                                                 EIRFTempCurveIndex,
-                                                                                                 RatedCOP,
-                                                                                                 EIRFFlowCurveIndex,
-                                                                                                 CondenserType(1));
+            // Calculate the standard ratings for multispeed DX cooling coil
+            std::map<std::string, Real64> StandardRatingsResult = VariableSpeedDXCoolingCoilStandardRatings(state,
+                                                                                                            DXCoilType,
+                                                                                                            DXCoilName,
+                                                                                                            CapFTempCurveIndex,
+                                                                                                            CapFFlowCurveIndex,
+                                                                                                            EIRFTempCurveIndex,
+                                                                                                            EIRFFlowCurveIndex,
+                                                                                                            PLFFPLRCurveIndex(1),
+                                                                                                            RatedTotalCapacity,
+                                                                                                            RatedCOP,
+                                                                                                            RatedAirVolFlowRate,
+                                                                                                            FanPowerPerEvapAirFlowRateFromInput,
+                                                                                                            FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                                                            ns,
+                                                                                                            CondenserType(1),
+                                                                                                            GrossRatedTotalCoolingCapacityVS,
+                                                                                                            RatedVolumetricAirFlowRateVS);
 
-            NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
+            NetCoolingCapRated_2023(ns) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"];
+            SEER2_User = StandardRatingsResult["SEER2_User"];
+            SEER2_Standard = StandardRatingsResult["SEER2_Standard"];
+            EER2 = StandardRatingsResult["EER2"];
 
-            // Writes the SEER value to the EIO file and standard tabular output tables
+            IEER_2022 = StandardRatingsResult["IEER_2022"];
+            EER_2022 = StandardRatingsResult["EER_2022"];
+
+            NetCoolingCapRated(ns) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed"];
+            if (SEER2_Standard > 0.0) {
+                EER = EER2;
+            } else if (IEER_2022 > 0.0) {
+                EER = EER_2022;
+            }
+
+            // Writes the SEER value to the EIO file and standard tabular output tables | 2017
+            ReportDXCoilRating(
+                state, DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(ns), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, false);
+            // Writes the SEER2 & IEER 2022 value to the EIO file and standard tabular output tables | 2023
             ReportDXCoilRating(state,
                                DXCoilType,
                                DXCoilName,
@@ -1465,8 +1500,8 @@ namespace StandardRatings {
                                NetCoolingCapRated_2023(ns),
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
-                               EER_2022,
-                               EER_2022 * ConvFromSIToIP,
+                               EER,
+                               EER * ConvFromSIToIP,
                                IEER_2022 * ConvFromSIToIP,
                                0.0,
                                0.0,
@@ -1474,6 +1509,7 @@ namespace StandardRatings {
                                0,
                                true);
             break;
+        }
         default:
             break; //... other DX Coil types will follow here
         }
@@ -1500,13 +1536,115 @@ namespace StandardRatings {
                                   Array1D<DataHeatBalance::RefrigCondenserType> const &CondenserType,
                                   int const &PLFFPLRCurveIndex)
     {
+        std::map<std::string, Real64> StandardRatingsResult;
+
         // Intermediate values calculated from the inputs in the idf file
         // SEER2 ANSI/AHRI 210/240 Standard 2023 Ratings
         Real64 SEER2_User(0.0);                     // Seasonal Energy Efficiency Ratio using user PLF curve in SI [W/W]
         Real64 SEER2_Standard(0.0);                 // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
+        Real64 EER2(0.0);                           // Energy Efficiency Ratio using AHRI 210/240 - 2023
         Real64 NetCoolingCapRatedMaxSpeed2023(0.0); // net cooling capacity at maximum speed
-        Real64 EER_2022(0.0);                       // Energy Efficiency Ratio in SI [W/W]
-        Real64 IEER_2022(0.0);                      // Integerated Energy Efficiency Ratio in SI [W/W]
+
+        Real64 EER_2022(0.0);  // Energy Efficiency Ratio in SI [W/W]
+        Real64 IEER_2022(0.0); // Integerated Energy Efficiency Ratio in SI [W/W]
+        Real64 NetCoolingCapRated2022(0.0);
+
+        Real64 EER(0.0);
+        Real64 NetCoolingCapRated(0.0);
+
+        int ns = 2;
+
+        StandardRatingsResult = TwoSpeedDXCoilStandardRatings(state,
+                                                              DXCoilName,
+                                                              DXCoilType,
+                                                              DXCoilType_Num,
+                                                              RatedTotalCapacity,
+                                                              RatedTotCap2,
+                                                              RatedCOP,
+                                                              RatedCOP2,
+                                                              CapFFlowCurveIndex, // only hs
+                                                              CapFTempCurveIndex,
+                                                              CCapFTemp2,
+                                                              EIRFFlowCurveIndex, // only hs
+                                                              EIRFTempCurveIndex,
+                                                              EIRFTemp2,
+                                                              RatedAirVolFlowRate,
+                                                              RatedAirVolFlowRate2,
+                                                              FanPowerPerEvapAirFlowRate_2023,
+                                                              FanPowerPerEvapAirFlowRate_2023_LowSpeed,
+                                                              CondenserType,
+                                                              PLFFPLRCurveIndex);
+
+        // From SEER2 implementation
+        NetCoolingCapRatedMaxSpeed2023 = StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"];
+        SEER2_User = StandardRatingsResult["SEER2_User"];
+        SEER2_Standard = StandardRatingsResult["SEER2_Standard"];
+        EER2 = StandardRatingsResult["EER2"];
+
+        // From IEER 2022 implementation
+        NetCoolingCapRated2022 = StandardRatingsResult["NetCoolingCapRatedMaxSpeed"];
+        IEER_2022 = StandardRatingsResult["IEER_2022"];
+        EER_2022 = StandardRatingsResult["EER_2022"];
+
+        NetCoolingCapRated = NetCoolingCapRatedMaxSpeed2023;
+        // for the Report routine to correctly initialize with EER value.
+        if (StandardRatingsResult["SEER2_Standard"] > 0.0) {
+            EER = EER2;
+        } else if (StandardRatingsResult["IEER_2022"] > 0.0) {
+            EER = EER_2022;
+            NetCoolingCapRated = NetCoolingCapRated2022;
+        }
+
+        // Writes the SEER & IEER value to the EIO file and standard tabular output tables
+        ReportDXCoilRating(state,
+                           DXCoilType,
+                           DXCoilName,
+                           DXCoilType_Num,
+                           NetCoolingCapRated,
+                           SEER2_User * ConvFromSIToIP,
+                           SEER2_Standard * ConvFromSIToIP,
+                           EER,
+                           EER * ConvFromSIToIP,
+                           IEER_2022 * ConvFromSIToIP,
+                           0.0,
+                           0.0,
+                           0.0,
+                           0,
+                           true);
+    }
+
+    std::map<std::string, Real64> TwoSpeedDXCoilStandardRatings(EnergyPlusData &state,
+                                                                std::string const &DXCoilName,
+                                                                std::string const &DXCoilType,
+                                                                int const &DXCoilType_Num,
+                                                                Array1A<Real64> const &RatedTotalCapacity,
+                                                                Real64 const &RatedTotCap2,
+                                                                Array1A<Real64> const &RatedCOP,
+                                                                Real64 const &RatedCOP2,
+                                                                Array1A_int const &CapFFlowCurveIndex, // only hs
+                                                                Array1A_int const &CapFTempCurveIndex,
+                                                                int const &CCapFTemp2,
+                                                                Array1A_int const &EIRFFlowCurveIndex, // only hs
+                                                                Array1A_int const &EIRFTempCurveIndex,
+                                                                int const &EIRFTemp2,
+                                                                Array1A<Real64> const &RatedAirVolFlowRate,
+                                                                Real64 const &RatedAirVolFlowRate2,
+                                                                Array1A<Real64> const &FanPowerPerEvapAirFlowRate_2023,
+                                                                Array1A<Real64> const &FanPowerPerEvapAirFlowRate_2023_LowSpeed,
+                                                                Array1D<DataHeatBalance::RefrigCondenserType> const &CondenserType,
+                                                                int const &PLFFPLRCurveIndex)
+    {
+        std::map<std::string, Real64> StandardRatingsResult;
+
+        // Intermediate values calculated from the inputs in the idf file
+        // SEER2 ANSI/AHRI 210/240 Standard 2023 Ratings
+        Real64 SEER2_User(0.0);                     // Seasonal Energy Efficiency Ratio using user PLF curve in SI [W/W]
+        Real64 SEER2_Standard(0.0);                 // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
+        Real64 EER2(0.0);                           // Energy Efficiency Ratio using AHRI 210/240 - 2023
+        Real64 NetCoolingCapRatedMaxSpeed2023(0.0); // net cooling capacity at maximum speed
+
+        Real64 EER_2022(0.0);  // Energy Efficiency Ratio in SI [W/W]
+        Real64 IEER_2022(0.0); // Integerated Energy Efficiency Ratio in SI [W/W]
         Real64 NetCoolingCapRated2022(0.0);
 
         int ns = 2;
@@ -1539,6 +1677,7 @@ namespace StandardRatings {
         TSRatedCOP.push_back(RatedCOP2);
 
         for (int spnum = 1; spnum <= ns; ++spnum) {
+            // TODO:BPS Implement Two Speed Case :
             CheckCurveLimitsForStandardRatings(state,
                                                DXCoilName,
                                                DXCoilType,
@@ -1550,54 +1689,75 @@ namespace StandardRatings {
                                                PLFFPLRCurveIndex);    // Only Coil Level
         }
 
-        // ANSI/AHRI 210/240 Standard 2023 only applies for solely to Air Cooled Cooling Coils
-        if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
+        if (RatedTotalCapacity(1) > 0.0 && RatedAirVolFlowRate(1) > 0.0) {
 
-            // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
-            std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard) =
-                TwoSpeedDXCoolingCoilSEER2(state,
-                                           // 2, // nsp will always be 2 in case of Two Speed Coil
-                                           CapFFlowCurveIndex, // only HS
-                                           TSRatedTotCap,
-                                           TSCCapFTemp,
-                                           TSFanPowerPerEvapAirFlowRate2023,
-                                           TSRatedAirVolFlowRate,
-                                           EIRFFlowCurveIndex, // only HS
-                                           TSRatedCOP,
-                                           TSEIRFTemp,
-                                           PLFFPLRCurveIndex); // only coil level
+            if (RatedTotalCapacity(1) > 39564.59445) {
+
+                Real64 TotCapTempModFac =
+                    Curve::CurveValue(state, CapFTempCurveIndex(1), CoolingCoilInletAirWetBulbTempRated, CoilInletAirCoolDryBulbIEER);
+                Real64 TotCapFlowModFac = Curve::CurveValue(state, CapFFlowCurveIndex(1), AirMassFlowRatioRated);
+                NetCoolingCapRatedMaxSpeed2023 =
+                    RatedTotalCapacity(1) * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate_2023(1) * RatedAirVolFlowRate(1);
+                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+                ShowSevereError(state,
+                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                    std::to_string(RatedTotalCapacity(1)) +
+                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+            } else if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air && RatedTotalCapacity(1) < 19049.61955) {
+                // ANSI/AHRI 210/240 Standard 2023 only applies for solely to Air Cooled Cooling Coils
+                // Also, this standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+                // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1
+                // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
+
+                // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
+                std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2) =
+                    TwoSpeedDXCoolingCoilSEER2(state,
+                                               // 2, // nsp will always be 2 in case of Two Speed Coil
+                                               CapFFlowCurveIndex, // only HS
+                                               TSRatedTotCap,
+                                               TSCCapFTemp,
+                                               TSFanPowerPerEvapAirFlowRate2023,
+                                               TSRatedAirVolFlowRate,
+                                               EIRFFlowCurveIndex, // only HS
+                                               TSRatedCOP,
+                                               TSEIRFTemp,
+                                               PLFFPLRCurveIndex); // only coil level
+            } else {
+
+                // Calculate the IEER 2022 Standard ratings for Two Speed DX cooling coil | AHRI 340/360
+                std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(state,
+                                                                                                DXCoilType,
+                                                                                                CondenserType,
+                                                                                                TSCCapFTemp,
+                                                                                                TSRatedTotCap,
+                                                                                                CapFFlowCurveIndex,
+                                                                                                TSFanPowerPerEvapAirFlowRate2023,
+                                                                                                TSRatedAirVolFlowRate,
+                                                                                                TSEIRFTemp,
+                                                                                                TSRatedCOP,
+                                                                                                EIRFFlowCurveIndex);
+                NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
+            }
+        } else {
+            ShowSevereError(state,
+                            "Standard Ratings: Coil:Cooling:DX:TwoSpeed either has a zero rated total cooling capacity or zero air flow rate. "
+                            "Standard ratings cannot be calculated.");
         }
 
-        // Calculate the IEER 2022 Standard ratings for Two Speed DX cooling coil | AHRI 340/360
-        std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(state,
-                                                                                        DXCoilType,
-                                                                                        CondenserType,
-                                                                                        TSCCapFTemp,
-                                                                                        TSRatedTotCap,
-                                                                                        CapFFlowCurveIndex,
-                                                                                        TSFanPowerPerEvapAirFlowRate2023,
-                                                                                        TSRatedAirVolFlowRate,
-                                                                                        TSEIRFTemp,
-                                                                                        TSRatedCOP,
-                                                                                        EIRFFlowCurveIndex);
-        NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
+        // From SEER2 implementation
+        StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+        StandardRatingsResult["SEER2_User"] = SEER2_User;
+        StandardRatingsResult["SEER2_Standard"] = SEER2_Standard;
+        StandardRatingsResult["EER2"] = EER2;
 
-        // Writes the SEER value to the EIO file and standard tabular output tables
-        ReportDXCoilRating(state,
-                           DXCoilType,
-                           DXCoilName,
-                           DXCoilType_Num,
-                           NetCoolingCapRated_2023(ns),
-                           SEER2_User * ConvFromSIToIP,
-                           SEER2_Standard * ConvFromSIToIP,
-                           EER_2022,
-                           EER_2022 * ConvFromSIToIP,
-                           IEER_2022 * ConvFromSIToIP,
-                           0.0,
-                           0.0,
-                           0.0,
-                           0,
-                           true);
+        // From IEER2 implementation
+        StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] = NetCoolingCapRated2022;
+        StandardRatingsResult["IEER_2022"] = IEER_2022;
+        StandardRatingsResult["EER_2022"] = EER_2022;
+
+        return StandardRatingsResult;
     }
 
     Real64 SingleSpeedHeatingHSPF(const Real64 NetHeatingCapRated,
@@ -2307,6 +2467,65 @@ namespace StandardRatings {
         return EER;
     }
 
+    std::tuple<Real64, Real64, Real64, Real64>
+    SEER2CalulcationCurveFit(EnergyPlusData &state, std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
+    {
+        Real64 EEER2(0.0);
+        Real64 SEER2_User(0.0);
+        Real64 SEER2_Standard(0.0);
+        Real64 NetCoolingCapRated2023(0.0); // QAFull
+
+        Array1D<int> MSCCapFTemp;
+        Array1D<Real64> MSRatedTotCap;
+        Array1D<int> MSCCapAirFFlow;
+        Array1D<Real64> MSRatedEvaporatorFanPowerPerVolumeFlowRate2023;
+        Array1D<Real64> MSRatedAirVolFlowRate;
+        Array1D<int> MSEIRFTemp;
+        Array1D<Real64> MSRatedCOP;
+        Array1D<int> MSEIRAirFFlow;
+        Array1D<int> MSPLRFPLF;
+
+        int nsp = operatingMode.speeds.size();
+
+        for (int i = 0; i < nsp; ++i) {
+            CoilCoolingDXCurveFitSpeed speed = operatingMode.speeds[i];
+            MSCCapFTemp.push_back(speed.indexCapFT);
+
+            // Calculate the rated cooling capacity for the speed using Gross Total Cooling Capacity
+            // and Gross Total Cooling Capacity Fraction of the speed.
+            auto ratedTotalCapacity = speed.rated_total_capacity * operatingMode.ratedGrossTotalCap;
+            MSRatedTotCap.push_back(speed.rated_total_capacity); // get the capcity at each speed bymultiplying this fraCTION WITH the gross.
+
+            MSCCapAirFFlow.push_back(speed.indexCapFFF);
+            MSRatedEvaporatorFanPowerPerVolumeFlowRate2023.push_back(speed.rated_evap_fan_power_per_volume_flow_rate_2023);
+
+            // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
+            // and Rated Evaporator Air flow fraction of the speed
+            auto ratedEvapAirFlowRate = speed.evap_air_flow_rate * operatingMode.ratedEvapAirFlowRate;
+            MSRatedAirVolFlowRate.push_back(ratedEvapAirFlowRate);
+
+            MSEIRFTemp.push_back(speed.indexEIRFT);
+            MSRatedCOP.push_back(speed.ratedCOP);
+            MSEIRAirFFlow.push_back(speed.indexEIRFFF);
+            MSPLRFPLF.push_back(speed.indexPLRFPLF);
+        }
+
+        std::tie(NetCoolingCapRated2023, SEER2_User, SEER2_Standard, EEER2) =
+            VariableSpeedDXCoolingCoilSEER2(state,
+                                            nsp,
+                                            MSCCapAirFFlow,
+                                            MSRatedTotCap,
+                                            MSCCapFTemp,
+                                            MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                            MSRatedAirVolFlowRate,
+                                            MSEIRAirFFlow,
+                                            MSRatedCOP,
+                                            MSEIRFTemp,
+                                            MSPLRFPLF);
+
+        return std::make_tuple(NetCoolingCapRated2023, SEER2_User, SEER2_Standard, EEER2);
+    }
+
     std::tuple<Real64, Real64, Real64>
     IEERCalulcationCurveFit(EnergyPlusData &state, std::string const &CoilType, EnergyPlus::CoilCoolingDXCurveFitOperatingMode operatingMode)
     {
@@ -2328,10 +2547,20 @@ namespace StandardRatings {
         for (int i = 0; i < nsp; ++i) {
             CoilCoolingDXCurveFitSpeed speed = operatingMode.speeds[i];
             MSCCapFTemp.push_back(speed.indexCapFT);
-            MSRatedTotCap.push_back(speed.rated_total_capacity);
+
+            // Calculate the rated cooling capacity for the speed using Gross Total Cooling Capacity
+            // and Gross Total Cooling Capacity Fraction of the speed.
+            auto ratedTotalCapacity = speed.rated_total_capacity * operatingMode.ratedGrossTotalCap;
+            MSRatedTotCap.push_back(speed.rated_total_capacity); // get the capcity at each speed bymultiplying this fraCTION WITH the gross.
+
             MSCCapAirFFlow.push_back(speed.indexCapFFF);
             MSRatedEvaporatorFanPowerPerVolumeFlowRate2023.push_back(speed.rated_evap_fan_power_per_volume_flow_rate_2023);
-            MSRatedAirVolFlowRate.push_back(speed.evap_air_flow_rate);
+
+            // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
+            // and Rated Evaporator Air flow fraction of the speed
+            auto ratedEvapAirFlowRate = speed.evap_air_flow_rate * operatingMode.ratedEvapAirFlowRate;
+            MSRatedAirVolFlowRate.push_back(ratedEvapAirFlowRate);
+
             MSEIRFTemp.push_back(speed.indexEIRFT);
             MSRatedCOP.push_back(speed.ratedCOP);
             MSEIRAirFFlow.push_back(speed.indexEIRFFF);
@@ -2361,6 +2590,7 @@ namespace StandardRatings {
                                                                                              MSRatedCOP,
                                                                                              MSEIRAirFFlow,
                                                                                              _CondenserType);
+
         return std::make_tuple(IEER_2022, NetCoolingCapRated2022, EER_2022);
     }
 
@@ -3455,46 +3685,20 @@ namespace StandardRatings {
             FanPowerPerEvapAirFlowRate_2023 = FanPowerPerEvapAirFlowRateFromInput_2023;
         }
 
-        if (RatedTotalCapacity > 0.0) {
-
+        // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+        // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+        if (RatedTotalCapacity > 0.0 && RatedAirVolFlowRate > 0.0) {
             // Standard Rating Cooling (net) Capacity calculations:
             TotCapFlowModFac = CurveValue(state, CapFFlowCurveIndex, AirMassFlowRatioRated);
             TotCapTempModFac = CurveValue(state, CapFTempCurveIndex, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             // Net Cooling = Gross Capacity - Fan Power Consumption
             NetCoolingCapRated = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * RatedAirVolFlowRate;
+            StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
             NetCoolingCapRated2023 = RatedTotalCapacity * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate_2023 * RatedAirVolFlowRate;
+            StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
             EIRFlowModFac = Curve::CurveValue(state, EIRFFlowCurveIndex, AirMassFlowRatioRated);
 
-            std::tie(SEER_User, SEER_Standard) = SEERSingleStageCalculation(state,
-                                                                            CapFTempCurveIndex,
-                                                                            RatedTotalCapacity,
-                                                                            TotCapFlowModFac,
-                                                                            EIRFTempCurveIndex,
-                                                                            EIRFlowModFac,
-                                                                            EIRFFlowCurveIndex,
-                                                                            RatedCOP,
-                                                                            FanPowerPerEvapAirFlowRate,
-                                                                            RatedAirVolFlowRate,
-                                                                            PLFFPLRCurveIndex,
-                                                                            CyclicDegradationCoeff);
-            StandarRatingResults["SEER_User"] = SEER_User;
-            StandarRatingResults["SEER_Standard"] = SEER_Standard;
-
-            std::tie(SEER2_User, SEER2_Standard) = SEERSingleStageCalculation(state,
-                                                                              CapFTempCurveIndex,
-                                                                              RatedTotalCapacity,
-                                                                              TotCapFlowModFac,
-                                                                              EIRFTempCurveIndex,
-                                                                              EIRFlowModFac,
-                                                                              EIRFFlowCurveIndex,
-                                                                              RatedCOP,
-                                                                              FanPowerPerEvapAirFlowRate_2023,
-                                                                              RatedAirVolFlowRate,
-                                                                              PLFFPLRCurveIndex,
-                                                                              CyclicDegradationCoeffSEER2);
-            StandarRatingResults["SEER2_User"] = SEER2_User;
-            StandarRatingResults["SEER2_Standard"] = SEER2_Standard;
-
+            // IEER calculations
             // EER calculations:
             EER = EERSingleSpeedCooling(state,
                                         CapFTempCurveIndex,
@@ -3519,42 +3723,90 @@ namespace StandardRatings {
                                              EIRFlowModFac);
             StandarRatingResults["EER_2022"] = EER_2022;
 
-            // IEER calculations
-            if (CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
-                std::tie(IEER, NetCoolingCapRated) = IEERSingleSpeedCooling(state,
-                                                                            CapFTempCurveIndex,
-                                                                            RatedTotalCapacity,
-                                                                            TotCapFlowModFac,
-                                                                            FanPowerPerEvapAirFlowRate,
-                                                                            RatedAirVolFlowRate,
-                                                                            EIRFTempCurveIndex,
-                                                                            RatedCOP,
-                                                                            EIRFlowModFac);
-            }
-            StandarRatingResults["IEER"] = IEER;
-            StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
+            if (RatedTotalCapacity > 39564.59445) {
+                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+                StandarRatingResults["EER"] = 0.0;
+                StandarRatingResults["EER_2022"] = 0.0;
+                ShowSevereError(state,
+                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                    std::to_string(RatedTotalCapacity) +
+                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+            } else if (RatedTotalCapacity < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+                // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+                // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
 
-            // IEER 2022 Calculations
-            if (DXCoilType == "Coil:Cooling:DX:SingleSpeed") {
+                std::tie(SEER_User, SEER_Standard) = SEERSingleStageCalculation(state,
+                                                                                CapFTempCurveIndex,
+                                                                                RatedTotalCapacity,
+                                                                                TotCapFlowModFac,
+                                                                                EIRFTempCurveIndex,
+                                                                                EIRFlowModFac,
+                                                                                EIRFFlowCurveIndex,
+                                                                                RatedCOP,
+                                                                                FanPowerPerEvapAirFlowRate,
+                                                                                RatedAirVolFlowRate,
+                                                                                PLFFPLRCurveIndex,
+                                                                                CyclicDegradationCoeff);
+                StandarRatingResults["SEER_User"] = SEER_User;
+                StandarRatingResults["SEER_Standard"] = SEER_Standard;
 
-                std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationSingleSpeed(state,
-                                                                                                   DXCoilType,
-                                                                                                   CapFTempCurveIndex,
-                                                                                                   RatedTotalCapacity,
-                                                                                                   TotCapFlowModFac,
-                                                                                                   FanPowerPerEvapAirFlowRate_2023,
-                                                                                                   RatedAirVolFlowRate,
-                                                                                                   EIRFTempCurveIndex,
-                                                                                                   RatedCOP,
-                                                                                                   EIRFlowModFac,
-                                                                                                   CondenserType);
-                StandarRatingResults["IEER_2022"] = IEER_2022;
-                StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
+                std::tie(SEER2_User, SEER2_Standard) = SEERSingleStageCalculation(state,
+                                                                                  CapFTempCurveIndex,
+                                                                                  RatedTotalCapacity,
+                                                                                  TotCapFlowModFac,
+                                                                                  EIRFTempCurveIndex,
+                                                                                  EIRFlowModFac,
+                                                                                  EIRFFlowCurveIndex,
+                                                                                  RatedCOP,
+                                                                                  FanPowerPerEvapAirFlowRate_2023,
+                                                                                  RatedAirVolFlowRate,
+                                                                                  PLFFPLRCurveIndex,
+                                                                                  CyclicDegradationCoeffSEER2);
+                StandarRatingResults["SEER2_User"] = SEER2_User;
+                StandarRatingResults["SEER2_Standard"] = SEER2_Standard;
+
+            } else { // RatedTotalCapacity > 19049.61955
                 StandarRatingResults["EER_2022"] = EER_2022;
+                if (CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                    std::tie(IEER, NetCoolingCapRated) = IEERSingleSpeedCooling(state,
+                                                                                CapFTempCurveIndex,
+                                                                                RatedTotalCapacity,
+                                                                                TotCapFlowModFac,
+                                                                                FanPowerPerEvapAirFlowRate,
+                                                                                RatedAirVolFlowRate,
+                                                                                EIRFTempCurveIndex,
+                                                                                RatedCOP,
+                                                                                EIRFlowModFac);
+                }
+                StandarRatingResults["IEER"] = IEER;
+                StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
+
+                // IEER 2022 Calculations
+                if (DXCoilType == "Coil:Cooling:DX:SingleSpeed") {
+
+                    std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationSingleSpeed(state,
+                                                                                                       DXCoilType,
+                                                                                                       CapFTempCurveIndex,
+                                                                                                       RatedTotalCapacity,
+                                                                                                       TotCapFlowModFac,
+                                                                                                       FanPowerPerEvapAirFlowRate_2023,
+                                                                                                       RatedAirVolFlowRate,
+                                                                                                       EIRFTempCurveIndex,
+                                                                                                       RatedCOP,
+                                                                                                       EIRFlowModFac,
+                                                                                                       CondenserType);
+                    StandarRatingResults["IEER_2022"] = IEER_2022;
+                    StandarRatingResults["EER_2022"] = EER_2022;
+                    StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
+                }
             }
         } else {
             ShowSevereError(state,
-                            format("Standard Ratings: {} {} has zero rated total cooling capacity. Standard ratings cannot be calculated.",
+                            format("Standard Ratings: {} {} has esither zero rated total cooling capacity or zero rated air volume flow rate. "
+                                   "Standard ratings cannot be calculated.",
                                    DXCoilType,
                                    DXCoilName));
         }
@@ -3668,17 +3920,17 @@ namespace StandardRatings {
         }
     }
 
-    std::tuple<Real64, Real64, Real64> MultiSpeedDXCoolingCoilSEER(EnergyPlusData &state,
-                                                                   int const nsp,
-                                                                   Array1A_int const CapFFlowCurveIndex,
-                                                                   Array1A<Real64> const RatedTotalCapacity,
-                                                                   Array1A_int const CapFTempCurveIndex,
-                                                                   Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput,
-                                                                   Array1A<Real64> const RatedAirVolFlowRate,
-                                                                   Array1A_int const EIRFFlowCurveIndex,
-                                                                   Array1A<Real64> const RatedCOP,
-                                                                   Array1A_int EIRFTempCurveIndex,
-                                                                   Array1A_int const PLFFPLRCurveIndex)
+    std::tuple<Real64, Real64, Real64, Real64> MultiSpeedDXCoolingCoilSEER(EnergyPlusData &state,
+                                                                           int const nsp,
+                                                                           Array1A_int const CapFFlowCurveIndex,
+                                                                           Array1A<Real64> const RatedTotalCapacity,
+                                                                           Array1A_int const CapFTempCurveIndex,
+                                                                           Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput,
+                                                                           Array1A<Real64> const RatedAirVolFlowRate,
+                                                                           Array1A_int const EIRFFlowCurveIndex,
+                                                                           Array1A<Real64> const RatedCOP,
+                                                                           Array1A_int EIRFTempCurveIndex,
+                                                                           Array1A_int const PLFFPLRCurveIndex)
     {
         // Intermediate values calculated from the inputs in the idf file
         Array1D<Real64> FanPowerPerEvapAirFlowRate(nsp); // 2017 Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
@@ -3725,6 +3977,7 @@ namespace StandardRatings {
         Real64 NetCoolingCapRatedMaxSpeed = 0.0;
         Real64 SEER_User = 0.0;
         Real64 SEER_Standard = 0.0;
+        Real64 EER = 0.0;
 
         NetCoolingCapWeighted = 0.0;
         TotCoolingElecPowerWeighted = 0.0;
@@ -3800,6 +4053,11 @@ namespace StandardRatings {
         // Standard Rating cooling (net) capacity calculations:
         NetCoolingCapRated(nsp) = TotCoolCapTestA2(nsp);
         NetCoolingCapRatedMaxSpeed = NetCoolingCapRated(nsp);
+
+        // EER2 calculation |  Section 3.1.16(AHRI 210/240 2017)
+        // A ratio of the cooling capacity in Btu/h to the Total Power in watts at AFull test conditions and expressed in Btu/(W-h)
+        // In case of Coil:Cooling:DX:MultiSpeed coil we're picking the max speed.
+        EER = TotCoolCapTestA2(nsp) / OutdoorUnitPowerTestA2(nsp);
 
         // Calculate the SEER value based on contribution of each outdoor air bin temperature
         for (BinNum = 0; BinNum < NumOfOATempBins; ++BinNum) {
@@ -3879,25 +4137,627 @@ namespace StandardRatings {
             SEER_Standard = NetCoolingCapWeighted / TotCoolingElecPowerWeightedDefault;
         }
 
-        return std::make_tuple(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard);
+        return std::make_tuple(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard, EER);
     }
 
-    std::tuple<Real64, Real64, Real64> TwoSpeedDXCoolingCoilSEER2(EnergyPlusData &state,
-                                                                  // int const nsp,
-                                                                  Array1A_int const CapFFlowCurveIndex,
-                                                                  Array1A<Real64> const RatedTotalCapacity,
-                                                                  Array1A_int const CapFTempCurveIndex,
-                                                                  Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                  Array1A<Real64> const RatedAirVolFlowRate,
-                                                                  Array1A_int const EIRFFlowCurveIndex,
-                                                                  Array1A<Real64> const RatedCOP,
-                                                                  Array1A_int EIRFTempCurveIndex,
-                                                                  Array1A_int const PLFFPLRCurveIndex)
+    std::pair<Real64, int> GetMatchingSpeedFromBuildingLoad(Real64 buildingLoad, const Array1A<Real64> &speedList)
+    {
+        std::pair<int, Real64> result = {-1, -1}; // Initialize result to indicate no suitable number found
+        for (int i = 0; i < speedList.size(); ++i) {
+            Real64 scaledSpeed = speedList[i];
+            if (scaledSpeed >= buildingLoad) {
+                result = {speedList[i], i};
+                break;
+            }
+        }
+        return result;
+    }
+
+    // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+    // q - total bin capacity for SEER2 Standard.
+    // e - total bin energy for SEER2 Standard.
+    // NetTotCoolCapBinned_2023 - total bin capacity for SEER2 User.
+    // TotCoolElecPowerBinned_2023 - total bin energy for SEER2 Standard.
+    std::tuple<Real64, Real64, Real64, Real64>
+    IntermediateCapacityAndPowerSEER2Case1(EnergyPlusData &state, Real64 bl, Real64 q_low, Real64 n, Real64 p_low, int PLFFPLRCurveIndex)
+    {
+        Real64 e(0.0);
+        Real64 q(0.0);
+        Real64 clf_low = bl / q_low;                                     // Equation 11.75 (AHRI-2023)
+        Real64 plf_low = 1.0 - CyclicDegradationCoeff * (1.0 - clf_low); // Equation 11.76 (AHRI-2023)
+        q = clf_low * q_low * n;                                         // Equation 11.73 (AHRI-2023)
+        e = clf_low * p_low * n / plf_low;                               // Equation 11.74 (AHRI-2023)
+        Real64 NetTotCoolCapBinned_2023(0.0);
+        Real64 TotCoolElecPowerBinned_2023(0.0);
+        NetTotCoolCapBinned_2023 = clf_low * q_low * n;
+        Real64 PartLoadFactorUser_2023 = Curve::CurveValue(state, PLFFPLRCurveIndex, clf_low);
+        TotCoolElecPowerBinned_2023 = (clf_low / PartLoadFactorUser_2023) * p_low * n;
+        return std::make_tuple(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023);
+    }
+
+    // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+    // Speed
+    // q - total bin capacity for SEER2 Standard.
+    // e - total bin energy for SEER2 Standard.
+    // NetTotCoolCapBinned_2023 - total bin capacity for SEER2 User.
+    // TotCoolElecPowerBinned_2023 - total bin energy for SEER2 Standard.
+    std::tuple<Real64, Real64, Real64, Real64> IntermediateCapacityAndPowerSEER2Case2A(
+        Real64 p_int, Real64 q_int, Real64 q_low, Real64 bl, Real64 n, Real64 Q_E_Int, Real64 q_full, Real64 P_E_Int, Real64 p_full, Real64 p_low)
+    {
+        Real64 e(0.0);
+        Real64 q(0.0);
+
+        Real64 cop_low = q_low / p_low;
+        Real64 cop_int = q_int / p_int;
+        Real64 cop_full = q_full / p_full;
+        // Low Speed
+        Real64 cop_int_bin = cop_low + (cop_int - cop_low) / (q_int - q_low) * (bl - q_low); // Equation 11.101 (AHRI-2023)
+        q = bl * n;                                                                          // 11.92 --> n is missing in the print ?
+        e = q / cop_int_bin;                                                                 // 11.93 --> adjusted to 11.101
+        Real64 NetTotCoolCapBinned_2023(0.0);
+        Real64 TotCoolElecPowerBinned_2023(0.0);
+        // full Speed
+        Real64 LoadFactorQEnt_2023 = min(1.0, (Q_E_Int - q_low) / (q_full - q_low));
+        LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
+        Real64 LoadFactorPEnt_2023 = min(1.0, (P_E_Int - p_low) / (p_full - p_low));
+        LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
+        NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * q_full + (1.0 - LoadFactorQEnt_2023) * q_low;
+        TotCoolElecPowerBinned_2023 = LoadFactorPEnt_2023 * p_full + (1.0 - LoadFactorPEnt_2023) * p_low;
+        return std::make_tuple(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023);
+    }
+
+    // Building load can be matched by modulating the compressor speed between low speed &
+    // full Speed |Section 11.2.1.3.2 CASE 2 (AHRI 210-240 2023)
+    // q - total bin capacity for SEER2 Standard.
+    // e - total bin energy for SEER2 Standard.
+    // NetTotCoolCapBinned_2023 - total bin capacity for SEER2 User.
+    // TotCoolElecPowerBinned_2023 - total bin energy for SEER2 Standard.
+    std::tuple<Real64, Real64, Real64, Real64> IntermediateCapacityAndPowerSEER2Case2B(
+        Real64 p_int, Real64 bl, Real64 q_int, Real64 n, Real64 Q_E_Int, Real64 P_E_Int, Real64 q_low, Real64 p_low, Real64 q_full, Real64 p_full)
+    {
+        Real64 e(0.0);
+        Real64 q(0.0);
+        Real64 NetTotCoolCapBinned_2023(0.0);
+        Real64 TotCoolElecPowerBinned_2023(0.0);
+        Real64 cop_low = q_low / p_low;
+        Real64 cop_int = q_int / p_int;
+        Real64 cop_full = q_full / p_full;
+        Real64 LoadFactorQEnt_2023 = min(1.0, (Q_E_Int - q_low) / (q_full - q_low));
+        LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
+        Real64 LoadFactorPEnt_2023 = min(1.0, (P_E_Int - p_low) / (p_full - p_low));
+        LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
+        NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * q_full + (1.0 - LoadFactorQEnt_2023) * q_low;
+        TotCoolElecPowerBinned_2023 = LoadFactorPEnt_2023 * p_full + (1.0 - LoadFactorPEnt_2023) * p_low;
+        // Full Speed
+        Real64 cop_int_bin = cop_int + (cop_full - cop_int) / (q_full - q_int) * (bl - q_int); // Equation 11.102 (AHRI-2023)
+        q = bl * n;                                                                            // 11.92 --> n is missing in the print ?
+        e = q / cop_int_bin;                                                                   // 11.93 --> adjusted to 11.102
+        return std::make_tuple(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023);
+    }
+
+    // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+    // q - total bin capacity for SEER2 Standard.
+    // e - total bin energy for SEER2 Standard.
+    // NetTotCoolCapBinned_2023 - total bin capacity for SEER2 User.
+    // TotCoolElecPowerBinned_2023 - total bin energy for SEER2 Standard.
+    std::tuple<Real64, Real64, Real64, Real64>
+    IntermediateCapacityAndPowerSEER2Case3(Real64 q_full, Real64 p_full, Real64 CoolingCapacityMax_2023, Real64 CoolingElecPowerMax_2023, Real64 n)
+    {
+        Real64 e(0.0);
+        Real64 q(0.0);
+        q = q_full * n; // Equation 11.88 (AHRI-2023)
+        e = p_full * n; // Equation 11.89 (AHRI-2023)
+        Real64 NetTotCoolCapBinned_2023(0.0);
+        Real64 TotCoolElecPowerBinned_2023(0.0);
+        NetTotCoolCapBinned_2023 = CoolingCapacityMax_2023 * n;
+        TotCoolElecPowerBinned_2023 = CoolingElecPowerMax_2023 * n;
+        return std::make_tuple(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023);
+    }
+
+    // N_Cq - Capacity adjustment factor in cooling mode SEER2 #1
+    // M_Cq - Capacity adjustment factor in cooling mode SEER2 #2
+    std::tuple<Real64, Real64>
+    CapacityAdjustmentFactorsInCoolingModeSEER2(Real64 q_F_low, Real64 q_B_low, Real64 BN, Real64 q_B_full, Real64 q_A_full, Real64 q_E_int)
+    {
+        // Equation 11.90 (AHRI-2023)
+        Real64 q_87_low = q_F_low + (q_B_low - q_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
+        Real64 q_87_full = q_B_full + (q_A_full - q_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
+        // Equation 11.96 (AHRI-2023)
+        Real64 N_Cq = (q_E_int - q_87_low) / (q_87_full - q_87_low);
+        // Equation 11.95 (AHRI-2023)
+        Real64 M_Cq = (q_B_low - q_F_low) / (27.77 - 19.44) * (1. - N_Cq) + (q_A_full - q_B_full) / (35.0 - 27.77) * N_Cq;
+        return std::make_tuple(N_Cq, M_Cq);
+    }
+
+    // N_CE - Energy adjustment factor in cooling mode SEER2 #1
+    // M_CE - Energy adjustment factor in cooling mode SEER2 #2
+    std::tuple<Real64, Real64>
+    EnergyAdjustmentFactorsInCoolingModeSEER2(Real64 p_F_low, Real64 p_B_low, Real64 BN, Real64 p_B_full, Real64 p_A_full, Real64 p_E_int)
+    {
+        // Equation 11.91 (AHRI-2023)
+        Real64 p_87_low = p_F_low + (p_B_low - p_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
+        Real64 p_87_full = p_B_full + (p_A_full - p_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
+
+        // Equation 11.99 (AHRI-2023)
+        Real64 N_CE = (p_E_int - p_87_low) / (p_87_full - p_87_low);
+
+        // Equaition 11.98 (AHRI-2023)
+        Real64 M_CE = (p_B_low - p_F_low) / (27.77 - 19.44) * (1. - N_CE) + (p_A_full - p_B_full) / (35.0 - 27.77) * N_CE;
+        return std::make_tuple(N_CE, M_CE);
+    }
+
+    // q_int - Intermediate Steady State Capacity SEER2
+    // p_int - Intermediate Steady State Power SEER2
+    std::tuple<Real64, Real64> IntermediateSteadyStateCpacityAndPowerSEER2(Real64 q_E_int, Real64 M_Cq, Real64 p_E_int, Real64 M_CE, Real64 t)
+    {
+        // Equation 11.94 (AHRI-2023)
+        Real64 q_int = q_E_int + M_Cq * (t - 30.55);
+
+        // Equation 11.97 (AHRI-2023)
+        Real64 p_int = p_E_int + M_CE * (t - 30.55);
+        return std::make_tuple(q_int, p_int);
+    }
+
+    std::tuple<Real64, Real64, Real64, Real64> VariableSpeedDXCoolingCoilSEER2(EnergyPlusData &state,
+                                                                               int const nsp,
+                                                                               Array1A_int const CapFFlowCurveIndex,
+                                                                               Array1A<Real64> const GrossRatedCapacityAtSpeedLevel,
+                                                                               Array1A_int const CapFTempCurveIndex,
+                                                                               Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                               Array1A<Real64> const LoopVolumetricAirFlowRateAtSpeedLevel,
+                                                                               Array1A_int const EIRFFlowCurveIndex,
+                                                                               Array1A<Real64> const RatedCOP,
+                                                                               Array1A_int EIRFTempCurveIndex,
+                                                                               Array1A_int const PLFFPLRCurveIndex)
+    {
+
+        Real64 NetCoolingCapRatedMaxSpeed2023 = 0.0;
+        Real64 SEER2_User = 0.0;
+        Real64 SEER2_Standard = 0.0;
+        Real64 EER2 = 0.0;
+
+        // Intermediate values calculated from the inputs in the idf file
+        // ANSI/AHRI 210/240 Std. 2023
+        Array1D<Real64> FanPowerPerEvapAirFlowRate_2023(nsp); // 2023 Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+        Array1D<Real64> Q_A_Full(nsp);                        // Total cooling capacity at A2 test condition (High speed) | q_A_Full
+        Array1D<Real64> Q_B_Full(nsp);                        // Total cooling capacity at B2 test condition (High speed) | q_B_Full
+        Array1D<Real64> Q_B_Low(nsp);                         // Total cooling capacity at B1 test condition (Low speed) | q_B_Low
+        Array1D<Real64> Q_F_Low(nsp);                         // Total cooling capacity at F1 test condition (Low speed) | q_F_Low
+        Array1D<Real64> Q_E_Int(nsp);                         // Total cooling capacity at Eint (Ev) test condition | q_E_Int
+        Array1D<Real64> P_A_Full(nsp);                        // Outdoor Unit electric power at A2 test condition (High speed) | p_A_Full
+        Array1D<Real64> P_B_Full(nsp);                        // Outdoor Unit electric power at B2 test condition (High speed) | p_B_Full
+        Array1D<Real64> P_B_Low(nsp);                         // Outdoor Unit electric power at B1 test condition (Low speed) | p_B_Low
+        Array1D<Real64> P_F_Low(nsp);                         // Outdoor Unit electric power at F1 test condition | p_F_Low
+        Array1D<Real64> P_E_Int(nsp);                         // Outdoor Unit electric power at Eint (Ev) test conditon | p_E_Int
+
+        int spnum;                                    // compressor speed number
+        Array1D<Real64> TotCapFlowModFac(nsp);        // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+        Array1D<Real64> EIRFlowModFac(nsp);           // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+        Array1D<Real64> NetCoolingCapRated_2023(nsp); // net cooling capacity at each speed
+        Real64 q_low(0.0);                            // cooling capacity of Mult-speed DX coil at lower speed, [W]
+        Real64 q_full(0.0);                           // cooling capacity of Mult-speed DX coil at higher speed, [W]
+        Real64 p_low(0.0);                            // outdoor unit electric power input at low speed, [W]
+        Real64 p_full(0.0);                           // outdoor unit electric power input at high speed, [W]
+        Real64 CoolingCapacityMax_2023(0.0);          // cooling capacity of Mult-speed DX coil at max speed, [W]
+        Real64 CoolingElecPowerMax_2023(0.0);         // outdoor unit electric power input at Max speed, [W]
+
+        // binned cooling hours
+        Real64 BuildingCoolingLoad_2023(0.0);    // Building space cooling load corresponding to an outdoor bin temperature [W]
+        Real64 NetTotCoolCapBinned_2023(0.0);    // Net tot cooling cap corresponding to an outdoor bin temperature [W]
+        Real64 TotCoolElecPowerBinned_2023(0.0); // Total cooling electric power corresponding to an outdoor bin temperature [W]
+
+        Real64 constexpr SF(1.10); // Sizing Factor as per AHRI Std 210/240-2023 | equation 11.68
+        // Real64 constexpr V(1);     // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
+        Real64 constexpr V(0.93); // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
+        // part-load factor based on user-input PLF curve and C_D value that accounts for the cyclic degradation, [-]
+        Real64 PartLoadFactorUser_2023(0.0);
+
+        for (int spnum = 1; spnum <= nsp; ++spnum) {
+            FanPowerPerEvapAirFlowRate_2023(spnum) = 0.0;
+            if (FanPowerPerEvapAirFlowRateFromInput_2023(spnum) <= 0.0) {
+                FanPowerPerEvapAirFlowRate_2023(spnum) = DefaultFanPowerPerEvapAirFlowRateSEER2;
+            } else {
+                FanPowerPerEvapAirFlowRate_2023(spnum) = FanPowerPerEvapAirFlowRateFromInput_2023(spnum);
+            }
+        }
+
+        // Calculate the capacity and power for each speed
+        for (spnum = 1; spnum <= nsp; ++spnum) {
+            TotCapFlowModFac(spnum) = Curve::CurveValue(state, CapFFlowCurveIndex(spnum), AirMassFlowRatioRated);
+
+            Q_A_Full(spnum) =
+                GrossRatedCapacityAtSpeedLevel(spnum) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                    TotCapFlowModFac(spnum) -
+                FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+            Q_B_Full(spnum) =
+                GrossRatedCapacityAtSpeedLevel(spnum) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestB2) *
+                    TotCapFlowModFac(spnum) -
+                FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+            Q_B_Low(spnum) =
+                GrossRatedCapacityAtSpeedLevel(spnum) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestB1) *
+                    TotCapFlowModFac(spnum) -
+                FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+            Q_F_Low(spnum) =
+                GrossRatedCapacityAtSpeedLevel(spnum) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestF1) *
+                    TotCapFlowModFac(spnum) -
+                FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+            Q_E_Int(spnum) =
+                GrossRatedCapacityAtSpeedLevel(spnum) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestEint) *
+                    TotCapFlowModFac(spnum) -
+                FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+            EIRFlowModFac(spnum) = Curve::CurveValue(state, EIRFFlowCurveIndex(spnum), AirMassFlowRatioRated);
+            if (RatedCOP(spnum) > 0.0) {
+                P_A_Full(spnum) =
+                    Q_A_Full(spnum) * EIRFlowModFac(spnum) *
+                        Curve::CurveValue(
+                            state, EIRFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) /
+                        RatedCOP(spnum) +
+                    FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+                P_B_Full(spnum) =
+                    Q_B_Full(spnum) * EIRFlowModFac(spnum) *
+                        Curve::CurveValue(
+                            state, EIRFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestB2) /
+                        RatedCOP(spnum) +
+                    FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+                P_B_Low(spnum) = Q_B_Low(spnum) * EIRFlowModFac(spnum) *
+                                     Curve::CurveValue(
+                                         state, EIRFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestB1) /
+                                     RatedCOP(spnum) +
+                                 FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+                P_F_Low(spnum) = Q_F_Low(spnum) * EIRFlowModFac(spnum) *
+                                     Curve::CurveValue(
+                                         state, EIRFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestF1) /
+                                     RatedCOP(spnum) +
+                                 FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+
+                P_E_Int(spnum) =
+                    Q_E_Int(spnum) * EIRFlowModFac(spnum) *
+                        Curve::CurveValue(
+                            state, EIRFTempCurveIndex(spnum), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestEint) /
+                        RatedCOP(spnum) +
+                    FanPowerPerEvapAirFlowRate_2023(spnum) * LoopVolumetricAirFlowRateAtSpeedLevel(spnum);
+            }
+        }
+        // Standard Rating cooling (net) capacity calculations:
+        NetCoolingCapRated_2023(nsp) = Q_A_Full(nsp);
+        NetCoolingCapRatedMaxSpeed2023 = NetCoolingCapRated_2023(nsp);
+
+        // EER2 calculation |  Section 3.1.16(AHRI 210/240 2023)
+        // A ratio of the cooling capacity in Btu/h to the Total Power in watts at AFull test conditions and expressed in Btu/(W-h)
+        // In case of Coil:Cooling:DX:MultiSpeed coil we're picking the max speed.
+        EER2 = Q_A_Full(nsp) / P_A_Full(nsp);
+        // Calculate the SEER2 value based on contribution of each outdoor air bin temperature
+        Real64 q_sum = 0.0;
+        Real64 e_sum = 0.0;
+        Real64 NetCoolingCapWeighted2_2023 = 0.0;
+        Real64 TotCoolingElecPowerWeighted2_2023 = 0.0;
+        SEER2_User = 0.0;
+        SEER2_Standard = 0.0;
+        std::vector<int> speedsUsed;
+        // speedsUsed.push_back(1);
+        for (int BN = 0; BN < NumOfOATempBins; ++BN) {
+            // Equation 11.67 (AHRI-2023)
+            BuildingCoolingLoad_2023 = ((OutdoorBinTemperatureSEER[BN] - 18.3) / (35.0 - 18.3) * (Q_A_Full(nsp) / SF)) * V;
+            // determine the speed number
+            CoolingCapacityMax_2023 =
+                Q_B_Full(nsp) + ((Q_A_Full(nsp) - Q_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+            CoolingElecPowerMax_2023 =
+                P_B_Full(nsp) + ((P_A_Full(nsp) - P_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+            // Equation 11.69 (AHRI-2023)
+            q_low = Q_F_Low(1) + ((Q_B_Low(1) - Q_F_Low(1)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
+                                     (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
+            // Equation 11.70 (AHRI-2023)4
+            p_low = P_F_Low(1) + ((P_B_Low(1) - P_F_Low(1)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
+                                     (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
+            // Equation 11.71 (AHRI-2023)
+            q_full =
+                Q_B_Full(nsp) + ((Q_A_Full(nsp) - Q_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+            // Equation 11.72 (AHRI-2023)
+            p_full =
+                P_B_Full(nsp) + ((P_A_Full(nsp) - P_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+            Real64 q(0.0);
+            Real64 e(0.0);
+            bool skipSpeed = false;
+
+            // # Intermediate Capacity
+            Real64 q_A_full = Q_A_Full(nsp);
+            Real64 q_B_full = Q_B_Full(nsp);
+            Real64 q_B_low = Q_B_Low(1);
+            Real64 q_F_low = Q_F_Low(1);
+            // # Intermediate Power
+            Real64 p_A_full = P_A_Full(nsp);
+            Real64 p_B_full = P_B_Full(nsp);
+            Real64 p_B_low = P_B_Low(1);
+            Real64 p_F_low = P_F_Low(1);
+
+            Real64 N_Cq(0.0);
+            Real64 M_Cq(0.0);
+
+            Real64 N_CE(0.0);
+            Real64 M_CE(0.0);
+
+            Real64 q_int(0.0);
+            Real64 p_int(0.0);
+            Real64 t = OutdoorBinTemperatureSEER[BN];
+            Real64 n = CoolFracBinHoursAtOutdoorBinTemp[BN];
+            Real64 bl = BuildingCoolingLoad_2023;
+            if ((nsp >= 5 && nsp <= 10)) {
+                // New speed selection strategy :
+                auto result = GetMatchingSpeedFromBuildingLoad(BuildingCoolingLoad_2023, GrossRatedCapacityAtSpeedLevel);
+                int spnum = result.second + 1;
+                if (spnum != -1) {
+                    // found a speed that meets the building load
+                    // # Intermediate Capacity
+                    Real64 q_E_int = Q_E_Int(spnum);
+                    std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
+
+                    // # Intermediate Power
+                    Real64 p_E_int = P_E_Int(spnum);
+                    std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
+
+                    std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
+
+                    // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                    if (BuildingCoolingLoad_2023 <= q_low) {
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
+                        speedsUsed.push_back(spnum);
+                        goto SpeedLoop3_exit;
+                    } else if (BuildingCoolingLoad_2023 > q_low && BuildingCoolingLoad_2023 < q_full) {
+                        // Case 2A:
+                        if (bl < q_int) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
+                                p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
+                            speedsUsed.push_back(spnum);
+                            goto SpeedLoop3_exit;
+                        } else if (bl < q_full) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                            // full Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
+                                p_int, bl, q_int, n, Q_E_Int(spnum), P_E_Int(spnum), q_low, p_low, q_full, p_full);
+                            speedsUsed.push_back(spnum);
+                            goto SpeedLoop3_exit;
+                        }
+                    } else if (BuildingCoolingLoad_2023 >= q_full) {
+                        // Case 3:
+                        // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case3(q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                        speedsUsed.push_back(spnum);
+                        goto SpeedLoop3_exit;
+                    }
+                } else {
+                    // << ",, BIN NUMBER (C3), " << BN + 1 << ", NO SPEEDS MATCHED ??, " << spnum << std::endl;
+                }
+            } else if (nsp == 4) {
+                for (spnum = 1; spnum <= nsp; ++spnum) {
+                    // # Intermediate Capacity
+                    Real64 q_E_int;
+                    if (spnum == 2 || spnum == 3) {
+                        q_E_int = (Q_E_Int(2) + Q_E_Int(3)) * 0.5;
+                    } else {
+                        q_E_int = Q_E_Int(spnum);
+                    }
+                    // # Intermediate Power
+                    Real64 p_E_int;
+                    if (spnum == 2 || spnum == 3) {
+                        p_E_int = (P_E_Int(2) + P_E_Int(3)) * 0.5;
+                    } else {
+                        p_E_int = P_E_Int(spnum);
+                    }
+
+                    std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
+
+                    std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
+
+                    std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
+
+                    // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                    if (bl <= q_low) {
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
+                        // This is the case and speed we're looking for now we exit and try calculating against the next bin
+                        goto SpeedLoop3_exit;
+                    } else if (bl > q_low && bl < q_full && (spnum == 2 || spnum == 3)) {
+
+                        // Case 2A:
+                        if (bl < q_int) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+                            // Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
+                                p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
+                            goto SpeedLoop3_exit;
+                        } else if (bl < q_full) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                            // full Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
+                                p_int, bl, q_int, n, Q_E_Int(spnum), P_E_Int(spnum), q_low, p_low, q_full, p_full);
+                            goto SpeedLoop3_exit;
+                        }
+                    } else if (bl >= q_full && spnum > 3) {
+                        // Case 3:
+                        // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case3(q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                        goto SpeedLoop3_exit;
+                    }
+                }
+            } else if (nsp == 3) {
+                for (spnum = 1; spnum <= nsp; ++spnum) {
+                    // # Intermediate Capacity
+                    Real64 q_E_int = Q_E_Int(spnum);
+                    std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
+
+                    // # Intermediate Power
+                    Real64 p_E_int = P_E_Int(spnum);
+                    std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
+
+                    std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
+
+                    // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                    if (bl <= q_low) {
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
+                        // This is the case and speed we're looking for now we exit and try calculating against the next bin
+                        goto SpeedLoop3_exit;
+                    } else if (bl > q_low && bl < q_full) {
+                        // Case 2A:
+                        if (bl < q_int) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+                            // Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
+                                p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
+                            goto SpeedLoop3_exit;
+                        } else if (bl < q_full) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                            // full Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
+                                p_int, bl, q_int, n, Q_E_Int(spnum), P_E_Int(spnum), q_low, p_low, q_full, p_full);
+                            goto SpeedLoop3_exit;
+                        }
+                    } else if (bl >= q_full) {
+                        // Case 3:
+                        // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case3(q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                        goto SpeedLoop3_exit;
+                    }
+                }
+            } else if (nsp == 2) {
+                for (spnum = 1; spnum <= nsp; ++spnum) {
+                    // # Intermediate Capacity
+                    Real64 q_E_int = Q_E_Int(1);
+                    std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
+
+                    // # Intermediate Power
+                    Real64 p_E_int = P_E_Int(1);
+                    std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
+
+                    std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
+
+                    // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                    if (bl <= q_low) {
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
+                        // This is the case and speed we're looking for now we exit and try calculating against the next bin
+                        goto SpeedLoop3_exit;
+                    } else if (bl > q_low && bl < q_full) {
+                        // Case 2A:
+                        if (bl < q_int) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+                            // Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
+                                p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
+                            goto SpeedLoop3_exit;
+                        } else if (bl < q_full) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                            // full Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
+                                p_int, bl, q_int, n, Q_E_Int(spnum), P_E_Int(spnum), q_low, p_low, q_full, p_full);
+                            goto SpeedLoop3_exit;
+                        }
+                    } else if (bl >= q_full && spnum == nsp) {
+                        // Case 3:
+                        // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case3(q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                        goto SpeedLoop3_exit;
+                    }
+                }
+            } else if (nsp == 1) {
+                // Every calculation for each of the bins will be using only one speed i.e, Speed 1
+                // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                // # Intermediate Capacity
+                Real64 q_E_int = Q_E_Int(1);
+                std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
+
+                // # Intermediate Power
+                Real64 p_E_int = P_E_Int(1);
+                std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
+
+                std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
+
+                // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
+                if (BuildingCoolingLoad_2023 <= q_low) {
+                    // Case 1:
+                    std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                        IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(1));
+                    goto SpeedLoop3_exit;
+
+                } else if (BuildingCoolingLoad_2023 > q_low && BuildingCoolingLoad_2023 < q_full) {
+                    // Case 2:
+                    // Case 2A:
+                    if (bl < q_int) {
+                        // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+                        // Speed
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case2A(p_int, q_int, q_low, bl, n, Q_E_Int(1), q_full, P_E_Int(1), p_full, p_low);
+                        goto SpeedLoop3_exit;
+                    } else if (bl < q_full) {
+                        // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                        // full Speed
+                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                            IntermediateCapacityAndPowerSEER2Case2B(p_int, bl, q_int, n, Q_E_Int(1), P_E_Int(1), q_low, p_low, q_full, p_full);
+                        goto SpeedLoop3_exit;
+                    }
+                    // Case 2B:
+                } else if (BuildingCoolingLoad_2023 >= q_full) {
+                    // Case 3:
+                    // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                    std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                        IntermediateCapacityAndPowerSEER2Case3(q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                    goto SpeedLoop3_exit;
+                }
+            }
+        SpeedLoop3_exit:;
+            NetCoolingCapWeighted2_2023 += NetTotCoolCapBinned_2023;
+            TotCoolingElecPowerWeighted2_2023 += TotCoolElecPowerBinned_2023;
+
+            q_sum += q;
+            e_sum += e;
+        }
+        if (e_sum > 0.0) {
+            SEER2_User = NetCoolingCapWeighted2_2023 / TotCoolingElecPowerWeighted2_2023;
+            SEER2_Standard = q_sum / e_sum; // Equation 11.66 (AHRI-2023)
+        }
+        return std::make_tuple(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2);
+    }
+
+    std::tuple<Real64, Real64, Real64, Real64> TwoSpeedDXCoolingCoilSEER2(EnergyPlusData &state,
+                                                                          // int const nsp,
+                                                                          Array1A_int const CapFFlowCurveIndex,
+                                                                          Array1A<Real64> const RatedTotalCapacity,
+                                                                          Array1A_int const CapFTempCurveIndex,
+                                                                          Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                          Array1A<Real64> const RatedAirVolFlowRate,
+                                                                          Array1A_int const EIRFFlowCurveIndex,
+                                                                          Array1A<Real64> const RatedCOP,
+                                                                          Array1A_int EIRFTempCurveIndex,
+                                                                          Array1A_int const PLFFPLRCurveIndex)
     {
         int nsp = 2;
         Real64 NetCoolingCapRatedMaxSpeed2023 = 0.0;
         Real64 SEER2_User = 0.0;
         Real64 SEER2_Standard = 0.0;
+        Real64 EER2 = 0.0;
 
         Real64 constexpr SF(1.10); // Sizing Factor as per AHRI Std 210/240-2023 | equation 11.68
         Real64 constexpr V(1);     // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
@@ -3994,7 +4854,6 @@ namespace StandardRatings {
                     RatedCOP(2) +
                 FanPowerPerEvapAirFlowRate_2023(1) * RatedAirVolFlowRate(2);
         }
-
         // High Stage
         TotCapFlowModFac(2) = Curve::CurveValue(state, CapFFlowCurveIndex(1), AirMassFlowRatioRated);
         EIRFlowModFac(2) = Curve::CurveValue(state, EIRFFlowCurveIndex(1), AirMassFlowRatioRated);
@@ -4048,6 +4907,11 @@ namespace StandardRatings {
         // Standard Rating cooling (net) capacity calculations:
         NetCoolingCapRated_2023(2) = Q_A_Full(2);
         NetCoolingCapRatedMaxSpeed2023 = NetCoolingCapRated_2023(2);
+
+        // EER2 calculation |  Section 3.1.16(AHRI 210/240 2023)
+        // A ratio of the cooling capacity in Btu/h to the Total Power in watts at AFull test conditions and expressed in Btu/(W-h)
+        // In case of Coil:Cooling:DX:TwoSpeed coil we're picking the High Speed for the same.
+        EER2 = Q_A_Full(2) / P_A_Full(2);
 
         // Calculate the SEER value based on contribution of each outdoor air bin temperature
         Real64 q_sum = 0.0;
@@ -4213,20 +5077,20 @@ namespace StandardRatings {
             SEER2_Standard = q_sum / e_sum; // Equation 11.66 (AHRI-2023)
         }
 
-        return std::make_tuple(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard);
+        return std::make_tuple(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2);
     }
 
-    std::tuple<Real64, Real64, Real64> MultiSpeedDXCoolingCoilSEER2(EnergyPlusData &state,
-                                                                    int const nsp,
-                                                                    Array1A_int const CapFFlowCurveIndex,
-                                                                    Array1A<Real64> const RatedTotalCapacity,
-                                                                    Array1A_int const CapFTempCurveIndex,
-                                                                    Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                    Array1A<Real64> const RatedAirVolFlowRate,
-                                                                    Array1A_int const EIRFFlowCurveIndex,
-                                                                    Array1A<Real64> const RatedCOP,
-                                                                    Array1A_int EIRFTempCurveIndex,
-                                                                    Array1A_int const PLFFPLRCurveIndex)
+    std::tuple<Real64, Real64, Real64, Real64> MultiSpeedDXCoolingCoilSEER2(EnergyPlusData &state,
+                                                                            int const nsp,
+                                                                            Array1A_int const CapFFlowCurveIndex,
+                                                                            Array1A<Real64> const RatedTotalCapacity,
+                                                                            Array1A_int const CapFTempCurveIndex,
+                                                                            Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                            Array1A<Real64> const RatedAirVolFlowRate,
+                                                                            Array1A_int const EIRFFlowCurveIndex,
+                                                                            Array1A<Real64> const RatedCOP,
+                                                                            Array1A_int EIRFTempCurveIndex,
+                                                                            Array1A_int const PLFFPLRCurveIndex)
     {
         // Intermediate values calculated from the inputs in the idf file
         // ANSI/AHRI 210/240 Std. 2023
@@ -4267,11 +5131,13 @@ namespace StandardRatings {
         Real64 CoolingElecPowerMax_2023(0.0);         // outdoor unit electric power input at Max speed, [W]
 
         Real64 constexpr SF(1.10); // Sizing Factor as per AHRI Std 210/240-2023 | equation 11.68
-        Real64 constexpr V(1);     // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
+        // Real64 constexpr V(1);     // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
+        Real64 constexpr V(0.93); // V = 0.93 for Variable Speed Heat Pumps, otherwise V = 1.0
 
         Real64 NetCoolingCapRatedMaxSpeed2023 = 0.0;
         Real64 SEER2_User = 0.0;
         Real64 SEER2_Standard = 0.0;
+        Real64 EER2 = 0.0;
 
         NetCoolingCapWeighted_2023 = 0.0;
         TotCoolingElecPowerWeighted_2023 = 0.0;
@@ -4360,6 +5226,11 @@ namespace StandardRatings {
         NetCoolingCapRated_2023(nsp) = Q_A_Full(nsp);
         NetCoolingCapRatedMaxSpeed2023 = NetCoolingCapRated_2023(nsp);
 
+        // EER2 calculation |  Section 3.1.16(AHRI 210/240 2023)
+        // A ratio of the cooling capacity in Btu/h to the Total Power in watts at AFull test conditions and expressed in Btu/(W-h)
+        // In case of Coil:Cooling:DX:MultiSpeed coil we're picking the max speed.
+        EER2 = Q_A_Full(nsp) / P_A_Full(nsp);
+
         // Calculate the SEER value based on contribution of each outdoor air bin temperature
         Real64 q_sum = 0.0;
         Real64 e_sum = 0.0;
@@ -4376,32 +5247,30 @@ namespace StandardRatings {
                 P_B_Full(nsp) + ((P_A_Full(nsp) - P_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
                                     (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
 
+            // Equation 11.69 (AHRI-2023)
+            q_low = Q_F_Low(1) + ((Q_B_Low(1) - Q_F_Low(1)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
+                                     (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
+            // Equation 11.70 (AHRI-2023)
+            p_low = P_F_Low(1) + ((P_B_Low(1) - P_F_Low(1)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
+                                     (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
+            // Equation 11.71 (AHRI-2023)
+            q_full =
+                Q_B_Full(nsp) + ((Q_A_Full(nsp) - Q_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+            // Equation 11.72 (AHRI-2023)
+            p_full =
+                P_B_Full(nsp) + ((P_A_Full(nsp) - P_B_Full(nsp)) / (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
+                                    (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
+
             Real64 q(0.0);
             Real64 e(0.0);
-            for (spnum = 1; spnum <= nsp - 1; ++spnum) {
-                // Equation 11.69 (AHRI-2023)
-                q_low = Q_F_Low(spnum) +
-                        ((Q_B_Low(spnum) - Q_F_Low(spnum)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
-                            (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
-                // Equation 11.70 (AHRI-2023)
-                p_low = P_F_Low(spnum) +
-                        ((P_B_Low(spnum) - P_F_Low(spnum)) / (OutdoorCoilInletAirDryBulbTempTestB1 - OutdoorCoilInletAirDryBulbTempTestF1)) *
-                            (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestF1);
-                // Equation 11.71 (AHRI-2023)
-                q_full = Q_B_Full(spnum + 1) + ((Q_A_Full(spnum + 1) - Q_B_Full(spnum + 1)) /
-                                                (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                   (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
-                // Equation 11.72 (AHRI-2023)
-                p_full = P_B_Full(spnum + 1) + ((P_A_Full(spnum + 1) - P_B_Full(spnum + 1)) /
-                                                (OutdoorCoilInletAirDryBulbTempTestA2 - OutdoorCoilInletAirDryBulbTempTestB2)) *
-                                                   (OutdoorBinTemperatureSEER[BN] - OutdoorCoilInletAirDryBulbTempTestB2);
-
+            for (spnum = 1; spnum <= nsp; ++spnum) {
                 // # Intermediate Capacity
-                Real64 q_A_full = Q_A_Full[spnum];
-                Real64 q_B_full = Q_B_Full[spnum];
-                Real64 q_B_low = Q_B_Low[spnum];
-                Real64 q_F_low = Q_F_Low[spnum];
-                Real64 q_E_int = Q_E_Int[spnum];
+                Real64 q_A_full = Q_A_Full(spnum);
+                Real64 q_B_full = Q_B_Full(spnum);
+                Real64 q_B_low = Q_B_Low(spnum);
+                Real64 q_F_low = Q_F_Low(spnum);
+                Real64 q_E_int = Q_E_Int(spnum);
                 // Equation 11.90 (AHRI-2023)
                 Real64 q_87_low = q_F_low + (q_B_low - q_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
                 Real64 q_87_full = q_B_full + (q_A_full - q_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
@@ -4412,11 +5281,11 @@ namespace StandardRatings {
                 Real64 M_Cq = (q_B_low - q_F_low) / (27.77 - 19.44) * (1. - N_Cq) + (q_A_full - q_B_full) / (35.0 - 27.77) * N_Cq;
 
                 // # Intermediate Power
-                Real64 p_A_full = P_A_Full[spnum];
-                Real64 p_B_full = P_B_Full[spnum];
-                Real64 p_B_low = P_B_Low[spnum];
-                Real64 p_F_low = P_F_Low[spnum];
-                Real64 p_E_int = P_E_Int[spnum];
+                Real64 p_A_full = P_A_Full(spnum);
+                Real64 p_B_full = P_B_Full(spnum);
+                Real64 p_B_low = P_B_Low(spnum);
+                Real64 p_F_low = P_F_Low(spnum);
+                Real64 p_E_int = P_E_Int(spnum);
                 // Equation 11.91 (AHRI-2023)
                 Real64 p_87_low = p_F_low + (p_B_low - p_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
                 Real64 p_87_full = p_B_full + (p_A_full - p_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
@@ -4440,56 +5309,58 @@ namespace StandardRatings {
 
                 // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
                 if (bl <= q_low) {
-                    Real64 clf_low = bl / q_low;                                     // Equation 11.75 (AHRI-2023)
-                    Real64 plf_low = 1.0 - CyclicDegradationCoeff * (1.0 - clf_low); // Equation 11.76 (AHRI-2023)
-                    q = clf_low * q_low * n;                                         // Equation 11.73 (AHRI-2023)
-                    e = clf_low * p_low * n / plf_low;                               // Equation 11.74 (AHRI-2023)
-
-                    NetTotCoolCapBinned_2023 = clf_low * q_low * CoolFracBinHoursAtOutdoorBinTemp[BN];
-                    PartLoadFactorUser_2023 = Curve::CurveValue(state, PLFFPLRCurveIndex(spnum), clf_low);
-                    TotCoolElecPowerBinned_2023 = (clf_low / PartLoadFactorUser_2023) * p_low * CoolFracBinHoursAtOutdoorBinTemp[BN];
+                    std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                        IntermediateCapacityAndPowerSEER2Case1(state, bl, q_low, n, p_low, PLFFPLRCurveIndex(spnum));
+                    // This is the case and speed we're looking for now we exit and try calculating against the next bin
                     goto SpeedLoop3_exit;
-                } else if (bl < q_int) {
-                    // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full Speed
-                    Real64 LoadFactorQEnt_2023 = min(1.0, (Q_E_Int(spnum) - q_low) / (q_full - q_low));
-                    LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
-                    Real64 LoadFactorPEnt_2023 = min(1.0, (P_E_Int(spnum) - p_low) / (p_full - p_low));
-                    LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
-                    NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * q_full + (1.0 - LoadFactorQEnt_2023) * q_low;
-                    TotCoolElecPowerBinned_2023 = LoadFactorPEnt_2023 * p_full + (1.0 - LoadFactorPEnt_2023) * p_low;
+                } else {
+                    //
+                    if (spnum < nsp - 1) {
+                        // As part of our new experiment if the first case is not satisfied then we'll go and try the next speed
+                        // instead of going to the next case.
+                    } else {
+                        // if we're here then all the speeds (apart from max speed) failed to satisfy the first case.
+                        // Now we've to try second case.
+                        if (bl < q_int) {
+                            // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full
+                            // Speed
+                            std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2A(
+                                p_int, q_int, q_low, bl, n, Q_E_Int(spnum), q_full, P_E_Int(spnum), p_full, p_low);
+                            goto SpeedLoop3_exit;
+                        } else {
+                            // if we're here then all the speeds (apart from max speed) failed to staisfy the case 2A
+                            if (bl < q_full) {
+                                // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed &
+                                // full Speed
+                                std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) = IntermediateCapacityAndPowerSEER2Case2B(
+                                    p_int, bl, q_int, n, Q_E_Int(spnum), P_E_Int(spnum), q_low, p_low, q_full, p_full);
+                                goto SpeedLoop3_exit;
+                            } else {
+                                // if we're here then all the speeds (apart form max speed ?? ) failed to staisfy the case 2B
+                                // max speed shoudl include in cases 1,2A,2B or not ?? TBD:
+                                if (bl >= q_full) { // bl >= q_full
 
-                    // Low Speed
-                    Real64 cop_int_bin = cop_low + (cop_int - cop_low) / (q_int - q_low) * (bl - q_low); // Equation 11.101 (AHRI-2023)
-                    q = bl * n;                                                                          // 11.92 --> n is missing in the print ?
-                    e = q / cop_int_bin;                                                                 // 11.93 --> adjusted to 11.101
-                    goto SpeedLoop3_exit;
-                } else if (bl <= q_full) {
-                    // Section 11.2.1.3.2 CASE 2 - Building load can be matched by modulating the compressor speed between low speed & full Speed
-                    Real64 LoadFactorQEnt_2023 = min(1.0, (Q_E_Int(spnum) - q_low) / (q_full - q_low));
-                    LoadFactorQEnt_2023 = max(0.0, LoadFactorQEnt_2023);
-                    Real64 LoadFactorPEnt_2023 = min(1.0, (P_E_Int(spnum) - p_low) / (p_full - p_low));
-                    LoadFactorPEnt_2023 = max(0.0, LoadFactorPEnt_2023);
-                    NetTotCoolCapBinned_2023 = LoadFactorQEnt_2023 * q_full + (1.0 - LoadFactorQEnt_2023) * q_low;
-                    TotCoolElecPowerBinned_2023 = LoadFactorPEnt_2023 * p_full + (1.0 - LoadFactorPEnt_2023) * p_low;
-
-                    // Full Speed
-                    Real64 cop_int_bin = cop_int + (cop_full - cop_int) / (q_full - q_int) * (bl - q_int); // Equation 11.102 (AHRI-2023)
-                    q = bl * n;                                                                            // 11.92 --> n is missing in the print ?
-                    e = q / cop_int_bin;                                                                   // 11.93 --> adjusted to 11.102
-                    goto SpeedLoop3_exit;
-                } else { // bl >= q_full
-                    // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
-                    NetTotCoolCapBinned_2023 = CoolingCapacityMax_2023 * CoolFracBinHoursAtOutdoorBinTemp[BN];
-                    TotCoolElecPowerBinned_2023 = CoolingElecPowerMax_2023 * CoolFracBinHoursAtOutdoorBinTemp[BN];
-
-                    q = q_full * n; // Equation 11.88 (AHRI-2023)
-                    e = p_full * n; // Equation 11.89 (AHRI-2023)
-                    goto SpeedLoop3_exit;
+                                    if (spnum == nsp - 1) {
+                                        // Case 4 if applicable for nsp-1 then we're skipping it to nsp( max speed )
+                                    } else {
+                                        // Section 11.2.1.3.3 CASE 3 - Building load is equal to or greater than unit capacity at full stage
+                                        std::tie(q, e, NetTotCoolCapBinned_2023, TotCoolElecPowerBinned_2023) =
+                                            IntermediateCapacityAndPowerSEER2Case3(
+                                                q_full, p_full, CoolingCapacityMax_2023, CoolingElecPowerMax_2023, n);
+                                        goto SpeedLoop3_exit;
+                                    }
+                                } else {
+                                    // << ",, BIN NUMBER, " << BN + 1 << ", NO CASES MATCHED, " << spnum << std::endl;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         SpeedLoop3_exit:;
             NetCoolingCapWeighted2_2023 += NetTotCoolCapBinned_2023;
             TotCoolingElecPowerWeighted2_2023 += TotCoolElecPowerBinned_2023;
+
             q_sum += q;
             e_sum += e;
         }
@@ -4500,12 +5371,13 @@ namespace StandardRatings {
             SEER2_Standard = q_sum / e_sum; // Equation 11.66 (AHRI-2023)
         }
 
-        return std::make_tuple(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard);
+        return std::make_tuple(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2);
     }
 
     std::map<std::string, Real64> MultiSpeedDXCoolingCoilStandardRatings(
         EnergyPlusData &state,
         std::string const &DXCoilType,                                  // Type of DX coil for which HSPF is calculated
+        std::string const &DXCoilName,                                  // Type of DX coil for which standard Ratings are calculated
         Array1A_int const CapFTempCurveIndex,                           // Index for the capacity as a function of temperature modifier curve
         Array1A_int const CapFFlowCurveIndex,                           // Index for the capacity as a function of flow fraction modifier curve
         Array1A_int const EIRFTempCurveIndex,                           // Index for the EIR as a function of temperature modifier curve
@@ -4570,6 +5442,7 @@ namespace StandardRatings {
         Real64 SEER_Standard(0.0); // seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF
                                    // curve and
                                    // C_D value
+        Real64 EER(0.0);
 
         // Ratings Based on ANSI/AHRI 210/140
         Real64 NetCoolingCapRatedMaxSpeed2023(0.0); // net cooling capacity at maximum speed
@@ -4577,7 +5450,12 @@ namespace StandardRatings {
         Real64 SEER2_Standard(0.0); // seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF
                                     // curve and
                                     // C_D value
+        Real64 EER2(0.0);
 
+        // IEER Calculation 2022
+        Real64 IEER_2022(0.0);
+        Real64 NetCoolingCapRated2023(0.0); // ?? for which speed (NetCoolingCapRatedMaxSpeed2023)
+        Real64 EER_2022(0.0);
         std::map<std::string, Real64> StandardRatingsResult;
         // StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] = NetCoolingCapRatedMaxSpeed;
         // StandardRatingsResult["SEER_User"] = SEER_User;
@@ -4585,58 +5463,92 @@ namespace StandardRatings {
         // StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
         // StandardRatingsResult["SEER2_User"] = SEER2_User;
         // StandardRatingsResult["SEER2_Standard"] = SEER2_Standard;
+        Real64 TotCapFlowModFac = Curve::CurveValue(state, CapFFlowCurveIndex(nsp), AirMassFlowRatioRated);
+        NetCoolingCapRatedMaxSpeed =
+            RatedTotalCapacity(nsp) *
+                Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                TotCapFlowModFac -
+            FanPowerPerEvapAirFlowRateFromInput(nsp) * RatedAirVolFlowRate(nsp);
+        if (RatedTotalCapacity(nsp) > 0.0 && RatedAirVolFlowRate(nsp) > 0.0) {
+            if (RatedTotalCapacity(nsp) > 39564.59445) {
 
-        std::tie(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard) = MultiSpeedDXCoolingCoilSEER(state,
-                                                                                                     nsp,
-                                                                                                     CapFFlowCurveIndex,
-                                                                                                     RatedTotalCapacity,
-                                                                                                     CapFTempCurveIndex,
-                                                                                                     FanPowerPerEvapAirFlowRateFromInput,
-                                                                                                     RatedAirVolFlowRate,
-                                                                                                     EIRFFlowCurveIndex,
-                                                                                                     RatedCOP,
-                                                                                                     EIRFTempCurveIndex,
-                                                                                                     PLFFPLRCurveIndex);
+                NetCoolingCapRated2023 =
+                    RatedTotalCapacity(nsp) *
+                        Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                        TotCapFlowModFac -
+                    FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * RatedAirVolFlowRate(nsp);
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
+                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+                ShowSevereError(state,
+                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                    std::to_string(RatedTotalCapacity(nsp)) +
+                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+            } else if (RatedTotalCapacity(nsp) < 19049.61955 && CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
+                // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+                // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+                // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
 
-        // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
-        std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard) = MultiSpeedDXCoolingCoilSEER2(state,
-                                                                                                            nsp,
-                                                                                                            CapFFlowCurveIndex,
-                                                                                                            RatedTotalCapacity,
-                                                                                                            CapFTempCurveIndex,
-                                                                                                            FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                                                            RatedAirVolFlowRate,
-                                                                                                            EIRFFlowCurveIndex,
-                                                                                                            RatedCOP,
-                                                                                                            EIRFTempCurveIndex,
-                                                                                                            PLFFPLRCurveIndex);
+                std::tie(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard, EER) = MultiSpeedDXCoolingCoilSEER(state,
+                                                                                                                  nsp,
+                                                                                                                  CapFFlowCurveIndex,
+                                                                                                                  RatedTotalCapacity,
+                                                                                                                  CapFTempCurveIndex,
+                                                                                                                  FanPowerPerEvapAirFlowRateFromInput,
+                                                                                                                  RatedAirVolFlowRate,
+                                                                                                                  EIRFFlowCurveIndex,
+                                                                                                                  RatedCOP,
+                                                                                                                  EIRFTempCurveIndex,
+                                                                                                                  PLFFPLRCurveIndex);
 
-        // IEER Calculation 2022
-        Real64 IEER_2022(0.0);
-        Real64 NetCoolingCapRated2023(0.0); // ?? for which speed (NetCoolingCapRatedMaxSpeed2023)
-        Real64 EER_2022(0.0);
-        std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationMultiSpeed(state,
-                                                                                          DXCoilType,
-                                                                                          nsp,
-                                                                                          CapFTempCurveIndex,
-                                                                                          RatedTotalCapacity,
-                                                                                          CapFFlowCurveIndex,
-                                                                                          // TotCapFlowModFac, // calculate for each speed
-                                                                                          FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                                          RatedAirVolFlowRate,
-                                                                                          EIRFTempCurveIndex,
-                                                                                          RatedCOP,
-                                                                                          EIRFFlowCurveIndex,
-                                                                                          // EIRFlowModFac, // calculate for each speed
-                                                                                          CondenserType);
+                // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
+                std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2) =
+                    MultiSpeedDXCoolingCoilSEER2(state,
+                                                 nsp,
+                                                 CapFFlowCurveIndex,
+                                                 RatedTotalCapacity,
+                                                 CapFTempCurveIndex,
+                                                 FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                 RatedAirVolFlowRate,
+                                                 EIRFFlowCurveIndex,
+                                                 RatedCOP,
+                                                 EIRFTempCurveIndex,
+                                                 PLFFPLRCurveIndex);
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+            } else {
+                // Gross total cooling capacity is greater than 65,000 Btu/h (19049.61955 Watts)
+                // Section 2.1 (ANSI/AHRI 210-240 2023)
+                std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationMultiSpeed(state,
+                                                                                                  DXCoilType,
+                                                                                                  nsp,
+                                                                                                  CapFTempCurveIndex,
+                                                                                                  RatedTotalCapacity,
+                                                                                                  CapFFlowCurveIndex,
+                                                                                                  // TotCapFlowModFac, // calculate for each speed
+                                                                                                  FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                                                  RatedAirVolFlowRate,
+                                                                                                  EIRFTempCurveIndex,
+                                                                                                  RatedCOP,
+                                                                                                  EIRFFlowCurveIndex,
+                                                                                                  // EIRFlowModFac, // calculate for each speed
+                                                                                                  CondenserType);
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
+            }
+        } else {
+            ShowSevereError(state,
+                            "Standard Ratings: Coil:Cooling:DX:MultiSpeed has eiher zero rated total cooling capacity or zero rated air vol flow "
+                            "rate. Standard ratings cannot be calculated.");
+        }
 
         StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] = NetCoolingCapRatedMaxSpeed;
         StandardRatingsResult["SEER_User"] = SEER_User;
         StandardRatingsResult["SEER_Standard"] = SEER_Standard;
+        StandardRatingsResult["EER"] = EER;
 
-        StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
         StandardRatingsResult["SEER2_User"] = SEER2_User;
         StandardRatingsResult["SEER2_Standard"] = SEER2_Standard;
+        StandardRatingsResult["EER2"] = EER2;
 
         StandardRatingsResult["IEER_2022"] = IEER_2022;
         StandardRatingsResult["EER_2022"] = EER_2022;
@@ -4644,7 +5556,189 @@ namespace StandardRatings {
         return StandardRatingsResult;
     }
 
-    std::tuple<Real64, Real64, Real64> MultiSpedDXHeatingCoilHSPF(
+    std::map<std::string, Real64> VariableSpeedDXCoolingCoilStandardRatings(
+        EnergyPlusData &state,
+        std::string const &DXCoilType,                                  // Type of DX coil for which HSPF is calculated
+        std::string const &DXCoilName,                                  // Name of the DX Coil for which Standard Ratings are calculated.
+        Array1A_int const CapFTempCurveIndex,                           // Index for the capacity as a function of temperature modifier curve
+        Array1A_int const CapFFlowCurveIndex,                           // Index for the capacity as a function of flow fraction modifier curve
+        Array1A_int const EIRFTempCurveIndex,                           // Index for the EIR as a function of temperature modifier curve
+        Array1A_int const EIRFFlowCurveIndex,                           // Index for the EIR as a function of flow fraction modifier curve
+        int const PLFFPLRCurveIndex,                                    // Index for the PLF vs part-load ratio curve
+        Array1A<Real64> const RatedTotalCapacity,                       // Reference capacity of DX coil [W]
+        Array1A<Real64> const RatedCOP,                                 // Reference coefficient of performance [W/W]
+        Array1A<Real64> const RatedAirVolFlowRate,                      // Reference air flow rate of DX coil [m3/s]
+        Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput,      // 2017 rated fan power per evap air flow rate [W/(m3/s)]
+        Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput_2023, // 2023 rated fan power per evap air flow rate [W/(m3/s)]
+        int const nsp,                                                  // Number of compressor speeds
+        DataHeatBalance::RefrigCondenserType const &CondenserType,
+        Real64 VSGrossRatedTotalCoolingCapacity,
+        Real64 VSRatedVolumetricAirFlowRate)
+    {
+        // Using/Aliasing
+        using Curve::CurveValue;
+
+        // Argument array dimensioning
+        CapFTempCurveIndex.dim(nsp);
+        CapFFlowCurveIndex.dim(nsp);
+        EIRFTempCurveIndex.dim(nsp);
+        EIRFFlowCurveIndex.dim(nsp);
+        // PLFFPLRCurveIndex.dim(nsp);
+        RatedTotalCapacity.dim(nsp);
+        RatedCOP.dim(nsp);
+        RatedAirVolFlowRate.dim(nsp);
+        FanPowerPerEvapAirFlowRateFromInput.dim(nsp);
+
+        // Ratings Based on ANSI/AHRI 210/140
+        Real64 NetCoolingCapRatedMaxSpeed2023(0.0); // net cooling capacity at maximum speed
+        Real64 SEER2_User(0.0);     // seasonal energy efficiency ratio of multi speed DX cooling coil, from user-input PLF curve and C_D value
+        Real64 SEER2_Standard(0.0); // seasonal energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF
+                                    // curve and
+                                    // C_D value
+        Real64 EER2(0.0);
+
+        Real64 IEER_2022(0.0);
+        Real64 NetCoolingCapRated2022(0.0); // ?? for which speed (NetCoolingCapRatedMaxSpeed2023)
+        Real64 EER_2022(0.0);
+
+        std::map<std::string, Real64> StandardRatingsResult;
+
+        Real64 GrossRatedTotalCoolingCapacityVS(0.0);
+        if (VSGrossRatedTotalCoolingCapacity < 0) {
+            GrossRatedTotalCoolingCapacityVS = RatedTotalCapacity(nsp);
+        } else {
+            GrossRatedTotalCoolingCapacityVS = VSGrossRatedTotalCoolingCapacity;
+        }
+        Real64 RatedVolumetricAirFlowRateVS(0.0);
+        if (VSRatedVolumetricAirFlowRate < 0) {
+            RatedVolumetricAirFlowRateVS = RatedAirVolFlowRate(nsp);
+        } else {
+            RatedVolumetricAirFlowRateVS = VSRatedVolumetricAirFlowRate;
+        }
+
+        Real64 CapacityScaleFactor(0.0);
+        Real64 GrossRatedTotalCoolingCapacity(0.0);
+        Real64 ReferenceUnitCapacityAtNominalSpeedLevel(0.0);
+
+        Array1D<Real64> GrossRatedCapacityAtSpeedLevel(nsp);
+        Array1D<Real64> ReferenceUnitCapacityAtSpeedLevel(nsp);
+
+        Real64 AirFlowScaleFactor(0.0);
+        Real64 RatedVolumetricAirFlowRate(0.0);
+        Real64 ReferenceUnitVolAirFlowRateAtNominalSpeedLevel(0.0);
+
+        Array1D<Real64> LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
+        Array1D<Real64> ReferenceUnitVolAirFlowRateAtSpeedLevel(nsp);
+
+        int NominalSpeedLevel = nsp;
+        for (int spnum = 1; spnum <= nsp; ++spnum) {
+            ReferenceUnitCapacityAtSpeedLevel(spnum) = RatedTotalCapacity(spnum);
+            ReferenceUnitVolAirFlowRateAtSpeedLevel(spnum) = RatedAirVolFlowRate(spnum);
+        }
+        GrossRatedTotalCoolingCapacity = GrossRatedTotalCoolingCapacityVS;
+        ReferenceUnitCapacityAtNominalSpeedLevel = ReferenceUnitCapacityAtSpeedLevel(NominalSpeedLevel);
+        CapacityScaleFactor =
+            GrossRatedTotalCoolingCapacity / ReferenceUnitCapacityAtNominalSpeedLevel; // Section 1.41.21.1.6 | Equation (1.160) | IO-Ref
+
+        RatedVolumetricAirFlowRate = RatedVolumetricAirFlowRateVS;
+        ReferenceUnitVolAirFlowRateAtNominalSpeedLevel = ReferenceUnitVolAirFlowRateAtSpeedLevel(NominalSpeedLevel);
+        AirFlowScaleFactor = RatedVolumetricAirFlowRate / (ReferenceUnitVolAirFlowRateAtNominalSpeedLevel *
+                                                           CapacityScaleFactor); // Section 1.41.21.1.7 | Equation (1.162) | IO-Ref
+
+        for (int sp = 1; sp <= nsp; ++sp) {
+            GrossRatedCapacityAtSpeedLevel(sp) =
+                CapacityScaleFactor * ReferenceUnitCapacityAtSpeedLevel(sp); //  Section 1.41.21.1.6 | Equation (1.161) | IO-Ref
+
+            LoopVolumetricAirFlowRateAtSpeedLevel(sp) = AirFlowScaleFactor * ReferenceUnitVolAirFlowRateAtSpeedLevel(sp) *
+                                                        CapacityScaleFactor; // Section 1.41.21.1.7 | Equation (1.163) | IO-Ref
+        }
+
+        if (GrossRatedTotalCoolingCapacityVS > 0.0 && RatedVolumetricAirFlowRateVS > 0.0) {
+
+            Real64 TotCapFlowModFac = Curve::CurveValue(state, CapFFlowCurveIndex(nsp), AirMassFlowRatioRated);
+            Real64 NetCoolingCapRated =
+                GrossRatedCapacityAtSpeedLevel(nsp) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                    TotCapFlowModFac -
+                FanPowerPerEvapAirFlowRateFromInput(nsp) * LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
+            StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] = NetCoolingCapRated;
+            if (GrossRatedTotalCoolingCapacityVS > 39564.59445) {
+
+                NetCoolingCapRatedMaxSpeed2023 =
+                    GrossRatedCapacityAtSpeedLevel(nsp) *
+                        Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                        TotCapFlowModFac -
+                    FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+                ShowSevereError(state,
+                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                    std::to_string(GrossRatedTotalCoolingCapacityVS) +
+                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+
+            } else if (GrossRatedTotalCoolingCapacityVS < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+                // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+                // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+                // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
+                Array1D<int> VSPLRFPLF;
+                for (int spnum = 1; spnum <= nsp; ++spnum) {
+                    VSPLRFPLF.push_back(PLFFPLRCurveIndex);
+                }
+
+                // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
+                std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2) =
+                    VariableSpeedDXCoolingCoilSEER2(state,
+                                                    nsp,
+                                                    CapFFlowCurveIndex,
+                                                    GrossRatedCapacityAtSpeedLevel, // RatedTotalCapacity,
+                                                    CapFTempCurveIndex,
+                                                    FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                    LoopVolumetricAirFlowRateAtSpeedLevel, // RatedAirVolFlowRate,
+                                                    EIRFFlowCurveIndex,
+                                                    RatedCOP,
+                                                    EIRFTempCurveIndex,
+                                                    VSPLRFPLF);
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+
+            } else {
+
+                // IEER Calculation 2022
+                std::tie(IEER_2022, NetCoolingCapRatedMaxSpeed2023, EER_2022) =
+                    IEERCalculationVariableSpeed(state,
+                                                 DXCoilType,
+                                                 nsp,
+                                                 CapFTempCurveIndex,
+                                                 GrossRatedCapacityAtSpeedLevel, // RatedTotalCapacity,
+                                                 CapFFlowCurveIndex,
+                                                 FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                 LoopVolumetricAirFlowRateAtSpeedLevel, // RatedAirVolFlowRate,
+                                                 EIRFTempCurveIndex,
+                                                 RatedCOP,
+                                                 EIRFFlowCurveIndex,
+                                                 CondenserType); // CondenserType(1));
+                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+            }
+        } else {
+            ShowSevereError(state,
+                            "Standard Ratings: Coil:Cooling:DX " + DXCoilType + // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
+                                " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
+        }
+
+        // From SEER2 implementation
+        StandardRatingsResult["SEER2_User"] = SEER2_User;
+        StandardRatingsResult["SEER2_Standard"] = SEER2_Standard;
+        StandardRatingsResult["EER2"] = EER2;
+
+        // From IEER2 implementation
+        StandardRatingsResult["IEER_2022"] = IEER_2022;
+        StandardRatingsResult["EER_2022"] = EER_2022;
+
+        return StandardRatingsResult;
+    }
+
+    std::tuple<Real64, Real64, Real64> MultiSpeedDXHeatingCoilHSPF(
         EnergyPlusData &state,
         int const nsp,                                              // Number of compressor speed
         Array1A<Real64> const MSFanPowerPerEvapAirFlowRateInput,    // 2017 rated fan power per evap air flow rate [W/(m3/s)]
@@ -4978,7 +6072,7 @@ namespace StandardRatings {
         return std::make_tuple(NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF);
     }
 
-    std::tuple<Real64, Real64, Real64> MultiSpedDXHeatingCoilHSPF2(
+    std::tuple<Real64, Real64, Real64> MultiSpeedDXHeatingCoilHSPF2(
         EnergyPlusData &state,
         int const nsp,                                                // Number of compressor speed
         Array1A<Real64> const MSFanPowerPerEvapAirFlowRateInput_2023, // 2023 rated fan power per evap air flow rate [W/(m3/s)]
@@ -5586,21 +6680,21 @@ namespace StandardRatings {
         // StandardRatingsResult["HSPF2_2023"] = HSPF2_2023;
 
         // HSPF Calculation | AHRI 2017 Std.
-        std::tie(NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF) = MultiSpedDXHeatingCoilHSPF(state,
-                                                                                                           nsp,
-                                                                                                           MSFanPowerPerEvapAirFlowRateInput,
-                                                                                                           CapFTempCurveIndex,
-                                                                                                           CapFFlowCurveIndex,
-                                                                                                           RatedTotalCapacity,
-                                                                                                           RatedAirVolFlowRate,
-                                                                                                           EIRFFlowCurveIndex,
-                                                                                                           EIRFTempCurveIndex,
-                                                                                                           RatedCOP,
-                                                                                                           RegionNum,
-                                                                                                           MinOATCompressor,
-                                                                                                           OATempCompressorOnOffBlank,
-                                                                                                           OATempCompressorOn,
-                                                                                                           DefrostControl);
+        std::tie(NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF) = MultiSpeedDXHeatingCoilHSPF(state,
+                                                                                                            nsp,
+                                                                                                            MSFanPowerPerEvapAirFlowRateInput,
+                                                                                                            CapFTempCurveIndex,
+                                                                                                            CapFFlowCurveIndex,
+                                                                                                            RatedTotalCapacity,
+                                                                                                            RatedAirVolFlowRate,
+                                                                                                            EIRFFlowCurveIndex,
+                                                                                                            EIRFTempCurveIndex,
+                                                                                                            RatedCOP,
+                                                                                                            RegionNum,
+                                                                                                            MinOATCompressor,
+                                                                                                            OATempCompressorOnOffBlank,
+                                                                                                            OATempCompressorOn,
+                                                                                                            DefrostControl);
 
         StandardRatingsResult["NetHeatingCapRatedHighTemp"] = NetHeatingCapRatedHighTemp;
         StandardRatingsResult["NetHeatingCapRatedLowTemp"] = NetHeatingCapRatedLowTemp;
@@ -5608,21 +6702,21 @@ namespace StandardRatings {
 
         // HSPF2 Calculation | AHRI 2023 Std.
         std::tie(NetHeatingCapRatedHighTemp_2023, NetHeatingCapRatedLowTemp_2023, HSPF2_2023) =
-            MultiSpedDXHeatingCoilHSPF2(state,
-                                        nsp,
-                                        MSFanPowerPerEvapAirFlowRateInput_2023,
-                                        CapFTempCurveIndex,
-                                        CapFFlowCurveIndex,
-                                        RatedTotalCapacity,
-                                        RatedAirVolFlowRate,
-                                        EIRFFlowCurveIndex,
-                                        EIRFTempCurveIndex,
-                                        RatedCOP,
-                                        RegionNum,
-                                        MinOATCompressor,
-                                        OATempCompressorOnOffBlank,
-                                        OATempCompressorOn,
-                                        DefrostControl);
+            MultiSpeedDXHeatingCoilHSPF2(state,
+                                         nsp,
+                                         MSFanPowerPerEvapAirFlowRateInput_2023,
+                                         CapFTempCurveIndex,
+                                         CapFFlowCurveIndex,
+                                         RatedTotalCapacity,
+                                         RatedAirVolFlowRate,
+                                         EIRFFlowCurveIndex,
+                                         EIRFTempCurveIndex,
+                                         RatedCOP,
+                                         RegionNum,
+                                         MinOATCompressor,
+                                         OATempCompressorOnOffBlank,
+                                         OATempCompressorOn,
+                                         DefrostControl);
 
         StandardRatingsResult["NetHeatingCapRatedHighTemp_2023"] = NetHeatingCapRatedHighTemp_2023;
         StandardRatingsResult["NetHeatingCapRatedLowTemp_2023"] = NetHeatingCapRatedLowTemp_2023;
@@ -5707,25 +6801,47 @@ namespace StandardRatings {
                 }
 
                 static constexpr std::string_view Format_991(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.1R}\n");
                 print(state.files.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
                 // W/W is the same as Btuh/Btuh so that's fine too
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                if (EERValueSI > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, "N/A");
+                }
                 // Btu/W-h will convert to itself
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
+                if (EERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, "N/A");
+                }
+                if (SEERUserIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, "N/A");
+                }
+                if (SEERStandardIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, "N/A");
+                }
+                if (IEERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 1);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, "N/A");
+                }
                 addFootNoteSubTable(state,
                                     state.dataOutRptPredefined->pdstDXCoolCoil,
                                     "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                                     "1 - EnergyPlus object type. <br/>"
-                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
-                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
-                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                                    "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2017. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/hv (39565 W) - calculated as per AHRI "
+                                    "Standard 340/360-2007. <br/>"
+                                    "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - "
+                                    "Ratings not yet supported in EnergyPlus. <br/>"
                                     "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
                                     "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
                                     "from the appropriate AHRI standard.");
@@ -5735,7 +6851,7 @@ namespace StandardRatings {
                     print(state.files.eio,
                           "{}",
                           "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                          "Cooling Capacity {W}, Standard Rated Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
+                          "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
                           "IEER 2022 "
                           "{Btu/W-h}\n");
                     state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
@@ -5748,21 +6864,43 @@ namespace StandardRatings {
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, CompName, CoolCapVal, 1);
                 // W/W is the same as Btuh/Btuh so that's fine too
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, EERValueSI, 2);
+                if (EERValueSI > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, EERValueSI, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, "N/A");
+                }
                 // Btu/W-h will convert to itself
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, EERValueIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
+                if (EERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, EERValueIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, "N/A");
+                }
+                if (SEERUserIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, "N/A");
+                }
+                if (SEERStandardIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, "N/A");
+                }
+                if (IEERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, "N/A");
+                }
                 addFootNoteSubTable(state,
                                     state.dataOutRptPredefined->pdstDXCoolCoil_2023,
                                     "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                                     "1 - EnergyPlus object type. <br/>"
-                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
-                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
-                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
-                                    "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
-                                    "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                                    "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard "
+                                    "340/360-2022. <br/>"
+                                    "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - "
+                                    "Ratings not yet supported in EnergyPlus. <br/>"
+                                    "3 - SEER2 (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                                    "&emsp;&nbsp;SEER2 (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
                                     "from the appropriate AHRI standard. <br/>"
                                     "4 - Value for the Full Speed of the coil.");
             }
@@ -5837,15 +6975,40 @@ namespace StandardRatings {
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
+                if (EERValueSI > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, EERValueSI, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP, CompName, "N/A");
+                }
+                if (EERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, EERValueIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP, CompName, "N/A");
+                }
+                if (SEERUserIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, SEERUserIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERUserIP, CompName, "N/A");
+                }
+                if (SEERStandardIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, SEERStandardIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, CompName, "N/A");
+                }
+                if (IEERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 1);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP, CompName, "N/A");
+                }
                 addFootNoteSubTable(state,
                                     state.dataOutRptPredefined->pdstDXCoolCoil,
                                     "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                                     "1 - EnergyPlus object type. <br/>"
-                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2017. <br/>"
-                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2007. <br/>"
-                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
+                                    "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2017. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard "
+                                    "340/360-2007. <br/>"
+                                    "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - "
+                                    "Ratings not yet supported in EnergyPlus. <br/>"
                                     "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
                                     "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
                                     "from the appropriate AHRI standard.");
@@ -5854,7 +7017,7 @@ namespace StandardRatings {
                 if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
                     static constexpr std::string_view Format_994_(
                         "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard "
+                        "Cooling Capacity {W}, Standard Rateing Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard "
                         "{Btu/W-h}, "
                         "IEER 2022 "
                         "{Btu/W-h}");
@@ -5865,30 +7028,46 @@ namespace StandardRatings {
                 static constexpr std::string_view Format_995_(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
                 print(state.files.eio, Format_995_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
-
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, CompName, CoolCapVal, 1);
                 // W/W is the same as Btuh/Btuh so that's fine too
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, EERValueSI, 2);
-                // Btu/W-h will convert to itself
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, EERValueIP, 2);
-                if (CompTypeNum == Coil_CoolingAirToAirVariableSpeed) {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, "N/A");
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, "N/A");
+                if (EERValueSI > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, EERValueSI, 2);
                 } else {
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
-                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilCOP_2023, CompName, "N/A");
                 }
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
+                // Btu/W-h will convert to itself
+                if (EERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, EERValueIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilEERIP_2023, CompName, "N/A");
+                }
+                if (SEERUserIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, SEERUserIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2UserIP_2023, CompName, "N/A");
+                }
+                if (SEERStandardIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, SEERStandardIP, 2);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEER2StandardIP_2023, CompName, "N/A");
+                }
+                if (IEERValueIP > 0.0) {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, IEERValueIP, 1);
+                } else {
+                    PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilIEERIP_2023, CompName, "N/A");
+                }
                 addFootNoteSubTable(state,
                                     state.dataOutRptPredefined->pdstDXCoolCoil_2023,
                                     "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                                     "1 - EnergyPlus object type. <br/>"
-                                    "2 - Capacity less than 65K Btu/h - calculated as per AHRI Standard 210/240-2023. <br/>"
-                                    "&emsp;&nbsp;Capacity of 65K Btu/h to less than 135K Btu/h - calculated as per AHRI Standard 340/360-2022. <br/>"
-                                    "&emsp;&nbsp;Capacity 135K Btu/h or more - n/a - should be calculated as per AHRI standard 365-2009. <br/>"
-                                    "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
-                                    "&emsp;&nbsp;SEER (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
+                                    "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023. <br/>"
+                                    "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard "
+                                    "340/360-2022. <br/>"
+                                    "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - "
+                                    "Ratings not yet supported in EnergyPlus. <br/>"
+                                    "3 - SEER2 (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
+                                    "&emsp;&nbsp;SEER2 (Standard) is calculated using the default PLF curve and cooling coefficient of degradation"
                                     "from the appropriate AHRI standard. <br/>"
                                     "4 - Value for the Full Speed of the coil.");
             }
@@ -5982,7 +7161,7 @@ namespace StandardRatings {
                       TotElectricPowerRated(Num + 3),
                       NetCoolingCapRated(Num + 4),
                       TotElectricPowerRated(Num + 4));
-                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompNameNew, CompType);
+                PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType2, CompNameNew, CompType);
                 // Note: If you call format("{:.1R}", NetCoolingCapRated(Num + 1)),
                 // Then it's not the OutputReportPredefined::PreDefTableEntry prototype with Real64 that is called.
                 // As a result, the entry isn't marked as being Real (origEntryIsReal) and unit conversion does not occur
@@ -6640,6 +7819,14 @@ namespace StandardRatings {
             }
             break;
         }
+            /* case CoilDX_CoolingTwoSpeed: {
+                 GetCurveMinMaxValues(state, CapFTempCurveIndex, CapacityWBTempMin, CapacityWBTempMax, CapacityDBTempMin, CapacityDBTempMax);
+                 GetCurveMinMaxValues(state, EIRFTempCurveIndex, EIRWBTempMin, EIRWBTempMax, EIRDBTempMin, EIRDBTempMax);
+                 GetCurveMinMaxValues(state, CapFFlowCurveIndex, CapacityFlowRatioMin, CapacityFlowRatioMax);
+                 GetCurveMinMaxValues(state, EIRFFlowCurveIndex, EIRFlowRatioMin, EIRFlowRatioMax);
+                 GetCurveMinMaxValues(state, PLFFPLRCurveIndex, PLFFPLRMin, PLFFPLRMax);
+                 break;
+             }*/
         default:
             break;
         }

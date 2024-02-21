@@ -7503,7 +7503,7 @@ TEST_F(SQLiteFixture, OutputReportTabularTest_PredefinedTableDXConversion)
     SetPredefinedTables(*state);
     std::string CompName = "My DX Coil with 10000W cooling";
 
-    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType, CompName, "Coil:Cooling:DX:SingleSpeed");
+    PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilType2, CompName, "Coil:Cooling:DX:SingleSpeed");
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIA, CompName, 10000., 1);
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIB, CompName, 12000., 1);
     PreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilNetCapSIC, CompName, 14000., 1);
