@@ -1490,8 +1490,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
             EPVector<int> supNode;
             EPVector<DataZoneEquipment::AirNodeType> supNodeType;
+            EPVector<int> supNodeCompNum;
             supNode.allocate(NumAllSupAirPathNodes);
             supNodeType.allocate(NumAllSupAirPathNodes);
+            supNodeCompNum.allocate(NumAllSupAirPathNodes);
 
             // figure out the order of the splitter and plenum in the path, by flagging the first node of the component
             // as either a 'pathinlet' or a 'compinlet'
@@ -1501,6 +1503,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 if (SplitterNum > 0) {
                     ++SupAirPathNodeNum;
                     supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
+                    supNodeCompNum(SupAirPathNodeNum) = CompNum;
                     if (CompNum == 1) {
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
@@ -1510,11 +1513,13 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                          ++SplitterOutNum) {
                         ++SupAirPathNodeNum;
                         supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
+                        supNodeCompNum(SupAirPathNodeNum) = CompNum;
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
                     supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
+                    supNodeCompNum(SupAirPathNodeNum) = CompNum;
                     if (CompNum == 1) {
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
@@ -1523,6 +1528,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     for (int PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                         ++SupAirPathNodeNum;
                         supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                        supNodeCompNum(SupAirPathNodeNum) = CompNum;
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
@@ -1556,6 +1562,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             SupAirPathNodeNum = 0;
             
             state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode.allocate(NumSupAirPathOutNodes);
+            state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNodeSupplyPathCompNum.allocate(NumSupAirPathOutNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).Node.allocate(NumSupAirPathNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType.allocate(NumSupAirPathNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).NumNodes = NumSupAirPathNodes;
