@@ -23941,6 +23941,7 @@ TEST_F(ZoneUnitarySysTest, CoilSystemDXCoil_CalcTest)
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     Autosize,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
