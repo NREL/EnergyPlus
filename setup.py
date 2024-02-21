@@ -88,7 +88,7 @@ def get_current_wheel_details():
                 "build_tool": "Unix Makefiles",
                 "extension": "dylib",
             },
-            "arm64": {  # TODO: Verify this machine name
+            "arm64": {
                 "wheel": "macosx_11_0_arm64",
                 "zip_tag": "OSX_arm64",
                 "build_tool": "Unix Makefiles",
@@ -97,7 +97,7 @@ def get_current_wheel_details():
         },
         "Linux": {
             "x86_64": {
-                "wheel": "manylinux1_x86_64",
+                "wheel": "linux_x86_64",
                 "zip_tag": "Linux",
                 "build_tool": "Unix Makefiles",
                 "extension": "so",
@@ -222,6 +222,7 @@ setup(
     url="https://github.com/NREL/EnergyPlus",
     description="EnergyPlus is a building simulation program for modeling energy and water use in buildings.",
     long_description=(repo_root_directory / "README.md").read_text(),
+    long_description_content_type='text/markdown',
     ext_modules=[Extension("energyplus", sources=[])],
     cmdclass={
         "build_ext": EnergyPlusBuild,
