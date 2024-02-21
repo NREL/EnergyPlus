@@ -887,6 +887,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     int pdstTopAirLoop = 0;
     int pdchTopAirLoopName = 0;
+    int pdchTopAirUpSplitMixName = 0;
     int pdchTopAirBranchName = 0;
     int pdchTopAirCompType = 0;
     int pdchTopAirCompName = 0;
@@ -894,9 +895,12 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopAirSubCompName = 0;
     int pdchTopAirSubSubCompType = 0;
     int pdchTopAirSubSubCompName = 0;
+    int pdchTopAirDownSplitMixName = 0;
 
     int pdstTopAirDemand = 0;
     int pdchTopAirDemandName = 0;
+    int pdchTopAirSupplyBranchName = 0;
+    int pdchTopAirSupplyDuctType = 0;
     int pdchTopAirSupplyPCompType = 0;
     int pdchTopAirSupplyPCompName = 0;
     int pdchTopAirZoneName = 0;

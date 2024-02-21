@@ -4778,12 +4778,25 @@ void reportAirLoopToplogy(EnergyPlusData &state)
 
     auto &orp = state.dataOutRptPredefined;
     int rowCounter = 1;
-    for (int AirLoopNum = 1; AirLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++AirLoopNum) {
-        auto &pas = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
+    for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
+        auto &pas = state.dataAirSystemsData->PrimaryAirSystems(airLoopNum);
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirLoopName, format("{}", rowCounter), pas.Name);
         ++rowCounter;
         for (int BranchNum = 1; BranchNum <= pas.NumBranches; ++BranchNum) {
             auto &pasBranch = pas.Branch(BranchNum);
+            if (pas.Splitter.Exists) {
+                for (int outNum : pas.Splitter.BranchNumOut) {
+                    if (outNum == BranchNum) {
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Splitter.Name);
+                        break;
+                    }
+                }
+            }
+            if (pas.Mixer.Exists) {
+                if (pas.Mixer.BranchNumOut == BranchNum) {
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Mixer.Name);
+                }
+            }
             for (int CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum) {
                 auto &pasBranchComp = pasBranch.Comp(CompNum);
                 fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
@@ -4805,11 +4818,26 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                     }
                 }
             }
+            if (pas.Mixer.Exists) {
+                for (int inNum : pas.Mixer.BranchNumIn) {
+                    if (inNum == BranchNum) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Mixer.Name);
+                        break;
+                    }
+                }
+            }
+            if (pas.Splitter.Exists) {
+                if (pas.Splitter.BranchNumIn == BranchNum) {
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Splitter.Name);
+                }
+            }
         }
     }
 
-    //    s->pdstTopAirDemand = newPreDefSubTable(state, s->pdrTopology, "Air Loop Demand Side Component Arrangement");
+    // s->pdstTopAirDemand = newPreDefSubTable(state, s->pdrTopology, "Air Loop Demand Side Component Arrangement");
     // s->pdchTopAirDemandName = newPreDefColumn(state, s->pdstTopAirDemand, "Airloop Name");
+    // s->pdchTopAirSupplyBranchName = newPreDefColumn(state, s->pdstTopAirDemand, "Supply Branch Name");
     // s->pdchTopAirSupplyPCompType = newPreDefColumn(state, s->pdstTopAirDemand, "Supply Path Component Type");
     // s->pdchTopAirSupplyPCompName = newPreDefColumn(state, s->pdstTopAirDemand, "Supply Path Component Name");
     // s->pdchTopAirZoneName = newPreDefColumn(state, s->pdstTopAirDemand, "Zone Name");
@@ -4819,6 +4847,108 @@ void reportAirLoopToplogy(EnergyPlusData &state)
     // s->pdchTopAirReturnPCompName = newPreDefColumn(state, s->pdstTopAirDemand, "Return Path Component Name");
 
     rowCounter = 1;
+    for (int airLoopNum = 1; airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++airLoopNum) {
+        auto &pas = state.dataAirSystemsData->PrimaryAirSystems(airLoopNum);
+        auto &thisAtoZInfo = state.dataAirLoop->AirToZoneNodeInfo(airLoopNum);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+        ++rowCounter;
+        if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
+            auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
+            auto &thisBranch = pas.Branch(pas.InletBranchNum[0]);
+            for (int compNum = 1; compNum <= thisReturnPath.NumOfComponents; ++compNum) {
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirReturnPCompType, format("{}", rowCounter), thisReturnPath.ComponentType(compNum));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirReturnPCompName, format("{}", rowCounter), thisReturnPath.ComponentName(compNum));
+                ++rowCounter;
+            }
+        }
+        for (int ductNum = 1; ductNum <= thisAtoZInfo.NumSupplyNodes; ++ductNum) {
+            auto &thisBranch = pas.Branch(thisAtoZInfo.SupplyDuctBranchNum(ductNum));
+            if (thisAtoZInfo.SupplyAirPathNum(ductNum) > 0) {
+                auto &thisSupplyPath = state.dataZoneEquip->SupplyAirPath(thisAtoZInfo.SupplyAirPathNum(ductNum));
+                for (int compNum = 1; compNum <= thisSupplyPath.NumOfComponents; ++compNum) {
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, orp->pdchTopAirSupplyPCompType, format("{}", rowCounter), thisSupplyPath.ComponentType(compNum));
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, orp->pdchTopAirSupplyPCompName, format("{}", rowCounter), thisSupplyPath.ComponentName(compNum));
+                    ++rowCounter;
+                }
+                if (thisBranch.DuctType == DataHVACGlobals::AirDuctType::Cooling || thisBranch.DuctType == DataHVACGlobals::AirDuctType::Main) {
+                    for (int zoneNum : thisAtoZInfo.CoolCtrlZoneNums) {
+                        auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
+                        for (auto &thisCoolADU : thisZoneEquipConfig.AirDistUnitCool) {
+                            if (thisCoolADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                     orp->pdchTopAirSupplyDuctType,
+                                                                     format("{}", rowCounter),
+                                                                     DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state,
+                                orp->pdchTopAirTermUnitType,
+                                format("{}", rowCounter),
+                                state.dataDefineEquipment->AirDistUnit(thisCoolADU.AirDistUnitIndex).EquipType(1));
+                            OutputReportPredefined::PreDefTableEntry(
+                                state,
+                                orp->pdchTopAirTermUnitName,
+                                format("{}", rowCounter),
+                                state.dataDefineEquipment->AirDistUnit(thisCoolADU.AirDistUnitIndex).EquipName(1));
+                            ++rowCounter;
+                        }
+                    }
+                } else if (thisBranch.DuctType == DataHVACGlobals::AirDuctType::Heating) {
+                    for (int zoneNum : thisAtoZInfo.HeatCtrlZoneNums) {
+                        auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
+                        for (auto &thisHeatADU : thisZoneEquipConfig.AirDistUnitHeat) {
+                            if (thisHeatADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                     orp->pdchTopAirSupplyDuctType,
+                                                                     format("{}", rowCounter),
+                                                                     DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state,
+                                orp->pdchTopAirTermUnitType,
+                                format("{}", rowCounter),
+                                state.dataDefineEquipment->AirDistUnit(thisHeatADU.AirDistUnitIndex).EquipType(1));
+                            OutputReportPredefined::PreDefTableEntry(
+                                state,
+                                orp->pdchTopAirTermUnitName,
+                                format("{}", rowCounter),
+                                state.dataDefineEquipment->AirDistUnit(thisHeatADU.AirDistUnitIndex).EquipName(1));
+                            ++rowCounter;
+                        }
+                    }
+                }
+
+            } else {
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                ++rowCounter;
+            }
+        }
+    }
 }
 
 void fillAirloopToplogyComponentRow(EnergyPlusData &state,
