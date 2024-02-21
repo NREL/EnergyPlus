@@ -84,6 +84,7 @@
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -690,6 +691,8 @@ namespace Furnaces {
         // SUBROUTINE PARAMETER DEFINITIONS:
         std::string_view constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
         std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
+
+        using namespace OutputReportPredefined;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;                // The Furnace that you are currently loading input into
@@ -3690,6 +3693,8 @@ namespace Furnaces {
 
             // Set maximum supply air temperature for supplemental heating coil
             thisFurnace.MaxOATSuppHeat = Numbers(5);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, HeatingCoilName, thisFurnace.MaxOATSuppHeat);
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
@@ -4516,6 +4521,8 @@ namespace Furnaces {
 
             // Set maximum supply air temperature for supplemental heating coil
             thisFurnace.MaxOATSuppHeat = Numbers(5);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, HeatingCoilName, thisFurnace.MaxOATSuppHeat);
 
             // set minimum outdoor temperature for compressor operation
             SetMinOATCompressor(state, FurnaceNum, cCurrentModuleObject, ErrorsFound);
