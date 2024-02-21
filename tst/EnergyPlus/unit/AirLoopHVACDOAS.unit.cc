@@ -11671,6 +11671,11 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanDrawThroughPlacement)
     EXPECT_NEAR(AirLoopDOAS_SplitterInletNode.MassFlowRate, 0.1, 0.0001);
     EXPECT_NEAR(DOAS_FanInletNode.MassFlowRate, 0.1, 0.0001);
     EXPECT_NEAR(DOAS_HeatingCOilOutletNode.MassFlowRate, 0.1, 0.0001);
+
+    // Issue 10204 Get AirLoopHVAC:Splitter inlet node number using NodeInputManager::GetOnlySingleNode
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopSplitter->InletNodeNum, 17);
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopSplitter->OutletNodeNum[0], 2);
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopMixer->InletNodeNum[0], 18);
 }
 
 } // namespace EnergyPlus
