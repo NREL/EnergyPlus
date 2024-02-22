@@ -97,7 +97,7 @@ return_value = api.runtime.run_energyplus(
         '-d',
         run_dir,
         '-D',
-        file_to_run
+        str(file_to_run)
     ]
 )
 print(f"EnergyPlus finished with outputs in directory: {run_dir}")
