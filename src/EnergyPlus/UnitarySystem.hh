@@ -374,7 +374,7 @@ namespace UnitarySystems {
 
         Real64 m_CoolingCycRatio = 0.0;
         Real64 m_CoolingSpeedRatio = 0.0;
-        int m_CoolingSpeedNum = 1;
+        int m_CoolingSpeedNum = 0;
 
         int m_EconoSpeedNum = 0;
         Real64 m_EconoPartLoadRatio = 0;
