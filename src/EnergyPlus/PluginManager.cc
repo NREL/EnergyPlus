@@ -378,7 +378,7 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 
     // first pre-config Python so that it can speak UTF-8
     PyPreConfig preConfig;
-    PyPreConfig_InitPythonConfig(&preConfig);
+    PyPreConfig_InitIsolatedConfig(&preConfig);
     preConfig.utf8_mode = 1;
     status = Py_PreInitialize(&preConfig);
     if (PyStatus_Exception(status)) {
@@ -443,7 +443,12 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
         PyMem_RawFree(wcharPath);
     }
 
-    Py_InitializeFromConfig(&config);
+    // This was Py_InitializeFromConfig(&config), but was giving a seg fault when running inside
+    // another Python instance, for example as part of an API run.  Per the example here:
+    // https://docs.python.org/3/c-api/init_config.html#preinitialize-python-with-pypreconfig
+    // It looks like we don't need to initialize from config again, it should be all set up with
+    // the init calls above, so just initialize and move on.
+    Py_Initialize();
 }
 #endif // LINK_WITH_PYTHON
 
