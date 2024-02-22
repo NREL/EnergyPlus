@@ -150,6 +150,7 @@ set(test_src
     ICSCollector.unit.cc
     IceThermalStorage.unit.cc
     IdfParser.unit.cc
+    IndoorGreen.unit.cc
     InputProcessor.unit.cc
     IntegratedHeatPump.unit.cc
     InternalHeatGains.unit.cc
