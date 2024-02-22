@@ -5030,7 +5030,7 @@ namespace SurfaceGeometry {
                 FrameField = 0;
                 OtherSurfaceField = 4;
                 surfClass = SurfaceClass::Window;
-                objName = "Window";
+                objName = "Window:Interzone";
             } else if (Item == 5) {
                 ItemsToGet = TotIZDoors;
                 GettingIZSurfaces = true;
@@ -5038,7 +5038,7 @@ namespace SurfaceGeometry {
                 FrameField = 0;
                 OtherSurfaceField = 4;
                 surfClass = SurfaceClass::Door;
-                objName = "Door";
+                objName = "Door:Interzone";
             } else { // Item = 6
                 ItemsToGet = TotIZGlazedDoors;
                 GettingIZSurfaces = true;
@@ -5046,7 +5046,7 @@ namespace SurfaceGeometry {
                 FrameField = 0;
                 OtherSurfaceField = 4;
                 surfClass = SurfaceClass::GlassDoor;
-                objName = "GlassDoor";
+                objName = "GlassDoor:Interzone";
             }
 
             for (int Loop = 1; Loop <= ItemsToGet; ++Loop) {
@@ -5137,30 +5137,29 @@ namespace SurfaceGeometry {
                 //  The subsurface inherits properties from the base surface
                 //  Exterior conditions, Zone, etc.
                 //  We can figure out the base surface though, because they've all been entered
-                if (auto found = state.dataSurfaceGeometry->surfaceMap.find(surf.BaseSurfName); found != state.dataSurfaceGeometry->surfaceMap.end()) {
-                    surf.BaseSurf = found->second;
-                    auto &baseSurf = state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf);
-                        
-                    surf.ExtBoundCond = baseSurf.ExtBoundCond;
-                    surf.ExtBoundCondName = baseSurf.ExtBoundCondName;
-                    surf.ExtSolar = baseSurf.ExtSolar;
-                    surf.ExtWind = baseSurf.ExtWind;
-                    surf.Tilt = baseSurf.Tilt;
-                    surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
-                    surf.Azimuth = baseSurf.Azimuth;
-                    surf.Zone = baseSurf.Zone;
-                    surf.ZoneName = baseSurf.ZoneName;
-                    surf.OSCPtr = baseSurf.OSCPtr;
-                    surf.ViewFactorGround = baseSurf.ViewFactorGround;
-                    surf.ViewFactorSky = baseSurf.ViewFactorSky;
-                } else {
+                auto found = state.dataSurfaceGeometry->surfaceMap.find(surf.BaseSurfName);
+                if (found == state.dataSurfaceGeometry->surfaceMap.end()) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                     surf.ZoneName = "Unknown Zone";
                     ErrorsFound = true;
                     continue;
                 }
 
+                surf.BaseSurf = found->second;
                 auto &baseSurf = state.dataSurfaceGeometry->SurfaceTmp(surf.BaseSurf);
+                        
+                surf.ExtBoundCond = baseSurf.ExtBoundCond;
+                surf.ExtBoundCondName = baseSurf.ExtBoundCondName;
+                surf.ExtSolar = baseSurf.ExtSolar;
+                surf.ExtWind = baseSurf.ExtWind;
+                surf.Tilt = baseSurf.Tilt;
+                surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
+                surf.Azimuth = baseSurf.Azimuth;
+                surf.Zone = baseSurf.Zone;
+                surf.ZoneName = baseSurf.ZoneName;
+                surf.OSCPtr = baseSurf.OSCPtr;
+                surf.ViewFactorGround = baseSurf.ViewFactorGround;
+                surf.ViewFactorSky = baseSurf.ViewFactorSky;
                 
                 if (baseSurf.ExtBoundCond == UnreconciledZoneSurface &&
                     baseSurf.ExtBoundCondName == baseSurf.Name) { // Adiabatic surface, no windows or doors allowed
@@ -5187,8 +5186,7 @@ namespace SurfaceGeometry {
                                 "...when Base surface uses \"Surface\" as {}, subsurfaces must also specify specific surfaces in the adjacent zone.",
                                 ipsc->cAlphaFieldNames(5)));
                         ShowContinueError(state, format("...Please use {}:Interzone to enter this surface.", ipsc->cCurrentModuleObject));
-                        surf.ExtBoundCondName =
-                            BlankString; // putting it as blank will not confuse things later.
+                        surf.ExtBoundCondName = BlankString; // putting it as blank will not confuse things later.
                         ErrorsFound = true;
                     }
                 }
@@ -5196,8 +5194,7 @@ namespace SurfaceGeometry {
                 if (surf.ExtBoundCond == UnreconciledZoneSurface) { // "Surface" Base Surface
                     if (GettingIZSurfaces) {
                         surf.ExtBoundCondName = ipsc->cAlphaArgs(OtherSurfaceField);
-                        IZFound = Util::FindItemInList(
-                            surf.ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
+                        IZFound = Util::FindItemInList(surf.ExtBoundCondName, state.dataHeatBal->Zone, state.dataGlobal->NumOfZones);
                         if (IZFound > 0) surf.ExtBoundCond = UnenteredAdjacentZoneSurface;
                     } else { // Interior Window
                         surf.ExtBoundCondName = surf.Name;
@@ -5205,8 +5202,7 @@ namespace SurfaceGeometry {
                 }
 
                 // This is the parent's property:
-                if (surf.ExtBoundCond ==
-                    UnenteredAdjacentZoneSurface) { // OtherZone - unmatched interior surface
+                if (surf.ExtBoundCond == UnenteredAdjacentZoneSurface) { // OtherZone - unmatched interior surface
                     if (GettingIZSurfaces) {
                         ++NeedToAddSubSurfaces;
                     } else { // Interior Window
@@ -5224,13 +5220,10 @@ namespace SurfaceGeometry {
                 if (GettingIZSurfaces) {
                     if (ipsc->lAlphaFieldBlanks(OtherSurfaceField)) {
                         // blank -- set it up for unentered adjacent zone
-                        if (surf.ExtBoundCond ==
-                            UnenteredAdjacentZoneSurface) { // already set but need Zone
-                            surf.ExtBoundCondName =
-                                baseSurf.ExtBoundCondName; // base surface has it
+                        if (surf.ExtBoundCond == UnenteredAdjacentZoneSurface) { // already set but need Zone
+                            surf.ExtBoundCondName = baseSurf.ExtBoundCondName; // base surface has it
                         } else if (surf.ExtBoundCond == UnreconciledZoneSurface) {
-                            surf.ExtBoundCondName =
-                                baseSurf.ZoneName; // base surface has it
+                            surf.ExtBoundCondName = baseSurf.ZoneName; // base surface has it
                             surf.ExtBoundCond = UnenteredAdjacentZoneSurface;
                         } else { // not correct boundary condition for interzone subsurface
                             ShowSevereError(state,
@@ -5252,15 +5245,11 @@ namespace SurfaceGeometry {
 
                 surf.Sides = 4;
                 surf.Vertex.allocate(surf.Sides);
-                if (surf.Class == SurfaceClass::Window ||
-                    surf.Class == SurfaceClass::GlassDoor ||
-                    surf.Class == SurfaceClass::Door)
+                if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::GlassDoor || surf.Class == SurfaceClass::Door) {
                     surf.Multiplier = int(ipsc->rNumericArgs(1));
+
                 // Only windows, glass doors and doors can have Multiplier > 1:
-                if ((surf.Class != SurfaceClass::Window &&
-                     surf.Class != SurfaceClass::GlassDoor &&
-                     surf.Class != SurfaceClass::Door) &&
-                    ipsc->rNumericArgs(1) > 1.0) {
+                } else if (ipsc->rNumericArgs(1) > 1.0) {
                     ShowWarningError(state,
                                      format("{}=\"{}\", invalid {}=[{:.1T}].",
                                             ipsc->cCurrentModuleObject,
@@ -5274,13 +5263,8 @@ namespace SurfaceGeometry {
                     surf.Multiplier = 1.0;
                 }
 
-                MakeRelativeRectangularVertices(state,
-                                                surf.BaseSurf,
-                                                SurfNum,
-                                                ipsc->rNumericArgs(2),
-                                                ipsc->rNumericArgs(3),
-                                                ipsc->rNumericArgs(4),
-                                                ipsc->rNumericArgs(5));
+                MakeRelativeRectangularVertices(state, surf.BaseSurf, SurfNum,
+                                                ipsc->rNumericArgs(2), ipsc->rNumericArgs(3), ipsc->rNumericArgs(4), ipsc->rNumericArgs(5));
 
                 if (surf.Area <= 0.0) {
                     ShowSevereError(state,
@@ -5367,8 +5351,6 @@ namespace SurfaceGeometry {
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
         int ConstrNum = surf.Construction;
-        auto const &constr = state.dataConstruction->Construct(ConstrNum);
-        
         int ConstrNumSh = 0;
         
         for (int shadeCtrlNum = 0; shadeCtrlNum < (int)surf.windowShadingControlList.size(); ++shadeCtrlNum) {
@@ -5392,12 +5374,14 @@ namespace SurfaceGeometry {
 
             if (ErrorsFound || WSCPtr == 0 || ConstrNum == 0 || ConstrNumSh == 0)
                 continue;
-            
+
+            // Have to do this here rather than outside the loop
+            // because redimensions in CreateWindowShadedConstrution()
+            // can invalidate references to constructions.
+            auto const &constr = state.dataConstruction->Construct(ConstrNum);
             auto const &constrSh = state.dataConstruction->Construct(ConstrNumSh);
             if (ANY_INTERIOR_SHADE_BLIND(winShadeCtrl.ShadingType)) {
-                int TotLayers = constr.TotLayers;
-                int TotShLayers = constrSh.TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
+                if (constrSh.TotLayers - 1 != constr.TotLayers) {
                     ShowWarningError(
                                      state,
                                      "WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
@@ -5422,9 +5406,7 @@ namespace SurfaceGeometry {
             } // if (ANY_INTERIOR_SHADE_OR_BLIND)
 
             if (ANY_EXTERIOR_SHADE_BLIND_SCREEN(winShadeCtrl.ShadingType)) {
-                int TotLayers = constr.TotLayers;
-                int TotShLayers = constrSh.TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
+                if (constrSh.TotLayers - 1 != constr.TotLayers) {
                     ShowWarningError(state,
                                      "WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
                                      "constructions, shaded should have 1 more layer than unshaded.");
@@ -5435,7 +5417,7 @@ namespace SurfaceGeometry {
                                       "#3) with the Window Construction rather than a shaded construction.");
                 }
                 for (int Lay = 1; Lay <= constr.TotLayers; ++Lay) {
-                    if (constr.LayerPoint(Lay) != constr.LayerPoint(Lay + 1)) {
+                    if (constr.LayerPoint(Lay) != constrSh.LayerPoint(Lay + 1)) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format(" The glass and gas layers in the shaded and unshaded constructions do not match for window={}",
@@ -5459,9 +5441,7 @@ namespace SurfaceGeometry {
                 }
                 // Check consistency of gap widths between unshaded and shaded constructions
                 int TotGlassLayers = constr.TotGlassLayers;
-                int TotLayers = constr.TotLayers;
-                int TotShLayers = constrSh.TotLayers;
-                if (TotShLayers - 2 != TotLayers) {
+                if (constrSh.TotLayers - 2 != constr.TotLayers) {
                     ShowWarningError(state,
                                      "WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
                                      "shaded should have 2 more layers than unshaded.");
@@ -5471,17 +5451,17 @@ namespace SurfaceGeometry {
                                       "If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
                                       "with the Window Construction rather than a shaded construction.");
                 }
-                if (constr.LayerPoint(TotLayers) != constrSh.LayerPoint(TotShLayers)) {
+                if (constr.LayerPoint(constr.TotLayers) != constrSh.LayerPoint(constrSh.TotLayers)) {
                     ShowSevereError(state, format("{}: Mis-match in unshaded/shaded inside layer materials.  These should match.", cRoutineName));
                     ShowContinueError(state,
                                       format("Unshaded construction={}, Material={}",
                                              constr.Name,
-                                             state.dataMaterial->Material(constr.LayerPoint(TotLayers))->Name));
+                                             state.dataMaterial->Material(constr.LayerPoint(constr.TotLayers))->Name));
                     ShowContinueError(
                                       state,
                                       format("Shaded construction={}, Material={}",
                                              constrSh.Name,
-                                             state.dataMaterial->Material(constrSh.LayerPoint(TotShLayers))->Name));
+                                             state.dataMaterial->Material(constrSh.LayerPoint(constrSh.TotLayers))->Name));
                     ErrorsFound = true;
                 }
                 if (constr.LayerPoint(1) != constrSh.LayerPoint(1)) {
@@ -5493,7 +5473,7 @@ namespace SurfaceGeometry {
                     ShowContinueError(state,
                                       format("Shaded construction={}, Material={}",
                                              constrSh.Name,
-                                             state.dataMaterial->Material(constr.LayerPoint(1))->Name));
+                                             state.dataMaterial->Material(constrSh.LayerPoint(1))->Name));
                     ErrorsFound = true;
                 }
                 if (TotGlassLayers == 2 || TotGlassLayers == 3) {
@@ -5534,7 +5514,8 @@ namespace SurfaceGeometry {
                 }
             } // if (ANY_BETWEENGLASS_SHADE_OR_BLIND)
         } // for (shadeCtrlNum)
-        
+
+        auto const &constr = state.dataConstruction->Construct(surf.Construction);
         if (surf.Sides != 3) { // Rectangular Window
             // Initialize the FrameDivider number for this window. W5FrameDivider will be positive if
             // this window's construction came from the Window5 data file and that construction had an
@@ -5628,9 +5609,6 @@ namespace SurfaceGeometry {
 
         using namespace DataErrorTracking;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumShades; // count on number of shading layers
-
         auto &sg = state.dataSurfaceGeometry;
         auto &surf = sg->SurfaceTmp(SurfNum);
         // Warning if window has multiplier > 1 and SolarDistribution = FullExterior or FullInteriorExterior
@@ -5649,15 +5627,13 @@ namespace SurfaceGeometry {
 
         //  Require that a construction referenced by a surface that is a window
         //  NOT have a shading device layer; use WindowShadingControl to specify a shading device.
-        int ConstrNum = surf.Construction;
-        if (ConstrNum > 0) {
+        if (surf.Construction > 0) {
+            auto &constr = state.dataConstruction->Construct(surf.Construction);
             int NumShades = 0;
-            for (int Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
-                int LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                if (LayerPtr == 0) continue; // Error is caught already, will terminate later
-                if (state.dataMaterial->Material(LayerPtr)->group == Material::Group::Shade ||
-                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::WindowBlind ||
-                    state.dataMaterial->Material(LayerPtr)->group == Material::Group::Screen)
+            for (int Lay = 1; Lay <= constr.TotLayers; ++Lay) {
+                if (constr.LayerPoint(Lay) == 0) continue; // Error is caught already, will terminate later
+                auto *mat = state.dataMaterial->Material(constr.LayerPoint(Lay));
+                if (mat->group == Material::Group::Shade || mat->group == Material::Group::WindowBlind || mat->group == Material::Group::Screen)
                     ++NumShades;
             }
             if (NumShades != 0) {
@@ -5666,20 +5642,13 @@ namespace SurfaceGeometry {
                 ShowContinueError(state, "Use WindowShadingControl to specify a shading device for a window.");
                 ErrorsFound = true;
             }
-        }
 
-        // Disallow glass transmittance dirt factor for interior windows and glass doors
-
-        if (surf.ExtBoundCond != ExternalEnvironment &&
-            (surf.Class == SurfaceClass::Window ||
-             surf.Class == SurfaceClass::GlassDoor)) {
-            ConstrNum = surf.Construction;
-            if (ConstrNum > 0) {
-                for (int Lay = 1; Lay <= state.dataConstruction->Construct(ConstrNum).TotLayers; ++Lay) {
-                    int LayerPtr = state.dataConstruction->Construct(ConstrNum).LayerPoint(Lay);
-                    auto const *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(LayerPtr));
-                    assert(thisMaterial != nullptr);
-                    if (thisMaterial->group == Material::Group::WindowGlass && thisMaterial->GlassTransDirtFactor < 1.0) {
+            // Disallow glass transmittance dirt factor for interior windows and glass doors
+            if (surf.ExtBoundCond != ExternalEnvironment && (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::GlassDoor)) {
+                for (int Lay = 1; Lay <= constr.TotLayers; ++Lay) {
+                    auto const *mat = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(constr.LayerPoint(Lay)));
+                    assert(mat != nullptr);
+                    if (mat->group == Material::Group::WindowGlass && mat->GlassTransDirtFactor < 1.0) {
                         ShowSevereError(state, format("{}: Interior Window or GlassDoor {} has a glass layer with", cRoutineName, SubSurfaceName));
                         ShowContinueError(state, "Dirt Correction Factor for Solar and Visible Transmittance < 1.0");
                         ShowContinueError(state, "A value less than 1.0 for this factor is only allowed for exterior windows and glass doors.");
@@ -5687,20 +5656,15 @@ namespace SurfaceGeometry {
                     }
                 }
             }
-        }
 
-        // If this is a window with a construction from the Window5DataFile, call routine that will
-        // (1) if one glazing system on Data File, give warning message if window height or width
-        //     differ by more than 10% from those of the glazing system on the Data File;
-        // (2) if two glazing systems (separated by a mullion) on Data File, create a second window
-        //     and adjust the dimensions of the original and second windows to those on the Data File
+            // If this is a window with a construction from the Window5DataFile, call routine that will
+            // (1) if one glazing system on Data File, give warning message if window height or width
+            //     differ by more than 10% from those of the glazing system on the Data File;
+            // (2) if two glazing systems (separated by a mullion) on Data File, create a second window
+            //     and adjust the dimensions of the original and second windows to those on the Data File
 
-        if (surf.Construction != 0) {
-
-            if (state.dataConstruction->Construct(surf.Construction).FromWindow5DataFile) {
-
+            if (constr.FromWindow5DataFile) {
                 ModifyWindow(state, SurfNum, ErrorsFound, AddedSubSurfaces);
-
             } else {
                 // Calculate net area for base surface (note that ModifyWindow, above, adjusts net area of
                 // base surface for case where window construction is from Window5 Data File
@@ -5710,8 +5674,7 @@ namespace SurfaceGeometry {
                     baseSurf.Area -= surf.Area;
 
                     // Subtract TDD:DIFFUSER area from other side interzone surface
-                    if (surf.Class == SurfaceClass::TDD_Diffuser &&
-                        !baseSurf.ExtBoundCondName.empty()) { // Base surface is an interzone surface
+                    if (surf.Class == SurfaceClass::TDD_Diffuser && !baseSurf.ExtBoundCondName.empty()) { // Base surface is an interzone surface
                         // Lookup interzone surface of the base surface
                         // (Interzone surfaces have not been assigned yet, but all base surfaces should already be loaded.)
                         if (auto found = sg->surfaceMap.find(baseSurf.ExtBoundCondName); found != sg->surfaceMap.end()) {
@@ -5729,8 +5692,7 @@ namespace SurfaceGeometry {
                     // Net area of base surface with unity window multipliers (used in shadowing checks)
                     // For Windows, Glass Doors and Doors, just one area is subtracted.  For the rest, should be
                     // full area.
-                    if (surf.Class == SurfaceClass::Window ||
-                        surf.Class == SurfaceClass::GlassDoor) {
+                    if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::GlassDoor) {
                         baseSurf.NetAreaShadowCalc -= surf.Area / surf.Multiplier;
                     } else if (surf.Class == SurfaceClass::Door) { // Door, TDD:Diffuser, TDD:DOME
                         baseSurf.NetAreaShadowCalc -= surf.Area / surf.Multiplier;
@@ -6997,7 +6959,8 @@ namespace SurfaceGeometry {
             
             cavity.SurfPtrs.allocate(cavity.NumSurfs);
             cavity.SurfPtrs = 0;
-            for (int ThisSurf = AlphaOffset + 1; ThisSurf <= AlphaOffset + cavity.NumSurfs; ++ThisSurf) {
+            for (int iSurf = 1; iSurf <= cavity.NumSurfs; ++iSurf) {
+                int ThisSurf = AlphaOffset + iSurf;    
                 int surfNum = Util::FindItemInList(ipsc->cAlphaArgs(ThisSurf), state.dataSurface->Surface, state.dataSurface->TotSurfaces);
                 if (surfNum == 0) {
                     ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(ThisSurf), ipsc->cAlphaArgs(ThisSurf));
@@ -7027,7 +6990,7 @@ namespace SurfaceGeometry {
                     ErrorsFound = true;
                     continue;
                 }
-                cavity.SurfPtrs(ThisSurf) = surfNum;
+                cavity.SurfPtrs(iSurf) = surfNum;
 
                 // now set info in Surface structure
                 state.dataSurface->SurfExtCavNum(surfNum) = Item;
@@ -8082,7 +8045,7 @@ namespace SurfaceGeometry {
             ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ""};
             ErrorsFoundSurfList = false;
 
-            HeatTransferModel htAlgo = static_cast<HeatTransferModel>(getEnumValue(heatTransferModelNamesUC, ipsc->cAlphaArgs(3)));
+            HeatTransferModel htAlgo = static_cast<HeatTransferModel>(getEnumValue(heatTransferModelNamesUC, ipsc->cAlphaArgs(2)));
 
             switch (htAlgo) {
             case HeatTransferModel::CTF: {
@@ -8098,7 +8061,7 @@ namespace SurfaceGeometry {
                 state.dataHeatBal->AnyCondFD = true;
             } break;
             default: {
-                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
+                ShowSevereInvalidKey(state, eoh, ipsc->cAlphaFieldNames(2), ipsc->cAlphaArgs(2));
                 ErrorsFoundMultiSurf = true;
             } break;
             }
@@ -12405,133 +12368,120 @@ namespace SurfaceGeometry {
         // Creates a shaded window construction for windows whose WindowShadingControl
         // has a shading device specified instead of a shaded construction
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string ShDevName;    // Shading device material name
-        std::string ConstrNameSh; // Shaded construction name
-        int TotLayersOld;         // Total layers in old (unshaded) construction
-        int TotLayersNew;         // Total layers in new (shaded) construction
-        //  INTEGER :: loop                            ! DO loop index
-
         auto &sg = state.dataSurfaceGeometry;
         auto &surf = sg->SurfaceTmp(SurfNum);
-        ShDevName = state.dataMaterial->Material(ShDevNum)->Name;
-        int ConstrNum = surf.Construction;
-        auto const &constr = state.dataConstruction->Construct(ConstrNum);
 
-        if (ANY_INTERIOR_SHADE_BLIND(state.dataSurface->WindowShadingControl(WSCPtr).ShadingType)) {
-            ConstrNameSh = format("{}:{}:INT", constr.Name, ShDevName);
-        } else {
-            ConstrNameSh = format("{}:{}:EXT", constr.Name, ShDevName);
-        }
+        auto const &constr = state.dataConstruction->Construct(surf.Construction);
+
+        auto &winShadeCtrl = state.dataSurface->WindowShadingControl(WSCPtr);
+        
+        std::string ConstrNameSh = format("{}:{}:{}", constr.Name, state.dataMaterial->Material(ShDevNum)->Name,
+                                          ANY_INTERIOR_SHADE_BLIND(winShadeCtrl.ShadingType) ? "INT" : "EXT");
 
         // If this construction name already exists, set the surface's shaded construction number to it
-
         int ConstrNewSh = Util::FindItemInList(ConstrNameSh, state.dataConstruction->Construct);
-
         if (ConstrNewSh > 0) {
             surf.shadedConstructionList[shadeControlIndex] = ConstrNewSh;
             surf.activeShadedConstruction = ConstrNewSh; // set the active to the current for now
+            return;
+        }
+        
+        // Create new construction
+        ++state.dataHeatBal->TotConstructs;
+        ConstrNewSh = state.dataHeatBal->TotConstructs;
+        surf.shadedConstructionList[shadeControlIndex] = ConstrNewSh;
+        surf.activeShadedConstruction = ConstrNewSh; // set the active to the current for now
+        state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
+        state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
+        state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
+        state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
+        
+        // Have to redo this reference because of the redimension.  Good lord I hate references
+        auto const &constr1 = state.dataConstruction->Construct(surf.Construction);
+        auto &constrSh = state.dataConstruction->Construct(ConstrNewSh);
+
+        constrSh.setArraysBasedOnMaxSolidWinLayers(state);
+        
+        constrSh.LayerPoint = 0;
+        constrSh.TotLayers = constr1.TotLayers + 1;
+        
+        auto const *matSh = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
+        if (winShadeCtrl.ShadingType == WinShadingType::IntShade || winShadeCtrl.ShadingType == WinShadingType::IntBlind) {
+            // Interior shading device
+            constrSh.LayerPoint({1, constr1.TotLayers}) = constr1.LayerPoint({1, constr1.TotLayers});
+            constrSh.LayerPoint(constrSh.TotLayers) = ShDevNum;
+            constrSh.InsideAbsorpSolar = matSh->AbsorpSolar;
+            auto const *matSh1 = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(constrSh.LayerPoint(1)));
+            constrSh.OutsideAbsorpSolar = matSh1->AbsorpSolar;
+            constrSh.OutsideAbsorpThermal = matSh1->AbsorpThermalFront;
         } else {
-            // Create new construction
-            ConstrNewSh = state.dataHeatBal->TotConstructs + 1;
-            surf.shadedConstructionList[shadeControlIndex] = ConstrNewSh;
-            surf.activeShadedConstruction = ConstrNewSh; // set the active to the current for now
-            state.dataHeatBal->TotConstructs = ConstrNewSh;
-            state.dataConstruction->Construct.redimension(state.dataHeatBal->TotConstructs);
-            state.dataHeatBal->NominalRforNominalUCalculation.redimension(state.dataHeatBal->TotConstructs);
-            state.dataHeatBal->NominalRforNominalUCalculation(state.dataHeatBal->TotConstructs) = 0.0;
-            state.dataHeatBal->NominalU.redimension(state.dataHeatBal->TotConstructs);
-            state.dataHeatBal->NominalU(state.dataHeatBal->TotConstructs) = 0.0;
-            state.dataHeatBal->NominalUBeforeAdjusted.redimension(state.dataHeatBal->TotConstructs);
-            state.dataHeatBal->CoeffAdjRatio.redimension(state.dataHeatBal->TotConstructs) = 1.0;
-
-            state.dataConstruction->Construct(state.dataHeatBal->TotConstructs).setArraysBasedOnMaxSolidWinLayers(state);
-
-            TotLayersOld = constr.TotLayers;
-            TotLayersNew = TotLayersOld + 1;
-
-            state.dataConstruction->Construct(ConstrNewSh).LayerPoint = 0;
-
-            auto const *thisMaterialSh = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(ShDevNum));
-            auto &thisConstructNewSh = state.dataConstruction->Construct(ConstrNewSh);
-            if (state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntShade ||
-                state.dataSurface->WindowShadingControl(WSCPtr).ShadingType == WinShadingType::IntBlind) {
-                // Interior shading device
-                thisConstructNewSh.LayerPoint({1, TotLayersOld}) = state.dataConstruction->Construct(ConstrNum).LayerPoint({1, TotLayersOld});
-                thisConstructNewSh.LayerPoint(TotLayersNew) = ShDevNum;
-                thisConstructNewSh.InsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
-                auto const *thisMaterialShLayer1 = dynamic_cast<const Material::MaterialChild *>(
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(1)));
-                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialShLayer1->AbsorpSolar;
-                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialShLayer1->AbsorpThermalFront;
-            } else {
-                // Exterior shading device
-                thisConstructNewSh.LayerPoint(1) = ShDevNum;
-                thisConstructNewSh.LayerPoint({2, TotLayersNew}) = constr.LayerPoint({1, TotLayersOld});
-                auto const *thisMaterialShInside = dynamic_cast<const Material::MaterialChild *>(
-                    state.dataMaterial->Material(state.dataConstruction->Construct(ConstrNewSh).LayerPoint(TotLayersNew)));
-                thisConstructNewSh.InsideAbsorpSolar = thisMaterialShInside->AbsorpSolar;
-                thisConstructNewSh.OutsideAbsorpSolar = thisMaterialSh->AbsorpSolar;
-                thisConstructNewSh.OutsideAbsorpThermal = thisMaterialSh->AbsorpThermalFront;
-            }
-            // The following InsideAbsorpThermal applies only to inside glass; it is corrected
-            //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-            thisConstructNewSh.InsideAbsorpThermal =
-                dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(constr.LayerPoint(TotLayersOld)))->AbsorpThermalBack;
-            thisConstructNewSh.OutsideRoughness = Material::Roughness::VerySmooth;
-            thisConstructNewSh.DayltPropPtr = 0;
-            thisConstructNewSh.CTFCross.fill(0.0);
-            thisConstructNewSh.CTFFlux.fill(0.0);
-            thisConstructNewSh.CTFInside.fill(0.0);
-            thisConstructNewSh.CTFOutside.fill(0.0);
-            thisConstructNewSh.CTFSourceIn.fill(0.0);
-            thisConstructNewSh.CTFSourceOut.fill(0.0);
-            thisConstructNewSh.CTFTimeStep = 0.0;
-            thisConstructNewSh.CTFTSourceOut.fill(0.0);
-            thisConstructNewSh.CTFTSourceIn.fill(0.0);
-            thisConstructNewSh.CTFTSourceQ.fill(0.0);
-            thisConstructNewSh.CTFTUserOut.fill(0.0);
-            thisConstructNewSh.CTFTUserIn.fill(0.0);
-            thisConstructNewSh.CTFTUserSource.fill(0.0);
-            thisConstructNewSh.NumHistories = 0;
-            thisConstructNewSh.NumCTFTerms = 0;
-            thisConstructNewSh.UValue = 0.0;
-            thisConstructNewSh.SourceSinkPresent = false;
-            thisConstructNewSh.SolutionDimensions = 0;
-            thisConstructNewSh.SourceAfterLayer = 0;
-            thisConstructNewSh.TempAfterLayer = 0;
-            thisConstructNewSh.ThicknessPerpend = 0.0;
-            thisConstructNewSh.AbsDiff = 0.0;
-            thisConstructNewSh.AbsDiffBack = 0.0;
-            thisConstructNewSh.AbsDiffShade = 0.0;
-            thisConstructNewSh.AbsDiffBackShade = 0.0;
-            thisConstructNewSh.ShadeAbsorpThermal = 0.0;
-            thisConstructNewSh.AbsBeamShadeCoef = 0.0;
-            thisConstructNewSh.TransDiff = 0.0;
-            thisConstructNewSh.TransDiffVis = 0.0;
-            thisConstructNewSh.ReflectSolDiffBack = 0.0;
-            thisConstructNewSh.ReflectSolDiffFront = 0.0;
-            thisConstructNewSh.ReflectVisDiffBack = 0.0;
-            thisConstructNewSh.ReflectVisDiffFront = 0.0;
-            thisConstructNewSh.TransSolBeamCoef = 0.0;
-            thisConstructNewSh.TransVisBeamCoef = 0.0;
-            thisConstructNewSh.ReflSolBeamFrontCoef = 0.0;
-            thisConstructNewSh.ReflSolBeamBackCoef = 0.0;
-            thisConstructNewSh.W5FrameDivider = 0;
-            thisConstructNewSh.FromWindow5DataFile = false;
-
-            thisConstructNewSh.Name = ConstrNameSh;
-            thisConstructNewSh.TotLayers = TotLayersNew;
-            thisConstructNewSh.TotSolidLayers = constr.TotSolidLayers + 1;
-            thisConstructNewSh.TotGlassLayers = constr.TotGlassLayers;
-            thisConstructNewSh.TypeIsWindow = true;
-            thisConstructNewSh.IsUsed = true;
-
-            for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
-                for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
-                    thisConstructNewSh.AbsBeamCoef(Layer)(index) = 0.0;
-                    thisConstructNewSh.AbsBeamBackCoef(Layer)(index) = 0.0;
-                }
+            // Exterior shading device
+            constrSh.LayerPoint(1) = ShDevNum;
+            constrSh.LayerPoint({2, constrSh.TotLayers}) = constr1.LayerPoint({1, constr1.TotLayers});
+            auto const *matShInside = dynamic_cast<const Material::MaterialChild *>(state.dataMaterial->Material(constrSh.LayerPoint(constrSh.TotLayers)));
+            constrSh.InsideAbsorpSolar = matShInside->AbsorpSolar;
+            constrSh.OutsideAbsorpSolar = matSh->AbsorpSolar;
+            constrSh.OutsideAbsorpThermal = matSh->AbsorpThermalFront;
+        }
+        
+        // The following InsideAbsorpThermal applies only to inside glass; it is corrected
+        //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
+        constrSh.InsideAbsorpThermal = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(constr1.LayerPoint(constr1.TotLayers)))->AbsorpThermalBack;
+        constrSh.OutsideRoughness = Material::Roughness::VerySmooth;
+        constrSh.DayltPropPtr = 0;
+        constrSh.CTFCross.fill(0.0);
+        constrSh.CTFFlux.fill(0.0);
+        constrSh.CTFInside.fill(0.0);
+        constrSh.CTFOutside.fill(0.0);
+        constrSh.CTFSourceIn.fill(0.0);
+        constrSh.CTFSourceOut.fill(0.0);
+        constrSh.CTFTimeStep = 0.0;
+        constrSh.CTFTSourceOut.fill(0.0);
+        constrSh.CTFTSourceIn.fill(0.0);
+        constrSh.CTFTSourceQ.fill(0.0);
+        constrSh.CTFTUserOut.fill(0.0);
+        constrSh.CTFTUserIn.fill(0.0);
+        constrSh.CTFTUserSource.fill(0.0);
+        constrSh.NumHistories = 0;
+        constrSh.NumCTFTerms = 0;
+        constrSh.UValue = 0.0;
+        constrSh.SourceSinkPresent = false;
+        constrSh.SolutionDimensions = 0;
+        constrSh.SourceAfterLayer = 0;
+        constrSh.TempAfterLayer = 0;
+        constrSh.ThicknessPerpend = 0.0;
+        constrSh.AbsDiff = 0.0;
+        constrSh.AbsDiffBack = 0.0;
+        constrSh.AbsDiffShade = 0.0;
+        constrSh.AbsDiffBackShade = 0.0;
+        constrSh.ShadeAbsorpThermal = 0.0;
+        constrSh.AbsBeamShadeCoef = 0.0;
+        constrSh.TransDiff = 0.0;
+        constrSh.TransDiffVis = 0.0;
+        constrSh.ReflectSolDiffBack = 0.0;
+        constrSh.ReflectSolDiffFront = 0.0;
+        constrSh.ReflectVisDiffBack = 0.0;
+        constrSh.ReflectVisDiffFront = 0.0;
+        constrSh.TransSolBeamCoef = 0.0;
+        constrSh.TransVisBeamCoef = 0.0;
+        constrSh.ReflSolBeamFrontCoef = 0.0;
+        constrSh.ReflSolBeamBackCoef = 0.0;
+        constrSh.W5FrameDivider = 0;
+        constrSh.FromWindow5DataFile = false;
+        
+        constrSh.Name = ConstrNameSh;
+        constrSh.TotSolidLayers = constr1.TotSolidLayers + 1;
+        constrSh.TotGlassLayers = constr1.TotGlassLayers;
+        constrSh.TypeIsWindow = true;
+        constrSh.IsUsed = true;
+        
+        for (int Layer = 1; Layer <= state.dataHeatBal->MaxSolidWinLayers; ++Layer) {
+            for (int index = 1; index <= DataSurfaces::MaxPolyCoeff; ++index) {
+                constrSh.AbsBeamCoef(Layer)(index) = 0.0;
+                constrSh.AbsBeamBackCoef(Layer)(index) = 0.0;
             }
         }
     } // CreateShadedWindowConstruction()
