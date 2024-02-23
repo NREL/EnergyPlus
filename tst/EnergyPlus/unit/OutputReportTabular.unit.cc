@@ -13394,61 +13394,67 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_IPUnitExceptElec)
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite1",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite2",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "AnotherEndUseSubCat");
     SetupOutputVariable(*state,
                         "Exterior Lights Electricity Energy",
                         Constant::Units::J,
                         extLitUse,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite3",
                         Constant::eResource::Electricity,
-                        OutputProcessor::SOVEndUseCat::ExteriorLights,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::ExteriorLights,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Coal Energy",
                         Constant::Units::J,
                         CoalHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite4",
                         Constant::eResource::Coal,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Gasoline Energy",
                         Constant::Units::J,
                         GasolineHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite5",
                         Constant::eResource::Gasoline,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     SetupOutputVariable(*state,
                         "Heating Propane Energy",
                         Constant::Units::J,
                         PropaneHeating,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Lite6",
                         Constant::eResource::Propane,
-                        OutputProcessor::SOVEndUseCat::Heating,
+                        OutputProcessor::Group::Invalid,
+                        OutputProcessor::EndUseCat::Heating,
                         "General");
     state->dataGlobal->DoWeathSim = true;
     state->dataGlobal->TimeStepZone = 1.0;
@@ -13459,8 +13465,8 @@ TEST_F(SQLiteFixture, ORT_EndUseBySubcategorySQL_IPUnitExceptElec)
 
     auto timeStep = 1.0;
 
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, timeStep);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, timeStep);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, timeStep);
 
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::Zone].TimeStep = 60;
     *state->dataOutputProcessor->TimeValue[(int)OutputProcessor::TimeStepType::System].TimeStep = 60;
