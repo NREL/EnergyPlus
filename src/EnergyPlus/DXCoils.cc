@@ -14964,11 +14964,11 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilSEERStandardIP, thisDXCoil.Name, "N/A");
         // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
         // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-        ShowSevereError(state,
-                        "Standard Ratings: The coils " + thisDXCoil.Name + " has a gross cooling capacity of " +
-                            std::to_string(thisDXCoil.RatedTotCap(1)) +
-                            ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                            "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+        ShowWarningError(state,
+                         "Standard Ratings: The coils " + thisDXCoil.Name + " has a gross cooling capacity of " +
+                             std::to_string(thisDXCoil.RatedTotCap(1)) +
+                             ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                             "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
     } else if (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air && thisDXCoil.RatedTotCap(1) < 19049.61955) {
         // These will convert with a factor of 1 which is ok
         // SEER | Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023.

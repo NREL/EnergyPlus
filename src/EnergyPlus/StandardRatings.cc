@@ -1700,11 +1700,11 @@ namespace StandardRatings {
                     RatedTotalCapacity(1) * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate_2023(1) * RatedAirVolFlowRate(1);
                 // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
                 // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowSevereError(state,
-                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
-                                    std::to_string(RatedTotalCapacity(1)) +
-                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+                ShowWarningError(state,
+                                 "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                     std::to_string(RatedTotalCapacity(1)) +
+                                     ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                     "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
             } else if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air && RatedTotalCapacity(1) < 19049.61955) {
                 // ANSI/AHRI 210/240 Standard 2023 only applies for solely to Air Cooled Cooling Coils
                 // Also, this standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
@@ -3728,11 +3728,11 @@ namespace StandardRatings {
                 // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
                 StandarRatingResults["EER"] = 0.0;
                 StandarRatingResults["EER_2022"] = 0.0;
-                ShowSevereError(state,
-                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
-                                    std::to_string(RatedTotalCapacity) +
-                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+                ShowWarningError(state,
+                                 "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                     std::to_string(RatedTotalCapacity) +
+                                     ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                     "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
             } else if (RatedTotalCapacity < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
                 // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
@@ -4161,14 +4161,20 @@ namespace StandardRatings {
     std::tuple<Real64, Real64, Real64, Real64>
     IntermediateCapacityAndPowerSEER2Case1(EnergyPlusData &state, Real64 bl, Real64 q_low, Real64 n, Real64 p_low, int PLFFPLRCurveIndex)
     {
+        // Case I. Building load is less than Low Stage capacity, BL(tj) < qLow(tj). Calculate total bin capacity by using Equation 11.73
+        // and total bin energy by using Equation 11.74.
         Real64 e(0.0);
         Real64 q(0.0);
-        Real64 clf_low = bl / q_low;                                     // Equation 11.75 (AHRI-2023)
-        Real64 plf_low = 1.0 - CyclicDegradationCoeff * (1.0 - clf_low); // Equation 11.76 (AHRI-2023)
-        q = clf_low * q_low * n;                                         // Equation 11.73 (AHRI-2023)
-        e = clf_low * p_low * n / plf_low;                               // Equation 11.74 (AHRI-2023)
         Real64 NetTotCoolCapBinned_2023(0.0);
         Real64 TotCoolElecPowerBinned_2023(0.0);
+        Real64 clf_low = bl / q_low; // Equation 11.75 (AHRI-2023)
+
+        // SEER2 STANDARD
+        Real64 plf_low = 1.0 - CyclicDegradationCoeff * (1.0 - clf_low); // Equation 11.76 (AHRI-2023)
+        q = clf_low * q_low * n;                                         // Total Bin Capacity, Equation 11.73 (AHRI-2023)
+        e = clf_low * p_low * n / plf_low;                               // Total Bin Energy, Equation 11.74 (AHRI-2023)
+
+        // SEER2 USER
         NetTotCoolCapBinned_2023 = clf_low * q_low * n;
         Real64 PartLoadFactorUser_2023 = Curve::CurveValue(state, PLFFPLRCurveIndex, clf_low);
         TotCoolElecPowerBinned_2023 = (clf_low / PartLoadFactorUser_2023) * p_low * n;
@@ -5264,6 +5270,15 @@ namespace StandardRatings {
 
             Real64 q(0.0);
             Real64 e(0.0);
+            Real64 N_Cq(0.0);
+            Real64 M_Cq(0.0);
+            Real64 N_CE(0.0);
+            Real64 M_CE(0.0);
+            Real64 q_int(0.0);
+            Real64 p_int(0.0);
+            Real64 t = OutdoorBinTemperatureSEER[BN];
+            Real64 n = CoolFracBinHoursAtOutdoorBinTemp[BN];
+            Real64 bl = BuildingCoolingLoad_2023;
             for (spnum = 1; spnum <= nsp; ++spnum) {
                 // # Intermediate Capacity
                 Real64 q_A_full = Q_A_Full(spnum);
@@ -5271,14 +5286,8 @@ namespace StandardRatings {
                 Real64 q_B_low = Q_B_Low(spnum);
                 Real64 q_F_low = Q_F_Low(spnum);
                 Real64 q_E_int = Q_E_Int(spnum);
-                // Equation 11.90 (AHRI-2023)
-                Real64 q_87_low = q_F_low + (q_B_low - q_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
-                Real64 q_87_full = q_B_full + (q_A_full - q_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
 
-                // Equation 11.96 (AHRI-2023)
-                Real64 N_Cq = (q_E_int - q_87_low) / (q_87_full - q_87_low);
-                // Equation 11.95 (AHRI-2023)
-                Real64 M_Cq = (q_B_low - q_F_low) / (27.77 - 19.44) * (1. - N_Cq) + (q_A_full - q_B_full) / (35.0 - 27.77) * N_Cq;
+                std::tie(N_Cq, M_Cq) = CapacityAdjustmentFactorsInCoolingModeSEER2(q_F_low, q_B_low, BN, q_B_full, q_A_full, q_E_int);
 
                 // # Intermediate Power
                 Real64 p_A_full = P_A_Full(spnum);
@@ -5286,26 +5295,10 @@ namespace StandardRatings {
                 Real64 p_B_low = P_B_Low(spnum);
                 Real64 p_F_low = P_F_Low(spnum);
                 Real64 p_E_int = P_E_Int(spnum);
-                // Equation 11.91 (AHRI-2023)
-                Real64 p_87_low = p_F_low + (p_B_low - p_F_low) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
-                Real64 p_87_full = p_B_full + (p_A_full - p_B_full) * ((OutdoorBinTemperatureSEER[BN] - 19.44 / 27.77 - 19.44));
 
-                // Equation 11.99 (AHRI-2023)
-                Real64 N_CE = (p_E_int - p_87_low) / (p_87_full - p_87_low);
-                // Equaition 11.98 (AHRI-2023)
-                Real64 M_CE = (p_B_low - p_F_low) / (27.77 - 19.44) * (1. - N_CE) + (p_A_full - p_B_full) / (35.0 - 27.77) * N_CE;
+                std::tie(N_CE, M_CE) = EnergyAdjustmentFactorsInCoolingModeSEER2(p_F_low, p_B_low, BN, p_B_full, p_A_full, p_E_int);
 
-                Real64 t = OutdoorBinTemperatureSEER[BN];
-                Real64 n = CoolFracBinHoursAtOutdoorBinTemp[BN];
-                Real64 bl = BuildingCoolingLoad_2023;
-
-                // Equation 11.94 (AHRI-2023)
-                Real64 q_int = q_E_int + M_Cq * (t - 30.55);
-                // Equation 11.97 (AHRI-2023)
-                Real64 p_int = p_E_int + M_CE * (t - 30.55);
-                Real64 cop_low = q_low / p_low;
-                Real64 cop_int = q_int / p_int;
-                Real64 cop_full = q_full / p_full;
+                std::tie(q_int, p_int) = IntermediateSteadyStateCpacityAndPowerSEER2(q_E_int, M_Cq, p_E_int, M_CE, t);
 
                 // Section 11.2.1.3.1 CASE 1 - Building load is no greater than unit capacity at low speed.
                 if (bl <= q_low) {
@@ -5480,11 +5473,11 @@ namespace StandardRatings {
                 StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
                 // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
                 // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowSevereError(state,
-                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
-                                    std::to_string(RatedTotalCapacity(nsp)) +
-                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+                ShowWarningError(state,
+                                 "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                     std::to_string(RatedTotalCapacity(nsp)) +
+                                     ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                     "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
             } else if (RatedTotalCapacity(nsp) < 19049.61955 && CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
                 // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
@@ -5672,11 +5665,11 @@ namespace StandardRatings {
                 StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
                 // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
                 // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowSevereError(state,
-                                "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
-                                    std::to_string(GrossRatedTotalCoolingCapacityVS) +
-                                    ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                                    "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+                ShowWarningError(state,
+                                 "Standard Ratings: The coils " + DXCoilName + " has a gross cooling capacity of " +
+                                     std::to_string(GrossRatedTotalCoolingCapacityVS) +
+                                     ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
+                                     "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
 
             } else if (GrossRatedTotalCoolingCapacityVS < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
