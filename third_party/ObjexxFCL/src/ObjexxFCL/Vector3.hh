@@ -784,10 +784,13 @@ public: // Modifiers
 	{
 		T const cur_length( length() );
 		if ( cur_length > T( 0 ) ) {
-			T const dilation( tar_length / cur_length );
-			x *= dilation;
-			y *= dilation;
-			z *= dilation;
+                        // Disabling this optimization because x *=
+                        // (1/x) comes out as 0.9999999999988 rather
+                        // than 1.
+			// T const dilation( tar_length / cur_length );
+			x /= cur_length; // x *= dilation;
+			y /= cur_length; // y *= dilation;
+			z /= cur_length; // z *= dilation;
 		} else { // Set zero vector
 			x = y = z = T( 0 );
 		}

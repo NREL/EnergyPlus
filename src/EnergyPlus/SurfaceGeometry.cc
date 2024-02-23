@@ -4381,9 +4381,6 @@ namespace SurfaceGeometry {
         Array1D<Vector2<Real64>> VV(4);
         Real64 Xb;
         Real64 Yb;
-        Real64 Perimeter;
-        int n;
-        int Vrt;
 
         auto &surf = state.dataSurfaceGeometry->SurfaceTmp(SurfNum);
         if (surf.Zone == 0 &&
@@ -4441,11 +4438,10 @@ namespace SurfaceGeometry {
         VV(3) = {Length, 0.0};
         VV(4) = {Length, Height};
 
-        for (n = 1; n <= surf.Sides; ++n) {
-            Vrt = n;
-            surf.Vertex(Vrt).x = LLC.x - VV(n).x * surf.CosAzim - VV(n).y * surf.CosTilt * surf.SinAzim;
-            surf.Vertex(Vrt).y = LLC.y + VV(n).x * surf.SinAzim - VV(n).y * surf.CosTilt * surf.CosAzim;
-            surf.Vertex(Vrt).z = LLC.z + VV(n).y * surf.SinTilt;
+        for (int n = 1; n <= surf.Sides; ++n) {
+            surf.Vertex(n).x = LLC.x - VV(n).x * surf.CosAzim - VV(n).y * surf.CosTilt * surf.SinAzim;
+            surf.Vertex(n).y = LLC.y + VV(n).x * surf.SinAzim - VV(n).y * surf.CosTilt * surf.CosAzim;
+            surf.Vertex(n).z = LLC.z + VV(n).y * surf.SinTilt;
         }
 
         surf.NewellAreaVec = Vectors::CalcNewellAreaVector(surf.Vertex, surf.Sides);
@@ -4478,18 +4474,14 @@ namespace SurfaceGeometry {
         surf.ViewFactorSkyIR = surf.ViewFactorSky;
         surf.ViewFactorGroundIR = 0.5 * (1.0 - surf.CosTilt);
 
-        Perimeter = distance(surf.Vertex(surf.Sides),
-                             surf.Vertex(1));
-        for (Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
-            Perimeter +=
-                distance(surf.Vertex(Vrt), surf.Vertex(Vrt - 1));
+        surf.Perimeter = distance(surf.Vertex(surf.Sides), surf.Vertex(1));
+        for (int Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
+            surf.Perimeter += distance(surf.Vertex(Vrt), surf.Vertex(Vrt - 1));
         }
-        surf.Perimeter = Perimeter;
 
         // Call to transform vertices
-
         TransformVertsByAspect(state, SurfNum, surf.Sides);
-    }
+    } // MakeRectangularVertices()
 
     void GetHTSubSurfaceData(EnergyPlusData &state,
                              bool &ErrorsFound,                       // Error flag indicator (true if errors found)
@@ -4987,7 +4979,6 @@ namespace SurfaceGeometry {
         int WindowShadingField;
         int FrameField;
         int OtherSurfaceField;
-        int ClassItem;
         int IZFound;
         SurfaceClass surfClass;
         std::string_view objName;
@@ -5022,7 +5013,7 @@ namespace SurfaceGeometry {
                 FrameField = 5;
                 OtherSurfaceField = 0;
                 surfClass = SurfaceClass::GlassDoor;
-                objName = "GlassDoor";
+                objName = "GlazedDoor";
             } else if (Item == 4) {
                 ItemsToGet = TotIZWindows;
                 GettingIZSurfaces = true;
@@ -5046,7 +5037,7 @@ namespace SurfaceGeometry {
                 FrameField = 0;
                 OtherSurfaceField = 4;
                 surfClass = SurfaceClass::GlassDoor;
-                objName = "GlassDoor:Interzone";
+                objName = "GlazedDoor:Interzone";
             }
 
             for (int Loop = 1; Loop <= ItemsToGet; ++Loop) {
@@ -5098,8 +5089,7 @@ namespace SurfaceGeometry {
                     surf.ConstructionStoredInputValue = surf.Construction;
                 }
 
-                if (surf.Class == SurfaceClass::Window ||
-                    surf.Class == SurfaceClass::GlassDoor) {
+                if (surf.Class == SurfaceClass::Window || surf.Class == SurfaceClass::GlassDoor) {
 
                     if (surf.Construction != 0) {
                         auto &construction = state.dataConstruction->Construct(surf.Construction);
@@ -5317,9 +5307,9 @@ namespace SurfaceGeometry {
                                              ipsc->cAlphaArgs(2),
                                              AddedSubSurfaces);
 
-            } // Getting Items
-        }
-    }
+            } // for (Loop)
+        } // for (Item)
+    } // GetRectSubSurfaces()
 
     void CheckWindowShadingControlFrameDivider(EnergyPlusData &state,
                                                std::string_view const cRoutineName, // routine name calling this one (for error messages)
@@ -5722,33 +5712,8 @@ namespace SurfaceGeometry {
         // PURPOSE OF THIS SUBROUTINE:
         // This routine creates world/3d coordinates for rectangular surfaces using relative X and Z, length & height.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-        using namespace Vectors;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Vector3<Real64> LLC;
         Array1D<Vector2<Real64>> VV(4);
-        Real64 Perimeter;
-        int n;
-        int Vrt;
 
         if (BaseSurfNum == 0) return; // invalid base surface, don't bother
 
@@ -5774,24 +5739,21 @@ namespace SurfaceGeometry {
         VV(4) = {Length, Height};
 
         for (int n = 1; n <= surf.Sides; ++n) {
-            Vrt = n;
-            surf.Vertex(Vrt).x = LLC.x - VV(n).x * surf.CosAzim - VV(n).y * surf.CosTilt * surf.SinAzim;
-            surf.Vertex(Vrt).y = LLC.y + VV(n).x * surf.SinAzim - VV(n).y * surf.CosTilt * surf.CosAzim;
-            surf.Vertex(Vrt).z = LLC.z + VV(n).y * surf.SinTilt;
+            surf.Vertex(n).x = LLC.x - VV(n).x * surf.CosAzim - VV(n).y * surf.CosTilt * surf.SinAzim;
+            surf.Vertex(n).y = LLC.y + VV(n).x * surf.SinAzim - VV(n).y * surf.CosTilt * surf.CosAzim;
+            surf.Vertex(n).z = LLC.z + VV(n).y * surf.SinTilt;
         }
 
-        surf.NewellAreaVec = CalcNewellAreaVector(surf.Vertex, surf.Sides);
+        surf.NewellAreaVec = Vectors::CalcNewellAreaVector(surf.Vertex, surf.Sides);
         surf.GrossArea = length(surf.NewellAreaVec);
         surf.Area = surf.GrossArea;
         surf.NetAreaShadowCalc = surf.Area;
-        surf.NewellNormVec = CalcNewellNormalVector(surf.Vertex, surf.Sides);
+        surf.NewellNormVec = Vectors::CalcNewellNormalVector(surf.Vertex, surf.Sides);
 
-        std::tie(surf.Azimuth, surf.Tilt) = CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
+        std::tie(surf.Azimuth, surf.Tilt) = Vectors::CalcAzimuthAndTilt(surf.Vertex, surf.lcsx, surf.lcsy, surf.lcsz, surf.NewellNormVec);
         surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
 
-        if (surf.Class != SurfaceClass::Window &&
-            surf.Class != SurfaceClass::GlassDoor &&
-            surf.Class != SurfaceClass::Door)
+        if (surf.Class != SurfaceClass::Window && surf.Class != SurfaceClass::GlassDoor && surf.Class != SurfaceClass::Door)
             surf.ViewFactorGround = 0.5 * (1.0 - surf.CosTilt);
         // Outward normal unit vector (pointing away from room)
         surf.OutNormVec = surf.NewellNormVec;
@@ -5830,14 +5792,13 @@ namespace SurfaceGeometry {
         surf.ViewFactorGroundIR = 0.5 * (1.0 - surf.CosTilt);
 
         surf.Perimeter = distance(surf.Vertex(surf.Sides), surf.Vertex(1));
-        for (Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
+        for (int Vrt = 2; Vrt <= surf.Sides; ++Vrt) {
             surf.Perimeter += distance(surf.Vertex(Vrt), surf.Vertex(Vrt - 1));
         }
 
         // Call to transform vertices
-
         TransformVertsByAspect(state, SurfNum, surf.Sides);
-    }
+    } // MakeRelativeRectangularVertices()
 
     void GetAttShdSurfaceData(EnergyPlusData &state,
                               bool &ErrorsFound,   // Error flag indicator (true if errors found)
@@ -6048,9 +6009,6 @@ namespace SurfaceGeometry {
         int NumNumbers;
         int NumParams;
         int IOStat; // IO Status when calling get input subroutine
-        Real64 Depth;
-        Real64 Length;
-        Vector3<Real64> p;
         Vector3<Real64> LLC;
 
         constexpr std::string_view routineName = "GetSimpleShdSurfaceData";
@@ -6160,12 +6118,8 @@ namespace SurfaceGeometry {
                     // for projection option:
                     //   N5;  \field Depth as Fraction of Window/Door Height
                     //        \units m
-                    Length = ipsc->rNumericArgs(3) + ipsc->rNumericArgs(4) + winSurf.Width;
-                    if (Item == 1) {
-                        Depth = ipsc->rNumericArgs(5);
-                    } else if (Item == 2) {
-                        Depth = ipsc->rNumericArgs(5) * winSurf.Height;
-                    }
+                    Real64 Length = ipsc->rNumericArgs(3) + ipsc->rNumericArgs(4) + winSurf.Width;
+                    Real64 Depth = (Item == 1) ? ipsc->rNumericArgs(5) : ipsc->rNumericArgs(5) * winSurf.Height;
 
                     if (Length * Depth <= 0.0) {
                         ShowSevereError(state, format("{}=\"{}\", illegal surface area=[{:.2R}]. Surface will NOT be entered.",
@@ -6230,12 +6184,8 @@ namespace SurfaceGeometry {
                     //   N5,  \field Left Depth as Fraction of Window/Door Width
                     //        \units m
                     surf.Name = surf.Name + " Left";
-                    Length = ipsc->rNumericArgs(2) + ipsc->rNumericArgs(3) + winSurf.Height;
-                    if (Item == 3) {
-                        Depth = ipsc->rNumericArgs(5);
-                    } else if (Item == 4) {
-                        Depth = ipsc->rNumericArgs(5) * winSurf.Width;
-                    }
+                    Real64 Length = ipsc->rNumericArgs(2) + ipsc->rNumericArgs(3) + winSurf.Height;
+                    Real64 Depth = (Item == 3) ? ipsc->rNumericArgs(5) : ipsc->rNumericArgs(5) * winSurf.Width;
 
                     if (Length * Depth <= 0.0) {
                         ShowWarningError(state,
@@ -6875,8 +6825,6 @@ namespace SurfaceGeometry {
         constexpr Real64 AZITOL = 15.0; // Degree Azimuth Angle Tolerance
         constexpr Real64 TILTOL = 10.0; // Degree Tilt Angle Tolerance
         int SurfID;                     // local surface "pointer"
-        bool IsBlank;
-        bool ErrorInName;
 
         constexpr std::string_view routineName = "GetHTSurfExtVentedCavityData";
         auto &ipsc = state.dataIPShortCut;
@@ -8981,8 +8929,6 @@ namespace SurfaceGeometry {
         int IShadedConst;    // Construction number of shaded construction
         int IShadingDevice;  // Material number of shading device
         int NLayers;         // Layers in shaded construction
-        bool ErrorInName;
-        bool IsBlank;
         bool BGShadeBlindError; // True if problem with construction that is supposed to have between-glass
         // shade or blind
 
@@ -10132,7 +10078,6 @@ namespace SurfaceGeometry {
                 int alpF = 1;
 
                 ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
-                bool ErrorInName = false;
 
                 HeatBalanceKivaManager::FoundationKiva fndInput;
 
@@ -10573,8 +10518,6 @@ namespace SurfaceGeometry {
         int NumProps;
         int IOStat;
         int OSCNum;
-        bool ErrorInName;
-        bool IsBlank;
         std::string cOSCLimitsString;
 
         constexpr std::string_view routineName = "GetOSCData";
@@ -10783,8 +10726,6 @@ namespace SurfaceGeometry {
         int NumProps;
         int IOStat;
         int OSCMNum;
-        bool ErrorInName;
-        bool IsBlank;
 
         constexpr std::string_view routineName = "GetOSCMData";
         auto &ipsc = state.dataIPShortCut;
@@ -10892,10 +10833,11 @@ namespace SurfaceGeometry {
             }
         } // for (Loop)
 
-
-        print(state.files.eio, "! <Other Side Conditions Model>,Name,Class\n");
-        for (int Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
-            print(state.files.eio, "Other Side Conditions Model,{},{}\n", state.dataSurface->OSCM(Loop).Name, state.dataSurface->OSCM(Loop).Class);
+        if (state.dataSurface->TotOSCM > 0) {
+            print(state.files.eio, "! <Other Side Conditions Model>,Name,Class\n");
+            for (int Loop = 1; Loop <= state.dataSurface->TotOSCM; ++Loop) {
+                print(state.files.eio, "Other Side Conditions Model,{},{}\n", state.dataSurface->OSCM(Loop).Name, state.dataSurface->OSCM(Loop).Class);
+            }
         }
     } // GetOSCMData()
 
@@ -11888,7 +11830,6 @@ namespace SurfaceGeometry {
 
         Vector3<Real64> p1;           // Intermediate Result
         Vector3<Real64> LLC;
-        int n;               // Vertex Number in Loop
         int ThisBaseSurface; // Current base surface
         SurfaceShape ThisShape(SurfaceShape::None);
         bool BaseSurface; // True if a base surface or a detached shading surface
@@ -11962,7 +11903,7 @@ namespace SurfaceGeometry {
         }
 
         if (BaseSurface) {
-            for (n = 1; n <= surf.Sides; ++n) {
+            for (int n = 1; n <= surf.Sides; ++n) {
                 sg->psv(n) = surf.Vertex(n);
             }
             surf.Width = length(surf.Vertex(3) - surf.Vertex(2));
@@ -12224,7 +12165,7 @@ namespace SurfaceGeometry {
             } break;
             }
 
-            for (n = 1; n <= surf.Sides; ++n) {
+            for (int n = 1; n <= surf.Sides; ++n) {
                 // if less than 1/10 inch
                 auto &psv = sg->psv(n);
                     
