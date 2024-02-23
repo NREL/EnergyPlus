@@ -393,6 +393,7 @@ namespace Constant {
         V,
         deltaC,
         kmol_s,
+        umol_m2s,
         rev_min,
         Btu_h_W,
         W_m2K,
@@ -448,6 +449,7 @@ namespace Constant {
         "V",                // V
         "deltaC",           // deltaC
         "kmol/s",           // kmol_s
+        "umol/m2-s",        // umol_m2s (micromol_m2s)
         "rev/min",          // rev_min
         "Btu/h-W",          // Btu_h_W
         "W/m2-K",           // W_m2K
@@ -502,6 +504,7 @@ namespace Constant {
         "V",                // V
         "DELTAC",           // deltaC
         "KMOL/S",           // kmol_s
+        "UMOL/M2-S",        // umol_m2s (micromol_m2s)
         "REV/MIN",          // rev_min
         "BTH/H-W",          // Btu_h_W
         "W/M2-K",           // W_m2K
