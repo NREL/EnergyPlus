@@ -8824,7 +8824,6 @@ namespace InternalHeatGains {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
-
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
                 if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectType != str_people) {
                     SumConvGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
@@ -9298,12 +9297,13 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesPeople = {DataHeatBalance::IntGainType::People};
         static constexpr std::array<DataHeatBalance::IntGainType, 1> IntGainTypesLight = {DataHeatBalance::IntGainType::Lights};
-        static constexpr std::array<DataHeatBalance::IntGainType, 6> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
+        static constexpr std::array<DataHeatBalance::IntGainType, 7> IntGainTypesEquip = {DataHeatBalance::IntGainType::ElectricEquipment,
                                                                                           DataHeatBalance::IntGainType::ElectricEquipmentITEAirCooled,
                                                                                           DataHeatBalance::IntGainType::GasEquipment,
                                                                                           DataHeatBalance::IntGainType::HotWaterEquipment,
                                                                                           DataHeatBalance::IntGainType::SteamEquipment,
-                                                                                          DataHeatBalance::IntGainType::OtherEquipment};
+                                                                                          DataHeatBalance::IntGainType::OtherEquipment,
+                                                                                          DataHeatBalance::IntGainType::IndoorGreen};
         static constexpr std::array<DataHeatBalance::IntGainType, 10> IntGainTypesRefrig = {
             DataHeatBalance::IntGainType::RefrigerationCase,
             DataHeatBalance::IntGainType::RefrigerationCompressorRack,
