@@ -3291,11 +3291,11 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
   Zone,Average,Zone Baseboard Total Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w-2}
 
 This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
 
-\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j-2}
 
 The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. This energy is included in the following meters:
 \begin{lstlisting}
@@ -3311,47 +3311,47 @@ InteriorEquipment:Electricity:SpaceType:<Space Type Name>
 <End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
 \end{lstlisting}
 
-\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
+\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-2a}
 
-\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
+\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j-2a}
 
 These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
+\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w-2a}
 
-\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
+\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j-2a}
 
 These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
 
-\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
+\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w-2a}
 
-\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
+\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j-2a}
 
 These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
-\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
+\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w-2}
 
 This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts.
 
-\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j-2}
 
 The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. 
 
-\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
+\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
+\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j-2}
 
 These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
+\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
+\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j-2}
 
 These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the space or zone air heat balance directly.
 
-\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
+\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
+\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j-2}
 
 These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
