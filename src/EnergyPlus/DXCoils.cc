@@ -17667,7 +17667,7 @@ void CalcVRFCoilCapModFac(EnergyPlusData &state,
     if (present(CoilIndex)) {
         CoilNum = CoilIndex;
     } else {
-        GetDXCoilIndex(state, CoilName, CoilNum, ErrorsFound, {}, true);
+        GetDXCoilIndex(state, CoilName, CoilNum, ErrorsFound, "", true);
     }
 
     BFC_rate = state.dataDXCoils->DXCoil(CoilNum).RateBFVRFIUEvap;
