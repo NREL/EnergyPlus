@@ -1717,7 +1717,7 @@ namespace SurfaceGeometry {
                     if (surf.ExtBoundCondName == surf.Name) {
                         surf.ExtBoundCond = SurfNum;
                     } else {
-                        surf.ExtBoundCond = Util::FindItemInList(state.dataSurface->Surface(SurfNum).ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
+                        surf.ExtBoundCond = Util::FindItemInList(surf.ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
                     }
                     if (surf.ExtBoundCond != 0) {
                         auto &osSurf = state.dataSurface->Surface(surf.ExtBoundCond);
@@ -1999,16 +1999,18 @@ namespace SurfaceGeometry {
             if (!surf.HeatTransSurf) continue;
             if (surf.BaseSurf == SurfNum) continue; // base surface
             // not base surface.  Check it.
-            if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond <= 0) { // exterior or other base surface
-                if (surf.ExtBoundCond != state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond) { // should match base surface
+
+            auto const &baseSurf = state.dataSurface->Surface(surf.BaseSurf);
+            if (baseSurf.ExtBoundCond <= 0) { // exterior or other base surface
+                if (surf.ExtBoundCond != baseSurf.ExtBoundCond) { // should match base surface
                     if (surf.ExtBoundCond == SurfNum) {
                         ShowSevereError(
                             state,
                             format("{}Subsurface=\"{}\" exterior condition [adiabatic surface] in a base surface=\"{}\" with exterior condition [{}]",
                                    RoutineName,
                                    surf.Name,
-                                   state.dataSurface->Surface(surf.BaseSurf).Name,
-                                   cExtBoundCondition(state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond)));
+                                   baseSurf.Name,
+                                   cExtBoundCondition(baseSurf.ExtBoundCond)));
                         SurfError = true;
                     } else if (surf.ExtBoundCond > 0) {
                         ShowSevereError(
@@ -2016,18 +2018,18 @@ namespace SurfaceGeometry {
                             format("{}Subsurface=\"{}\" exterior condition [interzone surface] in a base surface=\"{}\" with exterior condition [{}]",
                                    RoutineName,
                                    surf.Name,
-                                   state.dataSurface->Surface(surf.BaseSurf).Name,
-                                   cExtBoundCondition(state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond)));
+                                   baseSurf.Name,
+                                   cExtBoundCondition(baseSurf.ExtBoundCond)));
                         SurfError = true;
-                    } else if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond == OtherSideCondModeledExt) {
+                    } else if (baseSurf.ExtBoundCond == OtherSideCondModeledExt) {
                         ShowWarningError(
                             state,
                             format("{}Subsurface=\"{}\" exterior condition [{}] in a base surface=\"{}\" with exterior condition [{}]",
                                    RoutineName,
                                    surf.Name,
                                    cExtBoundCondition(surf.ExtBoundCond),
-                                   state.dataSurface->Surface(surf.BaseSurf).Name,
-                                   cExtBoundCondition(state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond)));
+                                   baseSurf.Name,
+                                   cExtBoundCondition(baseSurf.ExtBoundCond)));
                         ShowContinueError(state, "...SubSurface will not use the exterior condition model of the base surface.");
                     } else {
                         ShowSevereError(
@@ -2036,8 +2038,8 @@ namespace SurfaceGeometry {
                                    RoutineName,
                                    surf.Name,
                                    cExtBoundCondition(surf.ExtBoundCond),
-                                   state.dataSurface->Surface(surf.BaseSurf).Name,
-                                   cExtBoundCondition(state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond)));
+                                   baseSurf.Name,
+                                   cExtBoundCondition(baseSurf.ExtBoundCond)));
                         SurfError = true;
                     }
                     if (!SubSurfaceSevereDisplayed && SurfError) {
@@ -2045,7 +2047,7 @@ namespace SurfaceGeometry {
                         SubSurfaceSevereDisplayed = true;
                     }
                 }
-            } else if (state.dataSurface->Surface(surf.BaseSurf).BaseSurf == state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond) {
+            } else if (baseSurf.BaseSurf == baseSurf.ExtBoundCond) {
                 // adiabatic surface. make sure subsurfaces match
                 if (surf.ExtBoundCond != SurfNum) { // not adiabatic surface
                     if (surf.ExtBoundCond > 0) {
@@ -2054,7 +2056,7 @@ namespace SurfaceGeometry {
                                                "condition [adiabatic surface]",
                                                RoutineName,
                                                surf.Name,
-                                               state.dataSurface->Surface(surf.BaseSurf).Name));
+                                               baseSurf.Name));
                     } else {
                         ShowSevereError(
                             state,
@@ -2062,7 +2064,7 @@ namespace SurfaceGeometry {
                                    RoutineName,
                                    surf.Name,
                                    cExtBoundCondition(surf.ExtBoundCond),
-                                   state.dataSurface->Surface(surf.BaseSurf).Name));
+                                   baseSurf.Name));
                     }
                     if (!SubSurfaceSevereDisplayed) {
                         ShowContinueError(state, "...calculations for heat balance would be compromised.");
@@ -2070,13 +2072,13 @@ namespace SurfaceGeometry {
                     }
                     SurfError = true;
                 }
-            } else if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond > 0) { // interzone surface
+            } else if (baseSurf.ExtBoundCond > 0) { // interzone surface
                 if (surf.ExtBoundCond == SurfNum) {
                     ShowSevereError(state,
                                     format("{}Subsurface=\"{}\" is an adiabatic surface in an Interzone base surface=\"{}\"",
                                            RoutineName,
                                            surf.Name,
-                                           state.dataSurface->Surface(surf.BaseSurf).Name));
+                                           baseSurf.Name));
                     if (!SubSurfaceSevereDisplayed) {
                         ShowContinueError(state, "...calculations for heat balance would be compromised.");
                         SubSurfaceSevereDisplayed = true;
@@ -3706,17 +3708,13 @@ namespace SurfaceGeometry {
                     if (surf.Construction > 0) {
                         auto const &constr = state.dataConstruction->Construct(surf.Construction);
                         if (surf.Class == SurfaceClass::Wall && !constr.TypeIsCfactorWall) {
-                            ShowSevereError(state,
-                                            format("{}=\"{}\", invalid {}",
-                                                   ipsc->cCurrentModuleObject,
-                                                   surf.Name,
-                                                   ipsc->cAlphaFieldNames(ArgPointer)));
-                            ShowContinueError(state, format("Construction=\"{}\" is not type Construction:CfactorUndergroundWall.", constr.Name));
+                            ShowSevereFieldCustomMessage(state, eoh, ipsc->cAlphaFieldNames(ArgPointer), ipsc->cAlphaArgs(ArgPointer),
+                                                         "is not of type Construction:CfactorUndergroundWall.");
                             ErrorsFound = true;
                         }
                         if (surf.Class == SurfaceClass::Floor && !constr.TypeIsFfactorFloor) {
-                            ShowSevereError(state, format("{}=\"{}\", invalid {}", ipsc->cCurrentModuleObject, surf.Name, ipsc->cAlphaFieldNames(ArgPointer)));
-                            ShowContinueError(state, format("Construction=\"{}\" is not type Construction:FfactorGroundFloor.", constr.Name));
+                            ShowSevereFieldCustomMessage(state, eoh, ipsc->cAlphaFieldNames(ArgPointer), ipsc->cAlphaArgs(ArgPointer),
+                                                         "is not of type Construction:FfactorGroundFloor.");
                             ErrorsFound = true;
                         }
                     }
@@ -3905,11 +3903,7 @@ namespace SurfaceGeometry {
                 surf.NewVertex.allocate(surf.Sides);
                 GetVertices(state, SurfNum, surf.Sides, ipsc->rNumericArgs({3, _}));
                 if (surf.Area <= 0.0) {
-                    ShowSevereError(state,
-                                    format("{}=\"{}\", Surface Area <= 0.0; Entered Area={:.2T}",
-                                           ipsc->cCurrentModuleObject,
-                                           surf.Name,
-                                           surf.Area));
+                    ShowSevereCustomMessage(state, eoh, format("Surface Area <= 0.0; Entered Area={:.2T}.", surf.Area));
                     ErrorsFound = true;
                 }
 
@@ -3928,40 +3922,23 @@ namespace SurfaceGeometry {
                 }
                 if (surf.Construction > 0) {
                     // Check wall height for the CFactor walls
-
-                    if (surf.Class == SurfaceClass::Wall &&
-                        state.dataConstruction->Construct(surf.Construction).TypeIsCfactorWall) {
-                        if (std::abs(surf.Height -
-                                     state.dataConstruction->Construct(surf.Construction).Height) > 0.05) {
-                            ShowWarningError(state,
-                                             format("{}=\"{}\", underground Wall Height = {:.2T}",
-                                                    ipsc->cCurrentModuleObject,
-                                                    surf.Name,
-                                                    surf.Height));
-                            ShowContinueError(state, "..which does not match its construction height.");
+                    auto const &constr = state.dataConstruction->Construct(surf.Construction);
+                    if (surf.Class == SurfaceClass::Wall && constr.TypeIsCfactorWall) {
+                        if (std::abs(surf.Height - constr.Height) > 0.05) {
+                            ShowWarningCustomMessage(state, eoh,
+                                                     format("underground Wall Height = {:.2T} does not match construction height.", surf.Height));
                         }
                     }
 
                     // Check area and perimeter for the FFactor floors
-                    if (surf.Class == SurfaceClass::Floor &&
-                        state.dataConstruction->Construct(surf.Construction).TypeIsFfactorFloor) {
-                        if (std::abs(surf.Area -
-                                     state.dataConstruction->Construct(surf.Construction).Area) > 0.1) {
-                            ShowWarningError(state,
-                                             format("{}=\"{}\", underground Floor Area = {:.2T}",
-                                                    ipsc->cCurrentModuleObject,
-                                                    surf.Name,
-                                                    surf.Area));
-                            ShowContinueError(state, "..which does not match its construction area.");
+                    if (surf.Class == SurfaceClass::Floor && constr.TypeIsFfactorFloor) {
+                        if (std::abs(surf.Area - constr.Area) > 0.1) {
+                            ShowWarningCustomMessage(state, eoh, 
+                                                     format("underground Floor Area = {:.2T} does not match its construction area.", surf.Area));
                         }
-                        if (surf.Perimeter <
-                            state.dataConstruction->Construct(surf.Construction).PerimeterExposed - 0.1) {
-                            ShowWarningError(state,
-                                             format("{}=\"{}\", underground Floor Perimeter = {:.2T}",
-                                                    ipsc->cCurrentModuleObject,
-                                                    surf.Name,
-                                                    surf.Perimeter));
-                            ShowContinueError(state, "..which is less than its construction exposed perimeter.");
+                        if (surf.Perimeter < constr.PerimeterExposed - 0.1) {
+                            ShowWarningCustomMessage(state, eoh,
+                                                     format("underground Floor Perimeter = {:.2T} is less than its construction exposed perimeter.", surf.Perimeter));
                         }
                     }
                 } // if (surf.Construction > 0)
@@ -3969,11 +3946,10 @@ namespace SurfaceGeometry {
         } // for (Item)
         
         // Check number of Vertex between base surface and Outside Boundary surface
-        int ExtSurfNum;
         for (int i = 1; i <= SurfNum; i++) {
             auto &surf = sg->SurfaceTmp(i);
             if (surf.ExtBoundCond == UnreconciledZoneSurface && surf.ExtBoundCondName != "") {
-                ExtSurfNum = Util::FindItemInList(surf.ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp);
+                int ExtSurfNum = Util::FindItemInList(surf.ExtBoundCondName, state.dataSurfaceGeometry->SurfaceTmp);
                 // If we cannot find the referenced surface
                 if (ExtSurfNum == 0) {
                     ShowSevereError(state,
@@ -3982,15 +3958,18 @@ namespace SurfaceGeometry {
                                            surf.Name,
                                            surf.ExtBoundCondName));
                     ErrorsFound = true;
-                    // If vertex size mistmatch
-                } else if (surf.Vertex.size() !=
-                           state.dataSurfaceGeometry->SurfaceTmp(ExtSurfNum).Vertex.size()) {
+                    continue;
+                }
+
+                auto const &extSurf = sg->SurfaceTmp(ExtSurfNum);
+                // If vertex size mistmatch
+                if (surf.Vertex.size() != extSurf.Vertex.size()) {
                     ShowSevereError(state,
                                     format("{}=\"{}\", Vertex size mismatch between base surface :{} and outside boundary surface: {}",
                                            ipsc->cCurrentModuleObject,
                                            surf.Name,
                                            surf.Name,
-                                           state.dataSurfaceGeometry->SurfaceTmp(ExtSurfNum).Name));
+                                           extSurf.Name));
                     ShowContinueError(state,
                                       format("The vertex sizes are {} for base surface and {} for outside boundary surface. Please check inputs.",
                                              surf.Vertex.size(),
