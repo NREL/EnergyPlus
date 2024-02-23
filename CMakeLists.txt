@@ -349,6 +349,8 @@ if(BUILD_TESTING)
   set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
   set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
   set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeDeleteState_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeResetState_C PROPERTIES FOLDER Testing)
 endif()
 
 add_subdirectory(src/ConvertInputFormat)
