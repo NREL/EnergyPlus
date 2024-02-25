@@ -10,8 +10,13 @@ target_compile_definitions(
 )
 target_include_directories(
         nlohmann_json
-        INTERFACE
+        SYSTEM INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>
+)
+set_source_files_properties(
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/nlohmann>/json.hpp
+  TARGET_DIRECTORY nlohmann_json
+  PROPERTIES COMPILE_FLAGS -Wno-deprecated-declarations
 )
 
 # To avoid modifying every third_party library
@@ -67,11 +72,14 @@ elseif(MSVC) # VisualStudio
 endif()
 target_compile_features(ssc PRIVATE cxx_std_11)
 
-# C++17 flag is intentionally after ssd
+# C++17 flag is intentionally after ssc
 set(CMAKE_CXX_STANDARD 17)
 
 #Note: the Tarcog files are improperly initializing their virtual base classes, and this 4589 warning
 # on MSVC is legitimate, but silencing the warning because it's a third-party library
+
+# Shush every warning for any lib added after it?
+# link_libraries(turn_off_warnings)
 
 if(NOT MSVC)
   add_compile_options(-Wno-pedantic -Wno-unused-parameter -Wno-unknown-pragmas)
@@ -93,7 +101,7 @@ set(RE2_BUILD_TESTING
 #      CACHE BOOL "" FORCE)
 #endif()
 
-# We don't want to enable the global warnings for any of the third party projects
+# We don't want to enable the global project_warnings for any of the third party projects
 link_libraries(project_options)
 add_subdirectory(SQLite)
 set_target_properties(sqlite PROPERTIES FOLDER ThirdParty/SQLite)
@@ -123,21 +131,33 @@ endif()
 
 add_subdirectory(ObjexxFCL)
 set_target_properties(objexx PROPERTIES FOLDER ThirdParty/ObjexxFCL)
+
 add_subdirectory(BCVTB)
 set_target_properties(bcvtb PROPERTIES FOLDER ThirdParty/BCVTB)
+
 add_subdirectory(Expat)
 set_target_properties(epexpat PROPERTIES FOLDER ThirdParty/Expat)
+
 add_subdirectory(FMI)
 set_target_properties(epfmiimport PROPERTIES FOLDER ThirdParty/FMI)
+target_link_libraries(epfmiimport turn_off_warnings)
+
 add_subdirectory(zlib)
 set_target_properties(miniziplib PROPERTIES FOLDER ThirdParty/zlib)
+target_link_libraries(miniziplib PRIVATE turn_off_warnings)
+
 add_subdirectory(DElight)
 set_target_properties(DElight PROPERTIES FOLDER ThirdParty/DElight)
+target_link_libraries(DElight PRIVATE turn_off_warnings)
+
 add_subdirectory(re2)
 set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
+
 add_subdirectory(fmt-8.0.1)
 target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
+mark_as_advanced(FORCE FMT_SYSTEM_HEADERS)
+
 add_subdirectory(cpgfunctionEP)
 set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP)
 
@@ -152,7 +172,7 @@ set(KIVA_3D OFF CACHE BOOL "" FORCE)
 set(KIVA_GROUND_PLOT ${BUILD_GROUND_PLOT} CACHE BOOL "" FORCE)
 set(KIVA_COVERAGE OFF CACHE BOOL "" FORCE)
 
-add_subdirectory("kiva")
+add_subdirectory(kiva)
 set_target_properties(libkiva PROPERTIES FOLDER ThirdParty/Kiva)
 
 if(NOT APPLE)
@@ -173,6 +193,9 @@ set(BUILD_BTWXT_TESTING
     CACHE BOOL "" FORCE)
 add_subdirectory(btwxt)
 set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
+mark_as_advanced(FORCE btwxt_STATIC_LIB)
+mark_as_advanced(FORCE btwxt_COVERAGE)
+mark_as_advanced(FORCE btwxt_BUILD_TESTING)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
@@ -183,6 +206,8 @@ if(OPENGL_FOUND)
   set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
+  mark_as_advanced(FORCE penumbra_STATIC_LIB)
+  mark_as_advanced(FORCE penumbra_COVERAGE)
 endif()
 
 # libtk205
@@ -193,3 +218,7 @@ set(libtk205_USE_SUBMODULES
         OFF
         CACHE BOOL "" FORCE)
 add_subdirectory(libtk205)
+mark_as_advanced(FORCE libtk205_STATIC_LIB)
+mark_as_advanced(FORCE libtk205_COVERAGE)
+mark_as_advanced(FORCE libtk205_BUILD_TESTING)
+

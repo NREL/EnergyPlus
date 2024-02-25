@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -86,6 +86,7 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "AirLoopHVAC:OutdoorAirSystem",
     "AirLoopHVAC:ReturnPath",
     "AirLoopHVAC:ReturnPlenum",
+    "AirLoopHVAC:Splitter",
     "AirLoopHVAC:SupplyPath",
     "AirLoopHVAC:SupplyPlenum",
     "AirLoopHVAC:Unitary:Furnace:HeatCool",
@@ -367,6 +368,7 @@ constexpr std::array<std::string_view, static_cast<int>(DataLoopNode::Connection
     "AIRLOOPHVAC:OUTDOORAIRSYSTEM",
     "AIRLOOPHVAC:RETURNPATH",
     "AIRLOOPHVAC:RETURNPLENUM",
+    "AIALOOPHVAC:SPLITTER",
     "AIRLOOPHVAC:SUPPLYPATH",
     "AIRLOOPHVAC:SUPPLYPLENUM",
     "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",

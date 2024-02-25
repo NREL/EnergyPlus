@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -432,7 +432,7 @@ namespace EMSManager {
         // Update sensors with current data
         for (int SensorNum = 1; SensorNum <= state.dataRuntimeLang->NumSensors; ++SensorNum) {
             int ErlVariableNum = state.dataRuntimeLang->Sensor(SensorNum).VariableNum;
-            if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > 0)) {
+            if ((ErlVariableNum > 0) && (state.dataRuntimeLang->Sensor(SensorNum).Index > -1)) {
                 if (state.dataRuntimeLang->Sensor(SensorNum).SchedNum == 0) { // not a schedule so get from output processor
 
                     state.dataRuntimeLang->ErlVariable(ErlVariableNum).Value = RuntimeLanguageProcessor::SetErlValueNumber(
@@ -601,7 +601,7 @@ namespace EMSManager {
                 thisSensor.OutputVarName = cAlphaArgs(3);
 
                 int VarIndex = GetMeterIndex(state, cAlphaArgs(3));
-                if (VarIndex > 0) {
+                if (VarIndex > -1) {
                     if (!lAlphaFieldBlanks(2)) {
                         ShowWarningError(state, format("Unused{}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
                         ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
@@ -614,9 +614,9 @@ namespace EMSManager {
                 } else {
                     // Search for variable names
                     GetVariableTypeAndIndex(state, cAlphaArgs(3), cAlphaArgs(2), VarType, VarIndex);
-                    if (VarType != OutputProcessor::VariableType::NotFound) {
+                    if (VarType != OutputProcessor::VariableType::Invalid) {
                         thisSensor.VariableType = VarType;
-                        if (VarIndex != 0) {
+                        if (VarIndex != -1) {
                             thisSensor.Index = VarIndex;
                             thisSensor.CheckedOkay = true;
                         }
@@ -947,7 +947,7 @@ namespace EMSManager {
 
             // try again to process sensor.
             int VarIndex = GetMeterIndex(state, state.dataRuntimeLang->Sensor(SensorNum).OutputVarName);
-            if (VarIndex > 0) {
+            if (VarIndex > -1) {
 
                 state.dataRuntimeLang->Sensor(SensorNum).VariableType = OutputProcessor::VariableType::Meter;
                 state.dataRuntimeLang->Sensor(SensorNum).Index = VarIndex;
@@ -959,7 +959,7 @@ namespace EMSManager {
                                         state.dataRuntimeLang->Sensor(SensorNum).UniqueKeyName,
                                         VarType,
                                         VarIndex);
-                if (VarType == OutputProcessor::VariableType::NotFound) {
+                if (VarType == OutputProcessor::VariableType::Invalid) {
                     if (reportErrors) {
                         ShowSevereError(
                             state,
@@ -968,7 +968,7 @@ namespace EMSManager {
                         ShowContinueError(state, "Output:Variable Name not found");
                         ErrorsFound = true;
                     }
-                } else if (VarIndex == 0) {
+                } else if (VarIndex == -1) {
                     if (reportErrors) {
                         ShowSevereError(state,
                                         format("Invalid Output:Variable or Output:Meter Index Key Name ={}",
@@ -1204,37 +1204,35 @@ namespace EMSManager {
         int NumKeys;
         OutputProcessor::StoreType AvgOrSum;
         OutputProcessor::TimeStepType StepType;
-        OutputProcessor::Unit Units(OutputProcessor::Unit::None);
-        Array1D_string KeyName;
+        Constant::Units units = Constant::Units::None;
+        Array1D_string keyName;
         Array1D_int KeyIndex;
 
-        VarType = OutputProcessor::VariableType::NotFound;
-        VarIndex = 0;
-        GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, Units);
+        VarType = OutputProcessor::VariableType::Invalid;
+        VarIndex = -1;
+        GetVariableKeyCountandType(state, VarName, NumKeys, VarType, AvgOrSum, StepType, units);
 
         // note that schedules are not getting VarType set right...
 
         if (NumKeys > 0) {
-            KeyName.allocate(NumKeys);
             KeyIndex.allocate(NumKeys);
-            GetVariableKeys(state, VarName, VarType, KeyName, KeyIndex);
+            keyName.allocate(NumKeys);
+            GetVariableKeys(state, VarName, VarType, keyName, KeyIndex);
 
-            if (KeyName(1) == "ENVIRONMENT") {
+            if (VarType == OutputProcessor::VariableType::Schedule) {
+                VarIndex = KeyIndex(1);
+            } else if (keyName(1) == "ENVIRONMENT") {
                 VarIndex = KeyIndex(1);
             } else {
-                int KeyNum;
-                bool Found = false;
-                for (KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
-                    if (KeyName(KeyNum) == VarKeyName) {
-                        Found = true;
+                for (int KeyNum = 1; KeyNum <= NumKeys; ++KeyNum) {
+                    if (state.dataOutputProcessor->outVars[KeyIndex(KeyNum)]->keyUC == VarKeyName) {
+                        VarIndex = KeyIndex(KeyNum);
                         break;
                     }
                 }
-                if (Found) VarIndex = KeyIndex(KeyNum);
             }
-
-            KeyName.deallocate();
             KeyIndex.deallocate();
+            keyName.deallocate();
         }
     }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -124,6 +124,7 @@ namespace UnitarySystems {
         Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
         Real64 no_load_supply_air_flow_rate = -999.0;
+        std::string no_load_supply_air_flow_rate_low_speed;
         Real64 no_load_supply_air_flow_rate_per_floor_area = -999.0;
         Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
         Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
@@ -328,6 +329,7 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum = 0;
         int m_DesignSpecMSHPIndex = -1;
         Real64 m_NoLoadAirFlowRateRatio = 1.0;
+        bool m_useNoLoadLowSpeedAirFlow = true;
         int m_SingleMode = 0;
         bool m_MultiOrVarSpeedHeatCoil = false;
         bool m_MultiOrVarSpeedCoolCoil = false;

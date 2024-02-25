@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,6 +227,13 @@ void GetBoilerInput(EnergyPlusData &state)
             ShowContinueError(state, format("Invalid {}={:.3R}", state.dataIPShortCut->cNumericFieldNames(2), state.dataIPShortCut->rNumericArgs(2)));
             ShowSevereError(state, format("...{} must be greater than 0.0", state.dataIPShortCut->cNumericFieldNames(2)));
             ErrorsFound = true;
+        } else if (state.dataIPShortCut->rNumericArgs(2) > 1.0) {
+            ShowWarningError(state,
+                             fmt::format("{} = {}: {}={} should not typically be greater than 1.",
+                                         state.dataIPShortCut->cCurrentModuleObject,
+                                         state.dataIPShortCut->cAlphaArgs(1),
+                                         state.dataIPShortCut->cNumericFieldNames(2),
+                                         state.dataIPShortCut->rNumericArgs(2)));
         }
 
         if (state.dataIPShortCut->cAlphaArgs(3) == "ENTERINGBOILER") {
@@ -370,113 +377,109 @@ void BoilerSpecs::SetupOutputVars(EnergyPlusData &state)
     std::string_view const sFuelType = Constant::eFuelNames[static_cast<int>(this->FuelType)];
     SetupOutputVariable(state,
                         "Boiler Heating Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->BoilerLoad,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Heating Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->BoilerEnergy,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
+                        Constant::eResource::EnergyTransfer,
+                        OutputProcessor::SOVEndUseCat::Boilers,
                         {},
-                        eResourceSOV::EnergyTransfer,
-                        EndUseCatSOV::Boilers,
-                        {},
-                        GroupSOV::Plant);
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         format("Boiler {} Rate", sFuelType),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->FuelUsed,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("Boiler {} Energy", sFuelType),
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->FuelConsumed,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        {},
-                        sFuelType,
-                        "Heating",
+                        Constant::eFuel2eResource[(int)this->FuelType],
+                        OutputProcessor::SOVEndUseCat::Heating,
                         this->EndUseSubcategory,
-                        "Plant");
+                        OutputProcessor::SOVGroup::Plant);
     SetupOutputVariable(state,
                         "Boiler Inlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->BoilerInletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Outlet Temperature",
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->BoilerOutletTemp,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Mass Flow Rate",
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->BoilerMassFlowRate,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Ancillary Electricity Rate",
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->ParasiticElecPower,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Ancillary Electricity Energy",
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->ParasiticElecConsumption,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Summed,
                         this->Name,
-                        {},
-                        eResourceSOV::Electricity,
-                        EndUseCatSOV::Heating,
+                        Constant::eResource::Electricity,
+                        OutputProcessor::SOVEndUseCat::Heating,
                         "Boiler Parasitic",
-                        GroupSOV::Plant);
+                        OutputProcessor::SOVGroup::Plant);
     if (this->FuelType != Constant::eFuel::Electricity) {
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Rate", sFuelType),
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->ParasiticFuelRate,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             format("Boiler Ancillary {} Energy", sFuelType),
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             this->ParasiticFuelConsumption,
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Summed,
                             this->Name,
-                            {},
-                            sFuelType,
-                            "Heating",
+                            Constant::eFuel2eResource[(int)this->FuelType],
+                            OutputProcessor::SOVEndUseCat::Heating,
                             "Boiler Parasitic",
-                            "Plant");
+                            OutputProcessor::SOVGroup::Plant);
     }
     SetupOutputVariable(state,
                         "Boiler Part Load Ratio",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->BoilerPLR,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         "Boiler Efficiency",
-                        OutputProcessor::Unit::None,
+                        Constant::Units::None,
                         this->BoilerEff,
                         OutputProcessor::SOVTimeStepType::System,
                         OutputProcessor::SOVStoreType::Average,
@@ -963,7 +966,8 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
 
     // warn if overall efficiency greater than 1.1
     if (!state.dataGlobal->WarmupFlag && BoilerEff > 1.1) {
-        if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0) {
+        if (this->BoilerLoad > 0.0 && this->EfficiencyCurvePtr > 0 &&
+            NomEffic <= 1.0) { // NomEffic > 1 warning occurs elsewhere; avoid cascading warnings
             if (this->CalculatedEffError < 1) {
                 ++this->CalculatedEffError;
                 ShowWarningError(state, format("Boiler:HotWater \"{}\"", this->Name));

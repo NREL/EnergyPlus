@@ -237,6 +237,7 @@ install(CODE "execute_process(COMMAND \"${Python_EXECUTABLE}\" \"${PROJECT_SOURC
 install(FILES "${DOCS_OUT}/ExampleFiles-ObjectsLink.html" DESTINATION "./ExampleFiles/" COMPONENT ExampleFiles)
 
 option(BUILD_CHANGELOG "Build a changelog for this package -- requires GITHUB_TOKEN in environment" OFF)
+mark_as_advanced(FORCE BUILD_CHANGELOG)
 if(BUILD_CHANGELOG)
   # build the change log, only if we do have a github token in the environment
   # Watch out! GITHUB_TOKEN could go out of scope by the time install target is run.

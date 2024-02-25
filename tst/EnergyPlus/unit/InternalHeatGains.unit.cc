@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -712,8 +712,8 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
 
     // ** NOTE: If this unit test fails, the likely cause is that a new internal gain type was added, but it was not added to one of the subtotal
     // types in InternalHeatGains::GatherComponentLoadsIntGain() this also means that the new type may be missing from other places that collect
-    // internal gains by subgroups, such as the room air models and output reporting for zone-level gains search for IntGainTypeOf_Lights for places
-    // where these types of subtotals occur and add the new type as appropriate
+    // internal gains by subgroups, such as the room air models and output reporting for zone-level gains search for
+    // "DataHeatBalance::IntGainType::Lights" for places where these types of subtotals occur and add the new type as appropriate
     EXPECT_EQ(totConvGains, expectedTotConvGains);
 
     // cleanup

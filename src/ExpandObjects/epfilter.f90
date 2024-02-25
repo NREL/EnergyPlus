@@ -2115,6 +2115,210 @@ DoesGroundHeatTransferExist = isGHTexist
 END FUNCTION DoesGroundHeatTransferExist
 
 !----------------------------------------------------------------------------------
+
+SUBROUTINE AddEffectCurveHelper(fieldIdx, Eff75, Eff100, prefix)
+    ! SUBROUTINE INFORMATION:
+    !    AUTHOR         Yujie Xu
+    !    DATE WRITTEN   December 2023
+    !    MODIFIED       na
+    !    RE-ENGINEERED  na
+
+    ! PURPOSE OF THIS SUBROUTINE:
+    !    adds the dependent variable of the sensible or latent effectiveness curve
+
+    ! METHODOLOGY EMPLOYED:
+
+    ! REFERENCES:
+    !    na
+
+    ! USE STATEMENTS:
+
+    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+    ! SUBROUTINE ARGUMENT DEFINITIONS:
+    ! the index of the name of the object, so that the generated table etc. can have unique names
+    INTEGER,INTENT(IN)                       :: fieldIdx
+    REAL,INTENT(IN)                          :: Eff75
+    REAL,INTENT(IN)                          :: Eff100
+    CHARACTER(len=*),INTENT(IN)              :: prefix ! "Sen" (Sensible) or "Lat" (Latent)
+
+    ! SUBROUTINE PARAMETER DEFINITIONS:
+    !    na
+
+    ! INTERFACE BLOCK SPECIFICATIONS
+    !    na
+
+    ! DERIVED TYPE DEFINITIONS
+    !    na
+
+    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    !    na
+    CALL CreateNewObj('Table:Lookup')
+    CALL AddToObjFld('Name', fieldIdx,' '//prefix//'EffectivenessTable')
+    CALL AddToObjFld('Independent Variable List Name', fieldIdx,' effIndVarList')
+    CALL AddToObjStr('Normalization Method', 'DivisorOnly')
+    CALL AddToObjStr('Normalization Divisor', RealToStr(Eff100))
+    CALL AddToObjStr('Minimum Output', '0.0')
+    CALL AddToObjStr('Maximum Output', '10.0')
+    CALL AddToObjStr('Output Unit Type', 'Dimensionless')
+    CALL AddToObjStr('External File Name', '')
+    CALL AddToObjStr('External File Column Number', '')
+    CALL AddToObjStr('External File Starting Row Number', '')
+    CALL AddToObjStr('Value 1', RealToStr(Eff75))
+    CALL AddToObjStr('Value 2', RealToStr(Eff100),.TRUE.)
+END SUBROUTINE
+
+SUBROUTINE AddEffectCurveIndVar(fieldIdx)
+    ! SUBROUTINE INFORMATION:
+    !    AUTHOR         Yujie Xu
+    !    DATE WRITTEN   December 2023
+    !    MODIFIED       na
+    !    RE-ENGINEERED  na
+
+    ! PURPOSE OF THIS SUBROUTINE:
+    !    adds the independent variable of the sensible or latent effectiveness curve
+
+    ! METHODOLOGY EMPLOYED:
+
+    ! REFERENCES:
+    !    na
+
+    ! USE STATEMENTS:
+
+    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+    ! SUBROUTINE ARGUMENT DEFINITIONS:
+    ! the index of the name of the object, so that the generated table etc. can have unique names
+    INTEGER,INTENT(IN)                       :: fieldIdx
+
+    ! SUBROUTINE PARAMETER DEFINITIONS:
+    !    na
+
+    ! INTERFACE BLOCK SPECIFICATIONS
+    !    na
+
+    ! DERIVED TYPE DEFINITIONS
+    !    na
+
+    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    !    na
+
+    CALL CreateNewObj('Table:IndependentVariable')
+    CALL AddToObjFld('Name', fieldIdx,' airFlowRatio')
+    CALL AddToObjStr('Interpolation Method', 'Linear')
+    CALL AddToObjStr('Extrapolation Method', 'Linear')
+    CALL AddToObjStr('Minimum Value', '0.0')
+    CALL AddToObjStr('Maximum Value', '10.0')
+    CALL AddToObjStr('Normalization Reference Value', '')
+    CALL AddToObjStr('Unit Type', 'Dimensionless')
+    CALL AddToObjStr('External File Name', '')
+    CALL AddToObjStr('External File Column Number', '')
+    CALL AddToObjStr('External File Starting Row Number', '')
+    CALL AddToObjStr('Value 1', '0.75')
+    CALL AddToObjStr('Value 2', '1.0',.TRUE.)
+    CALL CreateNewObj('Table:IndependentVariableList')
+    CALL AddToObjFld('Name', fieldIdx,' effIndVarList')
+    CALL AddToObjFld('Independent Variable 1 Name', fieldIdx,' airFlowRatio',.TRUE.)
+END SUBROUTINE
+
+SUBROUTINE AddSenEffectCurve(fieldIdx, htRecSens75, htRecSens100)
+    ! SUBROUTINE INFORMATION:
+    !    AUTHOR         Yujie Xu
+    !    DATE WRITTEN   December 2023
+    !    MODIFIED       na
+    !    RE-ENGINEERED  na
+
+    ! PURPOSE OF THIS SUBROUTINE:
+    !    Create curves corresponding to the linear relationship specified using the 75% and 100% effectiveness value
+
+    ! METHODOLOGY EMPLOYED:
+
+    ! REFERENCES:
+    !    na
+
+    ! USE STATEMENTS:
+
+    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+    ! SUBROUTINE ARGUMENT DEFINITIONS:
+    ! the index of the name of the object, so that the generated table etc. can have unique names
+    INTEGER,INTENT(IN)                       :: fieldIdx
+    REAL,INTENT(IN)                          :: htRecSens75
+    REAL,INTENT(IN)                          :: htRecSens100
+
+    ! SUBROUTINE PARAMETER DEFINITIONS:
+    !    na
+
+    ! INTERFACE BLOCK SPECIFICATIONS
+    !    na
+
+    ! DERIVED TYPE DEFINITIONS
+    !    na
+
+    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    !    na
+
+    CALL AddToObjFld('Sensible Effectiveness of Heating Air Flow Curve Name', fieldIdx,' SenEffectivenessTable')
+    CALL AddToObjStr('Latent Effectiveness of Heating Air Flow Curve Name', '')
+    CALL AddToObjFld('Sensible Effectiveness of Cooling Air Flow Curve Name', fieldIdx,' SenEffectivenessTable')
+    CALL AddToObjStr('Latent Effectiveness of Cooling Air Flow Curve Name', '',.TRUE.)
+    ! create curve objects for the heat exchanger start
+    CALL AddEffectCurveIndVar(fieldIdx)
+    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100, 'Sen')
+    ! create curve objects for the heat exchanger end
+END SUBROUTINE
+
+SUBROUTINE AddSenLatEffectCurve(fieldIdx, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
+    ! SUBROUTINE INFORMATION:
+    !    AUTHOR         Yujie Xu
+    !    DATE WRITTEN   December 2023
+    !    MODIFIED       na
+    !    RE-ENGINEERED  na
+
+    ! PURPOSE OF THIS SUBROUTINE:
+    !    Create curves corresponding to the linear relationship specified using the 75% and 100% effectiveness value
+
+    ! METHODOLOGY EMPLOYED:
+
+    ! REFERENCES:
+    !    na
+
+    ! USE STATEMENTS:
+
+    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+    ! SUBROUTINE ARGUMENT DEFINITIONS:
+    ! the index of the name of the object, so that the generated table etc. can have unique names
+    INTEGER,INTENT(IN)                       :: fieldIdx
+    REAL,INTENT(IN)                          :: htRecSens75
+    REAL,INTENT(IN)                          :: htRecSens100
+    REAL,INTENT(IN)                          :: htRecLat75
+    REAL,INTENT(IN)                          :: htRecLat100
+
+    ! SUBROUTINE PARAMETER DEFINITIONS:
+    !    na
+
+    ! INTERFACE BLOCK SPECIFICATIONS
+    !    na
+
+    ! DERIVED TYPE DEFINITIONS
+    !    na
+
+    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    !    na
+
+    CALL AddToObjFld('Sensible Effectiveness of Heating Air Flow Curve Name', fieldIdx,' SenEffectivenessTable')
+    CALL AddToObjFld('Latent Effectiveness of Heating Air Flow Curve Name', fieldIdx,' LatEffectivenessTable')
+    CALL AddToObjFld('Sensible Effectiveness of Cooling Air Flow Curve Name', fieldIdx,' SenEffectivenessTable')
+    CALL AddToObjFld('Latent Effectiveness of Cooling Air Flow Curve Name', fieldIdx,' LatEffectivenessTable',.TRUE.)
+    ! create curve objects for the heat exchanger start
+    CALL AddEffectCurveIndVar(fieldIdx)
+    CALL AddEffectCurveHelper(fieldIdx, htRecSens75, htRecSens100, 'Sen')
+    CALL AddEffectCurveHelper(fieldIdx, htRecLat75, htRecLat100, 'Lat')
+    ! create curve objects for the heat exchanger end
+END SUBROUTINE
+
+!----------------------------------------------------------------------------------
 SUBROUTINE testBufferForGroundHeatTrans(doesGHT)
           ! SUBROUTINE INFORMATION:
           !    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -8605,7 +8809,9 @@ INTEGER :: iInt
 INTEGER :: supFanPlacement=0
 LOGICAL :: isMinOARateAutosize
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
+REAL    :: htRecLat100
 LOGICAL :: isDehumidifyNone
 INTEGER :: dehumidCtrlKind = 0
 LOGICAL :: isHumidifierNone
@@ -11370,19 +11576,17 @@ DO iSys = 1, numCompactSysVAV
   IF (heatRecovery .EQ. htrecSens) THEN
     !HEAT EXCHANGER:AIR TO AIR:GENERIC ~ line 685
     htRecSens75 = StringToReal(FldVal(base + vsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + vsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + vsAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + vsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + vsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + vsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + vsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + vsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + vsAirHandlerNameOff,' Relief Air Outlet')
@@ -11393,25 +11597,28 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + vsAirHandlerNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     !HEAT EXCHANGER:AIR TO AIR:GENERIC ~ line 708
     htRecSens75 = StringToReal(FldVal(base + vsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + vsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + vsHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + vsHeatRecSenEffOff))
+    htRecLat100 = StringToReal(FldVal(base + vsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + vsAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + vsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + vsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + vsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + vsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + vsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + vsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + vsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + vsAirHandlerNameOff,' Relief Air Outlet')
@@ -11422,7 +11629,9 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + vsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   !SET POINT MANAGER:SCHEDULED ~ line 734
   IF (heatRecovery .NE. htrecNone) THEN
@@ -12909,7 +13118,9 @@ DO iSys = 1, numCompactSysPVAV
   ENDIF
   IF (heatRecovery .EQ. htrecSens) THEN
     htRecSens75 = StringToReal(FldVal(base + pvavsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + pvavsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + pvavsAirHandlerNameOff,' Heat Recovery')
@@ -12917,12 +13128,8 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + pvavsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + pvavsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + pvavsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + pvavsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + pvavsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + pvavsAirHandlerNameOff,' Relief Air Outlet')
@@ -12933,12 +13140,18 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + pvavsAirHandlerNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     htRecSens75 = StringToReal(FldVal(base + pvavsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + pvavsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + pvavsHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + pvavsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + pvavsAirHandlerNameOff,' Heat Recovery')
@@ -12946,12 +13159,8 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + pvavsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + pvavsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + pvavsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + pvavsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + pvavsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + pvavsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + pvavsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + pvavsAirHandlerNameOff,' Relief Air Outlet')
@@ -12962,7 +13171,9 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + pvavsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (heatRecovery .NE. htrecNone) THEN
     IF (isEconoLowLimitBlank) THEN
@@ -13105,7 +13316,9 @@ LOGICAL :: isControlZonePlenumBlank
 LOGICAL :: isEconoLowLimitBlank
 LOGICAL :: isMinOARateAutosize
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
+REAL    :: htRecLat100
 CHARACTER(len=1) :: SchType
 INTEGER :: supFanPlacement=0
 INTEGER :: supFanKind=0
@@ -14460,19 +14673,17 @@ DO iSys = 1, numCompactSysUnit
   !HEAT EXCHANGER:AIR TO AIR:GENERIC
   IF (isHeatRecSensible) THEN
     htRecSens75 = StringToReal(FldVal(base + usHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + usHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + usAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + usMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + usHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + usHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + usAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + usAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + usAirHandlerNameOff,' Relief Air Outlet')
@@ -14483,25 +14694,27 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + usAirHandlerNameOff, htRecSens75, htRecSens100)
   END IF
   IF (isHeatRecEnthalpy) THEN
     htRecSens75 = StringToReal(FldVal(base + usHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + usHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + usHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + usHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + usAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + usMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + usHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + usHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + usHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + usHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + usAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + usAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + usAirHandlerNameOff,' Relief Air Outlet')
@@ -14512,7 +14725,9 @@ DO iSys = 1, numCompactSysUnit
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + usAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (.NOT. isHeatRecNone) THEN
     IF (isEconoLowLimitBlank) THEN
@@ -15392,7 +15607,9 @@ DO iSys = 1, numCompactSysUnitHP
   ENDIF
   IF (isHeatRecSensible) THEN
     htRecSens75 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + uhpsAirHandlerNameOff,' Heat Recovery')
@@ -15400,12 +15617,8 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + uhpsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Relief Air Outlet')
@@ -15416,13 +15629,19 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + uhpsAirHandlerNameOff, htRecSens75, htRecSens100)
   END IF
   IF (isHeatRecEnthalpy) THEN
     htRecSens75 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + uhpsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + uhpsHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + uhpsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + uhpsAirHandlerNameOff,' Heat Recovery')
@@ -15430,12 +15649,8 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + uhpsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + uhpsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + uhpsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + uhpsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + uhpsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + uhpsAirHandlerNameOff,' Relief Air Outlet')
@@ -15446,7 +15661,9 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + uhpsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (.NOT. isHeatRecNone) THEN
     IF (isEconoLowLimitBlank) THEN
@@ -16103,6 +16320,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('No Load Fraction of Autosized Heating Supply Air Flow Rate','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W','')
   CALL AddToObjStr('No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W','')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   CALL AddToObjStr('Maximum Supply Air Temperature {C}', 'Autosize')
   CALL AddToObjFld('Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}', base + ussSuppReHeatMaxODBOff,'')
   CALL AddToObjStr('Outdoor Dry-Bulb Temperature Sensor Node Name', '')
@@ -16704,12 +16922,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjFld('Supply Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + ussAirHandlerNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil Outlet Node')
@@ -16722,7 +16936,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
-      CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Economizer Lockout','No')
+      CALL AddSenEffectCurve(base + ussAirHandlerNameOff, 0.75, 0.7)
       !***Coil:Cooling:Water
       CALL CreateNewObj('Coil:Cooling:Water')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Coil')
@@ -16755,12 +16970,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjFld('Supply Air Inlet Node Name', base + ussAirHandlerNameOff, TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + ussAirHandlerNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ussAirHandlerNameOff,' Cooling Coil Outlet Node')
@@ -16773,7 +16984,8 @@ DO iSys = 1, numCompactSysUnitarySystem
       CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
-      CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Economizer Lockout','No')
+      CALL AddSenEffectCurve(base + ussAirHandlerNameOff, 0.75, 0.7)
       !***Coil:Cooling:DX:SingleSpeed
       CALL CreateNewObj('Coil:Cooling:DX:SingleSpeed')
       CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' Cooling Coil')
@@ -17965,7 +18177,9 @@ DO iSys = 1, numCompactSysUnitarySystem
   ENDIF
   IF (isHeatRecSensible) THEN
     htRecSens75 = StringToReal(FldVal(base + ussHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + ussHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + ussAirHandlerNameOff,' Heat Recovery')
@@ -17973,12 +18187,8 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + ussMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + ussHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + ussHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + ussAirHandlerNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + ussAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ussAirHandlerNameOff,' Relief Air Outlet')
@@ -17989,13 +18199,19 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + ussAirHandlerNameOff, htRecSens75, htRecSens100)
   END IF
   IF (isHeatRecEnthalpy) THEN
     htRecSens75 = StringToReal(FldVal(base + ussHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + ussHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + ussHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + ussHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     !Object ==> HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + ussAirHandlerNameOff,' Heat Recovery')
@@ -18003,12 +18219,8 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + ussMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + ussHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + ussHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + ussHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + ussHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow',htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + ussAirHandlerNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + ussAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ussAirHandlerNameOff,' Relief Air Outlet')
@@ -18019,7 +18231,9 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + ussAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (.NOT. isHeatRecNone) THEN
     IF (isEconoLowLimitBlank) THEN
@@ -18506,7 +18720,9 @@ INTEGER :: heatRecovery=0
 INTEGER :: iInt
 INTEGER :: supFanPlacement=0
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
+REAL    :: htRecLat100
 LOGICAL :: isDehumidifyNone
 INTEGER :: dehumidCtrlKind = 0
 LOGICAL :: isHumidifierNone
@@ -19675,12 +19891,8 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Supply Air Inlet Node Name', TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + cvsAirHandlerNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + cvsAirHandlerNameOff,' Cooling Coil Outlet Node')
@@ -19693,7 +19905,8 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
-      CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Economizer Lockout','No')
+      CALL AddSenEffectCurve(base + cvsAirHandlerNameOff, 0.75, 0.7)
       !***Coil:Cooling:Water
       CALL CreateNewObj('Coil:Cooling:Water')
       CALL AddToObjFld('Name', base + cvsAirHandlerNameOff,' Cooling Coil')
@@ -20234,7 +20447,9 @@ DO iSys = 1, numCompactSysConstVol
   END IF
   IF (heatRecovery .EQ. htrecSens) THEN
     htRecSens75 = StringToReal(FldVal(base + cvsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + cvsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !***HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + cvsAirHandlerNameOff,' Heat Recovery')
@@ -20242,12 +20457,8 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Nominal supply air flow rate {m3/s}', 'autosize')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + cvsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + cvsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + cvsAirHandlerNameOff,' Relief Air Outlet')
@@ -20259,12 +20470,17 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
-    CALL AddToObjStr('Economizer Lockout','Yes',.TRUE.)
+    CALL AddToObjStr('Economizer Lockout','Yes')
+    CALL AddSenEffectCurve(base + cvsAirHandlerNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     htRecSens75 = StringToReal(FldVal(base + cvsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + cvsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + cvsHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + cvsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     !***HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + cvsAirHandlerNameOff,' Heat Recovery')
@@ -20272,12 +20488,8 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + cvsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + cvsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + cvsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + cvsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + cvsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + cvsAirHandlerNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + cvsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + cvsAirHandlerNameOff,' Relief Air Outlet')
@@ -20289,7 +20501,8 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
-    CALL AddToObjStr('Economizer Lockout','Yes',.TRUE.)
+    CALL AddToObjStr('Economizer Lockout','Yes')
+    CALL AddSenLatEffectCurve(base + cvsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (heatRecovery .NE. htrecNone) THEN
     IF (isEconoLowLimitBlank) THEN
@@ -20449,7 +20662,9 @@ INTEGER :: coldFanKind=0
 INTEGER :: hotFanKind=0
 LOGICAL :: isMinOARateAutosize
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
+REAL    :: htRecLat100
 LOGICAL :: isDehumidifyNone
 INTEGER :: dehumidCtrlKind = 0
 LOGICAL :: isHumidifierNone
@@ -22439,19 +22654,17 @@ DO iSys = 1, numCompactSysDualDuct
   IF (heatRecovery .EQ. htrecSens) THEN
     !HEAT EXCHANGER:AIR TO AIR:GENERIC ~ line 685
     htRecSens75 = StringToReal(FldVal(base + ddsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + ddsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + ddsAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + ddsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + ddsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + ddsHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + ddsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + ddsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ddsAirHandlerNameOff,' Relief Air Outlet')
@@ -22462,25 +22675,27 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Frost Control Type','ExhaustOnly')
     CALL AddToObjStr('Threshold Temperature','-1.1')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.167')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.024')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenEffectCurve(base + ddsAirHandlerNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     !HEAT EXCHANGER:AIR TO AIR:GENERIC ~ line 708
     htRecSens75 = StringToReal(FldVal(base + ddsHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + ddsHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + ddsHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + ddsHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + ddsAirHandlerNameOff,' Heat Recovery')
     CALL AddToObjStr('Availability Schedule Name',' ')
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + ddsMinOutsideFlowOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + ddsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + ddsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + ddsHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + ddsHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + ddsAirHandlerNameOff,' Outside Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + ddsAirHandlerNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + ddsAirHandlerNameOff,' Relief Air Outlet')
@@ -22491,7 +22706,9 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Frost Control Type','MinimumExhaustTemperature')
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','')
-    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','',.TRUE.)
+    CALL AddToObjStr('Rate of Defrost Time Fraction Increase','')
+    CALL AddToObjStr('Economizer Lockout','')
+    CALL AddSenLatEffectCurve(base + ddsAirHandlerNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   !SET POINT MANAGER:SCHEDULED ~ line 734
   IF (heatRecovery .NE. htrecNone) THEN
@@ -24022,12 +24239,8 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-    CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
     CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-    CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + fczNameOff,' Supply Fan Outlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + fczNameOff,' HX Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + fczNameOff,' HX Exhaust Inlet')
@@ -24040,7 +24253,8 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
     ! MJW ???? - Not sure
-    CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+    CALL AddToObjStr('Economizer Lockout','No')
+    CALL AddSenEffectCurve(base + fczNameOff, 0.75, 0.7)
     CALL CreateNewObj('Coil:Cooling:Water')
     CALL AddToObjFld('Name', base + fczNameOff,' Cooling Coil')
     CALL AddToObjFld('Availability Schedule Name', base + fczCoolAvailSchedNameOff,'')
@@ -25050,6 +25264,7 @@ IF (.NOT. isBaseboardNone) THEN
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + ptaczSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -25657,6 +25872,7 @@ DO iZone = 1, numCompactPTHP
     CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + pthpzSupplyNoLoadFlowRateOff,'')
   END IF
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -30025,6 +30241,7 @@ DO iZone = 1, numCompactWaterAirHP
   CALL AddToObjStr('Heating Supply Air Flow Rate {m3/s}','autosize')
   CALL AddToObjFld('No Load Supply Air Flow Rate {m3/s}',   &
      base + wahpSupplyNoLoadFlowRateOff,'')
+  CALL AddToObjStr('No Load Supply Air Flow Rate Control Set To Low Speed','')
   IF (isDedOutAirNameBlank) THEN
     CALL AddToObjStr('Cooling Outdoor Air Flow Rate {m3/s}','autosize')
     CALL AddToObjStr('Heating Outdoor Air Flow Rate {m3/s}','autosize')
@@ -31210,7 +31427,9 @@ INTEGER :: heatRecovery=0
 INTEGER :: iInt
 INTEGER :: supFanPlacement=0
 REAL    :: htRecSens75
+REAL    :: htRecSens100
 REAL    :: htRecLat75
+REAL    :: htRecLat100
 LOGICAL :: isDehumidifyNone
 INTEGER :: dehumidCtrlKind = 0
 LOGICAL :: isHumidifierNone
@@ -32214,12 +32433,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Supply Air Inlet Node Name', TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + doasNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + doasNameOff,' Cooling Coil Outlet Node')
@@ -32232,7 +32447,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
-      CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Economizer Lockout','No')
+      CALL AddSenEffectCurve(base + doasNameOff, 0.75, 0.7)
       !***Coil:Cooling:Water
       CALL CreateNewObj('Coil:Cooling:Water')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil')
@@ -32304,12 +32520,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Nominal Supply Air Flow Rate {m3/s}','autosize')
       CALL AddToObjStr('Sensible Effectiveness at 100% Heating Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Heating Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}','0.7')
       CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow {dimensionless}','0.0')
-      CALL AddToObjStr('Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}','0.75')
-      CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow {dimensionless}','0.0')
       CALL AddToObjStr('Supply Air Inlet Node Name', TRIM(coolCoilUnitInlet))
       CALL AddToObjFld('Supply Air Outlet Node Name', base + doasNameOff,' HX Supply Outlet Node')
       CALL AddToObjFld('Exhaust Air Inlet Node Name', base + doasNameOff,' Cooling Coil Outlet Node')
@@ -32322,7 +32534,8 @@ DO iSys = 1, numCompactDedOutAir
       CALL AddToObjStr('Initial Defrost Time Fraction {dimensionless}','')
       CALL AddToObjStr('Rate of Defrost Time Fraction Increase {1/K}','')
       ! MJW ???? - Not sure
-      CALL AddToObjStr('Economizer Lockout','No',.TRUE.)
+      CALL AddToObjStr('Economizer Lockout','No')
+      CALL AddSenEffectCurve(base + doasNameOff, 0.75, 0.7)
       !***Coil:Cooling:DX:SingleSpeed
       CALL CreateNewObj('Coil:Cooling:DX:SingleSpeed')
       CALL AddToObjFld('Name', base + doasNameOff,' Cooling Coil')
@@ -32732,7 +32945,9 @@ DO iSys = 1, numCompactDedOutAir
   CALL AddToObjStr('Mechanical Ventilation Controller Name','',.TRUE.)
   IF (heatRecovery .EQ. htrecSens) THEN
     htRecSens75 = StringToReal(FldVal(base + doasHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + doasHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     !***HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + doasNameOff,' Heat Recovery')
@@ -32740,12 +32955,8 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + doasSupplyRateOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + doasHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Heating Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Heating Air Flow','0')
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + doasHeatRecSenEffOff,'')
     CALL AddToObjStr('Latent Effectiveness at 100% Cooling Air Flow','0')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjStr('Latent Effectiveness at 75% Cooling Air Flow','0')
     CALL AddToObjFld('Supply Air Inlet Node Name', base + doasNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + doasNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + doasNameOff,' Relief Air Outlet')
@@ -32757,12 +32968,17 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
-    CALL AddToObjStr('Economizer Lockout','Yes',.TRUE.)
+    CALL AddToObjStr('Economizer Lockout','Yes')
+    CALL AddSenEffectCurve(base + doasNameOff, htRecSens75, htRecSens100)
   ELSEIF (heatRecovery .EQ. htrecEnth) THEN
     htRecSens75 = StringToReal(FldVal(base + doasHeatRecSenEffOff)) + 0.05
+    htRecSens100 = StringToReal(FldVal(base + doasHeatRecSenEffOff))
     IF (htRecSens75 .GT. 1.) htRecSens75 = 1.
+    IF (htRecSens100 .GT. 1.) htRecSens100 = 1.
     htRecLat75 = StringToReal(FldVal(base + doasHeatRecLatEffOff)) + 0.05
+    htRecLat100 = StringToReal(FldVal(base + doasHeatRecLatEffOff))
     IF (htRecLat75 .GT. 1.) htRecLat75 = 1.
+    IF (htRecLat100 .GT. 1.) htRecLat100 = 1.
     !***HeatExchanger:AirToAir:SensibleAndLatent
     CALL CreateNewObj('HeatExchanger:AirToAir:SensibleAndLatent')
     CALL AddToObjFld('Heat exchanger name', base + doasNameOff,' Heat Recovery')
@@ -32770,12 +32986,8 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjFld('Nominal supply air flow rate {m3/s}', base + doasSupplyRateOff,'')
     CALL AddToObjFld('Sensible Effectiveness at 100% Heating Air Flow', base + doasHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Heating Air Flow', base + doasHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Heating Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Heating Air Flow', htRecLat75)
     CALL AddToObjFld('Sensible Effectiveness at 100% Cooling Air Flow', base + doasHeatRecSenEffOff,'')
     CALL AddToObjFld('Latent Effectiveness at 100% Cooling Air Flow', base + doasHeatRecLatEffOff,'')
-    CALL AddToObjNum('Sensible Effectiveness at 75% Cooling Air Flow', htRecSens75)
-    CALL AddToObjNum('Latent Effectiveness at 75% Cooling Air Flow', htRecLat75)
     CALL AddToObjFld('Supply Air Inlet Node Name', base + doasNameOff,' Outdoor Air Inlet')
     CALL AddToObjFld('Supply Air Outlet Node Name', base + doasNameOff,' Heat Recovery Supply Outlet')
     CALL AddToObjFld('Exhaust Air Inlet Node Name', base + doasNameOff,' Relief Air Outlet')
@@ -32787,7 +32999,8 @@ DO iSys = 1, numCompactDedOutAir
     CALL AddToObjStr('Threshold Temperature','1.7')
     CALL AddToObjStr('Initial Defrost Time Fraction','0.083')
     CALL AddToObjStr('Rate of Defrost Time Fraction Increase','0.012')
-    CALL AddToObjStr('Economizer Lockout','Yes',.TRUE.)
+    CALL AddToObjStr('Economizer Lockout','Yes')
+    CALL AddSenLatEffectCurve(base + doasNameOff, htRecSens75, htRecSens100, htRecLat75, htRecLat100)
   END IF
   IF (heatRecovery .NE. htrecNone) THEN
     !***SetpointManager:MixedAir for Heat Recovery Outlet - Reference heating coil setpoint

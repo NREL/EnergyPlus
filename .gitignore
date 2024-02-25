@@ -70,6 +70,12 @@ cppcheck.txt
 # by default CLion uses cmake-build-debug as the build folder, so add that as well
 cmake-build-*
 
+# for wheel builds, we can also ignore a couple
+build-wheel/
+dist/
+energyplus.egg-info
+wheelhouse/
+
 # App-specific project files, for example, for Geany IDE:
 *.geany
 .project

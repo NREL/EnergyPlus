@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2265,6 +2265,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
             zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
         }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.CoolFlowSeqNoOA = zoneSizing.CoolFlowSeq;
+            zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
+            zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
+        }
     }
     // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
     {
@@ -2297,7 +2305,6 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
             }
             for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = zoneSizing.CoolFlowSeq(TimeStepIndex);
                 if (MaxOfMinCoolMassFlowNoOA > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
                     zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
                 }
@@ -2445,6 +2452,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizingDD.HeatFlowSeqNoOA = zoneSizingDD.HeatFlowSeq;
             zoneSizingDD.DesHeatVolFlowNoOA = zoneSizingDD.DesHeatVolFlow;
             zoneSizingDD.DesHeatMassFlowNoOA = zoneSizingDD.DesHeatMassFlow;
+        }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.HeatFlowSeqNoOA = zoneSizing.HeatFlowSeq;
+            zoneSizing.DesHeatVolFlowNoOA = zoneSizing.DesHeatVolFlow;
+            zoneSizing.DesHeatMassFlowNoOA = zoneSizing.DesHeatMassFlow;
         }
     }
 

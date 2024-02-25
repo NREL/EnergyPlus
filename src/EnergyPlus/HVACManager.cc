@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -78,6 +78,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
@@ -246,7 +247,7 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-
+    IndoorGreen::SimIndoorGreen(state);
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -264,7 +265,6 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        PriorTimeStep);
 
     SimHVAC(state);
-
     if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
         state.dataGlobal->RunOptCondEntTemp = true;
         while (state.dataGlobal->RunOptCondEntTemp) {
@@ -712,28 +712,28 @@ void SimHVAC(EnergyPlusData &state)
     if (!state.dataHVACMgr->SimHVACIterSetup) {
         SetupOutputVariable(state,
                             "HVAC System Solver Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataHVACMgr->HVACManageIteration,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Solver Iteration Count",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             state.dataHVACMgr->RepIterAir,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACReliefHeatLoss,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "HVAC System Total Heat Rejection Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACRejectHeatLoss,
                             OutputProcessor::SOVTimeStepType::HVAC,
                             OutputProcessor::SOVStoreType::Summed,
@@ -751,14 +751,14 @@ void SimHVAC(EnergyPlusData &state)
         if (state.dataPlnt->TotNumLoops > 0) {
             SetupOutputVariable(state,
                                 "Plant Solver Sub Iteration Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 state.dataPlnt->PlantManageSubIterations,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
                                 "SimHVAC");
             SetupOutputVariable(state,
                                 "Plant Solver Half Loop Calls Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 state.dataPlnt->PlantManageHalfLoopCalls,
                                 OutputProcessor::SOVTimeStepType::HVAC,
                                 OutputProcessor::SOVStoreType::Summed,
