@@ -444,7 +444,6 @@ state.dataStrGlobals->inputFilePath='{}',
         state.files.wrl.filePath = composePath(normalSuffix + ".wrl");
         state.dataStrGlobals->outputSqlFilePath = composePath(normalSuffix + ".sql");
         state.files.debug.filePath = composePath(normalSuffix + ".dbg");
-        state.files.dblst.filePath = composePath(normalSuffix + ".dbl");
         state.dataStrGlobals->outputPerfLogFilePath = composePath(normalSuffix + "_perflog.csv");
         state.dataStrGlobals->outputTblCsvFilePath = composePath(tableSuffix + ".csv");
         state.dataStrGlobals->outputTblHtmFilePath = composePath(tableSuffix + ".htm");

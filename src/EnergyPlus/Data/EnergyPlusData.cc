@@ -561,7 +561,6 @@ void EnergyPlusData::clear_state()
     this->dataZoneTempPredictorCorrector->clear_state();
 
     this->files.debug.close();
-    this->files.dblst.close();
     this->files.err_stream.reset();
     this->files.eso.close();
     this->files.mtr.close();

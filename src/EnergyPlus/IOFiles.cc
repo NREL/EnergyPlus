@@ -491,7 +491,6 @@ void IOFiles::flushAll()
     rdd.flush();
     mdd.flush();
     debug.flush();
-    dblst.flush();
     dfs.flush();
     mtd.flush();
     edd.flush();

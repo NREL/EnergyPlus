@@ -87,7 +87,6 @@ void EnergyPlusFixture::openOutputFiles(EnergyPlusData &state)
     state.files.audit.open_as_stringstream();
     state.files.bnd.open_as_stringstream();
     state.files.debug.open_as_stringstream();
-    state.files.dblst.open_as_stringstream();
     state.files.mtd.open_as_stringstream();
     state.files.edd.open_as_stringstream();
     state.files.zsz.open_as_stringstream();
