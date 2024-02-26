@@ -5,6 +5,10 @@ Duct model road map
 
 ** Florida Solar Energy Center**
 
+ - 4th draft, 2/22/24
+
+	After a conference call with Scott on 2/22/24
+
  - Third draft, 2/15/24
 
 	After Technicalities on 2/7/24
@@ -146,10 +150,29 @@ When the makeup air is introduced, it is better to investigate the ZoneAirMassFl
 
 Gu: There are two types of makeup air. The first type is that the makeup aie flows from outdoor to a zone, equivalent to Infiltration. The second type is that the makeup air flows from a zone to another zone, equivalent to Mixing object. It is possible to assign makeup air into Infiltration and Mixing airflows and call ZoneAirMassFlowConservation to perform mass conservation. 
  
+### Discussion in the conference call on 2/22/24 ###
+
+Scott and Gu attended the conference call.
+
+#### New objects ####
+
+Scott prefer to use 3 new objects to represent conduction, leakage and makeup air, respectively.
+
+#### Supply leak calculation ####
+
+Scott also agrees to calculate equivalent temperature and humidity ratio after supply leak without chancge the mass flow rate of Airloop mass flow rate.
+
+#### Have a concern ####
+
+Although Scott accepts the proposed new and existing objects, he would like to reserve his opinion: no AFN names for none AFN approach.
+
+Gu's response: In order to keep the roadmap moving, the existing AFN objects will be used.
 
 ## Roadmap ##
 
-The roadmap presents my view to implement simplified duct model without using the AFN model. The proposed new feature should meet the above requirements and include a new object and possible modifications of existing objects. The present document addresses the possible inputs.
+The roadmap presents my view to implement simplified duct model without using the AFN model. The proposed new feature should meet the above requirements and include three new objects and possible modifications of existing objects. The present document addresses the possible inputs and partial design document so far.
+
+Any more design document will be followed.
 
 The following figure represents proposed duct configuration.
 
@@ -163,13 +186,34 @@ This section presents inputs used in both losses of conduction and leakage.
 
 The group has not finalized the new objects. There are two choices. The first has a new object with A4 field with 3 choices. The second has 3 new objects: Duct:Loss:Conduction, Duct:Loss:Leakage, and Duct:Loss:MakeupAir.
 
-#### A new object ####
+#### 3 new objects ####
 
-A new object of Duct:Loss to cover additional duct inputs for the simplified duct model is provided below.
+An alternative approach is to have 3 new obejcts. Each object represents each loss type explicitly. 
 
-	Duct:Loss,
-      \min-fields 3
-        \memo the object is used to calculate duct conduction and leakage losses without using AFN model.
+	Duct:Loss:Conduction,
+   	A1,  \field Name
+        \required-field
+   	A2,  \field AirLoopHAVC Name
+        \required-field
+        \type object-list
+        \object-list AirPrimaryLoops
+   	A3;  \field AirflowNetwork:Distribution:Linkage Name
+        \required-field
+        \type object-list
+        \object-list AirflowNetworkDistributionLinkageNames
+    A4,  \field Environment Type
+        \type choice
+        \key Zone
+        \key Schedule
+        \default Zone
+   	A5,  \field Ambient Temperature Zone Name
+        \type object-list
+        \object-list ZoneNames
+   	A6;  \field Ambient Temperature Schedule Name
+        \type object-list
+        \object-list ScheduleNames
+
+	Duct:Loss:Leakage,
    	A1,  \field Name
         \required-field
    	A2,  \field AirLoopHAVC Name
@@ -181,55 +225,17 @@ A new object of Duct:Loss to cover additional duct inputs for the simplified duc
         \type object-list
         \object-list AirflowNetworkDistributionLinkageNames
 
-An optional field may help users to understand the object function:
-
-   	A4;  \field Loss type
-      \type choice
-      \key Conduction
-      \key Leakage
-      \key MakeupAir
-      \default Conduction
-
- <span style="color:red">
-
-    A5,  \field Environment Type
-        \type choice
-        \key Zone
-        \key Schedule
-        \default Zone
-   	A6,  \field Ambient Temperature Zone Name
-        \type object-list
-        \object-list ZoneNames
-   	A7;  \field Ambient Temperature Schedule Name
-        \type object-list
-        \object-list ScheduleNames
-</span>
-
-Note:
-
-1. Additional 3 optional fields will be added to allow user to specify duct exterior enviroment for conduction loss calculation.
-
-#### 3 new objects ####
-
-An alternative approach is to have 3 new obejcts. Each object represents each loss type explicitly. 
-
-	Duct:Loss:Conduction,
-   	A1,  \field Name
-   	A2,  \field AirLoopHAVC Name
-   	A3,  \field AirflowNetwork:Distribution:Linkage Name
-    A4,  \field Environment Type
-   	A5,  \field Ambient Temperature Zone Name
-   	A6;  \field Ambient Temperature Schedule Name
-
-	Duct:Loss:Leakage,
-   	A1,  \field Name
-   	A2,  \field AirLoopHAVC Name
-   	A3;  \field AirflowNetwork:Distribution:Linkage Name
-
 	Duct:Loss:MakeupAir,
    	A1,  \field Name
+        \required-field
    	A2,  \field AirLoopHAVC Name
+        \required-field
+        \type object-list
+        \object-list AirPrimaryLoops
    	A3;  \field AirflowNetwork:Distribution:Linkage Name
+        \required-field
+        \type object-list
+        \object-list AirflowNetworkDistributionLinkageNames
  
 #### Existing object AirflowNetwork:Distribution:Node ####
 
@@ -605,21 +611,120 @@ Thie option is removed based on most people opinions in the Technicalities.
 I prefer to use this approach:
 </span>
 
-	Duct:Loss objects are used without any modifications of AirflowNetwork:SimulationControl. The objects can be accomplished all 3 choices.
-
-1. ConductionLossWithoutAFN
-
-When all nodes defined in the AirflowNetwork:Distribution:Linkage are air nodes, and all the components defined in the Component Name fields are AirflowNetwork:Distribution:Component:Duct, the simplified duct conduction loss calculation will be performed.
-
-  
-2. LeakageLossWithoutAFN
-
-When one of two nodes in all the AirflowNetwork:Distribution:Linkage is either a zone name or outdoor air node, and all the component defined in the Component Name fields are AirflowNetwork:Distribution:Component:LeakageRatio, the simplified duct leakage loss calculation will be performed.
-
-3. ConductionAndLeakageLossWithoutAFN
-
-When all the components defined in the Component Name fields are AirflowNetwork:Distribution:Component:Duct and AirflowNetwork:Distribution:Component:LeakageRatio, the simplified duct conduction and leakage loss calculation will be performed.
+	Duct:Loss objects are used without any modifications of AirflowNetwork:SimulationControl. 
 
 ### Leakage losses with mass flow changes ###
 
 The inputs of objects in this section should be the same as the section of Leakage losses without mass flow changes. The differences between two sections are internal code implementation. The changes will be addressed in Design document.
+
+## Design Document ##
+
+This section will provide algorithms and code implementation approach.
+
+### Algorithms ###
+
+The algorithms cover temperature and humidity ratio at the outlet for supply and return leaks.
+
+#### Supply leaks ####
+
+The schmetic of supply leak is shown below.
+
+![Supply Leaks](SupplyLeaks.PNG)
+
+Assumption:
+
+No mass flow rate in the Airloop will be changed. Instead, the equivalent temperature and humidity ratio at the outlet will be calculated as follows
+
+Energy balance for a supply leak
+
+m<sub>1</sub>h<sub>1</sub> = m<sub>2</sub> h<sub>2</sub> + m<sub>3</sub> h<sub>3</sub>
+
+Mass balance
+
+m<sub>1</sub> = m<sub>2</sub> + m<sub>3</sub> 
+
+Assumption:
+
+When a supply leak occurs, it assumes to be at the outlet of the duct. The reality is that the outlet enthalpy remains the same, and supply mass flow rate is changed. However, if we assume the same mass flow rate in the Airloop and keep energy balanced, the equivalent ourlet temperature and humidity will be calculated. 
+
+Based on EnergyPlus psychrometric functions, the enthalpy may be calculayed as follows:
+
+h = 1.00484e3 * TDB + max(dW, 1.0e-5) * (2.50094e6 + 1.85895e3 * TDB); // enthalpy {J/kg}   
+
+where TDB is dry bulb temperature with units of C.
+
+The above equation may be simplified as
+
+h = a\*T + W *(b+c\*T)
+
+where a, b, and c are constants.
+
+The energy balance equation can be re-written using the same mass flow rate at the outlet:
+
+m<sub>1</sub>h<sub>1</sub> = m<sub>2</sub> h<sub>2</sub> + m<sub>3</sub> h<sub>3</sub> = m<sub>1</sub> h<sub>4</sub> + m<sub>3</sub> h<sub>3</sub>
+
+where 
+
+h<sub>4</sub> = [(m<sub>1</sub> - m<sub>3</sub>) \*h<sub>1</sub>]/m<sub>1</sub> = h<sub>1</sub>*( 1 - m<sub>3</sub>/m<sub>1</sub> )
+
+By substituting E+ enthalpy equation, the energy balance equation can be written as:
+
+h<sub>4</sub> = h<sub>1</sub>*( 1 - m<sub>3</sub>/m<sub>1</sub> )
+
+[a\*T<sub>4</sub> + W<sub>4</sub> *(b+c\*T<sub>4</sub>)] = [a\*T<sub>1</sub> + W<sub>1</sub> *(b+c\*T<sub>1</sub>)] *( 1 - m<sub>3</sub>/m<sub>1</sub> ) 
+
+Since there are two variables, one set of possible solutions can be
+
+T<sub>4</sub> = T<sub>1</sub> *( 1 - m<sub>3</sub>/m<sub>1</sub> )
+
+W<sub>4</sub> = [W<sub>1</sub> \*(b+c\*T<sub>1</sub>)] \*( 1 - m<sub>3</sub>/m<sub>1</sub> ) / [b+c\*T<sub>1</sub>*( 1 - m<sub>3</sub>/m<sub>1</sub> )]
+
+#### Return leaks ####
+
+The schmetic of return leak is shown below.
+
+![Return Leaks](ReturnLeaks.PNG)
+
+
+The algorithm and code to calculate outlet condition of OAMixer is apply to return leaks.
+
+OAMixer calculation:
+
+    Real64 RecircMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).RetMassFlowRate - state.dataMixedAir->OAMixer(OAMixerNum).RelMassFlowRate;
+
+	state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate + RecircMassFlowRate;
+
+    state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy =
+        (RecircMassFlowRate * RecircEnthalpy +
+         state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate * state.dataMixedAir->OAMixer(OAMixerNum).OAEnthalpy) /
+        state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+    state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = (RecircMassFlowRate * RecircHumRat + state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate *                                                                                                 state.dataMixedAir->OAMixer(OAMixerNum).OAHumRat) /                                                         state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate;
+
+    state.dataMixedAir->OAMixer(OAMixerNum).MixTemp =
+        Psychrometrics::PsyTdbFnHW(state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat);
+
+Return leak calculation:
+
+1. Calculate recirculate flow
+
+m<sub>Recirculate</sub> = m<sub>Airloop</sub> - m<sub>Returnleak</sub>
+
+2. Calculate mixed flow
+
+m<sub>Mixed</sub> = m<sub>Recirculate</sub> + m<sub>returnleak</sub>
+
+3. Calculate mixed air properties
+
+Mass flow rate weighted air properties
+
+T<sub>Mixed</sub> = (T<sub>Recirculte</sub> * m<sub>Recirculte</sub> +  T<sub>Returnleak</sub> * m<sub>Returnleak</sub> ) /m<sub>Mixed</sub>
+
+W<sub>Mixed</sub> = (W<sub>Recirculte</sub> * m<sub>Recirculte</sub> +  W<sub>Returnleak</sub> * m<sub>Returnleak</sub> ) /m<sub>Mixed</sub>
+
+#### Add loss to zone load and system load ####
+
+This section will be added later.
+
+### Input process ###
+
+This section will be added later.
