@@ -345,6 +345,8 @@ namespace SystemReports {
     void fillZoneEquipToplogyComponentRow(
         EnergyPlusData &state, const std::string_view &zoneName, const std::string_view &compType, const std::string_view &compName, int &rowCounter);
 
+    void reportAirDistributionUnits(EnergyPlusData &state);
+
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************
 

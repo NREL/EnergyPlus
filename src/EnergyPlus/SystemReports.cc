@@ -895,6 +895,8 @@ void InitEnergyReports(EnergyPlusData &state)
 
         reportZoneEquipmentToplogy(state);
 
+        reportAirDistributionUnits(state);
+
         state.dataSysRpts->OneTimeFlag_InitEnergyReports = false;
     }
 
@@ -5017,6 +5019,56 @@ void fillZoneEquipToplogyComponentRow(
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopZnEqpCompType, format("{}", rowCounter), compType);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopZnEqpCompName, format("{}", rowCounter), compName);
     ++rowCounter;
+}
+
+void reportAirDistributionUnits(EnergyPlusData &state)
+{
+    auto &orp = state.dataOutRptPredefined;
+    for (auto &adu : state.dataDefineEquipment->AirDistUnit) 
+    {
+        auto &at = adu.airTerminalPtr;
+        const int aduCompNum = 1;
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTempCntl, adu.Name, adu.EquipName(aduCompNum));
+        OutputReportPredefined::PreDefTableEntry(
+            state, orp->pdchAirTermZoneName, adu.Name, state.dataHeatBal->Zone(adu.ZoneNum).Name);
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, adu.EquipType(aduCompNum));
+
+        if (adu.TermUnitSizingNum > 0) {
+            OutputReportPredefined::PreDefTableEntry(
+                state, orp->pdchAirTermMinFlow, adu.Name, state.dataSize->TermUnitSizing(adu.TermUnitSizingNum).AirVolFlow);
+        }
+
+        switch (adu.EquipTypeEnum(aduCompNum)) {
+        case DataDefineEquip::ZnAirLoopEquipType::DualDuctConstVolume:
+        case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAV:
+        case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAVOutdoorAir:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolNoReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVNoReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheatVSFan:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolCooledBeam:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam:
+            break;
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat:
+            break;
+        default:
+            break;
+        } // end switch
+
+
+    }
 }
 
 //        End of Reporting subroutines for the SimAir Module

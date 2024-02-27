@@ -80,6 +80,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -6510,6 +6511,18 @@ void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
         this->OutdoorAirFlowRate = 0.0;
     }
 }
+
+void SingleDuctAirTerminal::reportTerminalUnit(EnergyPlusData &state)
+{
+    // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+    if (this->AirLoopNum > 0) {
+        this->OutdoorAirFlowRate =
+            (this->sd_airterminalOutlet.AirMassFlowRate / state.dataEnvrn->StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
+    } else {
+        this->OutdoorAirFlowRate = 0.0;
+    }
+}
+
 
 //        End of Reporting subroutines for the Sys Module
 // *****************************************************************************

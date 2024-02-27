@@ -5509,32 +5509,30 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
         }
 
         // begin std 229 air terminal new table
+        std::string oldADUname = format("{}-old", thisTUFZSizing.ADUName);
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermZoneName,
-                                                 thisTUFZSizing.ADUName,
+                                                 oldADUname,
                                                  thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermMinFlow,
-                                                 thisTUFZSizing.ADUName,
+                                                 oldADUname,
                                                  thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, thisTUFZSizing.ADUName, thisTUFZSizing.MinOA);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, oldADUname, thisTUFZSizing.MinOA);
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, thisTUFZSizing.ADUName, thisTUFZSizing.CoolDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, oldADUname, thisTUFZSizing.CoolDesTemp);
 
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, thisTUFZSizing.ADUName, thisTUFZSizing.HeatDesTemp);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, oldADUname, thisTUFZSizing.HeatDesTemp);
 
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermHeatingCap,
-                                                 thisTUFZSizing.ADUName,
+                                                 oldADUname,
                                                  thisTUFZSizing.DesHeatLoad); // ? DesHeatLoad ==? Heating capacity?
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirTermCoolingCap,
-                                                 thisTUFZSizing.ADUName,
+                                                 oldADUname,
                                                  thisTUFZSizing.DesCoolLoad); // ? DesCoolLoad ==? Cooling capacity?
         // end std 229 air terminal new table
     }
