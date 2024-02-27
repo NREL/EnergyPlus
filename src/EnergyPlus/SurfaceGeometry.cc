@@ -1712,281 +1712,283 @@ namespace SurfaceGeometry {
             //   If other surface, match it up
             //  Both interzone and "internal" surfaces have this pointer set
             //  Internal surfaces point to themselves, Interzone to another
-            if (surf.ExtBoundCond == UnreconciledZoneSurface) {
-                if (not_blank(surf.ExtBoundCondName)) {
-                    if (surf.ExtBoundCondName == surf.Name) {
-                        surf.ExtBoundCond = SurfNum;
-                    } else {
-                        surf.ExtBoundCond = Util::FindItemInList(surf.ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
+            if (surf.ExtBoundCond != UnreconciledZoneSurface) continue;
+            
+            if (not_blank(surf.ExtBoundCondName)) {
+                if (surf.ExtBoundCondName == surf.Name) {
+                    surf.ExtBoundCond = SurfNum;
+                } else {
+                    surf.ExtBoundCond = Util::FindItemInList(surf.ExtBoundCondName, state.dataSurface->Surface, MovedSurfs);
+                }
+                if (surf.ExtBoundCond != 0) {
+                    auto &osSurf = state.dataSurface->Surface(surf.ExtBoundCond);
+                    // Check that matching surface is also "OtherZoneSurface"
+                    if (osSurf.ExtBoundCond <= 0 && osSurf.ExtBoundCond != UnreconciledZoneSurface) {
+                        ShowSevereError(state, format("{}Potential \"OtherZoneSurface\" is not matched correctly:", RoutineName));
+                        ShowContinueError(state, format("Surface={}, Zone={}", surf.Name, surf.ZoneName));
+                        ShowContinueError(state, format("Nonmatched Other/InterZone Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
+                        SurfError = true;
                     }
-                    if (surf.ExtBoundCond != 0) {
-                        auto &osSurf = state.dataSurface->Surface(surf.ExtBoundCond);
-                        // Check that matching surface is also "OtherZoneSurface"
-                        if (osSurf.ExtBoundCond <= 0 &&
-                            osSurf.ExtBoundCond != UnreconciledZoneSurface) {
-                            ShowSevereError(state, format("{}Potential \"OtherZoneSurface\" is not matched correctly:", RoutineName));
-                            ShowContinueError(state, format("Surface={}, Zone={}", surf.Name, surf.ZoneName));
-                            ShowContinueError(state, format("Nonmatched Other/InterZone Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
-                            SurfError = true;
+                    // Check that matching interzone surface has construction with reversed layers
+                    if (surf.ExtBoundCond != SurfNum) { // Interzone surface
+                        // Make sure different zones too (CR 4110)
+                        if (surf.spaceNum == osSurf.spaceNum) {
+                            ++state.dataSurfaceGeometry->ErrCount2;
+                            if (state.dataSurfaceGeometry->ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                ShowWarningError(state,
+                                                 format("{}CAUTION -- Interspace surfaces are occuring in the same space(s).", RoutineName));
+                                ShowContinueError(
+                                                  state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
+                            }
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                ShowWarningError(state, format("{}CAUTION -- Interspace surfaces are usually in different spaces", RoutineName));
+                                ShowContinueError(state,
+                                                  format("Surface={}, Space={}, Zone={}",
+                                                         surf.Name,
+                                                         state.dataHeatBal->space(surf.spaceNum).Name,
+                                                         surf.ZoneName));
+                                ShowContinueError(state,
+                                                  format("Surface={}, Space={}, Zone={}",
+                                                         osSurf.Name,
+                                                         state.dataHeatBal->space(osSurf.spaceNum).Name,
+                                                         osSurf.ZoneName));
+                            }
                         }
-                        // Check that matching interzone surface has construction with reversed layers
-                        if (surf.ExtBoundCond != SurfNum) { // Interzone surface
-                            // Make sure different zones too (CR 4110)
-                            if (surf.spaceNum == osSurf.spaceNum) {
-                                ++state.dataSurfaceGeometry->ErrCount2;
-                                if (state.dataSurfaceGeometry->ErrCount2 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state,
-                                                     format("{}CAUTION -- Interspace surfaces are occuring in the same space(s).", RoutineName));
-                                    ShowContinueError(
-                                        state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual occurrences.");
+
+                        if (surf.Construction <= 0 || osSurf.Construction <= 0) continue;
+
+                        auto &constr = state.dataConstruction->Construct(surf.Construction);
+                        auto &osConstr = state.dataConstruction->Construct(osSurf.Construction);
+                        
+                        if (constr.ReverseConstructionNumLayersWarning && osConstr.ReverseConstructionNumLayersWarning)
+                            continue;
+                        if (constr.ReverseConstructionLayersOrderWarning && osConstr.ReverseConstructionLayersOrderWarning)
+                            continue;
+                        TotLay = constr.TotLayers;
+                        TotLayFound = osConstr.TotLayers;
+                        if (TotLay != TotLayFound) { // Different number of layers
+                            // match on like Uvalues (nominal)
+                            if (std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction)) > 0.001) {
+                                ShowSevereError(state,
+                                                format("{}Construction {} of interzone surface {} does not have the same number of layers as the "
+                                                       "construction {} of adjacent surface {}",
+                                                       RoutineName,
+                                                       constr.Name,
+                                                       surf.Name,
+                                                       osConstr.Name,
+                                                       osSurf.Name));
+                                if (!constr.ReverseConstructionNumLayersWarning || !osConstr.ReverseConstructionNumLayersWarning) {
+                                    ShowContinueError(state, "...this problem for this pair will not be reported again.");
+                                    constr.ReverseConstructionNumLayersWarning = true;
+                                    osConstr.ReverseConstructionNumLayersWarning = true;
                                 }
-                                if (state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state, format("{}CAUTION -- Interspace surfaces are usually in different spaces", RoutineName));
+                                SurfError = true;
+                            }
+                        } else { // Same number of layers; check for reverse layers
+                            // check layers as number of layers is the same
+                            izConstDiff = false;
+                            // ok if same nominal U
+                            CheckForReversedLayers(state, izConstDiff, surf.Construction, osSurf.Construction, TotLay);
+                            if (izConstDiff &&
+                                std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction)) > 0.001) {
+                                ShowSevereError(state,
+                                                format("{}Construction {} of interzone surface {} does not have the same materials in the "
+                                                       "reverse order as the construction {} of adjacent surface {}",
+                                                       RoutineName,
+                                                       constr.Name,
+                                                       surf.Name,
+                                                       osConstr.Name,
+                                                       osSurf.Name));
+                                ShowContinueError(state,
+                                                  "or the properties of the reversed layers are not correct due to differing layer front and "
+                                                  "back side values");
+                                if (!constr.ReverseConstructionLayersOrderWarning || !osConstr.ReverseConstructionLayersOrderWarning) {
+                                    ShowContinueError(state, "...this problem for this pair will not be reported again.");
+                                    constr.ReverseConstructionLayersOrderWarning = osConstr.ReverseConstructionLayersOrderWarning = true;
+                                }
+                                SurfError = true;
+                            } else if (izConstDiff) {
+                                ShowWarningError(state,
+                                                 format("{}Construction {} of interzone surface {} does not have the same materials in the "
+                                                        "reverse order as the construction {} of adjacent surface {}",
+                                                        RoutineName,
+                                                        constr.Name,
+                                                        surf.Name,
+                                                        osConstr.Name,
+                                                        osSurf.Name));
+                                ShowContinueError(state,
+                                                  "or the properties of the reversed layers are not correct due to differing layer front and "
+                                                  "back side values");
+                                ShowContinueError(
+                                                  state,
+                                                  format("...but Nominal U values are similar, diff=[{:.4R}] ... simulation proceeds.",
+                                                         std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction))));
+                                if (!izConstDiffMsg) {
                                     ShowContinueError(state,
-                                                      format("Surface={}, Space={}, Zone={}",
-                                                             surf.Name,
-                                                             state.dataHeatBal->space(surf.spaceNum).Name,
-                                                             surf.ZoneName));
-                                    ShowContinueError(state,
-                                                      format("Surface={}, Space={}, Zone={}",
-                                                             osSurf.Name,
-                                                             state.dataHeatBal->space(osSurf.spaceNum).Name,
-                                                             osSurf.ZoneName));
+                                                      "...if the two zones are expected to have significantly different temperatures, the proper "
+                                                      "\"reverse\" construction should be created.");
+                                    izConstDiffMsg = true;
+                                }
+                                if (!constr.ReverseConstructionLayersOrderWarning || !osConstr.ReverseConstructionLayersOrderWarning) {
+                                    ShowContinueError(state, "...this problem for this pair will not be reported again.");
+                                    constr.ReverseConstructionLayersOrderWarning = osConstr.ReverseConstructionLayersOrderWarning = true;
                                 }
                             }
+                        }
+                        
+                        // If significantly different areas -- this would not be good
+                        MultFound = state.dataHeatBal->Zone(osSurf.Zone).Multiplier * state.dataHeatBal->Zone(osSurf.Zone).ListMultiplier;
+                        MultSurfNum = state.dataHeatBal->Zone(surf.Zone).Multiplier * state.dataHeatBal->Zone(surf.Zone).ListMultiplier;
+                        if (osSurf.Area > 0.0 && 
+                            std::abs((osSurf.Area * MultFound - surf.Area * MultSurfNum) / osSurf.Area * MultFound) > 0.02) { // 2% difference in areas
+                            ++state.dataSurfaceGeometry->ErrCount4;
+                            if (state.dataSurfaceGeometry->ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                                ShowWarningError(state,
+                                                 format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
+                                                        RoutineName));
+                                ShowContinueError(
+                                                  state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual mismatches.");
+                            }
+                            if (state.dataGlobal->DisplayExtraWarnings) {
+                                ShowWarningError(state,
+                                                 format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
+                                                        RoutineName));
 
-                            if (surf.Construction <= 0 || osSurf.Construction <= 0) continue;
-
-                            auto &constr = state.dataConstruction->Construct(surf.Construction);
-                            auto &osConstr = state.dataConstruction->Construct(osSurf.Construction);
-                            
-                            if (constr.ReverseConstructionNumLayersWarning && osConstr.ReverseConstructionNumLayersWarning)
-                                continue;
-                            if (constr.ReverseConstructionLayersOrderWarning && osConstr.ReverseConstructionLayersOrderWarning)
-                                continue;
-                            TotLay = constr.TotLayers;
-                            TotLayFound = osConstr.TotLayers;
-                            if (TotLay != TotLayFound) { // Different number of layers
-                                // match on like Uvalues (nominal)
-                                if (std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction)) > 0.001) {
-                                    ShowSevereError(state,
-                                                    format("{}Construction {} of interzone surface {} does not have the same number of layers as the "
-                                                           "construction {} of adjacent surface {}",
-                                                           RoutineName,
-                                                           constr.Name,
-                                                           surf.Name,
-                                                           osConstr.Name,
-                                                           osSurf.Name));
-                                    if (!constr.ReverseConstructionNumLayersWarning || !osConstr.ReverseConstructionNumLayersWarning) {
-                                        ShowContinueError(state, "...this problem for this pair will not be reported again.");
-                                        constr.ReverseConstructionNumLayersWarning = true;
-                                        osConstr.ReverseConstructionNumLayersWarning = true;
-                                    }
-                                    SurfError = true;
-                                }
-                            } else { // Same number of layers; check for reverse layers
-                                // check layers as number of layers is the same
-                                izConstDiff = false;
-                                // ok if same nominal U
-                                CheckForReversedLayers(state, izConstDiff, surf.Construction, osSurf.Construction, TotLay);
-                                if (izConstDiff &&
-                                    std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction)) > 0.001) {
-                                    ShowSevereError(state,
-                                                    format("{}Construction {} of interzone surface {} does not have the same materials in the "
-                                                           "reverse order as the construction {} of adjacent surface {}",
-                                                           RoutineName,
-                                                           constr.Name,
-                                                           surf.Name,
-                                                           osConstr.Name,
-                                                           osSurf.Name));
-                                    ShowContinueError(state,
-                                                      "or the properties of the reversed layers are not correct due to differing layer front and "
-                                                      "back side values");
-                                    if (!constr.ReverseConstructionLayersOrderWarning || !osConstr.ReverseConstructionLayersOrderWarning) {
-                                        ShowContinueError(state, "...this problem for this pair will not be reported again.");
-                                        constr.ReverseConstructionLayersOrderWarning = osConstr.ReverseConstructionLayersOrderWarning = true;
-                                    }
-                                    SurfError = true;
-                                } else if (izConstDiff) {
-                                    ShowWarningError(state,
-                                                     format("{}Construction {} of interzone surface {} does not have the same materials in the "
-                                                            "reverse order as the construction {} of adjacent surface {}",
-                                                            RoutineName,
-                                                            constr.Name,
-                                                            surf.Name,
-                                                            osConstr.Name,
-                                                            osSurf.Name));
-                                    ShowContinueError(state,
-                                                      "or the properties of the reversed layers are not correct due to differing layer front and "
-                                                      "back side values");
-                                    ShowContinueError(
-                                        state,
-                                        format("...but Nominal U values are similar, diff=[{:.4R}] ... simulation proceeds.",
-                                               std::abs(state.dataHeatBal->NominalU(surf.Construction) - state.dataHeatBal->NominalU(osSurf.Construction))));
-                                    if (!izConstDiffMsg) {
-                                        ShowContinueError(state,
-                                                          "...if the two zones are expected to have significantly different temperatures, the proper "
-                                                          "\"reverse\" construction should be created.");
-                                        izConstDiffMsg = true;
-                                    }
-                                    if (!constr.ReverseConstructionLayersOrderWarning || !osConstr.ReverseConstructionLayersOrderWarning) {
-                                        ShowContinueError(state, "...this problem for this pair will not be reported again.");
-                                        constr.ReverseConstructionLayersOrderWarning = osConstr.ReverseConstructionLayersOrderWarning = true;
-                                    }
+                                if (MultFound == 1 && MultSurfNum == 1) {
+                                    ShowContinueError(state, format("  Area={:.1T} in Surface={}, Zone={}", surf.Area, surf.Name, surf.ZoneName));
+                                    ShowContinueError(state, format("  Area={:.1T} in Surface={}, Zone={}", osSurf.Area, osSurf.Name, osSurf.ZoneName));
+                                } else { // Show multiplier info
+                                    ShowContinueError(state, format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
+                                                                    surf.Area, MultSurfNum, surf.Area * MultSurfNum, surf.Name, surf.ZoneName));
+                                    
+                                    ShowContinueError(state, format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
+                                                                    osSurf.Area, MultFound, osSurf.Area * MultFound, osSurf.Name, osSurf.ZoneName));
                                 }
                             }
+                        } // if (osSurf.Area > 0.0)
+                        // Check opposites Azimuth and Tilt
+                        // Tilt
+                        if (std::abs(std::abs(osSurf.Tilt + surf.Tilt) - 180.0) > 1.0) {
+                            ShowWarningError(state, format("{}InterZone Surface Tilts do not match as expected.", RoutineName));
+                            ShowContinueError(state, format("  Tilt={:.1T} in Surface={}, Zone={}", surf.Tilt, surf.Name, surf.ZoneName));
+                            ShowContinueError(state, format("  Tilt={:.1T} in Surface={}, Zone={}", osSurf.Tilt, osSurf.Name, osSurf.ZoneName));
+                        }
+                        // check surface class match.  interzone surface.
 
-                            // If significantly different areas -- this would not be good
-                            MultFound = state.dataHeatBal->Zone(osSurf.Zone).Multiplier * state.dataHeatBal->Zone(osSurf.Zone).ListMultiplier;
-                            MultSurfNum = state.dataHeatBal->Zone(surf.Zone).Multiplier * state.dataHeatBal->Zone(surf.Zone).ListMultiplier;
-                            if (osSurf.Area > 0.0 && 
-                                std::abs((osSurf.Area * MultFound - surf.Area * MultSurfNum) / osSurf.Area * MultFound) > 0.02) { // 2% difference in areas
-                                ++state.dataSurfaceGeometry->ErrCount4;
-                                if (state.dataSurfaceGeometry->ErrCount4 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state,
-                                                     format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
-                                                            RoutineName));
-                                    ShowContinueError(
-                                                      state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual mismatches.");
-                                    }
-                                if (state.dataGlobal->DisplayExtraWarnings) {
-                                    ShowWarningError(state,
-                                                     format("{}InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:",
-                                                            RoutineName));
-
-                                    if (MultFound == 1 && MultSurfNum == 1) {
-                                        ShowContinueError(state, format("  Area={:.1T} in Surface={}, Zone={}", surf.Area, surf.Name, surf.ZoneName));
-                                        ShowContinueError(state, format("  Area={:.1T} in Surface={}, Zone={}", osSurf.Area, osSurf.Name, osSurf.ZoneName));
-                                    } else { // Show multiplier info
-                                        ShowContinueError(state, format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
-                                                                        surf.Area, MultSurfNum, surf.Area * MultSurfNum, surf.Name, surf.ZoneName));
-
-                                        ShowContinueError(state, format("  Area={:.1T}, Multipliers={}, Total Area={:.1T} in Surface={} Zone={}",
-                                                                        osSurf.Area, MultFound, osSurf.Area * MultFound, osSurf.Name, osSurf.ZoneName));
-                                    }
-                                }
-                            } // if (osSurf.Area > 0.0)
-                            // Check opposites Azimuth and Tilt
-                            // Tilt
-                            if (std::abs(std::abs(osSurf.Tilt + surf.Tilt) - 180.0) > 1.0) {
-                                ShowWarningError(state, format("{}InterZone Surface Tilts do not match as expected.", RoutineName));
-                                ShowContinueError(state, format("  Tilt={:.1T} in Surface={}, Zone={}", surf.Tilt, surf.Name, surf.ZoneName));
-                                ShowContinueError(state, format("  Tilt={:.1T} in Surface={}, Zone={}", osSurf.Tilt, osSurf.Name, osSurf.ZoneName));
-                            }
-                            // check surface class match.  interzone surface.
-
-                            if ((surf.Class == SurfaceClass::Wall && osSurf.Class != SurfaceClass::Wall) ||
-                                (surf.Class != SurfaceClass::Wall && osSurf.Class == SurfaceClass::Wall)) {
-                                ShowWarningError(state, format("{}InterZone Surface Classes do not match as expected.", RoutineName));
-                                ShowContinueError(state, format("Surface=\"{}\", surface class={}", surf.Name, surfaceClassStrings[(int)surf.Class]));
-                                ShowContinueError(state, format("Adjacent Surface=\"{}\", surface class={}", osSurf.Name, surfaceClassStrings[(int)osSurf.Class]));
-                                ShowContinueError(state, "Other errors/warnings may follow about these surfaces.");
-                            }
-                            if ((surf.Class == SurfaceClass::Roof && osSurf.Class != SurfaceClass::Floor) ||
-                                (surf.Class != SurfaceClass::Roof && osSurf.Class == SurfaceClass::Floor)) {
-                                ShowWarningError(state, format("{}InterZone Surface Classes do not match as expected.", RoutineName));
-                                ShowContinueError(state, format("Surface=\"{}\", surface class={}", surf.Name, surfaceClassStrings[(int)surf.Class]));
-                                ShowContinueError(state, format("Adjacent Surface=\"{}\", surface class={}", osSurf.Name, surfaceClassStrings[(int)osSurf.Class]));
-                                ShowContinueError(state, "Other errors/warnings may follow about these surfaces.");
-                            }
-                            if (surf.Class != SurfaceClass::Roof && surf.Class != SurfaceClass::Floor) {
-                                // Walls, Windows, Doors, Glass Doors
-                                if (surf.Class != SurfaceClass::Wall) {
-                                    // Surface is a Door, Window or Glass Door
-                                    if (surf.BaseSurf == 0) continue; // error detected elsewhere
-                                    if (state.dataSurface->Surface(surf.BaseSurf).Class == SurfaceClass::Roof ||
-                                        state.dataSurface->Surface(surf.BaseSurf).Class == SurfaceClass::Floor)
+                        if ((surf.Class == SurfaceClass::Wall && osSurf.Class != SurfaceClass::Wall) ||
+                            (surf.Class != SurfaceClass::Wall && osSurf.Class == SurfaceClass::Wall)) {
+                            ShowWarningError(state, format("{}InterZone Surface Classes do not match as expected.", RoutineName));
+                            ShowContinueError(state, format("Surface=\"{}\", surface class={}", surf.Name, surfaceClassStrings[(int)surf.Class]));
+                            ShowContinueError(state, format("Adjacent Surface=\"{}\", surface class={}", osSurf.Name, surfaceClassStrings[(int)osSurf.Class]));
+                            ShowContinueError(state, "Other errors/warnings may follow about these surfaces.");
+                        }
+                        if ((surf.Class == SurfaceClass::Roof && osSurf.Class != SurfaceClass::Floor) ||
+                            (surf.Class != SurfaceClass::Roof && osSurf.Class == SurfaceClass::Floor)) {
+                            ShowWarningError(state, format("{}InterZone Surface Classes do not match as expected.", RoutineName));
+                            ShowContinueError(state, format("Surface=\"{}\", surface class={}", surf.Name, surfaceClassStrings[(int)surf.Class]));
+                            ShowContinueError(state, format("Adjacent Surface=\"{}\", surface class={}", osSurf.Name, surfaceClassStrings[(int)osSurf.Class]));
+                            ShowContinueError(state, "Other errors/warnings may follow about these surfaces.");
+                        }
+                        if (surf.Class != SurfaceClass::Roof && surf.Class != SurfaceClass::Floor) {
+                            // Walls, Windows, Doors, Glass Doors
+                            if (surf.Class != SurfaceClass::Wall) {
+                                // Surface is a Door, Window or Glass Door
+                                if (surf.BaseSurf == 0) continue; // error detected elsewhere
+                                if (state.dataSurface->Surface(surf.BaseSurf).Class == SurfaceClass::Roof ||
+                                    state.dataSurface->Surface(surf.BaseSurf).Class == SurfaceClass::Floor)
                                         continue;
-                                }
-                                if (std::abs(std::abs(surf.Azimuth - osSurf.Azimuth) - 180.0) > 1.0) {
-                                    if (std::abs(surf.SinTilt) > 0.5 || state.dataGlobal->DisplayExtraWarnings) {
-                                        // if horizontal surfaces, then these are windows/doors/etc in those items.
-                                        ShowWarningError(state, format("{}InterZone Surface Azimuths do not match as expected.", RoutineName));
-                                        ShowContinueError(state, format("  Azimuth={:.1T}, Tilt={:.1T}, in Surface={}, Zone={}",
-                                                                        surf.Azimuth, surf.Tilt, surf.Name, surf.ZoneName));
-                                        ShowContinueError(state, format("  Azimuth={:.1T}, Tilt={:.1T}, in Surface={}, Zone={}",
-                                                                        osSurf.Azimuth, osSurf.Tilt, osSurf.Name, osSurf.ZoneName));
-                                        ShowContinueError(state, format("..surface class of first surface={}", surfaceClassStrings[(int)surf.Class]));
-                                        ShowContinueError(state, format("..surface class of second surface={}", surfaceClassStrings[(int)osSurf.Class]));
-                                    }
+                            }
+                            if (std::abs(std::abs(surf.Azimuth - osSurf.Azimuth) - 180.0) > 1.0) {
+                                if (std::abs(surf.SinTilt) > 0.5 || state.dataGlobal->DisplayExtraWarnings) {
+                                    // if horizontal surfaces, then these are windows/doors/etc in those items.
+                                    ShowWarningError(state, format("{}InterZone Surface Azimuths do not match as expected.", RoutineName));
+                                    ShowContinueError(state, format("  Azimuth={:.1T}, Tilt={:.1T}, in Surface={}, Zone={}",
+                                                                    surf.Azimuth, surf.Tilt, surf.Name, surf.ZoneName));
+                                    ShowContinueError(state, format("  Azimuth={:.1T}, Tilt={:.1T}, in Surface={}, Zone={}",
+                                                                    osSurf.Azimuth, osSurf.Tilt, osSurf.Name, osSurf.ZoneName));
+                                    ShowContinueError(state, format("..surface class of first surface={}", surfaceClassStrings[(int)surf.Class]));
+                                    ShowContinueError(state, format("..surface class of second surface={}", surfaceClassStrings[(int)osSurf.Class]));
                                 }
                             }
+                        }
+                        
+                        // Make sure exposures (Sun, Wind) are the same.....and are "not"
+                        if (surf.ExtSolar || osSurf.ExtSolar) {
+                            ShowWarningError(state, format("{}Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed", RoutineName));
+                            ShowContinueError(state, format("  Surface={}, Zone={}", surf.Name, surf.ZoneName));
+                            ShowContinueError(state, format("  Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
+                            surf.ExtSolar = false;
+                            osSurf.ExtSolar = false;
+                        }
+                        if (surf.ExtWind || osSurf.ExtWind) {
+                            ShowWarningError(state, format("{}Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed", RoutineName));
+                            ShowContinueError(state, format("  Surface={}, Zone={}", surf.Name, surf.ZoneName));
+                            ShowContinueError(state, format("  Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
+                            surf.ExtWind = false;
+                            osSurf.ExtWind = false;
+                        }
+                    }
+                    // Set opposing surface back to this one (regardless of error)
+                    osSurf.ExtBoundCond = SurfNum;
+                    // Check subsurfaces...  make sure base surface is also an interzone surface
+                    if (surf.BaseSurf != SurfNum) { // Subsurface
+                        if ((surf.ExtBoundCond != SurfNum) && not_blank(surf.ExtBoundCondName)) {
+                            // if not internal subsurface
+                            if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond == surf.BaseSurf) {
+                                // base surface is not interzone surface
+                                ShowSevereError(state, format("{}SubSurface=\"{}\" is an interzone subsurface.", RoutineName, surf.Name));
+                                ShowContinueError(state, format("..but the Base Surface is not an interzone surface, Surface=\"{}\".",
+                                                                state.dataSurface->Surface(surf.BaseSurf).Name));
+                                SurfError = true;
+                            }
+                        }
+                    }
+                } else {
+                    //  Seems unlikely that an internal surface would be missing itself, so this message
+                    //  only indicates for adjacent (interzone) surfaces.
+                    ShowSevereError(state, format("{}Adjacent Surface not found: {} adjacent to surface {}",
+                                                  RoutineName, surf.ExtBoundCondName, surf.Name));
+                    NonMatch = true;
+                    SurfError = true;
+                }
 
-                            // Make sure exposures (Sun, Wind) are the same.....and are "not"
-                            if (surf.ExtSolar || osSurf.ExtSolar) {
-                                ShowWarningError(state, format("{}Interzone surfaces cannot be \"SunExposed\" -- removing SunExposed", RoutineName));
-                                ShowContinueError(state, format("  Surface={}, Zone={}", surf.Name, surf.ZoneName));
-                                ShowContinueError(state, format("  Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
-                                surf.ExtSolar = false;
-                                osSurf.ExtSolar = false;
-                            }
-                            if (surf.ExtWind || osSurf.ExtWind) {
-                                ShowWarningError(state, format("{}Interzone surfaces cannot be \"WindExposed\" -- removing WindExposed", RoutineName));
-                                ShowContinueError(state, format("  Surface={}, Zone={}", surf.Name, surf.ZoneName));
-                                ShowContinueError(state, format("  Surface={}, Zone={}", osSurf.Name, osSurf.ZoneName));
-                                surf.ExtWind = false;
-                                osSurf.ExtWind = false;
-                            }
-                        }
-                        // Set opposing surface back to this one (regardless of error)
-                        osSurf.ExtBoundCond = SurfNum;
-                        // Check subsurfaces...  make sure base surface is also an interzone surface
-                        if (surf.BaseSurf != SurfNum) { // Subsurface
-                            if ((surf.ExtBoundCond != SurfNum) && not_blank(surf.ExtBoundCondName)) {
-                                // if not internal subsurface
-                                if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond == surf.BaseSurf) {
-                                    // base surface is not interzone surface
-                                    ShowSevereError(state, format("{}SubSurface=\"{}\" is an interzone subsurface.", RoutineName, surf.Name));
-                                    ShowContinueError(state, format("..but the Base Surface is not an interzone surface, Surface=\"{}\".",
-                                                                    state.dataSurface->Surface(surf.BaseSurf).Name));
-                                    SurfError = true;
-                                }
-                            }
-                        }
-                    } else {
-                        //  Seems unlikely that an internal surface would be missing itself, so this message
-                        //  only indicates for adjacent (interzone) surfaces.
-                        ShowSevereError(state, format("{}Adjacent Surface not found: {} adjacent to surface {}",
-                                               RoutineName, surf.ExtBoundCondName, surf.Name));
-                        NonMatch = true;
-                        SurfError = true;
-                    }
-                } else if (surf.BaseSurf != SurfNum) { // Subsurface
-                    if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond > 0 &&
-                        state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond != surf.BaseSurf) { // If Interzone surface, subsurface must be also.
-                        ShowSevereError(state, format("{}SubSurface on Interzone Surface must be an Interzone SubSurface.", RoutineName));
-                        ShowContinueError(state, format("...OutsideFaceEnvironment is blank, in Surface={}", surf.Name));
-                        SurfError = true;
-                    } else {
-                        ++state.dataSurfaceGeometry->ErrCount3;
-                        if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
-                            ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
-                        }
-                        if (state.dataGlobal->DisplayExtraWarnings) {
-                            ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Object, in surface={}", RoutineName, surf.Name));
-                            ShowContinueError(state, format("Resetting this surface to be an internal zone surface, zone={}", surf.ZoneName));
-                        }
-                        surf.ExtBoundCondName = surf.Name;
-                        surf.ExtBoundCond = SurfNum;
-                    }
+                
+
+            } else if (surf.BaseSurf != SurfNum) { // Subsurface
+                if (state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond > 0 &&
+                    state.dataSurface->Surface(surf.BaseSurf).ExtBoundCond != surf.BaseSurf) { // If Interzone surface, subsurface must be also.
+                    ShowSevereError(state, format("{}SubSurface on Interzone Surface must be an Interzone SubSurface.", RoutineName));
+                    ShowContinueError(state, format("...OutsideFaceEnvironment is blank, in Surface={}", surf.Name));
+                    SurfError = true;
                 } else {
                     ++state.dataSurfaceGeometry->ErrCount3;
                     if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
-                        ShowSevereError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
+                        ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
                         ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                     }
                     if (state.dataGlobal->DisplayExtraWarnings) {
                         ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Object, in surface={}", RoutineName, surf.Name));
-                        ShowContinueError(state, format("Resetting this surface to be an internal zone (adiabatic) surface, zone={}", surf.ZoneName));
+                        ShowContinueError(state, format("Resetting this surface to be an internal zone surface, zone={}", surf.ZoneName));
                     }
                     surf.ExtBoundCondName = surf.Name;
                     surf.ExtBoundCond = SurfNum;
-                    SurfError = true;
                 }
+            } else {
+                ++state.dataSurfaceGeometry->ErrCount3;
+                if (state.dataSurfaceGeometry->ErrCount3 == 1 && !state.dataGlobal->DisplayExtraWarnings) {
+                    ShowSevereError(state, format("{}Blank name for Outside Boundary Condition Objects.", RoutineName));
+                    ShowContinueError(state, "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
+                }
+                if (state.dataGlobal->DisplayExtraWarnings) {
+                    ShowWarningError(state, format("{}Blank name for Outside Boundary Condition Object, in surface={}", RoutineName, surf.Name));
+                    ShowContinueError(state, format("Resetting this surface to be an internal zone (adiabatic) surface, zone={}", surf.ZoneName));
+                }
+                surf.ExtBoundCondName = surf.Name;
+                surf.ExtBoundCond = SurfNum;
+                SurfError = true;
             }
-
-        } // ...end of the Surface DO loop for finding BaseSurf
+        } // for (SurfNum)
+        
         if (NonMatch) {
             ShowSevereError(state, format("{}Non matching interzone surfaces found", RoutineName));
         }
@@ -2089,7 +2091,7 @@ namespace SurfaceGeometry {
         } // for (SurfNum)
 
         setSurfaceFirstLast(state);
-
+        
         // Set up Floor Areas for Zones and Spaces
         Real64 constexpr floorAreaTolerance(0.05);
         Real64 constexpr floorAreaPercentTolerance(floorAreaTolerance * 100.0);
@@ -2155,7 +2157,7 @@ namespace SurfaceGeometry {
                 }
                 thisSpace.FloorArea = thisSpace.userEnteredFloorArea;
                 thisSpace.hasFloor = true;
-            }
+            } // for (thisSpace)
 
             ErrCount = 0;
             for (auto &thisZone : state.dataHeatBal->Zone) {
@@ -2268,7 +2270,7 @@ namespace SurfaceGeometry {
                 // NOTE: This must be set early so that subsequent shading calculations are done correctly
                 surf.BaseSurf = SurfNum;
             }
-        }
+        } // for (SurfNum)
 
         errFlag = false;
         if (!SurfError) {
@@ -2657,7 +2659,7 @@ namespace SurfaceGeometry {
                     state.dataHeatBalSurf->SurfMovInsulIndexList.push_back(SurfNum);
                 }
             }
-        }
+        } // if (!SurfError)
         if (SurfError || ErrorsFound) {
             ErrorsFound = true;
             ShowFatalError(state, format("{}Errors discovered, program terminates.", RoutineName));
@@ -2740,7 +2742,7 @@ namespace SurfaceGeometry {
                 ShowWarningError(state, format("{}Space={} has no surfaces.", RoutineName, state.dataHeatBal->space(spaceNum).Name));
             }
         }
-    }
+    } // createSpaceSurfaceLists()
 
     void setSurfaceFirstLast(EnergyPlusData &state)
     {
@@ -2794,7 +2796,7 @@ namespace SurfaceGeometry {
             int firstSpaceNum = state.dataHeatBal->Zone(ZoneNum).spaceIndexes(1);
             state.dataHeatBal->Zone(ZoneNum).AllSurfaceFirst = state.dataHeatBal->space(firstSpaceNum).AllSurfaceFirst;
         }
-    }
+    } // setSurfaceFirstLast()
 
     void checkSubSurfAzTiltNorm(EnergyPlusData &state,
                                 SurfaceData &surf, // Base surface data (in)
@@ -3359,8 +3361,7 @@ namespace SurfaceGeometry {
                     surf.Azimuth += state.dataHeatBal->BuildingRotationAppendixG;
                 }
                 surf.Tilt = ipsc->rNumericArgs(2);
-                surf.convOrientation =
-                    Convect::GetSurfConvOrientation(surf.Tilt);
+                surf.convOrientation = Convect::GetSurfConvOrientation(surf.Tilt);
 
                 surf.Sides = 4;
                 surf.Vertex.allocate(surf.Sides);
@@ -11554,7 +11555,7 @@ namespace SurfaceGeometry {
             areFlrAndClgSame = false;
         }
         return areFlrAndClgSame;
-    }
+    } // areFloorAndCeilingSame()
 
     // test if the walls of a zone are all the same height using the polyhedron describing the zone geometry
     bool areWallHeightSame(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly)
@@ -11660,7 +11661,7 @@ namespace SurfaceGeometry {
             }
         }
         return foundOppEqual;
-    }
+    } // areOppositeWallsSame()
 
     // provides a list of indices of polyhedron faces that are facing a specific azimuth
     std::vector<int> listOfFacesFacingAzimuth(EnergyPlusData &state, DataVectorTypes::Polyhedron const &zonePoly, Real64 const azimuth)
@@ -11751,7 +11752,7 @@ namespace SurfaceGeometry {
 
         Vector3<Real64> projection = cross(t, other); // normal unit vector, that's the distance component
         return projection.length();
-    }
+    } // disatanceFromPointToLine()
 
     // tests if a point in space lies on the line segment defined by two other points
     bool isPointOnLineBetweenPoints(Vector3<Real64> const &start, Vector3<Real64> const &end, Vector3<Real64> const &test)
@@ -13262,8 +13263,6 @@ namespace SurfaceGeometry {
         int NAlphas;
         int NNum;
         int IOStat;
-        Real64 OldAspectRatio;
-        Real64 NewAspectRatio;
         // begin execution
         // get user input...
 
@@ -13289,8 +13288,8 @@ namespace SurfaceGeometry {
                                                                          ipsc->lAlphaFieldBlanks,
                                                                          ipsc->cAlphaFieldNames,
                                                                          ipsc->cNumericFieldNames);
-                OldAspectRatio = rNumerics(1);
-                NewAspectRatio = rNumerics(2);
+                sg->OldAspectRatio = rNumerics(1);
+                sg->NewAspectRatio = rNumerics(2);
                 if (cAlphas(1) != "XY") {
                     ShowWarningError(
                         state, format("{}: invalid {}=\"{}...ignored.", ipsc->cCurrentModuleObject, ipsc->cAlphaFieldNames(1), cAlphas(1)));
@@ -13307,6 +13306,7 @@ namespace SurfaceGeometry {
                 sg->firstTime = false;
             }
         }
+
         if (sg->noTransform) return;
 
         // check surface type.
@@ -13327,8 +13327,8 @@ namespace SurfaceGeometry {
             Real64 XnoRot = Xo * sg->CosBldgRelNorth + Yo * sg->SinBldgRelNorth;
             Real64 YnoRot = Yo * sg->CosBldgRelNorth - Xo * sg->SinBldgRelNorth;
             // translate
-            Real64 Xtrans = XnoRot * std::sqrt(NewAspectRatio / OldAspectRatio);
-            Real64 Ytrans = YnoRot * std::sqrt(OldAspectRatio / NewAspectRatio);
+            Real64 Xtrans = XnoRot * std::sqrt(sg->NewAspectRatio / sg->OldAspectRatio);
+            Real64 Ytrans = YnoRot * std::sqrt(sg->OldAspectRatio / sg->NewAspectRatio);
             // rerotate
             surf.Vertex(n).x = Xtrans * sg->CosBldgRelNorth - Ytrans * sg->SinBldgRelNorth;
             surf.Vertex(n).y = Xtrans * sg->SinBldgRelNorth + Ytrans * sg->CosBldgRelNorth;

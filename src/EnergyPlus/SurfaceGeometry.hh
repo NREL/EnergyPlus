@@ -458,6 +458,9 @@ struct SurfaceGeometryData : BaseGlobalStruct
     HeatBalanceKivaManager::KivaManager kivaManager;
     SurfaceGeometry::ExposedFoundationPerimeter exposedFoundationPerimeter;
 
+    Real64 OldAspectRatio = 1.0;
+    Real64 NewAspectRatio = 1.0;
+
     int ErrCount = 0;
     bool WarningDisplayed = false;
     int ErrCount2 = 0;
@@ -490,6 +493,9 @@ struct SurfaceGeometryData : BaseGlobalStruct
         kivaManager = HeatBalanceKivaManager::KivaManager();
         firstTime = true;
         noTransform = true;
+        OldAspectRatio = 1.0;
+        NewAspectRatio = 1.0;
+        
         CheckConvexityFirstTime = true;
         ErrCount = 0;
         WarningDisplayed = false;
