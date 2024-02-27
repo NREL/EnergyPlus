@@ -1,0 +1,182 @@
+
+Enhancement for Variable-Speed Heat Recovery Ventilation in Laboratories
+================
+
+**Richard Raustad**
+
+**Florida Solar Energy Center***
+
+ - Original Date: Feb 26, 2024
+
+## Justification for Feature Update
+
+Decarbonization efforts to electrify buildings has led to use of less common efficiency improvements. Use of chiller refrigerant migration, free cooling in air-cooled chillers, and integrated water-side economizer with air-cooled chiller, to name a few.
+
+## Overview ##
+
+### Chiller refrigerant migration ###
+Involves using cold condenser inlet fluid temperature (colder than the evaporator water temperature) to force refrigerant migration without the need to energize the compressor. This may include special refrigerant circuits or valves to ensure proper refrigerant flow. Studies have shown up to 40% of chiller capacity is available using this technique. An empirical model that requires no knowledge of the refrigerant type or chiller configuration is to use a mathematical representation of the fraction of available chiller capacity when this operating mode is viable (i.e., lower condenser inlet temperature with respect to the chilled water set point temperature). This empirical model uses an assumption of 10 C (50 F) maximum outdoor air wet-bulb temperature for a water-cooled chiller (left figure). A more generic model would use the temperature difference between the evaporator leaving water temperature set point and the entering condenser inlet temperature (right figure).
+
+<img src="Operating-envelope-refrigerant-migration.png" alt="Operating envelope and conditions for refrigerant migration" width="900px">
+</img>
+
+Figure 1. Operating envelope and conditions for refrigerant migration
+
+### Approach
+
+This feature proposes to add 2 optional fields to chillers representing the refrigerant migration empirical model. Tentatively at the end of the object but these fields could be inserted near the capacity and COP inputs if that seems better placement. The curve is likely the only required input field (i.e., the resulting curve fraction will determine if the chiller can meet the load using only refrigerant migration), however, the zero crossing of the performance curve may not accurately represent the actual operating range and an additional field is suggested as Refrigerant Migration Minimum Temperature Difference (see example for HeatPump:PlantLoop:EIR:Cooling). It is anticipated that both of these fields will be implemented in each chiller type.
+
+```
+HeatPump:PlantLoop:EIR:Cooling,
+  A13, \field Refrigerant Migration Temperature Difference Curve Name
+       \type object-list
+       \object-list UniVariateFunctions
+       \note quadratic curve = a + b * dT is typical, other univariate curves may be used
+  N10; \field Refrigerant Migration Minimum Temperature Difference
+       \type real
+       \minimum>=0
+       \default 0.0
+       \note refirgerant migration is disabled below this minimum limit and
+       \note when the load is greater than calculated using the prevoius field.
+
+Chiller:Electric,
+  A14; \field Refrigerant Migration Temperature Difference Curve Name
+       \type object-list
+       \object-list UniVariateFunctions
+       \note quadratic curve = a + b * dT is typical, other univariate curves may be used
+
+Chiller:Electric:EIR,
+  A17; \field Refrigerant Migration Temperature Difference Curve Name
+       \type object-list
+       \object-list UniVariateFunctions
+       \note quadratic curve = a + b * dT is typical, other univariate curves may be used
+
+Chiller:Electric:Reformulated:EIR,
+  A16; \field Refrigerant Migration Temperature Difference Curve Name
+       \type object-list
+       \object-list UniVariateFunctions
+       \note quadratic curve = a + b * dT is typical, other univariate curves may be used
+```
+
+### Free cooling in air-cooled chillers ###
+
+Free cooling from air-cooled chillers typically happens through air-side economizers. Although the previous discussion of refrigerant migration applied to water-cooled chillers, there is no reason that same concept could not be applied to air-cooled equipment. This concept would be applied to the same chillers described above.
+
+### Integrated water-side economizer with air-cooled chiller ###
+
+Integrated water-side economizer with air-cooled chillers is likely possible with existing objects with minor additions to control of the water flow through the WWHX (HeatExchanger:FluidToFluid). One side of the WWHX would be connected to the supply side inlet node of the chiller evaporator (or other appropriate branch in the plant, i.e., precool entire plant loop) while the other side of the WWHX would be connected to a demand side branch of the condenser loop. Activation of the condenser loop flow through the HX, to active free cooling, would be accomplished through controls modification. The WWHX object already has inputs for Control Type, Heat Exchanger Setpoint Node Name, Minimum Temperature Difference to Activate Heat Exchanger, Operation Minimum Temperature Limit, and Operation Maximum Temperature Limit. I am unsure at this time which of these fields would be used for configuration as an integrated water-side economizer or if other inputs would be required. It may be as simple as adding a new Control Type = IntegratedWaterSideEconomizer to allow the proper controls. Investigation into the new control will include review of the Component Override Loop inputs (e.g., using chiller evaporator inlet node temperature as a control point).
+
+```
+HeatExchanger:FluidToFluid,
+        \memo A fluid/fluid heat exchanger designed to couple the supply side of one loop to the demand side of another loop
+        \memo Loops can be either plant or condenser loops but no air side connections are allowed
+        \min-fields 14
+   A1 , \field Name
+        \required-field
+   A2 , \field Availability Schedule Name
+   A3 , \field Loop Demand Side Inlet Node Name
+   A4 , \field Loop Demand Side Outlet Node Name
+   N1 , \field Loop Demand Side Design Flow Rate
+        \autosizable
+   A5 , \field Loop Supply Side Inlet Node Name
+   A6 , \field Loop Supply Side Outlet Node Name
+   N2 , \field Loop Supply Side Design Flow Rate
+   A7 , \field Heat Exchange Model Type
+        \type choice
+        \key CrossFlowBothUnMixed
+        \key CrossFlowBothMixed
+        \key CrossFlowSupplyMixedDemandUnMixed
+        \key CrossFlowSupplyUnMixedDemandMixed
+        \key ParallelFlow
+        \key CounterFlow
+        \key Ideal
+        \default Ideal
+   N3 , \field Heat Exchanger U-Factor Times Area Value
+   A8 , \field Control Type
+        \type choice
+        \key UncontrolledOn
+        \key OperationSchemeModulated
+        \key OperationSchemeOnOff
+        \key HeatingSetpointModulated
+        \key HeatingSetpointOnOff
+        \key CoolingSetpointModulated
+        \key CoolingSetpointOnOff
+        \key DualDeadbandSetpointModulated
+        \key DualDeadbandSetpointOnOff
+        \key CoolingDifferentialOnOff
+        \key CoolingSetpointOnOffWithComponentOverride
+        \default UncontrolledOn
+   A9 , \field Heat Exchanger Setpoint Node Name
+        \note Setpoint node is needed with any Control Type that is "*Setpoint*"
+   N4 , \field Minimum Temperature Difference to Activate Heat Exchanger
+        \note Tolerance between control temperatures used to determine if heat exchanger should run.
+        \type real
+        \minimum 0.0
+        \maximum 50
+        \default 0.01
+        \units deltaC
+   A10, \field Heat Transfer Metering End Use Type
+        \note This field controls end use reporting for heat transfer meters
+        \type choice
+        \key FreeCooling
+        \key HeatRecovery
+        \key HeatRejection
+        \key HeatRecoveryForCooling
+        \key HeatRecoveryForHeating
+        \key LoopToLoop
+        \default LoopToLoop
+   A11, \field Component Override Loop Supply Side Inlet Node Name
+        \type node
+        \note This field is only used if Control Type is set to CoolingSetpointOnOffWithComponentOverride
+   A12, \field Component Override Loop Demand Side Inlet Node Name
+        \type node
+        \note This field is only used if Control Type is set to CoolingSetpointOnOffWithComponentOverride
+   A13, \field Component Override Cooling Control Temperature Mode
+        \type choice
+        \key WetBulbTemperature
+        \key DryBulbTemperature
+        \key Loop
+        \default Loop
+        \note This field is only used if Control Type is set to CoolingSetpointOnOffWithComponentOverride
+   N5 , \field Sizing Factor
+        \note Multiplies the autosized flow rates for this device
+        \type real
+        \minimum> 0.0
+        \default 1.0
+   N6 , \field Operation Minimum Temperature Limit
+        \note Lower limit on inlet temperatures, heat exchanger will not operate if either inlet is below this limit
+        \type real
+        \units C
+   N7 ; \field Operation Maximum Temperature Limit
+        \note Upper limit on inlet temperatures, heat exchanger will not operate if either inlet is above this limit
+        \type real
+        \units C
+```
+
+## Testing/Validation/Data Source(s)
+
+These features will be tested and demonstrated with one or more test files derived from 5Zone_AirCooled.idf and incorporation of integrated water-side in a similar example file. An attempt will be made to integrate these concepts into existing example files.
+
+## Proposed additions to Meters:
+
+N/A
+
+## Proposed Report Variables:
+
+- Refrigerant Migration Status (0 or 1)
+
+WWHX report for Fluid Heat Exchanger Operation Status should provide the necessary information to understand when the HX is active as an economizer.
+
+```
+if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this-DemandSideLoop.InletMassFlowRate > 0.0) && 
+    (this->SupplySideLoop.InletMassFlowRate > 0.0)) {
+    this->OperationStatus = 1.0;
+} else {
+    this->OperationStatus = 0.0;
+}
+```
+ 
+## References
+
+[1]	W. J. Turner, "Investigation and Development of Hybrid Ventilation Wall Convector," The University of Reading, 2009. [Online]. Available: https://www.researchgate.net/publication/263209666_Investigation_and_Development_of_Hybrid_Ventilation_Wall_Convector/figures?lo=1
+[2] Mahmoud, M., Filipsson, P., Brunninge, S., & Dalenbäck, J. O. (2022). Flow rate optimization in run-around heat recovery systems. Applied Thermal Engineering, 200, 117599.
