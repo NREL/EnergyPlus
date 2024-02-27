@@ -1560,7 +1560,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             //  eliminate the duplicates to find the number of nodes in the supply air path
             NumSupAirPathNodes = NumAllSupAirPathNodes - NumSupAirPathIntNodes;
             SupAirPathNodeNum = 0;
-            
+
             state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode.allocate(NumSupAirPathOutNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNodeSupplyPathCompNum.allocate(NumSupAirPathOutNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).Node.allocate(NumSupAirPathNodes);
@@ -1634,7 +1634,6 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 thisAirToZoneNodeInfo.SupplyAirPathNum(OutNum) = SupAirPathNum;
                 if (SupAirPathNum > 0) {
                     NumSupAirPathOutNodes = state.dataZoneEquip->SupplyAirPath(SupAirPathNum).NumOutletNodes;
-
                 }
 
                 // Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal

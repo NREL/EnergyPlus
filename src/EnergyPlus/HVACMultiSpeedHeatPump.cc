@@ -1250,7 +1250,6 @@ namespace HVACMultiSpeedHeatPump {
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchDXHeatCoilSuppHiT, thisMSHP.DXHeatCoilName, thisMSHP.SuppMaxOATemp);
 
-
             thisMSHP.AuxOnCyclePower = Numbers(4);
             thisMSHP.AuxOffCyclePower = Numbers(5);
             if (thisMSHP.AuxOnCyclePower < 0.0) {
