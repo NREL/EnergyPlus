@@ -1,12 +1,12 @@
 
-Enhancement for Variable-Speed Heat Recovery Ventilation in Laboratories
+New Feature for Plant Decarbonization
 ================
 
 **Richard Raustad**
 
 **Florida Solar Energy Center***
 
- - Original Date: Feb 26, 2024
+ - Original Date: Feb 27, 2024
 
 ## Justification for Feature Update
 
@@ -65,6 +65,12 @@ Free cooling from air-cooled chillers typically happens through air-side economi
 ### Integrated water-side economizer with air-cooled chiller ###
 
 Integrated water-side economizer with air-cooled chillers is likely possible with existing objects with minor additions to control of the water flow through the WWHX (HeatExchanger:FluidToFluid). One side of the WWHX would be connected to the supply side inlet node of the chiller evaporator (or other appropriate branch in the plant, i.e., precool entire plant loop) while the other side of the WWHX would be connected to a demand side branch of the condenser loop. Activation of the condenser loop flow through the HX, to active free cooling, would be accomplished through controls modification. The WWHX object already has inputs for Control Type, Heat Exchanger Setpoint Node Name, Minimum Temperature Difference to Activate Heat Exchanger, Operation Minimum Temperature Limit, and Operation Maximum Temperature Limit. I am unsure at this time which of these fields would be used for configuration as an integrated water-side economizer or if other inputs would be required. It may be as simple as adding a new Control Type = IntegratedWaterSideEconomizer to allow the proper controls. Investigation into the new control will include review of the Component Override Loop inputs (e.g., using chiller evaporator inlet node temperature as a control point).
+
+<img src="IntegratedWaterSideEconomizer.png" alt="Integrated Water-Side Economizer" width="900px">
+</img>
+
+Figure 2. Integrated Water-Side Economizer
+
 
 ```
 HeatExchanger:FluidToFluid,
@@ -178,5 +184,3 @@ if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this-Dem
  
 ## References
 
-[1]	W. J. Turner, "Investigation and Development of Hybrid Ventilation Wall Convector," The University of Reading, 2009. [Online]. Available: https://www.researchgate.net/publication/263209666_Investigation_and_Development_of_Hybrid_Ventilation_Wall_Convector/figures?lo=1
-[2] Mahmoud, M., Filipsson, P., Brunninge, S., & Dalenbäck, J. O. (2022). Flow rate optimization in run-around heat recovery systems. Applied Thermal Engineering, 200, 117599.
