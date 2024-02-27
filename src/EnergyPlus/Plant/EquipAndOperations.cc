@@ -321,6 +321,7 @@ namespace DataPlant {
                                             this_equip.LoopSideNumPtr = compLoc.loopSideNum;
                                             this_equip.BranchNumPtr = compLoc.branchNum;
                                             this_equip.CompNumPtr = compLoc.compNum;
+                                            this->PlantOps.PrimaryChWLoopIndex = compLoc.loopNum; // addd for testing HR
                                             foundit = true;
                                             continue;
                                         }
