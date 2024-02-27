@@ -86,6 +86,9 @@ namespace DataAirLoop {
         Array1D_int TermUnitCoolSizingIndex;                  // Air terminal sizing numbers for zones cooled by this air loop
         Array1D_int TermUnitHeatSizingIndex;                  // Air terminal sizing numbers for zones heated by this air loop
         Array1D<DataHVACGlobals::AirDuctType> SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
+        Array1D_int SupplyDuctBranchNum;                      // Supply duct branch number
+        Array1D_int SupplyAirPathNum;                         // Supply air path indexes
+        Array1D_int ReturnAirPathNum;                         // Return air path indexes
     };
 
     struct AirLoopOutsideAirConnectData

@@ -479,7 +479,9 @@ void GetAirPathData(EnergyPlusData &state)
         // Allocate the return air node arrays
         airLoopZoneInfo.AirLoopReturnNodeNum.allocate(airLoopZoneInfo.NumReturnNodes);
         airLoopZoneInfo.ZoneEquipReturnNodeNum.allocate(airLoopZoneInfo.NumReturnNodes);
+        airLoopZoneInfo.ReturnAirPathNum.allocate(airLoopZoneInfo.NumReturnNodes);
         // fill the return air node arrays with node numbers
+        airLoopZoneInfo.ReturnAirPathNum(1) = 0;
         airLoopZoneInfo.AirLoopReturnNodeNum(1) = GetOnlySingleNode(state,
                                                                     Alphas(6),
                                                                     ErrorsFound,
@@ -626,10 +628,15 @@ void GetAirPathData(EnergyPlusData &state)
         airLoopZoneInfo.ZoneEquipSupplyNodeNum.allocate(airLoopZoneInfo.NumSupplyNodes);
         airLoopZoneInfo.AirLoopSupplyNodeNum.allocate(airLoopZoneInfo.NumSupplyNodes);
         airLoopZoneInfo.SupplyDuctType.allocate(airLoopZoneInfo.NumSupplyNodes);
+        airLoopZoneInfo.SupplyDuctBranchNum.allocate(airLoopZoneInfo.NumSupplyNodes);
+        airLoopZoneInfo.SupplyAirPathNum.allocate(airLoopZoneInfo.NumSupplyNodes);
+
         // Fill the supply node arrays with node numbers
         for (I = 1; I <= airLoopZoneInfo.NumSupplyNodes; ++I) {
             airLoopZoneInfo.ZoneEquipSupplyNodeNum(I) = NodeNums(I);
             airLoopZoneInfo.SupplyDuctType(I) = DataHVACGlobals::AirDuctType::Invalid;
+            airLoopZoneInfo.SupplyDuctBranchNum(I) = 0;
+            airLoopZoneInfo.SupplyAirPathNum(I) = 0;
         }
         ErrInList = false;
         GetNodeNums(state,
@@ -979,7 +986,7 @@ void GetAirPathData(EnergyPlusData &state)
                 primaryAirSystems.Mixer.BranchNumIn(NodeNum) = 0;
                 for (BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
 
-                    if (primaryAirSystems.Branch(BranchNum).NodeNumIn == primaryAirSystems.Mixer.NodeNumIn(NodeNum)) {
+                    if (primaryAirSystems.Branch(BranchNum).NodeNumOut == primaryAirSystems.Mixer.NodeNumIn(NodeNum)) {
                         primaryAirSystems.Mixer.BranchNumIn(NodeNum) = BranchNum;
                         break;
                     }
@@ -1483,8 +1490,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             }
             EPVector<int> supNode;
             EPVector<DataZoneEquipment::AirNodeType> supNodeType;
+            EPVector<int> supNodeCompNum;
             supNode.allocate(NumAllSupAirPathNodes);
             supNodeType.allocate(NumAllSupAirPathNodes);
+            supNodeCompNum.allocate(NumAllSupAirPathNodes);
 
             // figure out the order of the splitter and plenum in the path, by flagging the first node of the component
             // as either a 'pathinlet' or a 'compinlet'
@@ -1494,6 +1503,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 if (SplitterNum > 0) {
                     ++SupAirPathNodeNum;
                     supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode;
+                    supNodeCompNum(SupAirPathNodeNum) = CompNum;
                     if (CompNum == 1) {
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
@@ -1503,11 +1513,13 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                          ++SplitterOutNum) {
                         ++SupAirPathNodeNum;
                         supNode(SupAirPathNodeNum) = state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(SplitterOutNum);
+                        supNodeCompNum(SupAirPathNodeNum) = CompNum;
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 } else if (PlenumNum > 0) {
                     ++SupAirPathNodeNum;
                     supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).InletNode;
+                    supNodeCompNum(SupAirPathNodeNum) = CompNum;
                     if (CompNum == 1) {
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::PathInlet;
                     } else {
@@ -1516,6 +1528,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     for (int PlenumOutNum = 1; PlenumOutNum <= state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).NumOutletNodes; ++PlenumOutNum) {
                         ++SupAirPathNodeNum;
                         supNode(SupAirPathNodeNum) = state.dataZonePlenum->ZoneSupPlenCond(PlenumNum).OutletNode(PlenumOutNum);
+                        supNodeCompNum(SupAirPathNodeNum) = CompNum;
                         supNodeType(SupAirPathNodeNum) = DataZoneEquipment::AirNodeType::Invalid;
                     }
                 }
@@ -1547,7 +1560,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             //  eliminate the duplicates to find the number of nodes in the supply air path
             NumSupAirPathNodes = NumAllSupAirPathNodes - NumSupAirPathIntNodes;
             SupAirPathNodeNum = 0;
+            
             state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode.allocate(NumSupAirPathOutNodes);
+            state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNodeSupplyPathCompNum.allocate(NumSupAirPathOutNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).Node.allocate(NumSupAirPathNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).NodeType.allocate(NumSupAirPathNodes);
             state.dataZoneEquip->SupplyAirPath(SupAirPath).NumNodes = NumSupAirPathNodes;
@@ -1604,6 +1619,8 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 int ZoneSideNodeNum = thisAirToZoneNodeInfo.ZoneEquipSupplyNodeNum(OutNum);
                 // find the corresponding branch number
                 int OutBranchNum = thisPrimaryAirSys.OutletBranchNum[OutNum - 1];
+                thisAirToZoneNodeInfo.SupplyDuctBranchNum(OutNum) = OutBranchNum;
+
                 // find the supply air path corresponding to each air loop outlet node
                 int SupAirPathNum = 0;
                 // loop over the air loop's output nodes
@@ -1614,8 +1631,10 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     }
                 }
                 int NumSupAirPathOutNodes = 0;
+                thisAirToZoneNodeInfo.SupplyAirPathNum(OutNum) = SupAirPathNum;
                 if (SupAirPathNum > 0) {
                     NumSupAirPathOutNodes = state.dataZoneEquip->SupplyAirPath(SupAirPathNum).NumOutletNodes;
+
                 }
 
                 // Now Loop over the Supply Air Path outlet nodes and find out which zone and which air terminal
@@ -2302,6 +2321,7 @@ void ConnectReturnNodes(EnergyPlusData &state)
                     if (AirToZoneNodeInfo(sysNum).NumReturnNodes > 0) {
                         if (thisRetPath.OutletNodeNum == AirToZoneNodeInfo(sysNum).ZoneEquipReturnNodeNum(1)) {
                             airLoopNum = sysNum;
+                            AirToZoneNodeInfo(sysNum).ReturnAirPathNum(1) = retPathNum;
                             break;
                         }
                     }
@@ -5246,21 +5266,18 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 // sum up the system mass flow rate for this time step
                 Real64 adjCoolFlowSeq =
                     termUnitSizing.applyTermUnitSizingCoolFlow(zoneSizing.CoolFlowSeq(TimeStepInDay), zoneSizing.CoolFlowSeqNoOA(TimeStepInDay));
-                state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) +=
-                    adjCoolFlowSeq / (1.0 + termUnitSizing.InducRat);
+                Real64 adjustedFlow = adjCoolFlowSeq / (1.0 + termUnitSizing.InducRat);
+                state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).CoolFlowSeq(TimeStepInDay) += adjustedFlow;
                 // sum up the zone cooling load to be met by this system for this time step
                 state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum).SumZoneCoolLoadSeq(TimeStepInDay) +=
-                    zoneSizing.CoolLoadSeq(TimeStepInDay);
+                    termUnitSizing.applyTermUnitSizingCoolLoad(zoneSizing.CoolLoadSeq(TimeStepInDay));
                 // calculate the return air temperature for this time step
-                SysCoolRetTemp +=
-                    zoneSizing.CoolZoneRetTempSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                SysCoolRetHumRat +=
-                    zoneSizing.CoolZoneHumRatSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                SysCoolZoneAvgTemp +=
-                    zoneSizing.CoolZoneTempSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                SysDOASHeatAdd += zoneSizing.DOASHeatAddSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                SysDOASLatAdd += zoneSizing.DOASLatAddSeq(TimeStepInDay) * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                SysLatCoolHumRat += zoneSizing.CoolDesHumRat * zoneSizing.CoolFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                SysCoolRetTemp += zoneSizing.CoolZoneRetTempSeq(TimeStepInDay) * adjustedFlow;
+                SysCoolRetHumRat += zoneSizing.CoolZoneHumRatSeq(TimeStepInDay) * adjustedFlow;
+                SysCoolZoneAvgTemp += zoneSizing.CoolZoneTempSeq(TimeStepInDay) * adjustedFlow;
+                SysDOASHeatAdd += zoneSizing.DOASHeatAddSeq(TimeStepInDay) * adjustedFlow;
+                SysDOASLatAdd += zoneSizing.DOASLatAddSeq(TimeStepInDay) * adjustedFlow;
+                SysLatCoolHumRat += zoneSizing.CoolDesHumRat * adjustedFlow;
             } // end of loop over zones cooled by central system
             // Get peak system cooling load with coincident
             auto &sysSizing = state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum);
@@ -5380,16 +5397,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     // sum up the heating mass flow rate for this time step
                     Real64 adjHeatFlowSeq =
                         termUnitSizing.applyTermUnitSizingHeatFlow(zoneSizing.HeatFlowSeq(TimeStepInDay), zoneSizing.HeatFlowSeqNoOA(TimeStepInDay));
-                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
+                    Real64 adjustedFlow = adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
+                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjustedFlow;
                     // sum up the zone heating load to be met by this system for this time step
-                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) += zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) +=
+                        termUnitSizing.applyTermUnitSizingHeatLoad(zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat));
                     // calculate the return air temperature for this time step
-                    SysHeatRetTemp +=
-                        zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                    SysHeatRetHumRat +=
-                        zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                    SysHeatZoneAvgTemp +=
-                        zoneSizing.HeatZoneTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetTemp += zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * adjustedFlow;
+                    SysHeatRetHumRat += zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * adjustedFlow;
+                    SysHeatZoneAvgTemp += zoneSizing.HeatZoneTempSeq(TimeStepInDay) * adjustedFlow;
                 } // end heated zones loop
                 // Get peak system heating load with coincident
                 if (abs(sysSizing.SysDesHeatLoad) > abs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {
@@ -5466,16 +5482,15 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                     // sum up the heating mass flow rate for this time step
                     Real64 adjHeatFlowSeq =
                         termUnitSizing.applyTermUnitSizingHeatFlow(zoneSizing.HeatFlowSeq(TimeStepInDay), zoneSizing.HeatFlowSeqNoOA(TimeStepInDay));
-                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
+                    Real64 adjustedFlow = adjHeatFlowSeq / (1.0 + termUnitSizing.InducRat);
+                    sysSizing.HeatFlowSeq(TimeStepInDay) += adjustedFlow;
                     // sum up the zone heating load to be met by this system for this time step
-                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) += zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    sysSizing.SumZoneHeatLoadSeq(TimeStepInDay) +=
+                        termUnitSizing.applyTermUnitSizingHeatLoad(zoneSizing.HeatLoadSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat));
                     // calculate the return air temperature for this time step
-                    SysHeatRetTemp +=
-                        zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                    SysHeatRetHumRat +=
-                        zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
-                    SysHeatZoneAvgTemp +=
-                        zoneSizing.HeatZoneTempSeq(TimeStepInDay) * zoneSizing.HeatFlowSeq(TimeStepInDay) / (1.0 + termUnitSizing.InducRat);
+                    SysHeatRetTemp += zoneSizing.HeatZoneRetTempSeq(TimeStepInDay) * adjustedFlow;
+                    SysHeatRetHumRat += zoneSizing.HeatZoneHumRatSeq(TimeStepInDay) * adjustedFlow;
+                    SysHeatZoneAvgTemp += zoneSizing.HeatZoneTempSeq(TimeStepInDay) * adjustedFlow;
                 } // end of cooled zones loop
                 // Get peak system heating load with coincident
                 if (fabs(sysSizing.SysDesHeatLoad) < fabs(sysSizing.SumZoneHeatLoadSeq(TimeStepInDay))) {

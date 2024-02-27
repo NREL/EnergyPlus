@@ -16006,7 +16006,9 @@ namespace UnitarySystems {
                         thisOASysEqSizing.HeatingCapacity = false;
                         this->m_FirstPass = false;
                     } else if (state.dataSize->CurSysNum > 0) {
-                        state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
+                        if (state.dataSize->CurSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+                            state.dataAirLoop->AirLoopControlInfo(state.dataSize->CurSysNum).UnitarySysSimulating = false;
+                        }
                         DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);
                     } else if (state.dataSize->CurZoneEqNum > 0) {
                         DataSizing::resetHVACSizingGlobals(state, state.dataSize->CurZoneEqNum, state.dataSize->CurSysNum, this->m_FirstPass);

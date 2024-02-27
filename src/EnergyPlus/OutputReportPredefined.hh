@@ -886,36 +886,46 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdrTopology = 0;
 
     int pdstTopAirLoop = 0;
-    int pdchTopAirSide = 0;
-    int pdchTopAirParType = 0;
-    int pdchTopAirParName = 0;
+    int pdchTopAirLoopName = 0;
+    int pdchTopAirUpSplitMixName = 0;
+    int pdchTopAirBranchName = 0;
     int pdchTopAirCompType = 0;
     int pdchTopAirCompName = 0;
-    int pdchTopAirConType = 0;
+    int pdchTopAirSubCompType = 0;
+    int pdchTopAirSubCompName = 0;
+    int pdchTopAirSubSubCompType = 0;
+    int pdchTopAirSubSubCompName = 0;
+    int pdchTopAirDownSplitMixName = 0;
 
-    int pdstTopZnEqpLoop = 0;
-    int pdchTopZnEqpSide = 0;
-    int pdchTopZnEqpParType = 0;
-    int pdchTopZnEqpParName = 0;
+    int pdstTopAirDemand = 0;
+    int pdchTopAirDemandName = 0;
+    int pdchTopAirSupplyBranchName = 0;
+    int pdchTopAirSupplyDuctType = 0;
+    int pdchTopAirSupplyPCompType = 0;
+    int pdchTopAirSupplyPCompName = 0;
+    int pdchTopAirZoneName = 0;
+    int pdchTopAirTermUnitType = 0;
+    int pdchTopAirTermUnitName = 0;
+    int pdchTopAirReturnPCompType = 0;
+    int pdchTopAirReturnPCompName = 0;
+
+    int pdstTopZnEqp = 0;
+    int pdchTopZnEqpName = 0;
     int pdchTopZnEqpCompType = 0;
     int pdchTopZnEqpCompName = 0;
-    int pdchTopZnEqpConType = 0;
+    int pdchTopZnEqpSubCompType = 0;
+    int pdchTopZnEqpSubCompName = 0;
+    int pdchTopZnEqpSubSubCompType = 0;
+    int pdchTopZnEqpSubSubCompName = 0;
 
-    int pdstTopPlantLoop = 0;
-    int pdchTopPlantSide = 0;
-    int pdchTopPlantParType = 0;
-    int pdchTopPlantParName = 0;
-    int pdchTopPlantCompType = 0;
-    int pdchTopPlantCompName = 0;
-    int pdchTopPlantConType = 0;
-
-    int pdstTopCondLoop = 0;
-    int pdchTopCondSide = 0;
-    int pdchTopCondParType = 0;
-    int pdchTopCondParName = 0;
-    int pdchTopCondCompType = 0;
-    int pdchTopCondCompName = 0;
-    int pdchTopCondConType = 0;
+    int pdstTopPlantLoop2 = 0;
+    int pdchTopPlantLoopType2 = 0;
+    int pdchTopPlantLoopName2 = 0;
+    int pdchTopPlantSide2 = 0;
+    int pdchTopPlantSplitMixName2 = 0;
+    int pdchTopPlantBranchName2 = 0;
+    int pdchTopPlantCompType2 = 0;
+    int pdchTopPlantCompName2 = 0;
 
     // Outdoor Air Report
     int pdrOutsideAir = 0;
