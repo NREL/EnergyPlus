@@ -636,7 +636,17 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
     } else {
         this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
     }
-    
+
+    // cap the HR outlet temperature
+    if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
+        this->heatRecoveryOutletTemp = this->maxHeatRecoveryTempLimit;
+        if (this->heatRecoveryInletTemp > this->maxHeatRecoveryTempLimit) {
+            this->heatRecoveryRate = 0.0;
+        } else {
+            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
+        }
+        
+    }
 }
 
 void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
