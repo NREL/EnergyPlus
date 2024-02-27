@@ -1,0 +1,47 @@
+name: Build wheels
+
+on:
+  # push:
+  #  branches:
+  #    - develop
+  #    - wheel
+  #  tags:
+  #    - "*"
+
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'The branch, tag, or SHA for which to run (eg: v22.1.0 or develop)'
+        required: true
+
+jobs:
+  build_wheel:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9"]
+        os: [ubuntu-22.04, macos-13, windows-2019]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout EnergyPlus
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.ref }}
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: build wheels
+      run: |
+        pip install wheel
+        python setup.py bdist_wheel
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: energyplus-wheel-${{ matrix.os }}
+        path: ./dist
