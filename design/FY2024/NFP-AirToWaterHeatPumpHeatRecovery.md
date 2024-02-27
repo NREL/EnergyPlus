@@ -8,7 +8,7 @@ Air-To-Water Heat Pump Heat Recovery Mode
  - First draft: January 26, 2024
  - Modified Date: February 01, 2024
  - Added Design Document: February 13, 2024
- 
+ - Modified Date: February 27, 2024
 
 ## Justification for New Feature ##
 
@@ -44,7 +44,7 @@ The existing Air-to-Water Heat Pump model supports heat-only and cool-only mode 
      Existing objects: `HeatPump:PlantLoop:EIR:Cooling` and `HeatPump:PlantLoop:EIR:Heating`
 
 
-*(2) Adds four new input fields to support heat recovery operation mode for each HeatPump:PlantLoop:EIR:* object.
+*(2) Adds six new input fields to support heat recovery operation mode for each HeatPump:PlantLoop:EIR:* object.
 
      Adds new heat recovery fluid inlet and outlet nodes: 
      New input fields `Heat Recovery Inlet Node Name` and `Heat Recovery Outlet Node Name` will be added to the `HeatPump:PlantLoop:EIR:Cooling` object.
@@ -56,6 +56,10 @@ The existing Air-to-Water Heat Pump model supports heat-only and cool-only mode 
 	 Adds heat recovery fluid temperature limits:
      New input field `Maximum Heat Recovery Outlet Temperature` will be added to the `HeatPump:PlantLoop:EIR:Cooling` object.
 	 New input field `Minimum Heat Recovery Outlet Temperature` will be added to the `HeatPump:PlantLoop:EIR:Heating` object.
+
+     Adds heat recovery capacity and EIR modifier curves:
+	 New input field `Heat Recovery Capacity Modifier Function of Temperature Curve Name` will be added to the `HeatPump:PlantLoop:EIR:*` objects.
+	 New input field `Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name` will be added to the `HeatPump:PlantLoop:EIR:*` objects.
 
 		
 *(3) Adds new code that supports calculating the heat rate and outlet node fluid temperature of the heat recovery system
@@ -325,13 +329,32 @@ HeatPump:PlantLoop:EIR:Cooling,
         \object-list UniVariateFunctions
         \note quadratic curve = a + b*OAT is typical, other univariate curves may be used
         \note OAT = Outdoor Dry-Bulb Temperature
-   N12; \field Maximum Heat Recovery Outlet Temperature
+   N12, \field Maximum Heat Recovery Outlet Temperature
         \type real
         \units C
         \default 60.0
         \note Enter the maximum heat recovery leaving water temperature limit
         \note The hot water temperature is not allowed to exceed this value
 	    \note Not available with water source condenser type
+   A15, \field Heat Recovery Capacity Modifier Function of Temperature Curve Name
+        \note Cooling capacity modifier as a function of CW supply temp and condenser entering fluid temp
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) chilled water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+		\note If this field is blank, the AWHP curve without heat recovery will be used
+   A16; \field Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of temperature
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*CWS + c*CWS**2 + d*ECT + e*ECT**2 + f*CWS*ECT
+        \note CWS = supply (leaving) chilled water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+		\note If this field is blank, the AWHP curve without heat recovery will be used		
 
 ### Existing Object HeatPump:PlantLoop:EIR:Heating ###
 
@@ -554,15 +577,32 @@ HeatPump:PlantLoop:EIR:Heating,
         \note WB = wet-bulb temperature (C) of air entering the indoor coil
         \note Timed Empirical Defrost Heat Input Energy in watts = rated hot load * curve output
         \note only applicable if TimedEmpirical defrost control is specified
-   N13; \field Minimum Heat Recovery Outlet Temperature
+   N13, \field Minimum Heat Recovery Outlet Temperature
         \type real
         \units C
         \default 4.5
         \note Enter the minimum heat recovery leaving water temperature limit
         \note The chilled water temperature is not allowed to drop below this value
 	    \note Not available with water source condenser type
-
-	   
+   A24, \field Heat Recovery Capacity Modifier Function of Temperature Curve Name
+        \note Heating capacity modifier as a function of CW supply temp and entering condenser fluid temp
+        \required-field
+        \type object-list
+        \object-list BivariateFunctions
+        \note curve = a + b*HWS + c*HWS**2 + d*ECT + e*ECT**2 + f*HWS*ECT
+        \note HWS = supply (leaving) hot water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+   A25; \field Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name
+        \note Electric Input Ratio (EIR) modifier as a function of temperature
+        \note EIR = 1/COP
+        \required-field
+        \type object-list
+        \object-list BiVariateFunctions
+        \note curve = a + b*HWS + c*HWS**2 + d*ECT + e*ECT**2 + f*HWS*ECT
+        \note HWS = supply (leaving) hot water temperature(C)
+        \note ECT = entering condenser fluid temperature(C)
+		\note If this field is blank, the AWHP curve without heat recovery will be used	
+		
 ## Testing/Validation/Data Source(s): ##
 
 Demonstrate that the air-to-water heat pump object supports heat recovery mode simulation. Unit tests will be added to demonstrate the new feature.
@@ -598,6 +638,13 @@ This autosizable field defines the heat recovery reference flow rate for the hea
 
 This optional numeric field specifies the maximum leaving water temperature at the heat recovery outlet node. The hot water temperature is not allowed to exceed this value. The default value is 60. The units for this field are [C].
 
+\paragraph{Field: Heat Recovery Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_cooling_inputs_heat_recovery_capft}
+
+This field is the name of a bivariate curve or table that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the heat recovery side inlet temperature. The temperatures are in degrees Celsius when used in the function and the output of the function is multiplied by the reference capacity to get a current available capacity when the unit is operating in heat recovery mode.
+
+\paragraph{Field: Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{plhp_eir_cooling_inputs_heat_recovery_eirft}
+
+This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the heat recovery side inlet temperature. The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR when the unit is operating in heat recovery mode.
 		
 ### HeatPump:PlantLoop:EIR:Heating ##
 
@@ -626,6 +673,14 @@ This autosizable field defines the heat recovery reference flow rate for the hea
 
 This optional numeric field specifies the minimum leaving water temperature at the heat recovery outlet node. The chilled water temperature is not allowed to drop below this value. The default value is 4.5. The units for this field is [C].
 
+\paragraph{Field: Heat Recovery Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_heat_recovery_capft}
+
+This field is the name of a bivariate curve or table that defines an available capacity modifier of the unit as a function of the load side outlet temperature and the heat recovery side inlet temperature. The temperatures are in degrees Celsius when used in the function and the output of the function is multiplied by the reference capacity to get a current available capacity when the unit is operating in heat recovery mode.
+
+\paragraph{Field: Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_heat_recovery_eirft}
+
+This field is the name of a bivariate curve or table that defines an EIR (1/COP) modifier as a function of the load side outlet temperature and the heat recovery side inlet temperature. The temperatures are in degrees Celsius when used in the function. The output of this function and the output of the EIR Modifier Function of PLR are multiplied by the reference EIR to get a current EIR when the unit is operating in heat recovery mode.
+
 		
 ## Engineering Reference ##
 As needed.
@@ -634,7 +689,7 @@ As needed.
 
 A new example file will be created for the heat recovery mode of air-to-water heat pumps. Simulation results will be examined, and sample results will be provided.
 
-Transition is required to handle the two node input fields.
+Transition is required to handle the two nodes and the heat recovery reference flow rate input fields.
 
 ## Proposed Report Variables: ##
 
@@ -685,7 +740,7 @@ NA
 
 The new feature may modify the following modules:
 
-   ** PlantLoopHeatPumpEIR.cc, PlantLoopHeatPumpEIR.hh, PlantCondLoopOperation.cc **
+   ** PlantLoopHeatPumpEIR.cc, PlantLoopHeatPumpEIR.hh, EquiAndOperation.cc, PlantCondLoopOperation.cc **
    
    
 The following changes are required to implement the new feature
