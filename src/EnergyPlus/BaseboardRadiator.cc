@@ -438,7 +438,7 @@ namespace BaseboardRadiator {
                                 OutputProcessor::StoreType::Sum,
                                 thisBaseboard.EquipID,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::Group::HVAC, 
+                                OutputProcessor::Group::HVAC,
                                 OutputProcessor::EndUseCat::Baseboard);
 
             SetupOutputVariable(state,

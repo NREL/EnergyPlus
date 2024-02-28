@@ -299,8 +299,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                     EnergyPlus::ShowFatalError(state, "Input error on PythonPlugin:OutputVariable causes program termination");
                 }
                 std::string const groupType = EnergyPlus::Util::makeUPPER(fields.at("group_type").get<std::string>());
-                OutputProcessor::Group group =
-                    static_cast<OutputProcessor::Group>(getEnumValue(OutputProcessor::groupNamesUC, groupType));
+                OutputProcessor::Group group = static_cast<OutputProcessor::Group>(getEnumValue(OutputProcessor::groupNamesUC, groupType));
                 if (group == OutputProcessor::Group::Invalid) {
                     ShowSevereError(state, format("Invalid input for PythonPlugin:OutputVariable, unexpected Group Type = {}", groupType));
                     ShowFatalError(state, "Python plugin output variable input problem causes program termination");
@@ -327,8 +326,7 @@ void PluginManager::setupOutputVariables([[maybe_unused]] EnergyPlusData &state)
                 if ((resource != Constant::eResource::EnergyTransfer) &&
                     (endUseCat == OutputProcessor::EndUseCat::HeatingCoils || endUseCat == OutputProcessor::EndUseCat::CoolingCoils ||
                      endUseCat == OutputProcessor::EndUseCat::Chillers || endUseCat == OutputProcessor::EndUseCat::Boilers ||
-                     endUseCat == OutputProcessor::EndUseCat::Baseboard ||
-                     endUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
+                     endUseCat == OutputProcessor::EndUseCat::Baseboard || endUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
                      endUseCat == OutputProcessor::EndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("Inconsistent resource type input for PythonPlugin:OutputVariable = {}", thisObjectName));
                     ShowContinueError(state, format("For end use subcategory = {}, resource type must be EnergyTransfer", endUse));

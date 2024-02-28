@@ -389,7 +389,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_columnHeadersToTitleCase)
                         Constant::eResource::Electricity,
                         OutputProcessor::Group::Invalid,
                         OutputProcessor::EndUseCat::InteriorLights, // Was "Facility"
-                        "General");                                    // create an electric meter
+                        "General");                                 // create an electric meter
 
     Meter *meter1 = new Meter("Electricity:Facility");
     meter1->units = Constant::Units::None;
@@ -453,7 +453,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularAnnual_invalidAggregationOrder)
                         Constant::eResource::Electricity,
                         OutputProcessor::Group::Invalid,
                         OutputProcessor::EndUseCat::InteriorLights, // Was "Facility"
-                        "General");                                    // create an electric meter
+                        "General");                                 // create an electric meter
 
     Meter *meter1 = new Meter("ELECTRICITY:FACILITY");
     meter1->units = Constant::Units::None;

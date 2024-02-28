@@ -537,7 +537,7 @@ void GetPlantProfileInput(EnergyPlusData &state)
                                 OutputProcessor::StoreType::Sum,
                                 state.dataPlantLoadProfile->PlantProfile(ProfileNum).Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::Group::Plant, 
+                                OutputProcessor::Group::Plant,
                                 OutputProcessor::EndUseCat::Heating); // is EndUseKey right?
 
             SetupOutputVariable(state,

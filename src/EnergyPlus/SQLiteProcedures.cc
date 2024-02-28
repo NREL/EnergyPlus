@@ -1399,10 +1399,12 @@ void SQLite::createSQLiteReportDictionaryRecord(int const reportVariableReportID
         "HVAC System Timestep", "Zone Timestep", "Hourly", "Daily", "Monthly", "Run Period", "Annual"};
 
     static constexpr std::array<std::string_view, (int)OutputProcessor::StoreType::Num> storeTypeStrings = {// "Dummy",
-                                                                                                            "Avg", "Sum"};
+                                                                                                            "Avg",
+                                                                                                            "Sum"};
 
     static constexpr std::array<std::string_view, (int)OutputProcessor::TimeStepType::Num> timeStepTypeStrings = {// "Dummy",
-                                                                                                                  "Zone", "HVAC System"};
+                                                                                                                  "Zone",
+                                                                                                                  "HVAC System"};
 
     if (m_writeOutputToSQLite) {
         sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
