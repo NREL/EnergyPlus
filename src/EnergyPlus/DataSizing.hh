@@ -120,6 +120,7 @@ namespace DataSizing {
     // parameters for sizing
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
+    constexpr int Combination(3);
 
     // parameters for Cooling Peak Load Type
     enum class PeakLoad
@@ -654,6 +655,16 @@ namespace DataSizing {
         Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
                                            Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
+
+        Real64 applyTermUnitSizingCoolLoad(Real64 coolLoad) const
+        {
+            return coolLoad * this->SpecDesSensCoolingFrac; // Apply DesignSpecification:AirTerminal:Sizing to cooling load
+        }
+
+        Real64 applyTermUnitSizingHeatLoad(Real64 heatLoad) const
+        {
+            return heatLoad * this->SpecDesSensHeatingFrac; // Apply DesignSpecification:AirTerminal:Sizing to heating load
+        }
     };
 
     struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents

@@ -5076,12 +5076,12 @@ void ProduceRDDMDD(EnergyPlusData &state)
         std::string_view unitName = Constant::unitNames[(int)meter->units];
         if (op->ProduceReportVDD == ReportVDD::Yes) {
             print(state.files.mdd, "Zone,Meter,{} [{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Zone,Meter,{}, [{}]", meter->Name, unitName));
+            rf->MDD.push_back(format("Zone,Meter,{} [{}]", meter->Name, unitName));
         } else if (op->ProduceReportVDD == ReportVDD::IDF) {
             print(state.files.mdd, "Output:Meter,{},hourly; !- [{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Output:Meter,{}, [{}]", meter->Name, unitName));
+            rf->MDD.push_back(format("Output:Meter,{} [{}]", meter->Name, unitName));
             print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !- [{}]\n", meter->Name, unitName);
-            rf->MDD.push_back(format("Output:Meter:Cumulative,{}, [{}]", meter->Name, unitName));
+            rf->MDD.push_back(format("Output:Meter:Cumulative,{} [{}]", meter->Name, unitName));
         }
     }
     state.files.mdd.close();
