@@ -11865,7 +11865,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                      CompEvaporatingCAPSpdMaxCurrentTsuc,
                                      CompEvaporatingCAPSpdMin));
         }
-        if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc) {
+        if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc) {
             // this branch resolves the issue of supplemental heating coil turning on when compressor speed is not at the highest
             Q_c_OU = CompEvaporatingCAPSpdMaxCurrentTsuc;
             CompSpdActual = this->CompressorSpeed(NumOfCompSpdInput);
