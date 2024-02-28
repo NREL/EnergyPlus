@@ -14551,7 +14551,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     NumOfCompSpdInput = this->CompressorSpeed.size();
     CompEvaporatingPWRSpd.dimension(NumOfCompSpdInput);
     CompEvaporatingCAPSpd.dimension(NumOfCompSpdInput);
-    Q_evap_req = TU_load + Pipe_Q;
+    Q_evap_req = TU_load + Pipe_Q - Ncomp;
 
     TUListNum = this->ZoneTUListPtr;
     RefrigerantIndex = FindRefrigerant(state, this->RefrigerantName);
@@ -14580,7 +14580,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
         CompEvaporatingCAPSpd(CounterCompSpdTemp) =
             this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
 
-        if ((Q_evap_req * C_cap_operation) <= CompEvaporatingCAPSpd(CounterCompSpdTemp) + CompEvaporatingPWRSpd(CounterCompSpdTemp)) {
+        if ((Q_evap_req * C_cap_operation) <= CompEvaporatingCAPSpd(CounterCompSpdTemp)) {
             // Compressor Capacity is greater than the required, finish Iteration DoName2
 
             if (CounterCompSpdTemp > 1) {
@@ -14588,11 +14588,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 CompSpdLB = CounterCompSpdTemp - 1;
                 CompSpdUB = CounterCompSpdTemp;
 
-                CompSpdActual = this->CompressorSpeed(CompSpdLB) +
-                                (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
-                                    (CompEvaporatingCAPSpd(CompSpdUB) + CompEvaporatingPWRSpd(CompSpdUB) -
-                                     (CompEvaporatingCAPSpd(CompSpdLB) + CompEvaporatingPWRSpd(CompSpdLB))) *
-                                    (Q_evap_req * C_cap_operation - (CompEvaporatingCAPSpd(CompSpdLB) + CompEvaporatingPWRSpd(CompSpdLB)));
+                CompSpdActual = this->CompressorSpeed(CompSpdLB) + (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) /
+                                                                       (CompEvaporatingCAPSpd(CompSpdUB) - CompEvaporatingCAPSpd(CompSpdLB)) *
+                                                                       (Q_evap_req * C_cap_operation - CompEvaporatingCAPSpd(CompSpdLB));
                 Modifi_SH = this->SH;
                 Ncomp = CompEvaporatingPWRSpd(CompSpdLB) + (CompEvaporatingPWRSpd(CompSpdUB) - CompEvaporatingPWRSpd(CompSpdLB)) /
                                                                (this->CompressorSpeed(CompSpdUB) - this->CompressorSpeed(CompSpdLB)) *
