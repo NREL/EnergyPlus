@@ -15,7 +15,7 @@ Decarbonization efforts to electrify buildings has led to use of less common eff
 ## Overview ##
 
 ### Chiller refrigerant migration ###
-Involves using cold condenser inlet fluid temperature (colder than the evaporator water temperature) to force refrigerant migration without the need to energize the compressor. This may include special refrigerant circuits or valves to ensure proper refrigerant flow. Studies have shown up to 40% of chiller capacity is available using this technique. An empirical model that requires no knowledge of the refrigerant type or chiller configuration is to use a mathematical representation of the fraction of available chiller capacity when this operating mode is viable (i.e., lower condenser inlet temperature with respect to the chilled water set point temperature). This empirical model uses an assumption of 10 C (50 F) maximum outdoor air wet-bulb temperature for a water-cooled chiller (left figure). A more generic model would use the temperature difference between the evaporator leaving water temperature set point and the entering condenser inlet temperature (right figure).
+Involves using cold condenser inlet fluid temperature (colder than the evaporator water temperature) to force refrigerant migration without the need to energize the compressor (1). This may include special refrigerant circuits or valves to ensure proper refrigerant flow. Studies have shown up to 40% of chiller capacity is available using this technique. An empirical model that requires no knowledge of the refrigerant type or chiller configuration is to use a mathematical representation of the fraction of available chiller capacity when this operating mode is viable (i.e., lower condenser inlet temperature with respect to the chilled water set point temperature). This empirical model uses an assumption of 10 C (50 F) maximum outdoor air wet-bulb temperature for a water-cooled chiller (left figure). A more generic model would use the temperature difference between the evaporator leaving water temperature set point and the entering condenser inlet temperature (right figure).
 
 <img src="Operating-envelope-refrigerant-migration.png" alt="Operating envelope and conditions for refrigerant migration" width="900px">
 </img>
@@ -64,7 +64,7 @@ Free cooling from air-cooled chillers typically happens through air-side economi
 
 ### Integrated water-side economizer with air-cooled chiller ###
 
-Integrated water-side economizer with air-cooled chillers is likely possible with existing objects with minor additions to control of the water flow through the WWHX (HeatExchanger:FluidToFluid). One side of the WWHX would be connected to the supply side inlet node of the chiller evaporator (or other appropriate branch in the plant, i.e., precool entire plant loop) while the other side of the WWHX would be connected to a demand side branch of the condenser loop. Activation of the condenser loop flow through the HX, to active free cooling, would be accomplished through controls modification. The WWHX object already has inputs for Control Type, Heat Exchanger Setpoint Node Name, Minimum Temperature Difference to Activate Heat Exchanger, Operation Minimum Temperature Limit, and Operation Maximum Temperature Limit. I am unsure at this time which of these fields would be used for configuration as an integrated water-side economizer or if other inputs would be required. It may be as simple as adding a new Control Type = IntegratedWaterSideEconomizer to allow the proper controls. Investigation into the new control will include review of the Component Override Loop inputs (e.g., using chiller evaporator inlet node temperature as a control point).
+Integrated water-side economizer with air-cooled chillers is likely possible with existing objects with minor additions to control of the water flow through the WWHX (HeatExchanger:FluidToFluid). One side of the WWHX would be connected to the supply side inlet node of the chiller evaporator (or other appropriate branch in the plant, i.e., precool entire plant loop) while the other side of the WWHX would be connected to a demand side branch of the condenser loop. Activation of the condenser loop flow through the HX, to active free cooling, would be accomplished through controls modification (2). The WWHX object already has inputs for Control Type, Heat Exchanger Setpoint Node Name, Minimum Temperature Difference to Activate Heat Exchanger, Operation Minimum Temperature Limit, and Operation Maximum Temperature Limit. I am unsure at this time which of these fields would be used for configuration as an integrated water-side economizer or if other inputs would be required. It may be as simple as adding a new Control Type = IntegratedWaterSideEconomizer to allow the proper controls. Investigation into the new control will include review of the Component Override Loop inputs (e.g., using chiller evaporator inlet node temperature as a control point).
 
 <img src="IntegratedWaterSideEconomizer.png" alt="Integrated Water-Side Economizer" width="900px">
 </img>
@@ -184,3 +184,10 @@ if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this-Dem
  
 ## References
 
+1) Trane Engineers Newsletter 37-3 "free" cooling using
+Water Economizers
+<https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/education-training/engineers-newsletters/waterside-design/admapn029en_0808.pdf>
+
+2) Trane Engineers Newsletter 45-2 waterside economizers
+Keeping the "Free" In Free-Cooling
+<https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/education-training/engineers-newsletters/waterside-design/ADM-APN058-EN_06012016.pdf>
