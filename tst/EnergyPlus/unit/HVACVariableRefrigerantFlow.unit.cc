@@ -2570,7 +2570,6 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         Real64 Ncomp = 1058;                // Compressor power [W]
         Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
-        Real64 CyclingRatio = 1.0;
         // Run
         state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
                                                                 TU_load,
@@ -2583,8 +2582,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
                                                                 Pipe_Q,
                                                                 OUEvapHeatExtract,
                                                                 CompSpdActual,
-                                                                Ncomp,
-                                                                CyclingRatio);
+                                                                Ncomp);
 
         // Test
         EXPECT_NEAR(5110, OUEvapHeatExtract, 1);

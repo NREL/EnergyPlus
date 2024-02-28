@@ -11856,61 +11856,80 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                                    CapMinTe + 8,
                                                    this->IUCondensingTemp - 5);
 
-        // Required heating load is greater than or equal to the min heating capacity
+        if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
+            // Required heating load is smaller than the min heating capacity
 
-        // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
-        Counter = 1;
-    Label20:;
-        Ncomp_new = Ncomp;
-        Q_c_OU = max(0.0, Q_h_TU_PL - Ncomp);
+            if (Q_c_OU == 0) {
+                // Q_h_TU_PL is less than or equal to CompEvaporatingPWRSpdMin
+                CyclingRatio = Q_h_TU_PL / CompEvaporatingPWRSpdMin;
+                this->EvaporatingTemp = OutdoorDryBulb;
+            } else {
+                // Q_h_TU_PL is greater than CompEvaporatingPWRSpdMin
+                CyclingRatio = Q_c_OU * C_cap_operation / CompEvaporatingCAPSpdMin;
+                this->EvaporatingTemp = max(CapMinTe, RefTLow);
+            }
 
-        // *VRF OU Te calculations
-        m_air = this->OUAirFlowRate * RhoAir;
-        SH_OU = this->SH;
-        this->VRFOU_TeTc(state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
-        this->SH = SH_OU;
+            double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
+            double HPRTF = CyclingRatio / CyclingRatioFrac;
+            Ncomp = CompEvaporatingPWRSpdMin * HPRTF;
+            CompSpdActual = this->CompressorSpeed(1);
 
-        Real64 CyclingRatio = 1.0;
-        // *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
-        this->VRFOU_CalcCompH(state,
-                              TU_HeatingLoad,
-                              this->EvaporatingTemp,
-                              Tdischarge,
-                              h_IU_cond_out_ave,
-                              this->IUCondensingTemp,
-                              CapMinTe,
-                              Tfs,
-                              Pipe_Q_h,
-                              Q_c_OU,
-                              CompSpdActual,
-                              Ncomp_new,
-                              CyclingRatio);
+        } else {
+            // Required heating load is greater than or equal to the min heating capacity
 
-        if ((std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
+            // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
+            Counter = 1;
+        Label20:;
+            Ncomp_new = Ncomp;
+            Q_c_OU = max(0.0, Q_h_TU_PL - Ncomp);
+
+            // *VRF OU Te calculations
+            m_air = this->OUAirFlowRate * RhoAir;
+            SH_OU = this->SH;
+            this->VRFOU_TeTc(
+                state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
+            this->SH = SH_OU;
+
+            // *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
+            this->VRFOU_CalcCompH(state,
+                                  TU_HeatingLoad,
+                                  this->EvaporatingTemp,
+                                  Tdischarge,
+                                  h_IU_cond_out_ave,
+                                  this->IUCondensingTemp,
+                                  CapMinTe,
+                                  Tfs,
+                                  Pipe_Q_h,
+                                  Q_c_OU,
+                                  CompSpdActual,
+                                  Ncomp_new);
+
+            if ((std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
+                Ncomp = Ncomp_new;
+                Counter = Counter + 1;
+                goto Label20;
+            }
+
+            // Update h_comp_out in iteration Label23
+            P_comp_in = GetSatPressureRefrig(state, this->RefrigerantName, this->EvaporatingTemp, RefrigerantIndex, RoutineName);
+            RefTSat = GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(P_comp_in, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+            h_comp_in_new = GetSupHeatEnthalpyRefrig(state,
+                                                     this->RefrigerantName,
+                                                     max(RefTSat, this->SH + this->EvaporatingTemp),
+                                                     max(min(P_comp_in, RefPHigh), RefPLow),
+                                                     RefrigerantIndex,
+                                                     RoutineName);
+            h_comp_out_new = Ncomp_new / m_ref_IU_cond + h_comp_in_new;
+
+            if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
+                h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
+                goto Label23;
+            }
+            if (h_IU_cond_in > h_IU_cond_in_up) {
+                h_IU_cond_in = 0.5 * (h_IU_cond_in_up + h_IU_cond_in_low);
+            }
             Ncomp = Ncomp_new;
-            Counter = Counter + 1;
-            goto Label20;
         }
-
-        // Update h_comp_out in iteration Label23
-        P_comp_in = GetSatPressureRefrig(state, this->RefrigerantName, this->EvaporatingTemp, RefrigerantIndex, RoutineName);
-        RefTSat = GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(P_comp_in, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-        h_comp_in_new = GetSupHeatEnthalpyRefrig(state,
-                                                 this->RefrigerantName,
-                                                 max(RefTSat, this->SH + this->EvaporatingTemp),
-                                                 max(min(P_comp_in, RefPHigh), RefPLow),
-                                                 RefrigerantIndex,
-                                                 RoutineName);
-        h_comp_out_new = Ncomp_new / m_ref_IU_cond + h_comp_in_new;
-
-        if ((std::abs(h_comp_out - h_comp_out_new) > Tolerance * h_comp_out) && (h_IU_cond_in < h_IU_cond_in_up)) {
-            h_IU_cond_in = h_IU_cond_in + 0.1 * (h_IU_cond_in_up - h_IU_cond_in_low);
-            goto Label23;
-        }
-        if (h_IU_cond_in > h_IU_cond_in_up) {
-            h_IU_cond_in = 0.5 * (h_IU_cond_in_up + h_IU_cond_in_low);
-        }
-        Ncomp = Ncomp_new;
 
         // Key outputs of this subroutine
         this->CompActSpeed = max(CompSpdActual, 0.0);
@@ -14468,8 +14487,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 Pipe_Q,             // Piping Loss Algorithm Parameter: Heat loss [W]
     Real64 &OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
     Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-    Real64 &Ncomp,             // Compressor power [W]
-    Real64 &CyclingRatio       // Compressor cycling ratio
+    Real64 &Ncomp              // Compressor power [W]
 )
 {
 
@@ -14633,13 +14651,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     NumIteCcap = NumIteCcap + 1;
                     goto Label19;
                 }
-                if (CapDiff > (Tolerance * Cap_Eva0)) {
-                    NumIteCcap = 999;
-                    CyclingRatio = (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1;
-                }
+                if (CapDiff > (Tolerance * Cap_Eva0)) NumIteCcap = 999;
 
-                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
-                OUEvapHeatExtract = CompEvaporatingCAPSpd(1) * CyclingRatio;
+                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
 
                 break; // EXIT DoName2
 

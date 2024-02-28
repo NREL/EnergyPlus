@@ -530,8 +530,7 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 Pipe_Q,             // Piping Loss Algorithm Parameter: Heat loss [W]
                         Real64 &OUEvapHeatExtract, // Condenser heat release (cooling mode) [W]
                         Real64 &CompSpdActual,     // Actual compressor running speed [rps]
-                        Real64 &Ncomp,             // Compressor power [W]
-                        Real64 &CyclingRatio       // Compressor cycling ratio
+                        Real64 &Ncomp              // Compressor power [W]
         );
 
         void VRFHR_OU_HR_Mode(EnergyPlusData &state,
