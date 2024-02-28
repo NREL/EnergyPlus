@@ -5023,20 +5023,21 @@ void fillZoneEquipToplogyComponentRow(
 
 void reportAirDistributionUnits(EnergyPlusData &state)
 {
+    // populate the predefined tabular report for Equipment Summary - Air Terminals
+
     auto &orp = state.dataOutRptPredefined;
-    for (auto &adu : state.dataDefineEquipment->AirDistUnit) 
-    {
+    for (auto &adu : state.dataDefineEquipment->AirDistUnit) {
         auto &at = adu.airTerminalPtr;
         const int aduCompNum = 1;
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTempCntl, adu.Name, adu.EquipName(aduCompNum));
-        OutputReportPredefined::PreDefTableEntry(
-            state, orp->pdchAirTermZoneName, adu.Name, state.dataHeatBal->Zone(adu.ZoneNum).Name);
-        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, adu.EquipType(aduCompNum));
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermZoneName, adu.Name, state.dataHeatBal->Zone(adu.ZoneNum).Name);
+        // OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermTypeInp, adu.Name, adu.EquipType(aduCompNum));
 
         if (adu.TermUnitSizingNum > 0) {
             OutputReportPredefined::PreDefTableEntry(
-                state, orp->pdchAirTermMinFlow, adu.Name, state.dataSize->TermUnitSizing(adu.TermUnitSizingNum).AirVolFlow);
+                state, orp->pdchAirTermPrimFlow, adu.Name, state.dataSize->TermUnitSizing(adu.TermUnitSizingNum).AirVolFlow);
         }
+        auto &sd = state.dataSingleDuct->sd_airterminal(adu.EquipIndex(aduCompNum));
 
         switch (adu.EquipTypeEnum(aduCompNum)) {
         case DataDefineEquip::ZnAirLoopEquipType::DualDuctConstVolume:
@@ -5048,6 +5049,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVNoReheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheatVSFan:
+            sd.reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat:
@@ -5066,8 +5068,6 @@ void reportAirDistributionUnits(EnergyPlusData &state)
         default:
             break;
         } // end switch
-
-
     }
 }
 
