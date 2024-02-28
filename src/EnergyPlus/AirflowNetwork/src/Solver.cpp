@@ -10302,7 +10302,11 @@ namespace AirflowNetwork {
                         ErrorsFound = true;
                     } else {
                         NodeFound(i) = true;
-                        AirflowNetworkNodeData(zoneNum).EPlusNodeNum = i;
+                        for (int iZone = 1; iZone <= AirflowNetworkNumOfZones; iZone++) {
+                            if (MultizoneZoneData(iZone).ZoneNum == zoneNum) {
+                                AirflowNetworkNodeData(iZone).EPlusNodeNum = i;
+                            }
+                        }
                     }
                     break;
                 }
@@ -10626,7 +10630,22 @@ namespace AirflowNetwork {
                     } else {
                         SetDXCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum);
                     }
-
+                } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC:MULTISTAGE") {
+                    ValidateComponent(
+                        m_state, "Coil:Heating:Electric:MultiStage", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        SetHeatingCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                    }
+                } else if (SELECT_CASE_var == "COIL:HEATING:GAS:MULTISTAGE") {
+                    ValidateComponent(
+                        m_state, "Coil:Heating:Gas:MultiStage", DisSysCompCoilData(i).name, IsNotOK, format(RoutineName) + CurrentModuleObject);
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        SetHeatingCoilAirLoopNumber(m_state, DisSysCompCoilData(i).name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                    }
                 } else {
                     ShowSevereError(m_state, format(RoutineName) + CurrentModuleObject + " Invalid coil type = " + DisSysCompCoilData(i).name);
                     ErrorsFound = true;

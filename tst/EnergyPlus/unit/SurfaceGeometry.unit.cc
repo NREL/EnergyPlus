@@ -5097,7 +5097,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
         "   ** Warning ** GlobalGeometryRules: Potential mismatch of coordinate specifications. Note that the rectangular surfaces are relying on "
         "the default SurfaceGeometry for 'Relative to zone' coordinate.",
         "   **   ~~~   ** Coordinate System=\"WORLD\"; while ",
-        "   **   ~~~   ** Rectangular Surface Coordinate System=\"defaults to RELATIVE\".",
+        "   **   ~~~   ** Rectangular Surface Coordinate System=\"RELATIVE\".",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }

@@ -526,7 +526,7 @@ void DXFOut(EnergyPlusData &state,
     print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerStringVar);
 
     if (PolygonAction.empty()) {
-        print(dxffile, Format_708, "Polygon Action", ",", "ThickPolyline");
+        print(dxffile, Format_708, "Polygon Action", ",", "Triangulate3DFace");
     } else {
         print(dxffile, Format_708, "Polygon Action", ",", PolygonAction);
     }

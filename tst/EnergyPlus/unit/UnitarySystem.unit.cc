@@ -617,6 +617,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -847,6 +848,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
     fanDT = thisSys->getFanDeltaTemp(*state, true, 0.5, 0.5);
     EXPECT_NEAR(fanDT, 0.7070, 0.0001);
+    EXPECT_TRUE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
 {
@@ -892,6 +894,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0;                           !- Maximum Supply Air Temperature{ C }
         Fan:OnOff,
           Supply Fan 1,                   !- Name
@@ -1066,6 +1069,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     EXPECT_NEAR(state->dataLoopNodes->Node(2).Temp, state->dataLoopNodes->Node(2).TempSetPoint, 0.001);
     // cooling coil air inlet node temp is greater than cooling coil air outlet node temp
     EXPECT_GT(state->dataLoopNodes->Node(3).Temp, state->dataLoopNodes->Node(2).Temp);
+    EXPECT_TRUE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 
 TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
@@ -1112,6 +1116,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -1470,6 +1475,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -1702,6 +1708,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -1948,6 +1955,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
           ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
           ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+          ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
           80.0,                           !- Maximum Supply Air Temperature{ C }
           ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
           ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -2279,6 +2287,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -2566,6 +2575,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -2811,6 +2821,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -3082,6 +3093,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -3278,6 +3290,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -3519,6 +3532,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed
   35.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -4189,6 +4203,7 @@ AirLoopHVAC:UnitarySystem,
   ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
   25.0;                    !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -4623,6 +4638,7 @@ AirLoopHVAC:UnitarySystem,
   ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
   25.0;                    !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -5833,6 +5849,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed"
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -6314,6 +6331,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -6712,6 +6730,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -7207,6 +7226,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -7706,6 +7726,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                     !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
   ,                       !- Outdoor Dry - Bulb Temperature Sensor Node Name
@@ -7888,6 +7909,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                     !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }
   ,                       !- Outdoor Dry - Bulb Temperature Sensor Node Name
@@ -8191,6 +8213,7 @@ AirLoopHVAC:UnitarySystem,
   ,                                                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
   ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
   ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+  ,                                                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
   Autosize,                                                !- Maximum Supply Air Temperature {C}
   21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                                                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -8587,6 +8610,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -9414,6 +9438,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  No,                     !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -9832,6 +9857,7 @@ Curve:QuadLinear,
     // Unitary System mines data from coil objects
     EXPECT_EQ(thisSys->m_MinOATCompressorCooling, -1000.0);
     EXPECT_EQ(thisSys->m_MinOATCompressorHeating, -1000.0);
+    EXPECT_FALSE(thisSys->m_useNoLoadLowSpeedAirFlow);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_ASHRAEModel_WaterCoils)
@@ -9918,6 +9944,7 @@ AirLoopHVAC:UnitarySystem,
   ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
   25.0;                    !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -10652,6 +10679,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -11212,15 +11240,16 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "  ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }",
         "  ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }",
-        "  50, !- Maximum Supply Air Temperature{ C }",
-        "  		21, !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }",
-        "  		, !- Outdoor Dry - Bulb Temperature Sensor Node Name",
-        "  		, !- Ancillary On - Cycle Electric Power",
-        "  		, !- Ancillary Off - Cycle Electric Power",
-        "  		, !- Design Heat Recovery Water Flow Rate",
-        "  		, !- Maximum Temperature for Heat Recovery",
-        "  		, !- Heat Recovery Water Inlet Node Name",
-        "  		, !- Heat Recovery Water Outlet Node Name",
+        "  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed ",
+        "  50,                     !- Maximum Supply Air Temperature{ C }",
+        "  21,                     !- Maximum Outdoor Dry - Bulb Temperature for Supplemental Heater Operation{ C }",
+        "  ,                       !- Outdoor Dry - Bulb Temperature Sensor Node Name",
+        "  ,                       !- Ancillary On - Cycle Electric Power",
+        "  ,                       !- Ancillary Off - Cycle Electric Power",
+        "  ,                       !- Design Heat Recovery Water Flow Rate",
+        "  ,                       !- Maximum Temperature for Heat Recovery",
+        "  ,                       !- Heat Recovery Water Inlet Node Name",
+        "  ,                       !- Heat Recovery Water Outlet Node Name",
         "  	UnitarySystemPerformance:Multispeed, !- Design Specification Multispeed Object Type",
         "   MyMultiSpeed;            !- Design Specification Multispeed Object Name",
         "  ",
@@ -12276,6 +12305,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80,                     !- Maximum Supply Air Temperature{ C }
   21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -13379,6 +13409,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -13524,6 +13555,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -13646,6 +13678,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -13770,6 +13803,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -13864,6 +13898,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     ,                                       !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                                       !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                                       !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                                       !- No Load Supply Air Flow Rate Control Set To Low Speed
     28.0,                                   !- Maximum Supply Air Temperature {C}
     21,                                     !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                       !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -14012,6 +14047,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     ,                                       !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     0.0000462180155978106,                  !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                                       !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                                       !- No Load Supply Air Flow Rate Control Set To Low Speed
     28.0,                                   !- Maximum Supply Air Temperature {C}
     21,                                     !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                       !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -14159,6 +14195,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     ,                                       !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     0.0000462180155978106,                  !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                                       !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                                       !- No Load Supply Air Flow Rate Control Set To Low Speed
     30.0,                                   !- Maximum Supply Air Temperature {C}
     20.0,                                   !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     System Outdoor Air Node,                !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -14371,6 +14408,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -14606,6 +14644,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -15404,6 +15443,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
     50.00000,                !- Maximum Supply Air Temperature {C}
     21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -16529,6 +16569,7 @@ AirLoopHVAC:UnitarySystem,
   ,                         !- No Load Fraction of Autosized Heating Supply Air Flow Rate
   ,                         !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation
   ,                         !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation
+  ,                         !- No Load Supply Air Flow Rate Control Set To Low Speed",
   Autosize;                 !- Maximum Supply Air Temperature
 
 Fan:OnOff,
@@ -17026,6 +17067,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
       ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
       ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
       ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+      No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
       Autosize,                !- Maximum Supply Air Temperature {C}
       21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
       ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -17333,6 +17375,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
       ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
       ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
       ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+      No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
       Autosize,                !- Maximum Supply Air Temperature {C}
       21,                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
       ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -18177,6 +18220,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_CheckBadInputOutputNodes)
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
     Autosize,                !- Maximum Supply Air Temperature {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                        !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -18250,6 +18294,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0;                           !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -18408,6 +18453,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -18612,6 +18658,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -18805,6 +18852,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -20341,6 +20389,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_LowerSpeedFlowSizingTest)
     ,                                !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                                !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
     ,                                !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+    ,                                !- No Load Supply Air Flow Rate Control Set To Low Speed
     80.0,                            !- Maximum Supply Air Temperature{ C }
     ,                                !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
     ,                                !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -20623,6 +20672,7 @@ AirLoopHVAC:UnitarySystem,
   ,                               !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                               !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                               !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80.0,                           !- Maximum Supply Air Temperature{ C }
   ,                               !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}
   ,                               !- Outdoor Dry-Bulb Temperature Sensor Node Name
@@ -21094,6 +21144,7 @@ AirLoopHVAC:UnitarySystem,
   ,                       !- Fraction of Autosized Design Heating Supply Air Flow Rate
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Cooling Operation{ m3/s-W }
   ,                       !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation{ m3/s-W }
+  ,                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
   80;                     !- Maximum Supply Air Temperature{ C }
 
 Fan:OnOff,
@@ -22327,6 +22378,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
         "    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
         "    Autosize,                !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed ",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -22386,6 +22438,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
         "    Autosize,                !- Cooling Supply Air Flow Rate {m3/s}",
         "    Autosize,                !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed ",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -23160,12 +23213,8 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
         "    autosize,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    DOAS Outdoor Air Inlet,  !- Supply Air Inlet Node Name",
         "    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name",
         "    DOAS Relief Air Outlet,  !- Exhaust Air Inlet Node Name",
@@ -23177,7 +23226,57 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedFanWSHP_Test)
         "    1.7,                     !- Threshold Temperature {C}",
         "    0.083,                   !- Initial Defrost Time Fraction {dimensionless}",
         "    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}",
-        "    Yes;                     !- Economizer Lockout",
+        "    Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    10.0,                    !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    10.0,                    !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    10.0,                    !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
 
         "  Controller:OutdoorAir,",
         "    DOAS OA Controller,      !- Name",

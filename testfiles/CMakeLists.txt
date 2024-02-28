@@ -391,6 +391,7 @@ add_simulation_test(IDF_FILE IceStorage-Series-ChillerDownstream.idf EPW_FILE US
 add_simulation_test(IDF_FILE IceStorage-Series-ChillerUpstream.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE IndEvapCoolerRTUoffice.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE IndirectAbsorptionChiller.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+add_simulation_test(IDF_FILE IndoorLivingWall.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 add_simulation_test(IDF_FILE InternalMass_wZoneList.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 add_simulation_test(IDF_FILE Fenestration_RefBldgSmallHotelNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE LgOffVAV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -786,6 +787,8 @@ add_simulation_test(IDF_FILE BasicsFiles/Exercise2.idf EPW_FILE USA_IL_Chicago-O
 
 # Macro files
 add_simulation_test(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -m)
+
+add_api_simulation_test(PYTHON_FILE user_defined_equipment.py)
 
 # External interface files -- note they don't work on Mac
 if (NOT APPLE)
