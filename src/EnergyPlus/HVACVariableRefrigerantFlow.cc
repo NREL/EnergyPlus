@@ -11877,7 +11877,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                               Tdischarge,
                               h_IU_cond_out_ave,
                               this->IUCondensingTemp,
-                              CapMinTe,
+                              this->IUEvapTempLow,
                               Tfs,
                               Pipe_Q_h,
                               Q_c_OU,
@@ -14620,7 +14620,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
                 OUEvapHeatExtract = CompEvaporatingCAPSpd(1) * CyclingRatio;
-
+                this->EvaporatingTemp = T_suction;
+                this->CondensingTemp = T_discharge;
+                this->IUCondensingTemp = T_discharge;
                 break; // EXIT DoName2
 
             } // End: if( CounterCompSpdTemp <= 1 ) Low load modification
