@@ -70,6 +70,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -5034,6 +5035,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
         case DataDefineEquip::ZnAirLoopEquipType::DualDuctConstVolume:
         case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAV:
         case DataDefineEquip::ZnAirLoopEquipType::DualDuctVAVOutdoorAir:
+            state.dataDualDuct->dd_airterminal(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolNoReheat:
