@@ -2295,6 +2295,7 @@ void EIRPlantLoopHeatPump::report(EnergyPlusData &state)
     this->loadSideEnergy = this->loadSideHeatTransfer * reportingInterval;
     this->powerEnergy = this->powerUsage * reportingInterval;
     this->sourceSideEnergy = this->sourceSideHeatTransfer * reportingInterval;
+    this->heatRecoveryEnergy = this->heatRecoveryRate * reportingInterval;
 
     // update nodes
     PlantUtilities::SafeCopyPlantNode(state, this->loadSideNodes.inlet, this->loadSideNodes.outlet);
