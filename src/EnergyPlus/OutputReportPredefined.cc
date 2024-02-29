@@ -542,7 +542,6 @@ namespace OutputReportPredefined {
         s->pdchAirTermMinFlowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow Schedule Name");
         s->pdchAirTermMaxFlowReh = newPreDefColumn(state, s->pdstAirTerm, "Maximum Flow During Reheat [m3/s]");
         s->pdchAirTermMinOAflowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow Schedule Name");
-        s->pdchAirTermTempCntl = newPreDefColumn(state, s->pdstAirTerm, "Temperature Control");
 
         // Std 229 Air Heat Recovery
         s->pdstAirHR = newPreDefSubTable(state, s->pdrEquip, "Air Heat Recovery");

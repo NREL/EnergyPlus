@@ -6515,27 +6515,6 @@ void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
 void SingleDuctAirTerminal::reportTerminalUnit(EnergyPlusData &state)
 {
     // populate the predefined equipment summary report related to air terminals
-
-    // xs->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");
-    // xs->pdchAirTermZoneName = newPreDefColumn(state, s->pdstAirTerm, "Zone Name");
-    // xs->pdchAirTermMinFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow [m3/s]");
-    // xs->pdchAirTermMinOutdoorFlow = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow [m3/s]");
-    // xs->pdchAirTermSupCoolingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Cooling Setpoint [C]");
-    // xs->pdchAirTermSupHeatingSP = newPreDefColumn(state, s->pdstAirTerm, "Supply Heating Setpoint [C]");
-    // xs->pdchAirTermHeatingCap = newPreDefColumn(state, s->pdstAirTerm, "Heating Capacity [W]");
-    // xs->pdchAirTermCoolingCap = newPreDefColumn(state, s->pdstAirTerm, "Cooling Capacity [W]");
-    // xs->pdchAirTermTypeInp = newPreDefColumn(state, s->pdstAirTerm, "Type of Input Object");
-    // s->pdchAirTermHeatCoilType = newPreDefColumn(state, s->pdstAirTerm, "Heat/Reheat Coil Object Type");
-    // s->pdchAirTermCoolCoilType = newPreDefColumn(state, s->pdstAirTerm, "Chilled Water Coil Object Type");
-    // s->pdchAirTermFanType = newPreDefColumn(state, s->pdstAirTerm, "Fan Object Type");
-    // s->pdchAirTermFanName = newPreDefColumn(state, s->pdstAirTerm, "Fan Name");
-    // s->pdchAirTermPrimFlow = newPreDefColumn(state, s->pdstAirTerm, "Primary Air Flow Rate [m3/s]");
-    // s->pdchAirTermSecdFlow = newPreDefColumn(state, s->pdstAirTerm, "Secondary Air Flow Rate [m3/s]");
-    // s->pdchAirTermMinFlowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Flow Schedule Name");
-    // s->pdchAirTermMaxFlowReh = newPreDefColumn(state, s->pdstAirTerm, "Maximum Flow During Reheat [m3/s]");
-    // s->pdchAirTermMinOAflowSch = newPreDefColumn(state, s->pdstAirTerm, "Minimum Outdoor Flow Schedule Name");
-    // s->pdchAirTermTempCntl = newPreDefColumn(state, s->pdstAirTerm, "Temperature Control");
-
     auto &orp = state.dataOutRptPredefined;
     auto &adu = state.dataDefineEquipment->AirDistUnit(this->ADUNum);
     auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
@@ -6547,6 +6526,25 @@ void SingleDuctAirTerminal::reportTerminalUnit(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSupHeatingSP, adu.Name, sizing.HeatDesTemp);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatingCap, adu.Name, sizing.DesHeatLoad);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolingCap, adu.Name, sizing.DesCoolLoad);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermPrimFlow, adu.Name, this->MaxAirVolFlowRate);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermSecdFlow, adu.Name, "n/a");
+    if (this->ZoneMinAirFracSchPtr > 0) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, orp->pdchAirTermMinFlowSch, adu.Name, ScheduleManager::GetScheduleName(state, this->ZoneMinAirFracSchPtr));
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlowSch, adu.Name, "n/a");
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMaxFlowReh, adu.Name, this->MaxAirVolFlowRateDuringReheat);
+    std::string schName = "n/a";
+    if (this->OARequirementsPtr > 0) {
+        int minOAsch = state.dataSize->OARequirements(this->OARequirementsPtr).OAFlowFracSchPtr;
+        if (minOAsch > 0) schName = ScheduleManager::GetScheduleName(state, minOAsch);
+    }
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, schName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, this->ReheatComp);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, this->FanType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
 //        End of Reporting subroutines for the Sys Module
