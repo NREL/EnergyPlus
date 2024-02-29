@@ -9370,6 +9370,16 @@ namespace InternalHeatGains {
             DataHeatBalance::IntGainType::ElectricLoadCenterStorageBattery,
             DataHeatBalance::IntGainType::ElectricLoadCenterStorageSimple,
             DataHeatBalance::IntGainType::ElectricLoadCenterConverter};
+        // Explicitly list internal gains not gathered here
+        static constexpr std::array<DataHeatBalance::IntGainType, 3> ExcludedIntGainTypes = {
+            DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
+            DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+            DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam};
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesPeople) + size(IntGainTypesLight) + size(IntGainTypesEquip) + size(IntGainTypesRefrig) +
+                     size(IntGainTypesWaterUse) + size(IntGainTypesHvacLoss) + size(IntGainTypesPowerGen) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         if (state.dataGlobal->CompLoadReportIsReq && !state.dataGlobal->isPulseZoneSizing) {
             int TimeStepInDay = (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;

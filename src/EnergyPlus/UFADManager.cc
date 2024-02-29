@@ -733,8 +733,6 @@ namespace RoomAir {
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
-        using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -781,12 +779,12 @@ namespace RoomAir {
         Real64 PowerPerPlume = zoneU.PowerPerPlume;
         // gains from occupants, task lighting, elec equip, gas equip, other equip, hot water equip, steam equip,
         // baseboards (nonthermostatic), water heater skin loss
-        Real64 ConvGainsOccSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+        Real64 ConvGainsOccSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-            ConvGainsOccSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+            ConvGainsOccSubzone += InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
         }
 
         // Add convection from pool cover to occupied region
@@ -794,11 +792,14 @@ namespace RoomAir {
 
         // gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
-        Real64 ConvGainsUpSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+        Real64 ConvGainsUpSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         ConvGainsUpSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum);
         if (state.dataHeatBal->Zone(ZoneNum).NoHeatToReturnAir) {
-            ConvGainsUpSubzone += SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
+            ConvGainsUpSubzone += InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesUpSubzone);
         }
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesUpSubzone)) == (int)DataHeatBalance::IntGainType::Num);
 
         Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
         Real64 ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
