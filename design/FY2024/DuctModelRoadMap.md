@@ -457,10 +457,13 @@ An example of objects used to calculate duct condiuction loss in an IDF is:
 
 \begin{lstlisting}
 
-	Duct:Loss,
+	Duct:Loss:Conduction,
       Main duct,    !- Name
       Main AirLoopHVAC,    !- AirLoopHAVC Name
-   	  Mail Duct Linkage;  \field AirflowNetwork:Distribution:Linkage Name
+   	  Mail Duct Linkage,   !- AirflowNetwork:Distribution:Linkage Name
+      Zone,         !- Environment Type
+   	  Zone 1,       !- Ambient Temperature Zone Name
+      ;             !- Ambient Temperature Schedule Name
 
   	AirflowNetwork:Distribution:Node,
       EquipmentOutletNode,      !- Name
@@ -531,7 +534,7 @@ An example of objects used to calculate duct leak loss in an IDF is:
 
 \begin{lstlisting}
 
-	Duct:Loss,
+	Duct:Loss:Leakage,
       Main duct leak,    !- Name
       Main AirLoopHVAC,    !- AirLoopHAVC Name
    	  Mail Duct Leak;  \field AirflowNetwork:Distribution:Linkage Name
@@ -564,7 +567,7 @@ An example of objects used to calculate duct leak loss in an IDF is:
 
 ! Make up air
 
-	Duct:Loss,
+	Duct:Loss:MakeupAir,
       Makeup air,    !- Name
       Main AirLoopHVAC,    !- AirLoopHAVC Name
    	  Duct Leak Makeup;  \field AirflowNetwork:Distribution:Linkage Name
@@ -624,6 +627,57 @@ This section will provide algorithms and code implementation approach.
 ### Algorithms ###
 
 The algorithms cover temperature and humidity ratio at the outlet for supply and return leaks.
+
+#### Conduction ####
+
+Section of 13.1.4 Node Temperature Calculations in Engineering Reference presents temperature at duct outlet node due to conduction losses:
+
+The outlet air temperature at the end of the duct (x = L) is:
+
+T<sub>o</sub> = T<sub>∞</sub> + (T<sub>i</sub> − T<sub>∞</sub>)*exp[-UA/(mC<sub>p</sub>)]
+
+where:
+
+Ti = Inlet air temperature [°C]
+
+To = Outlet air temperature [°C]
+
+T∞ = Temperature of air surrounding the duct element [°C]
+
+U = Overall heat transfer coefficient [W/m2-K]
+
+A = Surface area (Perimeter * Length) [m2]
+
+m˙ = Airflow rate [kg/s]
+
+The heat transfer by convection to ambient, Q, is:
+
+Q<sub>sen</sub> = m* C<sub>p</sub>(T<sub>∞</sub> − T<sub>i</sub>){1-exp[-UA/(mC<sub>p</sub>)]}
+
+13.1.5 Node Humidity Ratio Calculations presents temperature and humidity ratio at duct outlet node due to diffusion losses:
+
+The outlet air humidity ratio at the end of the duct (x = L) is:
+
+W<sub>o</sub> = W<sub>∞</sub> + (W<sub>i</sub> − W<sub>∞</sub>)*exp[-U<sub>m</sub>A/m]
+
+where:
+
+Wi = Inlet air temperature [°C]
+
+Wo = Outlet air temperature [°C]
+
+W∞ = Temperature of air surrounding the duct element [°C]
+
+U<sub>m</sub> = Overall moisture transfer coefficient [W/m2-K]
+
+A = Surface area (Perimeter * Length) [m2]
+
+m˙ = Airflow rate [kg/s]
+
+The mositure transfer by convection to ambient, Q, is:
+
+Q<sub>lat</sub> = m* (W<sub>∞</sub> − W<sub>i</sub>){1-exp[-U<sub>m</sub>A/m]}
+
 
 #### Supply leaks ####
 
@@ -721,10 +775,52 @@ T<sub>Mixed</sub> = (T<sub>Recirculte</sub> * m<sub>Recirculte</sub> +  T<sub>Re
 
 W<sub>Mixed</sub> = (W<sub>Recirculte</sub> * m<sub>Recirculte</sub> +  W<sub>Returnleak</sub> * m<sub>Returnleak</sub> ) /m<sub>Mixed</sub>
 
+#### Makeup air ####
+
+The additional energy losses from makeup air is treated as infiltration with airflow from outdoor to a zone, and mixing with airflow from a zone to another.
+
+##### Infiltration #####
+
+Q<sub>sen</sub> = m<sub>inf</sub>* C<sub>p</sub>(T<sub>∞</sub> − T<sub>i</sub>)
+
+Q<sub>lat</sub> = m<sub>inf</sub>h<sub>g</sub>(W<sub>∞</sub> − W<sub>i</sub>)
+
+##### Mixing #####
+
+Q<sub>sen</sub> = m<sub>mix</sub>* C<sub>p</sub>(T<sub>j</sub> − T<sub>i</sub>)
+
+Q<sub>lat</sub> = m<sub>mix</sub>h<sub>g</sub>(W<sub>j</sub> − W<sub>i</sub>)
+
 #### Add loss to zone load and system load ####
 
-This section will be added later.
+This section provides treament pathway of losses to either a system or a zone. 
 
-### Input process ###
+##### Conduction and leakage #####
 
-This section will be added later.
+All losses from conduction and leakage will be added to a system as Duct loss. The implementation code is similar to the DuctLoss code in UntarySystem, Furnace and Multispeed AirToAir Heat pump mdules. The addon is summed by all conduction and leakage losses served to a system by the same Airloop.  
+
+![Return Leaks](DuctlossAddon.PNG)
+
+It hsould be pointed out that the added loss is calculated at every iteration of the whole Airloop.
+
+Since the loss addon is system based one. Each individual system modification will be performed.
+
+##### Makeup air #####
+
+The energy losses from makeup air will be added in a zone used for the next time step.
+
+### New module ###
+
+A new module of DuctLoss will be created for inputs process and calculations.
+
+#### Inputs process ####
+
+The 3 new objects (Duct:Loss:XXX) will be processed in the new module. The other related AFN objects will be handled in the AFN module to read Node, Linkage, Duct and Leakage object. I will check to see possiblity if separated functions are needed or not, because AFN model and Non AFN model need to process the same objects of Node, Linkage, Duct and Leakage.
+
+#### Calculation ####
+
+Any calculation will be performed in the module. 
+
+#### Local variables ####
+
+All new objects and AFN obejcts will have local array variables defined in the header file.   
