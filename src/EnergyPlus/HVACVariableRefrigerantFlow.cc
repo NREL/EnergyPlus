@@ -283,6 +283,29 @@ void SimulateVRF(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
     }
+    if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
+        // consider cycling in fan calculation
+        for (int TUListNum = 1; TUListNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++TUListNum) {
+            auto &thisTUList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum);
+            for (int TUNum = 1; TUNum <= thisTUList.NumTUInList; ++TUNum) {
+                int heatingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).HeatCoilIndex;
+                int coolingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).CoolCoilIndex;
+                auto &heatingCoil = state.dataDXCoils->DXCoil(heatingCoilNum);
+                auto &coolingCoil = state.dataDXCoils->DXCoil(coolingCoilNum);
+                int fanIndex = state.dataHVACVarRefFlow->VRFTU(TUNum).FanIndex;
+                // only deal with cooling for now. heating RTF might have some issue
+                // does Fan:SystemModel need adjustment as well? if so consider 0-indexing and it's in state.dataHVACFan->fanObjs vector
+                if (fanIndex > 0 && heatingCoil.HeatingCoilRuntimeFraction == 0.0) { // in cooling mode
+                    // here coolingCoil.CoolingCoilRuntimeFraction equals state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio
+                    // this is not the case for heating
+                    auto &fan = state.dataFans->Fan(fanIndex);
+                    fan.FanPower *= coolingCoil.CoolingCoilRuntimeFraction;
+                    fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
+                    fan.PowerLossToAir *= coolingCoil.CoolingCoilRuntimeFraction;
+                }
+            }
+        }
+    }
 }
 
 PlantComponent *VRFCondenserEquipment::factory(EnergyPlusData &state, std::string const &objectName)
@@ -12481,27 +12504,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->ElecHeatingPower = 0;
     }
     this->VRFCondRTF = VRFRTF;
-    // consider cycling in fan calculation
-    for (int TUListNum = 1; TUListNum <= state.dataHVACVarRefFlow->NumVRFTULists; ++TUListNum) {
-        auto &thisTUList = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum);
-        for (int TUNum = 1; TUNum <= thisTUList.NumTUInList; ++TUNum) {
-            int heatingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).HeatCoilIndex;
-            int coolingCoilNum = state.dataHVACVarRefFlow->VRFTU(TUNum).CoolCoilIndex;
-            auto &heatingCoil = state.dataDXCoils->DXCoil(heatingCoilNum);
-            auto &coolingCoil = state.dataDXCoils->DXCoil(coolingCoilNum);
-            int fanIndex = state.dataHVACVarRefFlow->VRFTU(TUNum).FanIndex;
-            // only deal with cooling for now. heating RTF might have some issue
-            // does Fan:SystemModel need adjustment as well? if so consider 0-indexing and it's in state.dataHVACFan->fanObjs vector
-            if (fanIndex > 0 && heatingCoil.HeatingCoilRuntimeFraction == 0.0) { // in cooling mode
-                // here coolingCoil.CoolingCoilRuntimeFraction equals state.dataHVACVarRefFlow->VRF(VRFCond).VRFCondCyclingRatio
-                // this is not the case for heating
-                auto &fan = state.dataFans->Fan(fanIndex);
-                fan.FanPower *= coolingCoil.CoolingCoilRuntimeFraction;
-                fan.FanEnergy = fan.FanPower * state.dataHVACGlobal->TimeStepSysSec;
-                fan.PowerLossToAir *= coolingCoil.CoolingCoilRuntimeFraction;
-            }
-        }
-    }
 
     // Calculate CrankCaseHeaterPower: VRF Heat Pump Crankcase Heater Electric Power [W]
     if (this->MaxOATCCHeater > OutdoorDryBulb) {
