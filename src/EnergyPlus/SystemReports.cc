@@ -80,6 +80,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SystemReports.hh>
@@ -5046,6 +5047,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat:
+            state.dataPowerInductionUnits->PIU(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc:
             break;
