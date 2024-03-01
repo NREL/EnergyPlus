@@ -73,6 +73,7 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -5060,6 +5061,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
             state.dataHVACCooledBeam->CoolBeam(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam:
+            state.dataFourPipeBeam->FourPipeBeams(adu.EquipIndex(aduCompNum))->reportTerminalUnit(state, adu);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:
