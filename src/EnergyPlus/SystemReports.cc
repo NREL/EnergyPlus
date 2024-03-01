@@ -72,6 +72,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
@@ -5043,6 +5044,8 @@ void reportAirDistributionUnits(EnergyPlusData &state)
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVNoReheat:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheatVSFan:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat:
             state.dataSingleDuct->sd_airterminal(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat:
@@ -5050,15 +5053,14 @@ void reportAirDistributionUnits(EnergyPlusData &state)
             state.dataPowerInductionUnits->PIU(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ConstVol_4PipeInduc:
+            state.dataHVACSingleDuctInduc->IndUnit(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolCooledBeam:
-        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
-        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam:
             break;
-        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVReheat:
-        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctCBVAVNoReheat:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
+        case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:
             break;
         default:
             break;
