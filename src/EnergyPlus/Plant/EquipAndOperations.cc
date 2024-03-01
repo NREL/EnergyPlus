@@ -906,6 +906,9 @@ namespace DataPlant {
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
 
+        // for debug
+        Real64 HWSetPointTemp = this->DetermineHWSetpointOARest(state);
+        Real64 PrimaryHWLoopSupInletNodeTemp = state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp;
         Real64 HW_Qdot =
             max(0.0,
                 HW_RetMdot * CpHW *
@@ -991,6 +994,28 @@ namespace DataPlant {
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
             if (this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
                 this->PlantOps.AirSourcePlantCoolingOnly = true;
+            }
+        }
+
+        // override reset AirSourcePlantHeatingOnly to false and AirSourcePlantCoolingOnly to true if the plant cooling load is higher
+        // the plant heating load and the plant heating load is small. Issue #10417
+        if (!this->PlantOps.AirSourcePlantCoolingOnly && this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (std::abs(this->Report.PrimaryPlantCoolingLoad) > this->Report.PrimaryPlantHeatingLoad &&
+                this->Report.PrimaryPlantHeatingLoad < DataHVACGlobals::SmallLoad) {
+                this->PlantOps.AirSourcePlantCoolingOnly = true;
+                this->PlantOps.AirSourcePlantHeatingOnly = false;
+            }
+        }
+
+        // override reset AirSourcePlantHeatingOnly to true and AirSourcePlantCoolingOnly to false if the plant heating load is higher
+        // the plant cooling load and the plant cooling load is small. #Issue 10417
+        if (this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (this->Report.PrimaryPlantHeatingLoad > std::abs(this->Report.PrimaryPlantCoolingLoad) &&
+                this->Report.PrimaryPlantCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+                this->PlantOps.AirSourcePlantHeatingOnly = true;
+                this->PlantOps.AirSourcePlantCoolingOnly = false;
             }
         }
 

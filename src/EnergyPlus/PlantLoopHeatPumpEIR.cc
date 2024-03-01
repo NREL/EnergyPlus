@@ -335,6 +335,14 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
 
             if (this->heatRecoveryAvailable) {
                 this->heatRecoveryMassFlowRate = this->heatRecoveryDesignMassFlowRate;
+                //if (!FirstHVACIteration && this->flowControl == DataPlant::FlowMode::VariableSpeedPump) {
+                //    if (this->loadVSBranchPump || this->loadVSLoopPump) {
+                //        this->heatRecoveryMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
+                //        if (this->loadVSBranchPump) {
+                //            this->heatRecoveryMassFlowRate = std::max(this->heatRecoveryMassFlowRate, this->loadVSPumpMinLimitMassFlow);
+                //        }
+                //    }
+                //}
                 PlantUtilities::SetComponentFlowRate(
                     state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
             }
@@ -673,8 +681,7 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
             this->heatRecoveryRate = 0.0;
         } else {
             this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
-        }
-        
+        }        
     }
 }
 
