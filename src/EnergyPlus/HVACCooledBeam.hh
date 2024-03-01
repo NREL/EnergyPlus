@@ -143,6 +143,7 @@ namespace HVACCooledBeam {
         }
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimCoolBeam(EnergyPlusData &state,
