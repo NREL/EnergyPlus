@@ -5032,7 +5032,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
 
     auto &orp = state.dataOutRptPredefined;
     for (auto &adu : state.dataDefineEquipment->AirDistUnit) {
-        auto &at = adu.airTerminalPtr;
+        auto &airTerminal = adu.airTerminalPtr;
         const int aduCompNum = 1;
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermZoneName, adu.Name, state.dataHeatBal->Zone(adu.ZoneNum).Name);
         switch (adu.EquipTypeEnum(aduCompNum)) {
@@ -5061,7 +5061,9 @@ void reportAirDistributionUnits(EnergyPlusData &state)
             state.dataHVACCooledBeam->CoolBeam(adu.EquipIndex(aduCompNum)).reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam:
-            state.dataFourPipeBeam->FourPipeBeams(adu.EquipIndex(aduCompNum))->reportTerminalUnit(state, adu);
+            adu.airTerminalPtr->reportTerminalUnit(state);
+            // state.dataFourPipeBeam->FourPipeBeams(adu.EquipIndex(aduCompNum))->reportTerminalUnit(state);
+            // state.dataFourPipeBeam->FourPipeBeams(1)->reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:

@@ -1441,10 +1441,11 @@ namespace FourPipeBeam {
         }
     }
 
-    void HVACFourPipeBeam::reportTerminalUnit(EnergyPlusData &state, DataDefineEquip::ZoneAirEquip &adu)
+    void HVACFourPipeBeam::reportTerminalUnit(EnergyPlusData &state)
     {
         // populate the predefined equipment summary report related to air terminals
         auto &orp = state.dataOutRptPredefined;
+        auto &adu = state.dataDefineEquipment->AirDistUnit(1);
         if (!state.dataSize->TermUnitFinalZoneSizing.empty()) {
             auto &sizing = state.dataSize->TermUnitFinalZoneSizing(adu.TermUnitSizingNum);
             OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinFlow, adu.Name, sizing.DesCoolVolFlowMin);
