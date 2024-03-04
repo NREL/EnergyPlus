@@ -1119,7 +1119,8 @@ namespace ResultsFramework {
         }
 
         // Same issue here
-        static std::array<std::string, (int)ReportFreq::Num> const freqStrings = {"Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Yearly"};
+        static std::array<std::string, (int)ReportFreq::Num> const freqStrings = {
+            "Detailed", "Timestep", "Hourly", "Daily", "Monthly", "RunPeriod", "Yearly"};
         for (ReportFreq freq :
              {ReportFreq::Year, ReportFreq::Simulation, ReportFreq::Month, ReportFreq::Day, ReportFreq::Hour, ReportFreq::TimeStep}) {
             if (hasFreqTSData(freq)) {

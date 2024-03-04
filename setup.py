@@ -97,7 +97,7 @@ def get_current_wheel_details():
         },
         "Linux": {
             "x86_64": {
-                "wheel": "linux_x86_64",
+                "wheel": "manylinux_2_17_x86_64",
                 "zip_tag": "Linux",
                 "build_tool": "Unix Makefiles",
                 "extension": "so",
