@@ -5062,8 +5062,6 @@ void reportAirDistributionUnits(EnergyPlusData &state)
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolFourPipeBeam:
             adu.airTerminalPtr->reportTerminalUnit(state);
-            // state.dataFourPipeBeam->FourPipeBeams(adu.EquipIndex(aduCompNum))->reportTerminalUnit(state);
-            // state.dataFourPipeBeam->FourPipeBeams(1)->reportTerminalUnit(state);
             break;
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctUserDefined:
         case DataDefineEquip::ZnAirLoopEquipType::SingleDuctATMixer:

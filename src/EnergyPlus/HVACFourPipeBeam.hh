@@ -115,11 +115,6 @@ namespace FourPipeBeam {
 
         void reportTerminalUnit(EnergyPlusData &state);
 
-        // void reportTerminalUnit(EnergyPlusData &state, DataDefineEquip::ZoneAirEquip &adu);
-        // void reportTerminalUnit(EnergyPlusData &state, int aduNumber);
-        // void reportTerminalUnit(EnergyPlusData &state);
-
-
     private: // Methods
         void
         init(EnergyPlusData &state,
