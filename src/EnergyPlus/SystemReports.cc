@@ -5033,7 +5033,7 @@ void reportAirDistributionUnits(EnergyPlusData &state)
     auto &orp = state.dataOutRptPredefined;
     for (auto &adu : state.dataDefineEquipment->AirDistUnit) {
         auto &airTerminal = adu.airTerminalPtr;
-        const int aduCompNum = 1;
+        constexpr int aduCompNum = 1;
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermZoneName, adu.Name, state.dataHeatBal->Zone(adu.ZoneNum).Name);
         switch (adu.EquipTypeEnum(aduCompNum)) {
         case DataDefineEquip::ZnAirLoopEquipType::DualDuctConstVolume:

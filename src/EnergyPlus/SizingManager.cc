@@ -5507,34 +5507,6 @@ void UpdateTermUnitFinalZoneSizing(EnergyPlusData &state)
                 thisTUFZSizing.DesHeatOAFlowFrac = 0.0;
             }
         }
-
-        // begin std 229 air terminal new table
-        std::string oldADUname = format("{}-old", thisTUFZSizing.ADUName);
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermZoneName,
-                                                 oldADUname,
-                                                 thisTUFZSizing.ZoneNum > 0 ? state.dataHeatBal->Zone(thisTUFZSizing.ZoneNum).Name : "N/A");
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermMinFlow,
-                                                 oldADUname,
-                                                 thisTUFZSizing.DesCoolVolFlowMin); // ? there is another name that looks similar (see the next line)
-
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermMinOutdoorFlow, oldADUname, thisTUFZSizing.MinOA);
-
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupCoolingSP, oldADUname, thisTUFZSizing.CoolDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchAirTermSupHeatingSP, oldADUname, thisTUFZSizing.HeatDesTemp);
-
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermHeatingCap,
-                                                 oldADUname,
-                                                 thisTUFZSizing.DesHeatLoad); // ? DesHeatLoad ==? Heating capacity?
-        OutputReportPredefined::PreDefTableEntry(state,
-                                                 state.dataOutRptPredefined->pdchAirTermCoolingCap,
-                                                 oldADUname,
-                                                 thisTUFZSizing.DesCoolLoad); // ? DesCoolLoad ==? Cooling capacity?
-        // end std 229 air terminal new table
     }
 }
 } // namespace EnergyPlus::SizingManager

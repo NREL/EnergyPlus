@@ -2191,5 +2191,4 @@ void PowIndUnitData::reportTerminalUnit(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
-
 } // namespace EnergyPlus::PoweredInductionUnits
