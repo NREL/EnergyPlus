@@ -799,7 +799,7 @@ This section provides treament pathway of losses to either a system or a zone.
 
 All losses from conduction and leakage will be added to a system as Duct loss. The implementation code is similar to the DuctLoss code in UntarySystem, Furnace and Multispeed AirToAir Heat pump mdules. The addon is summed by all conduction and leakage losses served to a system by the same Airloop.  
 
-![Return Leaks](DuctlossAddon.PNG)
+![DuctlossAddon](DuctlossAddon.PNG)
 
 It hsould be pointed out that the added loss is calculated at every iteration of the whole Airloop.
 
