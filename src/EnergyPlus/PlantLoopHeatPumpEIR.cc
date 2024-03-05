@@ -2250,7 +2250,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->powerUsage += this->standbyElecPower;
 
     this->fuelEnergy = this->fuelRate * reportingInterval;
-    this->powerEnergy = this->powerEnergy * reportingInterval;
+    this->powerEnergy = this->powerUsage * reportingInterval;
 
     // energy balance on heat pump
     // this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);
