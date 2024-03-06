@@ -8836,16 +8836,14 @@ namespace InternalHeatGains {
     Real64 SumAllInternalConvectionGainsExceptPeople(EnergyPlusData &state, int const ZoneNum)
     {
         // Return value
-        Real64 SumConvGainRateExceptPeople(0.0);
-
-        std::string str_people = "PEOPLE";
+        Real64 SumConvGainRateExceptPeople = 0.0;
 
         for (int spaceNum : state.dataHeatBal->Zone(ZoneNum).spaceIndexes) {
             if (state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices == 0) {
                 continue;
             }
             for (int DeviceNum = 1; DeviceNum <= state.dataHeatBal->spaceIntGainDevices(spaceNum).numberOfDevices; ++DeviceNum) {
-                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompObjectType != str_people) {
+                if (state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).CompType != DataHeatBalance::IntGainType::People) {
                     SumConvGainRateExceptPeople += state.dataHeatBal->spaceIntGainDevices(spaceNum).device(DeviceNum).ConvectGainRate;
                 }
             }
