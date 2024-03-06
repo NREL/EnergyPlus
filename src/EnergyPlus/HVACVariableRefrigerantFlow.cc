@@ -283,24 +283,26 @@ void SimulateVRF(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
     }
-    // yujie: update coil and IU evaporating temperature
-    if (state.dataHVACVarRefFlow->VRF(VRFCondenser).adjustedTe && (!FirstHVACIteration)) {
-        state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
-            state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
-        state.dataHVACVarRefFlow->VRF(VRFCondenser).IUEvaporatingTemp = state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
-    }
+    // yujie: update coil and IU evaporating temperature, also keep coil RTF updated with the condenser side cycling ratio, for the FluidTCtrl model
+    if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
+        if (state.dataHVACVarRefFlow->VRF(VRFCondenser).adjustedTe && (!FirstHVACIteration)) {
+            state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
+                state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+            state.dataHVACVarRefFlow->VRF(VRFCondenser).IUEvaporatingTemp = state.dataHVACVarRefFlow->VRF(VRFCondenser).EvaporatingTemp;
+        }
 
-    auto const &thisTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
-    auto &coolingCoil = state.dataDXCoils->DXCoil(thisTU.CoolCoilIndex);
-    int PLF;
-    if (coolingCoil.PLFFPLR(1) > 0 && state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio < 1.0) {
-        PLF = Curve::CurveValue(
-            state, coolingCoil.PLFFPLR(1), state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio); // Calculate part-load factor
-    } else {
-        PLF = 1.0;
-    }
-    if (coolingCoil.TotalCoolingEnergyRate > 0.0) {
-        coolingCoil.CoolingCoilRuntimeFraction = state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio / PLF;
+        auto const &thisTU = state.dataHVACVarRefFlow->VRFTU(VRFTUNum);
+        auto &coolingCoil = state.dataDXCoils->DXCoil(thisTU.CoolCoilIndex);
+        int PLF;
+        if (coolingCoil.PLFFPLR(1) > 0 && state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio < 1.0) {
+            PLF = Curve::CurveValue(
+                state, coolingCoil.PLFFPLR(1), state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio); // Calculate part-load factor
+        } else {
+            PLF = 1.0;
+        }
+        if (coolingCoil.TotalCoolingEnergyRate > 0.0) {
+            coolingCoil.CoolingCoilRuntimeFraction = state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFCondCyclingRatio / PLF;
+        }
     }
 }
 
