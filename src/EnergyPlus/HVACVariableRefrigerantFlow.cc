@@ -14619,7 +14619,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 }
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
-                OUEvapHeatExtract = CompEvaporatingCAPSpd(1) * CyclingRatio;
+                // Cap_Eva1 is the updated compressor min speed capacity
+                OUEvapHeatExtract = Cap_Eva1 * CyclingRatio;
                 this->EvaporatingTemp = T_suction;
                 this->CondensingTemp = T_discharge;
                 this->IUCondensingTemp = T_discharge;
