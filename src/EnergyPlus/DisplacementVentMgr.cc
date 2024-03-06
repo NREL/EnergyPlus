@@ -603,9 +603,6 @@ namespace RoomAir {
 
         ConvGainsOccupiedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
-        // Make sure all types of internal gains have been gathered
-        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesMixedSubzone)) == (int)DataHeatBalance::IntGainType::Num);
-
         ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
@@ -624,6 +621,10 @@ namespace RoomAir {
         }
 
         ConvGains = ConvGainsOccupiedSubzone + ConvGainsMixedSubzone;
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesMixedSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         //=================== Entering air system temperature and flow====================
         SumSysMCp = 0.0;

@@ -710,6 +710,32 @@ namespace RoomAir {
     static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesUpSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
                                                                                           DataHeatBalance::IntGainType::Lights};
 
+    // Explicitly list internal gains not applicable for UFAD
+    // Explicitly list internal gains not applicable for Displacement Vent
+    static constexpr std::array<DataHeatBalance::IntGainType, 22> ExcludedIntGainTypes = {
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
+        DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
+        DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT,
+        DataHeatBalance::IntGainType::Pump_VarSpeed,
+        DataHeatBalance::IntGainType::Pump_ConSpeed,
+        DataHeatBalance::IntGainType::Pump_Cond,
+        DataHeatBalance::IntGainType::PumpBank_VarSpeed,
+        DataHeatBalance::IntGainType::PumpBank_ConSpeed,
+        DataHeatBalance::IntGainType::PlantComponentUserDefined,
+        DataHeatBalance::IntGainType::CoilUserDefined,
+        DataHeatBalance::IntGainType::ZoneHVACForcedAirUserDefined,
+        DataHeatBalance::IntGainType::AirTerminalUserDefined,
+        DataHeatBalance::IntGainType::PackagedTESCoilTank,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilSingleSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilTwoSpeed,
+        DataHeatBalance::IntGainType::SecCoolingDXCoilMultiSpeed,
+        DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed,
+        DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
+        DataHeatBalance::IntGainType::FanSystemModel};
+
     void CalcUFADInt(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
@@ -800,7 +826,8 @@ namespace RoomAir {
         }
 
         // Make sure all types of internal gains have been gathered
-        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesUpSubzone)) == (int)DataHeatBalance::IntGainType::Num);
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesUpSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         Real64 ConvGains = ConvGainsOccSubzone + ConvGainsUpSubzone + thisZoneHB.SysDepZoneLoadsLagged;
         Real64 ZoneEquipConfigNum = zoneU.ZoneEquipPtr;
