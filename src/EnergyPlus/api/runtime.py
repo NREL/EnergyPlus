@@ -137,8 +137,8 @@ class Runtime:
         self.api.callbackEndOfSystemSizing.restype = c_void_p
         self.api.callbackEndOfAfterComponentGetInput.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackEndOfAfterComponentGetInput.restype = c_void_p
-        # self.api.callbackUserDefinedComponentModel.argtypes = [self.py_empty_callback_type]
-        # self.api.callbackUserDefinedComponentModel.restype = c_void_p
+        self.api.callbackUserDefinedComponentModel.argtypes = [c_void_p, self.py_state_callback_type, c_char_p]
+        self.api.callbackUserDefinedComponentModel.restype = c_void_p
         self.api.callbackUnitarySystemSizing.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
         self.api.registerExternalHVACManager.argtypes = [c_void_p, self.py_state_callback_type]
@@ -551,8 +551,24 @@ class Runtime:
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfAfterComponentGetInput(state, cb_ptr)
 
-    # user defined component callbacks are not allowed, they are coupled directly to a specific EMS manager/PythonPlugin
-    # def callback_user_defined_component_model(self, f: FunctionType) -> None:
+    def callback_user_defined_component_model(self, state: c_void_p, f: FunctionType, program_name: str) -> None:
+        """
+        This function allows a client to register a function to be called by a specific user-defined equipment object
+        inside EnergyPlus.  This registration function takes a string for the program "name" which should match the
+        name given in the IDF.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing.
+        :param program_name: The program name which is listed in the IDF on the user-defined object, either as an
+                             initialization program name or a simulation program name.
+        :return: Nothing
+        """
+        self._check_callback_args(f, 1, 'callback_user_defined_component_model')
+        cb_ptr = self.py_state_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        if isinstance(program_name, str):
+            program_name = program_name.encode('utf-8')
+        self.api.callbackUserDefinedComponentModel(state, cb_ptr, program_name)
 
     def callback_unitary_system_sizing(self, state: c_void_p, f: FunctionType) -> None:
         """
