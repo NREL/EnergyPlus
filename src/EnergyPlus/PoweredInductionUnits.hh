@@ -105,7 +105,7 @@ namespace PoweredInductionUnits {
     {
         Invalid = -1,
         HeaterOff,
-        CVfirstStage,
+        ConstantVolumeHeat,
         StagedHeatFirstStage,
         StagedHeatSecondStage,
         StagedHeatThirdStage,
@@ -118,7 +118,8 @@ namespace PoweredInductionUnits {
     {
         Invalid = -1,
         CoolerOff,
-        PrimaryAirCooling1stStage,
+        CoolFirstStage,
+        CoolSecondStage,
         Num
     };
 
@@ -182,6 +183,7 @@ namespace PoweredInductionUnits {
         int ctrlZoneInNodeIndex;   // index to the control zone inlet node
         int AirLoopNum;            // index for the air loop that this terminal is connected to.
         Real64 OutdoorAirFlowRate; // zone outdoor air volume flow rate
+        Real64 PriAirMassFlow;
         Real64 SecAirMassFlow;
 
         FanCntrlType fanControlType = FanCntrlType::Invalid; // fan speed control, Constant or VS
@@ -253,19 +255,19 @@ namespace PoweredInductionUnits {
 
     void ReportPIU(EnergyPlusData &state, int PIUNum); // number of the current fan coil unit being simulated
 
-    void CalcVariableSpeedPIUModulatedBehavior(EnergyPlusData &state,
-                                               int const PIUNum,   // number of the current PIU being simulated
-                                               int const ZoneNode, // zone node number
-                                               Real64 const zoneLoad,
-                                               bool const Pri,
-                                               Real64 const primaryAirMassFlow);
+    void CalcVariableSpeedPIUModulatedHeatingBehavior(EnergyPlusData &state,
+                                                      int const PIUNum,   // number of the current PIU being simulated
+                                                      int const ZoneNode, // zone node number
+                                                      Real64 const zoneLoad,
+                                                      bool const Pri,
+                                                      Real64 const primaryAirMassFlow);
 
-    void CalcVariableSpeedPIUStagedBehavior(EnergyPlusData &state,
-                                            int const PIUNum,   // number of the current PIU being simulated
-                                            int const ZoneNode, // zone node number
-                                            Real64 const zoneLoad,
-                                            bool const Pri,
-                                            Real64 const primaryAirMassFlow);
+    void CalcVariableSpeedPIUStagedHeatingBehavior(EnergyPlusData &state,
+                                                   int const PIUNum,   // number of the current PIU being simulated
+                                                   int const ZoneNode, // zone node number
+                                                   Real64 const zoneLoad,
+                                                   bool const Pri,
+                                                   Real64 const primaryAirMassFlow);
 
     void
     ReportCurOperatingControlStage(EnergyPlusData &state, int const PIUNum, bool const unitOn, HeatOpModeType heaterMode, CoolOpModeType coolingMode);
@@ -285,12 +287,20 @@ namespace PoweredInductionUnits {
                                                bool const useDAT,
                                                Real64 const fanTurnDown);
 
-    Real64 CalcVariableSpeedPIUQdotDelivered(EnergyPlusData &state,
-                                             int const PIUNum,   // number of the current PIU being simulated
-                                             int const ZoneNode, // zone node number
-                                             bool const useDAT,
-                                             Real64 const TotAirMassFlow,
-                                             Real64 const fanTurnDown);
+    Real64 CalcVariableSpeedPIUCoolingResidual(
+        EnergyPlusData &state, Real64 const coolSignal, int const PIUNum, Real64 const targetQznReq, int const zoneNodeNum);
+
+    void CalcVariableSpeedPIUCoolingBehavior(EnergyPlusData &state,
+                                             int const PIUNum,
+                                             int const ZoneNode,
+                                             Real64 const zoneLoad,
+                                             Real64 const loadToHeatSetPt,
+                                             bool const Pri,
+                                             Real64 const PriAirMassFlowMin,
+                                             Real64 const PriAirMassFlowMax);
+
+    Real64 CalcVariableSpeedPIUQdotDelivered(
+        EnergyPlusData &state, int const PIUNum, int const ZoneNode, bool const useDAT, Real64 const TotAirMassFlow, Real64 const fanTurnDown);
 
 } // namespace PoweredInductionUnits
 
