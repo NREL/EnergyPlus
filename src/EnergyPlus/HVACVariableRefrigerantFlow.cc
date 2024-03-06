@@ -13031,6 +13031,9 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       _,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
+            // yujie: update TU air mass flow
+            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate =
+                state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
         } else {
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
         }
