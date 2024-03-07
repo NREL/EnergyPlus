@@ -5,6 +5,10 @@ Duct model road map
 
 ** Florida Solar Energy Center**
 
+ - 5th draft, 3/6/24
+
+	After a technicalities call on 3/6/24
+
  - 4th draft, 2/22/24
 
 	After a conference call with Scott on 2/22/24
@@ -168,6 +172,101 @@ Although Scott accepts the proposed new and existing objects, he would like to r
 
 Gu's response: In order to keep the roadmap moving, the existing AFN objects will be used.
 
+### Discussion in the technicalities call on 3/6/24 ###
+
+The design document was presented in the call.
+
+Mike asked a question why added duct loss is restricted to a system. The general is preferred.
+
+Gu's reply: 
+
+There is a function to calculate zone sensible and latent outputs as CalcZoneSensibleLatentOutput in the GeneralRoutines module.
+
+	void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+	                                  Real64 const TDBEquip,  // dry-bulb temperature at equipment outlet {C}
+	                                  Real64 const WEquip,    // humidity ratio at equipment outlet
+	                                  Real64 const TDBZone,   // dry-bulb temperature at zone air node {C}
+	                                  Real64 const WZone,     // humidity ratio at zone air node
+	                                  Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+	                                  Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
+	                                  Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
+	)
+	{
+	
+	    // Purpose:
+	    // returns total, sensible and latent heat rate of transfer between the supply air zone inlet
+	    // node and zone air node. The moist air energy transfer can be cooling or heating depending
+	    // on the supply air zone inlet node and zone air node conditions.
+	
+	    // Methodology:
+	    // Q_total = m_dot * (hEquip - hZone)
+	    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone);
+	    // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
+	    //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
+	    // Q_latent = Q_total - Q_latent;
+	
+	    TotalOutput = 0.0;
+	    LatentOutput = 0.0;
+	    SensibleOutput = 0.0;
+	    if (MassFlow > 0.0) {
+	        TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
+	                                  Psychrometrics::PsyHFnTdbW(TDBZone, WZone));                         // total addition/removal rate, {W};
+	        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+	        LatentOutput = TotalOutput - SensibleOutput;                                                   // latent addition/removal rate, {W}
+	    }
+	}
+	
+There are several modules to call this function: Furnace, HVACMultispeedHeatPump, HVACStandAloneERV, and UnitarySystem.
+
+Here is an example function to call CalcZoneSensibleLatentOutput in UnitarySystem:
+
+    void UnitarySys::calculateCapacity(EnergyPlusData &state, Real64 &SensOutput, Real64 &LatOutput)
+    {
+
+        // Check delta T (outlet to reference temp), IF positive use reference HumRat ELSE outlet humrat to calculate
+        // sensible capacity as MdotDeltaH at constant humidity ratio
+        int OutletNode = this->AirOutNode;
+        Real64 AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
+        Real64 RefTemp = 0.0;
+        Real64 RefHumRat = 0.0;
+        if (this->m_ControlType == UnitarySysCtrlType::Setpoint) {
+            RefTemp = state.dataLoopNodes->Node(this->AirInNode).Temp;
+            RefHumRat = state.dataLoopNodes->Node(this->AirInNode).HumRat;
+        } else {
+            RefTemp = state.dataLoopNodes->Node(this->NodeNumOfControlledZone).Temp;
+            RefHumRat = state.dataLoopNodes->Node(this->NodeNumOfControlledZone).HumRat;
+        }
+        Real64 SensibleOutput(0.0); // sensible output rate, {W}
+        Real64 LatentOutput(0.0);   // latent output rate, {W}
+        Real64 TotalOutput(0.0);    // total output rate, {W}
+        // calculate sensible load met
+        if (this->ATMixerExists) {
+			.....
+        } else {
+            // Calculate sensible load met
+            CalcZoneSensibleLatentOutput(AirMassFlow,
+                                         state.dataLoopNodes->Node(OutletNode).Temp,
+                                         state.dataLoopNodes->Node(OutletNode).HumRat,
+                                         RefTemp,
+                                         RefHumRat,
+                                         SensibleOutput,
+                                         LatentOutput,
+                                         TotalOutput);
+            SensOutput = SensibleOutput - this->m_SenLoadLoss;
+            if (this->m_Humidistat) {
+                LatOutput = LatentOutput - this->m_LatLoadLoss;
+            } else {
+                LatOutput = 0.0;
+            }
+        }
+        this->m_SensibleLoadMet = SensOutput;
+        this->m_LatentLoadMet = LatOutput;
+    } 
+
+The sensible and latent zone loads are claculated based on system outlet node (this->AirOutNode) and zone node, instead of zone supply inlet node. The assumtion is that air conditions at both zone supply inlet node and system outlet node are the same. It misses any possible losses between both nodes. The proposed new feature will add any possible losses between both nodes.
+
+It is recommended that possible refactor for any systems should use zone supply inlet condition, instead of system outlet condition.
+  
 ## Roadmap ##
 
 The roadmap presents my view to implement simplified duct model without using the AFN model. The proposed new feature should meet the above requirements and include three new objects and possible modifications of existing objects. The present document addresses the possible inputs and partial design document so far.
@@ -795,15 +894,38 @@ Q<sub>lat</sub> = m<sub>mix</sub>h<sub>g</sub>(W<sub>j</sub> − W<sub>i</sub>)
 
 This section provides treament pathway of losses to either a system or a zone. 
 
+1. Duct conduction and leakage loss
+
+When the system outlet node is replaced by the zone supply inlet zone, duct losses can be included for system capacity request without any changes of system load prediction. This happens every iteration.
+
+2. Makeup losses
+
+I have two choices for the makeup losses. The first choice is to add losses as a part of system load, so that all losses will be added every system iteration. The second choice is to treat makeup losses as zone load used in the next time step. 
+
+Here is a reason: 
+
+When makeup losses are added as zone gain, they are excluded in the predictor calculation, so that requested system load will not have makeup losses at beginning of every time step. Thereofre, the makeup losses needs to be caught in the next zone time step. 
+
+I will try the first choice first. If not working well, the second choice will be implemented.
+
 ##### Conduction and leakage #####
 
 All losses from conduction and leakage will be added to a system as Duct loss. The implementation code is similar to the DuctLoss code in UntarySystem, Furnace and Multispeed AirToAir Heat pump mdules. The addon is summed by all conduction and leakage losses served to a system by the same Airloop.  
 
-![DuctlossAddon](DuctlossAddon.PNG)
+![DuctlossAddon](DuctlossAddon.png)
 
 It hsould be pointed out that the added loss is calculated at every iteration of the whole Airloop.
 
-Since the loss addon is system based one. Each individual system modification will be performed.
+Since the loss addon is system-based one. Each individual system modification will be performed.
+
+<span style="color:red">
+
+###### Possible approach ######
+
+If the system outlet node is changed to a zone inlet node in the call of CalcZoneSensibleLatentOutput, the added losses may be removed. I will test this approach to see if it works or not.
+
+</span>
+
 
 ##### Makeup air #####
 
@@ -811,16 +933,65 @@ The energy losses from makeup air will be added in a zone used for the next time
 
 ### New module ###
 
-A new module of DuctLoss will be created for inputs process and calculations.
+A new module of DuctLoss will be created for inputs process and calculations. Here is a list of possible functions and associated functionality.
 
-#### Inputs process ####
+1. SimDuctLoss
+2. GetDuctLossInput
+3. InitDuctLoss
+4. CalcDuctLoss
+5. ReportDuctLoss
 
-The 3 new objects (Duct:Loss:XXX) will be processed in the new module. The other related AFN objects will be handled in the AFN module to read Node, Linkage, Duct and Leakage object. I will check to see possiblity if separated functions are needed or not, because AFN model and Non AFN model need to process the same objects of Node, Linkage, Duct and Leakage.
+#### SimDuctLoss ####
 
-#### Calculation ####
+A possible function is:
 
-Any calculation will be performed in the module. 
+void DuctLoss::SimDuctLoss(EnergyPlusData &state, bool const FirstHVACIteration)
 
-#### Local variables ####
+The function may contain calls shown below:
+
+        if (state.dataDuctLoss->GetInputOnceFlag) {
+            // Get the AirLoopHVACDOAS input
+            getDuctLossSInput(state);
+            state.dataDuctLoss->GetInputOnceFlag = false;
+        }
+
+        this->initDuctLoss(state, FirstHVACIteration);
+
+        this->CalcDuctLoss(state, FirstHVACIteration);
+
+        this->ReportDuctLoss(state);
+
+The function will be called in the SimZoneEquipment of the ZoneEquipmentManager. The location will be similar with the call of SplitterComponent::SimAirLoopSplitter or the call of ReturnAirPathManager::SimReturnAirPath.
+
+#### GetDuctLossInput ####
+
+The 3 new objects (Duct:Loss:XXX) will be processed in the new module. The other related AFN objects will be handled in the AFN module to read Node, Linkage, Duct and Leakage object. I will check to see possiblity if separated functions are needed or not in the AFN model, because AFN model and Non AFN model need to process the same objects of Node, Linkage, Duct and Leakage.
+
+The function may contain functionality shown below:
+
+Read all inputs for Duct:Loss:XXX
+Check possible errors
+Setup node connections
+Call AFN model functions to get all required AFN objects
+
+##### Local variables #####
 
 All new objects and AFN obejcts will have local array variables defined in the header file.   
+
+#### InitDuctLoss ####
+
+This function has two functionalities. The first one is to assign component values and check error when some components data are not available in the process of GetDuctLossInput.
+
+The second functionality is to assign component values at each AirLoop iteration.
+
+#### CalcDuctLoss ####
+
+All duct losses will be calculated in this function, including conduction, leaks and makeup air. The outputs will be temperature and humidity ratio at outlet nodes.
+
+#### ReportDuctLoss ####
+
+All sensible and latent losses from each Duct:Loss:XXX object will be reported.
+
+### Other module revisions ###
+
+The major revisions will be performed in 3 modules, UnitarySystem, MultispeedHeatPump, and Furnace. The change will replace system outlet node by supply inlet node to call CalcZoneSensibleLatentOutput, so that duct losses will be included automatically when system capacity is requested to reach zone setpoint.
