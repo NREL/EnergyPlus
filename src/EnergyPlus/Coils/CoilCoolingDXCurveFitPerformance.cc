@@ -509,10 +509,11 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
             // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
             // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
             ShowWarningError(state,
-                             "Standard Ratings: The coils " + this->name + " has a gross cooling capacity of " +
-                                 std::to_string(mode.ratedGrossTotalCap) +
-                                 ". Industry standard ratings for coils of this size are defined in ANSI/AHRI Standard 365 (I-P). " +
-                                 "Calculations for this standard are not yet implemented in EnergyPlus. Therefore, no rating can be reported.");
+                             format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of this "
+                                    "size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet implemented in "
+                                    "EnergyPlus. Therefore, no rating can be reported",
+                                    this->name,
+                                    mode.ratedGrossTotalCap));
         } else if (mode.ratedGrossTotalCap < 19049.61955 && mode.condenserType == CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED) {
             // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
             // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
