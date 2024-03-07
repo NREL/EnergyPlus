@@ -8,7 +8,9 @@ target_compile_definitions(
         INTERFACE
         JSON_USE_IMPLICIT_CONVERSIONS=1
 )
-target_compile_options(nlohmann_json INTERFACE -Wno-deprecated-declarations)
+if(NOT MSVC)  # This is really only needed with newer Clang, but gcc is fine with it
+  target_compile_options(nlohmann_json INTERFACE -Wno-deprecated-declarations)
+endif()
 target_include_directories(
         nlohmann_json
         SYSTEM INTERFACE
