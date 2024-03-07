@@ -8,6 +8,7 @@ target_compile_definitions(
         INTERFACE
         JSON_USE_IMPLICIT_CONVERSIONS=1
 )
+# target_compile_options(nlohmann_json PRIVATE -Wno-deprecated-declarations)
 target_include_directories(
         nlohmann_json
         SYSTEM INTERFACE
