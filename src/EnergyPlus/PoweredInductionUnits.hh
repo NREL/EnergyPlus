@@ -108,7 +108,6 @@ namespace PoweredInductionUnits {
         ConstantVolumeHeat,
         StagedHeatFirstStage,
         StagedHeatSecondStage,
-        StagedHeatThirdStage,
         ModulatedHeatFirstStage,
         ModulatedHeatSecondStage,
         ModulatedHeatThirdStage,

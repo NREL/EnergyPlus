@@ -2081,9 +2081,6 @@ void CalcParallelPIU(EnergyPlusData &state,
     case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
         break;
@@ -2091,9 +2088,6 @@ void CalcParallelPIU(EnergyPlusData &state,
     case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
 
@@ -2102,9 +2096,6 @@ void CalcParallelPIU(EnergyPlusData &state,
     case HtgCoilType::Gas: { // COIL:GAS:HEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
@@ -2134,8 +2125,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
     state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
 
-    ReportCurOperatingControlStage(
-        state, PIUNum, UnitOn, thisPIU.heaterOperatingMode, thisPIU.coolingOperatingMode); // TODO: last argument is currently useless (always off)
+    ReportCurOperatingControlStage(state, PIUNum, UnitOn, thisPIU.heaterOperatingMode, thisPIU.coolingOperatingMode);
 }
 
 void ReportCurOperatingControlStage(EnergyPlusData &state, int const PIUNum, bool const unitOn, HeatOpModeType heaterMode, CoolOpModeType coolingMode)
