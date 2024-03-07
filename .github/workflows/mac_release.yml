@@ -25,15 +25,19 @@ jobs:
         - macos_dev_target: 10.15
           os: macos-11
           allow_failure: false
+          arch: x86_64
         - macos_dev_target: 11.6
           os: macos-11
           allow_failure: false
+          arch: x86_64
         - macos_dev_target: 12.1
           os: macos-12
           allow_failure: false
+          arch: x86_64
         - macos_dev_target: 13.0
           os: macos-14
           allow_failure: false
+          arch: arm64
     permissions:
       # Needed permission to upload the release asset
       contents: write
@@ -111,7 +115,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-*.tar.gz
+        file: build/EnergyPlus-*-${{ matrix.arch }}.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -120,7 +124,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-*.dmg
+        file: build/EnergyPlus-*-${{ matrix.arch }}.dmg
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
