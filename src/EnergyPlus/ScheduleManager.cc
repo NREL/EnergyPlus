@@ -4351,6 +4351,8 @@ namespace ScheduleManager {
         int DayT;
         int Loop;
 
+        constexpr int lastDayType = static_cast<int>(DayType::Holiday);
+
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4366,7 +4368,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= lastDayType; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4376,7 +4378,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= lastDayType; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4442,6 +4444,8 @@ namespace ScheduleManager {
         int DayT;
         int Loop;
 
+        constexpr int lastDayType = static_cast<int>(DayType::Holiday);
+
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4457,7 +4461,7 @@ namespace ScheduleManager {
                 WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= maxDayTypes; ++DayT) {
+                for (DayT = 2; DayT <= lastDayType; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4467,7 +4471,7 @@ namespace ScheduleManager {
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                    for (DayT = 1; DayT <= lastDayType; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
