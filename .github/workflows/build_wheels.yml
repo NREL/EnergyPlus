@@ -17,13 +17,13 @@ on:
 jobs:
   build_wheel:
 
-    runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9"]
         os: [ubuntu-22.04, macos-13, windows-2019]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout EnergyPlus
@@ -43,5 +43,5 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        name: dist
+        name: energyplus-wheel-${{ matrix.os }}
         path: ./dist

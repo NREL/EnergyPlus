@@ -74,6 +74,7 @@ cmake-build-*
 build-wheel/
 dist/
 energyplus.egg-info
+wheelhouse/
 
 # App-specific project files, for example, for Geany IDE:
 *.geany

@@ -1677,12 +1677,8 @@
     0.05,                    !- Nominal Supply Air Flow Rate {m3/s}
     0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     ERV Outside Air Inlet Node,  !- Supply Air Inlet Node Name
     Heat Recovery Outlet Node,  !- Supply Air Outlet Node Name
     Zone 1 Exhaust Node,     !- Exhaust Air Inlet Node Name
@@ -1691,7 +1687,60 @@
     Yes,                     !- Supply Air Outlet Temperature Control
     Rotary,                  !- Heat Exchanger Type
     MinimumExhaustTemperature,  !- Frost Control Type
-    1.7;                     !- Threshold Temperature {C}
+    1.7,                     !- Threshold Temperature {C}
+    ,                        !- Initial Defrost Time Fraction {dimensionless}
+    ,                        !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name
+
+  Table:IndependentVariable,
+    airFlowRatio,  !- Name
+    Linear,                  !- Interpolation Method
+    Linear,                  !- Extrapolation Method
+    0.0,                     !- Minimum Value
+    10.0,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.75,                    !- Value 1
+    1.0;                     !- Value 2
+
+  Table:IndependentVariableList,
+    effectiveness_IndependentVariableList,  !- Name
+    airFlowRatio;     !- Independent Variable 1 Name
+
+  Table:Lookup,
+    SenEffectivenessTable,   !- Name
+    effectiveness_IndependentVariableList,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    0.76,                    !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    10.0,                    !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.81,                    !- Output Value 1
+    0.76;                    !- Output Value 2
+
+  Table:Lookup,
+    LatEffectivenessTable,   !- Name
+    effectiveness_IndependentVariableList,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    0.68,                    !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    10.0,                    !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.73,                    !- Output Value 1
+    0.68;                    !- Output Value 2
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     OA Heat Recovery 2,      !- Name
@@ -1699,12 +1748,8 @@
     0.05,                    !- Nominal Supply Air Flow Rate {m3/s}
     0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     ERV Outside Air Inlet Node 2,  !- Supply Air Inlet Node Name
     Heat Recovery Outlet Node 2,  !- Supply Air Outlet Node Name
     Zone 2 Exhaust Node,     !- Exhaust Air Inlet Node Name
@@ -1713,7 +1758,14 @@
     Yes,                     !- Supply Air Outlet Temperature Control
     Rotary,                  !- Heat Exchanger Type
     MinimumExhaustTemperature,  !- Frost Control Type
-    1.7;                     !- Threshold Temperature {C}
+    1.7,                     !- Threshold Temperature {C}
+    ,                        !- Initial Defrost Time Fraction {dimensionless}
+    ,                        !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     OA Heat Recovery 3,      !- Name
@@ -1721,12 +1773,8 @@
     0.015,                   !- Nominal Supply Air Flow Rate {m3/s}
     0.76,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.76,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.68,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.81,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.73,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     ERV Outside Air Inlet Node 3,  !- Supply Air Inlet Node Name
     Heat Recovery Outlet Node 3,  !- Supply Air Outlet Node Name
     Zone 3 Exhaust Node,     !- Exhaust Air Inlet Node Name
@@ -1735,7 +1783,14 @@
     Yes,                     !- Supply Air Outlet Temperature Control
     Rotary,                  !- Heat Exchanger Type
     MinimumExhaustTemperature,  !- Frost Control Type
-    1.7;                     !- Threshold Temperature {C}
+    1.7,                     !- Threshold Temperature {C}
+    ,                        !- Initial Defrost Time Fraction {dimensionless}
+    ,                        !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 
