@@ -117,6 +117,7 @@ namespace EIRPlantLoopHeatPumps {
         bool waterSource = false;
         bool airSource = false;
         bool heatRecoveryAvailable = false;
+        bool heatRecoveryIsActive = false;
         ControlType sysControlType = ControlType::Invalid;
         DataPlant::FlowMode flowControl = DataPlant::FlowMode::Invalid;
 
@@ -264,6 +265,8 @@ namespace EIRPlantLoopHeatPumps {
         void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
 
         void calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state);
+
+        void setHeatRecoveryOperatingASHP(EnergyPlusData &state, bool FirstHVACIteration);
 
         virtual void report(EnergyPlusData &state);
 
