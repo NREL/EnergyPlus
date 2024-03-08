@@ -355,7 +355,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         }
     }
 
-    // yujie: variable thermal solar absorptance overrides
+    // variable thermal solar absorptance overrides
     UpdateVariableAbsorptances(state);
 
     // Do the Begin Environment initializations

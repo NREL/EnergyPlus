@@ -283,7 +283,7 @@ void SimulateVRF(EnergyPlusData &state,
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).CondenserType == DataHeatBalance::RefrigCondenserType::Water)
             UpdateVRFCondenser(state, VRFCondenser);
     }
-    // yujie: update coil and IU evaporating temperature, also keep coil RTF updated with the condenser side cycling ratio, for the FluidTCtrl model
+    // update coil and IU evaporating temperature, also keep coil RTF updated with the condenser side cycling ratio, for the FluidTCtrl model
     if (state.dataHVACVarRefFlow->VRF(VRFCondenser).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
         if (state.dataHVACVarRefFlow->VRF(VRFCondenser).adjustedTe && (!FirstHVACIteration)) {
             state.dataDXCoils->DXCoil(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolCoilIndex).EvaporatingTemp =
@@ -12204,7 +12204,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         this->HeatingCapacity = 0.0;                                    // Include the piping loss
         this->PipingCorrectionHeating = 1.0;                            // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // default value is MaxCap = 1e+20, not 0
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 1.0;
@@ -14277,7 +14277,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                 MinOutdoorUnitPe = max(P_discharge - this->CompMaxDeltaP, MinRefriPe);
                 MinOutdoorUnitTe = GetSatTemperatureRefrig(
                     state, this->RefrigerantName, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-                // yujie: Te can't be smaller than user input lower bound
+                // Te can't be smaller than user input lower bound
                 MinOutdoorUnitTe = max(this->IUEvapTempLow, MinOutdoorUnitTe);
 
                 auto f = [&state, T_discharge_new, CondHeat, CAPFT](Real64 const T_suc) {
