@@ -90,7 +90,7 @@ namespace ScheduleManager {
     };
 
     int constexpr maxDayTypes = static_cast<int>(DayType::Num) - 1;
-    int constexpr holidayDayType = static_cast<int>(DayType::Holiday);  // used when specifically excluding SummerDesignDay and WinterDesignDay
+    int constexpr holidayDayType = static_cast<int>(DayType::Holiday); // used when specifically excluding SummerDesignDay and WinterDesignDay
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
 
