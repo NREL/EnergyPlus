@@ -185,17 +185,18 @@ namespace ScheduleManager {
         SchedType SchType = SchedType::Invalid; // what kind of object has been input.
         bool Used;                              // Indicator for this schedule being "used".
         bool MaxMinSet;                         // Max/min values have been stored for this schedule
-        Real64 MaxValue;                        // Maximum value for this schedule
-        Real64 MinValue;                        // Minimum value for this schedule
-        Real64 CurrentValue;                    // For Reporting
-        bool EMSActuatedOn;                     // indicates if EMS computed
-        Real64 EMSValue;                        // EMS value
-        bool UseDaylightSaving;                 // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
+        bool MaxMinSundayToHoliday; // if true the max/min values computed based on Sunday through Holiday and excludes design days and custom days
+        Real64 MaxValue;            // Maximum value for this schedule
+        Real64 MinValue;            // Minimum value for this schedule
+        Real64 CurrentValue;        // For Reporting
+        bool EMSActuatedOn;         // indicates if EMS computed
+        Real64 EMSValue;            // EMS value
+        bool UseDaylightSaving;     // Toggles between daylight saving option to be inclused as "No" or "Yes" (default)
 
         // Default Constructor
         ScheduleData()
-            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
+            : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxMinSundayToHoliday(false), MaxValue(0.0),
+              MinValue(0.0), CurrentValue(0.0), EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }
     };
@@ -275,39 +276,44 @@ namespace ScheduleManager {
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex, // Which Schedule being tested
-                                  bool includeOrEquals,    // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum     // Minimum desired value
+                                  int const ScheduleIndex,         // Which Schedule being tested
+                                  bool includeOrEquals,            // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,            // Minimum desired value
+                                  bool onlySundayToHoliday = false // true excludes design days and custom days
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,    // Which Schedule being tested
-                                  std::string_view MinString, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum,       // Minimum desired value
-                                  std::string_view MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum        // Maximum desired value
+                                  int const ScheduleIndex,         // Which Schedule being tested
+                                  std::string_view MinString,      // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,            // Minimum desired value
+                                  std::string_view MaxString,      // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum,            // Maximum desired value
+                                  bool onlySundayToHoliday = false // true excludes design days and custom days
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex, // Which Schedule being tested
-                                  Clusivity clusiveMin,    // true ? '>' : '>='
-                                  Real64 const Minimum,    // Minimum desired value
-                                  Clusivity clusiveMax,    // true ? '<' : '<='
-                                  Real64 const Maximum     // Maximum desired value
+                                  int const ScheduleIndex,         // Which Schedule being tested
+                                  Clusivity clusiveMin,            // true ? '>' : '>='
+                                  Real64 const Minimum,            // Minimum desired value
+                                  Clusivity clusiveMax,            // true ? '<' : '<='
+                                  Real64 const Maximum,            // Maximum desired value
+                                  bool onlySundayToHoliday = false // true excludes design days and custom days
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real32 const Minimum          // Minimum desired value
+                                  int const ScheduleIndex,         // Which Schedule being tested
+                                  std::string const &MinString,    // Minimum indicator ('>', '>=')
+                                  Real32 const Minimum,            // Minimum desired value
+                                  bool onlySundayToHoliday = false // true excludes design days and custom days
     );
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const ScheduleIndex,      // Which Schedule being tested
-                                  std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real32 const Minimum,         // Minimum desired value
-                                  std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real32 const Maximum          // Maximum desired value
+                                  int const ScheduleIndex,         // Which Schedule being tested
+                                  std::string const &MinString,    // Minimum indicator ('>', '>=')
+                                  Real32 const Minimum,            // Minimum desired value
+                                  std::string const &MaxString,    // Maximum indicator ('<', ',=')
+                                  Real32 const Maximum,            // Maximum desired value
+                                  bool onlySundayToHoliday = false // true excludes design days and custom days
     );
 
     bool CheckScheduleValue(EnergyPlusData &state,
@@ -336,9 +342,9 @@ namespace ScheduleManager {
 
     bool HasFractionalScheduleValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
-    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex, bool onlySundayToHoliday = false);
 
-    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
+    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex, bool onlySundayToHoliday = false);
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 

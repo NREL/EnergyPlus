@@ -3683,7 +3683,7 @@ namespace ScheduleManager {
         }
     }
 
-    void SetScheduleMinMax(EnergyPlusData &state, int SchedNum)
+    void SetScheduleMinMax(EnergyPlusData &state, int SchedNum, bool onlySundayToHoliday = false)
     {
         auto &sched = state.dataScheduleMgr->Schedule(SchedNum);
         if (sched.MaxMinSet) return;
@@ -3697,24 +3697,28 @@ namespace ScheduleManager {
             state.dataScheduleMgr->CheckScheduleValueMinMaxRunOnceOnly = false;
         }
 
+        int lastDayType = maxDayTypes;
+        if (onlySundayToHoliday) lastDayType = holidayDayType;
+
         auto const &wkSched = state.dataScheduleMgr->WeekSchedule(sched.WeekSchedulePointer(1));
         auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(1));
         Real64 MinValue = daySched.TSValMin;
         Real64 MaxValue = daySched.TSValMax;
-        for (int DayT = 2; DayT <= holidayDayType; ++DayT) {
+        for (int DayT = 2; DayT <= lastDayType; ++DayT) {
             auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
             MinValue = min(MinValue, daySched.TSValMin);
             MaxValue = max(MaxValue, daySched.TSValMax);
         }
         for (int Loop = 2; Loop <= 366; ++Loop) {
             auto const &wkSched = state.dataScheduleMgr->WeekSchedule(sched.WeekSchedulePointer(Loop));
-            for (int DayT = 1; DayT <= holidayDayType; ++DayT) {
+            for (int DayT = 1; DayT <= lastDayType; ++DayT) {
                 auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
                 MinValue = min(MinValue, daySched.TSValMin);
                 MaxValue = max(MaxValue, daySched.TSValMax);
             }
         }
         sched.MaxMinSet = true;
+        sched.MaxMinSundayToHoliday = onlySundayToHoliday;
         sched.MinValue = MinValue;
         sched.MaxValue = MaxValue;
     }
@@ -3722,7 +3726,8 @@ namespace ScheduleManager {
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const ScheduleIndex,    // Which Schedule being tested
                                   bool const includeOrEquals, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum        // Minimum desired value
+                                  Real64 const Minimum,       // Minimum desired value
+                                  bool onlySundayToHoliday    // true excludes design days and custom days
     )
     {
         // FUNCTION INFORMATION:
@@ -3756,7 +3761,7 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                SetScheduleMinMax(state, ScheduleIndex);
+                SetScheduleMinMax(state, ScheduleIndex, onlySundayToHoliday);
             }
             MinValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
             MinValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
@@ -3775,7 +3780,9 @@ namespace ScheduleManager {
                                   std::string_view MinString, // Minimum indicator ('>', '>=')
                                   Real64 const Minimum,       // Minimum desired value
                                   std::string_view MaxString, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum)       // Maximum desired value
+                                  Real64 const Maximum,       // Maximum desired value
+                                  bool onlySundayToHoliday    // true excludes design days and custom days
+    )
     {
         Clusivity clusiveMin = (MinString == ">=") ? Clusivity::Inclusive : ((MinString == ">") ? Clusivity::Exclusive : Clusivity::Invalid);
         Clusivity clusiveMax = (MaxString == "<=") ? Clusivity::Inclusive : ((MaxString == "<") ? Clusivity::Exclusive : Clusivity::Invalid);
@@ -3783,15 +3790,16 @@ namespace ScheduleManager {
         if (clusiveMin == Clusivity::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MinString {}", MinString));
         if (clusiveMax == Clusivity::Invalid) ShowFatalError(state, format("CheckScheduleValueMinMax: illegal MaxString {}", MaxString));
 
-        return CheckScheduleValueMinMax(state, schedNum, clusiveMin, Minimum, clusiveMax, Maximum);
+        return CheckScheduleValueMinMax(state, schedNum, clusiveMin, Minimum, clusiveMax, Maximum, onlySundayToHoliday);
     }
 
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
-                                  int const schedNum,   // Which Schedule being tested
-                                  Clusivity clusiveMin, // Minimum indicator ('>', '>=')
-                                  Real64 const Minimum, // Minimum desired value
-                                  Clusivity clusiveMax, // Maximum indicator ('<', ',=')
-                                  Real64 const Maximum  // Maximum desired value
+                                  int const schedNum,      // Which Schedule being tested
+                                  Clusivity clusiveMin,    // Minimum indicator ('>', '>=')
+                                  Real64 const Minimum,    // Minimum desired value
+                                  Clusivity clusiveMax,    // Maximum indicator ('<', ',=')
+                                  Real64 const Maximum,    // Maximum desired value
+                                  bool onlySundayToHoliday // true excludes design days and custom days
     )
     {
         // FUNCTION INFORMATION:
@@ -3821,7 +3829,7 @@ namespace ScheduleManager {
         } else if (schedNum > 0 && schedNum <= state.dataScheduleMgr->NumSchedules) {
             auto &sched = state.dataScheduleMgr->Schedule(schedNum);
             if (!sched.MaxMinSet) {
-                SetScheduleMinMax(state, schedNum);
+                SetScheduleMinMax(state, schedNum, onlySundayToHoliday);
             }
             MinValueOk = (clusiveMin == Clusivity::Exclusive) ? (sched.MinValue > Minimum) : (FLT_EPSILON >= Minimum - sched.MinValue);
             MaxValueOk = (clusiveMax == Clusivity::Exclusive) ? (sched.MaxValue < Maximum) : (sched.MaxValue - Maximum <= FLT_EPSILON);
@@ -3835,7 +3843,8 @@ namespace ScheduleManager {
     bool CheckScheduleValueMinMax(EnergyPlusData &state,
                                   int const schedNum,           // Which Schedule being tested
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
-                                  Real32 const Minimum          // Minimum desired value
+                                  Real32 const Minimum,         // Minimum desired value
+                                  bool onlySundayToHoliday      // true excludes design days and custom days
     )
     {
         // FUNCTION INFORMATION:
@@ -3859,7 +3868,7 @@ namespace ScheduleManager {
             MinValue = 0.0;
         } else if (schedNum > 0 && schedNum > state.dataScheduleMgr->NumSchedules) {
             if (!state.dataScheduleMgr->Schedule(schedNum).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                SetScheduleMinMax(state, schedNum);
+                SetScheduleMinMax(state, schedNum, onlySundayToHoliday);
             }
             MinValue = state.dataScheduleMgr->Schedule(schedNum).MinValue = MinValue;
         } else {
@@ -3874,7 +3883,8 @@ namespace ScheduleManager {
                                   std::string const &MinString, // Minimum indicator ('>', '>=')
                                   Real32 const Minimum,         // Minimum desired value
                                   std::string const &MaxString, // Maximum indicator ('<', ',=')
-                                  Real32 const Maximum          // Maximum desired value
+                                  Real32 const Maximum,         // Maximum desired value
+                                  bool onlySundayToHoliday      // true excludes design days and custom days
     )
     {
         // FUNCTION INFORMATION:
@@ -3902,7 +3912,7 @@ namespace ScheduleManager {
         } else if (schedNum > 0 && schedNum <= state.dataScheduleMgr->NumSchedules) {
             auto const &sched = state.dataScheduleMgr->Schedule(schedNum);
             if (!sched.MaxMinSet) { // Set Minimum/Maximums for this schedule
-                SetScheduleMinMax(state, schedNum);
+                SetScheduleMinMax(state, schedNum, onlySundayToHoliday);
             }
 
             MinValueOk = (MinString == ">") ? (sched.MinValue > Minimum) : (FLT_EPSILON >= Minimum - sched.MinValue);
@@ -4308,43 +4318,16 @@ namespace ScheduleManager {
         return HasFractions;
     }
 
-    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
+    Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex, bool onlySundayToHoliday)
     {
-        // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
         // This function returns the minimum value used by a schedule over
         // the entire year.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 MinimumValue; // Minimum value for schedule
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
         Real64 MaxValue(0.0);
         int WkSch;
@@ -4361,12 +4344,16 @@ namespace ScheduleManager {
             ShowFatalError(state, "GetScheduleMinValue called with ScheduleIndex out of range");
         }
 
+        int lastDayType = maxDayTypes;
+        if (onlySundayToHoliday) lastDayType = holidayDayType;
+
         if (ScheduleIndex > 0) {
-            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+            auto &sch = state.dataScheduleMgr->Schedule(ScheduleIndex);
+            if (!sch.MaxMinSet || sch.MaxMinSundayToHoliday != onlySundayToHoliday) { // Set Minimum/Maximums for this schedule
+                WkSch = sch.WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= holidayDayType; ++DayT) {
+                for (DayT = 2; DayT <= lastDayType; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4375,8 +4362,8 @@ namespace ScheduleManager {
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= holidayDayType; ++DayT) {
+                    WkSch = sch.WeekSchedulePointer(Loop);
+                    for (DayT = 1; DayT <= lastDayType; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4385,13 +4372,14 @@ namespace ScheduleManager {
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
+                sch.MaxMinSet = true;
+                sch.MaxMinSundayToHoliday = onlySundayToHoliday;
+                sch.MinValue = MinValue;
+                sch.MaxValue = MaxValue;
             }
 
             //  Min/max for schedule has been set.
-            MinimumValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue;
+            MinimumValue = sch.MinValue;
         } else {
             MinimumValue = MinValue;
         }
@@ -4399,43 +4387,16 @@ namespace ScheduleManager {
         return MinimumValue;
     }
 
-    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex) // Which Schedule being tested
+    Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex, bool onlySundayToHoliday)
     {
-        // FUNCTION INFORMATION:
         //       AUTHOR         Linda K. Lawrie
         //       DATE WRITTEN   February 2004
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
         // This function returns the maximum value used by a schedule over
         // the entire year.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
         Real64 MaximumValue; // Maximum value for schedule
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         Real64 MinValue(0.0);
         Real64 MaxValue(0.0);
         int WkSch;
@@ -4452,12 +4413,16 @@ namespace ScheduleManager {
             ShowFatalError(state, "CheckScheduleMaxValue called with ScheduleIndex out of range");
         }
 
+        int lastDayType = maxDayTypes;
+        if (onlySundayToHoliday) lastDayType = holidayDayType;
+
         if (ScheduleIndex > 0) {
-            if (!state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet) { // Set Minimum/Maximums for this schedule
-                WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(1);
+            auto &sch = state.dataScheduleMgr->Schedule(ScheduleIndex);
+            if (!sch.MaxMinSet) { // Set Minimum/Maximums for this schedule
+                WkSch = sch.WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
-                for (DayT = 2; DayT <= holidayDayType; ++DayT) {
+                for (DayT = 2; DayT <= lastDayType; ++DayT) {
                     MinValue =
                         min(MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4466,8 +4431,8 @@ namespace ScheduleManager {
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
                 for (Loop = 2; Loop <= 366; ++Loop) {
-                    WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= holidayDayType; ++DayT) {
+                    WkSch = sch.WeekSchedulePointer(Loop);
+                    for (DayT = 1; DayT <= lastDayType; ++DayT) {
                         MinValue = min(
                             MinValue,
                             minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
@@ -4476,14 +4441,15 @@ namespace ScheduleManager {
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                     }
                 }
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MinValue = MinValue;
-                state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue = MaxValue;
+                sch.MaxMinSet = true;
+                sch.MaxMinSundayToHoliday = onlySundayToHoliday;
+                sch.MinValue = MinValue;
+                sch.MaxValue = MaxValue;
             }
 
             //  Min/max for schedule has been set.
 
-            MaximumValue = state.dataScheduleMgr->Schedule(ScheduleIndex).MaxValue;
+            MaximumValue = sch.MaxValue;
         } else {
             MaximumValue = MaxValue;
         }

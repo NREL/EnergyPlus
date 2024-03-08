@@ -177,8 +177,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr);
+                SchMin = GetScheduleMinValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr, true);
+                SchMax = GetScheduleMaxValue(state, state.dataExteriorEnergyUse->ExteriorLights(Item).SchedPtr, true);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
@@ -384,8 +384,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr);
-                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
+                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr, true);
+                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr, true);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,
@@ -464,8 +464,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr);
-                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr);
+                SchMin = GetScheduleMinValue(state, exteriorEquip.SchedPtr, true);
+                SchMax = GetScheduleMaxValue(state, exteriorEquip.SchedPtr, true);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(state,

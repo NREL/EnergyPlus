@@ -352,8 +352,8 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisPeople.NumberOfPeoplePtr);
-                        SchMax = GetScheduleMaxValue(state, thisPeople.NumberOfPeoplePtr);
+                        SchMin = GetScheduleMinValue(state, thisPeople.NumberOfPeoplePtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisPeople.NumberOfPeoplePtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
@@ -580,8 +580,8 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                     } else { // Check values in Schedule
-                        SchMin = GetScheduleMinValue(state, thisPeople.ActivityLevelPtr);
-                        SchMax = GetScheduleMaxValue(state, thisPeople.ActivityLevelPtr);
+                        SchMin = GetScheduleMinValue(state, thisPeople.ActivityLevelPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisPeople.ActivityLevelPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
@@ -813,8 +813,8 @@ namespace InternalHeatGains {
                                         ErrorsFound = true;
                                     }
                                 } else { // check min/max on schedule
-                                    SchMin = GetScheduleMinValue(state, thisPeople.WorkEffPtr);
-                                    SchMax = GetScheduleMaxValue(state, thisPeople.WorkEffPtr);
+                                    SchMin = GetScheduleMinValue(state, thisPeople.WorkEffPtr, true);
+                                    SchMax = GetScheduleMaxValue(state, thisPeople.WorkEffPtr, true);
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
@@ -908,8 +908,8 @@ namespace InternalHeatGains {
                                             ErrorsFound = true;
                                         }
                                     } else { // check min/max on schedule
-                                        SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr);
-                                        SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr);
+                                        SchMin = GetScheduleMinValue(state, thisPeople.ClothingPtr, true);
+                                        SchMax = GetScheduleMaxValue(state, thisPeople.ClothingPtr, true);
                                         if (SchMin < 0.0 || SchMax < 0.0) {
                                             if (SchMin < 0.0) {
                                                 if (Item1 == 1) {
@@ -1012,8 +1012,8 @@ namespace InternalHeatGains {
                                         ErrorsFound = true;
                                     }
                                 } else { // check min/max on schedule
-                                    SchMin = GetScheduleMinValue(state, thisPeople.AirVelocityPtr);
-                                    SchMax = GetScheduleMaxValue(state, thisPeople.AirVelocityPtr);
+                                    SchMin = GetScheduleMinValue(state, thisPeople.AirVelocityPtr, true);
+                                    SchMax = GetScheduleMaxValue(state, thisPeople.AirVelocityPtr, true);
                                     if (SchMin < 0.0 || SchMax < 0.0) {
                                         if (SchMin < 0.0) {
                                             if (Item1 == 1) {
@@ -1148,9 +1148,9 @@ namespace InternalHeatGains {
                     int OptionNum = 0;
                     for (int Loop1 = 1; Loop1 <= state.dataHeatBal->TotPeople; ++Loop1) {
                         if (state.dataHeatBal->People(Loop1).ZonePtr != Loop) continue;
-                        if (maxOccupLoad < GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
+                        if (maxOccupLoad < GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr, true) *
                                                state.dataHeatBal->People(Loop1).NumberOfPeople) {
-                            maxOccupLoad = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr) *
+                            maxOccupLoad = GetScheduleMaxValue(state, state.dataHeatBal->People(Loop1).NumberOfPeoplePtr, true) *
                                            state.dataHeatBal->People(Loop1).NumberOfPeople;
                             OptionNum = Loop1;
                         }
@@ -1249,8 +1249,8 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisLights.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisLights.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisLights.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisLights.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
@@ -1696,8 +1696,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneElectric.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneElectric.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneElectric.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneElectric.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(
@@ -1932,8 +1932,8 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         }
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneGas.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneGas.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneGas.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneGas.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (Item1 == 1) {
                                 if (SchMin < 0.0) {
@@ -2200,8 +2200,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneHWEq.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneHWEq.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneHWEq.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneHWEq.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
@@ -2436,8 +2436,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneStmEq.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneStmEq.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneStmEq.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneStmEq.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
@@ -2719,8 +2719,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneOthEq.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneOthEq.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneOthEq.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneOthEq.SchedPtr, true);
                     }
 
                     // equipment design level calculation method.
@@ -3057,8 +3057,8 @@ namespace InternalHeatGains {
                                                    IHGAlphas(5)));
                             ErrorsFound = true;
                         } else { // check min/max on schedule
-                            SchMin = GetScheduleMinValue(state, thisZoneITEq.OperSchedPtr);
-                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.OperSchedPtr);
+                            SchMin = GetScheduleMinValue(state, thisZoneITEq.OperSchedPtr, true);
+                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.OperSchedPtr, true);
                             if (SchMin < 0.0 || SchMax < 0.0) {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(
@@ -3098,8 +3098,8 @@ namespace InternalHeatGains {
                                                    IHGAlphas(6)));
                             ErrorsFound = true;
                         } else { // check min/max on schedule
-                            SchMin = GetScheduleMinValue(state, thisZoneITEq.CPULoadSchedPtr);
-                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.CPULoadSchedPtr);
+                            SchMin = GetScheduleMinValue(state, thisZoneITEq.CPULoadSchedPtr, true);
+                            SchMax = GetScheduleMaxValue(state, thisZoneITEq.CPULoadSchedPtr, true);
                             if (SchMin < 0.0 || SchMax < 0.0) {
                                 if (SchMin < 0.0) {
                                     ShowSevereError(
@@ -3433,8 +3433,8 @@ namespace InternalHeatGains {
                         }
                         ErrorsFound = true;
                     } else { // check min/max on schedule
-                        SchMin = GetScheduleMinValue(state, thisZoneBBHeat.SchedPtr);
-                        SchMax = GetScheduleMaxValue(state, thisZoneBBHeat.SchedPtr);
+                        SchMin = GetScheduleMinValue(state, thisZoneBBHeat.SchedPtr, true);
+                        SchMax = GetScheduleMaxValue(state, thisZoneBBHeat.SchedPtr, true);
                         if (SchMin < 0.0 || SchMax < 0.0) {
                             if (SchMin < 0.0) {
                                 ShowSevereError(state,
@@ -3576,8 +3576,8 @@ namespace InternalHeatGains {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneCO2Gen(Loop).SchedPtr);
-                SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneCO2Gen(Loop).SchedPtr);
+                SchMin = GetScheduleMinValue(state, state.dataHeatBal->ZoneCO2Gen(Loop).SchedPtr, true);
+                SchMax = GetScheduleMaxValue(state, state.dataHeatBal->ZoneCO2Gen(Loop).SchedPtr, true);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(
