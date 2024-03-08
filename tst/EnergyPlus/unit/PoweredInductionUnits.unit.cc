@@ -2120,7 +2120,10 @@ TEST_F(EnergyPlusFixture, VSParallelPIUStagedHeat)
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
     Real64 PriMinMassFlow = thisPIU.MinPriAirMassFlow;
 
-    // first stage heating: reheat off, minimum primary air flow rate, secondary flow rate modulated between min and max
+    // first stage heating, expects:
+    // - reheat: no
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: modulating between minimum and maximum value
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 500.0;
@@ -2150,7 +2153,10 @@ TEST_F(EnergyPlusFixture, VSParallelPIUStagedHeat)
     EXPECT_GT(thisPIU.SecMassFlowRate, thisPIU.MinSecAirMassFlow);
     EXPECT_EQ(thisPIU.DischargeAirTemp, state->dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp); // no reheat
 
-    // second stage heating: reheat on, minimum primary air flow rate, maximum secondary flow rate
+    // second stage heating, expects:
+    // - reheat: yes
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 1000.0;
     PoweredInductionUnits::CalcParallelPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2312,7 +2318,11 @@ TEST_F(EnergyPlusFixture, VSParallelPIUModulatedHeat)
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
     Real64 PriMinMassFlow = thisPIU.MinPriAirMassFlow;
 
-    // first stage heating: modulated reheat, DAT below desin heating DAT, minimum primary air flow rate, minmum secondary flow rate
+    // first stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: DAT below design heating DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: minmum value
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 500.0;
@@ -2342,8 +2352,11 @@ TEST_F(EnergyPlusFixture, VSParallelPIUModulatedHeat)
     EXPECT_EQ(thisPIU.SecMassFlowRate, thisPIU.MinSecAirMassFlow);
     EXPECT_LT(thisPIU.DischargeAirTemp, thisPIU.designHeatingDAT);
 
-    // second stage heating: constant reheat, DAT at desin heating DAT, minimum primary air flow rate, modulating secondary flow rate between minimum
-    // and maximum
+    // second stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: design heating DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: modulating between minimum and maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 1000.0;
     PoweredInductionUnits::CalcParallelPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2353,8 +2366,11 @@ TEST_F(EnergyPlusFixture, VSParallelPIUModulatedHeat)
     EXPECT_GT(thisPIU.SecMassFlowRate, thisPIU.MinSecAirMassFlow);
     EXPECT_NEAR(thisPIU.DischargeAirTemp, thisPIU.designHeatingDAT, 0.0001);
 
-    // third stage heating: modulated reheat, DAT is greater than heating design DAT but less than high limit DAT, minimum primary air flow rate,
-    // maximum secondary flow rate
+    // third stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: modulating between design heating DAT and high limit DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 1500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 1500.0;
     PoweredInductionUnits::CalcParallelPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2542,7 +2558,10 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUStagedHeat)
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
     Real64 PriMinMassFlow = thisPIU.MinPriAirMassFlow;
 
-    // first stage heating: reheat off, minimum primary air flow rate, modulated secondary flow rate between minimum and maximum
+    // first stage heating, expects:
+    // - reheat: no
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: modulating between minimum and maximum value
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 500.0;
@@ -2573,7 +2592,10 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUStagedHeat)
     EXPECT_GT(thisPIU.SecMassFlowRate, thisPIU.MinSecAirMassFlow);
     EXPECT_EQ(thisPIU.DischargeAirTemp, state->dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp); // no reheat
 
-    // second stage heating: modulated reheat, minimum primary air flow rate, maximum secondary flow rate
+    // second stage heating, expects:
+    // - reheat: yes
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 2500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 2500.0;
     PoweredInductionUnits::CalcSeriesPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2738,7 +2760,11 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUModulatedHeat)
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
     Real64 PriMinMassFlow = thisPIU.MinPriAirMassFlow;
 
-    // first stage heating: modulated reheat, DAT below design heating DAT, minimum primary air flow rate, minmum secondary flow rate
+    // first stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: DAT below design heating DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: minmum value
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 500.0;
@@ -2768,8 +2794,11 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUModulatedHeat)
     EXPECT_EQ(thisPIU.SecMassFlowRate, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
     EXPECT_LT(thisPIU.DischargeAirTemp, thisPIU.designHeatingDAT);
 
-    // second stage heating: reheat, DAT at design heating DAT, minimum primary air flow rate, modulated secondary flow rate between minimum and
-    // maximum
+    // second stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: design heating DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: modulating between minimum and maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 1500.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 1500.0;
     PoweredInductionUnits::CalcSeriesPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2779,8 +2808,11 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUModulatedHeat)
     EXPECT_GT(thisPIU.SecMassFlowRate, thisPIU.MinSecAirMassFlow);
     EXPECT_NEAR(thisPIU.DischargeAirTemp, thisPIU.designHeatingDAT, 0.0001);
 
-    // third stage heating: modulated reheat, DAT is greater than heating design DAT but less than high limit DAT, minimum primary air flow rate,
-    // maximum secondary flow rate
+    // third stage heating, expects:
+    // - reheat: yes
+    // - discharge air temperature: modulating between design heating DAT and high limit DAT
+    // - primary air flow rate: minimum value
+    // - secondary air flow rate: maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = 3300.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToHeatSP = 3300.0;
     PoweredInductionUnits::CalcSeriesPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
@@ -2963,7 +2995,8 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUCool)
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
     Real64 PriMinMassFlow = thisPIU.MinPriAirMassFlow;
 
-    // first stage cooling: modulated total flow rate between minimum and maximum
+    // first stage cooling, expects:
+    // - total flow rate: modulating between minimum and maxium value
     state->dataLoopNodes->Node(PriNodeNum).MassFlowRate = PriMinMassFlow;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = -400.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToCoolSP = -400.0;
@@ -2991,6 +3024,8 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUCool)
     EXPECT_EQ(thisPIU.coolingOperatingMode, PoweredInductionUnits::CoolOpModeType::CoolFirstStage);
     EXPECT_LT(state->dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate, thisPIU.MaxTotAirMassFlow);
 
+    // second stage cooling, expects:
+    // - total flow rate: maximum value
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputRequired = -800.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNodeNum).RemainingOutputReqToCoolSP = -800.0;
     PoweredInductionUnits::CalcSeriesPIU(*state, SysNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
