@@ -1719,9 +1719,6 @@ void CalcSeriesPIU(EnergyPlusData &state,
     case HtgCoilType::SteamAirHeating: { // COIL:STEAM:AIRHEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
 
@@ -1730,9 +1727,6 @@ void CalcSeriesPIU(EnergyPlusData &state,
     case HtgCoilType::Electric: { // COIL:ELECTRIC:HEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
 
@@ -1741,9 +1735,6 @@ void CalcSeriesPIU(EnergyPlusData &state,
     case HtgCoilType::Gas: { // COIL:GAS:HEATING
         if ((thisPIU.heaterOperatingMode == HeatOpModeType::HeaterOff) || (thisPIU.heaterOperatingMode == HeatOpModeType::StagedHeatFirstStage)) {
             QCoilReq = 0.0;
-        } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
@@ -2424,7 +2415,7 @@ void CalcVariableSpeedPIUModulatedHeatingBehavior(EnergyPlusData &state,
     if (qdotDeliveredEnd1stStage >= zoneLoad) { // 1st stage, find heating power at minimum fan speed
         thisPIU.heaterOperatingMode = HeatOpModeType::ModulatedHeatFirstStage;
         if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-            thisPIU.SecAirMassFlow = thisPIU.MinTotAirMassFlow;
+            thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow; // TODO: Make sure that this fix makes sense
         } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
             thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
         }
