@@ -284,6 +284,7 @@ void GetPIUs(EnergyPlusData &state)
                 auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
                 thisPIU.Name = Util::makeUPPER(instance.key());
                 thisPIU.UnitType = cCurrentModuleObject;
+                ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
                 if (cCurrentModuleObject == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
                     thisPIU.UnitType_Num = DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat;
                 } else if (cCurrentModuleObject == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
