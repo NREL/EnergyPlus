@@ -11724,6 +11724,8 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         }
 
         // Key outputs of this subroutine
+        Ncomp *= CyclingRatio;
+        Q_h_OU *= CyclingRatio;
         this->CompActSpeed = max(CompSpdActual, 0.0);
         this->Ncomp = max(Ncomp, 0.0) / this->EffCompInverter; // 0.95 is the efficiency of the compressor inverter, can come from IDF //@minor
         this->OUFanPower = this->RatedOUFanPower;              //@ * pow_3( CondFlowRatio )
@@ -14449,8 +14451,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     CyclingRatio = 1.0;
                 }
 
-                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction) * CyclingRatio;
-                OUCondHeatRelease = Ncomp + Cap_Eva1 * CyclingRatio;
+                Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
+                OUCondHeatRelease = Ncomp + Cap_Eva1;
 
                 this->CondensingTemp = T_discharge; // OU Tc' is updated due to OUCondHeatRelease updates, which is caused by IU Te' updates
                                                     // during low load conditions
