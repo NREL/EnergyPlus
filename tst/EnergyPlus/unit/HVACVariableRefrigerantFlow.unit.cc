@@ -2632,7 +2632,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompEvaporatingPWRSpdMin =
         thisVRF.RatedCompPower * CurveValue(*state, thisVRF.OUCoolingPWRFT(1), thisVRF.CondensingTemp, thisVRF.EvaporatingTemp);
     EXPECT_NEAR(0.34, CyclingRatio, 0.01);
-    EXPECT_NEAR(OUEvapHeatExtract, CompEvaporatingCAPSpdMin * CyclingRatio, 1e-4);
+    EXPECT_NEAR(OUEvapHeatExtract, CompEvaporatingCAPSpdMin * CyclingRatio + Ncomp, 1e-4);
     EXPECT_NEAR(1500, CompSpdActual, 1);
     EXPECT_NEAR(Ncomp, CompEvaporatingPWRSpdMin * CyclingRatio, 1e-4);
 }
