@@ -1606,8 +1606,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_15000W_SameFanPower_SEER2_2023_
     EXPECT_DOUBLE_EQ(StandarRatingResults["EER_2022"], StandarRatingResults["EER"]);
     EXPECT_NEAR(3.51, StandarRatingResults["EER"], 0.01);
     EXPECT_NEAR(3.51, StandarRatingResults["EER_2022"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.6342576029986851, StandarRatingResults["IEER"], 0.01);
+    EXPECT_NEAR(3.6342083696690421, StandarRatingResults["IEER_2022"], 0.01);
     EXPECT_NEAR(14594.568882508802, StandarRatingResults["NetCoolingCapRated"], 0.01);
     EXPECT_NEAR(14594.568882508802, StandarRatingResults["NetCoolingCapRated2023"], 0.01);
 }
@@ -1867,8 +1867,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_9000W_SEER2_2023_ValueTest)
 
     EXPECT_NEAR(2.54, StandarRatingResults["EER"], 0.01);
     EXPECT_NEAR(2.46, StandarRatingResults["EER_2022"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.60, StandarRatingResults["IEER"], 0.01);
+    EXPECT_NEAR(2.47, StandarRatingResults["IEER_2022"], 0.01);
     EXPECT_NEAR(8611.903861568002, StandarRatingResults["NetCoolingCapRated"], 0.01);
     EXPECT_NEAR(8531.3538615680009, StandarRatingResults["NetCoolingCapRated2023"], 0.01);
 }
@@ -2130,8 +2130,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_18000W_SEER2_2023_ValueTest)
 
     EXPECT_NEAR(3.60, StandarRatingResults["EER"], 0.01);
     EXPECT_NEAR(3.45, StandarRatingResults["EER_2022"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.54, StandarRatingResults["IEER"], 0.01);
+    EXPECT_NEAR(3.33, StandarRatingResults["IEER_2022"], 0.01);
     EXPECT_NEAR(17223.807723136004, StandarRatingResults["NetCoolingCapRated"], 0.01);
     EXPECT_NEAR(17062.707723136002, StandarRatingResults["NetCoolingCapRated2023"], 0.01);
 }
@@ -2415,17 +2415,19 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilEvap_32000W_IEER_2022_ValueTest)
                                                                    thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
                                                                    thisCoil.CondenserType(1));
 
-    EXPECT_TRUE(StandarRatingResults["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] == 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] > 0.0);
     EXPECT_TRUE(StandarRatingResults["SEER2_User"] == 0.0);
     EXPECT_TRUE(StandarRatingResults["SEER2_Standard"] == 0.0);
     EXPECT_NEAR(3.14, StandarRatingResults["EER"], 0.01);
     EXPECT_NEAR(3.03, StandarRatingResults["EER_2022"], 0.01);
-    EXPECT_NEAR(0.0, StandarRatingResults["IEER"], 0.01);
+    EXPECT_NEAR(3.14, StandarRatingResults["IEER"], 0.01);
     EXPECT_NEAR(2.98, StandarRatingResults["IEER_2022"], 0.01);
     EXPECT_NEAR(10.16, StandarRatingResults["IEER_2022"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(30665.270282685444, StandarRatingResults["NetCoolingCapRated"], 0.01);
     EXPECT_NEAR(30391.40, StandarRatingResults["NetCoolingCapRated2023"], 0.01);
+    EXPECT_NEAR(3.30, StandarRatingResults["SEER_User"], 0.01);
+    EXPECT_NEAR(3.12, StandarRatingResults["SEER_Standard"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_AHRIExample_IEER_2022_ValueTest)
@@ -2558,10 +2560,14 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_AHRIExample_IEER_2022_ValueT
                                                                    thisCoil.FanPowerPerEvapAirFlowRate_2023(1),
                                                                    thisCoil.CondenserType(1));
 
-    EXPECT_TRUE(StandarRatingResults["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER2_Standard"] == 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER2_Standard"] > 0.0);
+    EXPECT_NEAR(3.27, StandarRatingResults["SEER_User"], 0.01);
+    EXPECT_NEAR(3.09, StandarRatingResults["SEER_Standard"], 0.01);
+    EXPECT_NEAR(3.34, StandarRatingResults["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.25, StandarRatingResults["SEER2_Standard"], 0.01);
     EXPECT_NEAR(3.12, StandarRatingResults["EER"], 0.01);
     EXPECT_NEAR(3.18, StandarRatingResults["EER_2022"], 0.01);
     EXPECT_NEAR(3.16, StandarRatingResults["IEER"], 0.01);
@@ -2597,10 +2603,14 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_AHRIExample_IEER_2022_ValueT
     EXPECT_NEAR(11.81, StandarRatingResults["IEER_2022"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(26045.36, StandarRatingResults["NetCoolingCapRated"], 0.01);
     EXPECT_NEAR(26045.36, StandarRatingResults["NetCoolingCapRated2023"], 0.01);
-    EXPECT_TRUE(StandarRatingResults["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandarRatingResults["SEER2_Standard"] == 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER_Standard"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandarRatingResults["SEER2_Standard"] > 0.0);
+    EXPECT_NEAR(3.47, StandarRatingResults["SEER_User"], 0.01);
+    EXPECT_NEAR(3.28, StandarRatingResults["SEER_Standard"], 0.01);
+    EXPECT_NEAR(3.47, StandarRatingResults["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.37, StandarRatingResults["SEER2_Standard"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_02_Speed_4400W_SEER2_2023_ValueTest)
@@ -3166,8 +3176,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_02_Speed_4400W_SEER2_2023_ValueT
     // EXPECT_DOUBLE_EQ(SEER2_User, SEER2_Standard);
     EXPECT_NEAR(10.01, SEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(9.96, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(2.46, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.65, StandardRatingsResult["EER_2022"], 0.01);
     // SEER and SEER_Default must match for the same PLF curve
 }
 
@@ -3646,8 +3658,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_03_Speed_12000W_SEER2_2023_Value
     EXPECT_NEAR(12.69, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(3.06, StandardRatingsResult["EER2"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(3.73, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.91, StandardRatingsResult["EER_2022"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_04_Speed_17750W_SEER2_2023_ValueTest)
@@ -4194,8 +4208,10 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_04_Speed_17750W_SEER2_2023_Value
     EXPECT_NEAR(9.71, SEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(2.60, StandardRatingsResult["EER2"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(2.92, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.49, StandardRatingsResult["EER_2022"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_02_Speeds_27717W_IEER_2022_ValueOrigTest)
@@ -4352,14 +4368,20 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_02_Speeds_27717W_IEER_2022_Value
                                                                    thisCoil.CondenserType);
 
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
-    EXPECT_NEAR(27786.977673053774, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
-    EXPECT_TRUE(StandardRatingsResult["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER"] == 0.0);
+    EXPECT_NEAR(26735.034484053773, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
+    EXPECT_TRUE(StandardRatingsResult["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER"] > 0.0);
+    EXPECT_NEAR(3.36, StandardRatingsResult["SEER_User"], 0.01);
+    EXPECT_NEAR(3.34, StandardRatingsResult["SEER_Standard"], 0.01);
+    EXPECT_NEAR(3.33, StandardRatingsResult["EER"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.74, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.52, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.31, StandardRatingsResult["EER2"], 0.01);
 
     EXPECT_NEAR(3.34, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_NEAR(2.98, StandardRatingsResult["IEER_2022"], 0.01);
@@ -4815,13 +4837,19 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_03_Speeds_27717W_IEER_2022_Value
                                                                    thisCoil.CondenserType);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(26672.541390621947, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
-    EXPECT_TRUE(StandardRatingsResult["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER"] > 0.0);
+    EXPECT_NEAR(3.65, StandardRatingsResult["SEER_User"], 0.01);
+    EXPECT_NEAR(3.61, StandardRatingsResult["SEER_Standard"], 0.01);
+    EXPECT_NEAR(3.29, StandardRatingsResult["EER"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.66, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.81, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.20, StandardRatingsResult["EER2"], 0.01);
 
     EXPECT_NEAR(3.07, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_NEAR(3.8899851971608825, StandardRatingsResult["IEER_2022"], 0.01);
@@ -5316,13 +5344,19 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_04_Speeds_35500W_COP3_IEER_2022_
 
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(34330.753817761368, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
-    EXPECT_TRUE(StandardRatingsResult["SEER_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER"] > 0.0);
+    EXPECT_NEAR(3.14, StandardRatingsResult["SEER_User"], 0.01);
+    EXPECT_NEAR(3.12, StandardRatingsResult["SEER_Standard"], 0.01);
+    EXPECT_NEAR(2.70, StandardRatingsResult["EER"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(2.89, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.07, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(2.65, StandardRatingsResult["EER2"], 0.01);
 
     EXPECT_NEAR(2.56, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_NEAR(3.11, StandardRatingsResult["IEER_2022"], 0.01);
@@ -5776,8 +5810,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_01_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(9.06, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6451.3230892544016, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(2.27, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.53, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6580.2030892544008, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -6005,8 +6041,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_02_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(10.16, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6451.3230892544016, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(1.62, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.18, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6580.20, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -6243,8 +6281,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_03_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(9.69, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6451.3230892544016, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(2.71, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.53, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6580.20, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -6494,8 +6534,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_04_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(10.27, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6451.3230892544016, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(2.84, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.53, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6580.20, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -6782,8 +6824,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_07_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(11.42, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6825.08, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(3.53, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.13, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6889.52, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -7072,8 +7116,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_07_Speed_14400W_SEER2_2023_ValueT
     EXPECT_NEAR(11.61, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(13696.88, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(3.59, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.18, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(13696.88, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 }
@@ -7397,8 +7443,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_10_Speed_7200W_SEER2_2023_ValueTe
     EXPECT_NEAR(11.46, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(6825.0830892544009, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(3.52, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.13, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(6889.52, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -7722,8 +7770,10 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_10_Speed_14400W_SEER2_2023_ValueT
     EXPECT_NEAR(11.68, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(13696.886178508803, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_NEAR(3.58, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(3.18, StandardRatingsResult["EER_2022"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(13817.71, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
@@ -7913,9 +7963,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_01_Speed_22000W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.11, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.11, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.00, StandardRatingsResult["EER2"], 0.01);
+
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(21185.399247418562, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 
@@ -8167,9 +8221,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_02_Speed_36000W_IEER_2022_ValueTe
 
     // NetCoolingCapRated(thisCoil.NumOfSpeeds) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed"];
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.67, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.77, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.26, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(34649.086950321282, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 
@@ -8463,9 +8520,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_03_Speed_36000W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.67, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.77, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.26, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(34649.086950321282, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 
@@ -8726,9 +8786,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_04_Speed_36000W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(2.80, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(2.89, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(2.56, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
     EXPECT_NEAR(34462.55, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 
@@ -9016,9 +9079,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_07_Speed_25001W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.44, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.60, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.20, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
     EXPECT_NEAR(24165.94683089908, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
@@ -9348,9 +9414,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_10_Speed_34582W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.58, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.66, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.20, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
     EXPECT_NEAR(33426.83, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
@@ -9678,9 +9747,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_10_Speed_32000W_IEER_2022_ValueTe
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.52, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.29, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.34, StandardRatingsResult["EER2"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
     EXPECT_NEAR(30499.818, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
@@ -10022,9 +10094,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCooling_04_Speed_AutoSize_IEER_2022_Value
         thisCoil.RatedCapCoolTotal,
         thisCoil.RatedAirVolFlowRate);
 
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_NEAR(2.86, StandardRatingsResult["EER2"], 0.01);
+    EXPECT_NEAR(3.45, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(3.55, StandardRatingsResult["SEER2_Standard"], 0.01);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
     EXPECT_NEAR(33917.499738697108, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
@@ -10585,9 +10660,12 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_12000W_SEER2_2023_ValueTest)
     EXPECT_NEAR(10.622617406463105, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(2.49, StandardRatingsResult["EER2"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
+    EXPECT_NEAR(2.98, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(2.36, StandardRatingsResult["EER_2022"], 0.01);
+    EXPECT_NEAR(11255.53, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_39000W_IEER_2022_ValueTest)
@@ -10863,10 +10941,14 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_39000W_IEER_2022_ValueTest)
                                                           thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed,
                                                           thisCoil.CondenserType,
                                                           thisCoil.PLFFPLR(1));
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(4.05, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(4.04, StandardRatingsResult["SEER2_Standard"], 0.01);
+    EXPECT_NEAR(3.12, StandardRatingsResult["EER2"], 0.01);
+    EXPECT_NEAR(38075.51, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
 
     EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
     EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
@@ -11148,14 +11230,22 @@ TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_54000W_IEER_2022_ValueTest)
                                                           thisCoil.FanPowerPerEvapAirFlowRate_2023_LowSpeed,
                                                           thisCoil.CondenserType,
                                                           thisCoil.PLFFPLR(1));
-    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_User"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["SEER2_Standard"] > 0.0);
     EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] > 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER2"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER2"] > 0.0);
+    EXPECT_NEAR(3.42, StandardRatingsResult["SEER2_User"], 0.01);
+    EXPECT_NEAR(51799.70, StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"], 0.01);
+    EXPECT_NEAR(11.62, StandardRatingsResult["SEER2_Standard"] * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(2.53, StandardRatingsResult["EER2"], 0.01);
 
-    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["EER_2022"] == 0.0);
-    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] == 0.0);
+    EXPECT_TRUE(StandardRatingsResult["IEER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["EER_2022"] > 0.0);
+    EXPECT_TRUE(StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] > 0.0);
+    EXPECT_NEAR(3.26, StandardRatingsResult["IEER_2022"], 0.01);
+    EXPECT_NEAR(51799.70, StandardRatingsResult["NetCoolingCapRatedMaxSpeed"], 0.01);
+    EXPECT_NEAR(11.15, StandardRatingsResult["IEER_2022"] * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(2.41, StandardRatingsResult["EER_2022"], 0.01);
 }
 
 TEST_F(EnergyPlusFixture, TwoSpeedCoolingCoilAir_33000W_IEER_2022_ValueTest)
@@ -11745,15 +11835,17 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingCoolingCapacity2023 > 0.0);
-    EXPECT_NEAR(3.72, thisCoil.performance.standardRatingEER2, 0.01);
+    EXPECT_NEAR(3.76, thisCoil.performance.standardRatingEER2, 0.01);
     EXPECT_NEAR(4.26, thisCoil.performance.standardRatingSEER2_User, 0.01);
     EXPECT_NEAR(4.05, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
     EXPECT_NEAR(14614.52, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
     EXPECT_NEAR(14.56, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(13.85, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
-    ASSERT_TRUE(thisCoil.performance.standardRatingIEER == 0);
-    ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 == 0);
+    ASSERT_TRUE(thisCoil.performance.standardRatingIEER > 0);
+    EXPECT_NEAR(3.42, thisCoil.performance.standardRatingIEER, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 > 0);
+    EXPECT_NEAR(3.65, thisCoil.performance.standardRatingIEER2, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
@@ -12066,15 +12158,17 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingCoolingCapacity2023 > 0.0);
-    EXPECT_NEAR(2.89, thisCoil.performance.standardRatingEER2, 0.01);
+    EXPECT_NEAR(2.86, thisCoil.performance.standardRatingEER2, 0.01);
     EXPECT_NEAR(3.21, thisCoil.performance.standardRatingSEER2_User, 0.01);
     EXPECT_NEAR(3.33, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
     EXPECT_NEAR(4950.465, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
     EXPECT_NEAR(10.96, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
     EXPECT_NEAR(11.36, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
-    ASSERT_TRUE(thisCoil.performance.standardRatingIEER == 0);
-    ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 == 0);
+    ASSERT_TRUE(thisCoil.performance.standardRatingIEER > 0);
+    EXPECT_NEAR(2.78, thisCoil.performance.standardRatingIEER, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 > 0);
+    EXPECT_NEAR(3.52, thisCoil.performance.standardRatingIEER2, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_ValueTest)
@@ -12367,11 +12461,14 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_Value
     EXPECT_NEAR(10.42108192037557, thisCoil.performance.standardRatingIEER2 * StandardRatings::ConvFromSIToIP, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingEER > 0);
-    EXPECT_NEAR(3.91, thisCoil.performance.standardRatingEER, 0.01);
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER == 0);
+    EXPECT_NEAR(3.39, thisCoil.performance.standardRatingEER, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER > 0);
+    EXPECT_NEAR(3.93, thisCoil.performance.standardRatingSEER, 0.01);
 
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User == 0);
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_Standard == 0);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0);
+    EXPECT_NEAR(3.93, thisCoil.performance.standardRatingSEER2_User, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0);
+    EXPECT_NEAR(3.86, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_03_Speed_20000W_IEER_2022_ValueTest)
@@ -12685,11 +12782,13 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_20000W_IEER_2022_ValueTest)
     EXPECT_NEAR(10.85, thisCoil.performance.standardRatingIEER2 * StandardRatings::ConvFromSIToIP, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingEER > 0);
-    EXPECT_NEAR(3.07, thisCoil.performance.standardRatingEER, 0.01);
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER == 0);
-
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User == 0);
-    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_Standard == 0);
+    EXPECT_NEAR(2.62, thisCoil.performance.standardRatingEER, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER > 0);
+    EXPECT_NEAR(2.80, thisCoil.performance.standardRatingSEER, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0);
+    EXPECT_NEAR(3.05, thisCoil.performance.standardRatingSEER2_User, 0.01);
+    ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0);
+    EXPECT_NEAR(3.07, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, ChillerCondenserEnteringFluidTemp_AHRIIPTestConditions)

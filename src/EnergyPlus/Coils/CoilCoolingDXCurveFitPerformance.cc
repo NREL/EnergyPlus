@@ -499,151 +499,135 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::Ene
 
     if (mode.ratedGrossTotalCap > 0.0) {
         TotCapFlowModFac = Curve::CurveValue(state, speed.indexCapFFF, AirMassFlowRatioRated);
-        if (mode.ratedGrossTotalCap > 39564.59445) {
-            TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-            TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
-            // Calculate net cooling capacity | 2017
-            this->standardRatingCoolingCapacity = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            // Calculate net cooling capacity | 2023
-            this->standardRatingCoolingCapacity2023 = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-            // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
-            // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-            ShowWarningError(state,
-                             format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of this "
-                                    "size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet implemented in "
-                                    "EnergyPlus. Therefore, no rating can be reported",
-                                    this->name,
-                                    mode.ratedGrossTotalCap));
-        } else if (mode.ratedGrossTotalCap < 19049.61955 && mode.condenserType == CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED) {
-            // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
-            // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
-            // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
 
-            // SEER calculations:
-            TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-            TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
-            EIRTempModFac = Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
-            EIRFlowModFac = Curve::CurveValue(state, speed.indexEIRFFF, AirMassFlowRatioRated);
-            if (speed.ratedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
-                EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
-            } else {
-                EIR = 0.0;
-            }
+        TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
+        // Calculate net cooling capacity | 2017
+        this->standardRatingCoolingCapacity = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        // Calculate net cooling capacity | 2023
+        this->standardRatingCoolingCapacity2023 = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
+        // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
+        // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
 
-            // Calculate net cooling capacity
-            NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+        // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+        // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
 
-            NetCoolingCapAHRI2023 = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-            TotalElecPower2023 = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-            // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
-            // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
-            PartLoadFactor = Curve::CurveValue(state, speed.indexPLRFPLF, PLRforSEER);
-            Real64 PartLoadFactorStandard = 1.0 - (1 - PLRforSEER) * CyclicDegradationCoefficient;
-            if (TotalElecPower > 0.0) {
-                this->standardRatingSEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
-                this->standardRatingSEER_Standard = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorStandard;
-            } else {
-                this->standardRatingSEER = 0.0;
-                this->standardRatingSEER2_Standard = 0.0;
-            }
+        // SEER calculations:
+        TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
+        EIRTempModFac = Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
+        EIRFlowModFac = Curve::CurveValue(state, speed.indexEIRFFF, AirMassFlowRatioRated);
+        if (speed.ratedCOP > 0.0) { // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
+            EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
+        } else {
+            EIR = 0.0;
+        }
 
-            if (TotalElecPower2023 > 0.0) {
-                this->standardRatingSEER2_User = (NetCoolingCapAHRI2023 / TotalElecPower2023) * PartLoadFactor;
-                this->standardRatingSEER2_Standard = (NetCoolingCapAHRI2023 / TotalElecPower2023) * PartLoadFactorStandard;
-            } else {
-                this->standardRatingSEER2_User = 0.0;
-                this->standardRatingSEER2_Standard = 0.0;
-            }
+        // Calculate net cooling capacity
+        NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
 
-            // EER calculations:
-            // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-            TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-            this->standardRatingCoolingCapacity =
-                mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            this->standardRatingCoolingCapacity2023 =
-                mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-            // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
-            EIRTempModFac = Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-            if (speed.ratedCOP > 0.0) {
-                // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
-                EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
-            } else {
-                EIR = 0.0;
-            }
-            TotalElecPowerRated =
-                EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            if (TotalElecPowerRated > 0.0) {
-                this->standardRatingEER = this->standardRatingCoolingCapacity / TotalElecPowerRated;
-            } else {
-                this->standardRatingEER = 0.0;
-            }
-            TotalElecPowerRated2023 =
-                EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
-            if (TotalElecPowerRated2023 > 0.0) {
-                this->standardRatingEER2 = this->standardRatingCoolingCapacity2023 / TotalElecPowerRated2023;
-            } else {
-                this->standardRatingEER2 = 0.0;
-            }
+        NetCoolingCapAHRI2023 = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
+        TotalElecPower2023 = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
+        // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
+        // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
+        PartLoadFactor = Curve::CurveValue(state, speed.indexPLRFPLF, PLRforSEER);
+        Real64 PartLoadFactorStandard = 1.0 - (1 - PLRforSEER) * CyclicDegradationCoefficient;
+        if (TotalElecPower > 0.0) {
+            this->standardRatingSEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
+            this->standardRatingSEER_Standard = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorStandard;
+        } else {
+            this->standardRatingSEER = 0.0;
+            this->standardRatingSEER2_Standard = 0.0;
+        }
 
+        if (TotalElecPower2023 > 0.0) {
+            this->standardRatingSEER2_User = (NetCoolingCapAHRI2023 / TotalElecPower2023) * PartLoadFactor;
+            this->standardRatingSEER2_Standard = (NetCoolingCapAHRI2023 / TotalElecPower2023) * PartLoadFactorStandard;
+        } else {
+            this->standardRatingSEER2_User = 0.0;
+            this->standardRatingSEER2_Standard = 0.0;
+        }
+
+        // EER calculations:
+        // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
+        TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        this->standardRatingCoolingCapacity =
+            mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        this->standardRatingCoolingCapacity2023 =
+            mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
+        // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
+        EIRTempModFac = Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        if (speed.ratedCOP > 0.0) {
+            // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
+            EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
+        } else {
+            EIR = 0.0;
+        }
+        TotalElecPowerRated =
+            EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        if (TotalElecPowerRated > 0.0) {
+            this->standardRatingEER = this->standardRatingCoolingCapacity / TotalElecPowerRated;
+        } else {
+            this->standardRatingEER = 0.0;
+        }
+        TotalElecPowerRated2023 =
+            EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate2023 * mode.ratedEvapAirFlowRate;
+        if (TotalElecPowerRated2023 > 0.0) {
+            this->standardRatingEER2 = this->standardRatingCoolingCapacity2023 / TotalElecPowerRated2023;
+        } else {
+            this->standardRatingEER2 = 0.0;
+        }
+
+        if (mode.condenserType == CoilCoolingDXCurveFitOperatingMode::CondenserType::AIRCOOLED) {
             std::tie(this->standardRatingCoolingCapacity2023,
                      this->standardRatingSEER2_User,
                      this->standardRatingSEER2_Standard,
                      this->standardRatingEER2) = StandardRatings::SEER2CalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
-
-        } else {
-
-            // IEER calculations: Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022.
-            this->standardRatingIEER = 0.0;
-            // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
-            TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-            this->standardRatingCoolingCapacity =
-                mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            for (int RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
-                // get the outdoor air dry bulb temperature for the reduced capacity test conditions
-                if (ReducedPLR[RedCapNum] > 0.444) {
-                    OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR[RedCapNum];
-                } else {
-                    OutdoorUnitInletAirDryBulbTempReduced = OADBTempLowReducedCapacityTest;
-                }
-                TotCapTempModFac =
-                    Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
-                NetCoolingCapReduced =
-                    mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-                EIRTempModFac =
-                    Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
-                EIRFlowModFac = Curve::CurveValue(state, speed.indexEIRFFF, AirMassFlowRatioRated);
-                if (speed.ratedCOP > 0.0) {
-                    EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
-                } else {
-                    EIR = 0.0;
-                }
-                if (NetCoolingCapReduced > 0.0) {
-                    LoadFactor = ReducedPLR[RedCapNum] * this->standardRatingCoolingCapacity / NetCoolingCapReduced;
-                } else {
-                    LoadFactor = 1.0;
-                }
-                DegradationCoeff = 1.130 - 0.130 * LoadFactor;
-                ElecPowerReducedCap = DegradationCoeff * EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac);
-                EERReduced =
-                    (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate);
-                this->standardRatingIEER += IEERWeightingFactor[RedCapNum] * EERReduced;
-            }
-
-            TotalElecPowerRated =
-                EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-            if (TotalElecPowerRated > 0.0) {
-                this->standardRatingEER = this->standardRatingCoolingCapacity / TotalElecPowerRated;
-            } else {
-                this->standardRatingEER = 0.0;
-            }
-
-            // IEER 2022 -->
-            // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the
-            // applicability.
-            std::tie(this->standardRatingIEER2, this->standardRatingCoolingCapacity2023, this->standardRatingEER2) =
-                StandardRatings::IEERCalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
         }
+
+        // IEER calculations: Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022.
+        this->standardRatingIEER = 0.0;
+        // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
+        TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        this->standardRatingCoolingCapacity =
+            mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        for (int RedCapNum = 0; RedCapNum < NumOfReducedCap; ++RedCapNum) {
+            // get the outdoor air dry bulb temperature for the reduced capacity test conditions
+            if (ReducedPLR[RedCapNum] > 0.444) {
+                OutdoorUnitInletAirDryBulbTempReduced = 5.0 + 30.0 * ReducedPLR[RedCapNum];
+            } else {
+                OutdoorUnitInletAirDryBulbTempReduced = OADBTempLowReducedCapacityTest;
+            }
+            TotCapTempModFac = Curve::CurveValue(state, speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
+            NetCoolingCapReduced =
+                mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+            EIRTempModFac = Curve::CurveValue(state, speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempReduced);
+            EIRFlowModFac = Curve::CurveValue(state, speed.indexEIRFFF, AirMassFlowRatioRated);
+            if (speed.ratedCOP > 0.0) {
+                EIR = EIRTempModFac * EIRFlowModFac / speed.ratedCOP;
+            } else {
+                EIR = 0.0;
+            }
+            if (NetCoolingCapReduced > 0.0) {
+                LoadFactor = ReducedPLR[RedCapNum] * this->standardRatingCoolingCapacity / NetCoolingCapReduced;
+            } else {
+                LoadFactor = 1.0;
+            }
+            DegradationCoeff = 1.130 - 0.130 * LoadFactor;
+            ElecPowerReducedCap = DegradationCoeff * EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac);
+            EERReduced =
+                (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate);
+            this->standardRatingIEER += IEERWeightingFactor[RedCapNum] * EERReduced;
+        }
+
+        // IEER 2022 -->
+        // TODO: we can always decide and give precedence to Alternate Mode 1 or Alternate Mode 2 if present | Needs Discussion about the
+        // applicability.
+        std::tie(this->standardRatingIEER2, this->standardRatingCoolingCapacity2023, this->standardRatingEER2) =
+            StandardRatings::IEERCalulcationCurveFit(state, "Coil:Cooling:DX:CurveFit", this->normalMode);
+
     } else {
         ShowSevereError(state,
                         "Standard Ratings: Coil:Cooling:DX " + this->name +

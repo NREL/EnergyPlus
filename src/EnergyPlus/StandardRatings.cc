@@ -1691,22 +1691,15 @@ namespace StandardRatings {
 
         if (RatedTotalCapacity(1) > 0.0 && RatedAirVolFlowRate(1) > 0.0) {
 
-            if (RatedTotalCapacity(1) > 39564.59445) {
+            Real64 TotCapTempModFac =
+                Curve::CurveValue(state, CapFTempCurveIndex(1), CoolingCoilInletAirWetBulbTempRated, CoilInletAirCoolDryBulbIEER);
+            Real64 TotCapFlowModFac = Curve::CurveValue(state, CapFFlowCurveIndex(1), AirMassFlowRatioRated);
+            NetCoolingCapRatedMaxSpeed2023 =
+                RatedTotalCapacity(1) * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate_2023(1) * RatedAirVolFlowRate(1);
+            // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445
+            // Watts) as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
 
-                Real64 TotCapTempModFac =
-                    Curve::CurveValue(state, CapFTempCurveIndex(1), CoolingCoilInletAirWetBulbTempRated, CoilInletAirCoolDryBulbIEER);
-                Real64 TotCapFlowModFac = Curve::CurveValue(state, CapFFlowCurveIndex(1), AirMassFlowRatioRated);
-                NetCoolingCapRatedMaxSpeed2023 =
-                    RatedTotalCapacity(1) * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate_2023(1) * RatedAirVolFlowRate(1);
-                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
-                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowWarningError(state,
-                                 format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of "
-                                        "this size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet "
-                                        "implemented in EnergyPlus. Therefore, no rating can be reported",
-                                        DXCoilName,
-                                        RatedTotalCapacity(1)));
-            } else if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air && RatedTotalCapacity(1) < 19049.61955) {
+            if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 // ANSI/AHRI 210/240 Standard 2023 only applies for solely to Air Cooled Cooling Coils
                 // Also, this standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
                 // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1
@@ -1725,22 +1718,22 @@ namespace StandardRatings {
                                                TSRatedCOP,
                                                TSEIRFTemp,
                                                PLFFPLRCurveIndex); // only coil level
-            } else {
-
-                // Calculate the IEER 2022 Standard ratings for Two Speed DX cooling coil | AHRI 340/360
-                std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(state,
-                                                                                                DXCoilType,
-                                                                                                CondenserType,
-                                                                                                TSCCapFTemp,
-                                                                                                TSRatedTotCap,
-                                                                                                CapFFlowCurveIndex,
-                                                                                                TSFanPowerPerEvapAirFlowRate2023,
-                                                                                                TSRatedAirVolFlowRate,
-                                                                                                TSEIRFTemp,
-                                                                                                TSRatedCOP,
-                                                                                                EIRFFlowCurveIndex);
-                NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
             }
+
+            // Calculate the IEER 2022 Standard ratings for Two Speed DX cooling coil | AHRI 340/360
+            std::tie(IEER_2022, NetCoolingCapRated2022, EER_2022) = IEERCalculationTwoSpeed(state,
+                                                                                            DXCoilType,
+                                                                                            CondenserType,
+                                                                                            TSCCapFTemp,
+                                                                                            TSRatedTotCap,
+                                                                                            CapFFlowCurveIndex,
+                                                                                            TSFanPowerPerEvapAirFlowRate2023,
+                                                                                            TSRatedAirVolFlowRate,
+                                                                                            TSEIRFTemp,
+                                                                                            TSRatedCOP,
+                                                                                            EIRFFlowCurveIndex);
+            NetCoolingCapRated_2023(ns) = NetCoolingCapRated2022;
+
         } else {
             ShowSevereError(state,
                             "Standard Ratings: Coil:Cooling:DX:TwoSpeed either has a zero rated total cooling capacity or zero air flow rate. "
@@ -3724,37 +3717,28 @@ namespace StandardRatings {
                                              EIRFlowModFac);
             StandarRatingResults["EER_2022"] = EER_2022;
 
-            if (RatedTotalCapacity > 39564.59445) {
-                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
-                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                StandarRatingResults["EER"] = 0.0;
-                StandarRatingResults["EER_2022"] = 0.0;
-                ShowWarningError(state,
-                                 format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of "
-                                        "this size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet "
-                                        "implemented in EnergyPlus. Therefore, no rating can be reported",
-                                        DXCoilName,
-                                        RatedTotalCapacity));
-            } else if (RatedTotalCapacity < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
-                // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
-                // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
-                // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
+            // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445
+            // Watts) as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
 
-                std::tie(SEER_User, SEER_Standard) = SEERSingleStageCalculation(state,
-                                                                                CapFTempCurveIndex,
-                                                                                RatedTotalCapacity,
-                                                                                TotCapFlowModFac,
-                                                                                EIRFTempCurveIndex,
-                                                                                EIRFlowModFac,
-                                                                                EIRFFlowCurveIndex,
-                                                                                RatedCOP,
-                                                                                FanPowerPerEvapAirFlowRate,
-                                                                                RatedAirVolFlowRate,
-                                                                                PLFFPLRCurveIndex,
-                                                                                CyclicDegradationCoeff);
-                StandarRatingResults["SEER_User"] = SEER_User;
-                StandarRatingResults["SEER_Standard"] = SEER_Standard;
+            // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
+            // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
+            // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
 
+            std::tie(SEER_User, SEER_Standard) = SEERSingleStageCalculation(state,
+                                                                            CapFTempCurveIndex,
+                                                                            RatedTotalCapacity,
+                                                                            TotCapFlowModFac,
+                                                                            EIRFTempCurveIndex,
+                                                                            EIRFlowModFac,
+                                                                            EIRFFlowCurveIndex,
+                                                                            RatedCOP,
+                                                                            FanPowerPerEvapAirFlowRate,
+                                                                            RatedAirVolFlowRate,
+                                                                            PLFFPLRCurveIndex,
+                                                                            CyclicDegradationCoeff);
+            StandarRatingResults["SEER_User"] = SEER_User;
+            StandarRatingResults["SEER_Standard"] = SEER_Standard;
+            if (CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 std::tie(SEER2_User, SEER2_Standard) = SEERSingleStageCalculation(state,
                                                                                   CapFTempCurveIndex,
                                                                                   RatedTotalCapacity,
@@ -3769,42 +3753,41 @@ namespace StandardRatings {
                                                                                   CyclicDegradationCoeffSEER2);
                 StandarRatingResults["SEER2_User"] = SEER2_User;
                 StandarRatingResults["SEER2_Standard"] = SEER2_Standard;
-
-            } else { // RatedTotalCapacity > 19049.61955
-                StandarRatingResults["EER_2022"] = EER_2022;
-                if (CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
-                    std::tie(IEER, NetCoolingCapRated) = IEERSingleSpeedCooling(state,
-                                                                                CapFTempCurveIndex,
-                                                                                RatedTotalCapacity,
-                                                                                TotCapFlowModFac,
-                                                                                FanPowerPerEvapAirFlowRate,
-                                                                                RatedAirVolFlowRate,
-                                                                                EIRFTempCurveIndex,
-                                                                                RatedCOP,
-                                                                                EIRFlowModFac);
-                }
-                StandarRatingResults["IEER"] = IEER;
-                StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
-
-                // IEER 2022 Calculations
-                if (DXCoilType == "Coil:Cooling:DX:SingleSpeed") {
-
-                    std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationSingleSpeed(state,
-                                                                                                       DXCoilType,
-                                                                                                       CapFTempCurveIndex,
-                                                                                                       RatedTotalCapacity,
-                                                                                                       TotCapFlowModFac,
-                                                                                                       FanPowerPerEvapAirFlowRate_2023,
-                                                                                                       RatedAirVolFlowRate,
-                                                                                                       EIRFTempCurveIndex,
-                                                                                                       RatedCOP,
-                                                                                                       EIRFlowModFac,
-                                                                                                       CondenserType);
-                    StandarRatingResults["IEER_2022"] = IEER_2022;
-                    StandarRatingResults["EER_2022"] = EER_2022;
-                    StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
-                }
             }
+
+            std::tie(IEER, NetCoolingCapRated) = IEERSingleSpeedCooling(state,
+                                                                        CapFTempCurveIndex,
+                                                                        RatedTotalCapacity,
+                                                                        TotCapFlowModFac,
+                                                                        FanPowerPerEvapAirFlowRate,
+                                                                        RatedAirVolFlowRate,
+                                                                        EIRFTempCurveIndex,
+                                                                        RatedCOP,
+                                                                        EIRFlowModFac);
+
+            StandarRatingResults["IEER"] = IEER;
+            StandarRatingResults["IEER"] = IEER;
+            StandarRatingResults["NetCoolingCapRated"] = NetCoolingCapRated;
+
+            // IEER 2022 Calculations
+            if (DXCoilType == "Coil:Cooling:DX:SingleSpeed") {
+
+                std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationSingleSpeed(state,
+                                                                                                   DXCoilType,
+                                                                                                   CapFTempCurveIndex,
+                                                                                                   RatedTotalCapacity,
+                                                                                                   TotCapFlowModFac,
+                                                                                                   FanPowerPerEvapAirFlowRate_2023,
+                                                                                                   RatedAirVolFlowRate,
+                                                                                                   EIRFTempCurveIndex,
+                                                                                                   RatedCOP,
+                                                                                                   EIRFlowModFac,
+                                                                                                   CondenserType);
+                StandarRatingResults["IEER_2022"] = IEER_2022;
+                StandarRatingResults["EER_2022"] = EER_2022;
+                StandarRatingResults["NetCoolingCapRated2023"] = NetCoolingCapRated2023;
+            }
+
         } else {
             ShowSevereError(state,
                             format("Standard Ratings: {} {} has esither zero rated total cooling capacity or zero rated air volume flow rate. "
@@ -4509,8 +4492,8 @@ namespace StandardRatings {
             if ((nsp >= 5 && nsp <= 10)) {
                 // New speed selection strategy :
                 auto result = GetMatchingSpeedFromBuildingLoad(BuildingCoolingLoad_2023, GrossRatedCapacityAtSpeedLevel);
-                int spnum = result.second + 1;
-                if (spnum != -1) {
+                if (result.second != -1) {
+                    int spnum = result.second + 1;
                     // found a speed that meets the building load
                     // # Intermediate Capacity
                     Real64 q_E_int = Q_E_Int(spnum);
@@ -5465,39 +5448,33 @@ namespace StandardRatings {
                 TotCapFlowModFac -
             FanPowerPerEvapAirFlowRateFromInput(nsp) * RatedAirVolFlowRate(nsp);
         if (RatedTotalCapacity(nsp) > 0.0 && RatedAirVolFlowRate(nsp) > 0.0) {
-            if (RatedTotalCapacity(nsp) > 39564.59445) {
 
-                NetCoolingCapRated2023 =
-                    RatedTotalCapacity(nsp) *
-                        Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
-                        TotCapFlowModFac -
-                    FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * RatedAirVolFlowRate(nsp);
-                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
-                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
-                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowWarningError(state,
-                                 format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of "
-                                        "this size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet "
-                                        "implemented in EnergyPlus. Therefore, no rating can be reported",
-                                        DXCoilName,
-                                        RatedTotalCapacity(nsp)));
-            } else if (RatedTotalCapacity(nsp) < 19049.61955 && CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
+            NetCoolingCapRated2023 =
+                RatedTotalCapacity(nsp) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                    TotCapFlowModFac -
+                FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * RatedAirVolFlowRate(nsp);
+            StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
+            // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445
+            // Watts) as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
+
+            std::tie(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard, EER) = MultiSpeedDXCoolingCoilSEER(state,
+                                                                                                              nsp,
+                                                                                                              CapFFlowCurveIndex,
+                                                                                                              RatedTotalCapacity,
+                                                                                                              CapFTempCurveIndex,
+                                                                                                              FanPowerPerEvapAirFlowRateFromInput,
+                                                                                                              RatedAirVolFlowRate,
+                                                                                                              EIRFFlowCurveIndex,
+                                                                                                              RatedCOP,
+                                                                                                              EIRFTempCurveIndex,
+                                                                                                              PLFFPLRCurveIndex);
+
+            if (CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
                 // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
                 // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
-
-                std::tie(NetCoolingCapRatedMaxSpeed, SEER_User, SEER_Standard, EER) = MultiSpeedDXCoolingCoilSEER(state,
-                                                                                                                  nsp,
-                                                                                                                  CapFFlowCurveIndex,
-                                                                                                                  RatedTotalCapacity,
-                                                                                                                  CapFTempCurveIndex,
-                                                                                                                  FanPowerPerEvapAirFlowRateFromInput,
-                                                                                                                  RatedAirVolFlowRate,
-                                                                                                                  EIRFFlowCurveIndex,
-                                                                                                                  RatedCOP,
-                                                                                                                  EIRFTempCurveIndex,
-                                                                                                                  PLFFPLRCurveIndex);
-
+                //
                 // SEER2 Calculations ANSI/AHRI 210/240 Standard 2023
                 std::tie(NetCoolingCapRatedMaxSpeed2023, SEER2_User, SEER2_Standard, EER2) =
                     MultiSpeedDXCoolingCoilSEER2(state,
@@ -5512,25 +5489,25 @@ namespace StandardRatings {
                                                  EIRFTempCurveIndex,
                                                  PLFFPLRCurveIndex);
                 StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
-            } else {
-                // Gross total cooling capacity is greater than 65,000 Btu/h (19049.61955 Watts)
-                // Section 2.1 (ANSI/AHRI 210-240 2023)
-                std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationMultiSpeed(state,
-                                                                                                  DXCoilType,
-                                                                                                  nsp,
-                                                                                                  CapFTempCurveIndex,
-                                                                                                  RatedTotalCapacity,
-                                                                                                  CapFFlowCurveIndex,
-                                                                                                  // TotCapFlowModFac, // calculate for each speed
-                                                                                                  FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                                                                  RatedAirVolFlowRate,
-                                                                                                  EIRFTempCurveIndex,
-                                                                                                  RatedCOP,
-                                                                                                  EIRFFlowCurveIndex,
-                                                                                                  // EIRFlowModFac, // calculate for each speed
-                                                                                                  CondenserType);
-                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
             }
+            // Gross total cooling capacity is greater than 65,000 Btu/h (19049.61955 Watts)
+            // Section 2.1 (ANSI/AHRI 210-240 2023)
+            std::tie(IEER_2022, NetCoolingCapRated2023, EER_2022) = IEERCalculationMultiSpeed(state,
+                                                                                              DXCoilType,
+                                                                                              nsp,
+                                                                                              CapFTempCurveIndex,
+                                                                                              RatedTotalCapacity,
+                                                                                              CapFFlowCurveIndex,
+                                                                                              // TotCapFlowModFac, // calculate for each speed
+                                                                                              FanPowerPerEvapAirFlowRateFromInput_2023,
+                                                                                              RatedAirVolFlowRate,
+                                                                                              EIRFTempCurveIndex,
+                                                                                              RatedCOP,
+                                                                                              EIRFFlowCurveIndex,
+                                                                                              // EIRFlowModFac, // calculate for each speed
+                                                                                              CondenserType);
+            StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRated2023;
+
         } else {
             ShowSevereError(state,
                             "Standard Ratings: Coil:Cooling:DX:MultiSpeed has eiher zero rated total cooling capacity or zero rated air vol flow "
@@ -5658,24 +5635,17 @@ namespace StandardRatings {
                     TotCapFlowModFac -
                 FanPowerPerEvapAirFlowRateFromInput(nsp) * LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
             StandardRatingsResult["NetCoolingCapRatedMaxSpeed"] = NetCoolingCapRated;
-            if (GrossRatedTotalCoolingCapacityVS > 39564.59445) {
 
-                NetCoolingCapRatedMaxSpeed2023 =
-                    GrossRatedCapacityAtSpeedLevel(nsp) *
-                        Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
-                        TotCapFlowModFac -
-                    FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
-                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
-                // Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445 Watts)
-                // as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
-                ShowWarningError(state,
-                                 format("Standard Ratings: The coils {} has a gross cooling capacity of {}. Industry standard ratings for coils of "
-                                        "this size are defined in ANSI/AHRI Standard 365 (I-P). Calculations for this standard are not yet "
-                                        "implemented in EnergyPlus. Therefore, no rating can be reported",
-                                        DXCoilName,
-                                        GrossRatedTotalCoolingCapacityVS));
+            NetCoolingCapRatedMaxSpeed2023 =
+                GrossRatedCapacityAtSpeedLevel(nsp) *
+                    Curve::CurveValue(state, CapFTempCurveIndex(nsp), IndoorCoilInletAirWetBulbTempRated, OutdoorCoilInletAirDryBulbTempTestA2) *
+                    TotCapFlowModFac -
+                FanPowerPerEvapAirFlowRateFromInput_2023(nsp) * LoopVolumetricAirFlowRateAtSpeedLevel(nsp);
+            StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+            // TODO: Commercial and industrial unitary air-conditioning condensing units with a capacity greater than 135,000 Btu/h (39564.59445
+            // Watts) as defined in ANSI/AHRI Standard 365(I-P). | Scope 2.2.6 (ANSI/AHRI 340-360 2022)
 
-            } else if (GrossRatedTotalCoolingCapacityVS < 19049.61955 && CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
+            if (CondenserType == DataHeatBalance::RefrigCondenserType::Air) {
                 // SEER2 standard applies to factory-made Unitary Air-conditioners and Unitary Air-source Heat Pumps with
                 // capacities less than 65,000 Btu/h (19049.61955 Watts) | Section 2.1 (ANSI/AHRI 210-240 2023)
                 // Removal of water-cooled and evaporatively-cooled products from the scope | Foreword (ANSI/AHRI 210-240 2023)
@@ -5698,25 +5668,23 @@ namespace StandardRatings {
                                                     EIRFTempCurveIndex,
                                                     VSPLRFPLF);
                 StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
-
-            } else {
-
-                // IEER Calculation 2022
-                std::tie(IEER_2022, NetCoolingCapRatedMaxSpeed2023, EER_2022) =
-                    IEERCalculationVariableSpeed(state,
-                                                 DXCoilType,
-                                                 nsp,
-                                                 CapFTempCurveIndex,
-                                                 GrossRatedCapacityAtSpeedLevel, // RatedTotalCapacity,
-                                                 CapFFlowCurveIndex,
-                                                 FanPowerPerEvapAirFlowRateFromInput_2023,
-                                                 LoopVolumetricAirFlowRateAtSpeedLevel, // RatedAirVolFlowRate,
-                                                 EIRFTempCurveIndex,
-                                                 RatedCOP,
-                                                 EIRFFlowCurveIndex,
-                                                 CondenserType); // CondenserType(1));
-                StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
             }
+            // IEER Calculation 2022
+            std::tie(IEER_2022, NetCoolingCapRatedMaxSpeed2023, EER_2022) =
+                IEERCalculationVariableSpeed(state,
+                                             DXCoilType,
+                                             nsp,
+                                             CapFTempCurveIndex,
+                                             GrossRatedCapacityAtSpeedLevel, // RatedTotalCapacity,
+                                             CapFFlowCurveIndex,
+                                             FanPowerPerEvapAirFlowRateFromInput_2023,
+                                             LoopVolumetricAirFlowRateAtSpeedLevel, // RatedAirVolFlowRate,
+                                             EIRFTempCurveIndex,
+                                             RatedCOP,
+                                             EIRFFlowCurveIndex,
+                                             CondenserType); // CondenserType(1));
+            StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
+
         } else {
             ShowSevereError(state,
                             "Standard Ratings: Coil:Cooling:DX " + DXCoilType + // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later

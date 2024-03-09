@@ -984,31 +984,21 @@ void PopulateCoolingCoilStandardRatingInformation(
     InputOutputFile &eio, std::string coilName, Real64 &capacity, Real64 &eer, Real64 &seer_User, Real64 &seer_Standard, Real64 &ieer)
 {
     Real64 constexpr ConvFromSIToIP(3.412141633);
-    if (capacity > 39564.59445) {
-        // TOO BIG |Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 -
-        // Ratings not yet supported in EnergyPlus
-        static constexpr std::string_view Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {}, {}, {}\n");
-        print(eio, Format_991, "Coil:Cooling:DX", coilName, capacity, "N/A", "N/A", "N/A", "N/A", "N/A");
-    } else if (capacity < 19049.61955) {
-        // SEER | Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023.
-        static constexpr std::string_view Format_991(
-            " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
-        print(eio,
-              Format_991,
-              "Coil:Cooling:DX",
-              coilName,
-              capacity,
-              eer,
-              eer * ConvFromSIToIP,
-              seer_User * ConvFromSIToIP,
-              seer_Standard * ConvFromSIToIP,
-              "N/A");
-    } else {
-        // IEER | Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022.
-        static constexpr std::string_view Format_991(
-            " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {}, {}, {:.1R}\n");
-        print(eio, Format_991, "Coil:Cooling:DX", coilName, capacity, eer, eer * ConvFromSIToIP, "N/A", "N/A", ieer * ConvFromSIToIP);
-    }
+    // TODO: TOO BIG |Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 -
+    // Ratings not yet supported in EnergyPlus
+    static constexpr std::string_view Format_991(
+        " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.1R}\n");
+    print(eio,
+          Format_991,
+          "Coil:Cooling:DX",
+          coilName,
+          capacity,
+          eer,
+          eer * ConvFromSIToIP,
+          seer_User * ConvFromSIToIP,
+          seer_Standard * ConvFromSIToIP, // SEER | Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023.
+          ieer * ConvFromSIToIP); // IEER | Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard
+                                  // 340/360-2022.
 }
 
 void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
@@ -1073,7 +1063,8 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
                 "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                 "1 - EnergyPlus object type. <br/>"
                 "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2017. <br/>"
-                "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2007. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2007. "
+                "<br/>"
                 "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - Ratings not yet "
                 "supported in EnergyPlus. <br/>"
                 "3 - SEER (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
@@ -1139,7 +1130,8 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
                 "ANSI/AHRI ratings account for supply air fan heat and electric power. <br/>"
                 "1 - EnergyPlus object type. <br/>"
                 "2 - Capacity less than 65K Btu/h (19050 W) - calculated as per AHRI Standard 210/240-2023. <br/>"
-                "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022. <br/>"
+                "&emsp;&nbsp;Capacity of 65K Btu/h (19050 W) to less than 135K Btu/h (39565 W) - calculated as per AHRI Standard 340/360-2022. "
+                "<br/>"
                 "&emsp;&nbsp;Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 - Ratings not yet "
                 "supported in EnergyPlus. <br/>"
                 "3 - SEER2 (User) is calculated using user-input PLF curve and cooling coefficient of degradation. <br/>"
