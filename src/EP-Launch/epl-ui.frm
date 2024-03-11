@@ -1313,11 +1313,16 @@ Begin VB.Form eplUI
    End
    Begin VB.Menu mnuHelp 
       Caption         =   "&Help"
-      Begin VB.Menu mnuHelpQuickstart 
-         Caption         =   "EnergyPlus QuickStart Webpage"
+      Begin VB.Menu mnuHelpEPDocs 
+         Caption         =   "EnergyPlus Documentation Menu"
+         Enabled         =   0   'False
+         Visible         =   0   'False
       End
       Begin VB.Menu mnuHelpEssentials 
          Caption         =   "EnergyPlus Essentials"
+      End
+      Begin VB.Menu mnuHelpGettingStarted 
+         Caption         =   "EnergyPlus Getting Started"
       End
       Begin VB.Menu mnuHelpIORef 
          Caption         =   "EnergyPlus Input/Output Reference"
@@ -1329,14 +1334,14 @@ Begin VB.Form eplUI
       Begin VB.Menu mnuHelpEngRef 
          Caption         =   "EnergyPlus Engineering Reference"
       End
-      Begin VB.Menu mnuHelpSep2 
-         Caption         =   "-"
+      Begin VB.Menu mnuHelpAuxProgs 
+         Caption         =   "EnergyPlus Auxiliary Programs"
       End
       Begin VB.Menu mnuHelpPlantAppl 
-         Caption         =   "Plant Application Guide"
+         Caption         =   "Application Guide for Plant Loops"
       End
       Begin VB.Menu mnuHelpEMS 
-         Caption         =   "EMS Application Guide"
+         Caption         =   "Application Guide for EMS"
       End
       Begin VB.Menu mnuHelpCompliance 
          Caption         =   "Using EnergyPlus for Compliance"
@@ -1344,14 +1349,8 @@ Begin VB.Form eplUI
       Begin VB.Menu mnuHelpExtInterface 
          Caption         =   "External Interface Application Guide"
       End
-      Begin VB.Menu mnuHelpSep3 
-         Caption         =   "-"
-      End
-      Begin VB.Menu mnuHelpGettingStarted 
-         Caption         =   "EnergyPlus Getting Started"
-      End
-      Begin VB.Menu mnuHelpAuxProgs 
-         Caption         =   "EnergyPlus Auxiliary Programs"
+      Begin VB.Menu mnuHelpTips 
+         Caption         =   "Tips and Tricks Using EnergyPlus"
       End
       Begin VB.Menu mnuHelpAcknowledge 
          Caption         =   "EnergyPlus Acknowledgments"
@@ -2082,7 +2081,6 @@ End Sub
 
 
 
-
 ' View
 Private Sub mnuViewDrawing_Click()
 Call viewOutputSet(outSetDrawingFiles)
@@ -2307,10 +2305,6 @@ End Sub
 Private Sub mnuHelpViewUpdateList_Click()
 Call viewWebPage(updatePageURL)
 End Sub
-Private Sub mnuHelpQuickstart_Click()
-Call viewWebPage("https://energyplus.net/quick-start")
-End Sub
-
 
 '=======================================================
 ' Start Adobe Acrobat Reader With a File
