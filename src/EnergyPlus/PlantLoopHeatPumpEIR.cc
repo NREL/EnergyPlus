@@ -500,33 +500,33 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
                 partLoadRatio *= (this->maxSourceTempLimit - this->sourceSideInletTemp) / (tempSourceOutletTemp - this->sourceSideInletTemp);
             }
         }
-        if (this->heatRecoveryIsActive) {
-            if (this->heatRecoveryMassFlowRate > 0.0) {
-                auto &thisRecoveryPlantLoop = state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum);
-                Real64 const CpHR = FluidProperties::GetSpecificHeatGlycol(state,
-                                                                           thisRecoveryPlantLoop.FluidName,
-                                                                           this->heatRecoveryInletTemp,
-                                                                           thisRecoveryPlantLoop.FluidIndex,
-                                                                           "EIRPlantLoopHeatPump::doPhysics()");
+        //if (this->heatRecoveryIsActive) {
+        //    if (this->heatRecoveryMassFlowRate > 0.0) {
+        //        auto &thisRecoveryPlantLoop = state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum);
+        //        Real64 const CpHR = FluidProperties::GetSpecificHeatGlycol(state,
+        //                                                                   thisRecoveryPlantLoop.FluidName,
+        //                                                                   this->heatRecoveryInletTemp,
+        //                                                                   thisRecoveryPlantLoop.FluidIndex,
+        //                                                                   "EIRPlantLoopHeatPump::doPhysics()");
 
-                Real64 const heatRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
-                Real64 const tempHROutletTemp =
-                    this->calcHROutletTemp(this->heatRecoveryInletTemp, (availableCapacity * partLoadRatio) / heatRecoveryMCp);
-                if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && tempHROutletTemp < this->minHeatRecoveryTempLimit) {
-                    Real64 ratio = std::clamp(
-                        std::abs((this->heatRecoveryInletTemp - this->minHeatRecoveryTempLimit) / (this->heatRecoveryInletTemp - tempHROutletTemp)),
-                        0.0,
-                        1.0);
-                    partLoadRatio *= ratio;
-                } else if (tempHROutletTemp > this->maxHeatRecoveryTempLimit) {
-                    Real64 ratio = std::clamp(
-                        std::abs((this->maxHeatRecoveryTempLimit - this->heatRecoveryInletTemp) / (tempHROutletTemp - this->heatRecoveryInletTemp)),
-                        0.0,
-                        1.0);
-                    partLoadRatio *= ratio;
-                }
-            }
-        }
+        //        Real64 const heatRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
+        //        Real64 const tempHROutletTemp =
+        //            this->calcHROutletTemp(this->heatRecoveryInletTemp, (availableCapacity * partLoadRatio) / heatRecoveryMCp);
+        //        if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating && tempHROutletTemp < this->minHeatRecoveryTempLimit) {
+        //            Real64 ratio = std::clamp(
+        //                std::abs((this->heatRecoveryInletTemp - this->minHeatRecoveryTempLimit) / (this->heatRecoveryInletTemp - tempHROutletTemp)),
+        //                0.0,
+        //                1.0);
+        //            partLoadRatio *= ratio;
+        //        } else if (tempHROutletTemp > this->maxHeatRecoveryTempLimit) {
+        //            Real64 ratio = std::clamp(
+        //                std::abs((this->maxHeatRecoveryTempLimit - this->heatRecoveryInletTemp) / (tempHROutletTemp - this->heatRecoveryInletTemp)),
+        //                0.0,
+        //                1.0);
+        //            partLoadRatio *= ratio;
+        //        }
+        //    }
+        //}
 
         if (!waterTempExceeded) {
             break;
@@ -657,7 +657,7 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
     if (this->heatRecoveryAvailable) {
         // reset the HR report variables
         this->heatRecoveryRate = 0.0;
-        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+        //this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
     }
 }
 
@@ -679,7 +679,8 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
 
     // limit the HR outlet temperature to the maximum allowed
     if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
-        this->heatRecoveryOutletTemp = std::max(this->maxHeatRecoveryTempLimit, this->heatRecoveryInletTemp);
+        this->heatRecoveryOutletTemp = this->maxHeatRecoveryTempLimit;
+        //this->heatRecoveryOutletTemp = std::max(this->maxHeatRecoveryTempLimit, this->heatRecoveryInletTemp);
         this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);        
     }
 
