@@ -75,7 +75,7 @@ Begin VB.Form frmAbout
       Width           =   3855
    End
    Begin VB.Label lblTitle 
-      Caption         =   "EP-Launch  -  Version 2.15"
+      Caption         =   "EP-Launch  -  Version 2.14c"
       BeginProperty Font 
          Name            =   "MS Sans Serif"
          Size            =   12
@@ -114,9 +114,9 @@ Private Sub Form_Load()
 If eplUI.getOSVersion() = 1 Then
   lblPlatform.Caption = "Running on Windows 95, 98 or ME"
 Else
-  lblPlatform.Caption = "Running on Windows NT, 2000, XP, Vista, 7, 8, 10, 11"
+  lblPlatform.Caption = "Running on Windows NT, 2000, XP, Vista, 7, 8, 10"
 End If
-txtNotice.Text = "Copyright (c) 2000-2024 GARD Analytics, " & vbCrLf
+txtNotice.Text = "Copyright (c) 2000-2020 GARD Analytics, " & vbCrLf
 txtNotice.Text = txtNotice.Text & "All rights reserved.                    " & vbCrLf
 txtNotice.Text = txtNotice.Text & "                                        " & vbCrLf
 txtNotice.Text = txtNotice.Text & "NOTICE: The U.S. Government is granted  " & vbCrLf

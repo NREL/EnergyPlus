@@ -744,11 +744,14 @@ Begin VB.Form IDFEdit
       Begin VB.Menu mnuHelpDiv1 
          Caption         =   "-"
       End
-      Begin VB.Menu mnuHelpQuickStart 
-         Caption         =   "EnergyPlus QuickStart Webpage"
+      Begin VB.Menu mnuHelpEPDocs 
+         Caption         =   "EnergyPlus Documentation Menu"
       End
-      Begin VB.Menu mnuHelpEssentials 
-         Caption         =   "EnergyPlus Essentials"
+      Begin VB.Menu mnuHelpDiv2 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuHelpGettingStarted 
+         Caption         =   "EnergyPlus Getting Started"
       End
       Begin VB.Menu mnuHelpIORef 
          Caption         =   "EnergyPlus I/O Reference"
@@ -759,11 +762,8 @@ Begin VB.Form IDFEdit
       Begin VB.Menu mnuHelpEngRef 
          Caption         =   "EnergyPlus Engineering Reference"
       End
-      Begin VB.Menu mnuHelpDiv6 
-         Caption         =   "-"
-      End
-      Begin VB.Menu mnuHelpPlant 
-         Caption         =   "EnergyPlus Plant Applications Guide"
+      Begin VB.Menu mnuHelpAuxProgs 
+         Caption         =   "EnergyPlus Auxiliary Programs"
       End
       Begin VB.Menu mnuHelpEMSguide 
          Caption         =   "EnergyPlus EMS Application Guide"
@@ -774,14 +774,8 @@ Begin VB.Form IDFEdit
       Begin VB.Menu mnuHelpExtInterface 
          Caption         =   "External Interface Application Guide "
       End
-      Begin VB.Menu mnuHelpDiv5 
-         Caption         =   "-"
-      End
-      Begin VB.Menu mnuHelpGettingStarted 
-         Caption         =   "EnergyPlus Getting Started"
-      End
-      Begin VB.Menu mnuHelpAuxProgs 
-         Caption         =   "EnergyPlus Auxiliary Programs"
+      Begin VB.Menu mnuHelpTips 
+         Caption         =   "Tips and Tricks Using EnergyPlus"
       End
       Begin VB.Menu mnuHelpAcknowledge 
          Caption         =   "EnergyPlus Acknowledgments"
@@ -1349,7 +1343,7 @@ Dim iObject As Long
 Dim classIndex As Long
 Dim firstValue As Long
 Dim firstField As Long
-Dim numfields  As Long
+Dim numFields  As Long
 Dim valueIndx As Long
 Dim fieldIndx As Long
 Dim jFld As Long
@@ -1368,8 +1362,8 @@ For iObject = 1 To maxUsedObject
     classIndex = IDFObject(iObject).classType
     firstValue = IDFObject(iObject).valueStart
     firstField = IDDClassDat(classIndex).fieldStart
-    numfields = IDDClassDat(classIndex).fieldEnd - firstField + 1
-    For jFld = 1 To numfields
+    numFields = IDDClassDat(classIndex).fieldEnd - firstField + 1
+    For jFld = 1 To numFields
       valueIndx = firstValue + jFld - 1
       fieldIndx = firstField + jFld - 1
       If IDDField(fieldIndx).type = 6 Then  'node
@@ -2217,8 +2211,11 @@ Call CreateRangeTestFiles
 End Sub
 
 
-
 ' References to EnergyPlus Documentation
+Private Sub mnuHelpEPDocs_Click()
+'Call startAcrobat("EPlusMainMenu.pdf")
+Call viewWebPage(documentationPath + "index.html")
+End Sub
 Private Sub mnuHelpGettingStarted_Click()
 Call startAcrobat("GettingStarted.pdf")
 End Sub
@@ -2238,24 +2235,17 @@ Private Sub mnuHelpAcknowledge_Click()
 Call startAcrobat("Acknowledgments.pdf")
 End Sub
 Private Sub mnuHelpCompliance_Click()
-Call startAcrobat("UsingEnergyPlusForCompliance.pdf")
+Call startAcrobat("Using_EnergyPlus_for_Compliance.pdf")
 End Sub
 Private Sub mnuHelpEMSguide_Click()
-Call startAcrobat("EMSApplicationGuide.pdf")
+Call startAcrobat("EMS_Application_Guide.pdf")
 End Sub
 Private Sub mnuHelpExtInterface_Click()
-Call startAcrobat("ExternalInterfacesApplicationGuide.pdf")
+Call startAcrobat("ExternalInterfaces_Application_Guide.pdf")
 End Sub
-Private Sub mnuHelpQuickStart_Click()
-Call viewWebPage("https://energyplus.net/quick-start")
+Private Sub mnuHelpTips_Click()
+Call startAcrobat("Tips_and_Tricks_Using_EnergyPlus.pdf")
 End Sub
-Private Sub mnuHelpEssentials_Click()
-Call startAcrobat("EnergyPlusEssentials.pdf")
-End Sub
-Private Sub mnuHelpPlant_Click()
-Call startAcrobat("PlantApplicationGuide.pdf")
-End Sub
-
 
 
 Private Sub mnuHelpWhatsNew_Click()
@@ -2747,7 +2737,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub FillGrid()
 Dim i As Long, j As Long
-Dim numfields As Long, firstField As Long
+Dim numFields As Long, firstField As Long
 Dim curObject As Long 'current object being displayed (each object in different column)
 Dim curField As Long ' pointer to the current item in IDDField array
 Dim StartVal As Long ' the first value pointed to by the current object being displayed
@@ -2762,14 +2752,14 @@ grdNew.TextMatrix(0, 0) = "Field"
 grdNew.TextMatrix(0, 1) = "Units"
 'set some general field level variables
 firstField = IDDClassDat(curIDDClass).fieldStart
-numfields = IDDClassDat(curIDDClass).fieldEnd - firstField + 1
+numFields = IDDClassDat(curIDDClass).fieldEnd - firstField + 1
 'define the size of the grid for the particular class
-grdNew.Rows = numfields + 1  'set the number of rows on the grid
+grdNew.Rows = numFields + 1  'set the number of rows on the grid
 grdNew.Cols = IDDClassObjPt(curIDDClass).objectCount + 2  'set the number of columns on the grid
 'create an array for rows with special unit handling
 'ReDim specialUnit(grdNew.Rows, grdNew.Cols)
 'fill heading (left) columns
-For j = 1 To numfields
+For j = 1 To numFields
   grdNew.TextMatrix(j, 0) = IDDField(firstField + j - 1).name
   useUnits = IDDField(firstField + j - 1).unitsIndex
   grdNew.RowData(j) = useUnits
@@ -2823,7 +2813,7 @@ i = grdNew.FixedCols  'pointer to the first column for data
 Do While curObject > 0
   StartVal = IDFObject(curObject).valueStart
   grdNew.ColData(i) = curObject  'store the current object pointer for the column
-  For j = 1 To numfields
+  For j = 1 To numFields
     curField = firstField + j - 1
     curAN = IDDField(curField).AN
     'special handling of ScheduleCompact fields
@@ -3430,7 +3420,7 @@ Dim curClass As Long  ' the class pointer for the object being parsed
 Dim curField As Long  ' the pointer to the field number in the class
 Dim aField As Long    ' the pointer to the IDDField array
 Dim curValue As Long  ' the pointer to the current item in the IDFValue array
-Dim numfields As Long ' the number of possible fields for that class
+Dim numFields As Long ' the number of possible fields for that class
 Dim commentBlockStart As Long  'points to the beginning of the comments
 Dim objPoint As Long  ' used to transverse the object list looking for an empty object pointer
 Dim lastObjectWithPt As Long 'used to hold last good pointer in object array
@@ -3611,19 +3601,19 @@ Do While Not fileEnd
                 IDFObject(maxUsedObject).nextObjectInClass = 0 'set the next object link to zero to show last defined
                 IDDClassObjPt(curClass).objectCount = IDDClassObjPt(curClass).objectCount + 1
                 'calculate the number of fields that should be reserved for this object based on the class
-                numfields = IDDClassDat(curClass).fieldEnd - IDDClassDat(curClass).fieldStart + 1
+                numFields = IDDClassDat(curClass).fieldEnd - IDDClassDat(curClass).fieldStart + 1
                 'clear the fields for the new object
                 'This makes sure that the fields are clear for the recently read object
                 'remember these must be cleared incase not all fields are given values in the
                 'IDF file for that object, i.e., location has five values, if only three are
                 'given the other two still should be blank and allocated.
-                Call resizeValueArray(numfields)
-                For i = 1 To numfields
+                Call resizeValueArray(numFields)
+                For i = 1 To numFields
                   IDFValue(maxUsedValue + i).entry = ""
                 Next i
                 curValue = maxUsedValue  'set the pointer to the IDFValue array to be the next value
                 curField = 0
-                maxUsedValue = maxUsedValue + numfields
+                maxUsedValue = maxUsedValue + numFields
                 parseMode = InObject
                 lastWord = ""
               End If
@@ -3703,7 +3693,7 @@ If curValue > maxUsedValue Then
   "Not all objects may have been loaded into the IDF Editor and data could be lost. It is recommended that you save the file using a different name or close the " & _
   "file without saving.  You may fix the file using a text editor such as Notepad. In a text editor, look for the object listed above.  Each object should end with a semi-colon. " & _
   "In addition, the object may be extensible, see Energy+.idd in main EnergyPlus install folder and search for \extensible for instructions.", "IDF Parsing Error")
-  Debug.Print lastWord, curField, numfields, maxUsedValue
+  Debug.Print lastWord, curField, numFields, maxUsedValue
 End If
 lastWord = ""
 Return
@@ -3858,7 +3848,7 @@ Sub saveSingleObject(objIndex As Long, fileHandle As Integer)
 Static prevFormat As Integer
 Dim classIndex As Long
 Dim iValue As Long, iComment As Long, iField As Long
-Dim firstField As Long, numfields As Long
+Dim firstField As Long, numFields As Long
 Dim StartVal As Long, numFilledfields As Long
 Dim j As Long, tabPlace As Long
 Dim commaLoc As Long
@@ -3877,12 +3867,12 @@ Dim valueTab As Integer
 numFilledfields = 1
 classIndex = IDFObject(objIndex).classType
 firstField = IDDClassDat(classIndex).fieldStart
-numfields = IDDClassDat(classIndex).fieldEnd - firstField + 1
+numFields = IDDClassDat(classIndex).fieldEnd - firstField + 1
 outputObjectNameYet = False
 'Print #fileHandle, iddclassdat(classIndex).name & ","   'print the class name - left justified
 StartVal = IDFObject(objIndex).valueStart
 'first go through fields and find last non-blank
-For j = numfields To 1 Step -1
+For j = numFields To 1 Step -1
   iValue = StartVal + j - 1
   If IDFValue(iValue).entry <> "" Then
     numFilledfields = j
@@ -3904,7 +3894,7 @@ If numFilledfields < IDDClassDat(classIndex).minFields Then
   numFilledfields = IDDClassDat(classIndex).minFields
 End If
 ' now scan through the fields
-If numFilledfields <= 0 And numfields > 0 Then numFilledfields = 1
+If numFilledfields <= 0 And numFields > 0 Then numFilledfields = 1
 'first go through all fields and create the output strings for each
 For j = 1 To numFilledfields
   iValue = StartVal + j - 1
@@ -4201,7 +4191,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub IDFDuplicateObject()
 Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
-Dim iVal As Long, i As Long, numfields As Long
+Dim iVal As Long, i As Long, numFields As Long
 Dim li As Long
 Dim iCol As Long, iObj As Long
 li = lstObjectTypes.ListIndex
@@ -4210,11 +4200,11 @@ If actObject = 0 Then Exit Sub    'can't duplicate if not on a selected object
 For iCol = colSt To colEnd
   iObj = grdNew.ColData(iCol)
   iVal = IDFObject(iObj).valueStart
-  numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+  numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
   Call IDFNewObject 'first make a new object
   ' now copy values into new object
-  For i = 0 To numfields - 1
-    IDFValue(maxUsedValue + i - numfields).entry = IDFValue(iVal + i).entry
+  For i = 0 To numFields - 1
+    IDFValue(maxUsedValue + i - numFields).entry = IDFValue(iVal + i).entry
     Debug.Print "dup "; IDFValue(iVal + i).entry
   Next i
 Next iCol
@@ -4237,7 +4227,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub IDFDuplicateObjectAndChange()
 Dim rowSt As Long, rowEnd As Long, colSt As Long, colEnd As Long
-Dim curVal As Long, jField As Long, numfields As Long, iLength As Long
+Dim curVal As Long, jField As Long, numFields As Long, iLength As Long
 Dim li As Long
 Dim curObj As Long
 Dim numChar As Long
@@ -4250,12 +4240,12 @@ If colEnd <> colEnd Then Exit Sub 'can't do changes across multiple objects
 ' find the text suggestion for search box
 curObj = grdNew.ColData(colSt)
 curVal = IDFObject(curObj).valueStart
-numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
 numChar = 2 'assume that this is the minimum number of characters that must match
 For iLength = 1 To Len(IDFValue(curVal).entry)
   found = False
   hintText = Left(IDFValue(curVal).entry, numChar)
-  For jField = 1 To numfields - 1
+  For jField = 1 To numFields - 1
     If InStr(IDFValue(curVal + jField).entry, hintText) > 0 Then
       found = True
       Exit For
@@ -4279,8 +4269,8 @@ frmDuplicateAndChange.Show vbModal
 If replaceTerm <> "" Then
   Call IDFNewObject 'first make a new object
   ' now copy values into new object
-  For jField = 0 To numfields - 1
-    IDFValue(maxUsedValue + jField - numfields).entry = Replace(IDFValue(curVal + jField).entry, searchTerm, replaceTerm)
+  For jField = 0 To numFields - 1
+    IDFValue(maxUsedValue + jField - numFields).entry = Replace(IDFValue(curVal + jField).entry, searchTerm, replaceTerm)
     Debug.Print "dup "; IDFValue(curVal + jField).entry
   Next jField
   Call FillList
@@ -4300,7 +4290,7 @@ End Sub
 ' This routine creates a new blank object with all default values set
 '-----------------------------------------------------------------------------
 Sub IDFNewObject()
-Dim objPoint As Long, lastObjectWithPt As Long, numfields As Long
+Dim objPoint As Long, lastObjectWithPt As Long, numFields As Long
 Dim i As Long, iField As Long, refPt As Long
 'Debug.Print actClass, actField, iddclassdat(actClass).name, IDDField(actField).name
 'find the last object in class
@@ -4323,14 +4313,14 @@ End If
 IDFObject(maxUsedObject).nextObjectInClass = 0 'set the next object link to zero to show last defined
 IDDClassObjPt(actClass).objectCount = IDDClassObjPt(actClass).objectCount + 1
 'calculate the number of fields that should be reserved for this object based on the class
-numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
 'clear the fields for the new object
 'This makes sure that the fields are clear for the recently read object
 'remember these must be cleared incase not all fields are given values in the
 'IDF file for that object, i.e., location has five values, if only three are
 'given the other two still should be blank and allocated.
-Call resizeValueArray(numfields)
-For i = 0 To numfields
+Call resizeValueArray(numFields)
+For i = 0 To numFields
 '  iField = i + iddclassdat(actClass).fieldStart - 1 original line before LL reported problem
   iField = i + IDDClassDat(actClass).fieldStart
   If IDDField(iField).AN = 1 Then 'alpha
@@ -4351,7 +4341,7 @@ For i = 0 To numfields
     End If
   End If
 Next i
-maxUsedValue = maxUsedValue + numfields
+maxUsedValue = maxUsedValue + numFields
 'grdNew.ShowCell grdNew.TopRow - 1, grdNew.LeftCol - 1
 End Sub
 
@@ -4528,7 +4518,7 @@ End Sub
 Function rangeSaveIDF(rangeItem As Long, subTest As String, testName As String, testedField As Long, testedClass As Long) As Boolean
 Dim iClass As Long, iObject As Long, iField As Long
 Dim iValue As Long, iComment As Long
-Dim firstField As Long, numfields As Long
+Dim firstField As Long, numFields As Long
 Dim StartVal As Long, numFilledfields As Long
 Dim j As Long, tabPlace As Long
 Dim t As String
@@ -4568,12 +4558,12 @@ For iClass = 1 To maxUsedIDDClass
     Print #3, ""
     iObject = IDDClassObjPt(iClass).objectStart
     firstField = IDDClassDat(iClass).fieldStart
-    numfields = IDDClassDat(iClass).fieldEnd - firstField + 1
+    numFields = IDDClassDat(iClass).fieldEnd - firstField + 1
     Do While iObject > 0
       Print #3, IDDClassDat(iClass).name & ","   'print the class name - left justified
       StartVal = IDFObject(iObject).valueStart
       'first go through fields and find last non-blank
-      For j = numfields To 1 Step -1
+      For j = numFields To 1 Step -1
         iValue = StartVal + j - 1
         If IDFValue(iValue).entry <> "" Then
           numFilledfields = j
@@ -5054,7 +5044,7 @@ End Sub
 ' Copy the currently selected object to the clipboard
 '-----------------------------------------------------------------------------
 Sub doCopyObject()
-Dim iVal As Long, i As Long, numfields As Long, toClip As String
+Dim iVal As Long, i As Long, numFields As Long, toClip As String
 Dim rowStart As Long, rowEnd As Long, colStart As Long, colEnd As Long
 Dim columnSelected As Long
 Dim selectedObject As Long
@@ -5068,11 +5058,11 @@ toClip = "IDF,"
 For columnSelected = colStart To colEnd
   selectedObject = grdNew.ColData(columnSelected)
   iVal = IDFObject(selectedObject).valueStart
-  numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+  numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
   'add name of object type
   toClip = toClip & IDDClassDat(actClass).name
   ' now copy values into a string
-  For i = 0 To numfields - 1
+  For i = 0 To numFields - 1
     toClip = toClip & "," & IDFValue(iVal + i).entry
   Next i
   toClip = toClip & ";"
@@ -5088,7 +5078,7 @@ End Sub
 ' appropriate for spreadsheet use.
 '-----------------------------------------------------------------------------
 Sub doCopyForSpreadsheet()
-Dim iVal As Long, jField As Long, numfields As Long, toClip As String
+Dim iVal As Long, jField As Long, numFields As Long, toClip As String
 Dim rowStart As Long, rowEnd As Long, colStart As Long, colEnd As Long
 Dim columnSelected As Long
 Dim selectedObject As Long
@@ -5098,9 +5088,9 @@ grdNew.GetSelection rowStart, colStart, rowEnd, colEnd
 'always clear the clipboard before writing to it
 Clipboard.Clear
 toClip = ""
-numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
 'loop through the selection to copy multiple columns as necessary
-For jField = 0 To numfields - 1
+For jField = 0 To numFields - 1
   toClip = toClip & IDDField(IDDClassDat(actClass).fieldStart + jField).name & vbTab
   For iCol = colStart To colEnd
     selectedObject = grdNew.ColData(iCol)
@@ -5183,7 +5173,7 @@ Dim fromClip As String
 Dim found As Long
 Dim atLeastOneFound As Boolean
 Dim possibleObjectName As String
-Dim numfields As Long
+Dim numFields As Long
 Dim wasCollapsedList As Boolean
 Dim nextChar As String
 Dim isComment As Boolean
@@ -5252,7 +5242,7 @@ If doesClipContainObject Then
       Call lstObjectTypes_Click
       Call IDFNewObject
       'match the number of possible fields and the number of parts
-      numfields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
+      numFields = IDDClassDat(actClass).fieldEnd - IDDClassDat(actClass).fieldStart + 1
       'If numFields <> numParts - 2 Then
       '  MsgBox "The number of copied fields does not match the number of fields in the target object", vbInformation, "Paste Warning"
       '  If numFields > numParts - 2 Then numFields = numParts - 2
@@ -5263,7 +5253,7 @@ If doesClipContainObject Then
       For i = 0 To numParts - 1
         curPart = Trim(parts(i + 1))
         Debug.Print "  "; curPart
-        IDFValue(maxUsedValue + i - numfields).entry = curPart
+        IDFValue(maxUsedValue + i - numFields).entry = curPart
       Next i
       If wasCollapsedList Then Call mnuViewClassesWithObjs_Click
     End If
@@ -5453,7 +5443,7 @@ End Sub
 Sub doValidityCheck(validityMsg() As String, classForMsg() As Long, objForMsg() As Long, fldForMsg() As Long)
 Dim classIndex As Long
 Dim firstField As Long
-Dim numfields As Long
+Dim numFields As Long
 Dim firstValue As Long
 Dim curNumericValue As Double
 Dim curAlphaValue As String
@@ -5484,8 +5474,8 @@ For iObject = 1 To maxUsedObject
     classIndex = IDFObject(iObject).classType
     firstValue = IDFObject(iObject).valueStart
     firstField = IDDClassDat(classIndex).fieldStart
-    numfields = IDDClassDat(classIndex).fieldEnd - firstField + 1
-    For j = 1 To numfields
+    numFields = IDDClassDat(classIndex).fieldEnd - firstField + 1
+    For j = 1 To numFields
       outOfRange = False
       valueIndx = firstValue + j - 1
       fieldIndx = firstField + j - 1
@@ -5774,7 +5764,7 @@ Dim jField As Long
 Dim classIndex As Long
 Dim firstValue As Long
 Dim firstField As Long
-Dim numfields As Long
+Dim numFields As Long
 Dim curValue As String
 Dim fieldIndx As Long
 Dim valueIndx As Long
@@ -5796,8 +5786,8 @@ For iObject = 1 To maxUsedObject
     classIndex = IDFObject(iObject).classType
     firstValue = IDFObject(iObject).valueStart
     firstField = IDDClassDat(classIndex).fieldStart
-    numfields = IDDClassDat(classIndex).fieldEnd - firstField + 1
-    For jField = 1 To numfields
+    numFields = IDDClassDat(classIndex).fieldEnd - firstField + 1
+    For jField = 1 To numFields
       valueIndx = firstValue + jField - 1
       fieldIndx = firstField + jField - 1
       curValue = IDFValue(valueIndx).entry
@@ -5978,7 +5968,7 @@ Dim iObject As Long
 Dim classIndex As Long
 Dim firstValue As Long
 Dim firstField As Long
-Dim numfields  As Long
+Dim numFields  As Long
 Dim valueIndx As Long
 Dim fieldIndx As Long
 Dim jFld As Long
@@ -6012,8 +6002,8 @@ If curFieldName <> "" Then
       classIndex = IDFObject(iObject).classType
       firstValue = IDFObject(iObject).valueStart
       firstField = IDDClassDat(classIndex).fieldStart
-      numfields = IDDClassDat(classIndex).fieldEnd - firstField + 1
-      For jFld = 1 To numfields
+      numFields = IDDClassDat(classIndex).fieldEnd - firstField + 1
+      For jFld = 1 To numFields
         valueIndx = firstValue + jFld - 1
         fieldIndx = firstField + jFld - 1
         'check if a node or a reference or name in first field of object
