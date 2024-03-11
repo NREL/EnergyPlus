@@ -14193,8 +14193,8 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
     Real64 T_discharge_new;                // Condensing temperature, for temporary use in iterations [C]
     Real64 Tfs;                            // Temperature of the air at the coil surface [C]]
-    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C]
-    Real64 TeTol(0.5);                     // Tolerance for the difference between Te and SmallLoadTe
+    Real64 constexpr Tolerance(0.05);      // Tolerance for condensing temperature calculation [C]
+    Real64 constexpr TeTol(0.5);           // Tolerance for the difference between Te and SmallLoadTe
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -14538,7 +14538,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
     Real64 RefTSat;                        // Saturated temperature of the refrigerant [C]
     Real64 RefPLow;                        // Low Pressure Value for Ps (>0.0) [Pa]
     Real64 RefPHigh;                       // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 Tolerance(0.05);                // Tolerance for condensing temperature calculation [C}
+    Real64 constexpr Tolerance(0.05);      // Tolerance for condensing temperature calculation [C}
     Array1D<Real64> CompEvaporatingPWRSpd; // Array for the compressor power at certain speed [W]
     Array1D<Real64> CompEvaporatingCAPSpd; // Array for the evaporating capacity at certain speed [W]
 
@@ -14721,30 +14721,30 @@ void VRFCondenserEquipment::VRFHR_OU_HR_Mode(EnergyPlusData &state,
     using FluidProperties::GetSupHeatEnthalpyRefrig;
     using General::SolveRoot;
 
-    Real64 constexpr ErrorTol(0.1); // tolerance for RegulaFalsi iterations
-    int constexpr MaxIte(100);      // maximum number of iterations
-    int HRMode(0);                  // HR operational mode [W]
-    int HRMode_sub(0);              // HR operational mode (sub) [W]
-    int RefrigerantIndex;           // Index of the refrigerant [-]
-    int SolFla;                     // Flag of RegulaFalsi solver
-    Real64 C_OU_HexRatio;           // capacity ratio between the OU condenser and OU evaporator [-]
-    Real64 m_air_rated;             // OU coil air mass flow rate [kg/s]
-    Real64 m_air_evap;              // OU evaporator air mass flow rate [kg/s]
-    Real64 m_air_cond;              // OU condenser air mass flow rate [kg/s]
-    Real64 m_air_evap_rated;        // Rated OU evaporator air mass flow rate [kg/s]
-    Real64 N_fan_OU_evap(0);        // OU evaporator air mass flow rate [kg/s]
-    Real64 N_fan_OU_cond(0);        // OU condenser air mass flow rate [kg/s]
-    Real64 RhoAir;                  // outdoor air density [kg/m3]
-    Real64 Q_c_tot;                 // Total evaporator capacity [W]
-    Real64 Q_h_tot;                 // Total condenser capacity [W]
-    Real64 Pipe_Q_c_new;            // IU evaporator side piping loss (new), updated because of Te update [W]
-    Real64 rps1_evap;               // compressor speed satisfying IU cooling load
-    Real64 rps2_cond;               // compressor speed satisfying IU heating load
-    Real64 RefPLow;                 // Low Pressure Value for Ps (>0.0) [Pa]
-    Real64 RefPHigh;                // High Pressure Value for Ps (max in tables) [Pa]
-    Real64 Tfs;                     // temperature of the air at coil surface [C]
-    Real64 Tolerance(0.05);         // Tolerance for condensing temperature calculation [C}
-    Real64 Tsuction_new;            // VRF compressor suction refrigerant temperature (new) [C]
+    Real64 constexpr ErrorTol(0.1);   // tolerance for RegulaFalsi iterations
+    int constexpr MaxIte(100);        // maximum number of iterations
+    int HRMode(0);                    // HR operational mode [W]
+    int HRMode_sub(0);                // HR operational mode (sub) [W]
+    int RefrigerantIndex;             // Index of the refrigerant [-]
+    int SolFla;                       // Flag of RegulaFalsi solver
+    Real64 C_OU_HexRatio;             // capacity ratio between the OU condenser and OU evaporator [-]
+    Real64 m_air_rated;               // OU coil air mass flow rate [kg/s]
+    Real64 m_air_evap;                // OU evaporator air mass flow rate [kg/s]
+    Real64 m_air_cond;                // OU condenser air mass flow rate [kg/s]
+    Real64 m_air_evap_rated;          // Rated OU evaporator air mass flow rate [kg/s]
+    Real64 N_fan_OU_evap(0);          // OU evaporator air mass flow rate [kg/s]
+    Real64 N_fan_OU_cond(0);          // OU condenser air mass flow rate [kg/s]
+    Real64 RhoAir;                    // outdoor air density [kg/m3]
+    Real64 Q_c_tot;                   // Total evaporator capacity [W]
+    Real64 Q_h_tot;                   // Total condenser capacity [W]
+    Real64 Pipe_Q_c_new;              // IU evaporator side piping loss (new), updated because of Te update [W]
+    Real64 rps1_evap;                 // compressor speed satisfying IU cooling load
+    Real64 rps2_cond;                 // compressor speed satisfying IU heating load
+    Real64 RefPLow;                   // Low Pressure Value for Ps (>0.0) [Pa]
+    Real64 RefPHigh;                  // High Pressure Value for Ps (max in tables) [Pa]
+    Real64 Tfs;                       // temperature of the air at coil surface [C]
+    Real64 constexpr Tolerance(0.05); // Tolerance for condensing temperature calculation [C}
+    Real64 Tsuction_new;              // VRF compressor suction refrigerant temperature (new) [C]
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     static constexpr std::string_view RoutineName("VRFHR_OU_Mode");
