@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, PIUArrayOutOfBounds)
     state->dataSize->TermUnitSizing.allocate(1);
     state->dataSize->TermUnitFinalZoneSizing.allocate(1);
     state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).AirVolFlow = 1.0;
-    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinFlowFrac = 0.5;
+    state->dataSize->TermUnitSizing(state->dataSize->CurTermUnitSizingNum).MinPriFlowFrac = 0.5;
     state->dataSize->TermUnitSingDuct = true;
     state->dataSize->TermUnitFinalZoneSizing(state->dataSize->CurTermUnitSizingNum)
         .copyFromZoneSizing(state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum));

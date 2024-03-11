@@ -159,7 +159,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     // Test 4 - Zone Equipment, Powered Induction TU
     state->dataSize->TermUnitSingDuct = false;
     state->dataSize->TermUnitPIU = true;
-    state->dataSize->TermUnitSizing(1).MinFlowFrac = 0.0; // all zone air
+    state->dataSize->TermUnitSizing(1).MinPriFlowFrac = 0.0; // all zone air
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
@@ -172,7 +172,7 @@ TEST_F(AutoSizingFixture, HeatingWaterDesAirInletHumRatSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 5 - Zone Equipment, Powered Induction TU with MinFlowFrac at 0.3
-    state->dataSize->TermUnitSizing(1).MinFlowFrac = 0.3; // mix zone air and DesHeatCoilInHumRatTU
+    state->dataSize->TermUnitSizing(1).MinPriFlowFrac = 0.3; // mix zone air and DesHeatCoilInHumRatTU
     // start with an auto-sized value as the user input
     inputValue = DataSizing::AutoSize;
     // do sizing
