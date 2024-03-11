@@ -299,12 +299,14 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     state->dataScheduleMgr->Schedule(1).MinValue = 1.0;
     state->dataScheduleMgr->Schedule(1).MaxValue = 1.0;
     state->dataScheduleMgr->Schedule(1).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(1).MaxMinSundayToHoliday = true;
     state->dataScheduleMgr->Schedule(2).Used = true;
 
     state->dataScheduleMgr->Schedule(2).CurrentValue = 131.8;
     state->dataScheduleMgr->Schedule(2).MinValue = 131.8;
     state->dataScheduleMgr->Schedule(2).MaxValue = 131.8;
     state->dataScheduleMgr->Schedule(2).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(2).MaxMinSundayToHoliday = true;
     InternalHeatGains::GetInternalHeatGainsInput(*state);
 
     EXPECT_FALSE(state->dataInternalHeatGains->ErrorsFound);

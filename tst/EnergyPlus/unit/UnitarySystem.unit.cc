@@ -16217,6 +16217,7 @@ Dimensionless;	!- Output Unit Type
     state->dataScheduleMgr->Schedule(7).MinValue = 4.0; // Enable schedule without calling schedule manager
     state->dataScheduleMgr->Schedule(7).MaxValue = 4.0; // Enable schedule without calling schedule manager
     state->dataScheduleMgr->Schedule(7).MaxMinSet = true;
+    state->dataScheduleMgr->Schedule(7).MaxMinSundayToHoliday = false;
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(*state);
 
     std::string compName = "SYS 1 FURNACE DX COOL UNITARY SYSTEM";
