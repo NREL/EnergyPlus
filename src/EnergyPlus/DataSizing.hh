@@ -627,7 +627,7 @@ namespace DataSizing {
         Real64 MaxHWVolFlow;           // design Hot Water vol flow for single duct terminal unit [m3/s]
         Real64 MaxSTVolFlow;           // design Steam vol flow rate for single duct terminal unit [m3/s]
         Real64 MaxCWVolFlow;           // design Cold Water vol flow for single duct terminal unit [m3/s]
-        Real64 MinFlowFrac;            // design minimum flow fraction for a terminal unit
+        Real64 MinPriFlowFrac;         // design minimum primary flow fraction for a terminal unit
         Real64 InducRat;               // design induction ratio for a terminal unit
         bool InducesPlenumAir;         // True if secondary air comes from the plenum
         Real64 ReheatAirFlowMult;      // multiplier for air flow in reheat coil UA calculation

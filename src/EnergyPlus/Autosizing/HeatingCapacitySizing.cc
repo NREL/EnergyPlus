@@ -111,7 +111,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         DesVolFlow = this->dataFlowUsedForSizing;
                     }
                     if (this->termUnitPIU && (this->curTermUnitSizingNum > 0)) {
-                        Real64 const MinPriFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinFlowFrac;
+                        Real64 const MinPriFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinPriFlowFrac;
                         if (this->termUnitSizing(this->curTermUnitSizingNum).InducesPlenumAir) {
                             CoilInTemp = (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInTempTU * MinPriFlowFrac) +
                                          (this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).ZoneRetTempAtHeatPeak * (1.0 - MinPriFlowFrac));

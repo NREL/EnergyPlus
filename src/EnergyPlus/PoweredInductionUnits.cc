@@ -782,9 +782,9 @@ void InitPIU(EnergyPlusData &state,
                 thisPIU.MaxSecAirMassFlow = RhoAir * thisPIU.MaxSecAirVolFlow;
                 thisPIU.MinSecAirMassFlow = max(0.0, thisPIU.MinTotAirMassFlow - thisPIU.MinPriAirMassFlow);
             } else {
-                thisPIU.MinTotAirMassFlow = thisPIU.MaxTotAirMassFlow * thisPIU.MinFanTurnDownRatio;
                 thisPIU.MaxSecAirMassFlow = RhoAir * thisPIU.MaxSecAirVolFlow;
                 thisPIU.MinSecAirMassFlow = max(0.0, thisPIU.MaxSecAirMassFlow * thisPIU.MinFanTurnDownRatio);
+                thisPIU.MinTotAirMassFlow = thisPIU.MinSecAirMassFlow + thisPIU.MinPriAirMassFlow;
             }
         }
 
@@ -1376,13 +1376,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     }
 
     if (CurTermUnitSizingNum > 0) {
-        if (state.dataPowerInductionUnits->PIU(PIUNum).UnitType_Num == DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat) {
-            TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = (thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow) /
-                                                               ((thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow) + thisPIU.MaxSecAirVolFlow);
-            TermUnitSizing(CurTermUnitSizingNum).plenumIndex = thisPIU.plenumIndex;
-        } else {
-            TermUnitSizing(CurTermUnitSizingNum).MinFlowFrac = thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow / thisPIU.MaxTotAirVolFlow;
-        }
+        TermUnitSizing(CurTermUnitSizingNum).MinPriFlowFrac = thisPIU.MinPriAirFlowFrac;
         TermUnitSizing(CurTermUnitSizingNum).MaxHWVolFlow = thisPIU.MaxVolHotWaterFlow;
         TermUnitSizing(CurTermUnitSizingNum).MaxSTVolFlow = thisPIU.MaxVolHotSteamFlow;
         TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
