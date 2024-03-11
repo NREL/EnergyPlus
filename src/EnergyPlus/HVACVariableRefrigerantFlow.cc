@@ -14286,8 +14286,17 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
 
                 General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe,
                                    T_suction); // SmallLoadTe is the updated Te'
-                // TeTol is added to prevent the final updated Te to go out of bounds
-                if (SolFla < 0) SmallLoadTe = 6 + TeTol; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+                if (SolFla == -1) {
+                    // show error not converging
+                    ShowWarningMessage(state, format("{}: low load Te adjustment failed for {}", RoutineName, this->Name));
+                    ShowContinueErrorTimeStamp(state, "");
+                    ShowContinueError(state, format("  Iteration limit [{}] exceeded in calculating OU evaporating temperature", MaxIter));
+                } else if (SolFla == -2) {
+                    // demand < capacity at both endpoints of the Te range, assuming f(x) is roughly monotonic than this is the low load case
+                    assert(f(T_suction) < 0);
+                    // TeTol is added to prevent the final updated Te to go out of bounds
+                    SmallLoadTe = 6 + TeTol; // MinOutdoorUnitTe; //SmallLoadTe( Te'_new ) is constant during iterations
+                }
 
                 // Get an updated Te corresponding to the updated Te'
                 // VRFOU_TeModification( VRFCond, this->EvaporatingTemp, SmallLoadTe, Pipe_h_IU_in, OutdoorDryBulb, Pipe_Te_assumed,
