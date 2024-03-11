@@ -266,7 +266,7 @@ namespace EIRPlantLoopHeatPumps {
 
         void calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state);
 
-        void setHeatRecoveryOperatingASHP(EnergyPlusData &state, bool FirstHVACIteration);
+        void setHeatRecoveryOperatingStatusASHP(EnergyPlusData &state, bool FirstHVACIteration);
 
         virtual void report(EnergyPlusData &state);
 

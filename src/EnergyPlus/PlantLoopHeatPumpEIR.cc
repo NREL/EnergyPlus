@@ -119,7 +119,7 @@ void EIRPlantLoopHeatPump::simulate(
             return;
         }
     } else if (this->airSource) {
-        this->setHeatRecoveryOperatingASHP(state, FirstHVACIteration);
+        this->setHeatRecoveryOperatingStatusASHP(state, FirstHVACIteration);
         this->setOperatingFlowRatesASHP(state, FirstHVACIteration);
 
         if (calledFromLocation.loopNum == this->heatRecoveryPlantLoc.loopNum) {
@@ -434,7 +434,7 @@ void EIRPlantLoopHeatPump::doPhysicsASHP(EnergyPlusData &state, Real64 currentLo
     //  calculate power usage from EIR curves
     this->calcPowerUsage(state);
 
-    if (heatRecoveryAvailable) {
+    if (this->heatRecoveryIsActive) {
         // evaluate the heat recovery side heat transfer rate
         this->calcHeatRecoveryHeatTransferASHP(state);
     } else {
@@ -654,6 +654,11 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
     Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+    if (this->heatRecoveryAvailable) {
+        // reset the HR report variables
+        this->heatRecoveryRate = 0.0;
+        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+    }
 }
 
 void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state)
@@ -670,24 +675,21 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
                                                                thisHeatRecoveryPlantLoop.FluidIndex,
                                                                "EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP()");
     Real64 const hRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
-    if (hRecoveryMCp > 0.0) {
-        this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
-    } else {
-        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+    this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
+
+    // limit the HR outlet temperature to the maximum allowed
+    if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
+        this->heatRecoveryOutletTemp = std::max(this->maxHeatRecoveryTempLimit, this->heatRecoveryInletTemp);
+        this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);        
     }
 
-    // cap the HR outlet temperature
-    if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
-        this->heatRecoveryOutletTemp = this->maxHeatRecoveryTempLimit;
-        if (this->heatRecoveryInletTemp > this->maxHeatRecoveryTempLimit) {
-            this->heatRecoveryRate = 0.0;
-        } else {
-            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
-        }        
-    }
+    // reset the source side report variables
+    this->sourceSideHeatTransfer = 0.0;
+    this->sourceSideOutletTemp = this->sourceSideInletTemp;
+
 }
 
-void EIRPlantLoopHeatPump::setHeatRecoveryOperatingASHP(EnergyPlusData &state, bool FirstHVACIteration)
+void EIRPlantLoopHeatPump::setHeatRecoveryOperatingStatusASHP(EnergyPlusData &state, bool FirstHVACIteration)
 {
     if (!this->running) {
         if (this->heatRecoveryAvailable) {
@@ -1893,10 +1895,10 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     heatRecoveryInletNodeName = Util::makeUPPER(fields.at("heat_recovery_inlet_node_name").get<std::string>());
                     heatRecoveryOutletNodeName = Util::makeUPPER(fields.at("heat_recovery_outlet_node_name").get<std::string>());
                     thisPLHP.heatRecoveryAvailable = true;
-                    thisPLHP.heatRecoveryIsActive = true;
+                    //thisPLHP.heatRecoveryIsActive = true;
                 } else {
                     thisPLHP.heatRecoveryAvailable = false;
-                    thisPLHP.heatRecoveryIsActive = true;
+                    //thisPLHP.heatRecoveryIsActive = true;
                 }
 
                 if (thisPLHP.heatRecoveryAvailable) {
