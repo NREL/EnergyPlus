@@ -14453,7 +14453,7 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
 
                 if (CapDiff > (Tolerance * Cap_Eva0)) {
                     NumIteCcap = 999;
-                    CyclingRatio = (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1;
+                    CyclingRatio = Cap_Eva0 / Cap_Eva1;
                 } else {
                     CyclingRatio = 1.0;
                 }
