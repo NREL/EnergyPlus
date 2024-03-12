@@ -1489,7 +1489,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             } else if (controllerProps.ControlVar == CtrlVarType::TemperatureAndHumidityRatio) {
                 ShowContinueError(state, format("Controller temperature setpoint = {:.2T} [C]", controllerProps.SetPointValue));
                 if (controllerProps.HumRatCtrlOverride) {
-                    ShowContinueError(state, "Temperature setpoint had been reduced for humidity control.");
+                    ShowContinueError(state, "Temperature setpoint has been reduced for humidity control.");
                 }
                 ShowContinueError(state, format("Controller sensed temperature = {:.2T} [C]", controllerProps.SensedValue));
                 ShowContinueError(state,
