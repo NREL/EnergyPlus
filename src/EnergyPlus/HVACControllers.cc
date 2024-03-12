@@ -1503,7 +1503,7 @@ void FindRootSimpleController(EnergyPlusData &state,
             }
             if (controllerProps.ActuatorVar == CtrlVarType::Flow) {
                 ShowContinueError(state, format("Controller actuator mass flow rate set to {:.2T} [kg/s]", controllerProps.MaxAvailActuated));
-                if (controllerProps.ControlVar == CtrlVarType::Temperature) {
+                if (controllerProps.ControlVar == CtrlVarType::Temperature || controllerProps.ControlVar == CtrlVarType::TemperatureAndHumidityRatio) {
                     ShowContinueError(
                         state, format("Controller actuator temperature = {:.2T} [C]", state.dataLoopNodes->Node(controllerProps.ActuatedNode).Temp));
                     ShowContinueError(state, "  Note: Chilled water coils should be reverse action and the entering chilled");
