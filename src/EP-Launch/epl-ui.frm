@@ -1779,7 +1779,6 @@ End Function
 
 
 
-
 Private Sub cmdViewDefine_Click()
 frmDefineViewResults.Show vbModal
 Call checkOutputButtonsFiles
