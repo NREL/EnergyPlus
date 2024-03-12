@@ -144,6 +144,8 @@ namespace EIRPlantLoopHeatPumps {
         int capacityDryAirCurveIndex = 0;
         int minSupplyWaterTempCurveIndex = 0;
         int maxSupplyWaterTempCurveIndex = 0;
+        int heatRecoveryCapFTempIndex = 0;
+        int heatRecoveryEIRFTempIndex = 0;
 
         // flow rate terms
         Real64 loadSideDesignVolFlowRate = 0.0;

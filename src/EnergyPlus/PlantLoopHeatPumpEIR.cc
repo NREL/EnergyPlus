@@ -459,7 +459,13 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
     for (int loop = 0; loop < 2; ++loop) {
 
         if (this->heatRecoveryIsActive) {
-            capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
+            if (this->heatRecoveryCapFTempIndex > 0) {
+                capacityModifierFuncTemp =
+                    Curve::CurveValue(state, this->heatRecoveryCapFTempIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
+            } else {
+                capacityModifierFuncTemp =
+                    Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
+            }
             availableCapacity = this->referenceCapacity * capacityModifierFuncTemp;
         } else {
             capacityModifierFuncTemp = Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->sourceSideInletTemp);
@@ -574,7 +580,16 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
 {
 
     // calculate power usage from EIR curves
-    Real64 eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    Real64 eirModifierFuncTemp = 0.0;
+    if (this->airSource && this->heatRecoveryIsActive) {
+        if (this->heatRecoveryEIRFTempIndex > 0) {
+            eirModifierFuncTemp = Curve::CurveValue(state, this->heatRecoveryEIRFTempIndex, this->loadSideOutletTemp, this->heatRecoveryInletTemp);
+        } else {
+            eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+        }
+    } else {
+        eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+    }
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
 
     // check curves value and resets to zero if negative
@@ -648,12 +663,18 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
     Real64 const hRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
     this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
 
-    // limit the HR outlet temperature to the maximum allowed
+    // limit the HR HW outlet temperature to the maximum allowed (HW Recovery)
     if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
-        this->heatRecoveryOutletTemp = this->maxHeatRecoveryTempLimit;
-        this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);        
+        if (this->heatRecoveryInletTemp < this->maxHeatRecoveryTempLimit) {
+            this->heatRecoveryOutletTemp = this->maxHeatRecoveryTempLimit;
+            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
+        } else {
+            this->heatRecoveryRate = 0.0;
+            this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+        }
     }
-
+    // TODO the HR CW outlet temperature to the minimum allowed (CW Recovery)
+    
     // reset the source side report variables
     this->sourceSideHeatTransfer = 0.0;
     this->sourceSideOutletTemp = this->sourceSideInletTemp;
@@ -1926,6 +1947,18 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                                                        heatRecoveryInletNodeName,
                                                        heatRecoveryOutletNodeName,
                                                        "Heat Recovery Water Nodes");
+
+                    auto const heatRecoveryCapFTempCurveName = fields.find("heat_recovery_capacity_modifier_function_of_temperature_curve_name");
+                    if (heatRecoveryCapFTempCurveName != fields.end()) {
+                        thisPLHP.heatRecoveryCapFTempIndex =
+                            Curve::GetCurveIndex(state, Util::makeUPPER(heatRecoveryCapFTempCurveName.value().get<std::string>()));
+                    }
+                    auto const heatRecoveryEIRFTempCurveName =
+                        fields.find("heat_recovery_electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
+                    if (heatRecoveryEIRFTempCurveName != fields.end()) {
+                        thisPLHP.heatRecoveryEIRFTempIndex =
+                            Curve::GetCurveIndex(state, Util::makeUPPER(heatRecoveryEIRFTempCurveName.value().get<std::string>()));
+                    }
                 }
 
                 if (thisPLHP.airSource && thisPLHP.EIRHPType == DataPlant::PlantEquipmentType::HeatPumpEIRHeating &&
