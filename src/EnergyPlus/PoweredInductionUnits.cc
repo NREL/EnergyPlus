@@ -641,15 +641,13 @@ void GetPIUs(EnergyPlusData &state)
                             OutputProcessor::SOVTimeStepType::System,
                             OutputProcessor::SOVStoreType::Average,
                             state.dataPowerInductionUnits->PIU(PIUNum).Name);
-        if (state.dataPowerInductionUnits->PIU(PIUNum).fanControlType == FanCntrlType::VariableSpeedFan) {
-            SetupOutputVariable(state,
-                                "Zone Air Terminal Current Operation Control Stage",
-                                Constant::Units::unknown,
-                                thisPIU.CurOperationControlStage,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
-                                state.dataPowerInductionUnits->PIU(PIUNum).Name);
-        }
+        SetupOutputVariable(state,
+                            "Zone Air Terminal Current Operation Control Stage",
+                            Constant::Units::unknown,
+                            thisPIU.CurOperationControlStage,
+                            OutputProcessor::SOVTimeStepType::System,
+                            OutputProcessor::SOVStoreType::Average,
+                            state.dataPowerInductionUnits->PIU(PIUNum).Name);
     }
 }
 
@@ -1467,13 +1465,13 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
     Real64 const PriAirMassFlowMax = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
     Real64 const PriAirMassFlowMin = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
-    Real64 SecAirMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;                  // secondary air mass flow rate [kg/s]
     Real64 const QZnReq =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // heating or cooling needed by zone [Watts]
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
     Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
     thisPIU.PriAirMassFlow = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate;   // primary air mass flow rate [kg/s]
+    thisPIU.SecAirMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;   // secondary air mass flow rate [kg/s]
     thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
     thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
 
@@ -1498,7 +1496,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     if ((GetCurrentScheduleValue(state, thisPIU.FanAvailSchedPtr) <= 0.0 || state.dataHVACGlobal->TurnFansOff) && !state.dataHVACGlobal->TurnFansOn) {
         UnitOn = false;
     }
-    if (PriAirMassFlowMin <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
+    if (thisPIU.PriAirMassFlow <= SmallMassFlow || PriAirMassFlowMax <= SmallMassFlow) {
         PriOn = false;
     }
     // Set the mass flow rates
@@ -1509,7 +1507,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
             thisPIU.PriAirMassFlow = 0.0;
             // PIU fan off if there is no heating load, also reset fan flag if fan should be off
             if (QZnReq <= SmallLoad) {
-                SecAirMassFlow = 0.0;
+                thisPIU.SecAirMassFlow = 0.0;
                 state.dataHVACGlobal->TurnFansOn = false;
             } else {
                 if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan &&
@@ -1811,7 +1809,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     bool PriOn(true);   // TRUE if primary air available
     bool HCoilOn(true); // TRUE if heating coil is on
 
-    Real64 QCoilReq;     // required heating coil outlet to meet zone load
+    Real64 QCoilReq = 0; // required heating coil outlet to meet zone load
     Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
     Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
 
