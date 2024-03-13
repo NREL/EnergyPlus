@@ -1450,9 +1450,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool UnitOn(true);  // TRUE if unit is on
-    bool PriOn(true);   // TRUE if primary air available
-    bool HCoilOn(true); // TRUE if heating coil is on
+    bool UnitOn(true); // TRUE if unit is on
+    bool PriOn(true);  // TRUE if primary air available
 
     Real64 QCoilReq;     // required heating coil outlet to meet zone load
     Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
@@ -1472,7 +1471,11 @@ void CalcSeriesPIU(EnergyPlusData &state,
     Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
     thisPIU.PriAirMassFlow = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate;   // primary air mass flow rate [kg/s]
     thisPIU.SecAirMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;   // secondary air mass flow rate [kg/s]
-    thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+    if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+        thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+    } else {
+        thisPIU.heatingOperatingMode = HeatOpModeType::ConstantVolumeHeat;
+    }
     thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
 
     // On the first HVAC iteration the system values are given to the controller, but after that
@@ -1608,27 +1611,32 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
     // fire the fan
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        // calculate fan speed ratio
-        Real64 fanFlowRatio(1.0);
-        if (thisPIU.MaxTotAirMassFlow > 0.0) {
-            fanFlowRatio = (thisPIU.PriAirMassFlow + thisPIU.SecAirMassFlow) / thisPIU.MaxTotAirMassFlow;
+        if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+            // calculate fan speed ratio
+            Real64 fanFlowRatio(1.0);
+            if (thisPIU.MaxTotAirMassFlow > 0.0) {
+                fanFlowRatio = (thisPIU.PriAirMassFlow + thisPIU.SecAirMassFlow) / thisPIU.MaxTotAirMassFlow;
+            }
+            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
+        } else {
+            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
         }
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _);
     }
 
     // the heating load seen by the reheat coil [W]
     Real64 QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
                                                (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+    Real64 QActualHeatingAlt = 0.0;
     if (thisPIU.heatingOperatingMode != HeatOpModeType::HeaterOff &&
         thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage) { // calculate heating power to heating setpoint with fan heat
         Real64 zoneEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
         Real64 mixEnthalpyNoHeatZoneW =
             Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
-        QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * (mixEnthalpyNoHeatZoneW - zoneEnthalpy);
+        QActualHeatingAlt = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * (mixEnthalpyNoHeatZoneW - zoneEnthalpy);
     } else {
-        QActualHeating = 0.0;
+        QActualHeatingAlt = 0.0;
     }
 
     // check if heating coil is off
@@ -1805,9 +1813,8 @@ void CalcParallelPIU(EnergyPlusData &state,
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
 
-    bool UnitOn(true);  // TRUE if unit is on
-    bool PriOn(true);   // TRUE if primary air available
-    bool HCoilOn(true); // TRUE if heating coil is on
+    bool UnitOn(true); // TRUE if unit is on
+    bool PriOn(true);  // TRUE if primary air available
 
     Real64 QCoilReq = 0; // required heating coil outlet to meet zone load
     Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
@@ -1968,14 +1975,18 @@ void CalcParallelPIU(EnergyPlusData &state,
     // now that inlet airflows have been set, the terminal box components can be simulated.
     // fire the fan
     if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-        // calculate fan speed ratio
-        Real64 fanFlowRatio(1.0);
-        if (thisPIU.MaxSecAirMassFlow) {
-            fanFlowRatio = thisPIU.SecAirMassFlow / thisPIU.MaxSecAirMassFlow;
+        if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+            // calculate fan speed ratio
+            Real64 fanFlowRatio(1.0);
+            if (thisPIU.MaxSecAirMassFlow > 0.0) {
+                fanFlowRatio = thisPIU.SecAirMassFlow / thisPIU.MaxSecAirMassFlow;
+            }
+            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
+        } else {
+            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
         }
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
     } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
+        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _);
     }
 
     // fire the mixer
