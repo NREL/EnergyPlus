@@ -1513,11 +1513,12 @@ void FindRootSimpleController(EnergyPlusData &state,
                     if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling ||
                         controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
 
-                        ShowContinueError(state, "Chilled water coils should be reverse action and the entering chilled");
-                        ShowContinueError(state, "water temperature (controller actuator temperature) should be below the setpoint temperature");
+                        ShowContinueError(
+                            state,
+                            "The entering chilled water temperature (controller actuator temperature) should be below the setpoint temperature.");
                     } else if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-                        ShowContinueError(state, "Hot water coils should be normal action and the entering hot");
-                        ShowContinueError(state, "water temperature (controller actuator temperature) should be above the setpoint temperature");
+                        ShowContinueError(
+                            state, "The entering hot water temperature (controller actuator temperature) should be above the setpoint temperature");
                     }
                 }
             } else {
