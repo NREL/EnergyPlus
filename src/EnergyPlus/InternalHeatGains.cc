@@ -3723,8 +3723,11 @@ namespace InternalHeatGains {
                       Format_723,
                       "People",
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
-                      "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
-                      "Number of People,Nominal Maximum Number of People");
+                      "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,"
+                      "Minimum Number of People for All Day Types,Maximum Number of People for All Day Types,"
+                      "Minimum Number of People for Weekdays, Maximum Number of People for Weekdays, "
+                      "Minimum Number of People for Weekends/Holidays, Maximum Number of People for Weekends /Holidays,"
+                      "Minimum Number of People for Design Days, Maximum Number of People for Design Days");
                 if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU ||
                     state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
@@ -3777,11 +3780,27 @@ namespace InternalHeatGains {
                 print(state.files.eio, "No,");
             }
             print(state.files.eio, "{:.4R},", state.dataHeatBal->People(Loop).CO2RateFactor);
-            print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMinNumberPeople);
+            print(state.files.eio, "{:.1R},", state.dataHeatBal->People(Loop).NomMinNumberPeople);
+            print(state.files.eio, "{:.1R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
+
+            auto &thisPeople = state.dataHeatBal->People(Loop);
+            // weekdays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::Weekday);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
+
+            // weekends/holidays
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::WeekEndHoliday);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
+
+            //design days
+            std::tie(SchMin, SchMax) = getScheduleMinMaxByDayType(state, thisPeople.NumberOfPeoplePtr, DayTypeGroup::DesignDay);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMin);
+            print(state.files.eio, "{:.1R},", thisPeople.NumberOfPeople * SchMax);
 
             if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU ||
                 state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
-                print(state.files.eio, "{:.0R},", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
 
                 if (state.dataHeatBal->People(Loop).MRTCalcType == DataHeatBalance::CalcMRT::EnclosureAveraged) {
                     print(state.files.eio, "Zone Averaged,");
@@ -3830,8 +3849,6 @@ namespace InternalHeatGains {
                 } else {
                     print(state.files.eio, "No\n");
                 }
-            } else {
-                print(state.files.eio, "{:.0R}\n", state.dataHeatBal->People(Loop).NomMaxNumberPeople);
             }
         }
         for (int Loop = 1; Loop <= state.dataHeatBal->TotLights; ++Loop) {

@@ -4491,6 +4491,55 @@ namespace ScheduleManager {
         return MaximumValue;
     }
 
+    std::pair<Real64, Real64> getScheduleMinMaxByDayType(EnergyPlusData &state, int const ScheduleIndex, DayTypeGroup const days)
+    {
+        // J. Glazer - March 2024
+        // finds the minimum and maximum for a specific set of day types for a given schedule
+        Real64 MinValue = Constant::BigNumber;
+        Real64 MaxValue = -Constant::BigNumber;
+        if (ScheduleIndex == -1) {
+            MinValue = 1.0;
+            MaxValue = 1.0;
+        } else if (ScheduleIndex == 0) {
+            MinValue = 0.0;
+            MaxValue = 0.0;
+        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
+            ShowFatalError(state, "getScheduleMinMaxByDayType called with ScheduleIndex out of range");
+        } else if (ScheduleIndex > 0) {
+            std::vector<bool> dayTypeFilter(maxDayTypes);
+            std::fill(dayTypeFilter.begin(), dayTypeFilter.end(), false);
+            switch (days) {
+            case DayTypeGroup::Weekday:
+                dayTypeFilter = {false, true, true, true, true, true, false, false, false, false, false, false};
+                break;
+            case DayTypeGroup::WeekEndHoliday:
+                dayTypeFilter = {true, false, false, false, false, false, true, true, false, false, false, false};
+                break;
+            case DayTypeGroup::DesignDay:
+                dayTypeFilter = {false, false, false, false, false, false, false, false, true, true, false, false};
+                break;
+            default:
+                dayTypeFilter = {false, false, false, false, false, false, false, false, false, false, false, false};
+                break;
+            }
+            for (int iDayOfYear = 1; iDayOfYear <= 366; ++iDayOfYear) {
+                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(iDayOfYear);
+                auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
+                for (int jType = 1; jType <= maxDayTypes; ++jType) {
+                    if (dayTypeFilter[jType -1]) {
+                        auto &daySch = state.dataScheduleMgr->DaySchedule;
+                        MinValue = min(MinValue, minval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
+                        MaxValue = max(MaxValue, maxval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
+                    }
+                }
+            }
+            if (MinValue == Constant::BigNumber) MinValue = 0;
+            if (MaxValue == -Constant::BigNumber) MaxValue = 0;
+        }
+        return std::make_pair(MinValue, MaxValue);
+    }
+
+
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex)
     {
         // FUNCTION INFORMATION:
