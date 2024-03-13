@@ -78,7 +78,7 @@ namespace RoomAir {
 
     void CalcDispVent3Node(EnergyPlusData &state, int ZoneNum); // Which Zonenum
 
-    static constexpr std::array<DataHeatBalance::IntGainType, 31> IntGainTypesOccupied = {
+    static constexpr std::array<DataHeatBalance::IntGainType, 51> IntGainTypesOccupied = {
         DataHeatBalance::IntGainType::People,
         DataHeatBalance::IntGainType::WaterHeaterMixed,
         DataHeatBalance::IntGainType::WaterHeaterStratified,
@@ -109,15 +109,7 @@ namespace RoomAir {
         DataHeatBalance::IntGainType::RefrigerationSystemSuctionPipe,
         DataHeatBalance::IntGainType::RefrigerationSecondaryReceiver,
         DataHeatBalance::IntGainType::RefrigerationSecondaryPipe,
-        DataHeatBalance::IntGainType::RefrigerationWalkIn};
-
-    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
-                                                                                             DataHeatBalance::IntGainType::Lights};
-
-    // Explicitly list internal gains not applicable for Displacement Vent
-    static constexpr std::array<DataHeatBalance::IntGainType, 22> ExcludedIntGainTypes = {
-        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
-        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam,
+        DataHeatBalance::IntGainType::RefrigerationWalkIn,
         DataHeatBalance::IntGainType::RefrigerationTransSysAirCooledGasCooler,
         DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeMT,
         DataHeatBalance::IntGainType::RefrigerationTransSysSuctionPipeLT,
@@ -138,6 +130,14 @@ namespace RoomAir {
         DataHeatBalance::IntGainType::SecHeatingDXCoilMultiSpeed,
         DataHeatBalance::IntGainType::ElectricLoadCenterConverter,
         DataHeatBalance::IntGainType::FanSystemModel};
+
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> IntGainTypesMixedSubzone = {DataHeatBalance::IntGainType::DaylightingDeviceTubular,
+                                                                                             DataHeatBalance::IntGainType::Lights};
+
+    // Explicitly list internal gains not applicable for Displacement Vent
+    static constexpr std::array<DataHeatBalance::IntGainType, 2> ExcludedIntGainTypes = {
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkCarbonDioxide,
+        DataHeatBalance::IntGainType::ZoneContaminantSourceAndSinkGenericContam};
 
 } // namespace RoomAir
 
