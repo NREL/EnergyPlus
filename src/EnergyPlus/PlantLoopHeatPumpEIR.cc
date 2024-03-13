@@ -661,7 +661,12 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
                                                                thisHeatRecoveryPlantLoop.FluidIndex,
                                                                "EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP()");
     Real64 const hRecoveryMCp = this->heatRecoveryMassFlowRate * CpHR;
-    this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
+    if (this->heatRecoveryMassFlowRate > 0.0) {
+        this->heatRecoveryOutletTemp = this->calcHROutletTemp(this->heatRecoveryInletTemp, this->heatRecoveryRate / hRecoveryMCp);
+    } else {
+        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+        this->heatRecoveryRate = 0.0;
+    }
 
     // limit the HR HW outlet temperature to the maximum allowed (HW Recovery)
     if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
@@ -689,7 +694,7 @@ void EIRPlantLoopHeatPump::setHeatRecoveryOperatingStatusASHP(EnergyPlusData &st
             this->heatRecoveryIsActive = false;
         }
     } else { // the heat pump must be running
-        if (this->heatRecoveryAvailable) {
+        if (this->heatRecoveryAvailable && FirstHVACIteration) {
             // apply min/max HR operating limits based on heat recovery entering fluid temperature
             if (this->minHeatRecoveryTempLimit > this->heatRecoveryInletTemp || this->maxHeatRecoveryTempLimit < this->heatRecoveryInletTemp) {
                 // set the HR operation off
@@ -1887,13 +1892,11 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
                     heatRecoveryInletNodeName = Util::makeUPPER(fields.at("heat_recovery_inlet_node_name").get<std::string>());
                     heatRecoveryOutletNodeName = Util::makeUPPER(fields.at("heat_recovery_outlet_node_name").get<std::string>());
                     thisPLHP.heatRecoveryAvailable = true;
-                    //thisPLHP.heatRecoveryIsActive = true;
                 } else {
                     thisPLHP.heatRecoveryAvailable = false;
-                    //thisPLHP.heatRecoveryIsActive = true;
                 }
 
-                if (thisPLHP.heatRecoveryAvailable) {
+                if (thisPLHP.airSource && thisPLHP.heatRecoveryAvailable) {
                     thisPLHP.heatRecoveryNodes.inlet = NodeInputManager::GetOnlySingleNode(state,
                                                                                            heatRecoveryInletNodeName,
                                                                                            nodeErrorsFound,
@@ -2371,7 +2374,7 @@ void EIRPlantLoopHeatPump::report(EnergyPlusData &state)
         PlantUtilities::SafeCopyPlantNode(state, this->sourceSideNodes.inlet, this->sourceSideNodes.outlet);
     }
     state.dataLoopNodes->Node(this->sourceSideNodes.outlet).Temp = this->sourceSideOutletTemp;
-    if (this->airSource && this->heatRecoveryAvailable) {
+    if (this->heatRecoveryAvailable) {
         PlantUtilities::SafeCopyPlantNode(state, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet);
         state.dataLoopNodes->Node(this->heatRecoveryNodes.outlet).Temp = this->heatRecoveryOutletTemp;
     }
