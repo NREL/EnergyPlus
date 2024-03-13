@@ -33,19 +33,18 @@ where:
 Indoor air heat balance connects with indoor living walls through convective heat transfer, which has the opposite sign of the term in surface heat balance. Convective portion of heat gain from LED lights also contributes to zone air heat balance equation.
 
 \begin{equation}
-\begin{array}{l}{\rho_{air}}{V_z}{c_p}{dT_z}/{dt} = \sum\limits_{i = 1}^{{N_{sl}}} {\dot Q_i^{}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} ({{T_{si}} - {T_z}}) + {{h_ip}}{A_ip}({{T_{p}} - {T_z}})\\ + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{{T_{zi}} - {T_z}} + {\dot m_{\inf }}{C_p}( {{T_\infty } - {T_z}}) +{\dot Q_{sys}}\right)\end{array}
+\begin{array}{l}{\rho_{air}}{V_z}{c_p}{dT_z}/{dt} = \sum\limits_{i = 1}^{{N_{sl}}} {\dot Q_i^{}}  + \sum\limits_{i = 1}^{{N_{surfaces}}} {{h_i}} {A_i} ({{T_{si}} - {T_z}}) + {{h_ip}}{A_ip}({{T_{p}} - {T_z}})\\ + \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} {C_p}{{T_{zi}} - {T_z}} + {\dot m_{\inf }}{C_p}( {{T_\infty } - {T_z}}) +{\dot Q_{sys}}\end{array}
 \end{equation} 
 
 where:
 
-\({\rho_{air}}{V_z}{c_p}\(dT_z}/{dt}\) represents energy stored in zone air during each timestep (W);  
+$\frac{\rho_{air} V_z c_p dT_z}{dt}$ represents energy stored in zone air during each timestep (W);
 
-\({\rho_{air}}\) is zone air density (kg/m\(^3\));
+$\rho_{air}$ is zone air density (kg/m\(^3\));
 
+$c_p$ is the air specific heat (J/(kg\(^{\circ}\)C)) ;
 
-\(c_p\) is the air specific heat (J/(kg\(^{\circ}\)C)) ; 
-
-\(V_z\) is zone air volume (m\(^3\));
+$V_z$ is zone air volume (m$^3$);
 
 \(\dot Q_i\) is the convective heat from internal loads (W); 
 
@@ -62,7 +61,7 @@ where:
 A modified zone air moisture balance equation shown below considers indoor living walls.
     
 \begin{equation}
-\begin{array}{l}{\rho_{air}}{V_z}{C_W}{\left( {\delta t} \right)^{ - 1}}\left( {W_z^t - W_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {k{g_{mas{s_{sched\;load}}}}} + kg_{mass_{et}} \\ + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_z^t} \right)+ \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_z^t} \right) + {{\dot m}_{\inf }}\left( {{W_\infty } - W_z^t} \right) + {{\dot m}_{sys}}\left( {{W_{\sup }} - W_z^t} \right)\end{array}
+\begin{array}{l} \frac{\rho_{air} V_z C_W}{\delta t} \left( {W_z^t - W_z^{t - \delta t}} \right) = \sum\limits_{i = 1}^{{N_{sl}}} {kg_{mass_{sched\;load}}} + kg_{mass_{et}} \\ + \sum\limits_{i = 1}^{{N_{surfaces}}} {{A_i}{h_{mi}}} {\rho_{ai{r_z}}}\left( {{W_{surf{s_i}}} - W_z^t} \right)+ \sum\limits_{i = 1}^{{N_{zones}}} {{{\dot m}_i}} \left( {{W_{zi}} - W_z^t} \right) + {{\dot m}_{\inf }}\left( {{W_\infty } - W_z^t} \right) + {{\dot m}_{sys}}\left( {{W_{\sup }} - W_z^t} \right)\end{array}
 \end{equation}
 
 where:
@@ -71,7 +70,7 @@ where:
  
 \(W\) is the humidity ratio of moisture air (kg moisture/kg dry air);  
 
-\({\rho_{air}}{V_z}{C_W}{({\delta t})^{ - 1}})({W_z^t - W_z^{t - \delta t}}) \right)\) represents moisture stored in zone air during each timestep (kg/s);
+$\frac{\rho_air V_z C_W}{\delta t} \left(W_z^t - W_z^{t-\delta t}\right)$ represents moisture stored in zone air during each timestep (kg/s);
 
 \(kg_{mass_{et}}\) represents moisture rate from plant evapotranspiration added to zone air (kg/s);
  
@@ -115,7 +114,7 @@ where:
 
 \(r_a\) represents aerodynamic resistance, which is the resistance to the flow of water vapor and sensible heat from the surface of the leaf to the surrounding air (s/m).
 
-Empirical models of stomatal resistance such as the Jarvis and the Ball models require experimental data to generate submodel structure and fit the model coefficients.  In this module, we used the surface and aerodynamic resistance models from Graamans et al. to calculate r_s and r_a. 
+Empirical models of stomatal resistance such as the Jarvis and the Ball models require experimental data to generate submodel structure and fit the model coefficients.  In this module, we used the surface and aerodynamic resistance models from Graamans et al. to calculate $r_s$ and $r_a$.
 
 \begin{equation}
 r_s=60 \cdot (1500+I_n/C)/(200+I_n/C) 
