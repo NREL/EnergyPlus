@@ -220,6 +220,9 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
     this->heatRecoveryEnergy = 0.0;
     this->heatRecoveryMassFlowRate = 0.0;
     this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+    this->heatRecoveryIsActive = false;
+    this->heatRecoveryOperatingStatus = 0;
+
 }
 
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
@@ -641,9 +644,10 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
     Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
     Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
     this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
-    if (this->heatRecoveryAvailable) {
+    if (this->heatRecoveryAvailable && !this->heatRecoveryIsActive) {
         // reset the HR report variables
         this->heatRecoveryRate = 0.0;
+        this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
     }
 }
 
@@ -692,16 +696,19 @@ void EIRPlantLoopHeatPump::setHeatRecoveryOperatingStatusASHP(EnergyPlusData &st
         if (this->heatRecoveryAvailable) {
             // set the HR operation off
             this->heatRecoveryIsActive = false;
+            this->heatRecoveryOperatingStatus = 0;
         }
     } else { // the heat pump must be running
-        if (this->heatRecoveryAvailable && FirstHVACIteration) {
+        if (this->heatRecoveryAvailable) {
             // apply min/max HR operating limits based on heat recovery entering fluid temperature
             if (this->minHeatRecoveryTempLimit > this->heatRecoveryInletTemp || this->maxHeatRecoveryTempLimit < this->heatRecoveryInletTemp) {
                 // set the HR operation off
                 this->heatRecoveryIsActive = false;
+                this->heatRecoveryOperatingStatus = 0;
             } else {
                 // set the HR operation on
                 this->heatRecoveryIsActive = true;
+                this->heatRecoveryOperatingStatus = 1;
             }
         }
     }
@@ -2245,6 +2252,13 @@ void EIRPlantLoopHeatPump::oneTimeInit(EnergyPlusData &state)
                                 "Heat Pump Heat Recovery Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 this->heatRecoveryMassFlowRate,
+                                OutputProcessor::SOVTimeStepType::System,
+                                OutputProcessor::SOVStoreType::Average,
+                                this->name);
+            SetupOutputVariable(state,
+                                "Heat Pump Heat Recovery Operation Status",
+                                Constant::Units::None,
+                                this->heatRecoveryOperatingStatus,
                                 OutputProcessor::SOVTimeStepType::System,
                                 OutputProcessor::SOVStoreType::Average,
                                 this->name);

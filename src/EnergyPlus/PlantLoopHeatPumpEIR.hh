@@ -118,6 +118,7 @@ namespace EIRPlantLoopHeatPumps {
         bool airSource = false;
         bool heatRecoveryAvailable = false;
         bool heatRecoveryIsActive = false;
+        int heatRecoveryOperatingStatus = 0;
         ControlType sysControlType = ControlType::Invalid;
         DataPlant::FlowMode flowControl = DataPlant::FlowMode::Invalid;
 
