@@ -1074,12 +1074,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                 thisController.SetPointValue = state.dataLoopNodes->Node(SensedNode).TempSetPoint - thisController.FaultyCoilSATOffset;
             }
         }
-        if (thisController.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-            thisController.SetPointValue = min(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-        } else {
-            // Chilled water coil
-            thisController.SetPointValue = max(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-        }
     } break;
     case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: { // 'TemperatureAndHumidityRatio'
         if (thisController.HumRatCtrlOverride) {
@@ -1088,12 +1082,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
         } else {
             // Temperature control
             thisController.SensedValue = state.dataLoopNodes->Node(SensedNode).Temp;
-            if (thisController.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-                thisController.SetPointValue = min(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-            } else {
-                // Chilled water coil
-                thisController.SetPointValue = max(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-            }
         }
         if (!thisController.IsSetPointDefinedFlag) {
             if (thisController.HumRatCtrlOverride) {
@@ -1102,12 +1090,6 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
             } else {
                 // Pure temperature setpoint control strategy
                 thisController.SetPointValue = state.dataLoopNodes->Node(SensedNode).TempSetPoint;
-                if (thisController.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-                    thisController.SetPointValue = min(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-                } else {
-                    // Chilled water coil
-                    thisController.SetPointValue = max(thisController.SetPointValue, state.dataLoopNodes->Node(thisController.ActuatedNode).Temp);
-                }
             }
             // Finally indicate thate the setpoint has been computed
             thisController.IsSetPointDefinedFlag = true;
