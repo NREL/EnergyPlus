@@ -1029,13 +1029,13 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
             if (state.dataHeatBal->People(PeopleNum).ZonePtr == CtrlZoneNum) {
                 auto &people = state.dataHeatBal->People(PeopleNum);
                 TotPeopleInZone += (people.NumberOfPeople * thisZone.Multiplier * thisZone.ListMultiplier);
-                Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr, true);
+                Real64 SchMax = ScheduleManager::GetScheduleMaxValue(state, people.NumberOfPeoplePtr, false);
                 if (SchMax > 0) {
                     finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone * SchMax;
                 } else {
                     finalZoneSizing.ZonePeakOccupancy = TotPeopleInZone;
                 }
-                ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(state, people.NumberOfPeoplePtr, true);
+                ZoneMinOccupancy += TotPeopleInZone * ScheduleManager::GetScheduleMinValue(state, people.NumberOfPeoplePtr, false);
             }
         }
         finalZoneSizing.TotalZoneFloorArea = (thisZone.FloorArea * thisZone.Multiplier * thisZone.ListMultiplier);

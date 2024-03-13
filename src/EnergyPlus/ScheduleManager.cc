@@ -4418,7 +4418,7 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             auto &sch = state.dataScheduleMgr->Schedule(ScheduleIndex);
-            if (!sch.MaxMinSet) { // Set Minimum/Maximums for this schedule
+            if (!sch.MaxMinSet || sch.MaxMinSundayToHoliday != onlySundayToHoliday) { // Set Minimum/Maximums for this schedule
                 WkSch = sch.WeekSchedulePointer(1);
                 MinValue = minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
                 MaxValue = maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(1)).TSValue);
