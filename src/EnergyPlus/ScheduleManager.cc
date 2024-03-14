@@ -4510,6 +4510,7 @@ namespace ScheduleManager {
             std::fill(dayTypeFilter.begin(), dayTypeFilter.end(), false);
             switch (days) {
             case DayTypeGroup::Weekday:
+                //               Sun    Mon   Tues  Wed   Thur  Fri   Sat    Sun    Summer Winter Cust1  Cust2
                 dayTypeFilter = {false, true, true, true, true, true, false, false, false, false, false, false};
                 break;
             case DayTypeGroup::WeekEndHoliday:
@@ -4526,7 +4527,7 @@ namespace ScheduleManager {
                 int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(iDayOfYear);
                 auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
                 for (int jType = 1; jType <= maxDayTypes; ++jType) {
-                    if (dayTypeFilter[jType -1]) {
+                    if (dayTypeFilter[jType - 1]) {
                         auto &daySch = state.dataScheduleMgr->DaySchedule;
                         MinValue = min(MinValue, minval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
                         MaxValue = max(MaxValue, maxval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
@@ -4538,7 +4539,6 @@ namespace ScheduleManager {
         }
         return std::make_pair(MinValue, MaxValue);
     }
-
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex)
     {
