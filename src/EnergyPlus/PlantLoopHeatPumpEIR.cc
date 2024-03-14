@@ -515,8 +515,8 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
     }
 
     // check the curve values, reset to zero if negative
-    if (this->heatRecoveryIsActive) {
-        this->heatRecCapModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
+    if (this->heatRecoveryIsActive && this->heatRecoveryCapFTempCurveIndex > 0) {
+        this->heatRecoveryCapModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
     } else {
         this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
     }
@@ -585,22 +585,27 @@ void EIRPlantLoopHeatPump::calcLoadSideHeatTransfer(EnergyPlusData &state, Real6
 
 void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
 {
-
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = 0.0;
     if (this->airSource && this->heatRecoveryIsActive) {
         if (this->heatRecoveryEIRFTempCurveIndex > 0) {
-            eirModifierFuncTemp = Curve::CurveValue(state, this->heatRecoveryEIRFTempCurveIndex, this->loadSideOutletTemp, this->heatRecoveryInletTemp);
+            eirModifierFuncTemp =
+                Curve::CurveValue(state, this->heatRecoveryEIRFTempCurveIndex, this->loadSideOutletTemp, this->heatRecoveryInletTemp);
+            // check cap func of temp curve value and reset to zero if negative
+            this->heatRecoveryEIRModCurveCheck(state, eirModifierFuncTemp);
         } else {
             eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+            // check cap func of temp curve value and reset to zero if negative
+            this->eirModCurveCheck(state, eirModifierFuncTemp);
         }
     } else {
         eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
+        // check curves value and resets to zero if negative
+        this->eirModCurveCheck(state, eirModifierFuncTemp);
     }
     Real64 eirModifierFuncPLR = Curve::CurveValue(state, this->powerRatioFuncPLRCurveIndex, this->partLoadRatio);
-
-    // check curves value and resets to zero if negative
-    this->eirModCurveCheck(state, eirModifierFuncTemp, eirModifierFuncPLR);
+    // check EIR func of PLR curve value and resets to zero if negative
+    this->eirModFPLRCurveCheck(state, eirModifierFuncPLR);
 
     // compute power usage
     this->powerUsage = (this->loadSideHeatTransfer / this->referenceCOP) * eirModifierFuncPLR * eirModifierFuncTemp * this->defrostPowerMultiplier *
@@ -657,9 +662,9 @@ void EIRPlantLoopHeatPump::calcSourceSideHeatTransferASHP(EnergyPlusData &state)
 
 void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &state)
 {
-
     // energy balance on heat pump
     this->heatRecoveryRate = this->calcQheatRecovery(this->loadSideHeatTransfer, this->powerUsage);
+    Real64 heatRecoverRateTot = this->heatRecoveryRate;
 
     // calculate heat recovery side outlet conditions
     auto &thisHeatRecoveryPlantLoop = state.dataPlnt->PlantLoop(this->heatRecoveryPlantLoc.loopNum);
@@ -675,7 +680,6 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
         this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
         this->heatRecoveryRate = 0.0;
     }
-
     // limit the HR HW outlet temperature to the maximum allowed (HW Recovery)
     if (this->heatRecoveryOutletTemp > this->maxHeatRecoveryTempLimit) {
         if (this->heatRecoveryInletTemp < this->maxHeatRecoveryTempLimit) {
@@ -686,12 +690,21 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
             this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
         }
     }
-    // TODO the HR CW outlet temperature to the minimum allowed (CW Recovery)
-    
-    // reset the source side report variables
-    this->sourceSideHeatTransfer = 0.0;
-    this->sourceSideOutletTemp = this->sourceSideInletTemp;
+    // TODO, limit the HR CW outlet temp to the minimum allowed (CW Recovery)
 
+    // report the net heat balance as source side heat transfer
+    Real64 heatReoveryRateUnused = std::max(0.0, (heatRecoverRateTot - this->heatRecoveryRate));
+    if (heatReoveryRateUnused > 0.0) {
+        this->sourceSideHeatTransfer = heatReoveryRateUnused;
+        // calculate source side outlet conditions
+        Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat);
+        Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
+        this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
+    } else {
+        // reset the source side report variables
+        this->sourceSideHeatTransfer = 0.0;
+        this->sourceSideOutletTemp = this->sourceSideInletTemp;
+    }
 }
 
 void EIRPlantLoopHeatPump::setHeatRecoveryOperatingStatusASHP(EnergyPlusData &state, bool FirstHVACIteration)
@@ -742,9 +755,11 @@ void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real6
     }
 }
 
-void EIRPlantLoopHeatPump::heatRecCapModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
+void EIRPlantLoopHeatPump::heatRecoveryCapModFTCurveCheck(EnergyPlusData &state,
+                                                          const Real64 loadSideOutletSetpointTemp,
+                                                          Real64 &capacityModifierFuncTemp)
 {
-    if (capacityModifierFuncTemp < 0.0 && this->heatRecoveryCapFTempCurveIndex > 0) {
+    if (capacityModifierFuncTemp < 0.0) {
         if (this->heatRecCapModFTErrorIndex == 0) {
             ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
             ShowContinueError(state,
@@ -758,18 +773,19 @@ void EIRPlantLoopHeatPump::heatRecCapModFTCurveCheck(EnergyPlusData &state, cons
                     this->heatRecoveryInletTemp));
             ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
         }
-        ShowRecurringWarningErrorAtEnd(state,
-                                       format("{} \"{}\": Capacity Modifier curve (function of Temperatures) output is negative warning continues...",
-                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
-                                              this->name),
-                                       this->heatRecCapModFTErrorIndex,
-                                       capacityModifierFuncTemp,
-                                       capacityModifierFuncTemp);
+        ShowRecurringWarningErrorAtEnd(
+            state,
+            format("{} \"{}\": Heat Recovery mode Capacity Modifier curve (function of Temperatures) output is negative warning continues...",
+                   DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                   this->name),
+            this->heatRecCapModFTErrorIndex,
+            capacityModifierFuncTemp,
+            capacityModifierFuncTemp);
         capacityModifierFuncTemp = 0.0;
     }
 }
 
-void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp, Real64 &eirModifierFuncPLR)
+void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp)
 {
     if (eirModifierFuncTemp < 0.0) {
         if (this->eirModFTErrorIndex == 0) {
@@ -790,7 +806,37 @@ void EIRPlantLoopHeatPump::eirModCurveCheck(EnergyPlusData &state, Real64 &eirMo
                                        eirModifierFuncTemp);
         eirModifierFuncTemp = 0.0;
     }
+}
 
+void EIRPlantLoopHeatPump::heatRecoveryEIRModCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncTemp)
+{
+    if (eirModifierFuncTemp < 0.0) {
+        if (this->heatRecEIRModFTErrorIndex == 0 && heatRecoveryEIRFTempCurveIndex > 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(
+                state, format(" Heat Recovery mode EIR Modifier curve (function of Temperatures) output is negative ({:.3T}).", eirModifierFuncTemp));
+            ShowContinueError(
+                state,
+                format(
+                    " Negative value occurs using a load side water temperature of {:.2T}C and heat recovery entering water temperature of {:.2T}C.",
+                    this->loadSideOutletTemp,
+                    this->heatRecoveryInletTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(
+            state,
+            format("{} \"{}\": Heat Recovery mode EIR Modifier curve (function of Temperatures) output is negative warning continues...",
+                   DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                   this->name),
+            this->eirModFTErrorIndex,
+            eirModifierFuncTemp,
+            eirModifierFuncTemp);
+        eirModifierFuncTemp = 0.0;
+    }
+}
+
+void EIRPlantLoopHeatPump::eirModFPLRCurveCheck(EnergyPlusData &state, Real64 &eirModifierFuncPLR)
+{
     if (eirModifierFuncPLR < 0.0) {
         if (this->eirModFPLRErrorIndex == 0) {
             ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
