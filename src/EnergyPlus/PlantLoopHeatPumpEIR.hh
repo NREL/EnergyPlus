@@ -145,8 +145,8 @@ namespace EIRPlantLoopHeatPumps {
         int capacityDryAirCurveIndex = 0;
         int minSupplyWaterTempCurveIndex = 0;
         int maxSupplyWaterTempCurveIndex = 0;
-        int heatRecoveryCapFTempIndex = 0;
-        int heatRecoveryEIRFTempIndex = 0;
+        int heatRecoveryCapFTempCurveIndex = 0;
+        int heatRecoveryEIRFTempCurveIndex = 0;
 
         // flow rate terms
         Real64 loadSideDesignVolFlowRate = 0.0;
@@ -207,6 +207,8 @@ namespace EIRPlantLoopHeatPumps {
         int capModFTErrorIndex = 0;
         int eirModFTErrorIndex = 0;
         int eirModFPLRErrorIndex = 0;
+        int heatRecCapModFTErrorIndex = 0;
+        int heatRecEIRModFTErrorIndex = 0;
 
         // defrost
         DefrostControl defrostStrategy = DefrostControl::Invalid;
@@ -285,7 +287,11 @@ namespace EIRPlantLoopHeatPumps {
 
         void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
 
+        void heatRecCapModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
+
         void eirModCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
+
+        void heatRecEIRModCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
 
         Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
 

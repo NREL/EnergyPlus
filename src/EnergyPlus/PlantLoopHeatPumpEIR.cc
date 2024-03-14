@@ -462,9 +462,9 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
     for (int loop = 0; loop < 2; ++loop) {
 
         if (this->heatRecoveryIsActive) {
-            if (this->heatRecoveryCapFTempIndex > 0) {
+            if (this->heatRecoveryCapFTempCurveIndex > 0) {
                 capacityModifierFuncTemp =
-                    Curve::CurveValue(state, this->heatRecoveryCapFTempIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
+                    Curve::CurveValue(state, this->heatRecoveryCapFTempCurveIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
             } else {
                 capacityModifierFuncTemp =
                     Curve::CurveValue(state, this->capFuncTempCurveIndex, loadSideOutletSetpointTemp, this->heatRecoveryInletTemp);
@@ -515,7 +515,11 @@ void EIRPlantLoopHeatPump::calcAvailableCapacity(EnergyPlusData &state, Real64 c
     }
 
     // check the curve values, reset to zero if negative
-    this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
+    if (this->heatRecoveryIsActive) {
+        this->heatRecCapModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
+    } else {
+        this->capModFTCurveCheck(state, loadSideOutletSetpointTemp, capacityModifierFuncTemp);
+    }
 }
 
 Real64 EIRPlantLoopHeatPump::heatingCapacityModifierASHP(EnergyPlusData &state) const
@@ -585,8 +589,8 @@ void EIRPlantLoopHeatPump::calcPowerUsage(EnergyPlusData &state)
     // calculate power usage from EIR curves
     Real64 eirModifierFuncTemp = 0.0;
     if (this->airSource && this->heatRecoveryIsActive) {
-        if (this->heatRecoveryEIRFTempIndex > 0) {
-            eirModifierFuncTemp = Curve::CurveValue(state, this->heatRecoveryEIRFTempIndex, this->loadSideOutletTemp, this->heatRecoveryInletTemp);
+        if (this->heatRecoveryEIRFTempCurveIndex > 0) {
+            eirModifierFuncTemp = Curve::CurveValue(state, this->heatRecoveryEIRFTempCurveIndex, this->loadSideOutletTemp, this->heatRecoveryInletTemp);
         } else {
             eirModifierFuncTemp = Curve::CurveValue(state, this->powerRatioFuncTempCurveIndex, this->loadSideOutletTemp, this->sourceSideInletTemp);
         }
@@ -732,6 +736,33 @@ void EIRPlantLoopHeatPump::capModFTCurveCheck(EnergyPlusData &state, const Real6
                                               DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
                                               this->name),
                                        this->capModFTErrorIndex,
+                                       capacityModifierFuncTemp,
+                                       capacityModifierFuncTemp);
+        capacityModifierFuncTemp = 0.0;
+    }
+}
+
+void EIRPlantLoopHeatPump::heatRecCapModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSetpointTemp, Real64 &capacityModifierFuncTemp)
+{
+    if (capacityModifierFuncTemp < 0.0 && this->heatRecoveryCapFTempCurveIndex > 0) {
+        if (this->heatRecCapModFTErrorIndex == 0) {
+            ShowSevereMessage(state, format("{} \"{}\":", DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)], this->name));
+            ShowContinueError(state,
+                              format(" Heat Recovery mode Capacity Modifier curve (function of Temperatures) output is negative ({:.3T}).",
+                                     capacityModifierFuncTemp));
+            ShowContinueError(
+                state,
+                format(
+                    " Negative value occurs using a load side water temperature of {:.2T}C and heat recovery entering water temperature of {:.2T}C.",
+                    loadSideOutletSetpointTemp,
+                    this->heatRecoveryInletTemp));
+            ShowContinueErrorTimeStamp(state, " Resetting curve output to zero and continuing simulation.");
+        }
+        ShowRecurringWarningErrorAtEnd(state,
+                                       format("{} \"{}\": Capacity Modifier curve (function of Temperatures) output is negative warning continues...",
+                                              DataPlant::PlantEquipTypeNames[static_cast<int>(this->EIRHPType)],
+                                              this->name),
+                                       this->heatRecCapModFTErrorIndex,
                                        capacityModifierFuncTemp,
                                        capacityModifierFuncTemp);
         capacityModifierFuncTemp = 0.0;
@@ -1960,13 +1991,13 @@ void EIRPlantLoopHeatPump::processInputForEIRPLHP(EnergyPlusData &state)
 
                     auto const heatRecoveryCapFTempCurveName = fields.find("heat_recovery_capacity_modifier_function_of_temperature_curve_name");
                     if (heatRecoveryCapFTempCurveName != fields.end()) {
-                        thisPLHP.heatRecoveryCapFTempIndex =
+                        thisPLHP.heatRecoveryCapFTempCurveIndex =
                             Curve::GetCurveIndex(state, Util::makeUPPER(heatRecoveryCapFTempCurveName.value().get<std::string>()));
                     }
                     auto const heatRecoveryEIRFTempCurveName =
                         fields.find("heat_recovery_electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
                     if (heatRecoveryEIRFTempCurveName != fields.end()) {
-                        thisPLHP.heatRecoveryEIRFTempIndex =
+                        thisPLHP.heatRecoveryEIRFTempCurveIndex =
                             Curve::GetCurveIndex(state, Util::makeUPPER(heatRecoveryEIRFTempCurveName.value().get<std::string>()));
                     }
                 }
