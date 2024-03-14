@@ -43,6 +43,9 @@ execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 # then we set the ID on the Python dylib; # TODO: Try without this...
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
 
+# with the bump to Python 3.12, it looks like we are having to unsign the Python binary also?
+execute_process(COMMAND "codesign --remove-signature ${LOCAL_PYTHON_LIBRARY}")
+
 # for the energyplus executable, just find the python dynamic library right next to it for sure
 file(GET_RUNTIME_DEPENDENCIES RESOLVED_DEPENDENCIES_VAR PREREQUISITES EXECUTABLES ${EXECUTABLE_PATH})
 foreach(PREREQ IN LISTS PREREQUISITES)
