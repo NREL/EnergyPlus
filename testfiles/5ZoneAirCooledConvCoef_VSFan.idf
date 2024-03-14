@@ -2249,7 +2249,7 @@
     SPACE5-1,                !- Zone Name
     SPACE5-1 Eq,             !- Zone Conditioning Equipment List Name
     SPACE5-1 In Node,        !- Zone Air Inlet Node or NodeList Name
-    SPACE5-1 Exhaust Node,   !- Zone Air Exhaust Node or NodeList Name
+    ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE5-1 Node,           !- Zone Air Node Name
     SPACE5-1 Out Node;       !- Zone Return Air Node or NodeList Name
 
@@ -2433,7 +2433,12 @@
     SPACE1-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    0.0001;                  !- Convergence Tolerance
+    0.0001,                  !- Convergence Tolerance
+    VariableSpeed,
+    0.5,
+    Modulated,
+    ,
+    ;
 
   Fan:SystemModel,
     SPACE1-1 PIU Fan,        !- Name
@@ -2568,7 +2573,12 @@
     SPACE3-1 Zone Coil,      !- Reheat Coil Name
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    0.0001;                  !- Convergence Tolerance
+    0.0001,                  !- Convergence Tolerance
+    VariableSpeed,
+    0.5,
+    Staged,
+    ,
+    ;
 
   Fan:SystemModel,
     SPACE3-1 PIU Fan,        !- Name
@@ -2619,7 +2629,7 @@
     autosize,                !- Minimum Primary Air Flow Fraction
     autosize,                !- Fan On Flow Fraction
     SPACE4-1 ATU In Node,    !- Supply Air Inlet Node Name
-    SPACE5-1 Exhaust Node,   !- Secondary Air Inlet Node Name
+    SPACE4-1 ATU Sec Node,   !- Secondary Air Inlet Node Name
     SPACE4-1 In Node,        !- Outlet Node Name
     SPACE4-1 Zone Coil Air In Node,  !- Reheat Coil Air Inlet Node Name
     SPACE4-1 PIU Mixer,      !- Zone Mixer Name
@@ -2638,7 +2648,7 @@
   Fan:SystemModel,
     SPACE4-1 PIU Fan,        !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    SPACE5-1 Exhaust Node,  !- Air Inlet Node Name
+    SPACE4-1 ATU Sec Node,   !- Air Inlet Node Name
     SPACE4-1 ATU Fan Outlet Node,  !- Air Outlet Node Name
     AUTOSIZE,                !- Design Maximum Air Flow Rate {m3/s}
     Continuous,              !- Speed Control Method
@@ -2726,7 +2736,8 @@
 
   NodeList,
     PLENUM-1 Induced Air Nodes,  !- Name
-    SPACE1-1 ATU Sec Node;   !- Node 1 Name
+    SPACE1-1 ATU Sec Node,       !- Node 1 Name
+    SPACE4-1 ATU SEC NODE;       !- Node 2 Name
 
   AirLoopHVAC:SupplyPath,
     Zone Supply Air Path 1,  !- Name
@@ -3478,6 +3489,22 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
+
+  !- This object is used to virtually increase the 
+  !- temperature of the plenum zone to showcase the
+  !- first stage of the `staged` variable speed control
+  !- of the terminal PIUs
+  OtherEquipment,
+    PlenumHG,
+    None,
+    PLENUM-1,
+    AlwaysOn,
+    EquipmentLevel,
+    5500,,,0,0.5,0;
+
+  Schedule:Constant,AlwaysOn,Fraction,1;
+  
+  Output:Diagnostics,DisplayAllWarnings;
 
   Output:Variable,*,Zone Air Temperature,detailed;
   Output:Variable,*,Zone Air System Sensible Cooling Rate,detailed;

@@ -1453,11 +1453,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
     bool UnitOn(true); // TRUE if unit is on
     bool PriOn(true);  // TRUE if primary air available
 
-    Real64 QCoilReq;     // required heating coil outlet to meet zone load
-    Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
-    Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
-    Real64 MinSteamFlow;
-    Real64 MaxSteamFlow;
+    Real64 QCoilReq = 0.0;     // required heating coil outlet to meet zone load
+    Real64 MaxWaterFlow = 0.0; // maximum water flow for heating or cooling [kg/s]
+    Real64 MinWaterFlow = 0.0; // minimum water flow for heating or cooling [kg/s]
 
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
@@ -1484,13 +1482,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (FirstHVACIteration) {
             MaxWaterFlow = thisPIU.MaxHotWaterFlow;
             MinWaterFlow = thisPIU.MinHotWaterFlow;
-            MaxSteamFlow = thisPIU.MaxHotWaterFlow;
-            MinSteamFlow = thisPIU.MinHotWaterFlow;
         } else {
             MaxWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMaxAvail;
             MinWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMinAvail;
-            MaxSteamFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMaxAvail;
-            MinSteamFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMinAvail;
         }
     }
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
@@ -1628,16 +1622,6 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // the heating load seen by the reheat coil [W]
     Real64 QActualHeating = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
                                                (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
-    Real64 QActualHeatingAlt = 0.0;
-    if (thisPIU.heatingOperatingMode != HeatOpModeType::HeaterOff &&
-        thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage) { // calculate heating power to heating setpoint with fan heat
-        Real64 zoneEnthalpy = Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
-        Real64 mixEnthalpyNoHeatZoneW =
-            Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat);
-        QActualHeatingAlt = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * (mixEnthalpyNoHeatZoneW - zoneEnthalpy);
-    } else {
-        QActualHeatingAlt = 0.0;
-    }
 
     // check if heating coil is off
     if (((!UnitOn) || (QActualHeating < SmallLoad) ||
@@ -1816,9 +1800,9 @@ void CalcParallelPIU(EnergyPlusData &state,
     bool UnitOn(true); // TRUE if unit is on
     bool PriOn(true);  // TRUE if primary air available
 
-    Real64 QCoilReq = 0; // required heating coil outlet to meet zone load
-    Real64 MaxWaterFlow; // maximum water flow for heating or cooling [kg/s]
-    Real64 MinWaterFlow; // minimum water flow for heating or cooling [kg/s]
+    Real64 QCoilReq = 0.0;     // required heating coil outlet to meet zone load
+    Real64 MaxWaterFlow = 0.0; // maximum water flow for heating or cooling [kg/s]
+    Real64 MinWaterFlow = 0.0; // minimum water flow for heating or cooling [kg/s]
 
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
@@ -2251,8 +2235,7 @@ void CalcVariableSpeedPIUCoolingBehavior(EnergyPlusData &state,
                 ShowContinueErrorTimeStamp(state, "");
                 ShowFatalError(state, format("Series PIU control failed for {}:{}", thisPIU.UnitType, thisPIU.Name));
             } else {
-                thisPIU.PriAirMassFlow = coolSignal * (thisPIU.MaxPriAirMassFlow - thisPIU.MinPriAirMassFlow) +
-                                         thisPIU.MinPriAirMassFlow; // TODO: Check that this modification is correct
+                thisPIU.PriAirMassFlow = coolSignal * (thisPIU.MaxPriAirMassFlow - thisPIU.MinPriAirMassFlow) + thisPIU.MinPriAirMassFlow;
                 Real64 TotAirMassFlow = coolSignal * (thisPIU.MaxTotAirMassFlow - thisPIU.MinTotAirMassFlow) + thisPIU.MinTotAirMassFlow;
                 thisPIU.SecAirMassFlow = max(0.0, TotAirMassFlow - thisPIU.PriAirMassFlow);
                 thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
@@ -2420,7 +2403,7 @@ void CalcVariableSpeedPIUModulatedHeatingBehavior(EnergyPlusData &state,
     if (qdotDeliveredEnd1stStage >= zoneLoad) { // 1st stage, find heating power at minimum fan speed
         thisPIU.heatingOperatingMode = HeatOpModeType::ModulatedHeatFirstStage;
         if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-            thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow; // TODO: Make sure that this fix makes sense
+            thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
         } else if (thisPIU.UnitType == "AirTerminal:SingleDuct:ParallelPIU:Reheat") {
             thisPIU.SecAirMassFlow = thisPIU.MinSecAirMassFlow;
         }
@@ -2511,7 +2494,7 @@ Real64 CalcVariableSpeedPIUHeatingResidual(EnergyPlusData &state,
     // calculate heating provided to zone
     Real64 qdotDelivered = CalcVariableSpeedPIUQdotDelivered(state, PIUNum, zoneNodeNum, useDAT, TotAirMassFlow, fanTurnDown);
     // formulate residual and return
-    Real64 Residuum = (targetQznReq - qdotDelivered); // TODO: Check if percentage approach is better
+    Real64 Residuum = (targetQznReq - qdotDelivered);
     return Residuum;
 }
 
