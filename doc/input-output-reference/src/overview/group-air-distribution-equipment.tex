@@ -882,6 +882,21 @@ The EnergyPlus model of the series PIU terminal unit is composed of three compon
 \caption{Series PIU Terminal Unit \protect \label{fig:series-piu-terminal-unit}}
 \end{figure}
 
+Additional optional inputs and control methods are available for modeling series fan-powered induction unit air terminal that has a variable speed fan. When using the variable speed fan the air terminal is controlled to represent how a modern programmable Controller would operate, but adapted for the context of long-timestep, predicted-zone-load EnergyPlus simulation rather than real world fast-acting controls.  The heating can be either staged or modulated heat with different heating controls as diagrammed below.
+
+\begin{figure}[hbtp] % fig 106b
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/VSFanStagedHeatControlDiag.png}
+\caption{Variable Speed Fan with Staged Heat Control \protect \label{fig:series-piu-terminal-unit-VS-staged-heat}}
+\end{figure}
+
+\begin{figure}[hbtp] % fig 106c
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/SeriesVSFanModulatedHeatControlDiag.png}
+\caption{Variable Speed Fan with Modulated Heat Control \protect \label{fig:series-piu-terminal-unit-VS-modulated-heat}}
+\end{figure}
+
+
 \subsubsection{Inputs}\label{inputs-7-000}
 
 \paragraph{Field: Name}\label{field-name-7-000}
@@ -967,6 +982,30 @@ The control tolerance for the unit heating output. The unit is controlled by mat
 
 For gas or electric heating coils, this input should be left blank. The default is 0.001.
 
+\paragraph{Field: Fan Control Type}\label{field-fan-control-type-seriesPIU}
+
+This field can be used to declare that a model for variable speed fan should be used.  There are two choices, \textbf{VariableSpeed} or \textbf{Constant}.  Enter VariableSpeed to indicate that the air terminal should operate with variable fan and emulate a modern controller.  TO use VariableSpeed the fan type needs to be a Fan:SystemModel and the named fan needs to be setup for variable flow.  Enter Constant to use the legacy model for constant fan operation. 
+
+\paragraph{Field: Minimum Fan Turn Down Ratio}\label{field-fan-turn-down-ratio-seriesPIU}
+
+This field is used to determine the minimum fan speed as a fraction when modeling variable speed fan.  This ratio or fraction is multiplied by the Maximum Air Flow Rate to determine the minimum air flow rate while the fan is operating. 
+
+\paragraph{Field: Heating Control Type}\label{field-heat-control-type-seriesPIU}
+
+This field is used to declare how the heating coil is to be controlled.  There are two choices, \textbf{Staged} or \textbf{Modulated}, see the control diagrams above. 
+
+Staged heat control has two stages. The first stage increases the fan flow first while leaving the reheat coil off.  The second stage runs the fan at full speed and brings on heating.  
+
+Modulated heat control has three stages and considers discharge air temperature.  The first stage of heating leaves fan speed at the minimum and brings on heat until the design discharge air temperature is reached.  The second stage of heating maintains the design discharge air temperature and ramps up the fan speed.  The third stage of heating runs at full fan speed and allows the discharge air temperature to exceed the design up until it reaches a high limit.  When using the Modulated heat control type the following two fields are needed for input on the discharge air temperatures. 
+
+\paragraph{Field: Design Heating Discharge Air Temperature}\label{field-heat-design-DAT-seriesPIU}
+
+This field is used to indicate the design discharge air temperature during stage two heating for Modulated heat control. There is a default of 32.1 C (90F). 
+
+\paragraph{Field: High Limit Heating Discharge Air Temperature}\label{field-heat-limit-DAT-seriesPIU}
+
+This field is used to indicate the high limit on discharge air temperature at the end of stage three heating for Modulated heat control.  There is a default of 37.7C (100F).
+
 An IDF example:
 
 \begin{lstlisting}
@@ -1005,6 +1044,16 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
   HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
 \item
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\item
+  HVAC,Average,Zone Air Terminal Total Air Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Zone Air Terminal Primary Air Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Zone Air Terminal Secondary Air Mass Flow Rate {[}kg/s{]}
+\item
+  HVAC,Average,Zone Air Terminal Outlet Discharge Air Temperature {[}C{]}
+\item
+  HVAC,Average,Zone Air Terminal Current Operation Control Stage {[} {]}
 \end{itemize}
 
 \paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-series-piu-primary-damper-position}
@@ -1030,6 +1079,51 @@ This field reports the dry air sensible heat extraction of the series PIU termin
 \paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
+\paragraph{Zone Air Terminal Total Air Mass Flow Rate {[}kg/s{]}}
+
+This field reports the total air mass flow rate discharging from the air terminal into the zone, in kg/s.  The flow rate will vary when using VariableSpeed fan option and this is a convenient method of reporting the flow.
+
+\paragraph{Zone Air Terminal Primary Air Mass Flow Rate {[}kg/s{]}}
+
+This field reports the air mass flow entering the terminal from the primary node, typically a central air handling unit, in kg/s.  The flow will vary during cooling when using a variable speed fan. 
+
+\paragraph{Zone Air Terminal Secondary Air Mass Flow Rate {[}kg/s{]}}
+
+This field reports the air mass flow entering the terminal from the secondary node, in kg/s. This air is typically local recirculated or induced air drawn from the return plenum or directly from the zone.  The flow rate will vary during heating when using a variable speed fan.
+
+\paragraph{Zone Air Terminal Outlet Discharge Air Temperature {[}C{]}}
+
+This field reports the drybulb temperature of the air leaving the terminal and discharging into the zone.  When using Modulated heating control method, the air terminal controls the discharge temperature with design and high limit values.  This output is convenient for examining the controlling. 
+
+\paragraph{Zone Air Terminal Current Operation Control Stage}
+
+This field reports the current control stage when using variable speed fan.  The controller diagrams above show the different stages.  This output helps to monitor what control stage the air terminal is in at a given time.  The output itself is an integer value that is mapped to a stage in the following list.  Note that the frequency of reporting needs to be at the highest level because averaging integers across more than one system timestep makes them meaningless. 
+
+\begin{itemize}
+\item
+  value = -1  => Not determined, should not occur, please report to developers  
+\item
+  value = 0 => Terminal Shut Down, system is not available. 
+\item
+  value = 1 => First Stage Cooling
+\item
+  value = 4 => In Deadband, neither cooling or heating
+\item
+  value = 5 => First Stage Heating, Staged Heat Control
+\item
+  value = 6 => Second Stage Heating, Staged Heat Control
+\item
+  value = 8 => First Stage Heating, Modulated Heat Control
+\item
+  value = 9 => Second Stage Heating, Modulated Heat Control
+\item
+  value = 10 => Third Stage Heating, Modulated Heat Control
+\item
+  value = 11 => Legacy Constant Volume Cooling
+\item 
+  value = 12 => Legacy Constant Volume Heating
+\end{itemize}
 
 \subsection{AirTerminal:SingleDuct:ParallelPIU:Reheat}\label{airterminalsingleductparallelpiureheat}
 
