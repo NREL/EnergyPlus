@@ -12372,12 +12372,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G SW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G SW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G SW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12388,7 +12384,58 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
+
+  Table:IndependentVariable,
+    airFlowRatio,  !- Name
+    Linear,                  !- Interpolation Method
+    Linear,                  !- Extrapolation Method
+    0.0,                     !- Minimum Value
+    10.0,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.75,                    !- Value 1
+    1.0;                     !- Value 2
+
+  Table:IndependentVariableList,
+    effectiveness_IndependentVariableList,  !- Name
+    airFlowRatio;     !- Independent Variable 1 Name
+
+  Table:Lookup,
+    SenEffectHeatingTable,   !- Name
+    effectiveness_IndependentVariableList,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    0.6,                     !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    10.0,                    !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.623,                   !- Output Value 1
+    0.60;                    !- Output Value 2
+
+  Table:Lookup,
+    SenEffectCoolingTable,   !- Name
+    effectiveness_IndependentVariableList,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    0.596,                   !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    10.0,                    !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.618,                   !- Output Value 1
+    0.596;                   !- Output Value 2
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G NW Apartment OA Heat Exchanger,  !- Name
@@ -12396,12 +12443,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G NW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G NW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G NW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12412,7 +12455,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G NE Apartment OA Heat Exchanger,  !- Name
@@ -12420,12 +12468,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G NE Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G NE Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G NE Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12436,7 +12480,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G N1 Apartment OA Heat Exchanger,  !- Name
@@ -12444,12 +12493,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G N1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G N1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G N1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12460,7 +12505,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G N2 Apartment OA Heat Exchanger,  !- Name
@@ -12468,12 +12518,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G N2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G N2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G N2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12484,7 +12530,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G S1 Apartment OA Heat Exchanger,  !- Name
@@ -12492,12 +12543,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G S1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G S1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G S1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12508,7 +12555,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     G S2 Apartment OA Heat Exchanger,  !- Name
@@ -12516,12 +12568,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     G S2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     G S2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     G S2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12532,7 +12580,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M SW Apartment OA Heat Exchanger,  !- Name
@@ -12540,12 +12593,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M SW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M SW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M SW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12556,7 +12605,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M NW Apartment OA Heat Exchanger,  !- Name
@@ -12564,12 +12618,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M NW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M NW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M NW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12580,7 +12630,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M SE Apartment OA Heat Exchanger,  !- Name
@@ -12588,12 +12643,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M SE Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M SE Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M SE Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12604,7 +12655,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M NE Apartment OA Heat Exchanger,  !- Name
@@ -12612,12 +12668,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M NE Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M NE Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M NE Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12628,7 +12680,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M N1 Apartment OA Heat Exchanger,  !- Name
@@ -12636,12 +12693,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M N1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M N1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M N1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12652,7 +12705,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M N2 Apartment OA Heat Exchanger,  !- Name
@@ -12660,12 +12718,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M N2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M N2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M N2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12676,7 +12730,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M S1 Apartment OA Heat Exchanger,  !- Name
@@ -12684,12 +12743,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M S1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M S1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M S1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12700,7 +12755,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     M S2 Apartment OA Heat Exchanger,  !- Name
@@ -12708,12 +12768,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     M S2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     M S2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     M S2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12724,7 +12780,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T SW Apartment OA Heat Exchanger,  !- Name
@@ -12732,12 +12793,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0,                       !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0,                       !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0,                       !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0,                       !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T SW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T SW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T SW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12756,12 +12813,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0,                       !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0,                       !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0,                       !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0,                       !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T NW Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T NW Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T NW Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12780,12 +12833,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T SE Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T SE Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T SE Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12796,7 +12845,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T NE Apartment OA Heat Exchanger,  !- Name
@@ -12804,12 +12858,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T NE Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T NE Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T NE Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12820,7 +12870,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T N1 Apartment OA Heat Exchanger,  !- Name
@@ -12828,12 +12883,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T N1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T N1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T N1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12844,7 +12895,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T N2 Apartment OA Heat Exchanger,  !- Name
@@ -12852,12 +12908,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T N2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T N2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T N2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12868,7 +12920,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T S1 Apartment OA Heat Exchanger,  !- Name
@@ -12876,12 +12933,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T S1 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T S1 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T S1 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12892,7 +12945,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   HeatExchanger:AirToAir:SensibleAndLatent,
     T S2 Apartment OA Heat Exchanger,  !- Name
@@ -12900,12 +12958,8 @@
     AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}
     0.6,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.623,                   !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.596,                   !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.618,                   !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     T S2 Apartment Outside Air Node,  !- Supply Air Inlet Node Name
     T S2 Apartment ERV Outlet Node,  !- Supply Air Outlet Node Name
     T S2 Apartment Zone Exhaust Node,  !- Exhaust Air Inlet Node Name
@@ -12916,7 +12970,12 @@
     ExhaustOnly,             !- Frost Control Type
     -23.3,                   !- Threshold Temperature {C}
     0.167,                   !- Initial Defrost Time Fraction {dimensionless}
-    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}
+    1.44,                    !- Rate of Defrost Time Fraction Increase {1/K}
+    ,                        !- Economizer Lockout
+    SenEffectHeatingTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    SenEffectCoolingTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   AirLoopHVAC:Unitary:Furnace:HeatCool,
     Split GSW Furnace with DX Cooling,  !- Name

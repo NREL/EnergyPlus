@@ -1,0 +1,623 @@
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
+// The Regents of the University of California, through Lawrence Berkeley National Laboratory
+// (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
+// contributors. All rights reserved.
+//
+// NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
+// U.S. Government consequently retains certain rights. As such, the U.S. Government has been
+// granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable,
+// worldwide license in the Software to reproduce, distribute copies to the public, prepare
+// derivative works, and perform publicly and display publicly, and to permit others to do so.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted
+// provided that the following conditions are met:
+//
+// (1) Redistributions of source code must retain the above copyright notice, this list of
+//     conditions and the following disclaimer.
+//
+// (2) Redistributions in binary form must reproduce the above copyright notice, this list of
+//     conditions and the following disclaimer in the documentation and/or other materials
+//     provided with the distribution.
+//
+// (3) Neither the name of the University of California, Lawrence Berkeley National Laboratory,
+//     the University of Illinois, U.S. Dept. of Energy nor the names of its contributors may be
+//     used to endorse or promote products derived from this software without specific prior
+//     written permission.
+//
+// (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
+//     without changes from the version obtained under this License, or (ii) Licensee makes a
+//     reference solely to the software portion of its product, Licensee must refer to the
+//     software as "EnergyPlus version X" software, where "X" is the version number Licensee
+//     obtained under this License and may not use a different name for the software. Except as
+//     specifically required in this Section (4), Licensee shall not use in a company name, a
+//     product name, in advertising, publicity, or other promotional activities any name, trade
+//     name, trademark, logo, or other designation of "EnergyPlus", "E+", "e+" or confusingly
+//     similar designation, without the U.S. Department of Energy's prior written consent.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+// C++ Headers
+
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IndoorGreen.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/api/datatransfer.h>
+
+namespace EnergyPlus {
+
+namespace IndoorGreen {
+    // Module containing the routines dealing with the Indoor Living Walls
+    static constexpr std::array<std::string_view, static_cast<int>(ETCalculationMethod::Num)> etCalculationMethodsUC = {"PENMAN-MONTEITH",
+                                                                                                                        "STANGHELLINI"};
+    static constexpr std::array<std::string_view, static_cast<int>(LightingMethod::Num)> lightingMethodsUC = {"LED", "DAYLIGHT", "LED-DAYLIGHT"};
+
+    void SimIndoorGreen(EnergyPlusData &state)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine simulates the thermal performance of indoor living walls including the grow lights.
+        // This subroutine interacts with inside surface heat balance, zone air heat balance and zone air moisture balance in EnergyPlus.
+        auto &lw = state.dataIndoorGreen;
+        if (lw->getInputFlag) {
+            bool ErrorsFound(false);
+            const char *RoutineName("IndoorLivingWall: "); // include trailing blank space
+            GetIndoorGreenInput(state, ErrorsFound);
+            if (ErrorsFound) {
+                ShowFatalError(state, format("{}Errors found in input.  Program terminates.", RoutineName));
+            }
+            SetIndoorGreenOutput(state);
+            lw->getInputFlag = false;
+        }
+        if (lw->NumIndoorGreen > 0) {
+            InitIndoorGreen(state);
+            // Simulate evapotranspiration from indoor living walls
+            ETModel(state);
+        }
+    }
+
+    void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // Get the input for the indoor living wall objects and store the input data in the indoorGreens array.
+
+        auto &lw = state.dataIndoorGreen;
+        auto &ip = state.dataInputProcessing->inputProcessor;
+        static constexpr std::string_view RoutineName("GetIndoorLivingWallInput: ");
+        std::string_view cCurrentModuleObject = "IndoorLivingWall"; // match the idd
+        int NumNums;                                                // Number of real numbers returned by GetObjectItem
+        int NumAlphas;                                              // Number of alphanumerics returned by GetObjectItem
+        int IOStat;                                                 // Status flag from GetObjectItem
+        Real64 SchMin;
+        Real64 SchMax;
+
+        lw->NumIndoorGreen = ip->getNumObjectsFound(state, cCurrentModuleObject);
+        if (lw->NumIndoorGreen > 0) lw->indoorGreens.allocate(lw->NumIndoorGreen); // Allocate the IndoorGreen input data array
+        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
+            ip->getObjectItem(state,
+                              cCurrentModuleObject,
+                              IndoorGreenNum,
+                              state.dataIPShortCut->cAlphaArgs,
+                              NumAlphas,
+                              state.dataIPShortCut->rNumericArgs,
+                              NumNums,
+                              IOStat,
+                              state.dataIPShortCut->lNumericFieldBlanks,
+                              state.dataIPShortCut->lAlphaFieldBlanks,
+                              state.dataIPShortCut->cAlphaFieldNames,
+                              state.dataIPShortCut->cNumericFieldNames);
+            ErrorObjectHeader eoh{RoutineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+            ig.Name = state.dataIPShortCut->cAlphaArgs(1);
+            ig.SurfName = state.dataIPShortCut->cAlphaArgs(2);
+            ig.SurfPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(2), state.dataSurface->Surface);
+            if (ig.SurfPtr <= 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2));
+                ErrorsFound = true;
+            } else {
+                if (state.dataSurface->Surface(ig.SurfPtr).InsideHeatSourceTermSchedule > 0) {
+                    ShowSevereError(state,
+                                    format("The indoor green surface {} has an Inside Face Heat Source Term Schedule defined. This surface cannot "
+                                           "also be used for indoor green.",
+                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ErrorsFound = true;
+                }
+                ig.ZonePtr = state.dataSurface->Surface(ig.SurfPtr).Zone;
+                ig.SpacePtr = state.dataSurface->Surface(ig.SurfPtr).spaceNum;
+
+                if (ig.ZonePtr <= 0 || ig.SpacePtr <= 0) {
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", invalid {} entered={}, {} is not assoicated with a thermal zone or space",
+                                           RoutineName,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2),
+                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ErrorsFound = true;
+                } else if (state.dataSurface->Surface(ig.SurfPtr).ExtBoundCond < 0 ||
+                           state.dataSurface->Surface(ig.SurfPtr).HeatTransferAlgorithm != DataSurfaces::HeatTransferModel::CTF) {
+                    ShowSevereError(state,
+                                    format("{}=\"{}\", invalid {} entered={}, not a valid surface for indoor green module",
+                                           RoutineName,
+                                           state.dataIPShortCut->cAlphaArgs(1),
+                                           state.dataIPShortCut->cAlphaFieldNames(2),
+                                           state.dataIPShortCut->cAlphaArgs(2)));
+                    ErrorsFound = true;
+                }
+            }
+            ig.SchedPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(3));
+            if (ig.SchedPtr == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3));
+                ErrorsFound = true;
+            } else { // check min/max on schedule
+                SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedPtr);
+                SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedPtr);
+                if (SchMin < 0.0 || SchMax < 0.0) {
+                    if (SchMin < 0.0) {
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {}, minimum is < 0.0",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
+                        ShowContinueError(
+                            state,
+                            format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
+                        ErrorsFound = true;
+                    }
+                    if (SchMax < 0.0) {
+                        ShowSevereError(state,
+                                        format("{}=\"{}\", {}, maximum is < 0.0",
+                                               RoutineName,
+                                               state.dataIPShortCut->cAlphaArgs(1),
+                                               state.dataIPShortCut->cAlphaFieldNames(3)));
+                        ShowContinueError(
+                            state,
+                            format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(3), SchMin));
+                        ErrorsFound = true;
+                    }
+                }
+            }
+
+            ig.etCalculationMethod = ETCalculationMethod::PenmanMonteith; // default
+            ig.etCalculationMethod = static_cast<ETCalculationMethod>(getEnumValue(etCalculationMethodsUC, state.dataIPShortCut->cAlphaArgs(4)));
+            ig.lightingMethod = LightingMethod::LED; // default
+            ig.lightingMethod = static_cast<LightingMethod>(getEnumValue(lightingMethodsUC, state.dataIPShortCut->cAlphaArgs(5)));
+            switch (ig.lightingMethod) {
+            case LightingMethod::LED: {
+                ig.SchedLEDPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(6));
+                if (ig.SchedLEDPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(6), state.dataIPShortCut->cAlphaArgs(6));
+                    ErrorsFound = true;
+                } else { // check min/max on schedule
+                    SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDPtr);
+                    SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedLEDPtr);
+                    if (SchMin < 0.0 || SchMax < 0.0) {
+                        if (SchMin < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, minimum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(6)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(6), SchMin));
+                            ErrorsFound = true;
+                        }
+                        if (SchMax < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, maximum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(6)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(6), SchMin));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            } break;
+            case LightingMethod::Daylighting: {
+                ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                      state.dataDayltg->DaylRefPt,
+                                                      &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
+                ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                          state.dataDayltg->daylightControl,
+                                                          &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
+                if (ig.LightControlPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
+                    ErrorsFound = true;
+                    continue;
+                }
+            } break;
+            case LightingMethod::LEDDaylighting: {
+                ig.LightRefPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                      state.dataDayltg->DaylRefPt,
+                                                      &EnergyPlus::Dayltg::RefPointData::Name); // Field: Daylighting Reference Point Name
+                ig.LightControlPtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(7),
+                                                          state.dataDayltg->daylightControl,
+                                                          &EnergyPlus::Dayltg::DaylightingControl::Name); // Field: Daylighting Control Name
+                if (ig.LightControlPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), state.dataIPShortCut->cAlphaArgs(7));
+                    ErrorsFound = true;
+                    continue;
+                }
+                ig.SchedLEDDaylightTargetPtr = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(8));
+                if (ig.SchedLEDDaylightTargetPtr == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), state.dataIPShortCut->cAlphaArgs(8));
+                    ErrorsFound = true;
+                } else { // check min/max on schedule
+                    SchMin = ScheduleManager::GetScheduleMinValue(state, ig.SchedLEDDaylightTargetPtr);
+                    SchMax = ScheduleManager::GetScheduleMaxValue(state, ig.SchedLEDDaylightTargetPtr);
+                    if (SchMin < 0.0 || SchMax < 0.0) {
+                        if (SchMin < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, minimum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(8)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Minimum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(8), SchMin));
+                            ErrorsFound = true;
+                        }
+                        if (SchMax < 0.0) {
+                            ShowSevereError(state,
+                                            format("{}=\"{}\", {}, maximum is < 0.0",
+                                                   RoutineName,
+                                                   state.dataIPShortCut->cAlphaArgs(1),
+                                                   state.dataIPShortCut->cAlphaFieldNames(8)));
+                            ShowContinueError(
+                                state,
+                                format("Schedule=\"{}\". Maximum is [{:.1R}]. Values must be >= 0.0.", state.dataIPShortCut->cAlphaArgs(8), SchMin));
+                            ErrorsFound = true;
+                        }
+                    }
+                }
+            } break;
+            default:
+                break;
+            }
+
+            ig.LeafArea = state.dataIPShortCut->rNumericArgs(1);
+            if (ig.LeafArea < 0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(1),
+                                       state.dataIPShortCut->rNumericArgs(1)));
+                ErrorsFound = true;
+            }
+            ig.LEDNominalPPFD = state.dataIPShortCut->rNumericArgs(2);
+            if (ig.LEDNominalPPFD < 0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(2),
+                                       state.dataIPShortCut->rNumericArgs(2)));
+                ErrorsFound = true;
+            }
+            ig.LEDNominalEleP = state.dataIPShortCut->rNumericArgs(3);
+            if (ig.LEDNominalEleP < 0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(3),
+                                       state.dataIPShortCut->rNumericArgs(3)));
+                ErrorsFound = true;
+            }
+            ig.LEDRadFraction = state.dataIPShortCut->rNumericArgs(4);
+            if (ig.LEDRadFraction < 0 || ig.LEDRadFraction > 1.0) {
+                ShowSevereError(state,
+                                format("{}=\"{}\", invalid {} entered={}",
+                                       RoutineName,
+                                       state.dataIPShortCut->cAlphaArgs(1),
+                                       state.dataIPShortCut->cNumericFieldNames(4),
+                                       state.dataIPShortCut->rNumericArgs(4)));
+                ErrorsFound = true;
+            }
+            if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
+                SetupEMSActuator(state, "IndoorLivingWall", ig.Name, "Evapotranspiration Rate", "[kg_m2s]", ig.EMSETCalOverrideOn, ig.EMSET);
+            } // EMS and API
+        }
+    }
+
+    void SetIndoorGreenOutput(EnergyPlusData &state)
+    {
+        // Set up output variables
+        auto &lw = state.dataIndoorGreen;
+        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
+            SetupZoneInternalGain(state,
+                                  ig.ZonePtr,
+                                  ig.Name,
+                                  DataHeatBalance::IntGainType::IndoorGreen,
+                                  &ig.SensibleRate,
+                                  nullptr,
+                                  &ig.LatentRate,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr);
+
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Plant Surface Temperature",
+                                Constant::Units::C,
+                                state.dataHeatBalSurf->SurfTempIn(ig.SurfPtr),
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(
+                state,
+                "Indoor Living Wall Sensible Heat Gain Rate",
+                Constant::Units::W,
+                state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
+                OutputProcessor::SOVTimeStepType::Zone,
+                OutputProcessor::SOVStoreType::Average,
+                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Latent Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.LatentRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Evapotranspiration Rate",
+                                Constant::Units::kg_m2s,
+                                ig.ETRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
+                                Constant::Units::W_m2,
+                                ig.LambdaET,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Operational PPFD",
+                                Constant::Units::umol_m2s,
+                                ig.LEDActualPPFD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall PPFD",
+                                Constant::Units::umol_m2s,
+                                ig.ZPPFD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall Vapor Pressure Deficit",
+                                Constant::Units::Pa,
+                                ig.ZVPD,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Sensible Heat Gain Rate",
+                                Constant::Units::W,
+                                ig.SensibleRate,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Operational Power",
+                                Constant::Units::W,
+                                ig.LEDActualEleP,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Average,
+                                ig.Name);
+            SetupOutputVariable(state,
+                                "Indoor Living Wall LED Electricity Energy",
+                                Constant::Units::J,
+                                ig.LEDActualEleCon,
+                                OutputProcessor::SOVTimeStepType::Zone,
+                                OutputProcessor::SOVStoreType::Summed,
+                                ig.Name,
+                                Constant::eResource::Electricity,
+                                OutputProcessor::SOVEndUseCat::InteriorLights,
+                                "IndoorLivingWall", // End Use subcategory
+                                OutputProcessor::SOVGroup::Building,
+                                state.dataHeatBal->Zone(ig.ZonePtr).Name,
+                                state.dataHeatBal->Zone(ig.ZonePtr).Multiplier,
+                                state.dataHeatBal->Zone(ig.ZonePtr).ListMultiplier,
+                                {},
+                                {},
+                                state.dataHeatBal->space(ig.SpacePtr).spaceType);
+        }
+    }
+
+    void InitIndoorGreen(EnergyPlusData &state)
+    {
+        // Set the reporting variables to zero at each timestep.
+        for (auto &ig : state.dataIndoorGreen->indoorGreens) {
+            ig.SensibleRate = 0.0;
+            ig.LatentRate = 0.0;
+            ig.ZCO2 = 400;
+            ig.ZPPFD = 0;
+        }
+    }
+
+    void ETModel(EnergyPlusData &state)
+    {
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine is for the calculation of evapotranspiration effects from the Indoor Greenery System objects.
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view RoutineName("ETModel: ");
+        auto &lw = state.dataIndoorGreen;
+        Real64 ZonePreTemp; // Indoor air temprature (C)
+        Real64 ZonePreHum;  // Indoor humidity ratio (kg moisture / kg dry air)
+        Real64 ZoneNewTemp; // Indoor air temprature (C) after ET
+        Real64 ZoneNewHum;  // Indoor humidity ratio (kg moisture / kg dry air) after ET
+        Real64 ZoneSatHum;  // Saturated humidity ratio
+        Real64 ZoneCO2;     // Indoor zone co2 concentration (ppm)
+        Real64 ZonePPFD;    // Indoor net radiation (PPFD)
+        Real64 ZoneVPD;     // vapor pressure deficit (kpa); local variable
+        Real64 Timestep;    // s
+        Real64 ETTotal;     // kg
+        Real64 rhoair;      // kg/m3
+        Real64 Tdp;         // dew point temperature
+        Real64 Twb;         // wet bulb temperature
+        Real64 HCons;       // enthalpy (J/kg)
+        Real64 HMid;        // enthalpy 3rd point (J/kg)
+        Real64 ZoneAirVol;  // zone air volume (m3)
+        Real64 LAI;         // leaf area index, the ratio of one-side leaf area per unit plant growing area, maximum LAI =2 if LAI_cal>2.0
+        Real64 LAI_Cal;     // calculated leaf area index based on users's input on total leaf area
+        Real64 OutPb;       // outdoor pressure (kPa)
+        Real64 vp;          // actual vapor pressure of the air (kpa)
+        Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
+        std::string_view cCurrentModuleObject = "IndoorLivingWall";
+        Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
+        for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
+            auto &ig = lw->indoorGreens(IndoorGreenNum);
+            ZonePreTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ig.ZonePtr).ZT;
+            ZonePreHum = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ig.ZonePtr).airHumRat;
+            ZoneCO2 = 400;
+            OutPb = state.dataEnvrn->OutBaroPress / 1000;
+            Tdp = Psychrometrics::PsyTdpFnWPb(state, ZonePreHum, OutPb * 1000);
+            vp = Psychrometrics::PsyPsatFnTemp(state, Tdp, RoutineName) / 1000;
+            vpSat = Psychrometrics::PsyPsatFnTemp(state, ZonePreTemp, RoutineName) / 1000;
+            ig.ZVPD = (vpSat - vp) * 1000; // Pa
+            LAI_Cal = ig.LeafArea / state.dataSurface->Surface(ig.SurfPtr).Area;
+            LAI = LAI_Cal;
+            if (LAI_Cal > 2.0) {
+                LAI = 2.0; // maximum LAI=2.0 in the surface heat balance
+                ShowSevereError(state, format("Maximum indoor living wall leaf area index (LAI) =2.0 is used,calculated LAI is {}", LAI_Cal));
+            }
+            switch (ig.lightingMethod) {
+            case LightingMethod::LED: {
+                ig.ZPPFD = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDPtr) * ig.LEDNominalPPFD; // PPFD
+                ig.LEDActualPPFD = ig.LEDNominalPPFD;
+                ig.LEDActualEleP = ig.LEDNominalEleP;
+                ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
+            } break;
+            case LightingMethod::Daylighting: {
+                ig.ZPPFD = 0;
+                ig.LEDActualPPFD = 0;
+                ig.LEDActualEleP = 0;
+                ig.LEDActualEleCon = 0;
+                if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
+                    ig.ZPPFD = state.dataDayltg->daylightControl(ig.LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
+                               77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
+                }
+            } break;
+            case LightingMethod::LEDDaylighting: {
+                Real64 a = ScheduleManager::GetCurrentScheduleValue(state, ig.SchedLEDDaylightTargetPtr);
+                Real64 b = 0;
+                if (!state.dataDayltg->CalcDayltghCoefficients_firstTime && state.dataEnvrn->SunIsUp) {
+                    b = state.dataDayltg->daylightControl(ig.LightControlPtr).refPts(1).lums[DataSurfaces::iLum_Illum] /
+                        77; // To be updated currently only take one reference point; 77 conversion factor from Lux to PPFD
+                }
+                ig.LEDActualPPFD = max((a - b), 0.0);
+                if (ig.LEDActualPPFD >= ig.LEDNominalPPFD) {
+                    ig.ZPPFD = ig.LEDNominalPPFD + b; // LED Nominal + Daylight
+                    ig.LEDActualEleP = ig.LEDNominalEleP;
+                    ig.LEDActualEleCon = ig.LEDNominalEleP * Timestep;
+                } else {
+                    ig.ZPPFD = a; // Targeted PPFD
+                    ig.LEDActualEleP = ig.LEDNominalEleP * ig.LEDActualPPFD / ig.LEDNominalPPFD;
+                    ig.LEDActualEleCon = ig.LEDActualEleP * Timestep;
+                }
+            } break;
+            default:
+                break;
+            }
+            ZonePPFD = ig.ZPPFD;
+            ZoneVPD = ig.ZVPD / 1000; // kPa
+            // ET Calculation
+            if (ig.EMSETCalOverrideOn) {
+                ig.ETRate = ig.EMSET;
+            } else {
+                Real64 SwitchF = ig.etCalculationMethod == ETCalculationMethod::PenmanMonteith ? 1.0 : 2 * LAI;
+                ig.ETRate = ETBaseFunction(state, ZonePreTemp, ZonePreHum, ZonePPFD, ZoneVPD, LAI, SwitchF);
+            }
+            Real64 effectivearea = std::min(ig.LeafArea, LAI * state.dataSurface->Surface(ig.SurfPtr).Area);
+            ETTotal =
+                ig.ETRate * Timestep * effectivearea *
+                ScheduleManager::GetCurrentScheduleValue(state, ig.SchedPtr); // kg; this unit area should be surface area instead of total leaf area
+            Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+            ig.LambdaET = ETTotal * hfg * std::pow(10, 6) / state.dataSurface->Surface(ig.SurfPtr).Area / Timestep; // (W/m2))
+            rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, ZonePreTemp, ZonePreHum);
+            ZoneAirVol = state.dataHeatBal->Zone(ig.ZonePtr).Volume;
+            ZoneNewHum = ZonePreHum + ETTotal / (rhoair * ZoneAirVol);
+            Twb = Psychrometrics::PsyTwbFnTdbWPb(state, ZonePreTemp, ZonePreHum, state.dataEnvrn->OutBaroPress);
+            ZoneSatHum = Psychrometrics::PsyWFnTdpPb(state, ZonePreTemp, state.dataEnvrn->OutBaroPress); // saturated humidity ratio
+            HCons = Psychrometrics::PsyHFnTdbW(ZonePreTemp, ZonePreHum);
+            if (ZoneNewHum <= ZoneSatHum) {
+                ZoneNewTemp = Psychrometrics::PsyTdbFnHW(HCons, ZoneNewHum);
+            } else {
+                ZoneNewTemp = Twb;
+                ZoneNewHum = ZoneSatHum;
+            }
+            HMid = Psychrometrics::PsyHFnTdbW(ZoneNewTemp, ZoneNewHum);
+            ig.SensibleRate = (1 - ig.LEDRadFraction) * ig.LEDActualEleP; // convective heat gain from LED lights when LED is on; heat convection from
+                                                                          // plants was considered and counted from plant surface heat balance.
+            ig.LatentRate = ZoneAirVol * rhoair * (HCons - HMid) / Timestep; // unit W
+            state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(ig.SurfPtr) = -1.0 * ig.LambdaET;
+        }
+    }
+
+    Real64 ETBaseFunction(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZonePPFD, Real64 ZoneVPD, Real64 LAI, Real64 SwitchF)
+    {
+        // This subroutine provides calculation for Penman-Monteith model and Stanghellini models to predict evapotranspiration rates of plants.
+        // Reference: Monteith, J.L. Evaporation and environment. in Symposia of the society for experimental biology. 1965. Cambridge University
+        // Press (CUP) Cambridge
+        // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
+        // Wageningen, The Netherlands
+
+        static constexpr std::string_view RoutineName("ETBaseFunction: ");
+        Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
+        Real64 slopepat =
+            0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(ZonePreHum) / std::pow(10, 6); // specific heat of air at constant pressure (MJ kg−1 °C−1)
+        Real64 OutPb = state.dataEnvrn->OutBaroPress / 1000;                      // outdoor pressure (kPa)
+        Real64 constexpr mw(0.622);                                               // ratio molecular weight of water vapor / dry air = 0.622.
+        Real64 psyconst = CpAir * OutPb / (hfg * mw);                             // Psychrometric constant (kPa/°C)
+        Real64 In = ZonePPFD * 0.327 / std::pow(10, 6);                           // net radiation MW/m2
+        Real64 G = 0.0;                                                           // soil heat flux (MJ/(m2s))
+        Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, OutPb * 1000, ZonePreTemp, ZonePreHum); // kg/m3
+        Real64 ETRate;                                                                                   // mm/s; kg/(m2s)
+        Real64 rs = 60 * (1500 + ZonePPFD) / (200 + ZonePPFD);                                           // stomatal resistance s/m
+        Real64 ra = 350 * std::pow((0.1 / 0.1), 0.5) * (1 / (LAI + 1e-10));                              // aerodynamic resistance s/m
+        ETRate = (1 / hfg) * (slopepat * (In - G) + (SwitchF * rhoair * CpAir * ZoneVPD) / ra) /
+                 (slopepat + psyconst * (1 + rs / ra)); // Penman-Monteith ET model
+        return ETRate;                                  // mm/s; kg/(m2s)
+    }
+
+} // namespace IndoorGreen
+
+} // namespace EnergyPlus

@@ -378,7 +378,10 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
 
     // first pre-config Python so that it can speak UTF-8
     PyPreConfig preConfig;
+    // This is the other related line that caused Decent CI to start having trouble.  I'm putting it back to
+    // PyPreConfig_InitPythonConfig, even though I think it should be isolated.  Will deal with this after IO freeze.
     PyPreConfig_InitPythonConfig(&preConfig);
+    // PyPreConfig_InitIsolatedConfig(&preConfig);
     preConfig.utf8_mode = 1;
     status = Py_PreInitialize(&preConfig);
     if (PyStatus_Exception(status)) {
@@ -443,6 +446,15 @@ void initPython(EnergyPlusData &state, fs::path const &pathToPythonPackages)
         PyMem_RawFree(wcharPath);
     }
 
+    // This was Py_InitializeFromConfig(&config), but was giving a seg fault when running inside
+    // another Python instance, for example as part of an API run.  Per the example here:
+    // https://docs.python.org/3/c-api/init_config.html#preinitialize-python-with-pypreconfig
+    // It looks like we don't need to initialize from config again, it should be all set up with
+    // the init calls above, so just initialize and move on.
+    // UPDATE: This worked happily for me on Linux, and also when I build locally on Windows, but not on Decent CI
+    // I suspect a difference in behavior for Python versions.  I'm going to temporarily revert this back to initialize
+    // with config and get IO freeze going, then get back to solving it.
+    // Py_Initialize();
     Py_InitializeFromConfig(&config);
 }
 #endif // LINK_WITH_PYTHON
