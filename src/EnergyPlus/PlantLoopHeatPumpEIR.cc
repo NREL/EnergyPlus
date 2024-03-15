@@ -1862,8 +1862,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     auto &thisInletNode = state.dataLoopNodes->Node(this->loadSideNodes.inlet);
     auto &thisOutletNode = state.dataLoopNodes->Node(this->loadSideNodes.outlet);
     auto &sim_component = DataPlant::CompData::getPlantComponent(state, this->loadSidePlantLoc);
-    bool RunFlag = true;
-    if ((this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0) || !RunFlag) {
+    if (this->EIRHPType == DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating && currentLoad <= 0.0) {
         if (sim_component.FlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive) this->loadSideMassFlowRate = thisInletNode.MassFlowRate;
         this->resetReportingVariables();
         return;
@@ -2250,7 +2249,7 @@ void EIRFuelFiredHeatPump::doPhysics(EnergyPlusData &state, Real64 currentLoad)
     this->powerUsage += this->standbyElecPower;
 
     this->fuelEnergy = this->fuelRate * reportingInterval;
-    this->powerEnergy = this->powerEnergy * reportingInterval;
+    this->powerEnergy = this->powerUsage * reportingInterval;
 
     // energy balance on heat pump
     // this->sourceSideHeatTransfer = this->calcQsource(this->loadSideHeatTransfer, this->powerUsage);

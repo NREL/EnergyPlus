@@ -862,6 +862,7 @@ End
 		  dim nextDashVersion as String
 		  dim repcsvName as String
 		  dim repcsvFileInOrig as FolderItem
+		  dim dirOfTransApp as FolderItem
 		  
 		  origVerIndx = AllNewVersions.IndexOf(inOrigVersion)
 		  if origVerIndx = -1 then origVerIndx = AllNewVersions.FirstIndex 'if not found just start at the beginning
@@ -873,29 +874,32 @@ End
 		    origFile = new FolderItem(inFile)
 		    origFileDirectory = origFile.Parent
 		    for iVer = origVerIndx to finalVerIndx
+		      dirOfTransApp = TransitionApps(iVer).Parent
 		      dashVersion = AllNewVersions(iVer).ReplaceAll(".","-") ' Convert "3.1.0" format to "3-1-0"
 		      ' delete previously copied VXX-X-X-Energy+.idd files
 		      iddName = "V" + dashVersion + "-Energy+.idd"
 		      iddFileInOrig = origFileDirectory.Child(iddName)
-		      if iddFileInOrig.exists then
-		        try
-		          iddFileInOrig.Remove()
-		        exception
-		          MsgBox "Cannot remove copied IDD file from local directory: " + iddFileInOrig.NativePath
-		        end try
-		      end if
-		      ' delete previously copied Report Variables XX-X-X to XX-X-X.csv files
-		      ' don't need to do last iteration
-		      if iVer <> finalVerIndx then
-		        nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
-		        repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
-		        repcsvFileInOrig = origFileDirectory.Child(repcsvName)
-		        if repcsvFileInOrig.exists then
+		      if origFileDirectory.NativePath <> dirOfTransApp.NativePath then
+		        if iddFileInOrig.exists then
 		          try
-		            repcsvFileInOrig.Remove()
+		            iddFileInOrig.Remove()
 		          exception
-		            MsgBox "Cannot remove copied report csv file to local directory: " + repcsvFileInOrig.NativePath
+		            MsgBox "Cannot remove copied IDD file from local directory: " + iddFileInOrig.NativePath
 		          end try
+		        end if
+		        ' delete previously copied Report Variables XX-X-X to XX-X-X.csv files
+		        ' don't need to do last iteration
+		        if iVer <> finalVerIndx then
+		          nextDashVersion = AllNewVersions(iVer + 1).ReplaceAll(".","-")
+		          repcsvName = "Report Variables "+ dashVersion + " to " + nextDashVersion + ".csv"
+		          repcsvFileInOrig = origFileDirectory.Child(repcsvName)
+		          if repcsvFileInOrig.exists then
+		            try
+		              repcsvFileInOrig.Remove()
+		            exception
+		              MsgBox "Cannot remove copied report csv file to local directory: " + repcsvFileInOrig.NativePath
+		            end try
+		          end if
 		        end if
 		      end if
 		    next iVer
@@ -973,7 +977,7 @@ End
 		    pmnuNewVersion.ListIndex = 0
 		    cmdConvert.Enabled = False
 		    MsgBox "No appropriate TransitionV-x-x-to-V-x-x.exe files found. They may need to be downloaded from " + EndOfLine + EndOfLine + _
-		    " http://www.energyplus.gov/" + EndOfLine + EndOfLine + "click on Add-Ons and look for the link to download the Transition programs."
+		    " https://energyplushelp.freshdesk.com/" + EndOfLine + EndOfLine + "click on IDF Version Updater under Downloads."
 		  elseif foundOld <= AllOldVersions.Ubound then
 		    'this is the case when it has been found and a transition should be performed
 		    for i = foundOld to AllOldVersions.Ubound 'loop through the old version numbers but add the new version numbers
@@ -1125,7 +1129,7 @@ End
 		        if strParts.lastIndex = 1 then
 		          returnVersion = strParts(0) + "." + strParts(1) + ".0"
 		        elseif strParts.LastIndex >= 2 then
-		          returnVersion = strParts(0) + "." + strParts(1) + strParts(2)
+		          returnVersion = strParts(0) + "." + strParts(1) + "." + strParts(2)
 		        Else
 		          returnVersion = ""
 		        End If
@@ -1338,8 +1342,8 @@ End
 	#tag Event
 		Sub Action()
 		  dim t as String
-		  t = "IDF Version Updater - Version 0.16" + EndOfLine+ EndOfLine
-		  t = t + "Copyright (c) 2011-2022 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
+		  t = "IDF Version Updater - Version 0.17" + EndOfLine+ EndOfLine
+		  t = t + "Copyright (c) 2011-2024 GARD Analytics, All rights reserved." + EndOfLine+ EndOfLine
 		  t = t + "NOTICE: The U.S. Government is granted for itself and others acting on its behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to reproduce, prepare derivativeworks, and perform publicly and display publicly. Beginning five (5) years after permission to assert copyright is granted, subject to two possible five year renewals, the U.S. Government is granted for itself and others acting on its behalf a paid-up, non-exclusive,irrevocable worldwide license in this data to reproduce, prepare derivative works, distribute copies to the public,perform publicly and display publicly,and to permit others to do so." + EndOfLine+ EndOfLine
 		  t = t + "TRADEMARKS: EnergyPlus, DOE-2.1E, DOE-2, and DOE are trademarks of the US Department of Energy." + EndOfLine+ EndOfLine
 		  t = t + "DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY: THIS SOFTWARE IS PROVIDED 'AS IS' WITHOUT WARRANTY OF ANY KIND. NEITHER GARD ANALYTICS, THE DEPARTMENT OF ENERGY, THE US GOVERNMENT, THEIR LICENSORS, OR ANY PERSON OR ORGANIZATION ACTING ON BEHALF OF ANY OF THEM:" + EndOfLine+ EndOfLine
