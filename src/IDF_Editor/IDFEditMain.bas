@@ -34,7 +34,7 @@ Attribute VB_Name = "IDFMain"
 ' command line argument /idd:iddfilename
 '
 
-Public Const ver = "1.53" 'current version of IDFEditor - less than 1 is a beta
+Public Const ver = "1.54" 'current version of IDFEditor - less than 1 is a beta
 Option Explicit
 Option Base 1
 
@@ -628,7 +628,7 @@ End Sub
 '-----------------------------------------------------------------------------
 Sub setUnits()
 Dim i As Long
-maxUsedConvUnits = 155
+maxUsedConvUnits = 156
 unitsDimensionless = 56
 ReDim convUnits(maxUsedConvUnits)
 ' the following is pasted in from the unitsIPandSI.xls file
@@ -787,6 +787,7 @@ convUnits(152).siName = "m3/hr-m2"
 convUnits(153).siName = "m3/hr"
 convUnits(154).siName = "W/((m3/s)-Pa)"
 convUnits(155).siName = "W/m2, deg C or cd/m2"
+convUnits(156).siName = "umol/m2-s"
 
 convUnits(1).ipName = "ft"
 convUnits(2).ipName = "in"
@@ -943,6 +944,7 @@ convUnits(152).ipName = "gal/hr-ft2"
 convUnits(153).ipName = "gal/hr"
 convUnits(154).ipName = "W/((ft3/min)-inH2O)"
 convUnits(155).ipName = "unknown"
+convUnits(156).ipName = "umol/ft2-s"
 
 convUnits(1).mult = 3.28083989501312
 convUnits(2).mult = 39.3700787401575
@@ -1099,6 +1101,7 @@ convUnits(152).mult = 24.5423853466941
 convUnits(153).mult = 264.172037284185
 convUnits(154).mult = 0.117556910599482
 convUnits(155).mult = 1
+convUnits(156).mult = 0.09290304
 
 convUnits(7).offset = 32
 convUnits(19).offset = 7.686

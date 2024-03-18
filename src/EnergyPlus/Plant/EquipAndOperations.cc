@@ -321,7 +321,6 @@ namespace DataPlant {
                                             this_equip.LoopSideNumPtr = compLoc.loopSideNum;
                                             this_equip.BranchNumPtr = compLoc.branchNum;
                                             this_equip.CompNumPtr = compLoc.compNum;
-                                            this->PlantOps.PrimaryChWLoopIndex = compLoc.loopNum; // addd for testing HR
                                             foundit = true;
                                             continue;
                                         }
@@ -906,9 +905,6 @@ namespace DataPlant {
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
 
-        // for debug
-        Real64 HWSetPointTemp = this->DetermineHWSetpointOARest(state);
-        Real64 PrimaryHWLoopSupInletNodeTemp = state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp;
         Real64 HW_Qdot =
             max(0.0,
                 HW_RetMdot * CpHW *
@@ -998,7 +994,7 @@ namespace DataPlant {
         }
 
         // override reset AirSourcePlantHeatingOnly to false and AirSourcePlantCoolingOnly to true if the plant cooling load is higher
-        // the plant heating load and the plant heating load is small. Issue #10417
+        // the plant heating load and the plant heating load is small.
         if (!this->PlantOps.AirSourcePlantCoolingOnly && this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
             if (std::abs(this->Report.PrimaryPlantCoolingLoad) > this->Report.PrimaryPlantHeatingLoad &&
@@ -1009,7 +1005,7 @@ namespace DataPlant {
         }
 
         // override reset AirSourcePlantHeatingOnly to true and AirSourcePlantCoolingOnly to false if the plant heating load is higher
-        // the plant cooling load and the plant cooling load is small. #Issue 10417
+        // the plant cooling load and the plant cooling load is small.
         if (this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
             if (this->Report.PrimaryPlantHeatingLoad > std::abs(this->Report.PrimaryPlantCoolingLoad) &&

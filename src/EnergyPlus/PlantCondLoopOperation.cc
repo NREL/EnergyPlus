@@ -412,6 +412,7 @@ void GetPlantOperationInput(EnergyPlusData &state, bool &GetInputOK)
                                                                      state.dataIPShortCut->cNumericFieldNames);
             state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes = (NumAlphas - 1) / 3;
             if (state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes > 0) {
+                state.dataPlnt->PlantLoop(LoopNum).OpScheme.clear();
                 state.dataPlnt->PlantLoop(LoopNum).OpScheme.allocate(state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes);
                 for (Num = 1; Num <= state.dataPlnt->PlantLoop(LoopNum).NumOpSchemes; ++Num) {
                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(Num).TypeOf = state.dataIPShortCut->cAlphaArgs(Num * 3 - 1);
