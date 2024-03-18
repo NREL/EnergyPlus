@@ -1019,17 +1019,17 @@ This field is ``yes'' if there is outdoor controlled baseboard heat in a Zone.
 
 \subsection{People Gains}\label{people-gains}
 
-! \textless{}People Internal Gains - Nominal\textgreater{},Name,Schedule Name,Zone Name,Zone Floor Area \{m2\},\# Zone Occupants,Number of People \{\},People/Floor Area \{person/m2\},Floor Area per person \{m2/person\},Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People
+! \textless{}People Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, # Zone Occupants, Number of People \{\}, People/Floor Area \{person/m2\}, Floor Area per person \{m2/person\}, Fraction Radiant, Fraction Convected, Sensible Fraction Calculation, Activity level, ASHRAE 55 Warnings, Carbon Dioxide Generation Rate, Minimum Number of People for All Day Types, Maximum Number of People for All Day Types, Minimum Number of People for Weekdays,  Maximum Number of People for Weekdays,  Minimum Number of People for Weekends/Holidays,  Maximum Number of People for Weekends /Holidays, Minimum Number of People for Design Days,  Maximum Number of People for Design Days
 
-People Internal Gains,~ SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 99.16, 11.0, 11.0, 0.111, 9.015, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+People Internal Gains Nominal,~ SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 90.00, 10.0, 10.0, 0.111, 9.009, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 10.0, 0.0, 10.0, 0.0, 0.0, 0.0, 10.0
 
-~People Internal Gains,~ SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+~People Internal Gains Nominal,~ SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.37, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 5.0, 0.0, 5.0, 0.0, 0.0, 0.0, 5.0
 
-~People Internal Gains,~ SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+~People Internal Gains Nominal,~ SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 11.0, 0.0, 11.0, 0.0, 0.0, 0.0, 11.0
 
-~People Internal Gains,~ SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+~People Internal Gains Nominal,~ SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 5.0, 0.0, 5.0, 0.0, 0.0, 0.0, 5.0
 
-~People Internal Gains,~ SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 20
+~ People Internal Gains Nominal,~ SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 20.0, 0.0, 20.0, 0.0, 0.0, 0.0, 20.0
 
 \subsubsection{Field: \textless{}People Internal Gains - Nominal\textgreater{}}\label{field-people-internal-gains---nominal}
 
@@ -1123,13 +1123,37 @@ This numeric input field specifies carbon dioxide generation rate per person wit
 
 Number of People * People Schedule * People Activity * Carbon Dioxide Generation Rate. The default value is 3.82E-8 m3/s-W (obtained from ASHRAE Standard 62.1-2007 value at 0.0084 cfm/met/person over the general adult population). The maximum value can be 10 times the default value.
 
-\subsubsection{Field: Nominal Minimum Number of People}\label{field-nominal-minimum-number-of-people}
+\subsubsection{Field: Minimum Number of People for All Day Types}\label{field-minimum-number-of-people-for-all-day-types}
 
-This numeric field is the calculated minimum number of people based on the number of people field * the minimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
 
-\subsubsection{Field: Nominal Maximum Number of People}\label{field-nominal-maximum-number-of-people}
+\subsubsection{Field: Maximum Number of People for All Day Types}\label{field-maximum-number-of-people-for-all-day-types}
 
-This numeric field is the calculated maximum number of people based on the number of people field * the maxnimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Minimum Number of People for Weekdays}\label{field-minimum-number-of-people-for-weekdays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for weekday day types (Monday through Friday).
+
+\subsubsection{Field: Maximum Number of People for Weekdays}\label{field-maximum-number-of-people-for-weekdays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for weekend day types (Monday through Friday).
+
+\subsubsection{Field: Minimum Number of People for Weekends/Holidays}\label{field-minimum-number-of-people-for-weekends-holidays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Maximum Number of People for Weekends/Holidays}\label{field-maximum-number-of-people-for-weekends-holidays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for weekend (Saturday and Sunday) or holiday day types
+
+\subsubsection{Field: Minimum Number of People for Design Days}\label{field-minimum-number-of-people-for-designdays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for design day types (SummerDesignDay and WinterDesignDay).
+
+\subsubsection{Field: Maximum Number of People for Design Days}\label{field-maximum-number-of-people-for-designdays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for design day types (SummerDesignDay and WinterDesignDay).
 
 \subsection{Lights Gains}\label{lights-gains}
 
