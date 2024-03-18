@@ -50,6 +50,7 @@ jobs:
       uses: jmarrec/setup-python@v5
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
+        check-latest: true # Force pick up the python I built instead of the (potential) toolcache one. I could also do `rm -Rf $RUNNER_TOOL_CACHE/Python/3.12.2` before this action
 
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
