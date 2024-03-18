@@ -13192,6 +13192,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
 
+    // add VRF cycling ratio initialization. Since TU's are simulated first, if there's no initialization, the coil runtime fraction will be zero
+    state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio = 1.0;
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,
@@ -13219,8 +13221,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5125.0840, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(4999.8265, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(125.2573, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(125.2573 * thisDXCoolingCoil.CoolingCoilRuntimeFraction, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+    EXPECT_NEAR(0.8930, state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio, 0.0001);
+    EXPECT_NEAR(state->dataHVACVarRefFlow->VRF(1).OUFanPower,
+                state->dataHVACVarRefFlow->VRF(1).RatedOUFanPower * state->dataHVACVarRefFlow->VRF(1).VRFCondCyclingRatio,
+                0.0001);
 }
 
 // Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
