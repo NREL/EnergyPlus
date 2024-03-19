@@ -993,6 +993,28 @@ namespace DataPlant {
             }
         }
 
+        // override reset AirSourcePlantHeatingOnly to false and AirSourcePlantCoolingOnly to true if the plant cooling load is higher
+        // the plant heating load and the plant heating load is small.
+        if (!this->PlantOps.AirSourcePlantCoolingOnly && this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (std::abs(this->Report.PrimaryPlantCoolingLoad) > this->Report.PrimaryPlantHeatingLoad &&
+                this->Report.PrimaryPlantHeatingLoad < DataHVACGlobals::SmallLoad) {
+                this->PlantOps.AirSourcePlantCoolingOnly = true;
+                this->PlantOps.AirSourcePlantHeatingOnly = false;
+            }
+        }
+
+        // override reset AirSourcePlantHeatingOnly to true and AirSourcePlantCoolingOnly to false if the plant heating load is higher
+        // the plant cooling load and the plant cooling load is small.
+        if (this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (this->Report.PrimaryPlantHeatingLoad > std::abs(this->Report.PrimaryPlantCoolingLoad) &&
+                this->Report.PrimaryPlantCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+                this->PlantOps.AirSourcePlantHeatingOnly = true;
+                this->PlantOps.AirSourcePlantCoolingOnly = false;
+            }
+        }
+
         // do we need to turn on heating-only if in off mode but PrimaryPlantHeatingLoad is loaded?
         if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
