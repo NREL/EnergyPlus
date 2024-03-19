@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAirCooledConvCoef.idf
+! 5ZoneAirCooledConvCoef_VSFan.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Illustrates the use of the convection coefficients applied to multiple surfaces object.
@@ -2498,7 +2498,7 @@
     autosize,                !- Maximum Primary Air Flow Rate {m3/s}
     autosize,                !- Maximum Secondary Air Flow Rate {m3/s}
     autosize,                !- Minimum Primary Air Flow Fraction
-    autosize,                !- Fan On Flow Fraction
+    0,                       !- Fan On Flow Fraction
     SPACE2-1 ATU In Node,    !- Supply Air Inlet Node Name
     SPACE2-1 ATU Sec Node,   !- Secondary Air Inlet Node Name
     SPACE2-1 In Node,        !- Outlet Node Name
@@ -2627,7 +2627,7 @@
     autosize,                !- Maximum Primary Air Flow Rate {m3/s}
     autosize,                !- Maximum Secondary Air Flow Rate {m3/s}
     autosize,                !- Minimum Primary Air Flow Fraction
-    autosize,                !- Fan On Flow Fraction
+    0,                       !- Fan On Flow Fraction
     SPACE4-1 ATU In Node,    !- Supply Air Inlet Node Name
     SPACE4-1 ATU Sec Node,   !- Secondary Air Inlet Node Name
     SPACE4-1 In Node,        !- Outlet Node Name
@@ -3491,7 +3491,7 @@
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
   !- This object is used to virtually increase the 
-  !- temperature of the plenum zone to showcase the
+  !- temeprature of the plenum zone to showcase the
   !- first stage of the `staged` variable speed control
   !- of the terminal PIUs
   OtherEquipment,
@@ -3504,7 +3504,6 @@
 
   Schedule:Constant,AlwaysOn,Fraction,1;
   
-  Output:Diagnostics,DisplayAllWarnings;
 
   Output:Variable,*,Zone Air Temperature,detailed;
   Output:Variable,*,Zone Air System Sensible Cooling Rate,detailed;
@@ -3569,6 +3568,10 @@
   Output:Variable,*,Zone Air Terminal Secondary Air Mass Flow Rate,detailed; !- HVAC Average [kg/s]
   Output:Variable,*,Zone Air Terminal Outlet Discharge Air Temperature,detailed; !- HVAC Average [C]
   Output:Variable,*,Zone Air Terminal Current Operation Control Stage,detailed; !- HVAC Average [unknown]
+  Output:Variable,*,Zone Predicted Sensible Load to Setpoint Heat Transfer Rate,detailed; !- HVAC Average [W]
+  Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,detailed; !- HVAC Average [W]
+  Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,detailed; !- HVAC Average [W]
+  Output:Variable,ReheatCoilAvailSched,Schedule Value,detailed;
 
   Output:VariableDictionary,IDF;
 
