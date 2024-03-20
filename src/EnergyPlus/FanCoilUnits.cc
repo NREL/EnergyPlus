@@ -1252,8 +1252,8 @@ namespace FanCoilUnits {
 
         auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilNum);
 
-        std::string CompType = fanCoil.UnitType;
-        std::string CompName = fanCoil.Name;
+        std::string_view const CompType = fanCoil.UnitType;
+        std::string_view const CompName = fanCoil.Name;
         state.dataSize->DataZoneNumber = fanCoil.ControlZoneNum;
         if (fanCoil.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
@@ -1718,8 +1718,6 @@ namespace FanCoilUnits {
             }
         } else if (fanCoil.HCoilType_Num == HCoil::Electric) {
             if (fanCoil.DesignHeatingCapacity == DataSizing::AutoSize) {
-                CompName = fanCoil.HCoilName;
-                CompType = fanCoil.HCoilType;
                 SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
                 PrintFlag = false;
                 TempSize = fanCoil.DesignHeatingCapacity;
@@ -1899,8 +1897,6 @@ namespace FanCoilUnits {
 
             if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE && !fanCoil.ASHRAETempControl) {
 
-                CompType = fanCoil.UnitType;
-                CompName = fanCoil.Name;
                 PrintFlag = true;
 
                 ZoneCoolingLoadSizer sizerZoneCoolingLoad;
@@ -1916,8 +1912,6 @@ namespace FanCoilUnits {
 
             } else if (fanCoil.CapCtrlMeth_Num == CCM::ASHRAE && fanCoil.ASHRAETempControl) {
 
-                CompType = fanCoil.UnitType;
-                CompName = fanCoil.Name;
                 Real64 capacityMultiplier = 0.6; // 60% of design zone load for water coils
                 state.dataSize->DataCapacityUsedForSizing = fanCoil.DesCoolingLoad * capacityMultiplier;
                 bool SizingDesRunThisZone = false;
