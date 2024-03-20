@@ -3582,7 +3582,6 @@ namespace WindowManager {
         // Real64 CondHeatGainShade = 0.0; // Conduction through shade/blind, outside to inside (W)
         //  shade/blind is present. Zero if shade/blind has zero IR transmittance (W)
         // Real64 IncidentSolar = 0.0;         // Solar incident on outside of window (W)
-        Real64 TransDiff = 0.0;      // Diffuse shortwave transmittance
         Real64 TotAirflowGap = 0.0;  // Total volumetric airflow through window gap (m3/s)
         Real64 CpAirOutlet = 0.0;    // Heat capacity of air from window gap (J/kg-K)
         Real64 CpAirZone = 0.0;      // Heat capacity of zone air (J/kg-K)
@@ -3842,31 +3841,40 @@ namespace WindowManager {
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
-            TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
+            // Real64 TransDiff = 0.0; // Diffuse shortwave transmittance
+            //  TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
+            Real64 TransRefl = 0.0; // Diffuse shortwave back reflectance
             if (NOT_SHADED(ShadeFlag)) {
-                TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff;
+                TransRefl = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
             } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
-                TransDiff = state.dataConstruction->Construct(ConstrNumSh).TransDiff;
+                TransRefl = state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack;
             } else if (ANY_BLIND(ShadeFlag)) {
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    TransDiff =
-                        General::Interp(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                                        state.dataConstruction->Construct(ConstrNumSh)
-                                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    // TransDiff =
+                    //     General::Interp(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                    //                     state.dataConstruction->Construct(ConstrNumSh)
+                    //                         .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                    //                     state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
+                    TransRefl = General::Interp(
+                        state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
+                        state.dataConstruction->Construct(ConstrNumSh)
+                            .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
+                        state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
-                    TransDiff = state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(1);
+                    TransRefl = state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(1);
                 }
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
-                TransDiff = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
-                                     state.dataConstruction->Construct(ConstrNum).TransDiff,
-                                     state.dataConstruction->Construct(ConstrNumSh).TransDiff);
+                TransRefl = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+                                     state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack,
+                                     state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack);
             }
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                TransDiff;
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
+                (1 - TransRefl);
+            state.dataSurface->SurfWinHeatGain(SurfNum) -=
+                (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
+                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);
 
             if (ANY_SHADE_SCREEN(ShadeFlag) || ANY_BLIND(ShadeFlag)) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =
@@ -7208,7 +7216,8 @@ namespace WindowManager {
                   "{}\n",
                   "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
                   "Convection Coefficient Adjustment Ratio,SHGC,"
-                  "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
+                  "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence,Diffuse Solar Transmittance, Diffuse Visible "
+                  "Transmittance, Diffuse Front Reflectance, Diffuse Back Reflectance");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7371,7 +7380,8 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
                         state.dataConstruction->Construct(ThisNum).SolTransNorm = TransSolNorm;
 
-                        static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr std::string_view Format_700(
+                            " WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7383,7 +7393,11 @@ namespace WindowManager {
                               state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
-                              TransVisNorm);
+                              TransVisNorm,
+                              state.dataConstruction->Construct(ThisNum).TransDiff,
+                              state.dataConstruction->Construct(ThisNum).TransDiffVis,
+                              state.dataConstruction->Construct(ThisNum).ReflectSolDiffFront,
+                              state.dataConstruction->Construct(ThisNum).ReflectSolDiffBack);
                     }
                     //    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
