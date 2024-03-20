@@ -362,6 +362,8 @@ namespace VariableSpeedCoils {
 
     void GetVarSpeedCoilInput(EnergyPlusData &state);
 
+    void checkVarSpeedCoilCoolCap(EnergyPlusData &state, std::string coilName, Real64 const highestSpeedCoolCap, Real64 &totalCoolCap);
+
     // Beginning Initialization Section of the Module
     //******************************************************************************
 

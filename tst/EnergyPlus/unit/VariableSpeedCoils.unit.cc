@@ -6963,4 +6963,57 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 0.0, 1e-3);
 }
 
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_checkVarSpeedCoilCoolCapTest)
+{
+    // Unit Test for fix that addresses Issue 10386
+
+    std::string coilName = "DXCoil1";
+    Real64 totalCoolingCapacity;
+    Real64 highestSpeedCoolingCapacity;
+    Real64 constexpr closeEnough = 0.00001;
+    Real64 expectedAnswer1;
+    Real64 expectedAnswer2;
+    std::string error_string;
+
+    // Test 1: both capacities zero or less
+    totalCoolingCapacity = 0.0;
+    highestSpeedCoolingCapacity = -1.0;
+    expectedAnswer1 = 0.0;
+    expectedAnswer2 = -1.0;
+    VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
+    error_string = delimited_string({
+        "   ** Warning ** Variable Speed DX Coil: zero cooling capacity and zero cooling capacity for highest speed",
+        "   **   ~~~   ** This occurs for Variable Speed DX Coil DXCoil1.",
+        "   **   ~~~   ** Ignore this warning if the DX Coil has no cooling capabilities.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Test 2: total capacity is zero but highest speed capacity is positive (this generated the infinite loop problem in the code)
+    totalCoolingCapacity = 0.0;
+    highestSpeedCoolingCapacity = 23.0;
+    expectedAnswer1 = 23.0;
+    expectedAnswer2 = 23.0;
+    VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
+    error_string = delimited_string({
+        "   ** Warning ** Variable Speed DX Coil: zero cooling capacity with a non-zero cooling capacity for highest speed",
+        "   **   ~~~   ** This occurs for Variable Speed DX Coil DXCoil1.",
+        "   **   ~~~   ** The cooling capacity was reset to the highest speed cooling capacity.",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    // Test 3: total capacity is positive so no changes
+    totalCoolingCapacity = 23.0;
+    highestSpeedCoolingCapacity = 22.0;
+    expectedAnswer1 = 23.0;
+    expectedAnswer2 = 22.0;
+    VariableSpeedCoils::checkVarSpeedCoilCoolCap(*state, coilName, highestSpeedCoolingCapacity, totalCoolingCapacity);
+    EXPECT_NEAR(highestSpeedCoolingCapacity, expectedAnswer2, closeEnough);
+    EXPECT_NEAR(totalCoolingCapacity, expectedAnswer1, closeEnough);
+    EXPECT_TRUE(compare_err_stream("", true));
+}
+
 } // namespace EnergyPlus
