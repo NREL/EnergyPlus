@@ -205,10 +205,9 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
 void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state,
                                                 const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
-                                                int useAlternateMode,
-                                                Real64 &PLR,
-                                                int &speedNum,
-                                                Real64 &speedRatio,
+                                                int const useAlternateMode,
+                                                int const speedNum,
+                                                Real64 const speedRatio,
                                                 int const fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
                                                 DataLoopNode::NodeData &condOutletNode,
@@ -234,8 +233,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         Real64 EnthalpyNorOut;
         Real64 modeRatio;
 
-        this->calculate(
-            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
         // this->OperatingMode = 1;
         CalcComponentSensibleLatentOutput(
@@ -248,7 +246,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
             this->wasteHeatRate = this->normalMode.OpModeWasteHeat;
         }
 
-        if ((PLR != 0.0) && (LoadSHR != 0.0)) {
+        if ((speedRatio != 0.0) && (LoadSHR != 0.0)) {
             if (totalCoolingRate == 0.0) {
                 SysNorSHR = 1.0;
             } else {
@@ -261,17 +259,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
 
             if (LoadSHR < SysNorSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(state,
-                                this->alternateMode,
-                                inletNode,
-                                outletNode,
-                                PLR,
-                                speedNum,
-                                speedRatio,
-                                fanOpMode,
-                                condInletNode,
-                                condOutletNode,
-                                singleMode);
+                this->calculate(
+                    state, this->alternateMode, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
                 CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
                                                   inletNode.Temp,
                                                   inletNode.HumRat,
@@ -287,7 +276,6 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                                     this->alternateMode2,
                                     inletNode,
                                     outletNode,
-                                    PLR,
                                     speedNum,
                                     speedRatio,
                                     fanOpMode,
@@ -348,14 +336,13 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         }
     } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
         this->calculate(
-            state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+            state, this->alternateMode, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 2;
         this->powerUse = this->alternateMode.OpModePower;
         this->RTF = this->alternateMode.OpModeRTF;
         this->wasteHeatRate = this->alternateMode.OpModeWasteHeat;
     } else {
-        this->calculate(
-            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 1;
         this->powerUse = this->normalMode.OpModePower;
         this->RTF = this->normalMode.OpModeRTF;
@@ -419,9 +406,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
                                                  CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
-                                                 Real64 &PLR,
-                                                 int &speedNum,
-                                                 Real64 &speedRatio,
+                                                 int const speedNum,
+                                                 Real64 const speedRatio,
                                                  int const fanOpMode,
                                                  DataLoopNode::NodeData &condInletNode,
                                                  DataLoopNode::NodeData &condOutletNode,
@@ -429,7 +415,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlus::EnergyPlusData &sta
 {
 
     // calculate the performance at this mode/speed
-    currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
+    currentMode.CalcOperatingMode(state, inletNode, outletNode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240(EnergyPlus::EnergyPlusData &state)

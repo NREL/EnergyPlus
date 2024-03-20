@@ -89,27 +89,27 @@ struct CoilCoolingDXCurveFitPerformance
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   int useAlternateMode,
-                  Real64 &PLR,
-                  int &speedNum,
-                  Real64 &speedRatio,
-                  int const fanOpMode,
+                  int speedNum,
+                  Real64 speedRatio,
+                  int fanOpMode,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
-                  bool const singleMode,
+                  bool singleMode,
                   Real64 LoadSHR = 0.0);
 
     void calculate(EnergyPlusData &state,
                    CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,
                    DataLoopNode::NodeData &outletNode,
-                   Real64 &PLR,
-                   int &speedNum,
-                   Real64 &speedRatio,
-                   int const fanOpMode,
+                   int speedNum,
+                   Real64 speedRatio,
+                   int fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode,
-                   bool const singleMode);
+                   bool singleMode);
+
     void calcStandardRatings210240(EnergyPlusData &state);
+
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name);

@@ -665,14 +665,15 @@ void CoilCoolingDX::size(EnergyPlusData &state)
 }
 
 void CoilCoolingDX::simulate(EnergyPlusData &state,
-                             int useAlternateMode,
-                             Real64 PLR,
-                             int speedNum,
-                             Real64 speedRatio,
+                             int const useAlternateMode,
+                             int const speedNum,
+                             Real64 const speedRatio,
                              int const fanOpMode,
                              bool const singleMode,
-                             Real64 LoadSHR)
+                             Real64 const LoadSHR)
 {
+    assert(speedNum != 0);
+
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit(state);
         this->myOneTimeInitFlag = false;
@@ -700,18 +701,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(state,
-                               evapInletNode,
-                               evapOutletNode,
-                               useAlternateMode,
-                               PLR,
-                               speedNum,
-                               speedRatio,
-                               fanOpMode,
-                               condInletNode,
-                               condOutletNode,
-                               singleMode,
-                               LoadSHR);
+    this->performance.simulate(
+        state, evapInletNode, evapOutletNode, useAlternateMode, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode, LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -788,7 +779,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->wasteHeatEnergyRate = this->performance.wasteHeatRate;
     this->wasteHeatEnergy = this->performance.wasteHeatRate * reportingConstant;
 
-    this->partLoadRatioReport = PLR;
+    this->partLoadRatioReport = speedNum > 1 ? 1.0 : speedRatio;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
@@ -855,10 +846,9 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             DataLoopNode::NodeData dummyEvapOutlet;
             DataLoopNode::NodeData dummyCondInlet;
             DataLoopNode::NodeData dummyCondOutlet;
-            Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
-            int dummyFanOpMode = 1.0;
+            int dummyFanOpMode = 1;
             bool dummySingleMode = false;
 
             Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
@@ -897,7 +887,6 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                        dummyEvapInlet,
                                        dummyEvapOutlet,
                                        false,
-                                       dummyPLR,
                                        dummySpeedNum,
                                        dummySpeedRatio,
                                        dummyFanOpMode,
