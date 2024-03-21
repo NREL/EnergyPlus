@@ -6731,10 +6731,6 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                   (AbsBlDiffBack * RGlDiffFront / (1.0 - RhoBlDiffBack * RGlDiffFront)) *
                                                       (RGlFront * TBlBmBm * RhoBlBack + TBlBmDiff);
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsShade * CosInc * SunLitFract * InOutProjSLFracMult;
-                                if (state.dataEnvrn->Month == 7 && state.dataEnvrn->DayOfMonth == 21 && state.dataGlobal->HourOfDay == 8) {
-                                    double tst = state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum);
-                                    tst = 0;
-                                }
                             } else if (ShadeFlag == WinShadingType::ExtScreen) {
                                 // Exterior screen on
                                 Real64 TScBmBm = state.dataMaterial->Screens(ScNum).BmBmTrans;    // Screen solar front beam-beam transmittance
