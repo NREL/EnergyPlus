@@ -117,6 +117,7 @@ namespace PoweredInductionUnits {
     {
         Invalid = -1,
         CoolerOff,
+        ConstantVolumeCool,
         CoolFirstStage,
         CoolSecondStage,
         Num

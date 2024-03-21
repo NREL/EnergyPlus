@@ -1579,6 +1579,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
                     thisPIU.PriAirMassFlow = min(max(thisPIU.PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                 }
                 thisPIU.SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.PriAirMassFlow);
+                if (QZnReq < 0) {
+                    thisPIU.coolingOperatingMode = CoolOpModeType::ConstantVolumeCool;
+                }
             } else if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
                 CalcVariableSpeedPIUCoolingBehavior(state, PIUNum, ZoneNode, QZnReq, QToHeatSetPt, PriAirMassFlowMin, PriAirMassFlowMax);
             }
@@ -1802,8 +1805,8 @@ void CalcParallelPIU(EnergyPlusData &state,
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
     Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
-    thisPIU.heatingOperatingMode == HeatOpModeType::HeaterOff;
-    thisPIU.coolingOperatingMode == CoolOpModeType::CoolerOff;
+    thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
+    thisPIU.coolingOperatingMode = CoolOpModeType::CoolerOff;
 
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
@@ -1924,6 +1927,17 @@ void CalcParallelPIU(EnergyPlusData &state,
                      min(-SmallTempDiff, (state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
                 thisPIU.PriAirMassFlow = min(max(thisPIU.PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                 thisPIU.SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
+            }
+            if (QZnReq < 0) {
+                if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
+                    if (thisPIU.PriAirMassFlow == PriAirMassFlowMax) {
+                        thisPIU.coolingOperatingMode = CoolOpModeType::CoolSecondStage;
+                    } else {
+                        thisPIU.coolingOperatingMode = CoolOpModeType::CoolFirstStage;
+                    }
+                } else {
+                    thisPIU.coolingOperatingMode = CoolOpModeType::ConstantVolumeCool;
+                }
             }
         }
     } else {
@@ -2101,40 +2115,40 @@ void ReportCurOperatingControlStage(EnergyPlusData &state, int const piuNum, boo
 
     if (!unitOn) {
         state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = off;
-    }
-    if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::ConstantSpeedFan) {
-        if (heaterMode != HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeHeating;
-        } else if (coolingMode != CoolOpModeType::CoolerOff && heaterMode == HeatOpModeType::HeaterOff) {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeCooling;
-        } else {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
-        }
-    }
-    if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::VariableSpeedFan) {
-        if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
-            if (heaterMode == HeatOpModeType::StagedHeatFirstStage) {
-                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatFirstStageHeating;
-            } else if (heaterMode == HeatOpModeType::StagedHeatSecondStage) {
-                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatSecondStageHeating;
-            }
-        } else if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
-            if (heaterMode == HeatOpModeType::ModulatedHeatFirstStage) {
-                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatFirstStageHeating;
-            } else if (heaterMode == HeatOpModeType::ModulatedHeatSecondStage) {
-                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatSecondStageHeating;
-            } else if (heaterMode == HeatOpModeType::ModulatedHeatThirdStage) {
-                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatThirdStageHeating;
+    } else {
+        if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::ConstantSpeedFan) {
+            if (heaterMode != HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeHeating;
+            } else if (coolingMode != CoolOpModeType::CoolerOff && heaterMode == HeatOpModeType::HeaterOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = constantVolumeCooling;
+            } else {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
             }
         }
-        if (coolingMode == CoolOpModeType::CoolFirstStage) {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedFirstStageCooling;
-        }
-        if (coolingMode == CoolOpModeType::CoolSecondStage) {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedSecondStageCooling;
-        }
-        if (heaterMode == HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
-            state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
+        if (state.dataPowerInductionUnits->PIU(piuNum).fanControlType == FanCntrlType::VariableSpeedFan) {
+            if (heaterMode != HeatOpModeType::HeaterOff) {
+                if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::StagedHeaterBehavior) {
+                    if (heaterMode == HeatOpModeType::StagedHeatFirstStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatFirstStageHeating;
+                    } else if (heaterMode == HeatOpModeType::StagedHeatSecondStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedStagedHeatSecondStageHeating;
+                    }
+                } else if (state.dataPowerInductionUnits->PIU(piuNum).heatingControlType == HeatCntrlBehaviorType::ModulatedHeaterBehavior) {
+                    if (heaterMode == HeatOpModeType::ModulatedHeatFirstStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatFirstStageHeating;
+                    } else if (heaterMode == HeatOpModeType::ModulatedHeatSecondStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatSecondStageHeating;
+                    } else if (heaterMode == HeatOpModeType::ModulatedHeatThirdStage) {
+                        state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedModulatedHeatThirdStageHeating;
+                    }
+                }
+            } else if (coolingMode == CoolOpModeType::CoolFirstStage) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedFirstStageCooling;
+            } else if (coolingMode == CoolOpModeType::CoolSecondStage) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = variableSpeedSecondStageCooling;
+            } else if (heaterMode == HeatOpModeType::HeaterOff && coolingMode == CoolOpModeType::CoolerOff) {
+                state.dataPowerInductionUnits->PIU(piuNum).CurOperationControlStage = deadband;
+            }
         }
     }
 }

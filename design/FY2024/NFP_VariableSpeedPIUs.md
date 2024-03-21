@@ -163,7 +163,7 @@ This field reports the drybulb temperature of the air leaving the terminal and d
 
 \paragraph{Zone Air Terminal Current Operation Control Stage}
 
-This field reports the current control stage when using variable speed fan.  The controller diagrams above show the different stages.  This output helps to monitor what control stage the air terminal is in at a given time.  The output itself is an integer value that is mapped to a stage in the following list.  Note that the frequency of reporting needs to be at the highest level because averaging integers across more than one system timestep makes them meaningless. 
+This field reports the current control stage of a PIU terminal. The controller diagrams above show the different stages.  This output helps to monitor what control stage the air terminal is in at a given time.  The output itself is an integer value that is mapped to a stage in the following list.  Note that the frequency of reporting needs to be at the highest level because averaging integers across more than one system timestep makes them meaningless. 
 
 \begin{itemize}
 \item
