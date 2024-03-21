@@ -7216,8 +7216,7 @@ namespace WindowManager {
                   "{}\n",
                   "! <WindowConstruction>,Construction Name,Index,#Layers,Roughness,Conductance {W/m2-K},Conductance (Before Adjusted) {W/m2-K},"
                   "Convection Coefficient Adjustment Ratio,SHGC,"
-                  "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence,Diffuse Solar Transmittance, Diffuse Visible "
-                  "Transmittance, Diffuse Front Reflectance, Diffuse Back Reflectance");
+                  "Solar Transmittance at Normal Incidence,Visible Transmittance at Normal Incidence");
             if ((state.dataHeatBal->TotSimpleWindow > 0) || (state.dataHeatBal->W5GlsMat > 0) || (state.dataHeatBal->W5GlsMatAlt > 0))
                 print(state.files.eio,
                       "{}\n",
@@ -7380,8 +7379,7 @@ namespace WindowManager {
                         state.dataConstruction->Construct(ThisNum).VisTransNorm = TransVisNorm;
                         state.dataConstruction->Construct(ThisNum).SolTransNorm = TransSolNorm;
 
-                        static constexpr std::string_view Format_700(
-                            " WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                        static constexpr std::string_view Format_700(" WindowConstruction,{},{},{},{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                         print(state.files.eio,
                               Format_700,
                               state.dataConstruction->Construct(ThisNum).Name,
@@ -7393,11 +7391,7 @@ namespace WindowManager {
                               state.dataHeatBal->CoeffAdjRatio(ThisNum),
                               SHGCSummer,
                               TransSolNorm,
-                              TransVisNorm,
-                              state.dataConstruction->Construct(ThisNum).TransDiff,
-                              state.dataConstruction->Construct(ThisNum).TransDiffVis,
-                              state.dataConstruction->Construct(ThisNum).ReflectSolDiffFront,
-                              state.dataConstruction->Construct(ThisNum).ReflectSolDiffBack);
+                              TransVisNorm);
                     }
                     //    Write(OutputFileConstrainParams, 705)  TRIM(Construct(ThisNum)%Name), SHGCSummer ,TransVisNorm
 
