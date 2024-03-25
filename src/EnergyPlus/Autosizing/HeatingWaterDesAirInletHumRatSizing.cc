@@ -63,7 +63,7 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(EnergyPlusData &state, Real64 _o
             this->autoSizedValue = _originalValue;
         } else {
             if (this->termUnitPIU && (this->curTermUnitSizingNum > 0)) {
-                Real64 MinFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinFlowFrac;
+                Real64 MinFlowFrac = this->termUnitSizing(this->curTermUnitSizingNum).MinPriFlowFrac;
                 this->autoSizedValue = this->termUnitFinalZoneSizing(this->curTermUnitSizingNum).DesHeatCoilInHumRatTU * MinFlowFrac +
                                        this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtHeatPeak * (1.0 - MinFlowFrac);
             } else if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {

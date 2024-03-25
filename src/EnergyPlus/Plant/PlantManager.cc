@@ -3050,16 +3050,6 @@ void SizePlantLoop(EnergyPlusData &state,
                     state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).PumpSizFac = PlantSizFac;
                 }
             }
-
-        } else {
-            // fill PlantSizFac from data structure
-            //                    for (BranchNum = 1;
-            //                         BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).TotalBranches; ++BranchNum) {
-            //                        if (PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).NodeNumIn ==
-            //                            PlantLoop(LoopNum).LoopSide(LoopSideLocation::Supply).Branch(BranchNum).NodeNumIn) {
-            //                            break;
-            //                        }
-            //                    }
         }
 
         // sum up contributions from CompDesWaterFlow, demand side size request (non-coincident)
