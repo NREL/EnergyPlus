@@ -1304,7 +1304,6 @@ namespace DataHeatBalance {
     struct GenericComponentZoneIntGainStruct
     {
         // Members
-        std::string CompObjectType;                   // device object class name
         std::string CompObjectName;                   // device user unique name
         IntGainType CompType = IntGainType::Invalid;  // type of internal gain device identifier
         Real64 spaceGainFrac = 1.0;                   // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
