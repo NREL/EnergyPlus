@@ -557,6 +557,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchIntFenVisTr = 0;
     int pdchIntFenParent = 0;
 
+    int pdstOpqConsLayers = 0;
+    std::vector<int> pdchOpqConsLayCol;
+
     // Shading Report
     int pdrShading = 0;
     int pdstSunlitFrac = 0;

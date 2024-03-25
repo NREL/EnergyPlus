@@ -215,6 +215,19 @@ namespace OutputReportPredefined {
         s->pdchIntDrGrArea = newPreDefColumn(state, s->pdstIntDoor, "Gross Area [m2]");
         s->pdchIntDrParent = newPreDefColumn(state, s->pdstIntDoor, "Parent Surface");
 
+        s->pdstOpqConsLayers = newPreDefSubTable(state, s->pdrEnvelope, "Opaque Construction Layers");
+
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 1"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 2"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 3"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 4"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 5"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 6"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 7"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 8"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 9"));
+        s->pdchOpqConsLayCol.push_back(newPreDefColumn(state, s->pdstOpqConsLayers, "Layer 10"));
+
         // Shading Report
         s->pdrShading = newPreDefReport(state, "ShadingSummary", "Shade", "Shading Summary");
 
