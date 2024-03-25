@@ -482,6 +482,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdrEnvelope = 0;
     int pdstOpaque = 0;
     int pdchOpCons = 0;
+    int pdchOpZone = 0; 
     int pdchOpRefl = 0;
     int pdchOpUfactFilm = 0;
     int pdchOpUfactNoFilm = 0;
@@ -492,6 +493,8 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchOpDir = 0;
     int pdstIntOpaque = 0;
     int pdchIntOpCons = 0;
+    int pdchIntOpZone = 0;
+    int pdchIntOpAdjSurf = 0;
     int pdchIntOpRefl = 0;
     int pdchIntOpUfactFilm = 0;
     int pdchIntOpUfactNoFilm = 0;
