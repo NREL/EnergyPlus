@@ -888,6 +888,14 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchULnotMetHeatOcc = 0;
     int pdchULnotMetCoolOcc = 0;
 
+    int pdstStatSchd = 0;
+    int pdchStatName = 0;
+    int pdchStatCtrlTypeSchd = 0;
+    int pdchStatSchdType1 = 0;
+    int pdchStatSchdTypeName1 = 0;
+    int pdchStatSchdHeatName = 0;
+    int pdchStatSchdCoolName = 0;
+
     // HVAC Topology
     int pdrTopology = 0;
 

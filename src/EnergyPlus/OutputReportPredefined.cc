@@ -925,6 +925,14 @@ namespace OutputReportPredefined {
         s->pdchULnotMetHeatOcc = newPreDefColumn(state, s->pdstUnmetLoads, "During Occupied Heating [hr]");
         s->pdchULnotMetCoolOcc = newPreDefColumn(state, s->pdstUnmetLoads, "During Occupied Cooling [hr]");
 
+        s->pdstStatSchd = newPreDefSubTable(state, s->pdrSystem, "Thermostat Schedules");
+        s->pdchStatName = newPreDefColumn(state, s->pdstStatSchd, "Thermostat Name 1");
+        s->pdchStatCtrlTypeSchd = newPreDefColumn(state, s->pdstStatSchd, "Control Type Schedule");
+        s->pdchStatSchdType1 = newPreDefColumn(state, s->pdstStatSchd, "Control Type");
+        s->pdchStatSchdTypeName1 = newPreDefColumn(state, s->pdstStatSchd, "Control Type Name");
+        s->pdchStatSchdHeatName = newPreDefColumn(state, s->pdstStatSchd, "Heating Schedule");
+        s->pdchStatSchdCoolName = newPreDefColumn(state, s->pdstStatSchd, "Cooling Schedule");
+
         // HVAC Topology Report
         s->pdrTopology = newPreDefReport(state, "HVACTopology", "Top", "HVAC Topology");
 

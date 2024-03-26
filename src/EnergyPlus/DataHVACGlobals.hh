@@ -112,6 +112,9 @@ namespace DataHVACGlobals {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(ThermostatType::Num)> thermostatTypeNames = {
+        "Uncontrolled", "SingleHeating", "SingleCooling", "SingleHeatCool", "DualSetPointWithDeadBand"};
+
     enum class AirDuctType
     // parameters describing air duct type
     {

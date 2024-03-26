@@ -6899,6 +6899,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     }
     // fill the LEED setpoint table
     ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
+    ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSchedules(state);
 }
 
 void WriteMonthlyTables(EnergyPlusData &state)
