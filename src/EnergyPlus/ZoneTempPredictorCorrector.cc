@@ -7070,39 +7070,30 @@ void FillPredefinedTableOnThermostatSchedules(EnergyPlusData &state)
         PreDefTableEntry(state, orp->pdchStatName, tcz.ZoneName, tcz.Name);
         PreDefTableEntry(state, orp->pdchStatCtrlTypeSchd, tcz.ZoneName, tcz.ControlTypeSchedName);
         for (int ctInx = 1; ctInx <= tcz.NumControlTypes; ++ctInx) {
-            PreDefTableEntry(state, orp->pdchStatSchdType1,
-                             tcz.ZoneName, DataHVACGlobals::thermostatTypeNames[(int)tcz.ControlTypeEnum(ctInx)]);
+            PreDefTableEntry(state, orp->pdchStatSchdType1, tcz.ZoneName, DataHVACGlobals::thermostatTypeNames[(int)tcz.ControlTypeEnum(ctInx)]);
             PreDefTableEntry(state, orp->pdchStatSchdTypeName1, tcz.ZoneName, tcz.ControlTypeName(1));
             switch (tcz.ControlTypeEnum(ctInx)) {
-                case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
-                    PreDefTableEntry(state,
-                                     orp->pdchStatSchdHeatName,
-                                     tcz.ZoneName,
-                                     ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandHeat));
-                    PreDefTableEntry(state,
-                                     orp->pdchStatSchdCoolName,
-                                     tcz.ZoneName,
-                                     ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandCool));
-                    break;
-                case DataHVACGlobals::ThermostatType::SingleHeatCool:
-                    PreDefTableEntry(state,
-                                     orp->pdchStatSchdHeatName,
-                                     tcz.ZoneName,
-                                     ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
-                    PreDefTableEntry(state,
-                                     orp->pdchStatSchdCoolName,
-                                     tcz.ZoneName,
-                                     ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
-                    break; 
-                case DataHVACGlobals::ThermostatType::SingleCooling:
-                    PreDefTableEntry(
-                        state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleCoolSetPoint));
-                    break; 
-                case DataHVACGlobals::ThermostatType::SingleHeating:
-                    PreDefTableEntry(
-                        state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatSetPoint));
-                    break;
-                }
+            case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandHeat));
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_DualSetPointWDeadBandCool));
+                break;
+            case DataHVACGlobals::ThermostatType::SingleHeatCool:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatCoolSetPoint));
+                break;
+            case DataHVACGlobals::ThermostatType::SingleCooling:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdHeatName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleCoolSetPoint));
+                break;
+            case DataHVACGlobals::ThermostatType::SingleHeating:
+                PreDefTableEntry(
+                    state, orp->pdchStatSchdCoolName, tcz.ZoneName, ScheduleManager::GetScheduleName(state, tcz.SchIndx_SingleHeatSetPoint));
+                break;
+            }
         }
     }
 }
