@@ -139,6 +139,7 @@ namespace HVACSingleDuctInduc {
         }
         void ReportIndUnit(EnergyPlusData &state);
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimIndUnit(EnergyPlusData &state,

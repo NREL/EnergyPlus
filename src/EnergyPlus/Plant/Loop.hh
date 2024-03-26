@@ -68,6 +68,8 @@ namespace DataPlant {
         Num
     };
 
+    constexpr std::array<std::string_view, (int)LoopType::Num> loopTypeNames = {"PlantLoop", "CondenserLoop", "Both"};
+
     struct HalfLoopContainer : std::array<HalfLoopData, static_cast<int>(DataPlant::LoopSideLocation::Num)>
     {
         HalfLoopData &operator()(LoopSideLocation ls)

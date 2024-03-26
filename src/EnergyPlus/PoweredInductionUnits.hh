@@ -163,6 +163,8 @@ namespace PoweredInductionUnits {
         }
 
         void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
+
+        void reportTerminalUnit(EnergyPlusData &state);
     };
 
     void SimPIU(EnergyPlusData &state,

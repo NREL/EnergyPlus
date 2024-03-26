@@ -124,6 +124,9 @@ namespace DataHVACGlobals {
         Num
     };
 
+    static constexpr std::array<std::string_view, static_cast<int>(AirDuctType::Num)> airDuctTypeNames = {
+        "Main", "Cooling", "Heating", "Other", "Return Air Bypass"};
+
     int constexpr Cooling(2);
     int constexpr Heating(3);
 
