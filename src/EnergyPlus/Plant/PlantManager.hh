@@ -90,12 +90,19 @@ namespace PlantManager {
     //                          const std::string_view &fluidName,
     //                          const int reportOffset);
 
-    void fillPlantToplogySplitterMixerRow2(EnergyPlusData &state,
+    void fillPlantToplogySplitterRow2(EnergyPlusData &state,
                                            const std::string_view &loopType,
                                            const std::string_view &loopName,
                                            const std::string_view &side,
-                                           const std::string_view &splitterMixerName,
+                                           const std::string_view &splitterName,
                                            int &rowCounter);
+
+    void fillPlantToplogyMixerRow2(EnergyPlusData &state,
+                                      const std::string_view &loopType,
+                                      const std::string_view &loopName,
+                                      const std::string_view &side,
+                                      const std::string_view &mixerName,
+                                      int &rowCounter);
 
     void fillPlantToplogyComponentRow2(EnergyPlusData &state,
                                        const std::string_view &loopType,

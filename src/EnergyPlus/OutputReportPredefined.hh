@@ -922,10 +922,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopPlantLoopType2 = 0;
     int pdchTopPlantLoopName2 = 0;
     int pdchTopPlantSide2 = 0;
-    int pdchTopPlantSplitMixName2 = 0;
+    int pdchTopPlantSplitName2 = 0;
     int pdchTopPlantBranchName2 = 0;
     int pdchTopPlantCompType2 = 0;
     int pdchTopPlantCompName2 = 0;
+    int pdchTopPlantMixName2 = 0;
 
     // Outdoor Air Report
     int pdrOutsideAir = 0;
