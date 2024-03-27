@@ -1129,22 +1129,22 @@ void SetupCommonPipes(EnergyPlusData &state)
                                 "Plant Common Pipe Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisCommonPipe.Flow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Temperature",
                                 Constant::Units::C,
                                 thisCommonPipe.Temp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Flow Direction Status",
                                 Constant::Units::None,
                                 thisCommonPipe.FlowDir,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
 
             if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
@@ -1161,29 +1161,29 @@ void SetupCommonPipes(EnergyPlusData &state)
                                 "Plant Common Pipe Primary Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisCommonPipe.PriCPLegFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Secondary Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisCommonPipe.SecCPLegFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Primary to Secondary Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisCommonPipe.PriToSecFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Secondary to Primary Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 thisCommonPipe.SecToPriFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
 
             // check type of pump on supply side inlet

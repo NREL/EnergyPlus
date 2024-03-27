@@ -2708,8 +2708,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
     int VariableNum(0); // temporary
     int RuntimeReportVarNum;
     bool Found;
-    OutputProcessor::SOVTimeStepType sovTimeStepType; // temporary
-    OutputProcessor::SOVStoreType sovStoreType;       // temporary
+    OutputProcessor::TimeStepType sovTimeStepType; // temporary
+    OutputProcessor::StoreType sovStoreType;       // temporary
     std::string EndUseSubCatString;
 
     int TrendNum;
@@ -3350,9 +3350,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 if (cAlphaArgs(3) == "AVERAGED") {
-                    sovStoreType = OutputProcessor::SOVStoreType::Average;
+                    sovStoreType = OutputProcessor::StoreType::Average;
                 } else if (cAlphaArgs(3) == "SUMMED") {
-                    sovStoreType = OutputProcessor::SOVStoreType::Summed;
+                    sovStoreType = OutputProcessor::StoreType::Sum;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
@@ -3361,9 +3361,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 if (cAlphaArgs(4) == "ZONETIMESTEP") {
-                    sovTimeStepType = OutputProcessor::SOVTimeStepType::Zone;
+                    sovTimeStepType = OutputProcessor::TimeStepType::Zone;
                 } else if (cAlphaArgs(4) == "SYSTEMTIMESTEP") {
-                    sovTimeStepType = OutputProcessor::SOVTimeStepType::System;
+                    sovTimeStepType = OutputProcessor::TimeStepType::System;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
@@ -3388,13 +3388,14 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         Constant::eResource::Invalid,
-                                        OutputProcessor::SOVEndUseCat::Invalid,
-                                        {}, // EndUseSub
-                                        OutputProcessor::SOVGroup::Invalid,
-                                        {}, // Zone
-                                        1,
-                                        1,
-                                        -999,
+                                        OutputProcessor::Group::Invalid,
+                                        OutputProcessor::EndUseCat::Invalid,
+                                        "",   // EndUseSubCat
+                                        "",   // ZoneName
+                                        1,    // ZoneMult
+                                        1,    // ZoneListMult
+                                        "",   // SpaceType
+                                        -999, // indexGroupKey
                                         UnitsB);
                 }
                 // Last field is index key, no indexing here so mimic weather output data
@@ -3520,12 +3521,12 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                     state.dataRuntimeLangProcessor->RuntimeReportVar(RuntimeReportVarNum).VariableNum = VariableNum;
                 }
 
-                sovStoreType = OutputProcessor::SOVStoreType::Summed; // all metered vars are sum type
+                sovStoreType = OutputProcessor::StoreType::Sum; // all metered vars are sum type
 
                 if (cAlphaArgs(3) == "ZONETIMESTEP") {
-                    sovTimeStepType = OutputProcessor::SOVTimeStepType::Zone;
+                    sovTimeStepType = OutputProcessor::TimeStepType::Zone;
                 } else if (cAlphaArgs(3) == "SYSTEMTIMESTEP") {
-                    sovTimeStepType = OutputProcessor::SOVTimeStepType::System;
+                    sovTimeStepType = OutputProcessor::TimeStepType::System;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(4), cAlphaArgs(4)));
@@ -3544,16 +3545,16 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // Group Type
-                OutputProcessor::SOVGroup sovGroup;
+                OutputProcessor::Group sovGroup;
 
                 if (cAlphaArgs(6) == "BUILDING") {
-                    sovGroup = OutputProcessor::SOVGroup::Building;
+                    sovGroup = OutputProcessor::Group::Building;
                 } else if (cAlphaArgs(6) == "HVAC") {
-                    sovGroup = OutputProcessor::SOVGroup::HVAC;
+                    sovGroup = OutputProcessor::Group::HVAC;
                 } else if (cAlphaArgs(6) == "PLANT") {
-                    sovGroup = OutputProcessor::SOVGroup::Plant;
+                    sovGroup = OutputProcessor::Group::Plant;
                 } else if (cAlphaArgs(6) == "SYSTEM") {
-                    sovGroup = OutputProcessor::SOVGroup::HVAC;
+                    sovGroup = OutputProcessor::Group::HVAC;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(6), cAlphaArgs(6)));
@@ -3561,50 +3562,50 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 }
 
                 // End Use Type
-                OutputProcessor::SOVEndUseCat sovEndUseCat;
+                OutputProcessor::EndUseCat sovEndUseCat;
 
                 if (cAlphaArgs(7) == "HEATING") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Heating;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Heating;
                 } else if (cAlphaArgs(7) == "COOLING") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Cooling;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Cooling;
                 } else if (cAlphaArgs(7) == "INTERIORLIGHTS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::InteriorLights;
+                    sovEndUseCat = OutputProcessor::EndUseCat::InteriorLights;
                 } else if (cAlphaArgs(7) == "EXTERIORLIGHTS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::ExteriorLights;
+                    sovEndUseCat = OutputProcessor::EndUseCat::ExteriorLights;
                 } else if (cAlphaArgs(7) == "INTERIOREQUIPMENT") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::InteriorEquipment;
+                    sovEndUseCat = OutputProcessor::EndUseCat::InteriorEquipment;
                 } else if (cAlphaArgs(7) == "EXTERIOREQUIPMENT") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::ExteriorEquipment;
+                    sovEndUseCat = OutputProcessor::EndUseCat::ExteriorEquipment;
                 } else if (cAlphaArgs(7) == "FANS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Fans;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Fans;
                 } else if (cAlphaArgs(7) == "PUMPS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Pumps;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Pumps;
                 } else if (cAlphaArgs(7) == "HEATREJECTION") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRejection;
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRejection;
                 } else if (cAlphaArgs(7) == "HUMIDIFIER") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Humidification;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Humidification;
                 } else if (cAlphaArgs(7) == "HEATRECOVERY") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecovery;
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecovery;
                 } else if (cAlphaArgs(7) == "WATERSYSTEMS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::WaterSystem;
+                    sovEndUseCat = OutputProcessor::EndUseCat::WaterSystem;
                 } else if (cAlphaArgs(7) == "REFRIGERATION") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Refrigeration;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Refrigeration;
                 } else if (cAlphaArgs(7) == "ONSITEGENERATION") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Cogeneration;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Cogeneration;
                 } else if (cAlphaArgs(7) == "HEATINGCOILS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatingCoils;
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatingCoils;
                 } else if (cAlphaArgs(7) == "COOLINGCOILS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::CoolingCoils;
+                    sovEndUseCat = OutputProcessor::EndUseCat::CoolingCoils;
                 } else if (cAlphaArgs(7) == "CHILLERS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Chillers;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Chillers;
                 } else if (cAlphaArgs(7) == "BOILERS") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Boilers;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Boilers;
                 } else if (cAlphaArgs(7) == "BASEBOARD") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::Baseboard;
+                    sovEndUseCat = OutputProcessor::EndUseCat::Baseboard;
                 } else if (cAlphaArgs(7) == "HEATRECOVERYFORCOOLING") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling;
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecoveryForCooling;
                 } else if (cAlphaArgs(7) == "HEATRECOVERYFORHEATING") {
-                    sovEndUseCat = OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating;
+                    sovEndUseCat = OutputProcessor::EndUseCat::HeatRecoveryForHeating;
                 } else {
                     ShowSevereError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state, format("Invalid {}={}", cAlphaFieldNames(7), cAlphaArgs(7)));
@@ -3613,11 +3614,10 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
 
                 // Additional End Use Types Only Used for EnergyTransfer
                 if ((resource != Constant::eResource::EnergyTransfer) &&
-                    (sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Chillers || sovEndUseCat == OutputProcessor::SOVEndUseCat::Boilers ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::Baseboard ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling ||
-                     sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating)) {
+                    (sovEndUseCat == OutputProcessor::EndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::EndUseCat::CoolingCoils ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::Chillers || sovEndUseCat == OutputProcessor::EndUseCat::Boilers ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::Baseboard || sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state,
                                       format("Invalid {}={} for {}={}", cAlphaFieldNames(5), cAlphaArgs(5), cAlphaFieldNames(7), cAlphaArgs(7)));
@@ -3636,9 +3636,9 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         resource,
+                                        sovGroup,
                                         sovEndUseCat,
-                                        EndUseSubCatString,
-                                        sovGroup);
+                                        EndUseSubCatString);
                 } else { // no subcat
                     SetupOutputVariable(state,
                                         cAlphaArgs(1),
@@ -3648,9 +3648,8 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         sovStoreType,
                                         "EMS",
                                         resource,
-                                        sovEndUseCat,
-                                        {},
-                                        sovGroup);
+                                        sovGroup,
+                                        sovEndUseCat);
                 }
             }
         } // NumEMSMeteredOutputVariables > 0

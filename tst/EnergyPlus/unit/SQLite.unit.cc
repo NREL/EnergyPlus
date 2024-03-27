@@ -239,14 +239,14 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     auto &sql = state->dataSQLiteProcedures->sqlite;
     sql->sqliteBegin();
     sql->createSQLiteReportDictionaryRecord(
-        1, StoreType::Averaged, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
+        1, StoreType::Average, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
     sql->createSQLiteReportDictionaryRecord(
-        2, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Hour, true);
+        2, StoreType::Sum, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Hour, true);
     sql->createSQLiteReportDictionaryRecord(
-        3, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Month, true);
-    sql->createSQLiteReportDictionaryRecord(4, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false);
+        3, StoreType::Sum, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Month, true);
+    sql->createSQLiteReportDictionaryRecord(4, StoreType::Average, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false);
     sql->createSQLiteReportDictionaryRecord(
-        5, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false, "test schedule");
+        5, StoreType::Average, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Hour, false, "test schedule");
     auto result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     sql->sqliteCommit();
 
@@ -267,10 +267,10 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDictionaryRecord)
     sql->createSQLiteReportDictionaryRecord(
         6, StoreType::Invalid, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
     sql->createSQLiteReportDictionaryRecord(
-        7, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Invalid, "J", ReportFreq::Hour, true);
+        7, StoreType::Sum, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Invalid, "J", ReportFreq::Hour, true);
     sql->createSQLiteReportDictionaryRecord(
-        8, StoreType::Summed, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Invalid, true);
-    sql->createSQLiteReportDictionaryRecord(9, StoreType::Averaged, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Invalid, false);
+        8, StoreType::Sum, "Facility:Electricity", "", "Facility:Electricity", TimeStepType::Zone, "J", ReportFreq::Invalid, true);
+    sql->createSQLiteReportDictionaryRecord(9, StoreType::Average, "HVAC", "", "AHU-1", TimeStepType::System, "", ReportFreq::Invalid, false);
     result = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
     sql->sqliteCommit();
 
@@ -413,7 +413,7 @@ TEST_F(SQLiteFixture, SQLiteProcedures_createSQLiteReportDataRecord)
     sql->sqliteBegin();
     sql->createSQLiteTimeIndexRecord(ReportFreq::Simulation, 1, 1, 0, 2017, false);
     sql->createSQLiteReportDictionaryRecord(
-        1, StoreType::Averaged, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
+        1, StoreType::Average, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", TimeStepType::Zone, "C", ReportFreq::Hour, false);
     sql->createSQLiteReportDataRecord(1, 999.9);
     sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::Day, 0, 1310459, 100, 7031530, 15);
     sql->createSQLiteReportDataRecord(1, 999.9, ReportFreq::TimeStep, 0, 1310459, 100, 7031530, 15);

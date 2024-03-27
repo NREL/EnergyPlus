@@ -415,29 +415,29 @@ namespace ZoneAirLoopEquipmentManager {
                                     "Zone Air Terminal Sensible Heating Energy",
                                     Constant::Units::J,
                                     airDistUnit.HeatGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Energy",
                                     Constant::Units::J,
                                     airDistUnit.CoolGain,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Heating Rate",
                                     Constant::Units::W,
                                     airDistUnit.HeatRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     airDistUnit.Name);
                 SetupOutputVariable(state,
                                     "Zone Air Terminal Sensible Cooling Rate",
                                     Constant::Units::W,
                                     airDistUnit.CoolRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     airDistUnit.Name);
             }
         }

@@ -372,7 +372,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     // noAggregation, valueWhenMaxMin, sumOrAverageHoursShown,     maximumDuringHoursShown, minimumDuringHoursShown:
                     switch (fldStIt->m_aggregate) {
                     case AnnualFieldSet::AggregationKind::sumOrAvg:
-                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                             newResultValue = oldResultValue + curValue;
                         } else {
                             newResultValue = oldResultValue + curValue * elapsedTime; // for averaging - weight by elapsed time
@@ -382,7 +382,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                         break;
                     case AnnualFieldSet::AggregationKind::maximum:
                         // per MJW when a summed variable is used divide it by the length of the time step
-                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                             curValue /= secondsInTimeStep;
                         }
                         if (curValue > oldResultValue) {
@@ -396,7 +396,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                         break;
                     case AnnualFieldSet::AggregationKind::minimum:
                         // per MJW when a summed variable is used divide it by the length of the time step
-                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                             curValue /= secondsInTimeStep;
                         }
                         if (curValue < oldResultValue) {
@@ -469,7 +469,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev:
                     case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev:
                         //  for all of the binning options add the value to the deferred
-                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) {                  // if it is a summed variable
+                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) {                     // if it is a summed variable
                             fldStIt->m_cell[row].deferredResults.push_back(curValue /= secondsInTimeStep); // divide by time just like max and min
                         } else {
                             fldStIt->m_cell[row].deferredResults.push_back(curValue);
@@ -513,7 +513,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                 if (scanVarNum > -1) {
                                     Real64 scanValue = GetInternalVariableValue(state, scanTypeOfVar, scanVarNum);
                                     // When a summed variable is used divide it by the length of the time step
-                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                         scanValue /= secondsInTimeStep;
                                     }
                                     fldStRemainIt->m_cell[row].result = scanValue;
@@ -542,7 +542,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                     // end scanning since these might reset
                                     break; // for fldStRemainIt
                                 } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::sumOrAverageHoursShown) {
-                                    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                         fldStRemainIt->m_cell[row].result = oldScanValue + scanValue;
                                     } else {
                                         fldStRemainIt->m_cell[row].result =
@@ -550,7 +550,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                     }
                                     fldStRemainIt->m_cell[row].duration += elapsedTime;
                                 } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::minimumDuringHoursShown) {
-                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                         scanValue /= secondsInTimeStep;
                                     }
                                     if (scanValue < oldScanValue) {
@@ -558,7 +558,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                                         fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                     }
                                 } else if (fldStRemainIt->m_aggregate == AnnualFieldSet::AggregationKind::maximumDuringHoursShown) {
-                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+                                    if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                                         scanValue /= secondsInTimeStep;
                                     }
                                     if (scanValue > oldScanValue) {
@@ -751,7 +751,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
 
             for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
                 if (fldStIt->m_cell[row].indexesForKeyVar >= 0) {
-                    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+                    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Average) { // if it is a average variable divide by duration
                         if (fldStIt->m_cell[row].duration != 0.0) {
                             curVal = ((fldStIt->m_cell[row].result / fldStIt->m_cell[row].duration) * curConversionFactor) + curConversionOffset;
                         } else {
@@ -772,7 +772,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
 
             } // row
             // add the summary to bottom
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Averaged) { // if it is a average variable divide by duration
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Average) { // if it is a average variable divide by duration
                 if (sumDuration > 0) {
                     tableBody(columnRecount, rowSumAvg) = OutputReportTabular::RealToStr(sumVal / sumDuration, fldStIt->m_showDigits);
                 } else {
@@ -812,7 +812,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
                 tableBody(columnRecount, rowMin) = OutputReportTabular::RealToStr(maxVal, fldStIt->m_showDigits);
             }
         } else if (curAgg == AnnualFieldSet::AggregationKind::valueWhenMaxMin) {
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) {
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) {
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
@@ -837,7 +837,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
                    (curAgg == AnnualFieldSet::AggregationKind::maximumDuringHoursShown) ||
                    (curAgg == AnnualFieldSet::AggregationKind::minimumDuringHoursShown)) {
             // put in the name of the variable for the column
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
@@ -879,7 +879,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
             }
         } else if (curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToMax) {
             // put in the name of the variable for the column
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
@@ -896,7 +896,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
             createBinRangeTable = true;
         } else if (curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsZeroToMax) {
             // put in the name of the variable for the column
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
@@ -919,7 +919,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
             createBinRangeTable = true;
         } else if (curAgg == AnnualFieldSet::AggregationKind::hoursInTenBinsMinToZero) {
             // put in the name of the variable for the column
-            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
+            if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) { // if it is a summed variable
                 curUnits += "/s";
             }
             fixUnitsPerSecond(curUnits, curConversionFactor);
@@ -945,7 +945,7 @@ void AnnualTable::writeTable(EnergyPlusData &state, OutputReportTabular::UnitsSt
         }
     } // fldStIt
     if (produceTabular_para) {
-        OutputReportTabular::WriteReportHeaders(state, m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
+        OutputReportTabular::WriteReportHeaders(state, m_name, "Entire Facility", OutputProcessor::StoreType::Average);
         OutputReportTabular::WriteSubtitle(state, "Custom Annual Report");
         OutputReportTabular::WriteTable(state, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
     }
@@ -1318,7 +1318,7 @@ void AnnualTable::convertUnitForDeferredResults(EnergyPlusData &state,
             curConversionOffset = 0.0;
         }
     }
-    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Summed) {
+    if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) {
         curUnits += "/s";
     }
     fixUnitsPerSecond(curUnits, curConversionFactor);

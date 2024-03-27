@@ -193,40 +193,40 @@ namespace ExhaustAirSystemManager {
                                             "Central Exhaust Fan Mass Flow Rate",
                                             Constant::Units::kg_s,
                                             thisExhSys.centralFan_MassFlowRate,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Standard",
                                             Constant::Units::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Std,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Current",
                                             Constant::Units::m3_s,
                                             thisExhSys.centralFan_VolumeFlowRate_Cur,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Power",
                                             Constant::Units::W,
                                             thisExhSys.centralFan_Power,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Average,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Energy",
                                             Constant::Units::J,
                                             thisExhSys.centralFan_Energy,
-                                            OutputProcessor::SOVTimeStepType::System,
-                                            OutputProcessor::SOVStoreType::Summed,
+                                            OutputProcessor::TimeStepType::System,
+                                            OutputProcessor::StoreType::Sum,
                                             thisExhSys.Name);
 
                     } else {
@@ -268,40 +268,40 @@ namespace ExhaustAirSystemManager {
                                                 "Central Exhaust Fan Mass Flow Rate",
                                                 Constant::Units::kg_s,
                                                 thisExhSys.centralFan_MassFlowRate,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Volumetric Flow Rate Standard",
                                                 Constant::Units::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Std,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Volumetric Flow Rate Current",
                                                 Constant::Units::m3_s,
                                                 thisExhSys.centralFan_VolumeFlowRate_Cur,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Power",
                                                 Constant::Units::W,
                                                 thisExhSys.centralFan_Power,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Average,
                                                 thisExhSys.Name);
 
                             SetupOutputVariable(state,
                                                 "Central Exhaust Fan Energy",
                                                 Constant::Units::J,
                                                 thisExhSys.centralFan_Energy,
-                                                OutputProcessor::SOVTimeStepType::System,
-                                                OutputProcessor::SOVStoreType::Summed,
+                                                OutputProcessor::TimeStepType::System,
+                                                OutputProcessor::StoreType::Sum,
                                                 thisExhSys.Name);
 
                             if (errFlag) {

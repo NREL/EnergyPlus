@@ -757,15 +757,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -1066,8 +1066,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool Sys Loop
@@ -1779,15 +1779,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -1977,8 +1977,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool:NoReheat Sys Loop
@@ -2414,8 +2414,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
     }
 
@@ -2425,8 +2425,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             Constant::Units::m3_s,
                             state.dataSingleDuct->sd_airterminal(sdIndex).OutdoorAirFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(sdIndex).SysName);
     }
 
