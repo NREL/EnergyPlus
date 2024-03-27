@@ -716,4 +716,65 @@ TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowEqualToMax)
     EXPECT_NEAR(state->dataPumps->PumpEquip(1).NomVolFlowRate, expectedAnswer, allowableTolerance);
 }
 
+TEST_F(EnergyPlusFixture, HeaderedVariableSpeedPumpEMSPressureTest)
+{
+    std::string const idf_objects = delimited_string({
+        "HeaderedPumps:VariableSpeed,",
+        "Chilled Water Headered Pumps,  !- Name",
+        "CW Supply Inlet Node,    !- Inlet Node Name",
+        "CW Pumps Outlet Node,    !- Outlet Node Name",
+        "0.001,                   !- Total Design Flow Rate {m3/s}",
+        "2,                       !- Number of Pumps in Bank",
+        "SEQUENTIAL,              !- Flow Sequencing Control Scheme",
+        "100000,                  !- Design Pump Head {Pa}",
+        "autosize,                !- Design Power Consumption {W}",
+        "0.8,                     !- Motor Efficiency",
+        "0.0,                     !- Fraction of Motor Inefficiencies to Fluid Stream",
+        "0,                       !- Coefficient 1 of the Part Load Performance Curve",
+        "1,                       !- Coefficient 2 of the Part Load Performance Curve",
+        "0,                       !- Coefficient 3 of the Part Load Performance Curve",
+        "0,                       !- Coefficient 4 of the Part Load Performance Curve",
+        "0.1,                     !- Minimum Flow Rate Fraction",
+        "INTERMITTENT,            !- Pump Control Type",
+        "CoolingPumpAvailSched,   !- Pump Flow Rate Schedule Name",
+        ",                        !- Zone Name",
+        ",                        !- Skin Loss Radiative Fraction",
+        "PowerPerFlowPerPressure, !- Design Power Sizing Method",
+        ",                        !- Design Electric Power per Unit Flow Rate",
+        "1.3,                     !- Design Shaft Power per Unit Flow Rate per Unit Head",
+        "Pump Energy;             !- End-Use Subcategory",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    Pumps::GetPumpInput(*state);
+    Pumps::SizePump(*state, 1);
+    Real64 massflowrate = 1.0;
+    state->dataPumps->PumpEquip(1).EMSPressureOverrideOn = true;
+    state->dataPumps->PumpEquip(1).plantLoc.loopSideNum = DataPlant::LoopSideLocation::Supply;
+    state->dataPumps->PumpEquip(1).plantLoc.loopNum = 1;
+    state->dataPumps->PumpEquip(1).plantLoc.branchNum = 1;
+    state->dataPumps->PumpEquip(1).plantLoc.compNum = 1;
+    state->dataPumps->PumpEquip(1).MassFlowRateMax = massflowrate;
+    bool PumpRunning = true;
+    int thisLoopNum = 1, thisBranchNum = 1, thisCompNum = 1;
+    DataPlant::LoopSideLocation thisLoopSideNum = DataPlant::LoopSideLocation::Supply;
+    PlantLocation plantLoc{thisLoopNum, thisLoopSideNum, thisBranchNum, thisCompNum};
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(thisLoopSideNum).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(thisLoopSideNum).Branch(thisBranchNum).Comp.allocate(1);
+    state->dataLoopNodes->Node(1).MassFlowRate = massflowrate;
+    state->dataLoopNodes->Node(1).MassFlowRateMinAvail = massflowrate;
+    state->dataLoopNodes->Node(1).MassFlowRateMin = massflowrate;
+    state->dataLoopNodes->Node(1).MassFlowRateMax = massflowrate;
+    state->dataLoopNodes->Node(2).MassFlowRateMaxAvail = massflowrate;
+    state->dataLoopNodes->Node(1).MassFlowRateMaxAvail = massflowrate;
+
+    state->dataPumps->PumpEquip(1).PumpEffic = 0.8;
+    state->dataPumps->PumpEquip(1).EMSPressureOverrideValue = 200.0;
+
+    Pumps::CalcPumps(*state, 1, massflowrate, PumpRunning);
+
+    EXPECT_NEAR(state->dataPumps->PumpEquip(1).Power, 0.1563, 0.0001);
+}
+
 } // namespace EnergyPlus
