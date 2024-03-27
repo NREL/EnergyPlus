@@ -11835,17 +11835,17 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingCoolingCapacity2023 > 0.0);
-    EXPECT_NEAR(3.76, thisCoil.performance.standardRatingEER2, 0.01);
-    EXPECT_NEAR(4.26, thisCoil.performance.standardRatingSEER2_User, 0.01);
-    EXPECT_NEAR(4.05, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
-    EXPECT_NEAR(14614.52, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
-    EXPECT_NEAR(14.56, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(13.85, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(3.67, thisCoil.performance.standardRatingEER2, 0.01);
+    EXPECT_NEAR(4.18, thisCoil.performance.standardRatingSEER2_User, 0.01);
+    EXPECT_NEAR(4.12, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
+    EXPECT_NEAR(14513.51, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
+    EXPECT_NEAR(14.26, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(14.07, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER > 0);
     EXPECT_NEAR(3.42, thisCoil.performance.standardRatingIEER, 0.01);
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 > 0);
-    EXPECT_NEAR(3.65, thisCoil.performance.standardRatingIEER2, 0.01);
+    EXPECT_NEAR(3.47, thisCoil.performance.standardRatingIEER2, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
@@ -12158,17 +12158,17 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0.0);
     EXPECT_TRUE(thisCoil.performance.standardRatingCoolingCapacity2023 > 0.0);
-    EXPECT_NEAR(2.86, thisCoil.performance.standardRatingEER2, 0.01);
-    EXPECT_NEAR(3.21, thisCoil.performance.standardRatingSEER2_User, 0.01);
-    EXPECT_NEAR(3.33, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
-    EXPECT_NEAR(4950.465, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
-    EXPECT_NEAR(10.96, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
-    EXPECT_NEAR(11.36, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(2.55, thisCoil.performance.standardRatingEER2, 0.01);
+    EXPECT_NEAR(3.05, thisCoil.performance.standardRatingSEER2_User, 0.01);
+    EXPECT_NEAR(3.07, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
+    EXPECT_NEAR(4798.04, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
+    EXPECT_NEAR(10.41, thisCoil.performance.standardRatingSEER2_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(10.47, thisCoil.performance.standardRatingSEER2_Standard * StandardRatings::ConvFromSIToIP, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER > 0);
     EXPECT_NEAR(2.78, thisCoil.performance.standardRatingIEER, 0.01);
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 > 0);
-    EXPECT_NEAR(3.52, thisCoil.performance.standardRatingIEER2, 0.01);
+    EXPECT_NEAR(3.17, thisCoil.performance.standardRatingIEER2, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_ValueTest)
@@ -12455,10 +12455,10 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_Value
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER > 0);
     ASSERT_TRUE(thisCoil.performance.standardRatingIEER2 > 0);
     ASSERT_TRUE(thisCoil.performance.standardRatingCoolingCapacity2023 > 0);
-    EXPECT_NEAR(3.43, thisCoil.performance.standardRatingEER2, 0.01);
-    EXPECT_NEAR(3.0541176308713824, thisCoil.performance.standardRatingIEER2, 0.01);
-    EXPECT_NEAR(28420.989286400007, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
-    EXPECT_NEAR(10.42108192037557, thisCoil.performance.standardRatingIEER2 * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(3.67, thisCoil.performance.standardRatingEER2, 0.01);
+    EXPECT_NEAR(3.47, thisCoil.performance.standardRatingIEER2, 0.01);
+    EXPECT_NEAR(29027.03, thisCoil.performance.standardRatingCoolingCapacity2023, 0.01);
+    EXPECT_NEAR(11.87, thisCoil.performance.standardRatingIEER2 * StandardRatings::ConvFromSIToIP, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingEER > 0);
     EXPECT_NEAR(3.39, thisCoil.performance.standardRatingEER, 0.01);
@@ -12466,9 +12466,9 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_Value
     EXPECT_NEAR(3.93, thisCoil.performance.standardRatingSEER, 0.01);
 
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_User > 0);
-    EXPECT_NEAR(3.93, thisCoil.performance.standardRatingSEER2_User, 0.01);
+    EXPECT_NEAR(4.18, thisCoil.performance.standardRatingSEER2_User, 0.01);
     ASSERT_TRUE(thisCoil.performance.standardRatingSEER2_Standard > 0);
-    EXPECT_NEAR(3.86, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
+    EXPECT_NEAR(4.12, thisCoil.performance.standardRatingSEER2_Standard, 0.01);
 }
 
 TEST_F(EnergyPlusFixture, CurveFit_03_Speed_20000W_IEER_2022_ValueTest)

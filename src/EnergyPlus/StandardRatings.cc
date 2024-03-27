@@ -1336,12 +1336,6 @@ namespace StandardRatings {
                                0,
                                false);
 
-            Real64 EER_Report(0.0);
-            if (SEER2_Standard > 0.0) {
-                EER_Report = EER;
-            } else if (IEER_2022 > 0.0) {
-                EER_Report = EER_2022;
-            }
             // Writes the SEER value to the EIO file and standard tabular output tables
             ReportDXCoilRating(state,
                                DXCoilType,
@@ -1350,8 +1344,8 @@ namespace StandardRatings {
                                NetCoolingCapRated_2023(ns),
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
-                               EER_Report,
-                               EER_Report * ConvFromSIToIP,
+                               EER_2022,
+                               EER_2022 * ConvFromSIToIP,
                                IEER_2022 * ConvFromSIToIP,
                                0.0,
                                0.0,
@@ -1483,15 +1477,7 @@ namespace StandardRatings {
             EER_2022 = StandardRatingsResult["EER_2022"];
 
             NetCoolingCapRated(ns) = StandardRatingsResult["NetCoolingCapRatedMaxSpeed"];
-            if (SEER2_Standard > 0.0) {
-                EER = EER2;
-            } else if (IEER_2022 > 0.0) {
-                EER = EER_2022;
-            }
 
-            // Writes the SEER value to the EIO file and standard tabular output tables | 2017
-            ReportDXCoilRating(
-                state, DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated(ns), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, false);
             // Writes the SEER2 & IEER 2022 value to the EIO file and standard tabular output tables | 2023
             ReportDXCoilRating(state,
                                DXCoilType,
@@ -1500,8 +1486,8 @@ namespace StandardRatings {
                                NetCoolingCapRated_2023(ns),
                                SEER2_User * ConvFromSIToIP,
                                SEER2_Standard * ConvFromSIToIP,
-                               EER,
-                               EER * ConvFromSIToIP,
+                               EER_2022,
+                               EER_2022 * ConvFromSIToIP,
                                IEER_2022 * ConvFromSIToIP,
                                0.0,
                                0.0,
@@ -2487,7 +2473,6 @@ namespace StandardRatings {
 
             // Calculate the rated cooling capacity for the speed using Gross Total Cooling Capacity
             // and Gross Total Cooling Capacity Fraction of the speed.
-            auto ratedTotalCapacity = speed.rated_total_capacity * operatingMode.ratedGrossTotalCap;
             MSRatedTotCap.push_back(speed.rated_total_capacity); // get the capcity at each speed bymultiplying this fraCTION WITH the gross.
 
             MSCCapAirFFlow.push_back(speed.indexCapFFF);
@@ -2495,8 +2480,7 @@ namespace StandardRatings {
 
             // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
             // and Rated Evaporator Air flow fraction of the speed
-            auto ratedEvapAirFlowRate = speed.evap_air_flow_rate * operatingMode.ratedEvapAirFlowRate;
-            MSRatedAirVolFlowRate.push_back(ratedEvapAirFlowRate);
+            MSRatedAirVolFlowRate.push_back(speed.evap_air_flow_rate);
 
             MSEIRFTemp.push_back(speed.indexEIRFT);
             MSRatedCOP.push_back(speed.ratedCOP);
@@ -2552,8 +2536,7 @@ namespace StandardRatings {
 
             // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
             // and Rated Evaporator Air flow fraction of the speed
-            auto ratedEvapAirFlowRate = speed.evap_air_flow_rate * operatingMode.ratedEvapAirFlowRate;
-            MSRatedAirVolFlowRate.push_back(ratedEvapAirFlowRate);
+            MSRatedAirVolFlowRate.push_back(speed.evap_air_flow_rate);
 
             MSEIRFTemp.push_back(speed.indexEIRFT);
             MSRatedCOP.push_back(speed.ratedCOP);
@@ -6812,19 +6795,19 @@ namespace StandardRatings {
                                     "from the appropriate AHRI standard.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | SEER2
-                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2) {
                     print(state.files.eio,
                           "{}",
-                          "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                          "Cooling Capacity {W}, Standard Rated Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
+                          "! <DX Cooling Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                          "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard {Btu/W-h}, "
                           "IEER 2022 "
                           "{Btu/W-h}\n");
-                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2 = false;
                 }
 
                 static constexpr std::string_view Format_991_(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_991_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, ' ');
+                    " DX Cooling Coil AHRI 2023 Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.1R}\n");
+                print(state.files.eio, Format_991_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, CompName, CoolCapVal, 1);
@@ -6935,8 +6918,8 @@ namespace StandardRatings {
                 }
 
                 static constexpr std::string_view Format_995(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
-                print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
+                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
+                print(state.files.eio, Format_995, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
@@ -6979,19 +6962,19 @@ namespace StandardRatings {
                                     "from the appropriate AHRI standard.");
             } else {
                 // ANSI/AHRI 210/240 Standard 2023 Ratings | SEER2
-                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+                if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2) {
                     static constexpr std::string_view Format_994_(
-                        "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard "
+                        "! <DX Cooling Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                        "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 User {Btu/W-h}, SEER2 Standard "
                         "{Btu/W-h}, "
                         "IEER 2022 "
                         "{Btu/W-h}");
                     print(state.files.eio, "{}\n", Format_994_);
-                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
+                    state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag2 = false;
                 }
 
                 static constexpr std::string_view Format_995_(
-                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {}\n");
+                    " DX Cooling Coil AHRI 2023 Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.1R}\n");
                 print(state.files.eio, Format_995_, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, CompName, CompType);
                 PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI_2023, CompName, CoolCapVal, 1);

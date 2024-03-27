@@ -14953,6 +14953,24 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
           SupAirMdot_TestPoint(3),
           SupAirMdot_TestPoint(4));
 
+    static constexpr std::string_view Format_994(
+        "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
+        "IEER "
+        "{Btu/W-h}");
+    print(state.files.eio, "{}\n", Format_994);
+    static constexpr std::string_view Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {}, {}, {}\n");
+    print(state.files.eio,
+          Format_995,
+          "Coil:Cooling:DX:TwoSpeed",
+          thisDXCoil.Name,
+          NetCoolingCapRated,
+          EER_TestPoint_SI(1),
+          EER_TestPoint_IP(1),
+          "N/A",
+          "N/A",
+          IEER);
+
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, thisDXCoil.Name, "Coil:Cooling:DX:TwoSpeed");
     // W to tons
     PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilNetCapSI, thisDXCoil.Name, NetCoolingCapRated, 1);

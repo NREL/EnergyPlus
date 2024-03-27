@@ -980,14 +980,25 @@ void CoilCoolingDX::passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void PopulateCoolingCoilStandardRatingInformation(
-    InputOutputFile &eio, std::string coilName, Real64 &capacity, Real64 &eer, Real64 &seer_User, Real64 &seer_Standard, Real64 &ieer)
+void PopulateCoolingCoilStandardRatingInformation(InputOutputFile &eio,
+                                                  std::string coilName,
+                                                  Real64 &capacity,
+                                                  Real64 &eer,
+                                                  Real64 &seer_User,
+                                                  Real64 &seer_Standard,
+                                                  Real64 &ieer,
+                                                  bool const AHRI2023StandardRatings)
 {
     Real64 constexpr ConvFromSIToIP(3.412141633);
     // TODO: TOO BIG |Capacity from 135K (39565 W) to 250K Btu/hr (73268 W) - calculated as per AHRI Standard 365-2009 -
     // Ratings not yet supported in EnergyPlus
-    static constexpr std::string_view Format_991(
-        " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.1R}\n");
+    // Define the format string based on the condition
+    std::string_view Format_991;
+    if (!AHRI2023StandardRatings) {
+        Format_991 = " DX Cooling Coil Standard Rating Information, {}, {}, {:.1f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.1f}\n";
+    } else {
+        Format_991 = " DX Cooling Coil AHRI 2023 Standard Rating Information, {}, {}, {:.1f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.1f}\n";
+    }
     print(eio,
           Format_991,
           "Coil:Cooling:DX",
@@ -1007,7 +1018,7 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
         Real64 constexpr ConvFromSIToIP(3.412141633); // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr std::string_view Format_990(
             "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER1 {Btu/W-h}, SEER {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}\n");
+            "Cooling Capacity {W}, Standard Rating Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}\n");
         print(state.files.eio, "{}", Format_990);
         for (auto &coil : state.dataCoilCooingDX->coilCoolingDXs) {
             coil.performance.calcStandardRatings210240(state);
@@ -1017,7 +1028,8 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
                                                          coil.performance.standardRatingEER,
                                                          coil.performance.standardRatingSEER,
                                                          coil.performance.standardRatingSEER_Standard,
-                                                         coil.performance.standardRatingIEER);
+                                                         coil.performance.standardRatingIEER,
+                                                         false);
 
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType, coil.name, "Coil:Cooling:DX");
             OutputReportPredefined::PreDefTableEntry(
@@ -1072,13 +1084,18 @@ void CoilCoolingDX::reportAllStandardRatings(EnergyPlusData &state)
                 "from the appropriate AHRI standard.");
 
             // AHRI 2023 Standard SEER2 Calculations
+            static constexpr std::string_view Format_991(
+                "! <DX Cooling Coil AHRI 2023 Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                "Cooling Capacity {W}, Standard Rating Net COP2 {W/W}, EER2 {Btu/W-h}, SEER2 {Btu/W-h}, SEER2 Standard {Btu/W-h}, IEER {Btu/W-h}\n");
+            print(state.files.eio, "{}", Format_991);
             PopulateCoolingCoilStandardRatingInformation(state.files.eio,
                                                          coil.name,
                                                          coil.performance.standardRatingCoolingCapacity2023,
                                                          coil.performance.standardRatingEER2,
                                                          coil.performance.standardRatingSEER2_User,
                                                          coil.performance.standardRatingSEER2_Standard,
-                                                         coil.performance.standardRatingIEER2);
+                                                         coil.performance.standardRatingIEER2,
+                                                         true);
 
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchDXCoolCoilType_2023, coil.name, "Coil:Cooling:DX");
             OutputReportPredefined::PreDefTableEntry(
