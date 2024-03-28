@@ -8100,26 +8100,24 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
                 Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin));
 
-                // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                state.dataSurface->SurfWinHeatGain(SurfNum) =
-                    state.dataSurface->SurfWinTransSolar(SurfNum) +
-                    HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum)) +
-                    state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                        (Sigma_Temp_4 -
-                         (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum))) -
-                    state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                        state.dataConstruction->Construct(surface.Construction).TransDiff;
-                // Transmitted solar | Convection | IR exchange | IR
-                // Zone diffuse interior shortwave reflected back into the TDD
-
                 // fill out report vars for components of Window Heat Gain
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) =
                     HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) =
                     state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                     (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum)));
-                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                                                                           state.dataConstruction->Construct(surface.Construction).TransDiff;
+                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
+                    state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                    (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack);
+
+                // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
+                state.dataSurface->SurfWinHeatGain(SurfNum) =
+                    state.dataSurface->SurfWinTransSolar(SurfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) +
+                    state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) -
+                    surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum);
+                // Net ransmitted solar | Convection | IR exchange | IR
+                // Zone diffuse interior shortwave reflected back into the TDD
+
             } else {                                                // Regular window
                 if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                     // Get outside convection coeff for exterior window here to avoid calling
@@ -8788,19 +8786,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
                         Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
 
-                        // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                        state.dataSurface->SurfWinHeatGain(surfNum) =
-                            state.dataSurface->SurfWinTransSolar(surfNum) +
-                            HConvIn_surf * surface.Area *
-                                (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)) +
-                            state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                                (Sigma_Temp_4 -
-                                 (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum))) -
-                            state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                                state.dataConstruction->Construct(surface.Construction)
-                                    .TransDiff; // Transmitted solar | Convection | IR exchange | IR
-                        // Zone diffuse interior shortwave reflected back into the TDD
-
                         // fill out report vars for components of Window Heat Gain
                         state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
                             HConvIn_surf * surface.Area *
@@ -8809,9 +8794,17 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                             (Sigma_Temp_4 -
                              (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum)));
-                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) *
-                                                                                   surface.Area *
-                                                                                   state.dataConstruction->Construct(surface.Construction).TransDiff;
+                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) =
+                            state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                            (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack);
+
+                        // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
+                        state.dataSurface->SurfWinHeatGain(surfNum) =
+                            state.dataSurface->SurfWinTransSolar(surfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) +
+                            state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) -
+                            surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(surfNum);
+                        // Net ransmitted solar | Convection | IR exchange | IR
+                        // Zone diffuse interior shortwave reflected back into the TDD
                     } else {                                                // Regular window
                         if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                             // Get outside convection coeff for exterior window here to avoid calling
