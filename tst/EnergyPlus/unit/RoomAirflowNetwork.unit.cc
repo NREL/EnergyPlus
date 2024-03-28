@@ -628,6 +628,8 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
         EXPECT_EQ("SupplyNode", SupplyNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode1";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode1";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator;
     state->dataFans->GetFanInputFlag = false;
     state->dataFans->Fan.allocate(1);
@@ -635,29 +637,35 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
     state->dataFans->Fan(1).OutletNodeNum = 1;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
+        EXPECT_EQ("SupplyNode1", SupplyNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode2";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode2";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
     state->dataFanCoilUnits->FanCoil.allocate(1);
     state->dataFanCoilUnits->FanCoil(EquipIndex).AirOutNode = 1;
     state->dataFanCoilUnits->FanCoil(EquipIndex).AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode2", SupplyNodeName);
+        EXPECT_EQ("ReturnNode2", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode3";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode3";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::OutdoorAirUnit;
     state->dataOutdoorAirUnit->OutAirUnit.allocate(1);
     state->dataOutdoorAirUnit->OutAirUnit(EquipIndex).AirOutletNode = 1;
     state->dataOutdoorAirUnit->OutAirUnit(EquipIndex).AirInletNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode3", SupplyNodeName);
+        EXPECT_EQ("ReturnNode3", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode4";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode4";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
     UnitarySystems::UnitarySys thisUnit;
     state->dataUnitarySystems->unitarySys.push_back(thisUnit);
@@ -668,10 +676,12 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
     state->dataUnitarySystems->unitarySys[EquipIndex - 1].AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode4", SupplyNodeName);
+        EXPECT_EQ("ReturnNode4", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode5";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode5";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump;
     // UnitarySystems::UnitarySys thisUnit;
     // state->dataUnitarySystems->unitarySys.push_back(thisUnit);
@@ -682,9 +692,11 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
     state->dataUnitarySystems->unitarySys[EquipIndex - 1].AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode5", SupplyNodeName);
+        EXPECT_EQ("ReturnNode5", ReturnNodeName);
     }
+    state->dataLoopNodes->NodeID(1) = "SupplyNode6";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode6";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir;
     // UnitarySystems::UnitarySys thisUnit;
     // state->dataUnitarySystems->unitarySys.push_back(thisUnit);
@@ -695,47 +707,55 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
     state->dataUnitarySystems->unitarySys[EquipIndex - 1].AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode6", SupplyNodeName);
+        EXPECT_EQ("ReturnNode6", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode7";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode7";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::UnitHeater;
     state->dataUnitHeaters->UnitHeat.allocate(1);
     state->dataUnitHeaters->UnitHeat(EquipIndex).AirOutNode = 1;
     state->dataUnitHeaters->UnitHeat(EquipIndex).AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode7", SupplyNodeName);
+        EXPECT_EQ("ReturnNode7", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode8";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode8";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::UnitVentilator;
     state->dataUnitVentilators->UnitVent.allocate(1);
     state->dataUnitVentilators->UnitVent(EquipIndex).AirOutNode = 1;
     state->dataUnitVentilators->UnitVent(EquipIndex).AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode8", SupplyNodeName);
+        EXPECT_EQ("ReturnNode8", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode9";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode9";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::VentilatedSlab;
     state->dataVentilatedSlab->VentSlab.allocate(1);
     state->dataVentilatedSlab->VentSlab(EquipIndex).ZoneAirInNode = 1;
     state->dataVentilatedSlab->VentSlab(EquipIndex).ReturnAirNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode9", SupplyNodeName);
+        EXPECT_EQ("ReturnNode9", ReturnNodeName);
     }
 
+    state->dataLoopNodes->NodeID(1) = "SupplyNode10";
+    state->dataLoopNodes->NodeID(2) = "ReturnNode10";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::WindowAirConditioner;
     state->dataWindowAC->WindAC.allocate(1);
     state->dataWindowAC->WindAC(EquipIndex).AirOutNode = 1;
     state->dataWindowAC->WindAC(EquipIndex).AirInNode = 2;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
-        EXPECT_EQ("SupplyNode", SupplyNodeName);
-        EXPECT_EQ("ReturnNode", ReturnNodeName);
+        EXPECT_EQ("SupplyNode10", SupplyNodeName);
+        EXPECT_EQ("ReturnNode10", ReturnNodeName);
     }
 }
