@@ -72,8 +72,8 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -89,14 +89,14 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UFADManager.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
