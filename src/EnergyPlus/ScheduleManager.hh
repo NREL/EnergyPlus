@@ -93,6 +93,15 @@ namespace ScheduleManager {
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNames;
     extern const std::array<std::string_view, static_cast<int>(DayType::Num)> dayTypeNamesUC;
 
+    enum class DayTypeGroup
+    {
+        Invalid = -1,
+        Weekday = 1,
+        WeekEndHoliday,
+        DesignDay,
+        Num
+    };
+
     enum class SchedType : int
     {
         Invalid = -1,
@@ -338,6 +347,8 @@ namespace ScheduleManager {
     Real64 GetScheduleMinValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
 
     Real64 GetScheduleMaxValue(EnergyPlusData &state, int const ScheduleIndex); // Which Schedule being tested
+
+    std::pair<Real64, Real64> getScheduleMinMaxByDayType(EnergyPlusData &state, int const ScheduleIndex, DayTypeGroup const days);
 
     std::string GetScheduleName(EnergyPlusData &state, int const ScheduleIndex);
 
