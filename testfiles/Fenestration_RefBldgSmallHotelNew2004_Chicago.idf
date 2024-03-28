@@ -11285,11 +11285,11 @@
     0.900000,                !- Divider Solar Absorptance
     0.900000,                !- Divider Visible Absorptance
     0.900000,                !- Divider Thermal Hemispherical Emissivity
-    ,                        !- Outside Reveal Solar Absorptance
-    ,                        !- Inside Sill Depth {m}
-    ,                        !- Inside Sill Solar Absorptance
-    ,                        !- Inside Reveal Depth {m}
-    ,                        !- Inside Reveal Solar Absorptance
+    0.8,                     !- Outside Reveal Solar Absorptance
+    0.3,                     !- Inside Sill Depth {m}
+    0.7,                     !- Inside Sill Solar Absorptance
+    0.1,                     !- Inside Reveal Depth {m}
+    0.8,                     !- Inside Reveal Solar Absorptance
     VerticalSlider;          !- NFRC Product Type for Assembly Calculations
 
   FenestrationSurface:Detailed,
