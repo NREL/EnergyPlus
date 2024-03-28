@@ -2004,15 +2004,8 @@ TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
     coil3->running = true;
     coil4->running = true;
 
-    // check to warn about concurrent operation
-    EIRPlantLoopHeatPump::checkConcurrentOperation(*state);
-
-    // that will just add a recurring warning to the end, so to check whether
-    //  a warning was actually made, I'll just check the warning index values
-    ASSERT_EQ(0, coil1->recurringConcurrentOperationWarningIndex);
-    ASSERT_EQ(0, coil2->recurringConcurrentOperationWarningIndex);
-    ASSERT_EQ(1, coil3->recurringConcurrentOperationWarningIndex);
-    ASSERT_EQ(1, coil4->recurringConcurrentOperationWarningIndex);
+    // check fatal error about concurrent operation
+    EXPECT_THROW(EIRPlantLoopHeatPump::checkConcurrentOperation(*state), std::runtime_error);
 }
 
 TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
