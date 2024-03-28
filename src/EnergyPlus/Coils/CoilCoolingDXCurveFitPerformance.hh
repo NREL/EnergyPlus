@@ -154,6 +154,7 @@ struct CoilCoolingDXCurveFitPerformance
     // standard rating stuff -- for now just 210/240
     Real64 standardRatingCoolingCapacity = 0.0; // net cooling capacity of single speed DX cooling coil
     Real64 standardRatingSEER = 0.0;            // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingSEER_Standard = 0.0;   // seasonal energy efficiency ratio
     Real64 standardRatingEER = 0.0;             // energy efficiency ratio of single speed DX cooling coil
     Real64 standardRatingIEER = 0.0;            // Integrated energy efficiency ratio of single speed DX cooling coil
 
