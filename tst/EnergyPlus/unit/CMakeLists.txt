@@ -70,6 +70,7 @@ set(test_src
     Coils/CoilCoolingDXCurveFitSpeed.unit.cc
     Coils/CoilCoolingDXFixture.hh
     CondenserLoopTowers.unit.cc
+    Construction.unit.cc
     ConstructionInternalSource.unit.cc
     ConvectionCoefficients.unit.cc
     CoolTower.unit.cc

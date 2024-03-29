@@ -1703,7 +1703,6 @@ TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
 {
     using namespace EnergyPlus::OutputReportPredefined;
 
-
     state->dataScheduleMgr->Schedule.allocate(5);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
