@@ -93,7 +93,7 @@ namespace DataConvergParams {
 
     // Energy Tolerance Calculation, used to scale the answer for a more intuitive answer for comparison
     constexpr Real64 PlantFlowFlowRateToler(0.01);    // Tolerance for mass flow rate convergence (in kg/s)
-    constexpr Real64 PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when plant pumps can be shut down
+    constexpr Real64 PlantLowFlowRateToler(1.0E-9); // Tolerance for low flow rate used for determining when plant pumps can be shut down
 
     constexpr int ConvergLogStackDepth(10);
 
