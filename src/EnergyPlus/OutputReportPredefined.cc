@@ -914,15 +914,13 @@ namespace OutputReportPredefined {
 
         s->pdstTopAirLoop = newPreDefSubTable(state, s->pdrTopology, "Air Loop Supply Side Component Arrangement");
         s->pdchTopAirLoopName = newPreDefColumn(state, s->pdstTopAirLoop, "Airloop Name");
-        s->pdchTopAirUpSplitMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Upstream Splitter or Mixer Name");
+        s->pdchTopAirSplitName = newPreDefColumn(state, s->pdstTopAirLoop, "Splitter Name");
         s->pdchTopAirBranchName = newPreDefColumn(state, s->pdstTopAirLoop, "Branch Name");
         s->pdchTopAirCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Component Type");
         s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
-        s->pdchTopAirSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Type");
-        s->pdchTopAirSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Name");
-        s->pdchTopAirSubSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Type");
-        s->pdchTopAirSubSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Name");
-        s->pdchTopAirDownSplitMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Downstream Splitter or Mixer Name");
+        s->pdchTopAirMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Mixer Name");
+        s->pdchTopAirParentCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type");
+        s->pdchTopAirParentCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name");
 
         s->pdstTopAirDemand = newPreDefSubTable(state, s->pdrTopology, "Air Loop Demand Side Component Arrangement");
         s->pdchTopAirDemandName = newPreDefColumn(state, s->pdstTopAirDemand, "Airloop Name");

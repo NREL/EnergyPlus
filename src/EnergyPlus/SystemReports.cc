@@ -4768,13 +4768,13 @@ void reportAirLoopToplogy(EnergyPlusData &state)
 {
     // s->pdstTopAirLoop = newPreDefSubTable(state, s->pdrTopology, "Air Loop Supply Side Component Arrangement");
     // s->pdchTopAirLoopName = newPreDefColumn(state, s->pdstTopAirLoop, "Airloop Name");
+    // s->pdchTopAirSplitName = newPreDefColumn(state, s->pdstTopAirLoop, "Splitter Name");
     // s->pdchTopAirBranchName = newPreDefColumn(state, s->pdstTopAirLoop, "Branch Name");
     // s->pdchTopAirCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Component Type");
     // s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
-    // s->pdchTopAirSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Type");
-    // s->pdchTopAirSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Name");
-    // s->pdchTopAirSubSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Type");
-    // s->pdchTopAirSubSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Name");
+    // s->pdchTopAirMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Mixer Name");
+    // s->pdchTopAirParentCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type");
+    // s->pdchTopAirParentCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name");
 
     auto &orp = state.dataOutRptPredefined;
     int rowCounter = 1;
@@ -4787,49 +4787,41 @@ void reportAirLoopToplogy(EnergyPlusData &state)
             if (pas.Splitter.Exists) {
                 for (int outNum : pas.Splitter.BranchNumOut) {
                     if (outNum == BranchNum) {
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Splitter.Name);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSplitName, format("{}", rowCounter), pas.Splitter.Name);
                         break;
                     }
                 }
             }
-            if (pas.Mixer.Exists) {
-                if (pas.Mixer.BranchNumOut == BranchNum) {
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Mixer.Name);
-                }
-            }
             for (int CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum) {
                 auto &pasBranchComp = pasBranch.Comp(CompNum);
-                fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                if (pasBranchComp.NumSubComps == 0) {
+                    fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                }
                 for (int SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                     auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
-                    fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                    if (pasBranchSubComp.NumSubSubComps == 0) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchComp.TypeOf);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchComp.Name);
+                        fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchSubComp.TypeOf, pasBranchSubComp.Name, rowCounter);
+                    }
                     for (int SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                         auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
+                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubSubCompType, format("{}", rowCounter), pasBranchSubSubComp.TypeOf);
-                        OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubSubCompName, format("{}", rowCounter), pasBranchSubSubComp.Name);
-                        fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                            state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchSubComp.Name);
+                        fillAirloopToplogyComponentRow(
+                            state, pas.Name, pasBranch.Name, pasBranchSubSubComp.TypeOf, pasBranchSubSubComp.Name, rowCounter);
                     }
                 }
             }
             if (pas.Mixer.Exists) {
                 for (int inNum : pas.Mixer.BranchNumIn) {
                     if (inNum == BranchNum) {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Mixer.Name);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirMixName, format("{}", rowCounter - 1), pas.Mixer.Name);
                         break;
                     }
-                }
-            }
-            if (pas.Splitter.Exists) {
-                if (pas.Splitter.BranchNumIn == BranchNum) {
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Splitter.Name);
                 }
             }
         }
