@@ -913,6 +913,8 @@ endif()
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${Python_LIBRARIES}" REALPATH)
+  message("Python_LIBRARIES=${Python_LIBRARIES}")
+  message("RESOLVED_PYTHON_LIBRARY=${RESOLVED_PYTHON_LIBRARY}")
   if(WIN32)
 
     # In case you have both release and debug Python libraries on your system, Python_LIBRARIES might be "optimized;C:/.../python38.lib;debug;C:/.../python38_d.lib"
@@ -931,6 +933,7 @@ if(LINK_WITH_PYTHON)
       endforeach()
     # else()
       # No-op, already done above
+      message("RESOLVED_PYTHON_LIBRARY (optimized) =${RESOLVED_PYTHON_LIBRARY}")
     endif()
 
     # Windows is being ugly and linking against the Python DLL but not running
@@ -941,6 +944,7 @@ if(LINK_WITH_PYTHON)
       COMMAND ${CMAKE_COMMAND} -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY} -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi> -P
               ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake)
   endif()
+
   install(
     CODE "execute_process(
       COMMAND ${CMAKE_COMMAND}
