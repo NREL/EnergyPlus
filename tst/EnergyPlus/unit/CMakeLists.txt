@@ -121,6 +121,7 @@ set(test_src
     GeneralRoutines.unit.cc
     GroundHeatExchangers.unit.cc
     HVACControllers.unit.cc
+    HVACCooledBeam.unit.cc
     HVACDXSystem.unit.cc
     HVACDXHeatPumpSystem.unit.cc
     HVACFan.unit.cc
