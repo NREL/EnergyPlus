@@ -208,4 +208,4 @@ jobs:
         run: ls
 
       - name: Run Package Tests
-        run: python checkout/scripts/dev/package_tests/runner.py --verbose win64 package/
+        run: python checkout/scripts/package_tests/runner.py --verbose win64 package/
