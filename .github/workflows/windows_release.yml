@@ -198,5 +198,14 @@ jobs:
           name: energyplus-x86_64
           path: package
 
+      - name: Check Contents
+        shell: bash
+        run: ls
+
+      - name: Check Checkout contents
+        shell: bash
+        working-directory: checkout
+        run: ls
+
       - name: Run Package Tests
-        run: checkout/scripts/dev/package_tests/runner.py --verbose win64 package/
+        run: python checkout/scripts/dev/package_tests/runner.py --verbose win64 package/
