@@ -2474,10 +2474,8 @@ namespace StandardRatings {
             // Calculate the rated cooling capacity for the speed using Gross Total Cooling Capacity
             // and Gross Total Cooling Capacity Fraction of the speed.
             MSRatedTotCap.push_back(speed.rated_total_capacity); // get the capcity at each speed bymultiplying this fraCTION WITH the gross.
-
             MSCCapAirFFlow.push_back(speed.indexCapFFF);
             MSRatedEvaporatorFanPowerPerVolumeFlowRate2023.push_back(speed.rated_evap_fan_power_per_volume_flow_rate_2023);
-
             // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
             // and Rated Evaporator Air flow fraction of the speed
             MSRatedAirVolFlowRate.push_back(speed.evap_air_flow_rate);
@@ -2525,19 +2523,14 @@ namespace StandardRatings {
         for (int i = 0; i < nsp; ++i) {
             CoilCoolingDXCurveFitSpeed speed = operatingMode.speeds[i];
             MSCCapFTemp.push_back(speed.indexCapFT);
-
             // Calculate the rated cooling capacity for the speed using Gross Total Cooling Capacity
             // and Gross Total Cooling Capacity Fraction of the speed.
-            auto ratedTotalCapacity = speed.rated_total_capacity * operatingMode.ratedGrossTotalCap;
             MSRatedTotCap.push_back(speed.rated_total_capacity); // get the capcity at each speed bymultiplying this fraCTION WITH the gross.
-
             MSCCapAirFFlow.push_back(speed.indexCapFFF);
             MSRatedEvaporatorFanPowerPerVolumeFlowRate2023.push_back(speed.rated_evap_fan_power_per_volume_flow_rate_2023);
-
             // Calculate the rated evap air flow rate for the speed using Rated Evaporator Air flow Rate
             // and Rated Evaporator Air flow fraction of the speed
             MSRatedAirVolFlowRate.push_back(speed.evap_air_flow_rate);
-
             MSEIRFTemp.push_back(speed.indexEIRFT);
             MSRatedCOP.push_back(speed.ratedCOP);
             MSEIRAirFFlow.push_back(speed.indexEIRFFF);
@@ -3182,19 +3175,32 @@ namespace StandardRatings {
         } else if (nsp == 2) {
             // Having 2 Speeds
             Real64 QAFull_(0.0);
-            std::tie(IEER_2022, QAFull_, EER_2022) =
-                IEERCalculationTwoSpeed(state,
-                                        DXCoilType,                      // thisCoil.DXCoilType, // NoChange
-                                        CondenserType,                   // thisCoil.CondenserType,
-                                        CapFTempCurveIndex,              // TSCCapFTemp,                      // thisCoil.MSCCapFTemp,
-                                        RatedTotalCapacity,              // TSRatedTotCap,      // thisCoil.MSRatedTotCap,
-                                        CapFFlowCurveIndex,              // thisCoil.MSCCapFFlow, | Only for HIGH SPEED
-                                        FanPowerPerEvapAirFlowRate_2023, // thisCoil.MSFanPowerPerEvapAirFlowRate_2023,
-                                        RatedAirVolFlowRate,             // thisCoil.MSRatedAirVolFlowRate,
-                                        EIRFTempCurveIndex,              // thisCoil.MSEIRFTemp,
-                                        RatedCOP,                        // thisCoil.MSRatedCOP,
-                                        EIRFFlowCurveIndex               // thisCoil.MSEIRFFlow, | Only for HIGH SPEED
-                );
+            // Reversing the input arrays because IEERCalculationTwoSpeed is expecting High Speed Data before the Low Speed.
+            Array1D<Real64> FanPowerPerEvapAirFlowRateHighAndLow(FanPowerPerEvapAirFlowRate_2023.size()); // Ensure ReversedArray has the same size
+            std::reverse_copy(
+                FanPowerPerEvapAirFlowRate_2023.begin(), FanPowerPerEvapAirFlowRate_2023.end(), FanPowerPerEvapAirFlowRateHighAndLow.begin());
+
+            Array1D<Real64> RatedAirVolFlowRateHighAndLow(RatedAirVolFlowRate.size());
+            std::reverse_copy(RatedAirVolFlowRate.begin(), RatedAirVolFlowRate.end(), RatedAirVolFlowRateHighAndLow.begin());
+
+            Array1D<Real64> RatedCOPHighAndLow(RatedCOP.size());
+            std::reverse_copy(RatedCOP.begin(), RatedCOP.end(), RatedCOPHighAndLow.begin());
+
+            Array1D<Real64> RatedTotalCapacityHighAndLow(RatedTotalCapacity.size());
+            std::reverse_copy(RatedTotalCapacity.begin(), RatedTotalCapacity.end(), RatedTotalCapacityHighAndLow.begin());
+
+            std::tie(IEER_2022, QAFull_, EER_2022) = IEERCalculationTwoSpeed(state,
+                                                                             DXCoilType,
+                                                                             CondenserType,
+                                                                             CapFTempCurveIndex,
+                                                                             RatedTotalCapacityHighAndLow,
+                                                                             CapFFlowCurveIndex, // Only for HIGH SPEED
+                                                                             FanPowerPerEvapAirFlowRateHighAndLow,
+                                                                             RatedAirVolFlowRateHighAndLow,
+                                                                             EIRFTempCurveIndex,
+                                                                             RatedCOPHighAndLow,
+                                                                             EIRFFlowCurveIndex // Only for HIGH SPEED
+            );
         } else if (nsp == 1) {
             // NA : The minimum number of speeds for cooling is 2 and the maximum number is 4 for Coil:Cooling:DX:MultiSpeed
         }
@@ -5665,7 +5671,7 @@ namespace StandardRatings {
                                              EIRFTempCurveIndex,
                                              RatedCOP,
                                              EIRFFlowCurveIndex,
-                                             CondenserType); // CondenserType(1));
+                                             CondenserType);
             StandardRatingsResult["NetCoolingCapRatedMaxSpeed2023"] = NetCoolingCapRatedMaxSpeed2023;
 
         } else {
