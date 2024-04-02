@@ -904,9 +904,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopAirSupplyDuctType = 0;
     int pdchTopAirSupplyPCompType = 0;
     int pdchTopAirSupplyPCompName = 0;
-    int pdchTopAirZoneName = 0;
     int pdchTopAirTermUnitType = 0;
     int pdchTopAirTermUnitName = 0;
+    int pdchTopAirZoneName = 0;
     int pdchTopAirReturnPCompType = 0;
     int pdchTopAirReturnPCompName = 0;
 

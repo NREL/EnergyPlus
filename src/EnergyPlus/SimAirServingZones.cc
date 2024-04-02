@@ -1582,6 +1582,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     ++SupAirPathOutNodeNum;
                     // map the outlet node number to the HVAC (global) node number
                     state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) = supNode(SupNodeIndex);
+                    state.dataZoneEquip->SupplyAirPath(SupAirPath).OutletNodeSupplyPathCompNum(SupAirPathOutNodeNum) = supNodeCompNum(SupNodeIndex);
                 }
             }
         }
@@ -2333,6 +2334,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                         for (int inNode = 1; inNode <= thisMixer.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisMixer.InletNode(inNode)) {
                                 thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
+                                thisZoneEquip.ReturnNodeRetPathNum(zoneOutNum) = retPathNum;
+                                thisZoneEquip.ReturnNodeRetPathCompNum(zoneOutNum) = compNum;
                                 returnPathFound = true;
                                 break; // leave component inlet node loop
                             }
@@ -2342,6 +2345,8 @@ void ConnectReturnNodes(EnergyPlusData &state)
                         for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                             if (thisReturnNode == thisPlenum.InletNode(inNode)) {
                                 thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num
+                                thisZoneEquip.ReturnNodeRetPathNum(zoneOutNum) = retPathNum;
+                                thisZoneEquip.ReturnNodeRetPathCompNum(zoneOutNum) = compNum;
                                 returnPathFound = true;
                                 break; // leave component inlet node loop
                             }
