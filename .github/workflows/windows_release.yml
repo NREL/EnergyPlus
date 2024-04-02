@@ -173,6 +173,7 @@ jobs:
 
   test_package:
     name: Test Built Package
+    needs: build_installer_artifact
     runs-on: windows-2019
 
     permissions:
