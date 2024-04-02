@@ -52,3 +52,4 @@ jobs:
         repository-url: https://test.pypi.org/legacy/
         user: __token__
         password: ${{ secrets.TESTPYPIPW }}
+        verbose: true
