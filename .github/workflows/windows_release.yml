@@ -207,5 +207,8 @@ jobs:
         working-directory: checkout
         run: ls
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Run Package Tests
         run: python checkout/scripts/package_tests/runner.py --verbose win64 package/
