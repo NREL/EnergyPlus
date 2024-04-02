@@ -1,0 +1,2 @@
+class EPTestingException(Exception):
+    pass
