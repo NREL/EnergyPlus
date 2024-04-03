@@ -55,24 +55,19 @@
 
 
 import argparse
+from os import chdir, devnull, scandir
 from pathlib import Path
 from re import search
+from shutil import rmtree
+from subprocess import check_call, CalledProcessError, STDOUT
 from sys import exit, path
 
 this_file_path = Path(__file__).resolve()
 package_test_root_dir = this_file_path.parent
 path.insert(0, str(package_test_root_dir))
 
-from ep_testing.config import CONFIGURATIONS, TestConfiguration
+from ep_testing.config import CONFIGURATIONS, TestConfiguration, OS
 from ep_testing.tester import Tester
-
-
-def run(config: str, this: str, last: str, last_tag: str, package_dir: Path, msvc: str, verbose: bool) -> int:
-    c = TestConfiguration(config, this, last, last_tag, msvc)
-    print(f'Attempting to test local EnergyPlus package extracted at: {package_dir}')
-    t = Tester(c, package_dir, verbose)
-    t.run()
-    return 0  # TODO: be better about the exit code
 
 
 def get_version_info() -> tuple:
@@ -90,6 +85,49 @@ def get_version_info() -> tuple:
     return this_version, last_version, last_tag
 
 
+def find_and_extract_package(config: TestConfiguration, artifact_folder: Path) -> str:
+    extract_path = Path.cwd() / 'ep_package'
+    saved_working_directory = Path.cwd()
+    chdir(artifact_folder)
+    package_file_name = str(list(artifact_folder.rglob('*'))[0])
+    if config.os == OS.Linux:
+        # tar -xzf ep.tar.gz -C ep_package
+        extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
+    elif config.os == OS.Mac:
+        # tar -xzf ep.tar.gz -C ep_package
+        extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
+    else:  # if config.os == OS.Windows:
+        # 7z x ep.zip -oep_package
+        extract_command = ['7z.exe', 'x', package_file_name, '-o' + str(extract_path)]
+    if extract_path.exists():
+        rmtree(extract_path)
+    try:
+        extract_path.mkdir(parents=True)
+    except Exception as e:
+        raise Exception('Could not create extraction path at %s; error: %s' % (extract_path, str(e)))
+    try:
+        print("Extracting asset...")
+        dev_null = open(devnull, 'w')
+        check_call(extract_command, stdout=dev_null, stderr=STDOUT)
+        print(" ...Extraction Complete")
+    except CalledProcessError as e:
+        raise Exception("Extraction failed with this error: " + str(e))
+    # should result in a single new directory inside the extract path, like: /extract/path/EnergyPlus-V1-abc-Linux
+    all_sub_folders = [f.path for f in scandir(extract_path) if f.is_dir()]
+    if len(all_sub_folders) > 1:
+        raise Exception('Extracted EnergyPlus package has more than one directory, problem.')
+    chdir(saved_working_directory)
+    return all_sub_folders[0]
+
+
+def run(config: str, this: str, last: str, last_tag: str, package_dir: Path, msvc: str, verbose: bool) -> int:
+    c = TestConfiguration(config, this, last, last_tag, msvc)
+    extracted_package_dir = find_and_extract_package(c, package_dir)
+    t = Tester(c, Path(extracted_package_dir), verbose)
+    t.run()
+    return 0  # TODO: be better about the exit code
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run Package Tests on EnergyPlus")
     arg = parser.add_argument  # readability
@@ -99,7 +137,9 @@ def main() -> int:
     arg('--verbose', action='store_true', help="If specified, get verbose output")
     args = parser.parse_args()
     this, last, last_tag = get_version_info()
-    r = run(args.config, this, last, last_tag, Path(args.package_dir), args.msvc, args.verbose)
+    tentative_path = Path(args.package_dir)
+    p = tentative_path if tentative_path.is_absolute() else Path(Path.cwd()) / tentative_path
+    r = run(args.config, this, last, last_tag, p, args.msvc, args.verbose)
     return r
 
 

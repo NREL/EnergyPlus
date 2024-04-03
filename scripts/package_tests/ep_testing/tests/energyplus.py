@@ -83,8 +83,8 @@ class TestPlainDDRunEPlusFile(BaseTest):
         else:
             eplus_binary_to_use = eplus_binary
 
-        print(f"Attempting to execute the EnergyPlus binary located at: {eplus_binary}")
-        print(f"Does it exist? {os.path.exists(eplus_binary)}")
+        # print(f"Attempting to execute the EnergyPlus binary located at: {eplus_binary}")
+        # print(f"Does it exist? {os.path.exists(eplus_binary)}")
         cmd = [eplus_binary_to_use, '-D', idf_path]
         r = subprocess.run(cmd,
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)

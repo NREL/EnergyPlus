@@ -202,9 +202,9 @@ jobs:
         shell: bash
         run: ls
 
-      - name: Check Checkout contents
+      - name: Check Package contents
         shell: bash
-        working-directory: checkout
+        working-directory: package
         run: ls
 
 #      - name: Setup tmate session

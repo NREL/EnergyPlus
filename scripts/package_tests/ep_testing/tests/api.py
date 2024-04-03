@@ -86,7 +86,8 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
             'stdout:\n'
             f'{r.stdout.decode().strip()}')
     elif verbose:
-        print(r.stderr.decode().strip())
+        if len(r.stderr) > 0:
+            print(r.stderr.decode().strip())
 
 
 class TestPythonAPIAccess(BaseTest):
