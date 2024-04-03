@@ -4905,7 +4905,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                                 auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
                                 for (int retNodeNum = 1; retNodeNum <= thisZoneEquipConfig.NumReturnNodes; ++retNodeNum) {
                                     if (thisZoneEquipConfig.ReturnNodeAirLoopNum(retNodeNum) == airLoopNum) {
-                                        int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathNum(retNodeNum);
+                                        int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathCompNum(retNodeNum);
                                         if (retPathCompNum > 0) {
                                             OutputReportPredefined::PreDefTableEntry(state,
                                                                                      orp->pdchTopAirReturnPCompType,
@@ -4958,7 +4958,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                             if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
                                 auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
                                 for (int retNodeNum = 1; retNodeNum <= thisZoneEquipConfig.NumReturnNodes; ++retNodeNum) {
-                                    int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathNum(retNodeNum);
+                                    int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathCompNum(retNodeNum);
                                     if (retPathCompNum > 0) {
                                         OutputReportPredefined::PreDefTableEntry(state,
                                                                                  orp->pdchTopAirReturnPCompType,
