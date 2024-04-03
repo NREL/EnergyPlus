@@ -133,7 +133,7 @@ def main() -> int:
     arg = parser.add_argument  # readability
     arg('config', choices=CONFIGURATIONS.keys(), help="Specify the run configuration")
     arg('package_dir', help="Path to the extracted EnergyPlus package directory")
-    arg('--msvc', type=str, default='2022', help="For MSVC builds, this is the VS 'year', like '2022'")
+    arg('--msvc', type=str, default='', help="For MSVC builds, this is the VS 'year', like '2022'")
     arg('--verbose', action='store_true', help="If specified, get verbose output")
     args = parser.parse_args()
     this, last, last_tag = get_version_info()

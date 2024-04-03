@@ -211,4 +211,4 @@ jobs:
 #        uses: mxschmitt/action-tmate@v3
 
       - name: Run Package Tests
-        run: python checkout/scripts/package_tests/runner.py --verbose win64 package/
+        run: python checkout/scripts/package_tests/runner.py --verbose --msvc 2022 win64 package/

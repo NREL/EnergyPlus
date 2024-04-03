@@ -100,7 +100,7 @@ class TestConfiguration:
         self.os_version = this_config['os_version']
         self.os = this_config['os']
         self.msvc_version = None
-        if msvc_version is not None:
+        if msvc_version in ['16', '17', '18']:
             self.msvc_version = msvc_version
         elif self.os == OS.Windows and self.os_version == '2022':
             self.msvc_version = 17
