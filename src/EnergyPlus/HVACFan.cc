@@ -634,7 +634,7 @@ namespace HVACFan {
                             Constant::eResource::Electricity,
                             OutputProcessor::Group::HVAC,
                             OutputProcessor::EndUseCat::Fans,
-                            m_endUseSubcategoryName);        
+                            m_endUseSubcategoryName);
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
                             Constant::Units::kg_s,

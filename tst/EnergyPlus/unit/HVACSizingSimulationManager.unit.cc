@@ -116,8 +116,7 @@ protected:
         state->dataLoopNodes->Node.allocate(1);
         // OutputProcessor::TimeValue.allocate(2);
         // set up time related
-        SetupTimePointers(
-            *state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+        SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers(*state, OutputProcessor::TimeStepType::System, state->dataHVACGlobal->TimeStepSys);
 
         state->dataGlobal->NumOfTimeStepInHour = 4;

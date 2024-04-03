@@ -469,7 +469,7 @@ void AnnualTable::gatherForTimestep(EnergyPlusData &state, OutputProcessor::Time
                     case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusTwoStdDev:
                     case AnnualFieldSet::AggregationKind::hoursInTenBinsPlusMinusThreeStdDev:
                         //  for all of the binning options add the value to the deferred
-                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) {                  // if it is a summed variable
+                        if (fldStIt->m_varAvgSum == OutputProcessor::StoreType::Sum) {                     // if it is a summed variable
                             fldStIt->m_cell[row].deferredResults.push_back(curValue /= secondsInTimeStep); // divide by time just like max and min
                         } else {
                             fldStIt->m_cell[row].deferredResults.push_back(curValue);

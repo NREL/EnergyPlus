@@ -266,11 +266,11 @@ namespace OutputReportTabular {
         int resIndex = 0; // result index - pointer to BinResults array
         int numTables = 0;
         OutputProcessor::VariableType typeOfVar = OutputProcessor::VariableType::Invalid; // Was NotFound
-        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Average;     // Variable  is Averaged=1 or Summed=2
-        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone; // Variable time step is Zone=1 or HVAC=2
-        Constant::Units units = Constant::Units::Invalid;                             // the units enumeration
-        std::string ScheduleName;                                                     // the name of the schedule
-        int scheduleIndex = 0;                                                        // index to the schedule specified - if no schedule use zero
+        OutputProcessor::StoreType avgSum = OutputProcessor::StoreType::Average;          // Variable  is Averaged=1 or Summed=2
+        OutputProcessor::TimeStepType stepType = OutputProcessor::TimeStepType::Zone;     // Variable time step is Zone=1 or HVAC=2
+        Constant::Units units = Constant::Units::Invalid;                                 // the units enumeration
+        std::string ScheduleName;                                                         // the name of the schedule
+        int scheduleIndex = 0;                                                            // index to the schedule specified - if no schedule use zero
     };
 
     struct BinResultsType

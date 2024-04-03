@@ -5495,7 +5495,7 @@ void WaterThermalTankData::setupWaterHeaterOutputVars(EnergyPlusData &state)
                         OutputProcessor::Group::Plant,
                         OutputProcessor::EndUseCat::WaterSystem, // DHW
                         this->EndUseSubcategoryName);
-    
+
     SetupOutputVariable(state,
                         "Water Heater Water Volume Flow Rate",
                         Constant::Units::m3_s,

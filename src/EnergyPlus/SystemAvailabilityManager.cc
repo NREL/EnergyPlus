@@ -885,13 +885,13 @@ namespace SystemAvailabilityManager {
                                     Constant::eResource::Invalid,
                                     OutputProcessor::Group::Invalid,
                                     OutputProcessor::EndUseCat::Invalid,
-                                    "", // End-use SubCat
-                                    "", // Zone
-                                    1, // ZoneMult
-                                    1, // ZoneListMult
-                                    "", // space type
+                                    "",   // End-use SubCat
+                                    "",   // Zone
+                                    1,    // ZoneMult
+                                    1,    // ZoneListMult
+                                    "",   // space type
                                     -999, // indexGroupKey
-                                    "", // custom units
+                                    "",   // custom units
                                     OutputProcessor::ReportFreq::Day);
             }
         }

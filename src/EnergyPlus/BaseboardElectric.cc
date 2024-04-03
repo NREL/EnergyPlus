@@ -353,7 +353,7 @@ namespace BaseboardElectric {
                                 thisBaseboard.EquipName,
                                 Constant::eResource::EnergyTransfer,
                                 OutputProcessor::Group::HVAC,
-                                OutputProcessor::EndUseCat::Baseboard); 
+                                OutputProcessor::EndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Rate",
@@ -371,7 +371,7 @@ namespace BaseboardElectric {
                                 OutputProcessor::StoreType::Sum,
                                 thisBaseboard.EquipName,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::Group::HVAC, 
+                                OutputProcessor::Group::HVAC,
                                 OutputProcessor::EndUseCat::Heating);
 
             SetupOutputVariable(state,

@@ -3390,11 +3390,11 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                                         Constant::eResource::Invalid,
                                         OutputProcessor::Group::Invalid,
                                         OutputProcessor::EndUseCat::Invalid,
-                                        "", // EndUseSubCat
-                                        "", // ZoneName
-                                        1, // ZoneMult
-                                        1, // ZoneListMult
-                                        "", // SpaceType
+                                        "",   // EndUseSubCat
+                                        "",   // ZoneName
+                                        1,    // ZoneMult
+                                        1,    // ZoneListMult
+                                        "",   // SpaceType
                                         -999, // indexGroupKey
                                         UnitsB);
                 }
@@ -3616,8 +3616,7 @@ void GetRuntimeLanguageUserInput(EnergyPlusData &state)
                 if ((resource != Constant::eResource::EnergyTransfer) &&
                     (sovEndUseCat == OutputProcessor::EndUseCat::HeatingCoils || sovEndUseCat == OutputProcessor::EndUseCat::CoolingCoils ||
                      sovEndUseCat == OutputProcessor::EndUseCat::Chillers || sovEndUseCat == OutputProcessor::EndUseCat::Boilers ||
-                     sovEndUseCat == OutputProcessor::EndUseCat::Baseboard ||
-                     sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
+                     sovEndUseCat == OutputProcessor::EndUseCat::Baseboard || sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForCooling ||
                      sovEndUseCat == OutputProcessor::EndUseCat::HeatRecoveryForHeating)) {
                     ShowWarningError(state, format("{}{}=\"{} invalid field.", RoutineName, cCurrentModuleObject, cAlphaArgs(1)));
                     ShowContinueError(state,
