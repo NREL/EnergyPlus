@@ -57,7 +57,6 @@
 import os
 from subprocess import check_call, CalledProcessError, STDOUT
 
-from ep_testing.exceptions import EPTestingException
 from ep_testing.tests.base import BaseTest
 
 
@@ -75,14 +74,14 @@ class HVACDiagram(BaseTest):
             check_call([eplus_binary, '-D', idf_path], stdout=dev_null, stderr=STDOUT)
             print(' [E+ FINISHED] ', end='')
         except CalledProcessError:
-            raise EPTestingException('EnergyPlus failed!')
+            raise Exception('EnergyPlus failed!') from None
         hvac_diagram_binary = os.path.join(install_root, 'PostProcess', 'HVAC-Diagram')
         try:
             check_call([hvac_diagram_binary], stdout=dev_null, stderr=STDOUT)
             print(' [HVAC DIAGRAM FINISHED] ', end='')
         except CalledProcessError:
-            raise EPTestingException('Transition failed!')
+            raise Exception('Transition failed!') from None
         if os.path.exists('eplusout.svg'):
             print(' [SVG FILE EXISTS] [DONE]!')
         else:
-            raise EPTestingException('SVG Did not exist!')
+            raise Exception('SVG Did not exist!')

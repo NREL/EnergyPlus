@@ -57,7 +57,6 @@
 import os
 import subprocess
 
-from ep_testing.exceptions import EPTestingException
 from ep_testing.tests.base import BaseTest
 
 
@@ -68,7 +67,7 @@ class TestPlainDDRunEPlusFile(BaseTest):
 
     def run(self, install_root: str, verbose: bool, kwargs: dict):
         if 'test_file' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass test_file in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass test_file in kwargs' % self.__class__.__name__)
         test_file = kwargs['test_file']
         print('* Running test class "%s" on file "%s"... ' % (self.__class__.__name__, test_file), end='')
         eplus_binary = os.path.join(install_root, 'energyplus')
@@ -91,7 +90,7 @@ class TestPlainDDRunEPlusFile(BaseTest):
         if r.returncode == 0:
             print(' [DONE]!')
         else:
-            raise EPTestingException(
+            raise Exception(
                 'EnergyPlus failed!\n'
                 f'Command {cmd} failed with exit status {r.returncode}!\n'
                 'stderr:\n'

@@ -62,7 +62,6 @@ from tempfile import mkdtemp, mkstemp
 from typing import List
 
 from ep_testing.config import OS
-from ep_testing.exceptions import EPTestingException
 from ep_testing.tests.base import BaseTest
 
 
@@ -78,7 +77,7 @@ def my_check_call(verbose: bool, command_line: List[str], **kwargs) -> None:
     r = subprocess.run(command_line,
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     if r.returncode != 0:
-        raise EPTestingException(
+        raise Exception(
             f'Command {command_line} failed with exit status {r.returncode}!\n'
             'stderr:\n'
             f'{r.stderr.decode().strip()}'
@@ -113,7 +112,7 @@ class TestPythonAPIAccess(BaseTest):
         self.verbose = verbose
         print('* Running test class "%s"... ' % self.__class__.__name__, end='')
         if 'os' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         handle, python_file_path = mkstemp(suffix='.py')
         with os.fdopen(handle, 'w') as f:
@@ -139,7 +138,7 @@ class TestPythonAPIAccess(BaseTest):
                 idf_to_run = os.path.join(install_root, 'ExampleFiles', '1ZoneUncontrolled.idf')  # PythonPluginCustomOutputVariable
             my_check_call(self.verbose, [py, python_file_path, '-D', idf_to_run], env=my_env)
             print(' [DONE]!')
-        except EPTestingException as e:
+        except Exception as e:
             print('Python API Wrapper Script failed!')
             raise e
 
@@ -153,7 +152,7 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
         command_line = ['cmake', '..']
         if this_os == OS.Windows:
             if bitness not in ['x32', 'x64']:
-                raise EPTestingException('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
+                raise Exception('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
             if msvc_version == 15:
                 if bitness == 'x64':
                     command_line.extend(['-G', 'Visual Studio 15 Win64'])
@@ -171,7 +170,7 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
                 elif bitness == 'x32':
                     command_line.extend(['-G', 'Visual Studio 17 2022', '-A', 'x86'])
             else:
-                raise EPTestingException("Unknown msvc_version passed to make_build_dir_and_build")
+                raise Exception("Unknown msvc_version passed to make_build_dir_and_build")
 
         my_check_call(verbose, command_line, cwd=cmake_build_dir, env=my_env)
         command_line = ['cmake', '--build', '.']
@@ -179,7 +178,7 @@ def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, 
             command_line.extend(['--config', 'Release'])
         my_check_call(verbose, command_line, env=my_env, cwd=cmake_build_dir)
         print(' [COMPILED] ', end='')
-    except EPTestingException as e:
+    except Exception as e:
         print("C API Wrapper Compilation Failed!")
         raise e
 
@@ -228,9 +227,9 @@ class TestCAPIAccess(BaseTest):
         self.verbose = verbose
         print('* Running test class "%s"... ' % self.__class__.__name__, end='')
         if 'os' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
         if 'bitness' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
         self.msvc_version = kwargs['msvc_version']
@@ -256,7 +255,7 @@ class TestCAPIAccess(BaseTest):
                 new_binary_path = os.path.join(cmake_build_dir, 'Release', self.target_name + '.exe')
             command_line = [new_binary_path]
             my_check_call(self.verbose, command_line, cwd=install_root)
-        except EPTestingException as e:
+        except Exception as e:
             print('C API Wrapper Execution failed!')
             raise e
         print(' [DONE]!')
@@ -287,7 +286,7 @@ class TestCppAPIDelayedAccess(BaseTest):
         elif platform.system() == 'Darwin':
             lib_file_name = '/libenergyplusapi.dylib'
         else:  # windows
-            raise EPTestingException('Dont call TestCAPIDelayedAccess._api_script_content for Windows')
+            raise Exception('Dont call TestCAPIDelayedAccess._api_script_content for Windows')
         template_file = os.path.join(api_resource_dir(), 'delayed_cpp_source_linux_mac.cpp')
         template = open(template_file).read()
         return template.replace('{EPLUS_INSTALL_NO_SLASH}', install_path).replace('{LIB_FILE_NAME}', lib_file_name)
@@ -304,9 +303,9 @@ class TestCppAPIDelayedAccess(BaseTest):
         self.verbose = verbose
         print('* Running test class "%s"... ' % self.__class__.__name__, end='')
         if 'os' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass os in kwargs' % self.__class__.__name__)
         if 'bitness' not in kwargs:
-            raise EPTestingException('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
+            raise Exception('Bad call to %s -- must pass bitness in kwargs' % self.__class__.__name__)
         self.os = kwargs['os']
         self.bitness = kwargs['bitness']
         self.msvc_version = kwargs['msvc_version']
@@ -334,7 +333,7 @@ class TestCppAPIDelayedAccess(BaseTest):
             my_env["PATH"] = install_root + ";" + my_env["PATH"]
         try:
             my_check_call(self.verbose, [built_binary_path], env=my_env)
-        except EPTestingException as e:
+        except Exception as e:
             print("Delayed C API Wrapper execution failed")
             raise e
         print(' [DONE]!')
