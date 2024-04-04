@@ -11239,9 +11239,9 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
 
                         if (A2ill > 1.0e-6) {
 
-                            auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                             DiffReflGlass = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
                             if (ShadeFlag == WinShadingType::SwitchableGlazing) {
+                                auto const &thisConstructSh = state.dataConstruction->Construct(ConstrNumSh);
                                 SolTransGlassSh =
                                     POLYF(state.dataHeatBal->SurfCosIncAng(state.dataGlobal->HourOfDay, state.dataGlobal->TimeStep, SurfNum),
                                           thisConstructSh.TransSolBeamCoef);
