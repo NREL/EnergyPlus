@@ -1964,3 +1964,60 @@ TEST_F(EnergyPlusFixture, PIU_InducedAir_Plenums)
     });
     EXPECT_TRUE(compare_err_stream(expectedError, true));
 }
+
+TEST_F(EnergyPlusFixture, PIU_reportTerminalUnit)
+{
+    using namespace EnergyPlus::OutputReportPredefined;
+    auto &orp = *state->dataOutRptPredefined;
+
+    SetPredefinedTables(*state);
+
+    state->dataScheduleMgr->ScheduleInputProcessed = true;
+    auto &sch = state->dataScheduleMgr->Schedule;
+    sch.allocate(5);
+    sch(1).Name = "schA";
+    sch(2).Name = "schB";
+
+    auto &adu = state->dataDefineEquipment->AirDistUnit;
+    adu.allocate(2);
+    adu(1).Name = "ADU a";
+    adu(1).TermUnitSizingNum = 1;
+
+    auto &siz = state->dataSize->TermUnitFinalZoneSizing;
+    siz.allocate(2);
+    siz(1).DesCoolVolFlowMin = 0.15;
+    siz(1).MinOA = 0.05;
+    siz(1).CoolDesTemp = 12.5;
+    siz(1).HeatDesTemp = 40.0;
+    siz(1).DesHeatLoad = 2000.0;
+    siz(1).DesCoolLoad = 3000.0;
+
+    auto &piu = state->dataPowerInductionUnits->PIU;
+    piu.allocate(2);
+    piu(1).ADUNum = 1;
+    piu(1).UnitType = "AirTerminal:SingleDuct:SeriesPIU:Reheat";
+    piu(1).MaxPriAirVolFlow = 0.30;
+    piu(1).MaxSecAirVolFlow = 0.25;
+    piu(1).HCoilType = PoweredInductionUnits::HtgCoilType::Electric;
+    piu(1).Fan_Num = 1;
+    piu(1).FanName = "FanA";
+
+    piu(1).reportTerminalUnit(*state);
+
+    EXPECT_EQ("0.15", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlow, "ADU a"));
+    EXPECT_EQ("0.05", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOutdoorFlow, "ADU a"));
+    EXPECT_EQ("12.50", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupCoolingSP, "ADU a"));
+    EXPECT_EQ("40.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermSupHeatingSP, "ADU a"));
+    EXPECT_EQ("2000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatingCap, "ADU a"));
+    EXPECT_EQ("3000.00", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolingCap, "ADU a"));
+    EXPECT_EQ("AirTerminal:SingleDuct:SeriesPIU:Reheat", RetrievePreDefTableEntry(*state, orp.pdchAirTermTypeInp, "ADU a"));
+    EXPECT_EQ("0.30", RetrievePreDefTableEntry(*state, orp.pdchAirTermPrimFlow, "ADU a"));
+    EXPECT_EQ("0.25", RetrievePreDefTableEntry(*state, orp.pdchAirTermSecdFlow, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinFlowSch, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMaxFlowReh, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
+    EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
+    EXPECT_EQ("FAN:VARIABLEVOLUME", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("FanA", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
+}
