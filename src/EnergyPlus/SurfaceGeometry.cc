@@ -6800,8 +6800,6 @@ namespace SurfaceGeometry {
         int AlphaOffset; // local temp var
         std::string Roughness;
         int ThisSurf;                   // do loop counter
-        Real64 AvgAzimuth;              // temp for error checking
-        Real64 AvgTilt;                 // temp for error checking
         constexpr Real64 AZITOL = 15.0; // Degree Azimuth Angle Tolerance
         constexpr Real64 TILTOL = 10.0; // Degree Tilt Angle Tolerance
         int SurfID;                     // local surface "pointer"
@@ -6945,11 +6943,11 @@ namespace SurfaceGeometry {
                                        
             for (int surfNum : cavity.SurfPtrs) {
                 auto const &surf = state.dataSurface->Surface(surfNum);
-                if (General::rotAzmDiffDeg(surf.Azimuth, AvgAzimuth) > AZITOL) {
+                if (General::rotAzmDiffDeg(surf.Azimuth, cavity.Azimuth) > AZITOL) {
                     ShowWarningError(state, format("{}=\"{}, Surface {} has Azimuth different from others in the associated group.",
                                                    ipsc->cCurrentModuleObject, cavity.Name, surf.Name));
                 }
-                if (std::abs(surf.Tilt - AvgTilt) > TILTOL) {
+                if (std::abs(surf.Tilt - cavity.Tilt) > TILTOL) {
                     ShowWarningError(state, format("{}=\"{}, Surface {} has Tilt different from others in the associated group.",
                                                    ipsc->cCurrentModuleObject, cavity.Name, surf.Name));
                 }

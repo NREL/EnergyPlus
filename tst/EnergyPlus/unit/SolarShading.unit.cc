@@ -5210,9 +5210,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     state->dataSurface->SurfWinTanProfileAngVert(2) = 10.0;
     state->dataSurface->SurfWinTanProfileAngHor(1) = 10.0;
     state->dataSurface->SurfWinTanProfileAngHor(2) = 10.0;
-    state->dataEnvrn->SOLCOS(1) = 0.5;
-    state->dataEnvrn->SOLCOS(2) = 0.5;
-    state->dataEnvrn->SOLCOS(3) = 0.5;
+    state->dataEnvrn->SOLCOS = {0.5, 0.5, 0.5};
     state->dataEnvrn->SunIsUp = true;
     state->dataEnvrn->DifSolarRad = 200.0;
     state->dataEnvrn->BeamSolarRad = 1000.0;
