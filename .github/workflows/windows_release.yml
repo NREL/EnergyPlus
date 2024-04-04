@@ -58,7 +58,7 @@ jobs:
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
       with:
-        qtifw-version: '4.x'
+        qtifw-version: '4.6.1'
 
     - name: Install Python dependencies
       run: |
@@ -102,6 +102,15 @@ jobs:
         mpm --find-updates
         mpm --admin --find-updates
 
+    - name: Downgrade cmake to 3.28
+      run: |
+        cmake --version
+        choco install cmake --version=3.28.4 --installargs 'ADD_CMAKE_TO_PATH=System'
+
+    - name: Check cmake
+      run: |
+        cmake --version
+
     # This will install all required packages and does that in a single thread. So later in cmake we can safely run in parallel
     - name: Install required packages by building the Test document
       shell: bash
@@ -131,7 +140,7 @@ jobs:
     - name: Build Package
       working-directory: ./build
       shell: bash
-      run: cmake --build . --target package -j 2 --config $BUILD_TYPE
+      run: cmake --build . --target package -j 4 --config $BUILD_TYPE
 
     - name: Upload Zip to release
       uses: svenstaro/upload-release-action@v2

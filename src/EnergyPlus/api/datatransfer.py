@@ -1,4 +1,4 @@
-# EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University
+# EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
 # from the U.S. Dept. of Energy), Oak Ridge National Laboratory, managed by UT-
@@ -1158,7 +1158,7 @@ class DataExchange:
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :return: The current zone time step in fractional hours.
         """
-        return self.api.systemTimeStep(state)
+        return self.api.zoneTimeStep(state)
 
     def system_time_step(self, state: c_void_p) -> float:
         """

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,6 @@
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Array4D.hh>
 #include <ObjexxFCL/Optional.hh>
-#include <ObjexxFCL/Reference.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/ConvectionConstants.hh>
@@ -278,6 +277,7 @@ namespace DataHeatBalance {
         SecHeatingDXCoilMultiSpeed,
         ElectricLoadCenterConverter,
         FanSystemModel,
+        IndoorGreen,
         Num
     };
 
@@ -358,7 +358,8 @@ namespace DataHeatBalance {
         "COIL:COOLING:DX:MULTISPEED",
         "COIL:HEATING:DX:MULTISPEED",
         "ELECTRICLOADCENTER:STORAGE:CONVERTER",
-        "FAN:SYSTEMMODEL"};
+        "FAN:SYSTEMMODEL",
+        "INDOORGREEN"};
 
     static constexpr std::array<std::string_view, static_cast<int>(DataHeatBalance::IntGainType::Num)> IntGainTypeNamesCC = {
         "People",
@@ -414,7 +415,8 @@ namespace DataHeatBalance {
         "Coil:Cooling:DX:MultiSpeed",
         "Coil:Heating:DX:MultiSpeed",
         "ElectricLoadCenter:Storage:Converter",
-        "Fan:SystemModel"};
+        "Fan:SystemModel",
+        "IndoorGreen"};
 
     // Parameters for checking surface heat transfer models
     constexpr Real64 HighDiffusivityThreshold(1.e-5);   // used to check if Material properties are out of line.
@@ -481,8 +483,8 @@ namespace DataHeatBalance {
         Real64 minOccupants = 0.0;     // minimum occupancy (sum of NomMinNumberPeople for the space People objects, not multiplied)
         Real64 maxOccupants = 0.0;     // maximum occupancy (sum of NomMaxNumberPeople for the space People objects, not multiplied)
         bool isRemainderSpace = false; // True if this space is auto-generated "-Remainder" space
+
         std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this space
-        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this space
 
         // Pointers to Surface Data Structure
         // |AllSurfF                                                                      |AllSurfL
@@ -667,7 +669,6 @@ namespace DataHeatBalance {
         int ZoneContamControllerSchedIndex = 0;              // Index for this schedule
         bool FlagCustomizedZoneCap = false;                  // True if customized Zone Capacitance Multiplier is used
         std::vector<Constant::eFuel> otherEquipFuelTypeNums; // List of fuel types used by other equipment in this zone
-        std::vector<std::string> otherEquipFuelTypeNames;    // List of fuel types used by other equipment in this zone
 
         // Hybrid Modeling
         Real64 ZoneMeasuredTemperature = 0.0;               // Measured zone air temperature input by user
@@ -698,10 +699,8 @@ namespace DataHeatBalance {
         int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
         // Spaces
-        bool anySurfacesWithoutSpace = false; // True if any surfaces in a zone do not have a space assigned in input
-        bool anySurfacesWithSpace = false;    // True if any surfaces in a zone have a space assigned in input
-        EPVector<int> spaceIndexes;           // Indexes to spaces in this zone
-        int numSpaces = 0;                    // Number of spaces in this zone
+        EPVector<int> spaceIndexes; // Indexes to spaces in this zone
+        int numSpaces = 0;          // Number of spaces in this zone
 
         // Default Constructor
         ZoneData() : Centroid(0.0, 0.0, 0.0)
@@ -1305,7 +1304,6 @@ namespace DataHeatBalance {
     struct GenericComponentZoneIntGainStruct
     {
         // Members
-        std::string CompObjectType;                   // device object class name
         std::string CompObjectName;                   // device user unique name
         IntGainType CompType = IntGainType::Invalid;  // type of internal gain device identifier
         Real64 spaceGainFrac = 1.0;                   // Fraction of gain value assigned to this Space (because gain rate might be for an entire zone)
@@ -1478,7 +1476,7 @@ namespace DataHeatBalance {
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
 
-        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string_view name);
+        void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };
 
     struct ZonePreDefRepType

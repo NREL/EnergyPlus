@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -511,8 +511,6 @@ namespace RoomAir {
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
-        using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -603,26 +601,30 @@ namespace RoomAir {
             }
         }
 
-        ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+        ConvGainsOccupiedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
         ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
             ConvGainsOccupiedSubzone += RetAirGain;
         }
 
-        ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+        ConvGainsMixedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                  0.5 * thisZoneHB.SysDepZoneLoadsLagged;
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
             ConvGainsMixedSubzone += RetAirGain;
         }
 
         ConvGains = ConvGainsOccupiedSubzone + ConvGainsMixedSubzone;
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesMixedSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         //=================== Entering air system temperature and flow====================
         SumSysMCp = 0.0;

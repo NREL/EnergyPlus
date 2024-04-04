@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,46 +45,93 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SortAndStringUtilities_hh_INCLUDED
-#define SortAndStringUtilities_hh_INCLUDED
-
+#ifndef IndoorGreen_hh_INCLUDED
+#define IndoorGreen_hh_INCLUDED
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.hh>
-
+#include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace SortAndStringUtilities {
+struct EnergyPlusData;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+namespace IndoorGreen {
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    enum class ETCalculationMethod
+    {
+        Invalid = -1,
+        PenmanMonteith,
+        Stanghellini,
+        Num
+    };
+    enum class LightingMethod
+    {
+        Invalid = -1,
+        LED,
+        Daylighting,
+        LEDDaylighting,
+        Num
+    };
+    struct IndoorGreenParams
+    {
+        std::string Name;
+        std::string ZoneName;
+        std::string SurfName;
+        std::string Schedule;
+        int SchedPtr = 0;
+        int SchedLEDPtr = 0;
+        int LightRefPtr = 0;               // daylight reference point number;
+        int LightControlPtr = 0;           // daylight control point number;
+        int SchedLEDDaylightTargetPtr = 0; // LED-Daylight PPFD setpoint schedule pointer
+        Real64 LeafArea = 0.0;             // one-sided leaf area
+        Real64 LEDNominalPPFD = 0.0;       // nominal PPFD for LED grow light (PPFD)
+        Real64 LEDNominalEleP = 0.0;       // nominal power for total LED grow light (W)
+        Real64 LEDRadFraction = 0.0;       // radiant fraction of LED grow light (0-1)
+        Real64 ZCO2 = 400;
+        Real64 ZVPD = 0.0;            // vapor pressure deficit (pa)
+        Real64 ZPPFD = 0;             // PPFD
+        Real64 SensibleRate = 0.0;    // w
+        Real64 LatentRate = 0.0;      // w
+        Real64 ETRate = 0.0;          // kg/(m2s)
+        Real64 LambdaET = 0.0;        // J/(kg m2)
+        Real64 LEDActualPPFD = 0.0;   // LED operational PPFD
+        Real64 LEDActualEleP = 0.0;   // LED operational power (W)
+        Real64 LEDActualEleCon = 0.0; // LED operational electricity consumption (J)
+        int SurfPtr = 0;
+        int ZoneListPtr = 0;
+        int ZonePtr = 0;                         // point to the zone where the indoor greenery system is located
+        int SpacePtr = 0;                        // point to the space where the indoor greenery system is located
+        ETCalculationMethod etCalculationMethod; // Enum for ETCalculationMethod
+        LightingMethod lightingMethod;           // Enum for LightingMethod
+        bool CheckIndoorGreenName = true;
+        Real64 EMSET = 0.0;
+        bool EMSETCalOverrideOn = false;
+        Array1D_string FieldNames;
+    };
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
+    void SimIndoorGreen(EnergyPlusData &state);
+    void GetIndoorGreenInput(EnergyPlusData &state, bool &ErrorsFound);
+    void SetIndoorGreenOutput(EnergyPlusData &state);
+    void InitIndoorGreen(EnergyPlusData &state);
+    void ETModel(EnergyPlusData &state);
+    Real64 ETBaseFunction(EnergyPlusData &state, Real64 ZonePreTemp, Real64 ZonePreHum, Real64 ZonePPFD, Real64 VPD, Real64 LAI, Real64 SwitchF);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SortUtilities
+} // namespace IndoorGreen
 
-    // Functions
-
-    void SetupAndSort(Array1D_string &Alphas, // Alphas to be sorted
-                      Array1D_int &iAlphas    // Indexes of sorted array
-    );
-
-    void QsortC(Array1S_string Alphas, // Alphas to be sorted
-                Array1S_int iAlphas    // Indexes of sorted array
-    );
-
-    void QsortPartition(Array1S_string Alphas, // Alphas to be sorted
-                        Array1S_int iAlphas,   // Indexes of sorted array
-                        int &marker);
-
-} // namespace SortAndStringUtilities
+struct IndoorGreenData : BaseGlobalStruct
+{
+    int NumIndoorGreen = 0; // Number of Indoor Greenery Systems found in input
+    bool getInputFlag = true;
+    Array1D<IndoorGreen::IndoorGreenParams> indoorGreens;
+    void clear_state() override
+    {
+        new (this) IndoorGreenData();
+    }
+};
 
 } // namespace EnergyPlus
 

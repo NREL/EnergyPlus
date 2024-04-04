@@ -150,6 +150,7 @@ set(test_src
     ICSCollector.unit.cc
     IceThermalStorage.unit.cc
     IdfParser.unit.cc
+    IndoorGreen.unit.cc
     InputProcessor.unit.cc
     IntegratedHeatPump.unit.cc
     InternalHeatGains.unit.cc
@@ -220,7 +221,6 @@ set(test_src
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
     SolarShading.unit.cc
-    SortAndStringUtilities.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -206,6 +206,7 @@ namespace EIRPlantLoopHeatPumps {
         Real64 defrostEnergy = 0.0;
         Real64 fractionalDefrostTime = 0.0;
         Real64 maxOutdoorTemperatureDefrost = 0.0;
+        Real64 defrostPowerMultiplier = 1.0; // defrost power adjustment factor
 
         // a couple worker functions to easily allow merging of cooling and heating operations
         std::function<Real64(Real64, Real64)> calcLoadOutletTemp;
@@ -229,11 +230,37 @@ namespace EIRPlantLoopHeatPumps {
 
         virtual void doPhysics(EnergyPlusData &state, Real64 currentLoad);
 
+        void doPhysicsWSHP(EnergyPlusData &state, Real64 currentLoad);
+
+        void doPhysicsASHP(EnergyPlusData &state, Real64 currentLoad);
+
+        void calcAvailableCapacity(EnergyPlusData &state, Real64 const currentLoad, Real64 &availableCapacity, Real64 &partLoadRatio);
+
+        Real64 heatingCapacityModifierASHP(EnergyPlusData &state) const;
+
+        void setPartLoadAndCyclingRatio(EnergyPlusData &state, Real64 &partLoadRatio);
+
+        void calcLoadSideHeatTransfer(EnergyPlusData &state, Real64 const availableCapacity);
+
+        void calcPowerUsage(EnergyPlusData &state);
+
+        void calcSourceSideHeatTransferWSHP(EnergyPlusData &state);
+
+        void calcSourceSideHeatTransferASHP(EnergyPlusData &state);
+
+        virtual void report(EnergyPlusData &state);
+
         void sizeLoadSide(EnergyPlusData &state);
 
         void sizeSrcSideWSHP(EnergyPlusData &state);
 
         void sizeSrcSideASHP(EnergyPlusData &state);
+
+        void doDefrost(EnergyPlusData &state, Real64 &AvailableCapacity);
+
+        void capModFTCurveCheck(EnergyPlusData &state, const Real64 loadSideOutletSPTemp, Real64 &capModFTemp);
+
+        void eirModCurveCheck(EnergyPlusData &state, Real64 &eirModFTemp, Real64 &eirModFPLR);
 
         Real64 getLoadSideOutletSetPointTemp(EnergyPlusData &state) const;
 
@@ -350,6 +377,7 @@ namespace EIRPlantLoopHeatPumps {
         static void pairUpCompanionCoils(EnergyPlusData &state);
         static void processInputForEIRPLHP(EnergyPlusData &state);
         void oneTimeInit(EnergyPlusData &state);
+        void report(EnergyPlusData &state);
 
         // New or specialized functions for derived struct
         virtual ~EIRFuelFiredHeatPump() = default;

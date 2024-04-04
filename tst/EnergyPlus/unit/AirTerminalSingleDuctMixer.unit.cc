@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,6 +189,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
         "    0.300,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.300,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -438,6 +439,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -790,6 +792,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -1144,6 +1147,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -1581,6 +1585,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0,                       !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",

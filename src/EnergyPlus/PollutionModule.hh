@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -83,40 +83,57 @@ namespace Pollution {
         Num
     };
 
-    constexpr std::array<std::string_view, (int)Pollutant::Num> poll2Names = {"CO2",
-                                                                              "CO",
-                                                                              "CH4",
-                                                                              "NOx",
-                                                                              "N2O",
-                                                                              "SO2",
-                                                                              "PM",
-                                                                              "PM10",
-                                                                              "PM2.5",
-                                                                              "NH3",
-                                                                              "NMVOC",
-                                                                              "Hg",
-                                                                              "Pb",
-                                                                              "WaterEnvironmentalFactors",
-                                                                              "Nuclear High",
-                                                                              "Nuclear Low"};
+    constexpr std::array<std::string_view, (int)Pollutant::Num> pollNames = {"CO2",
+                                                                             "CO",
+                                                                             "CH4",
+                                                                             "NOx",
+                                                                             "N2O",
+                                                                             "SO2",
+                                                                             "PM",
+                                                                             "PM10",
+                                                                             "PM2.5",
+                                                                             "NH3",
+                                                                             "NMVOC",
+                                                                             "Hg",
+                                                                             "Pb",
+                                                                             "WaterEnvironmentalFactors",
+                                                                             "Nuclear High",
+                                                                             "Nuclear Low"};
 
-    constexpr std::array<OutputProcessor::Unit, (int)Pollutant::Num> poll2Units = {
-        OutputProcessor::Unit::kg, // CO2
-        OutputProcessor::Unit::kg, // CO
-        OutputProcessor::Unit::kg, // CH4
-        OutputProcessor::Unit::kg, // NOx
-        OutputProcessor::Unit::kg, // N2O
-        OutputProcessor::Unit::kg, // SO2
-        OutputProcessor::Unit::kg, // PM
-        OutputProcessor::Unit::kg, // PM10
-        OutputProcessor::Unit::kg, // PM2_5
-        OutputProcessor::Unit::kg, // NH3
-        OutputProcessor::Unit::kg, // NMVOC
-        OutputProcessor::Unit::kg, // Hg
-        OutputProcessor::Unit::kg, // Pb
-        OutputProcessor::Unit::L,  // Water
-        OutputProcessor::Unit::kg, // NuclearHigh
-        OutputProcessor::Unit::m3, // NuclearLow
+    constexpr std::array<Constant::eResource, (int)Pollutant::Num> poll2Resource = {Constant::eResource::CO2,
+                                                                                    Constant::eResource::CO,
+                                                                                    Constant::eResource::CH4,
+                                                                                    Constant::eResource::NOx,
+                                                                                    Constant::eResource::N2O,
+                                                                                    Constant::eResource::SO2,
+                                                                                    Constant::eResource::PM,
+                                                                                    Constant::eResource::PM10,
+                                                                                    Constant::eResource::PM2_5,
+                                                                                    Constant::eResource::NH3,
+                                                                                    Constant::eResource::NMVOC,
+                                                                                    Constant::eResource::Hg,
+                                                                                    Constant::eResource::Pb,
+                                                                                    Constant::eResource::WaterEnvironmentalFactors,
+                                                                                    Constant::eResource::NuclearHigh,
+                                                                                    Constant::eResource::NuclearLow};
+
+    constexpr std::array<Constant::Units, (int)Pollutant::Num> pollUnits = {
+        Constant::Units::kg, // CO2
+        Constant::Units::kg, // CO
+        Constant::Units::kg, // CH4
+        Constant::Units::kg, // NOx
+        Constant::Units::kg, // N2O
+        Constant::Units::kg, // SO2
+        Constant::Units::kg, // PM
+        Constant::Units::kg, // PM10
+        Constant::Units::kg, // PM2_5
+        Constant::Units::kg, // NH3
+        Constant::Units::kg, // NMVOC
+        Constant::Units::kg, // Hg
+        Constant::Units::kg, // Pb
+        Constant::Units::L,  // Water
+        Constant::Units::kg, // NuclearHigh
+        Constant::Units::m3, // NuclearLow
     };
 
     constexpr std::array<std::string_view, (int)Pollutant::Num> poll2outVarStrs = {

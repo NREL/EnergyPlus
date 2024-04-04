@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -120,6 +120,7 @@ namespace DataSizing {
     // parameters for sizing
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
+    constexpr int Combination(3);
 
     // parameters for Cooling Peak Load Type
     enum class PeakLoad
@@ -654,6 +655,16 @@ namespace DataSizing {
         Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
                                            Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
+
+        Real64 applyTermUnitSizingCoolLoad(Real64 coolLoad) const
+        {
+            return coolLoad * this->SpecDesSensCoolingFrac; // Apply DesignSpecification:AirTerminal:Sizing to cooling load
+        }
+
+        Real64 applyTermUnitSizingHeatLoad(Real64 heatLoad) const
+        {
+            return heatLoad * this->SpecDesSensHeatingFrac; // Apply DesignSpecification:AirTerminal:Sizing to heating load
+        }
     };
 
     struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents

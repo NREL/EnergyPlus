@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2811,6 +2811,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_3Speeds_IEER2022ValueOrigTest)
         "{m3/s-W",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation "
         "{m3/s-W",
+        "  No,                                                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  Autosize,                                                !- Maximum Supply Air Temperature {C}",
         "  21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
         "  ,                                                        !- Outdoor Dry-Bulb Temperature Sensor Node Name",
