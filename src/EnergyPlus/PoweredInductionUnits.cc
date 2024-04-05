@@ -2187,7 +2187,7 @@ void PowIndUnitData::reportTerminalUnit(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, "n/a");
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, HCoilNamesUC[(int)this->HCoilType]);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
-    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, DataHVACGlobals::fanTypeNamesUC[(int)this->Fan_Num]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, DataHVACGlobals::cFanTypes((int)this->Fan_Num));
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 

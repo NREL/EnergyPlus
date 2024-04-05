@@ -1101,14 +1101,18 @@ void processZoneEquipmentInput(EnergyPlusData &state,
 
         thisEquipConfig.ReturnNode.allocate(NumNodes);
         thisEquipConfig.ReturnNodeAirLoopNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathNum.allocate(NumNodes);
+        thisEquipConfig.ReturnNodeRetPathCompNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeInletNum.allocate(NumNodes);
         thisEquipConfig.FixedReturnFlow.allocate(NumNodes);
         thisEquipConfig.ReturnNodePlenumNum.allocate(NumNodes);
         thisEquipConfig.ReturnNodeExhaustNodeNum.allocate(NumNodes);
         thisEquipConfig.SharedExhaustNode.allocate(NumNodes);
-        thisEquipConfig.ReturnNode = 0;                                         // initialize to zero here
-        thisEquipConfig.ReturnNodeAirLoopNum = 0;                               // initialize to zero here
-        thisEquipConfig.ReturnNodeInletNum = 0;                                 // initialize to zero here
+        thisEquipConfig.ReturnNode = 0;           // initialize to zero here
+        thisEquipConfig.ReturnNodeAirLoopNum = 0; // initialize to zero here
+        thisEquipConfig.ReturnNodeInletNum = 0;   // initialize to zero here
+        thisEquipConfig.ReturnNodeRetPathNum = 0;
+        thisEquipConfig.ReturnNodeRetPathCompNum = 0;
         thisEquipConfig.FixedReturnFlow = false;                                // initialize to false here
         thisEquipConfig.ReturnNodePlenumNum = 0;                                // initialize to zero here
         thisEquipConfig.ReturnNodeExhaustNodeNum = 0;                           // initialize to zero here

@@ -2095,14 +2095,16 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
         auto &thisLoopSide = thisLoop.LoopSide(LoopSideNum);
         std::string_view const loopSide = DataPlant::DemandSupplyNames[static_cast<int>(LoopSideNum)];
 
-        // OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompType + repOffset, thisLoopSide.loopSideDescription, loopType);
-        // OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide + repOffset, thisLoopSide.loopSideDescription, loopSide);
-
-        // s->pdstTopPlantLoop2 = newPreDefSubTable(state, s->pdrTopology, "Plant Loop Component Arrangement 2");
+        // s->pdstTopPlantLoop2 = newPreDefSubTable(state, s->pdrTopology, "Plant Loop Component Arrangement");
         // s->pdchTopPlantLoopType2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Loop Type");
         // s->pdchTopPlantLoopName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Loop Name");
         // s->pdchTopPlantSide2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Side");
-        // s->pdchTopPlantSplitMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter/Mixer Name");
+        // s->pdchTopPlantSplitName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter Name");
+        // s->pdchTopPlantBranchName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Branch Name");
+        // s->pdchTopPlantCompType2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Component Type");
+        // s->pdchTopPlantCompName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Component Name");
+        // s->pdchTopPlantMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Mixer Name");
+
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), thisLoop.Name);
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), loopSide);
@@ -2111,28 +2113,20 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
         // Report for first branch
         auto &thisBranch = thisLoopSide.Branch(1);
         constexpr std::string_view branch = "Branch";
-        // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
-        // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
 
         for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
             auto &thisComp = thisBranch.Comp(compNum);
-            // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
             fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
         }
 
         if (thisLoopSide.TotalBranches >= 3) {
-            // splitter
-            if (thisLoopSide.Splitter.Exists) {
-                constexpr std::string_view splitter = "Splitter";
-                // fillPlantToplogyRow(state, thisLoopSide.Splitter.Name, splitter, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
-                fillPlantToplogySplitterMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Splitter.Name, rowCounter);
-            }
-
             // parallel branches
             for (int branchNum = 2; branchNum <= thisLoopSide.TotalBranches - 1; ++branchNum) {
                 auto &thisBranch = thisLoopSide.Branch(branchNum);
-                // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
-                // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
+                // splitter
+                if (thisLoopSide.Splitter.Exists) {
+                    fillPlantToplogySplitterRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Splitter.Name, rowCounter);
+                }
 
                 for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
                     auto &thisComp = thisBranch.Comp(compNum);
@@ -2140,59 +2134,52 @@ void fillPlantCondenserTopology(EnergyPlusData &state, DataPlant::PlantLoopData 
                     fillPlantToplogyComponentRow2(
                         state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
                 }
-            }
-
-            // mixer
-            if (thisLoopSide.Mixer.Exists) {
-                constexpr std::string_view mixer = "Mixer";
-                // fillPlantToplogyRow(state, thisLoopSide.Mixer.Name, mixer, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
-                fillPlantToplogySplitterMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Mixer.Name, rowCounter);
+                // mixer
+                if (thisLoopSide.Mixer.Exists) {
+                    rowCounter -= 1;
+                    constexpr std::string_view mixer = "Mixer";
+                    fillPlantToplogyMixerRow2(state, loopType, thisLoop.Name, loopSide, thisLoopSide.Mixer.Name, rowCounter);
+                    rowCounter += 1;
+                }
             }
 
             // Outlet Branch
             auto &thisBranch = thisLoopSide.Branch(thisLoopSide.TotalBranches);
-            // fillPlantToplogyRow(state, thisBranch.Name, branch, loopSide, loopType, thisLoop.Name, thisLoop.FluidName, repOffset);
-            // fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, "", "", rowCounter);
             for (int compNum = 1; compNum <= thisBranch.TotalComponents; ++compNum) {
                 auto &thisComp = thisBranch.Comp(compNum);
-                // fillPlantToplogyRow(state, thisComp.Name, thisComp.TypeOf, loopSide, branch, thisBranch.Name, thisLoop.FluidName, repOffset);
                 fillPlantToplogyComponentRow2(state, loopType, thisLoop.Name, loopSide, thisBranch.Name, thisComp.TypeOf, thisComp.Name, rowCounter);
             }
         }
     }
 }
 
-// void fillPlantToplogyRow(EnergyPlusData &state,
-//                          const std::string_view &compName,
-//                          const std::string_view &compType,
-//                          const std::string_view &side,
-//                          const std::string_view &parentType,
-//                          const std::string_view &parentName,
-//                          const std::string_view &fluidName,
-//                          const int reportOffset)
-//{
-//     auto &orp = state.dataOutRptPredefined;
-//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantCompType + reportOffset, compName, compType);
-//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide + reportOffset, compName, side);
-//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantParType + reportOffset, compName, parentType);
-//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantParName + reportOffset, compName, parentName);
-//     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantConType + reportOffset, compName, fluidName);
-// }
-
-void fillPlantToplogySplitterMixerRow2(EnergyPlusData &state,
-                                       const std::string_view &loopType,
-                                       const std::string_view &loopName,
-                                       const std::string_view &side,
-                                       const std::string_view &splitterMixerName,
-                                       int &rowCounter)
+void fillPlantToplogySplitterRow2(EnergyPlusData &state,
+                                  const std::string_view &loopType,
+                                  const std::string_view &loopName,
+                                  const std::string_view &side,
+                                  const std::string_view &splitterName,
+                                  int &rowCounter)
 {
     auto &orp = state.dataOutRptPredefined;
-    // s->pdchTopPlantSplitMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter/Mixer Name");
+    // s->pdchTopPlantSplitName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Splitter Name");
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), loopName);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), side);
-    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSplitMixName2, format("{}", rowCounter), splitterMixerName);
-    ++rowCounter;
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSplitName2, format("{}", rowCounter), splitterName);
+}
+void fillPlantToplogyMixerRow2(EnergyPlusData &state,
+                               const std::string_view &loopType,
+                               const std::string_view &loopName,
+                               const std::string_view &side,
+                               const std::string_view &mixerName,
+                               int &rowCounter)
+{
+    auto &orp = state.dataOutRptPredefined;
+    // s->pdchTopPlantMixName2 = newPreDefColumn(state, s->pdstTopPlantLoop2, "Mixer Name");
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopType2, format("{}", rowCounter), loopType);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantLoopName2, format("{}", rowCounter), loopName);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantSide2, format("{}", rowCounter), side);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopPlantMixName2, format("{}", rowCounter), mixerName);
 }
 void fillPlantToplogyComponentRow2(EnergyPlusData &state,
                                    const std::string_view &loopType,

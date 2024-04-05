@@ -156,6 +156,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                         if (thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).InNode ==
                                             state.dataZoneEquip->SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
                                             thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
+                                            thisZoneEquipConfig.AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathOutNodeIndex = SAPOutNode;
                                             for (int OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                                  ++OutNum) {
                                                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
@@ -224,6 +225,7 @@ void InitEnergyReports(EnergyPlusData &state)
                                         if (thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).InNode ==
                                             state.dataZoneEquip->SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
                                             thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
+                                            thisZoneEquipConfig.AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathOutNodeIndex = SAPOutNode;
                                             for (int OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes;
                                                  ++OutNum) {
                                                 if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
@@ -4768,13 +4770,16 @@ void reportAirLoopToplogy(EnergyPlusData &state)
 {
     // s->pdstTopAirLoop = newPreDefSubTable(state, s->pdrTopology, "Air Loop Supply Side Component Arrangement");
     // s->pdchTopAirLoopName = newPreDefColumn(state, s->pdstTopAirLoop, "Airloop Name");
-    // s->pdchTopAirBranchName = newPreDefColumn(state, s->pdstTopAirLoop, "Branch Name");
+    // s->pdchTopAirSplitName = newPreDefColumn(state, s->pdstTopAirLoop, "Splitter Name");
+    // s->pdchTopAirBranchName = newPreDefColumn(state, s->pdstTopAirLoop, "Supply Branch Name");
+    // s->pdchTopAirSupplyBranchType = newPreDefColumn(state, s->pdstTopAirLoop, "Supply Branch Type");
     // s->pdchTopAirCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Component Type");
     // s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
-    // s->pdchTopAirSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Type");
-    // s->pdchTopAirSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Name");
-    // s->pdchTopAirSubSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Type");
-    // s->pdchTopAirSubSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Name");
+    // s->pdchTopAirMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Mixer Name");
+    // s->pdchTopAirParentCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type");
+    // s->pdchTopAirParentCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name");
+    // s->pdchTopAirParentCompType2 = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type 2");
+    // s->pdchTopAirParentCompName2 = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name 2");
 
     auto &orp = state.dataOutRptPredefined;
     int rowCounter = 1;
@@ -4787,49 +4792,46 @@ void reportAirLoopToplogy(EnergyPlusData &state)
             if (pas.Splitter.Exists) {
                 for (int outNum : pas.Splitter.BranchNumOut) {
                     if (outNum == BranchNum) {
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Splitter.Name);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSplitName, format("{}", rowCounter), pas.Splitter.Name);
                         break;
                     }
                 }
             }
-            if (pas.Mixer.Exists) {
-                if (pas.Mixer.BranchNumOut == BranchNum) {
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirUpSplitMixName, format("{}", rowCounter), pas.Mixer.Name);
-                }
-            }
             for (int CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum) {
                 auto &pasBranchComp = pasBranch.Comp(CompNum);
-                fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                if (pasBranchComp.NumSubComps == 0) {
+                    fillAirloopToplogyComponentRow(
+                        state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                }
                 for (int SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                     auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
-                    fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                    if (pasBranchSubComp.NumSubSubComps == 0) {
+                        OutputReportPredefined::PreDefTableEntry(
+                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchComp.TypeOf);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchComp.Name);
+                        fillAirloopToplogyComponentRow(
+                            state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchSubComp.TypeOf, pasBranchSubComp.Name, rowCounter);
+                    }
                     for (int SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                         auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
+                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchComp.TypeOf);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchComp.Name);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubSubCompType, format("{}", rowCounter), pasBranchSubSubComp.TypeOf);
+                            state, orp->pdchTopAirParentCompType2, format("{}", rowCounter), pasBranchSubComp.TypeOf);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirSubSubCompName, format("{}", rowCounter), pasBranchSubSubComp.Name);
-                        fillAirloopToplogyComponentRow(state, pas.Name, pasBranch.Name, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
+                            state, orp->pdchTopAirParentCompName2, format("{}", rowCounter), pasBranchSubComp.Name);
+                        fillAirloopToplogyComponentRow(
+                            state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchSubSubComp.TypeOf, pasBranchSubSubComp.Name, rowCounter);
                     }
                 }
             }
             if (pas.Mixer.Exists) {
                 for (int inNum : pas.Mixer.BranchNumIn) {
                     if (inNum == BranchNum) {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Mixer.Name);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirMixName, format("{}", rowCounter - 1), pas.Mixer.Name);
                         break;
                     }
-                }
-            }
-            if (pas.Splitter.Exists) {
-                if (pas.Splitter.BranchNumIn == BranchNum) {
-                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDownSplitMixName, format("{}", rowCounter - 1), pas.Splitter.Name);
                 }
             }
         }
@@ -4852,21 +4854,6 @@ void reportAirLoopToplogy(EnergyPlusData &state)
         auto &thisAtoZInfo = state.dataAirLoop->AirToZoneNodeInfo(airLoopNum);
         OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
         ++rowCounter;
-        if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
-            auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
-            auto &thisBranch = pas.Branch(pas.InletBranchNum[0]);
-            for (int compNum = 1; compNum <= thisReturnPath.NumOfComponents; ++compNum) {
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
-                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
-                OutputReportPredefined::PreDefTableEntry(
-                    state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
-                OutputReportPredefined::PreDefTableEntry(
-                    state, orp->pdchTopAirReturnPCompType, format("{}", rowCounter), thisReturnPath.ComponentType(compNum));
-                OutputReportPredefined::PreDefTableEntry(
-                    state, orp->pdchTopAirReturnPCompName, format("{}", rowCounter), thisReturnPath.ComponentName(compNum));
-                ++rowCounter;
-            }
-        }
         for (int ductNum = 1; ductNum <= thisAtoZInfo.NumSupplyNodes; ++ductNum) {
             auto &thisBranch = pas.Branch(thisAtoZInfo.SupplyDuctBranchNum(ductNum));
             if (thisAtoZInfo.SupplyAirPathNum(ductNum) > 0) {
@@ -4888,6 +4875,13 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
                         for (auto &thisCoolADU : thisZoneEquipConfig.AirDistUnitCool) {
                             if (thisCoolADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
+                            if (thisCoolADU.SupplyAirPathExists) {
+                                int spCompNum = thisSupplyPath.OutletNodeSupplyPathCompNum(thisCoolADU.SupplyAirPathOutNodeIndex);
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, orp->pdchTopAirSupplyPCompType, format("{}", rowCounter), thisSupplyPath.ComponentType(spCompNum));
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, orp->pdchTopAirSupplyPCompName, format("{}", rowCounter), thisSupplyPath.ComponentName(spCompNum));
+                            }
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                             OutputReportPredefined::PreDefTableEntry(
@@ -4907,6 +4901,25 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                                                                      orp->pdchTopAirTermUnitName,
                                                                      format("{}", rowCounter),
                                                                      state.dataDefineEquipment->AirDistUnit(aduIndex).EquipName(1));
+                            if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
+                                auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
+                                for (int retNodeNum = 1; retNodeNum <= thisZoneEquipConfig.NumReturnNodes; ++retNodeNum) {
+                                    if (thisZoneEquipConfig.ReturnNodeAirLoopNum(retNodeNum) == airLoopNum) {
+                                        int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathCompNum(retNodeNum);
+                                        if (retPathCompNum > 0) {
+                                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                                     orp->pdchTopAirReturnPCompType,
+                                                                                     format("{}", rowCounter),
+                                                                                     thisReturnPath.ComponentType(retPathCompNum));
+                                            OutputReportPredefined::PreDefTableEntry(state,
+                                                                                     orp->pdchTopAirReturnPCompName,
+                                                                                     format("{}", rowCounter),
+                                                                                     thisReturnPath.ComponentName(retPathCompNum));
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
                             ++rowCounter;
                         }
                     }
@@ -4916,6 +4929,13 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
                         for (auto &thisHeatADU : thisZoneEquipConfig.AirDistUnitHeat) {
                             if (thisHeatADU.SupplyBranchIndex != thisAtoZInfo.SupplyDuctBranchNum(ductNum)) continue;
+                            if (thisHeatADU.SupplyAirPathExists) {
+                                int spCompNum = thisSupplyPath.OutletNodeSupplyPathCompNum(thisHeatADU.SupplyAirPathOutNodeIndex);
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, orp->pdchTopAirSupplyPCompType, format("{}", rowCounter), thisSupplyPath.ComponentType(spCompNum));
+                                OutputReportPredefined::PreDefTableEntry(
+                                    state, orp->pdchTopAirSupplyPCompName, format("{}", rowCounter), thisSupplyPath.ComponentName(spCompNum));
+                            }
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                             OutputReportPredefined::PreDefTableEntry(
@@ -4935,6 +4955,22 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                                                                      orp->pdchTopAirTermUnitName,
                                                                      format("{}", rowCounter),
                                                                      state.dataDefineEquipment->AirDistUnit(aduIndex).EquipName(1));
+                            if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
+                                auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
+                                for (int retNodeNum = 1; retNodeNum <= thisZoneEquipConfig.NumReturnNodes; ++retNodeNum) {
+                                    int retPathCompNum = thisZoneEquipConfig.ReturnNodeRetPathCompNum(retNodeNum);
+                                    if (retPathCompNum > 0) {
+                                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                                 orp->pdchTopAirReturnPCompType,
+                                                                                 format("{}", rowCounter),
+                                                                                 thisReturnPath.ComponentType(retPathCompNum));
+                                        OutputReportPredefined::PreDefTableEntry(state,
+                                                                                 orp->pdchTopAirReturnPCompName,
+                                                                                 format("{}", rowCounter),
+                                                                                 thisReturnPath.ComponentName(retPathCompNum));
+                                    }
+                                }
+                            }
                             ++rowCounter;
                         }
                     }
@@ -4948,12 +4984,30 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                 ++rowCounter;
             }
         }
+        if (thisAtoZInfo.ReturnAirPathNum(1) > 0) {
+            auto &thisReturnPath = state.dataZoneEquip->ReturnAirPath(thisAtoZInfo.ReturnAirPathNum(1));
+            for (int compNum = 1; compNum <= thisReturnPath.NumOfComponents; ++compNum) {
+                OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
+                if (compNum == thisReturnPath.OutletRetPathCompNum) {
+                    auto &thisBranch = pas.Branch(pas.InletBranchNum[0]);
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
+                    OutputReportPredefined::PreDefTableEntry(
+                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                }
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirReturnPCompType, format("{}", rowCounter), thisReturnPath.ComponentType(compNum));
+                OutputReportPredefined::PreDefTableEntry(
+                    state, orp->pdchTopAirReturnPCompName, format("{}", rowCounter), thisReturnPath.ComponentName(compNum));
+                ++rowCounter;
+            }
+        }
     }
 }
 
 void fillAirloopToplogyComponentRow(EnergyPlusData &state,
                                     const std::string_view &loopName,
                                     const std::string_view &branchName,
+                                    const DataHVACGlobals::AirDuctType ductType,
                                     const std::string_view &compType,
                                     const std::string_view &compName,
                                     int &rowCounter)
@@ -4965,6 +5019,8 @@ void fillAirloopToplogyComponentRow(EnergyPlusData &state,
     // s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirLoopName, format("{}", rowCounter), loopName);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirBranchName, format("{}", rowCounter), branchName);
+    OutputReportPredefined::PreDefTableEntry(
+        state, orp->pdchTopAirSupplyBranchType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)ductType]);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompType, format("{}", rowCounter), compType);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompName, format("{}", rowCounter), compName);
     ++rowCounter;

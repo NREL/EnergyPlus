@@ -901,15 +901,16 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     int pdstTopAirLoop = 0;
     int pdchTopAirLoopName = 0;
-    int pdchTopAirUpSplitMixName = 0;
+    int pdchTopAirSplitName = 0;
     int pdchTopAirBranchName = 0;
+    int pdchTopAirSupplyBranchType = 0;
     int pdchTopAirCompType = 0;
     int pdchTopAirCompName = 0;
-    int pdchTopAirSubCompType = 0;
-    int pdchTopAirSubCompName = 0;
-    int pdchTopAirSubSubCompType = 0;
-    int pdchTopAirSubSubCompName = 0;
-    int pdchTopAirDownSplitMixName = 0;
+    int pdchTopAirMixName = 0;
+    int pdchTopAirParentCompType = 0;
+    int pdchTopAirParentCompName = 0;
+    int pdchTopAirParentCompType2 = 0;
+    int pdchTopAirParentCompName2 = 0;
 
     int pdstTopAirDemand = 0;
     int pdchTopAirDemandName = 0;
@@ -917,9 +918,9 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopAirSupplyDuctType = 0;
     int pdchTopAirSupplyPCompType = 0;
     int pdchTopAirSupplyPCompName = 0;
-    int pdchTopAirZoneName = 0;
     int pdchTopAirTermUnitType = 0;
     int pdchTopAirTermUnitName = 0;
+    int pdchTopAirZoneName = 0;
     int pdchTopAirReturnPCompType = 0;
     int pdchTopAirReturnPCompName = 0;
 
@@ -936,10 +937,11 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchTopPlantLoopType2 = 0;
     int pdchTopPlantLoopName2 = 0;
     int pdchTopPlantSide2 = 0;
-    int pdchTopPlantSplitMixName2 = 0;
+    int pdchTopPlantSplitName2 = 0;
     int pdchTopPlantBranchName2 = 0;
     int pdchTopPlantCompType2 = 0;
     int pdchTopPlantCompName2 = 0;
+    int pdchTopPlantMixName2 = 0;
 
     // Outdoor Air Report
     int pdrOutsideAir = 0;
