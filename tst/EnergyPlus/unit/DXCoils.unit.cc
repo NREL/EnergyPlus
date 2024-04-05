@@ -683,7 +683,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
                    (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
-    EXPECT_LT(COPwDefrost, COPwoDefrost);
+    EXPECT_NEAR(COPwDefrost, COPwoDefrost, 0.0001);
     Coil.DefrostTime = 0.058333;
 
     // Defroster off

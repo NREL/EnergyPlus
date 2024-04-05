@@ -3968,7 +3968,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 ZoneEquipment,
                 SysOutputProvided,
                 LatOutputProvided);
-    EXPECT_NEAR(PowerWithDefrost, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower, 0.001);
+    EXPECT_GT(PowerWithDefrost, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower);
 
     state->dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
     // test that Hi curves are used for higher OAT
