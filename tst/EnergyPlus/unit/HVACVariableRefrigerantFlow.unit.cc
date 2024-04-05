@@ -3940,7 +3940,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
         ASSERT_TRUE(true);
     }
 
-    // test that when resistive defrost is used and defrost time is 0 the COP is still degradaed due to frost built up
+    // test that when resistive defrost is used and defrost time is 0 the COP is NOT degradaed due to frost built up
     state->dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
     SimulateVRF(*state,
                 state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
@@ -3968,6 +3968,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
                 ZoneEquipment,
                 SysOutputProvided,
                 LatOutputProvided);
+    EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
+    EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostConsumption);
     EXPECT_GT(PowerWithDefrost, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower);
 
     state->dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
