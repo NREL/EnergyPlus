@@ -53,19 +53,17 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::HVACCooledBeam;
 using namespace EnergyPlus::DataPlant;
-
 
 TEST_F(EnergyPlusFixture, HVACCooledBeam_reportTerminalUnit)
 {

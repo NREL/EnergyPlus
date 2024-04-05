@@ -1883,5 +1883,4 @@ TEST_F(EnergyPlusFixture, SingleDuctInduction_reportTerminalUnit)
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
 }
 
-
 } // namespace EnergyPlus

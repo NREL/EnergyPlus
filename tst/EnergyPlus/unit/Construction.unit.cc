@@ -52,14 +52,13 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;
-
 
 TEST_F(EnergyPlusFixture, Construction_reportLayers)
 {
@@ -108,7 +107,6 @@ TEST_F(EnergyPlusFixture, Construction_reportLayers)
     c->Construct(3).LayerPoint(2) = 1;
     c->Construct(3).reportLayers(*state);
 
-
     EXPECT_EQ("mat b", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[0], "ConsB"));
     EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[1], "ConsB"));
 
@@ -123,5 +121,3 @@ TEST_F(EnergyPlusFixture, Construction_reportLayers)
     EXPECT_EQ("mat a", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[1], "ConsDA"));
     EXPECT_EQ("NOT FOUND", RetrievePreDefTableEntry(*state, orp.pdchOpqConsLayCol[2], "ConsDA"));
 }
-
-
