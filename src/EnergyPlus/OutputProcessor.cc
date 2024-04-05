@@ -2432,7 +2432,7 @@ namespace OutputProcessor {
                                            ? unitNameCustomEMS
                                            : ((units == Constant::Units::Invalid) ? "" : Constant::unitNames[(int)units]);
 
-        std::string_view schedString = (SchedPtr != 0) ? state.dataScheduleMgr->Schedule(SchedPtr).Name : "";
+        std::string schedString = (SchedPtr != 0) ? state.dataScheduleMgr->Schedule(SchedPtr).Name : "";
 
         if (state.files.eso.good()) {
             print(state.files.eso,
