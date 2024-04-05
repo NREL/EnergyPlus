@@ -1999,7 +1999,7 @@ TEST_F(EnergyPlusFixture, PIU_reportTerminalUnit)
     piu(1).MaxPriAirVolFlow = 0.30;
     piu(1).MaxSecAirVolFlow = 0.25;
     piu(1).HCoilType = PoweredInductionUnits::HtgCoilType::Electric;
-    piu(1).Fan_Num = 1;
+    piu(1).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
     piu(1).FanName = "FanA";
 
     piu(1).reportTerminalUnit(*state);
@@ -2018,6 +2018,6 @@ TEST_F(EnergyPlusFixture, PIU_reportTerminalUnit)
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
     EXPECT_EQ("COIL:HEATING:ELECTRIC", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
-    EXPECT_EQ("FAN:VARIABLEVOLUME", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("Fan:ConstantVolume", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
     EXPECT_EQ("FanA", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
 }
