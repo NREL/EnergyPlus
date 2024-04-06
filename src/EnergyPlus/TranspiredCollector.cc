@@ -258,8 +258,6 @@ namespace TranspiredCollector {
         int AlphaOffset; // local temp var
         std::string Roughness;
         int ThisSurf;         // do loop counter
-        Real64 AvgAzimuth;    // temp for error checking
-        Real64 AvgTilt;       // temp for error checking
         int SurfID;           // local surface "pointer"
         Real64 TiltRads;      // average tilt of collector in radians
         Real64 tempHdeltaNPL; // temporary variable for buoyancy length scale
@@ -730,7 +728,7 @@ namespace TranspiredCollector {
             default:
                 break;
             }
-            TiltRads = std::abs(AvgTilt) * Constant::DegToRadians;
+            TiltRads = std::abs(areaWeightedTilt / area) * Constant::DegToRadians;
             tempHdeltaNPL = std::sin(TiltRads) * state.dataTranspiredCollector->UTSC(Item).Height / 4.0;
             state.dataTranspiredCollector->UTSC(Item).HdeltaNPL = max(tempHdeltaNPL, state.dataTranspiredCollector->UTSC(Item).PlenGapThick);
 
