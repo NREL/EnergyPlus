@@ -7002,43 +7002,43 @@ namespace SurfaceGeometry {
                                 "Surface Exterior Cavity Baffle Surface Temperature",
                                 Constant::Units::C,
                                 cavity.Tbaffle,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Air Drybulb Temperature",
                                 Constant::Units::C,
                                 cavity.TAirCav,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Air Change Rate",
                                 Constant::Units::ach,
                                 cavity.PassiveACH,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Total Natural Ventilation Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 cavity.PassiveMdotVent,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Wind Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 cavity.PassiveMdotWind,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
             SetupOutputVariable(state,
                                 "Surface Exterior Cavity Natural Ventilation from Buoyancy Mass Flow Rate",
                                 Constant::Units::kg_s,
                                 cavity.PassiveMdotTherm,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 cavity.Name);
         } // for (Item)
     } // GetHTSurfExtVentedCavityData()
@@ -7573,9 +7573,40 @@ namespace SurfaceGeometry {
                 }
             }
             for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
-                thisGndSurfsObj.SurfsViewFactorSum += thisGndSurfsObj.GndSurfs(gSurfNum).ViewFactor;
+                    thisGndSurfsObj.SurfsViewFactorSum += thisGndSurfsObj.GndSurfs(gSurfNum).ViewFactor;
             }
             state.dataSurface->GroundSurfsProperty.push_back(thisGndSurfsObj);
+        } // for (instance)
+
+        // set report variables
+        if (state.dataSurface->TotSurfPropGndSurfs > 0) {
+            for (int Loop = 1; Loop <= state.dataSurface->TotSurfPropGndSurfs; Loop++) {
+                bool SetTempSchReportVar = true;
+                bool SetReflSchReportVar = true;
+                auto &thisGndSurfsObj = state.dataSurface->GroundSurfsProperty(Loop);
+                for (int gSurfNum = 1; gSurfNum <= thisGndSurfsObj.NumGndSurfs; gSurfNum++) {
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).TempSchPtr != 0 && SetTempSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Temperature",
+                                            Constant::Units::C,
+                                            thisGndSurfsObj.SurfsTempAvg,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            thisGndSurfsObj.Name);
+                        SetTempSchReportVar = false;
+                    }
+                    if (thisGndSurfsObj.GndSurfs(gSurfNum).ReflSchPtr != 0 && SetReflSchReportVar) {
+                        SetupOutputVariable(state,
+                                            "Surfaces Property Ground Surfaces Average Reflectance",
+                                            Constant::Units::None,
+                                            thisGndSurfsObj.SurfsReflAvg,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            thisGndSurfsObj.Name);
+                        SetReflSchReportVar = false;
+                    }
+                }
+            }
         }
         
         // set report variables
@@ -7591,8 +7622,8 @@ namespace SurfaceGeometry {
                                         "Surfaces Property Ground Surfaces Average Temperature",
                                         Constant::Units::C,
                                         thisGndSurfsObj.SurfsTempAvg,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         thisGndSurfsObj.Name);
                     SetTempSchReportVar = false;
                 }
@@ -7601,8 +7632,8 @@ namespace SurfaceGeometry {
                                         "Surfaces Property Ground Surfaces Average Reflectance",
                                         Constant::Units::None,
                                         thisGndSurfsObj.SurfsReflAvg,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         thisGndSurfsObj.Name);
                     SetReflSchReportVar = false;
                 }
@@ -10620,8 +10651,8 @@ namespace SurfaceGeometry {
                                     "Surface Other Side Coefficients Exterior Air Drybulb Temperature",
                                     Constant::Units::C,
                                     osc.OSCTempCalc,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     osc.Name);
             } else {
                 ipsc->cAlphaArgs(1) = "N/A";
@@ -10754,29 +10785,29 @@ namespace SurfaceGeometry {
                                 "Surface Other Side Conditions Modeled Convection Air Temperature",
                                 Constant::Units::C,
                                 oscm.TConv,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 oscm.Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Convection Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 oscm.HConv,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 oscm.Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Radiation Temperature",
                                 Constant::Units::C,
                                 oscm.TRad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 oscm.Name);
             SetupOutputVariable(state,
                                 "Surface Other Side Conditions Modeled Radiation Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 oscm.HRad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 oscm.Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -13969,8 +14000,8 @@ namespace SurfaceGeometry {
                                 "Enclosure Mean Radiant Temperature",
                                 Constant::Units::C,
                                 thisEnclosure.MRT,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisEnclosure.Name);
         }
 

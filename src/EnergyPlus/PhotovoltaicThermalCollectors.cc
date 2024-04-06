@@ -532,8 +532,8 @@ namespace PhotovoltaicThermalCollectors {
                             "Generator Produced Thermal Rate",
                             Constant::Units::W,
                             this->Report.ThermPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {
@@ -541,33 +541,31 @@ namespace PhotovoltaicThermalCollectors {
                                 "Generator Produced Thermal Energy",
                                 Constant::Units::J,
                                 this->Report.ThermEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarWater,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::Plant);
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatProduced);
 
         } else if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
             SetupOutputVariable(state,
                                 "Generator Produced Thermal Energy",
                                 Constant::Units::J,
                                 this->Report.ThermEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
                                 Constant::eResource::SolarAir,
-                                OutputProcessor::SOVEndUseCat::HeatProduced,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatProduced);
 
             SetupOutputVariable(state,
                                 "Generator PVT Fluid Bypass Status",
                                 Constant::Units::None,
                                 this->Report.BypassStatus,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
         }
 
@@ -575,24 +573,24 @@ namespace PhotovoltaicThermalCollectors {
                             "Generator PVT Fluid Inlet Temperature",
                             Constant::Units::C,
                             this->Report.TinletWorkFluid,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Outlet Temperature",
                             Constant::Units::C,
                             this->Report.ToutletWorkFluid,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Generator PVT Fluid Mass Flow Rate",
                             Constant::Units::kg_s,
                             this->Report.MdotWorkFluid,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
     }
 
