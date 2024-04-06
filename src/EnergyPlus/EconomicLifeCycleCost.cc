@@ -1670,7 +1670,7 @@ void WriteTabularLifeCycleCostReport(EnergyPlusData &state)
         //---------------------------------
         // Life-Cycle Cost Verification and Results Report
         //---------------------------------
-        OutputReportTabular::WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+        OutputReportTabular::WriteReportHeaders(state, "Life-Cycle Cost Report", "Entire Facility", OutputProcessor::StoreType::Average);
         //---- Life-Cycle Cost Parameters
         rowHead.allocate(11);
         columnHead.allocate(1);

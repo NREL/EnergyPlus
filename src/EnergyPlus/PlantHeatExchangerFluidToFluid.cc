@@ -449,15 +449,15 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
 
             std::string endUseCat = Util::makeUPPER(cAlphaArgs(10));
             if (endUseCat == "FREECOOLING")
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::FreeCooling;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::FreeCooling;
             else if (endUseCat == "HEATREJECTION")
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRejection;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRejection;
             else if (endUseCat == "HEATRECOVERYFORCOOLING")
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRecoveryForCooling;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRecoveryForCooling;
             else if (endUseCat == "HEATRECOVERYFORCOOLING")
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::HeatRecoveryForHeating;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::HeatRecoveryForHeating;
             else if (endUseCat == "LOOPTOLOOP")
-                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::SOVEndUseCat::LoopToLoop;
+                state.dataPlantHXFluidToFluid->FluidHX(CompLoop).HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::LoopToLoop;
             else {
                 ShowWarningError(
                     state,
@@ -550,84 +550,83 @@ void HeatExchangerStruct::setupOutputVars(EnergyPlusData &state)
                         "Fluid Heat Exchanger Heat Transfer Rate",
                         Constant::Units::W,
                         this->HeatTransferRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Heat Transfer Energy",
                         Constant::Units::J,
                         this->HeatTransferEnergy,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
                         Constant::eResource::EnergyTransfer,
-                        this->HeatTransferMeteringEndUse,
-                        {},
-                        OutputProcessor::SOVGroup::Plant);
+                        OutputProcessor::Group::Plant,
+                        this->HeatTransferMeteringEndUse);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->SupplySideLoop.InletMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Inlet Temperature",
                         Constant::Units::C,
                         this->SupplySideLoop.InletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Supply Side Outlet Temperature",
                         Constant::Units::C,
                         this->SupplySideLoop.OutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Mass Flow Rate",
                         Constant::Units::kg_s,
                         this->DemandSideLoop.InletMassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Inlet Temperature",
                         Constant::Units::C,
                         this->DemandSideLoop.InletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Loop Demand Side Outlet Temperature",
                         Constant::Units::C,
                         this->DemandSideLoop.OutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Operation Status",
                         Constant::Units::None,
                         this->OperationStatus,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 
     SetupOutputVariable(state,
                         "Fluid Heat Exchanger Effectiveness",
                         Constant::Units::None,
                         this->Effectiveness,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 }
 
