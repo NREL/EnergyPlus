@@ -1698,7 +1698,6 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
     EXPECT_NEAR(oldValue[3], DSHistoryValue4, 0.000001);
 }
 
-
 TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
 {
     using namespace EnergyPlus::OutputReportPredefined;
