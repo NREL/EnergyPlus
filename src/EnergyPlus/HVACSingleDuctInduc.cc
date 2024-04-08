@@ -445,8 +445,8 @@ namespace HVACSingleDuctInduc {
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
         }
 

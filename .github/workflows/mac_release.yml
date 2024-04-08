@@ -10,7 +10,6 @@ env:
   BUILD_TYPE: Release
   FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-  Python_REQUIRED_VERSION: 3.8
 
 jobs:
   mac_release:
@@ -20,17 +19,23 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        macos_dev_target: [10.15, 11.6, 12.1]
+        macos_dev_target: [11.6, 12.1]  #, 13.0]
         include:
-        - macos_dev_target: 10.15
-          os: macos-11
-          allow_failure: false
         - macos_dev_target: 11.6
           os: macos-11
           allow_failure: false
+          arch: x86_64
+          python: 3.8
         - macos_dev_target: 12.1
           os: macos-12
           allow_failure: false
+          arch: x86_64
+          python: 3.8
+#        - macos_dev_target: 13.0
+#          os: macos-14
+#          allow_failure: false
+#          arch: arm64
+#          python: 3.12.0
     permissions:
       # Needed permission to upload the release asset
       contents: write
@@ -38,11 +43,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
+    - name: Set up Python ${{ matrix.python }}
       id: setup-python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ env.Python_REQUIRED_VERSION }}
+        python-version: ${{ matrix.python }}
 
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
@@ -108,7 +113,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-x86_64.tar.gz
+        file: build/EnergyPlus-*-${{ matrix.arch }}.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -117,7 +122,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/EnergyPlus-*-x86_64.dmg
+        file: build/EnergyPlus-*-${{ matrix.arch }}.dmg
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
