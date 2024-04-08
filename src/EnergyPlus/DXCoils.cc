@@ -14448,8 +14448,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 FanInletNode = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->inletNodeNum;
                 FanOutletNode = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->outletNodeNum;
             } else {
-                FanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", thisDXCoil.SupplyFanName, ErrorsFound);
-                FanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", thisDXCoil.SupplyFanName, ErrorsFound);
+                FanInletNode = Fans::GetFanInletNode(state, thisDXCoil.SupplyFanIndex);
+                FanOutletNode = Fans::GetFanOutletNode(state, thisDXCoil.SupplyFanIndex);
             }
 
             // set node state variables in preparation for fan model.
@@ -15017,7 +15017,7 @@ void GetFanIndexForTwoSpeedCoil(
                     if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
                         SimAirServingZones::CompType::Fan_Simple_VAV) {
                         SupplyFanName = state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                        Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound);
+                        SupplyFanIndex = Fans::GetFanIndex(state, SupplyFanName);
                         SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                         break;
                         // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19

@@ -11418,6 +11418,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
     state->dataWaterThermalTanks->HPWaterHeater(1).InletAirConfiguration = WaterThermalTanks::WTTAmbientTemp::TempZone;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanName = state->dataFans->Fan(1).FanName;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanType = "Fan:OnOff";
+    state->dataWaterThermalTanks->HPWaterHeater(1).FanNum = 1;
     state->dataWaterThermalTanks->HPWaterHeater(1).FanOutletNode = 3;
 
     // Check validation and expected warning

@@ -114,7 +114,6 @@ namespace UnitHeater {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::cFanTypes;
     using DataHVACGlobals::ContFanCycCoil;
     using DataHVACGlobals::CycFanCycCoil;
     using DataHVACGlobals::SmallAirVolFlow;
@@ -236,6 +235,9 @@ namespace UnitHeater {
         using SteamCoils::GetSteamCoilIndex;
         using WaterCoils::GetCoilWaterInletNode;
 
+        static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
+        static constexpr std::string_view routineName = "GetUnitHeaterInput"; // include trailing blank space
+        
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);                                               // Set to true if errors in input, fatal at end of routine
         int IOStatus;                                                          // Used in GetObjectItem
@@ -245,7 +247,7 @@ namespace UnitHeater {
         int NumNumbers;                                                        // Number of Numbers for each GetObjectItem call
         int NumFields;                                                         // Total number of fields in object
         int UnitHeatNum;                                                       // Item to be "gotten"
-        static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
+
         Real64 FanVolFlow;                                                     // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
@@ -294,6 +296,8 @@ namespace UnitHeater {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
+            
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames.allocate(NumNumbers);
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = "";
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = cNumericFields;
@@ -354,47 +358,32 @@ namespace UnitHeater {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                 ErrorsFound = true;
             } else {
-                if (!Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state,
-                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num,
-                               errFlag,
-                               CurrentModuleObject,
-                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-
-                    {
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType);
+                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num == -1) {
+                    ShowSevereInvalidKey(state, eoh, cAlphaFields(5), state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType);
+                    ErrorsFound = true;
+                } else if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index = Fans::GetFanIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
+                    if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index == 0) {
+                        ShowSevereItemNotFound(state, eoh, cAlphaFields(6), state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
+                        ErrorsFound = true;
+                    } else {
                         switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num) {
                         case FanType_SimpleConstVolume:
                         case FanType_SimpleVAV:
-                        case FanType_SimpleOnOff:
+                        case FanType_SimpleOnOff: {
                             // Get fan outlet node
                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode =
-                                GetFanOutletNode(state,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType,
-                                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                                 errFlag);
-                            if (errFlag) {
-                                ShowContinueError(
-                                    state,
-                                    format("specified in {} = \"{}\".", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
-                                ErrorsFound = true;
-                            }
-                            break;
-                        default:
+                                GetFanOutletNode(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
+                        } break;
+                        default: {
                             ShowSevereError(state, format("{}{} = \"{}\"", RoutineName, CurrentModuleObject, Alphas(1)));
                             ShowContinueError(state, "Fan Type must be Fan:ConstantVolume or Fan:VariableVolume");
                             ErrorsFound = true;
-                        }
-                    }
-                    GetFanIndex(state,
-                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index,
-                                errFlag,
-                                CurrentModuleObject);
-                    if (errFlag) {
-                        ErrorsFound = true;
-                    } else {
-                        GetFanVolFlow(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index, FanVolFlow);
+                        } break;
+                        } // swtich ()
+                        
+                        FanVolFlow = GetFanVolFlow(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
 
                         if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&
                             FanVolFlow < state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow) {
@@ -422,13 +411,9 @@ namespace UnitHeater {
                             ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                         }
                         state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanAvailSchedPtr =
-                            GetFanAvailSchPtr(state,
-                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType,
-                                              state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                              errFlag);
+                            GetFanAvailSchPtr(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
                     }
-                } else if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+                } else {
                     state.dataHVACFan->fanObjs.emplace_back(
                         new HVACFan::FanSystem(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName)); // call constructor
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index =

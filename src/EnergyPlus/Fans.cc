@@ -1888,7 +1888,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                 Real64 SpeedRaisedToPower = Curve::CurveValue(state, fan.FanPowerRatAtSpeedRatCurveIndex, SpeedRatio);
                 if (SpeedRaisedToPower < 0.0) {
                     if (fan.OneTimePowerRatioCheck && !state.dataGlobal->WarmupFlag) {
-                        ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::cFanTypes(fan.FanType_Num), fan.FanName));
+                        ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::fanTypeNames[fan.FanType_Num], fan.FanName));
                         ShowContinueError(state, "Error in Fan Power Ratio curve. Curve output less than 0.0.");
                         ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", SpeedRaisedToPower, SpeedRatio));
                         ShowContinueError(state, "Check curve coefficients to ensure proper power ratio as a function of fan speed ratio.");
@@ -1902,7 +1902,7 @@ void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Re
                     EffRatioAtSpeedRatio = Curve::CurveValue(state, fan.FanEffRatioCurveIndex, SpeedRatio);
                     if (EffRatioAtSpeedRatio < 0.01) {
                         if (fan.OneTimeEffRatioCheck && !state.dataGlobal->WarmupFlag) {
-                            ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::cFanTypes(fan.FanType_Num), fan.FanName));
+                            ShowSevereError(state, format("{} = {}\"", DataHVACGlobals::fanTypeNames[fan.FanType_Num], fan.FanName));
                             ShowContinueError(state, "Error in Fan Efficiency Ratio curve. Curve output less than 0.01.");
                             ShowContinueError(state, format("Curve output = {:.5T}, fan speed ratio = {:.5T}", EffRatioAtSpeedRatio, SpeedRatio));
                             ShowContinueError(state, "Check curve coefficients to ensure proper efficiency ratio as a function of fan speed ratio.");
@@ -2333,7 +2333,7 @@ void ReportFan(EnergyPlusData &state, int const FanNum)
     }
 }
 
-void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view ThisObjectType)
+int GetFanIndex(EnergyPlusData &state, std::string const &FanName)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2349,18 +2349,10 @@ void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanInde
         state.dataFans->GetFanInputFlag = false;
     }
 
-    FanIndex = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-    if (FanIndex == 0) {
-        if (!ThisObjectType.empty()) {
-            ShowSevereError(state, fmt::format("{}, GetFanIndex: Fan not found={}", ThisObjectType, FanName));
-        } else {
-            ShowSevereError(state, format("GetFanIndex: Fan not found={}", FanName));
-        }
-        ErrorsFound = true;
-    }
+    return Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
 }
 
-void GetFanVolFlow(EnergyPlusData &state, int const FanIndex, Real64 &FanVolFlow)
+Real64 GetFanVolFlow(EnergyPlusData &state, int const FanIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2370,12 +2362,9 @@ void GetFanVolFlow(EnergyPlusData &state, int const FanIndex, Real64 &FanVolFlow
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the fan volumetric flow for use by zone equipment (e.g. Packaged Terminal Heat Pump)
     // Zone equipment must ensure that a properly sized fan is used to meet the maximum supply air flow rate
-
-    if (FanIndex == 0) {
-        FanVolFlow = 0.0;
-    } else {
-        FanVolFlow = state.dataFans->Fan(FanIndex).MaxAirFlowRate;
-    }
+        
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
 }
 
 Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
@@ -2395,12 +2384,8 @@ Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
     }
 }
 
-void GetFanType(EnergyPlusData &state,
-                std::string const &FanName,            // Fan name
-                int &FanType,                          // returned fantype number
-                bool &ErrorsFound,                     // error indicator
-                std::string_view const ThisObjectType, // parent object type (for error message)
-                std::string_view const ThisObjectName  // parent object name (for error message)
+int GetFanType(EnergyPlusData &state,
+                int FanIndex
 )
 {
 
@@ -2411,35 +2396,12 @@ void GetFanType(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine sets an integer type for a given fan -- issues error message if that fan
     // is not a legal fan.
-
-    auto &Fan(state.dataFans->Fan);
-
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    int FanIndex = Util::FindItemInList(FanName, Fan, &FanEquipConditions::FanName);
-    if (FanIndex == 0) {
-        if ((!ThisObjectType.empty()) && (!ThisObjectName.empty())) {
-            ShowSevereError(state, fmt::format("GetFanType: {}=\"{}\", invalid Fan specified=\"{}\".", ThisObjectType, ThisObjectName, FanName));
-        } else if (!ThisObjectType.empty()) {
-            ShowSevereError(state, fmt::format("{}, GetFanType: Fan not found={}", ThisObjectType, FanName));
-        } else {
-            ShowSevereError(state, format("GetFanType: Fan not found={}", FanName));
-        }
-        FanType = 0;
-        ErrorsFound = true;
-    } else {
-        FanType = Fan(FanIndex).FanType_Num;
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).FanType_Num;
 }
 
 Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                  std::string_view FanType,              // must match fan types in this module
-                                  std::string_view FanName,              // must match fan names for the fan type
-                                  bool &ErrorsFound,                     // set to true if problem
-                                  ObjexxFCL::Optional_int_const FanIndex // index to fan
+                                  int FanIndex // index to fan
 )
 {
 
@@ -2453,31 +2415,12 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as negative.
 
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    if (present(FanIndex)) {
-        return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
-    } else {
-        int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-        if (WhichFan != 0) {
-            return state.dataFans->Fan(WhichFan).MaxAirFlowRate;
-        } else {
-            ShowSevereError(state, format("GetFanDesignVolumeFlowRate: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-            ShowContinueError(state, "... Design Volume Flow rate returned as -1000.");
-            ErrorsFound = true;
-            return -1000.0;
-        }
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
 }
 
 int GetFanInletNode(EnergyPlusData &state,
-                    std::string_view FanType, // must match fan types in this module
-                    std::string_view FanName, // must match fan names for the fan type
-                    bool &ErrorsFound         // set to true if problem
+                    int FanIndex
 )
 {
 
@@ -2490,26 +2433,12 @@ int GetFanInletNode(EnergyPlusData &state,
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
 
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-    if (WhichFan != 0) {
-        return state.dataFans->Fan(WhichFan).InletNodeNum;
-    } else {
-        ShowSevereError(state, format("GetFanInletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-        ErrorsFound = true;
-        return 0;
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).InletNodeNum;
 }
 
 int GetFanOutletNode(EnergyPlusData &state,
-                     std::string const &FanType, // must match fan types in this module
-                     std::string const &FanName, // must match fan names for the fan type
-                     bool &ErrorsFound           // set to true if problem
+                     int FanIndex
 )
 {
 
@@ -2522,26 +2451,12 @@ int GetFanOutletNode(EnergyPlusData &state,
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
 
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-    if (WhichFan != 0) {
-        return state.dataFans->Fan(WhichFan).OutletNodeNum;
-    } else {
-        ShowSevereError(state, format("GetFanOutletNode: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-        ErrorsFound = true;
-        return 0;
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).OutletNodeNum;
 }
 
 int GetFanAvailSchPtr(EnergyPlusData &state,
-                      std::string const &FanType, // must match fan types in this module
-                      std::string const &FanName, // must match fan names for the fan type
-                      bool &ErrorsFound           // set to true if problem
+                      int FanIndex
 )
 {
 
@@ -2553,27 +2468,12 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     // This function looks up the given fan and returns the availability schedule pointer.  If
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero.
-
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    int WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-    if (WhichFan != 0) {
-        return state.dataFans->Fan(WhichFan).AvailSchedPtrNum;
-    } else {
-        ShowSevereError(state, format("GetFanAvailSchPtr: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-        ErrorsFound = true;
-        return 0;
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).AvailSchedPtrNum;
 }
 
 int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                               std::string &FanType,           // must match fan types in this module (set if nonzero index passed)
-                               std::string &FanName,           // must match fan names for the fan type (set if nonzero index passed)
-                               ObjexxFCL::Optional_int IndexIn // optional fan index if fan type and name are unknown or index needs setting
+                               int FanIndex
 )
 {
 
@@ -2586,34 +2486,8 @@ int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
     // incorrect fan type or name is given, ErrorsFound is returned as true and value is returned
     // as zero. If optional index argument is passed along with fan type and name, the index is set.
 
-    // FUNCTION LOCAL VARIABLE DECLARATIONS:
-    int WhichFan;
-
-    // Obtains and Allocates fan related parameters from input file
-    if (state.dataFans->GetFanInputFlag) { // First time subroutine has been entered
-        GetFanInput(state);
-        state.dataFans->GetFanInputFlag = false;
-    }
-
-    if (present(IndexIn)) {
-        if (IndexIn > 0) {
-            WhichFan = IndexIn;
-            FanType = state.dataFans->Fan(WhichFan).FanType;
-            FanName = state.dataFans->Fan(WhichFan).FanName;
-        } else {
-            WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-            IndexIn = WhichFan;
-        }
-    } else {
-        WhichFan = Util::FindItemInList(FanName, state.dataFans->Fan, &FanEquipConditions::FanName);
-    }
-
-    if (WhichFan != 0) {
-        return state.dataFans->Fan(WhichFan).FanPowerRatAtSpeedRatCurveIndex;
-    } else {
-        ShowSevereError(state, format("GetFanSpeedRatioCurveIndex: Could not find Fan, Type=\"{}\" Name=\"{}\"", FanType, FanName));
-        return 0;
-    }
+    assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
+    return state.dataFans->Fan(FanIndex).FanPowerRatAtSpeedRatCurveIndex;
 }
 
 void SetFanData(EnergyPlusData &state,

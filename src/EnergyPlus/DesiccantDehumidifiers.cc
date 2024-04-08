@@ -221,6 +221,7 @@ namespace DesiccantDehumidifiers {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetDesiccantDehumidifierInput: "); // include trailing blank space
+        static constexpr std::string_view routineName = "GetDesiccantDehumidifierInput"; 
         static std::string const dehumidifierDesiccantNoFans("Dehumidifier:Desiccant:NoFans");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -624,19 +625,15 @@ namespace DesiccantDehumidifiers {
                 desicDehum.RegenFanOutNode = state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->outletNodeNum;
 
             } else {
-                Fans::GetFanType(state, desicDehum.RegenFanName, desicDehum.regenFanType_Num, errFlag, CurrentModuleObject, desicDehum.Name);
-                desicDehum.RegenFanInNode = Fans::GetFanInletNode(state, desicDehum.RegenFanType, desicDehum.RegenFanName, ErrorsFound2);
-                if (ErrorsFound2) {
-                    ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.Name));
+                ErrorObjectHeader eoh{routineName, CurrentModuleObject, desicDehum.Name};
+                desicDehum.RegenFanIndex = Fans::GetFanIndex(state, desicDehum.RegenFanName);
+                if (desicDehum.RegenFanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(11), desicDehum.RegenFanName);
                     ErrorsFoundGeneric = true;
-                }
-
-                ErrorsFound2 = false;
-                desicDehum.RegenFanOutNode = Fans::GetFanOutletNode(state, desicDehum.RegenFanType, desicDehum.RegenFanName, ErrorsFound2);
-                Fans::GetFanIndex(state, desicDehum.RegenFanName, desicDehum.RegenFanIndex, ErrorsFound2, desicDehum.RegenFanType);
-                if (ErrorsFound2) {
-                    ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                    ErrorsFoundGeneric = true;
+                } else {
+                    desicDehum.regenFanType_Num = Fans::GetFanType(state, desicDehum.RegenFanIndex);
+                    desicDehum.RegenFanInNode = Fans::GetFanInletNode(state, desicDehum.RegenFanIndex);
+                    desicDehum.RegenFanOutNode = Fans::GetFanOutletNode(state, desicDehum.RegenFanIndex);
                 }
             }
         }
@@ -810,19 +807,15 @@ namespace DesiccantDehumidifiers {
                 desicDehum.RegenFanInNode = state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->inletNodeNum;
                 desicDehum.RegenFanOutNode = state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->outletNodeNum;
             } else {
-                Fans::GetFanType(state, desicDehum.RegenFanName, desicDehum.regenFanType_Num, errFlag, CurrentModuleObject, desicDehum.Name);
-                desicDehum.RegenFanInNode = Fans::GetFanInletNode(state, desicDehum.RegenFanType, desicDehum.RegenFanName, ErrorsFound2);
-                if (ErrorsFound2) {
-                    ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.Name));
+                desicDehum.RegenFanIndex = Fans::GetFanIndex(state, desicDehum.RegenFanName);
+                if (desicDehum.RegenFanIndex == 0) {
+                    ErrorObjectHeader eoh{routineName, CurrentModuleObject, desicDehum.Name};
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(7), desicDehum.RegenFanName);
                     ErrorsFoundGeneric = true;
-                }
-
-                ErrorsFound2 = false;
-                desicDehum.RegenFanOutNode = Fans::GetFanOutletNode(state, desicDehum.RegenFanType, desicDehum.RegenFanName, ErrorsFound2);
-                Fans::GetFanIndex(state, desicDehum.RegenFanName, desicDehum.RegenFanIndex, ErrorsFound2, desicDehum.RegenFanType);
-                if (ErrorsFound2) {
-                    ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                    ErrorsFoundGeneric = true;
+                } else {
+                    desicDehum.regenFanType_Num = Fans::GetFanType(state, desicDehum.RegenFanIndex);
+                    desicDehum.RegenFanInNode = Fans::GetFanInletNode(state, desicDehum.RegenFanIndex);
+                    desicDehum.RegenFanOutNode = Fans::GetFanOutletNode(state, desicDehum.RegenFanIndex);
                 }
             }
 

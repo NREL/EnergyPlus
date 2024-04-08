@@ -3356,6 +3356,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     // get input for zone evap cooler unit
 
     // SUBROUTINE PARAMETER DEFINITIONS:
+    static constexpr std::string_view routineName = "GetInputZoneEvaporativeCoolerUnit";
     static constexpr std::string_view RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3465,24 +3466,21 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                                                        DataLoopNode::ObjectIsParent);
             }
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisZoneEvapUnit.Name};
             thisZoneEvapUnit.FanObjectClassName = Alphas(7);
             thisZoneEvapUnit.FanName = Alphas(8);
             bool errFlag = false;
             if (!Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
-                Fans::GetFanType(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanType_Num, errFlag, CurrentModuleObject, thisZoneEvapUnit.Name);
-                Fans::GetFanIndex(state, thisZoneEvapUnit.FanName, thisZoneEvapUnit.FanIndex, errFlag, CurrentModuleObject);
-                thisZoneEvapUnit.FanInletNodeNum =
-                    Fans::GetFanInletNode(state, thisZoneEvapUnit.FanObjectClassName, thisZoneEvapUnit.FanName, errFlag);
-                thisZoneEvapUnit.FanOutletNodeNum =
-                    Fans::GetFanOutletNode(state, thisZoneEvapUnit.FanObjectClassName, thisZoneEvapUnit.FanName, errFlag);
-                Fans::GetFanVolFlow(state, thisZoneEvapUnit.FanIndex, FanVolFlow);
-                thisZoneEvapUnit.ActualFanVolFlowRate = FanVolFlow;
-                // Get the fan's availability schedule
-                thisZoneEvapUnit.FanAvailSchedPtr =
-                    Fans::GetFanAvailSchPtr(state, thisZoneEvapUnit.FanObjectClassName, thisZoneEvapUnit.FanName, errFlag);
-                if (errFlag) {
-                    ShowContinueError(state, format("...specified in {} = {}", CurrentModuleObject, thisZoneEvapUnit.Name));
+                thisZoneEvapUnit.FanIndex = Fans::GetFanIndex(state, thisZoneEvapUnit.FanName);
+                if (thisZoneEvapUnit.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), thisZoneEvapUnit.FanName);
                     ErrorsFound = true;
+                } else {
+                    thisZoneEvapUnit.FanType_Num = Fans::GetFanType(state, thisZoneEvapUnit.FanIndex);
+                    thisZoneEvapUnit.FanInletNodeNum = Fans::GetFanInletNode(state, thisZoneEvapUnit.FanIndex);
+                    thisZoneEvapUnit.FanOutletNodeNum = Fans::GetFanOutletNode(state, thisZoneEvapUnit.FanIndex);
+                    thisZoneEvapUnit.ActualFanVolFlowRate = Fans::GetFanVolFlow(state, thisZoneEvapUnit.FanIndex);
+                    thisZoneEvapUnit.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisZoneEvapUnit.FanIndex);
                 }
             } else if (Util::SameString(thisZoneEvapUnit.FanObjectClassName, "Fan:SystemModel")) {
 
@@ -3807,7 +3805,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
             zoneEvapUnit.MyFan = false;
         } else {
             if (zoneEvapUnit.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::GetFanVolFlow(state, zoneEvapUnit.FanIndex, zoneEvapUnit.ActualFanVolFlowRate);
+                zoneEvapUnit.ActualFanVolFlowRate = Fans::GetFanVolFlow(state, zoneEvapUnit.FanIndex);
             } else {
                 zoneEvapUnit.ActualFanVolFlowRate = state.dataHVACFan->fanObjs[zoneEvapUnit.FanIndex]->designAirVolFlowRate;
             }

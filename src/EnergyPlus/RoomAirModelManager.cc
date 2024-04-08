@@ -2692,6 +2692,8 @@ namespace RoomAir {
         // Using/Aliasing
         using Fans::GetFanOutletNode;
 
+        static constexpr std::string_view routineName = "CheckEquipName";
+        
         // Return value
         bool EquipFind; // True if an error is found
 
@@ -2742,13 +2744,21 @@ namespace RoomAir {
             }
         }
 
+        ErrorObjectHeader eoh{routineName, equipTypeName, EquipName};
+        
         switch (zoneEquipType) {
         case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeName = Alphas(4);
             ReturnNodeName = ""; // Zone return node
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            int nodeNum = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
+            int fanIndex = Fans::GetFanIndex(state, Alphas(4));
+            if (fanIndex == 0) {
+                ShowSevereItemNotFound(state, eoh, "", Alphas(4));
+                errorfound = true;
+            }
+
+            int nodeNum = GetFanOutletNode(state, fanIndex);
             if (errorfound) {
             }
             SupplyNodeName = state.dataLoopNodes->NodeID(nodeNum); // ?????

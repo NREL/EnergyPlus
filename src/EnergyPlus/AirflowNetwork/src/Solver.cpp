@@ -474,25 +474,23 @@ namespace AirflowNetwork {
 
                 // This breaks the component model, need to fix
                 bool fanErrorFound = false;
-                int fanIndex;
-                GetFanIndex(m_state, thisObjectName, fanIndex, fanErrorFound);
-                if (fanErrorFound) {
+                int fanIndex = GetFanIndex(m_state, thisObjectName);
+                if (fanIndex == 0) {
                     ShowSevereError(m_state,
                                     format("{}: {} = {} is not found in Fan:ZoneExhaust objects.", RoutineName, CurrentModuleObject, thisObjectName));
                     success = false;
                 }
                 Real64 flowRate;
 
-                GetFanVolFlow(m_state, fanIndex, flowRate);
+                flowRate = GetFanVolFlow(m_state, fanIndex);
                 flowRate *= m_state.dataEnvrn->StdRhoAir;
                 bool nodeErrorsFound{false};
-                int inletNode = GetFanInletNode(m_state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
-                int outletNode = GetFanOutletNode(m_state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int inletNode = GetFanInletNode(m_state, fanIndex);
+                int outletNode = GetFanOutletNode(m_state, fanIndex);
                 if (nodeErrorsFound) {
                     success = false;
                 }
-                int fanType_Num;
-                GetFanType(m_state, thisObjectName, fanType_Num, fanErrorFound);
+                int fanType_Num = GetFanType(m_state, fanIndex);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(m_state,
                                     format("{}: {} = {}. The specified Name is not found as a valid Fan:ZoneExhaust object.",
@@ -1396,19 +1394,20 @@ namespace AirflowNetwork {
                     }
 
                 } else {
-
                     bool FanErrorFound = false;
-                    GetFanIndex(m_state, fan_name, fanIndex, FanErrorFound);
 
-                    if (FanErrorFound) {
-                        ShowSevereError(m_state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
+                    fanIndex = GetFanIndex(m_state, fan_name);
+
+                    if (fanIndex == 0) {
+                        ErrorObjectHeader eoh{RoutineName, CurrentModuleObject, DisSysCompCVFData(i).name};
+                        ShowSevereItemNotFound(m_state, eoh, "Fan Name", fan_name);
                         success = false;
                     }
 
-                    GetFanVolFlow(m_state, fanIndex, flowRate);
+                    flowRate = GetFanVolFlow(m_state, fanIndex);
                     flowRate *= m_state.dataEnvrn->StdRhoAir;
 
-                    GetFanType(m_state, fan_name, fanType_Num, FanErrorFound);
+                    fanType_Num = GetFanType(m_state, fanIndex);
                     SupplyFanType = fanType_Num;
                 }
 
@@ -1432,16 +1431,16 @@ namespace AirflowNetwork {
                 }
                 bool ErrorsFound{false};
                 if (fanType_Num == FanType_SimpleConstVolume) {
-                    inletNode = GetFanInletNode(m_state, "Fan:ConstantVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(m_state, fanIndex);
+                    outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
                 if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(m_state, "Fan:OnOff", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:OnOff", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(m_state, fanIndex); 
+                    outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
                 if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(m_state, "Fan:VariableVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode(m_state, "Fan:VariableVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(m_state, fanIndex);
+                    outletNode = GetFanOutletNode(m_state, fanIndex);
                     VAVSystem = true;
                 }
 
@@ -11105,8 +11104,7 @@ namespace AirflowNetwork {
                         DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
                             m_state.dataHVACFan->fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * m_state.dataEnvrn->StdRhoAir;
                     } else {
-                        Real64 FanFlow; // Return type
-                        GetFanVolFlow(m_state, DisSysCompCVFData(typeNum).FanIndex, FanFlow);
+                        Real64 FanFlow = GetFanVolFlow(m_state, DisSysCompCVFData(typeNum).FanIndex);
                         DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * m_state.dataEnvrn->StdRhoAir;
                     }
                 }

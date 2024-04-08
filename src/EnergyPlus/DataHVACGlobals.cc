@@ -60,10 +60,11 @@ namespace DataHVACGlobals {
     // to be "global" in nature in EnergyPlus.
 
     // fan types
-    Array1D_string const
+#ifdef GET_OUT
+        Array1D_string const
         cFanTypes(NumAllFanTypes,
                   {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
-
+#endif // GET_OUT
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",

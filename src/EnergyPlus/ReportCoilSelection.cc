@@ -868,23 +868,13 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         case DataAirSystems::StructArrayLegacyFanModels: {
             int locFanTypeNum(0);
             bool errorsFound(false);
-            Fans::GetFanType(state, c->fanAssociatedWithCoilName, locFanTypeNum, errorsFound);
-            if (locFanTypeNum == DataHVACGlobals::FanType_SimpleConstVolume) {
-                c->fanTypeName = "Fan:ConstantVolume";
-            } else if (locFanTypeNum == DataHVACGlobals::FanType_SimpleVAV) {
-                c->fanTypeName = "Fan:VariableVolume";
-            } else if (locFanTypeNum == DataHVACGlobals::FanType_SimpleOnOff) {
-                c->fanTypeName = "Fan:OnOff";
-            } else if (locFanTypeNum == DataHVACGlobals::FanType_ZoneExhaust) {
-                c->fanTypeName = "Fan:ZoneExhaust";
-            } else if (locFanTypeNum == DataHVACGlobals::FanType_ComponentModel) {
-                c->fanTypeName = "Fan:ComponentModel";
-            }
             if (c->supFanNum <= 0) {
-                Fans::GetFanIndex(state, c->fanAssociatedWithCoilName, c->supFanNum, errorsFound, c->fanTypeName);
+                c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
             }
-            c->fanSizeMaxAirVolumeFlow =
-                Fans::GetFanDesignVolumeFlowRate(state, c->fanTypeName, c->fanAssociatedWithCoilName, errorsFound, c->supFanNum);
+
+            locFanTypeNum = Fans::GetFanType(state, c->supFanNum);
+            c->fanTypeName = DataHVACGlobals::fanTypeNames[locFanTypeNum];
+            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state, c->supFanNum);
             c->fanSizeMaxAirMassFlow = state.dataFans->Fan(c->supFanNum).MaxAirMassFlowRate;
             break;
         }
@@ -2025,7 +2015,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     if (fanEnumType == DataAirSystems::StructArrayLegacyFanModels) {
         if (fanIndex <= 0) {
             bool errorsFound(false);
-            Fans::GetFanIndex(state, fanName, locFanIndex, errorsFound);
+            locFanIndex = Fans::GetFanIndex(state, fanName);
         } else {
             locFanIndex = fanIndex;
         }

@@ -233,50 +233,23 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view ThisObjectType = {});
+    int GetFanIndex(EnergyPlusData &state, std::string const &FanName);
 
-    void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
+    Real64 GetFanVolFlow(EnergyPlusData &state, int FanIndex);
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
-    void GetFanType(EnergyPlusData &state,
-                    std::string const &FanName,           // Fan name
-                    int &FanType,                         // returned fantype number
-                    bool &ErrorsFound,                    // error indicator
-                    std::string_view ThisObjectType = {}, // parent object type (for error message)
-                    std::string_view ThisObjectName = {}  // parent object name (for error message)
-    );
+    int GetFanType(EnergyPlusData &state, int FanIndex); 
 
-    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                      std::string_view FanType,                  // must match fan types in this module
-                                      std::string_view FanName,                  // must match fan names for the fan type
-                                      bool &ErrorsFound,                         // set to true if problem
-                                      ObjexxFCL::Optional_int_const FanIndex = _ // index to fan
-    );
+    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, int FanIndex);
 
-    int GetFanInletNode(EnergyPlusData &state,
-                        std::string_view FanType, // must match fan types in this module
-                        std::string_view FanName, // must match fan names for the fan type
-                        bool &ErrorsFound         // set to true if problem
-    );
+    int GetFanInletNode(EnergyPlusData &state, int FanIndex);
 
-    int GetFanOutletNode(EnergyPlusData &state,
-                         std::string const &FanType, // must match fan types in this module
-                         std::string const &FanName, // must match fan names for the fan type
-                         bool &ErrorsFound           // set to true if problem
-    );
+    int GetFanOutletNode(EnergyPlusData &state, int FanIndex);
 
-    int GetFanAvailSchPtr(EnergyPlusData &state,
-                          std::string const &FanType, // must match fan types in this module
-                          std::string const &FanName, // must match fan names for the fan type
-                          bool &ErrorsFound           // set to true if problem
-    );
+    int GetFanAvailSchPtr(EnergyPlusData &state, int FanIndex);
 
-    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                                   std::string &FanType,               // must match fan types in this module (set if nonzero index passed)
-                                   std::string &FanName,               // must match fan names for the fan type (set if nonzero index passed)
-                                   ObjexxFCL::Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
-    );
+    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state, int FanIndex);
 
     void SetFanData(EnergyPlusData &state,
                     int FanNum,                                          // Index of fan

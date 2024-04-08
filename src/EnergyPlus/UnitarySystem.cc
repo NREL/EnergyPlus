@@ -494,7 +494,7 @@ namespace UnitarySystems {
                             FanType = "Fan:SystemModel";
                             FanName = this->m_FanName;
                         } else {
-                            if (Fans::GetFanSpeedRatioCurveIndex(state, FanType, FanName, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
+                            if (Fans::GetFanSpeedRatioCurveIndex(state, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
                         }
                         if (fanHasPowerSpeedRatioCurve) {
 
@@ -538,8 +538,7 @@ namespace UnitarySystems {
                     if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         this->m_ActualFanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
-                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(
-                            state, blankString, blankString, state.dataUnitarySystems->initUnitarySystemsErrorsFound, this->m_FanIndex);
+                        this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, this->m_FanIndex);
                     }
                 }
                 // do not set false this->m_MyFanFlag so that next pass specific initialization and warning are executed
@@ -3039,14 +3038,14 @@ namespace UnitarySystems {
             if (!state.dataSize->SysSizingRunDone) {
                 int BranchNum = BranchInputManager::GetAirBranchIndex(state, "AirloopHVAC:UnitarySystem", this->Name);
                 std::string FanType = "";
-                std::string m_FanName = "";
+                std::string m_FanName = ""; // the notation m_ implies member variables, and this is a local
                 BranchFanFlow = 0.0;
                 if (BranchNum > 0.0) BranchInputManager::GetBranchFanTypeName(state, BranchNum, FanType, m_FanName, ErrFound);
                 if (!ErrFound && BranchNum > 0) {
                     if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         BranchFanFlow = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
-                        BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(state, FanType, m_FanName, ErrFound);
+                        BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(state, this->m_FanIndex);
                     }
                 }
                 if (BranchFanFlow > 0.0) {
@@ -3496,13 +3495,17 @@ namespace UnitarySystems {
                                       bool const ZoneEquipment,
                                       int const ZoneOAUnitNum)
     {
-
+        static constexpr std::string_view routineName = "UnitarySys::processInputSpec";
+            
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string const &cCurrentModuleObject = input_data.system_type;
         DataLoopNode::ConnectionObjectType objType = static_cast<DataLoopNode::ConnectionObjectType>(
             getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(input_data.system_type)));
         std::string const &thisObjectName = input_data.name;
+
+        ErrorObjectHeader eoh{routineName, cCurrentModuleObject, thisObjectName};
+        
         this->Name = Util::makeUPPER(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);
         this->m_UnitarySysNum = sysNum;
@@ -4132,76 +4135,45 @@ namespace UnitarySystems {
         std::string const &loc_m_FanName = input_data.supply_fan_name;
 
         if (!loc_m_FanName.empty() && !loc_fanType.empty()) {
-            if (Util::SameString(loc_fanType, "Fan:SystemModel")) {
-                if (!HVACFan::checkIfFanNameIsAFanSystem(state, loc_m_FanName)) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                    errorsFound = true;
-                } else {
-                    this->m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    isNotOK = false;
-                    ValidateComponent(state, loc_fanType, loc_m_FanName, isNotOK, cCurrentModuleObject);
-                    if (isNotOK) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    } else { // mine data from fan object
-                        if (HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false) < 0) {
-                            state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, loc_m_FanName)); // call constructor
-                        }
-                        this->m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName);
-                        if (this->m_FanIndex > -1) {
-                            FanInletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->inletNodeNum;
-                            FanOutletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->outletNodeNum;
-                            this->m_FanAvailSchedPtr = state.dataHVACFan->fanObjs[this->m_FanIndex]->availSchedIndex;
-                            FanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
-                        } else {
-                            ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
-                            ShowContinueError(state, "Unable to access fan data.");
-                            ShowContinueError(state, format("Fan Type = {}, Fan name = {}", loc_fanType, loc_m_FanName));
-                            errorsFound = true;
-                        }
-                        if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                        this->m_ActualFanVolFlowRate = FanVolFlowRate;
-                        this->m_DesignFanVolFlowRate = FanVolFlowRate;
-                    }
+            this->m_FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, loc_fanType);
+            
+            if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                this->m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false);
+                if (this->m_FanIndex == -1) {
+                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, loc_m_FanName)); // call constructor
+                    this->m_FanIndex = state.dataHVACFan->fanObjs.size() - 1;
                 }
-            } else {
-                Fans::GetFanType(state, loc_m_FanName, this->m_FanType_Num, isNotOK, cCurrentModuleObject, loc_m_FanName);
-                if (isNotOK) {
-                    ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
+                FanInletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->inletNodeNum;
+                FanOutletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->outletNodeNum;
+                this->m_FanAvailSchedPtr = state.dataHVACFan->fanObjs[this->m_FanIndex]->availSchedIndex;
+                FanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+
+                if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                this->m_ActualFanVolFlowRate = FanVolFlowRate;
+                this->m_DesignFanVolFlowRate = FanVolFlowRate;
+
+            } else { // (this->m_FanType_Num != FanType_SystemModelObject)
+                this->m_FanIndex = Fans::GetFanIndex(state, loc_m_FanName);
+                if (this->m_FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, "fan_name", loc_m_FanName);
                     errorsFound = true;
-                } else {
-                    isNotOK = false;
-                    ValidateComponent(state, loc_fanType, loc_m_FanName, isNotOK, cCurrentModuleObject);
-                    if (isNotOK) {
-                        ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                        errorsFound = true;
-                    } else { // mine data from fan object
-                        Fans::GetFanIndex(state, loc_m_FanName, this->m_FanIndex, errFlag);
-                        if (errFlag) {
-                            ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisObjectName));
-                            errorsFound = true;
-                            errFlag = false;
-                        } else {
-                            auto const &fans = state.dataFans->Fan(this->m_FanIndex);
-                            FanVolFlowRate = fans.MaxAirFlowRate;
-                            if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
-                            this->m_ActualFanVolFlowRate = FanVolFlowRate;
-                            this->m_DesignFanVolFlowRate = FanVolFlowRate;
-                            FanInletNode = fans.InletNodeNum;
-                            FanOutletNode = fans.OutletNodeNum;
-                            this->m_FanAvailSchedPtr = fans.AvailSchedPtrNum;
-                        }
-                    } // IF (IsNotOK) THEN
+                } else { 
+                    auto const &fans = state.dataFans->Fan(this->m_FanIndex);
+                    FanVolFlowRate = fans.MaxAirFlowRate;
+                    if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
+                    this->m_ActualFanVolFlowRate = FanVolFlowRate;
+                    this->m_DesignFanVolFlowRate = FanVolFlowRate;
+                    FanInletNode = fans.InletNodeNum;
+                    FanOutletNode = fans.OutletNodeNum;
+                    this->m_FanAvailSchedPtr = fans.AvailSchedPtrNum;
                 }
             }
             this->m_FanExists = true;
             this->m_FanName = loc_m_FanName;
-        } else {
-            if ((loc_m_FanName.empty() && !loc_fanType.empty()) || (!loc_m_FanName.empty() && loc_fanType.empty())) {
-                ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
-                ShowContinueError(state, format("Invalid Fan Type or Name: Fan Name = {}, Fan Type = {}", loc_m_FanName, loc_fanType));
-                errorsFound = true;
-            }
+        } else if (!loc_m_FanName.empty() || !loc_fanType.empty()) {
+            ShowSevereError(state, format("Input errors for {}:{}", cCurrentModuleObject, thisObjectName));
+            ShowContinueError(state, format("Invalid Fan Type or Name: Fan Name = {}, Fan Type = {}", loc_m_FanName, loc_fanType));
+            errorsFound = true;
         }
 
         // Add fan to component sets array

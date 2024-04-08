@@ -690,7 +690,9 @@ namespace Furnaces {
         // SUBROUTINE PARAMETER DEFINITIONS:
         std::string_view constexpr getUnitaryHeatOnly("GetUnitaryHeatOnly");
         std::string_view constexpr getAirLoopHVACHeatCoolInput("GetAirLoopHVACHeatCoolInput");
+        std::string_view constexpr routineName = "GetFurnaceInput";
 
+        
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FurnaceNum;                // The Furnace that you are currently loading input into
         int GetObjectNum;              // The index to each specific object name
@@ -831,6 +833,7 @@ namespace Furnaces {
 
             FurnaceNum = HeatOnlyNum;
             auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
+
             thisFurnace.FurnaceType_Num = FurnaceType_Num;
             thisFurnace.iterationMode.allocate(3);
 
@@ -850,7 +853,10 @@ namespace Furnaces {
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
+                            
             thisFurnace.Name = Alphas(1);
+            ErrorObjectHeader eoh{routineName, cAlphaFields(1), thisFurnace.Name};
+            
             if (lAlphaBlanks(2)) {
                 thisFurnace.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -959,61 +965,25 @@ namespace Furnaces {
             FanType = Alphas(7);
             FanName = Alphas(8);
             errFlag = false;
-            Fans::GetFanType(state, FanName, thisFurnace.FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
-            if (errFlag) {
+
+            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
+            if (thisFurnace.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), FanType);
                 ErrorsFound = true;
             }
+            
             if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                 thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
 
-                ValidateComponent(state, FanType, FanName, IsNotOK, CurrentModuleObject);
-                if (IsNotOK) {
-                    ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
+                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
+                if (thisFurnace.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
                     ErrorsFound = true;
-
-                } else { // mine data from fan object
-
-                    // Get the fan index
-                    errFlag = false;
-                    Fans::GetFanIndex(state, FanName, thisFurnace.FanIndex, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Set the Design Fan Volume Flow Rate
-                    errFlag = false;
-                    FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
-                    thisFurnace.ActualFanVolFlowRate = FanVolFlowRate;
-
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} ={}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Fan Inlet Node
-                    errFlag = false;
-                    FanInletNode = Fans::GetFanInletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Fan Outlet Node
-                    errFlag = false;
-                    FanOutletNode = Fans::GetFanOutletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the fan's availabitlity schedule
-                    errFlag = false;
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
+                } else {
+                    thisFurnace.ActualFanVolFlowRate =  Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
+                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
+                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
 
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
                     if (thisFurnace.FanSchedPtr > 0 && thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
@@ -1433,6 +1403,9 @@ namespace Furnaces {
                 state, state.dataFurnaces->UniqueFurnaceNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
             thisFurnace.Name = Alphas(1);
+
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisFurnace.Name};
+            
             if (lAlphaBlanks(2)) {
                 thisFurnace.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -1540,61 +1513,26 @@ namespace Furnaces {
             FanType = Alphas(7);
             FanName = Alphas(8);
 
-            errFlag = false;
-            Fans::GetFanType(state, FanName, thisFurnace.FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
-            if (errFlag) {
+            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
+            if (thisFurnace.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), FanType);
                 ErrorsFound = true;
             }
 
+
             if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                 thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                ValidateComponent(state, FanType, FanName, IsNotOK, CurrentModuleObject);
-                if (IsNotOK) {
-                    ShowContinueError(state, format("In Furnace={}", Alphas(1)));
+
+                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
+                if (thisFurnace.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
                     ErrorsFound = true;
-
-                } else { // mine data from fan object
-
-                    // Get the fan index
-                    errFlag = false;
-                    Fans::GetFanIndex(state, FanName, thisFurnace.FanIndex, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Design Fan Volume Flow Rate
-                    errFlag = false;
-                    FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
+                } else {
+                    FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
                     thisFurnace.ActualFanVolFlowRate = FanVolFlowRate;
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} \"{}\"", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Fan Inlet Node
-                    errFlag = false;
-                    FanInletNode = Fans::GetFanInletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Fan Outlet Node
-                    errFlag = false;
-                    FanOutletNode = Fans::GetFanOutletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the fan's availability schedule
-                    errFlag = false;
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
+                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
+                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
+                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
 
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
                     if (thisFurnace.FanSchedPtr > 0 && thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
@@ -2767,6 +2705,9 @@ namespace Furnaces {
 
             thisFurnace.FurnaceType_Num = DataHVACGlobals::UnitarySys_HeatPump_AirToAir;
             thisFurnace.Name = Alphas(1);
+
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisFurnace.Name};
+            
             if (lAlphaBlanks(2)) {
                 thisFurnace.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -2869,67 +2810,26 @@ namespace Furnaces {
             FanName = Alphas(7);
 
             errFlag = false;
-            Fans::GetFanType(state, FanName, thisFurnace.FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
-            if (errFlag) {
+            
+            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
+            if (thisFurnace.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), FanType);
                 ErrorsFound = true;
             }
 
             if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
                 thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                ValidateComponent(state, FanType, FanName, IsNotOK, CurrentModuleObject);
-                if (IsNotOK) {
-                    ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
+
+                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
+                if (thisFurnace.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
                     ErrorsFound = true;
-
-                } else { // mine data from fan object
-
-                    // Get the fan index
-                    errFlag = false;
-                    Fans::GetFanIndex(state, FanName, thisFurnace.FanIndex, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the fan inlet node number
-                    errFlag = false;
-                    FanInletNode = Fans::GetFanInletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the fan outlet node number
-                    errFlag = false;
-                    FanOutletNode = Fans::GetFanOutletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the fan availability schedule
-                    errFlag = false;
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                    // Get the Design Fan Volume Flow Rate
-                    errFlag = false;
-                    FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
-                    thisFurnace.ActualFanVolFlowRate = FanVolFlowRate;
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-
-                } // IF (IsNotOK) THEN
-
-            } else {
-                ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(6), Alphas(6)));
-                ErrorsFound = true;
+                } else {
+                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
+                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
+                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
+                    thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+                }
             }
 
             // Get heating coil type and name data
@@ -3735,6 +3635,9 @@ namespace Furnaces {
 
             thisFurnace.FurnaceType_Num = DataHVACGlobals::UnitarySys_HeatPump_WaterToAir;
             thisFurnace.Name = Alphas(1);
+
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisFurnace.Name};
+            
             if (lAlphaBlanks(2)) {
                 thisFurnace.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -3836,41 +3739,21 @@ namespace Furnaces {
             FanType = Alphas(6);
             FanName = Alphas(7);
             errFlag = false;
-            Fans::GetFanType(state, FanName, thisFurnace.FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
-            if (errFlag) {
+            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
+            if (thisFurnace.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
                 ErrorsFound = true;
             }
-
+            
             if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                ValidateComponent(state, FanType, FanName, IsNotOK, CurrentModuleObject);
-                if (IsNotOK) {
-                    ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
+                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
+                if (thisFurnace.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
                     ErrorsFound = true;
                 } else {
-                    errFlag = false;
-                    Fans::GetFanIndex(state, FanName, thisFurnace.FanIndex, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-                    errFlag = false;
-                    FanInletNode = Fans::GetFanInletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-                    errFlag = false;
-                    FanOutletNode = Fans::GetFanOutletNode(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
-                    errFlag = false;
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, FanType, FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                        ErrorsFound = true;
-                    }
+                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
+                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
+                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
                 }
             } else {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
@@ -4386,13 +4269,7 @@ namespace Furnaces {
             BranchNodeConnections::SetUpCompSets(state, CurrentModuleObject, Alphas(1), Alphas(12), Alphas(13), "UNDEFINED", Alphas(4));
 
             // Set the Design Fan Volume Flow Rate
-            errFlag = false;
-            FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
-            thisFurnace.ActualFanVolFlowRate = FanVolFlowRate;
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
-                ErrorsFound = true;
-            }
+            thisFurnace.ActualFanVolFlowRate = FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
 
             // CR8094 - simple water to air heat pump MUST operate at the same flow rate specified in the coil objects
             //        Furnace(FurnaceNum)%DesignFanVolFlowRate = Numbers(1)
@@ -4933,7 +4810,7 @@ namespace Furnaces {
         if (!state.dataGlobal->DoingSizing && state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
-            FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, thisFurnace.FanIndex);
+            FanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
             thisFurnace.ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError(state,
@@ -4948,7 +4825,7 @@ namespace Furnaces {
                     ShowContinueError(state,
                                       format("... Entered value={:.2R}... Fan [{}] Max Value={:.2R}",
                                              thisFurnace.DesignFanVolFlowRate,
-                                             DataHVACGlobals::cFanTypes(thisFurnace.FanType_Num),
+                                             DataHVACGlobals::fanTypeNames[thisFurnace.FanType_Num],
                                              FanVolFlowRate));
                 }
                 if (thisFurnace.DesignFanVolFlowRate <= 0.0) {
@@ -5200,7 +5077,7 @@ namespace Furnaces {
                 }
                 std::string FanType; // used in warning messages
                 std::string FanName; // used in warning messages
-                if (Fans::GetFanSpeedRatioCurveIndex(state, FanType, FanName, thisFurnace.FanIndex) > 0) {
+                if (Fans::GetFanSpeedRatioCurveIndex(state, thisFurnace.FanIndex) > 0) {
                     if (thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxHeatAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxCoolAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxNoCoolHeatAirVolFlow) {
@@ -5215,7 +5092,7 @@ namespace Furnaces {
                 }
                 state.dataFurnaces->MyFanFlag(FurnaceNum) = false;
             } else {
-                thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, thisFurnace.FanIndex);
+                thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
             }
         }
 
@@ -5478,7 +5355,7 @@ namespace Furnaces {
             // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
             if (thisFurnace.CheckFanFlow) {
                 state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
-                Fans::GetFanVolFlow(state, thisFurnace.FanIndex, thisFurnace.FanVolFlow);
+                thisFurnace.FanVolFlow = Fans::GetFanVolFlow(state, thisFurnace.FanIndex);
 
                 if (thisFurnace.FanVolFlow != DataSizing::AutoSize) {
                     //     Check fan versus system supply air flow rates

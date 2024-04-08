@@ -13897,7 +13897,7 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     EXPECT_TRUE(thisVRFTU.OAMixerUsed);
     ASSERT_EQ("TU1 OA MIXER", thisVRFTU.OAMixerName);
     ASSERT_EQ(thisVRFTU.fanType_Num, DataHVACGlobals::FanType_SystemModelObject);
-    ASSERT_EQ("Fan:SystemModel", DataHVACGlobals::cFanTypes(thisVRFTU.fanType_Num));
+    ASSERT_EQ("Fan:SystemModel", DataHVACGlobals::fanTypeNames[thisVRFTU.fanType_Num]);
     ASSERT_EQ(DataHVACGlobals::BlowThru, thisVRFTU.FanPlace);
     EXPECT_TRUE(thisVRFTU.CoolingCoilPresent);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);

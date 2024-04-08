@@ -456,7 +456,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // PARAMETERS
         static constexpr std::string_view RoutineName("GetMSHeatPumpInput: "); // include trailing blank space
-        static constexpr std::string_view RoutineNameNoColon("GetMSHeatPumpInput");
+        static constexpr std::string_view routineName = "GetMSHeatPumpInput";
 
         // LOCAL VARIABLES
         int NumAlphas;                 // Number of elements in the alpha array
@@ -540,6 +540,9 @@ namespace HVACMultiSpeedHeatPump {
                                                                      cNumericFields);
 
             thisMSHP.Name = Alphas(1);
+
+            ErrorObjectHeader eoh{routineName, state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name};
+            
             if (lAlphaBlanks(2)) {
                 thisMSHP.AvaiSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -652,8 +655,12 @@ namespace HVACMultiSpeedHeatPump {
 
             // Get supply fan data
             bool errFound = false;
-            Fans::GetFanIndex(state, Alphas(7), thisMSHP.FanNum, errFound, state.dataHVACMultiSpdHP->CurrentModuleObject);
-            if (!errFound && thisMSHP.FanNum > 0) {
+            
+            thisMSHP.FanNum = Fans::GetFanIndex(state, Alphas(7));
+            if (thisMSHP.FanNum == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFields(7), Alphas(7));
+                ErrorsFound = true;
+            } else {
                 thisMSHP.FanName = state.dataFans->Fan(thisMSHP.FanNum).FanName;
                 thisMSHP.FanType = state.dataFans->Fan(thisMSHP.FanNum).FanType_Num;
                 thisMSHP.FanInletNode = state.dataFans->Fan(thisMSHP.FanNum).InletNodeNum;
@@ -661,19 +668,12 @@ namespace HVACMultiSpeedHeatPump {
                 BranchNodeConnections::SetUpCompSets(state,
                                                      state.dataHVACMultiSpdHP->CurrentModuleObject,
                                                      thisMSHP.Name,
-                                                     DataHVACGlobals::cFanTypes(thisMSHP.FanType),
+                                                     DataHVACGlobals::fanTypeNames[thisMSHP.FanType],
                                                      thisMSHP.FanName,
                                                      "UNDEFINED",
                                                      "UNDEFINED");
-            } else {
-                ShowSevereError(
-                    state,
-                    format(
-                        "{}, \"{}\", fan {} \"{}\" not found", state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name, Alphas(6), Alphas(7)));
-                ShowContinueError(state, "Correct this fan name using valid Fan:OnOff or Fan:ConstantVolume fan object names.");
-                ErrorsFound = true;
             }
-
+            
             // Get supply fan placement data
             if (Util::SameString(Alphas(8), "BlowThrough") || Util::SameString(Alphas(8), "DrawThrough")) {
                 if (Util::SameString(Alphas(8), "BlowThrough")) {
@@ -920,7 +920,7 @@ namespace HVACMultiSpeedHeatPump {
                     if (thisMSHP.MaxCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = FluidProperties::GetSatDensityRefrig(
-                            state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineNameNoColon);
+                            state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, routineName);
                         thisMSHP.MaxCoilFluidFlow *= SteamDensity;
                     }
 
@@ -1192,7 +1192,7 @@ namespace HVACMultiSpeedHeatPump {
                     if (thisMSHP.MaxSuppCoilFluidFlow > 0.0) {
                         SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
                         SteamDensity = FluidProperties::GetSatDensityRefrig(
-                            state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, RoutineNameNoColon);
+                            state, fluidNameSteam, state.dataHVACMultiSpdHP->TempSteamIn, 1.0, SteamIndex, routineName);
                         thisMSHP.MaxSuppCoilFluidFlow *= SteamDensity;
                     }
 
@@ -1967,7 +1967,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (!state.dataGlobal->SysSizingCalc && MSHeatPump(MSHeatPumpNum).MySizeFlag) {
-            Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
+            MSHeatPump(MSHeatPumpNum).FanVolFlow = Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum);
             SizeMSHeatPump(state, MSHeatPumpNum);
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
@@ -2191,7 +2191,7 @@ namespace HVACMultiSpeedHeatPump {
         // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
         if (!state.dataGlobal->DoingSizing && MSHeatPump(MSHeatPumpNum).CheckFanFlow) {
             state.dataHVACMultiSpdHP->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed";
-            Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum, MSHeatPump(MSHeatPumpNum).FanVolFlow);
+            MSHeatPump(MSHeatPumpNum).FanVolFlow = Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum);
             if (MSHeatPump(MSHeatPumpNum).FanVolFlow != DataSizing::AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {

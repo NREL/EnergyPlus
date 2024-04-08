@@ -141,15 +141,19 @@ namespace DataHVACGlobals {
         System,
         Num
     };
+        
+    static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNames = {
+        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
+
     static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNamesUC = {
         "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
-    int constexpr FanType_SimpleConstVolume(1);
-    int constexpr FanType_SimpleVAV(2);
-    int constexpr FanType_SimpleOnOff(3);
-    int constexpr FanType_ZoneExhaust(4);
-    int constexpr FanType_ComponentModel(5);
-    int constexpr FanType_SystemModelObject(6);
+    int constexpr FanType_SimpleConstVolume = 0;
+    int constexpr FanType_SimpleVAV = 1;
+    int constexpr FanType_SimpleOnOff = 2;
+    int constexpr FanType_ZoneExhaust = 3;
+    int constexpr FanType_ComponentModel = 4;
+    int constexpr FanType_SystemModelObject = 5;
 
     // Fan Minimum Flow Fraction Input Method
     int constexpr MinFrac(1);
@@ -392,7 +396,7 @@ namespace DataHVACGlobals {
 
     int constexpr MaxSpeedLevels = 10;
 
-    extern Array1D_string const cFanTypes;
+    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;

@@ -211,6 +211,7 @@ namespace UnitVentilator {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetUnitVentilatorInput: "); // include trailing blank
+        static constexpr std::string_view routineName = "GetUnitVentilatorInput"; // include trailing blank
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
@@ -272,6 +273,8 @@ namespace UnitVentilator {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
+            
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames.allocate(NumNumbers);
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames = "";
             state.dataUnitVentilators->UnitVentNumericFields(UnitVentNum).FieldNames = cNumericFields;
@@ -394,93 +397,83 @@ namespace UnitVentilator {
                                                                          DataLoopNode::ObjectIsNotParent);
             }
 
+
             unitVent.FanName = Alphas(12);
-            errFlag = false;
-            ValidateComponent(state, Alphas(11), unitVent.FanName, errFlag, CurrentModuleObject);
-            if (errFlag) {
-                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, unitVent.Name));
+            unitVent.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(11));
+            if (unitVent.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(11), Alphas(11));
                 ErrorsFound = true;
-            } else {
-                if (!Util::SameString(Alphas(11), "Fan:SystemModel")) {
-                    Fans::GetFanType(state, unitVent.FanName, unitVent.FanType_Num, errFlag, CurrentModuleObject, unitVent.Name);
-
-                    {
-                        if ((unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) ||
-                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleVAV) ||
-                            (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff)) {
-
-                            if (errFlag) {
-                                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, unitVent.Name));
-                                ErrorsFound = true;
-                            } else {
-                                Fans::GetFanIndex(state, unitVent.FanName, FanIndex, errFlag, CurrentModuleObject);
-                                if (FanIndex > 0) {
-                                    unitVent.FanOutletNode = state.dataFans->Fan(FanIndex).OutletNodeNum;
-                                    unitVent.FanAvailSchedPtr = state.dataFans->Fan(FanIndex).AvailSchedPtrNum; // Get the fan's availability schedule
-                                    FanVolFlow = state.dataFans->Fan(FanIndex).MaxAirFlowRate;
-                                    if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize &&
-                                        FanVolFlow < unitVent.MaxAirVolFlow) {
-                                        ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                                        ShowContinueError(
-                                            state,
-                                            format("...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum "
-                                                   "supply air flow rate [{:.7T}].",
-                                                   FanVolFlow,
-                                                   unitVent.FanName,
-                                                   unitVent.MaxAirVolFlow));
-                                        ShowContinueError(state,
-                                                          "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply "
-                                                          "air flow rate.");
-                                        ErrorsFound = true;
-                                    } else if (FanVolFlow == DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize) {
-                                        ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                                        ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
-                                        ShowContinueError(state,
-                                                          "...this can lead to unexpected results where the fan flow rate is less than required.");
-                                    } else if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow == DataSizing::AutoSize) {
-                                        ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                                        ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
-                                        ShowContinueError(state,
-                                                          "...this can lead to unexpected results where the fan flow rate is less than required.");
-                                    }
-                                }
-                            }
-                        } else {
-                            ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                            ShowContinueError(state, "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume.");
-                            ErrorsFound = true;
-                        }
-                    }
-                } else if (Util::SameString(Alphas(11), "Fan:SystemModel")) {
-                    unitVent.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
-                    unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
-                    unitVent.FanOutletNode = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->outletNodeNum;
-                    FanVolFlow = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->designAirVolFlowRate;
-                    if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize && FanVolFlow < unitVent.MaxAirVolFlow) {
+            } else if ((unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) ||
+                       (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleVAV) ||
+                       (unitVent.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff)) {
+                FanIndex = Fans::GetFanIndex(state, unitVent.FanName);
+                if (FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(12), unitVent.FanName);
+                    ErrorsFound = true;
+                } else {
+                    unitVent.FanOutletNode = state.dataFans->Fan(FanIndex).OutletNodeNum;
+                    unitVent.FanAvailSchedPtr = state.dataFans->Fan(FanIndex).AvailSchedPtrNum; // Get the fan's availability schedule
+                    FanVolFlow = state.dataFans->Fan(FanIndex).MaxAirFlowRate;
+                    if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize &&
+                        FanVolFlow < unitVent.MaxAirVolFlow) {
                         ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                         ShowContinueError(
-                            state,
-                            format(
-                                "...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum supply air flow rate [{:.7T}].",
-                                FanVolFlow,
-                                unitVent.FanName,
-                                unitVent.MaxAirVolFlow));
+                                          state,
+                                          format("...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum "
+                                                 "supply air flow rate [{:.7T}].",
+                                                 FanVolFlow,
+                                                 unitVent.FanName,
+                                                 unitVent.MaxAirVolFlow));
                         ShowContinueError(state,
-                                          "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
+                                          "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply "
+                                          "air flow rate.");
                         ErrorsFound = true;
                     } else if (FanVolFlow == DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize) {
                         ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                         ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
-                        ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
+                        ShowContinueError(state,
+                                          "...this can lead to unexpected results where the fan flow rate is less than required.");
                     } else if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow == DataSizing::AutoSize) {
-                        ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
-                        ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
-                        ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
+                            ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
+                            ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
+                            ShowContinueError(state,
+                                              "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
-                    unitVent.FanAvailSchedPtr = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->availSchedIndex;
                 }
+            } else if (unitVent.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
+                unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
+                unitVent.FanOutletNode = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->outletNodeNum;
+                FanVolFlow = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->designAirVolFlowRate;
+                if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize && FanVolFlow < unitVent.MaxAirVolFlow) {
+                    ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
+                    ShowContinueError(
+                                      state,
+                                      format(
+                                             "...air flow rate [{:.7T}] in fan object {} is less than the unit ventilator maximum supply air flow rate [{:.7T}].",
+                                             FanVolFlow,
+                                             unitVent.FanName,
+                                         unitVent.MaxAirVolFlow));
+                    ShowContinueError(state,
+                                      "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate.");
+                    ErrorsFound = true;
+                } else if (FanVolFlow == DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize) {
+                    ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
+                    ShowContinueError(state, "...the fan flow rate is autosized while the unit ventilator flow rate is not.");
+                    ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
+                } else if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow == DataSizing::AutoSize) {
+                    ShowWarningError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
+                    ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
+                    ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
+                }
+                unitVent.FanAvailSchedPtr = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->availSchedIndex;
+            } else {
+                ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
+                ShowContinueError(state, "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume.");
+                ErrorsFound = true;
             }
+
             // For node connections, this object is both a parent and a non-parent, because the
             // OA mixing box is not called out as a separate component, its nodes must be connected
             // as ObjectIsNotParent.  But for the fan and coils, the nodes are connected as ObjectIsParent

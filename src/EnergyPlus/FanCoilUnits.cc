@@ -208,6 +208,7 @@ namespace FanCoilUnits {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         static constexpr std::string_view RoutineName("GetFanCoilUnits: "); // include trailing blank space
+        static constexpr std::string_view routineName = "GetFanCoilUnits";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;                 // Number of Alphas for each GetObjectItem call
@@ -263,6 +264,8 @@ namespace FanCoilUnits {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
+            
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames.allocate(NumNumbers);
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = "";
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = cNumericFields;
@@ -503,34 +506,31 @@ namespace FanCoilUnits {
                 }
             }
 
-            errFlag = false;
-            ValidateComponent(state, fanCoil.FanType, fanCoil.FanName, errFlag, CurrentModuleObject);
-            if (errFlag) {
-                ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, fanCoil.Name));
+            fanCoil.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, fanCoil.FanType);
+            if (fanCoil.FanType_Num == -1) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(9), fanCoil.FanType);
                 ErrorsFound = true;
-            } else {
-                if (!Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
-                    Fans::GetFanType(state, fanCoil.FanName, fanCoil.FanType_Num, errFlag, CurrentModuleObject, fanCoil.Name);
-                    // need to grab fan index here
-                    // Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
-                    fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanType, fanCoil.FanName, errFlag);
-                    if (errFlag) {
-                        ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, fanCoil.Name));
-                        ErrorsFound = true;
-                        errFlag = false;
-                    }
+                
+            } else if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                fanCoil.FanIndex = Fans::GetFanIndex(state, fanCoil.FanName);
+                if (fanCoil.FanIndex == 0) {
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(10), fanCoil.FanName);
+                    ErrorsFound = true;    
+                } else {
+                    assert(fanCoil.FanType_Num == Fans::GetFanType(state, fanCoil.FanIndex));
+                    fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanIndex);
                     switch (fanCoil.FanType_Num) {
                     case DataHVACGlobals::FanType_SimpleConstVolume:
                     case DataHVACGlobals::FanType_SimpleVAV:
                     case DataHVACGlobals::FanType_SimpleOnOff: {
                         // Get fan air volume flow rate
-                        fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanType, fanCoil.FanName, IsNotOK);
+                        fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanIndex);
                         // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                         if (fanCoil.MaxAirVolFlow > fanCoil.FanAirVolFlow && fanCoil.FanAirVolFlow != DataSizing::AutoSize) {
                             ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
                             ShowContinueError(state, format("... {} is greater than the maximum fan flow rate.", cNumericFields(1)));
                             ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", fanCoil.MaxAirVolFlow));
-                            ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName));
+                            ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[fanCoil.FanType_Num], fanCoil.FanName));
                             ShowContinueError(state, format("... Fan flow = {:.5T} m3/s.", fanCoil.FanAirVolFlow));
                             ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
                             fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;
@@ -559,38 +559,38 @@ namespace FanCoilUnits {
                         ErrorsFound = true;
                     } break;
                     }
-                } else if (Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
-                    fanCoil.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, fanCoil.FanName)); // call constructor
-                    fanCoil.FanIndex = HVACFan::getFanObjectVectorIndex(state, fanCoil.FanName);             // zero-based
-                    fanCoil.fanAvailSchIndex = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->availSchedIndex;
-                    fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
-                    // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
-                    if (fanCoil.MaxAirVolFlow > fanCoil.FanAirVolFlow && fanCoil.FanAirVolFlow != DataSizing::AutoSize) {
-                        ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
-                        ShowContinueError(state, format("... {} is greater than the maximum fan flow rate.", cNumericFields(1)));
-                        ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", fanCoil.MaxAirVolFlow));
-                        ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName));
-                        ShowContinueError(state, format("... Fan flow = {:.5T} m3/s.", fanCoil.FanAirVolFlow));
-                        ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
-                        fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;
-                    }
-
-                    // check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
-                    if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow || fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow ||
-                        fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
-                        if (state.dataHVACFan->fanObjs[fanCoil.FanIndex]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous) {
-                            ShowSevereError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
-                            ShowContinueError(state,
-                                              format("...the fan type of the object : {} does not match with the capacity control method selected : "
-                                                     "{} please see I/O reference",
-                                                     fanCoil.FanName,
-                                                     capCtrlMeth));
-                            ShowContinueError(
-                                state,
-                                "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
-                            ErrorsFound = true;
-                        }
+                }
+            } else {
+                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, fanCoil.FanName)); // call constructor
+                fanCoil.FanIndex = HVACFan::getFanObjectVectorIndex(state, fanCoil.FanName);             // zero-based
+                fanCoil.fanAvailSchIndex = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->availSchedIndex;
+                fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
+                // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
+                if (fanCoil.MaxAirVolFlow > fanCoil.FanAirVolFlow && fanCoil.FanAirVolFlow != DataSizing::AutoSize) {
+                    ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
+                    ShowContinueError(state, format("... {} is greater than the maximum fan flow rate.", cNumericFields(1)));
+                    ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", fanCoil.MaxAirVolFlow));
+                    ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[fanCoil.FanType_Num], fanCoil.FanName));
+                    ShowContinueError(state, format("... Fan flow = {:.5T} m3/s.", fanCoil.FanAirVolFlow));
+                    ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
+                    fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;
+                }
+                
+                // check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
+                if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow ||
+                    fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow ||
+                    fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
+                    if (state.dataHVACFan->fanObjs[fanCoil.FanIndex]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous) {
+                        ShowSevereError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
+                        ShowContinueError(state,
+                                          format("...the fan type of the object : {} does not match with the capacity control method selected : "
+                                                 "{} please see I/O reference",
+                                                 fanCoil.FanName,
+                                                 capCtrlMeth));
+                        ShowContinueError(
+                                          state,
+                                          "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
+                        ErrorsFound = true;
                     }
                 }
             }
@@ -1439,8 +1439,7 @@ namespace FanCoilUnits {
                 if (fanCoil.FanAirVolFlow == DataSizing::AutoSize) {
                     if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, fanCoil.FanName, true, fanCoil.FanIndex);
-                        fanCoil.FanAirVolFlow =
-                            Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
+                        fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanIndex);
                     } else {
                         state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                         fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
@@ -1451,7 +1450,7 @@ namespace FanCoilUnits {
                     ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
                     ShowContinueError(state, "... Maximum supply air flow rate is greater than the maximum fan flow rate.");
                     ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} [m3/s].", MaxAirVolFlowDes));
-                    ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName));
+                    ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[fanCoil.FanType_Num], fanCoil.FanName));
                     ShowContinueError(state, format("... Fan flow = {:.5T} [m3/s].", fanCoil.FanAirVolFlow));
                     ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
                     MaxAirVolFlowDes = fanCoil.FanAirVolFlow;
@@ -1480,8 +1479,7 @@ namespace FanCoilUnits {
         } else if (fanCoil.FanAirVolFlow == DataSizing::AutoSize) {
             if (fanCoil.FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state, fanCoil.FanName, true, fanCoil.FanIndex);
-                fanCoil.FanAirVolFlow =
-                    Fans::GetFanDesignVolumeFlowRate(state, DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName, ErrorsFound);
+                fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanIndex);
             } else {
                 state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
@@ -1491,7 +1489,7 @@ namespace FanCoilUnits {
                 ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
                 ShowContinueError(state, "... Maximum supply air flow rate is greater than the maximum fan flow rate.");
                 ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", fanCoil.MaxAirVolFlow));
-                ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::cFanTypes(fanCoil.FanType_Num), fanCoil.FanName));
+                ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[fanCoil.FanType_Num], fanCoil.FanName));
                 ShowContinueError(state, format("... Fan flow = {:.5T} m3/s.", fanCoil.FanAirVolFlow));
                 ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
                 fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;

@@ -116,7 +116,7 @@ namespace PoweredInductionUnits {
         std::string MixerName; // name of air mixer component
         int Mixer_Num;         // index for type of mixer
         std::string FanName;   // name of fan component
-        int Fan_Num;           // index for fan type
+        int FanType_Num;           // index for fan type
         int Fan_Index;         // store index for this fan
         int FanAvailSchedPtr;  // index to fan availability schedule
         HtgCoilType HCoilType; // index for heating coil type
@@ -153,7 +153,7 @@ namespace PoweredInductionUnits {
             : UnitType_Num(DataDefineEquip::ZnAirLoopEquipType::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0),
               MaxPriAirVolFlow(0.0), MaxPriAirMassFlow(0.0), MinPriAirFlowFrac(0.0), MinPriAirMassFlow(0.0), PriDamperPosition(0.0),
               MaxSecAirVolFlow(0.0), MaxSecAirMassFlow(0.0), FanOnFlowFrac(0.0), FanOnAirMassFlow(0.0), PriAirInNode(0), SecAirInNode(0),
-              OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), Fan_Num(0), Fan_Index(0), FanAvailSchedPtr(0),
+              OutAirNode(0), HCoilInAirNode(0), ControlCompTypeNum(0), CompErrIndex(0), Mixer_Num(0), FanType_Num(-1), Fan_Index(0), FanAvailSchedPtr(0),
               HCoilType(HtgCoilType::Invalid), HCoil_PlantType(DataPlant::PlantEquipmentType::Invalid), HCoil_Index(0), HCoil_FluidIndex(0),
               MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),

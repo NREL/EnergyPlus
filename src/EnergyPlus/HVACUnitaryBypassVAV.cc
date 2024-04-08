@@ -325,6 +325,7 @@ namespace HVACUnitaryBypassVAV {
         // Uses "Get" routines to read in data.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
+        static constexpr std::string_view routineName = "GetCBVAV";
         static constexpr std::string_view getUnitaryHeatCoolVAVChangeoverBypass("GetUnitaryHeatCool:VAVChangeoverBypass");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -376,6 +377,9 @@ namespace HVACUnitaryBypassVAV {
             auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
 
             thisCBVAV.Name = Alphas(1);
+
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisCBVAV.Name};
+            
             thisCBVAV.UnitType = CurrentModuleObject;
             thisCBVAV.Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -622,10 +626,15 @@ namespace HVACUnitaryBypassVAV {
                     fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
                     thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
                 } else {
-                    Fans::GetFanIndex(state, thisCBVAV.FanName, thisCBVAV.FanIndex, FanErrFlag);
-                    thisCBVAV.FanInletNodeNum = state.dataFans->Fan(thisCBVAV.FanIndex).InletNodeNum;
-                    fanOutletNode = state.dataFans->Fan(thisCBVAV.FanIndex).OutletNodeNum;
-                    thisCBVAV.FanVolFlow = state.dataFans->Fan(thisCBVAV.FanIndex).MaxAirFlowRate;
+                    thisCBVAV.FanIndex = Fans::GetFanIndex(state, thisCBVAV.FanName);
+                    if (thisCBVAV.FanIndex == 0) {
+                        ShowSevereItemNotFound(state, eoh, cAlphaFields(11), thisCBVAV.FanName);
+                        ErrorsFound = true;
+                    } else {
+                        thisCBVAV.FanInletNodeNum = state.dataFans->Fan(thisCBVAV.FanIndex).InletNodeNum;
+                        fanOutletNode = state.dataFans->Fan(thisCBVAV.FanIndex).OutletNodeNum;
+                        thisCBVAV.FanVolFlow = state.dataFans->Fan(thisCBVAV.FanIndex).MaxAirFlowRate;
+                    }
                 }
             }
 

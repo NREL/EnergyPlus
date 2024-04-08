@@ -1126,6 +1126,8 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 
 bool getHPWaterHeaterInput(EnergyPlusData &state)
 {
+
+    static constexpr std::string_view routineName = "getHPWaterHeaterInput";    
     bool ErrorsFound = false;
 
     int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -1185,8 +1187,10 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
-        // Copy those lists into C++ std::maps
-        std::map<int, std::string> hpwhAlpha;
+        ErrorObjectHeader eoh{routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+        
+        // Copy those lists into C++ std::maps // Why, no really why?  This is really dumb 
+        std::map<int, std::string> hpwhAlpha; 
         std::map<int, Real64> hpwhNumeric;
         std::map<int, bool> hpwhAlphaBlank;
         std::map<int, bool> hpwhNumericBlank;
@@ -1617,25 +1621,26 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         HPWH.FanName = hpwhAlpha[23 + nAlphaOffset];
         HPWH.FanType = hpwhAlpha[22 + nAlphaOffset];
 
-        // check that the fan exists
-        bool errFlag = false;
-        ValidateComponent(state, HPWH.FanType, HPWH.FanName, errFlag, state.dataIPShortCut->cCurrentModuleObject);
-
         Real64 FanVolFlow = 0.0;
-        if (errFlag) {
-            ShowContinueError(state, format("...occurs in {}, unit=\"{}\".", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
+        bool errFlag(false);
+        
+        HPWH.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, HPWH.FanType);
+        if (HPWH.FanType_Num == -1) {
+            ShowSevereInvalidKey(state, eoh, hpwhAlphaFieldNames[22 + nAlphaOffset], HPWH.FanType);
             ErrorsFound = true;
-        } else {
-            if (Util::SameString(HPWH.FanType, "Fan:SystemModel")) {
-                HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
-                HPWH.FanNum = HVACFan::getFanObjectVectorIndex(state, HPWH.FanName);
-                FanVolFlow = state.dataHVACFan->fanObjs[HPWH.FanNum]->designAirVolFlowRate;
+        } else if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
+            HPWH.FanNum = HVACFan::getFanObjectVectorIndex(state, HPWH.FanName);
+            FanVolFlow = state.dataHVACFan->fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
+        } else {
+            HPWH.FanNum = Fans::GetFanIndex(state, HPWH.FanName);
+            if (HPWH.FanNum == 0) {
+                ShowSevereItemNotFound(state, eoh, hpwhAlphaFieldNames[23 + nAlphaOffset], HPWH.FanName);
+                ErrorsFound = true;
             } else {
-                Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, state.dataIPShortCut->cCurrentModuleObject, HPWH.Name);
-                Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, state.dataIPShortCut->cCurrentModuleObject);
-                Fans::GetFanVolFlow(state, HPWH.FanNum, FanVolFlow);
+                assert(HPWH.FanType_Num == Fans::GetFanType(state, HPWH.FanNum));
+                FanVolFlow = Fans::GetFanVolFlow(state, HPWH.FanNum);
             }
         }
         // issue #5630, set fan info in coils.
@@ -1643,6 +1648,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(state, HPWH.DXCoilNum, HPWH.FanType_Num);
             VariableSpeedCoils::setVarSpeedHPWHFanIndex(state, HPWH.DXCoilNum, HPWH.FanNum);
         } else {
+            // LOL
             DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
             DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
             DXCoils::SetDXCoolingCoilData(
@@ -2096,12 +2102,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             FanOutletNodeNum = state.dataHVACFan->fanObjs[HPWH.FanNum]->outletNodeNum;
         } else {
-            errFlag = false;
-            FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
-                ErrorsFound = true;
-            }
+            FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanNum);
         }
         if (FanOutletNodeNum != HPWH.FanOutletNode) {
             ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
@@ -2118,12 +2119,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             FanInletNodeNum = state.dataHVACFan->fanObjs[HPWH.FanNum]->inletNodeNum;
         } else {
-            errFlag = false;
-            FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
-            if (errFlag) {
-                ShowContinueError(state, format("...occurs in unit=\"{}\".", HPWH.Name));
-                ErrorsFound = true;
-            }
+            FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanNum);
         }
         int HPWHFanInletNodeNum(0);
         if (HPWH.InletAirMixerNode != 0) {
@@ -6731,7 +6727,7 @@ void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVA
             if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 FanVolFlow = state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->designAirVolFlowRate;
             } else if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
-                Fans::GetFanVolFlow(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum, FanVolFlow);
+                FanVolFlow = Fans::GetFanVolFlow(state, state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum);
             }
 
             if (FanVolFlow < state.dataWaterThermalTanks->HPWaterHeater(HPNum).HPWHAirVolFlowRate(
@@ -12589,11 +12585,7 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 FanInletNodeIndex = state.dataHVACFan->fanObjs[HPWH.FanNum]->inletNodeNum;
             } else {
-                FanInletNodeIndex = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, ErrorsFound);
-                if (ErrorsFound) {
-                    ShowWarningError(state, format("Could not retrieve fan outlet node for this unit=\"{}\".", HPWH.Name));
-                    ErrorsFound = true;
-                }
+                FanInletNodeIndex = Fans::GetFanInletNode(state, HPWH.FanNum);
             }
 
             // Fan inlet node
