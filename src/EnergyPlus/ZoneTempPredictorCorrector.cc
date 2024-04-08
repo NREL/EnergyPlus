@@ -1983,8 +1983,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "Zone Thermostat Operative Temperature",
                                         Constant::Units::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
                 }
             } else {
@@ -2091,8 +2091,8 @@ void GetZoneAirSetPoints(EnergyPlusData &state)
                                         "Zone Thermostat Operative Temperature",
                                         Constant::Units::C,
                                         state.dataHeatBal->ZnAirRpt(TempControlledZone(TempControlledZoneNum).ActualZoneNum).ThermOperativeTemp,
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         Zone(TempControlledZone(TempControlledZoneNum).ActualZoneNum).Name);
                 } // TStat Objects Loop
             }     // found thermostat referene
@@ -2912,43 +2912,43 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Thermostat Air Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalFanSys->TempTstatAir(zoneNum),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Control Type",
                                 Constant::Units::None,
                                 TempControlTypeRpt(zoneNum),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Heating Setpoint Temperature",
                                 Constant::Units::C,
                                 ZoneThermostatSetPointLo(zoneNum),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Thermostat Cooling Setpoint Temperature",
                                 Constant::Units::C,
                                 ZoneThermostatSetPointHi(zoneNum),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Adaptive Comfort Operative Temperature Set Point",
                                 Constant::Units::C,
                                 state.dataHeatBalFanSys->AdapComfortCoolingSetPoint(zoneNum),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
             SetupOutputVariable(state,
                                 "Zone Predicted Sensible Load Room Air Correction Factor",
                                 Constant::Units::None,
                                 state.dataHeatBalFanSys->LoadCorrectionFactor(zoneNum),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisZone.Name);
         } // zoneNum
 
@@ -2962,22 +2962,22 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                     "Zone Thermal Comfort Control Type",
                                     Constant::Units::None,
                                     state.dataHeatBalFanSys->ComfortControlTypeRpt(zoneNum),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger Low Setpoint PMV",
                                     Constant::Units::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).LowPMV,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     thisZone.Name);
                 SetupOutputVariable(state,
                                     "Zone Thermal Comfort Control Fanger High Setpoint PMV",
                                     Constant::Units::None,
                                     state.dataHeatBalFanSys->ZoneComfortControlsFanger(zoneNum).HighPMV,
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     thisZone.Name);
             }
         }
@@ -2988,29 +2988,29 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone List Sensible Heating Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadHeatEnergy(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneListSNLoadCoolEnergy(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Heating Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadHeatRate(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ZoneList(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone List Sensible Cooling Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneListSNLoadCoolRate(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ZoneList(Loop).Name);
         } // Loop
 
@@ -3020,29 +3020,29 @@ void InitZoneAirSetPoints(EnergyPlusData &state)
                                 "Zone Group Sensible Heating Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatEnergy(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Energy",
                                 Constant::Units::J,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolEnergy(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Heating Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadHeatRate(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
             SetupOutputVariable(state,
                                 "Zone Group Sensible Cooling Rate",
                                 Constant::Units::W,
                                 state.dataHeatBal->ZoneGroupSNLoadCoolRate(Loop),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->ZoneGroup(Loop).Name);
         } // Loop
 
@@ -3258,29 +3258,29 @@ void ZoneSpaceHeatBalanceData::setUpOutputVars(EnergyPlusData &state, std::strin
                         format("{} Air Temperature", prefix),
                         Constant::Units::C,
                         this->ZT,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Humidity Ratio", prefix),
                         Constant::Units::None,
                         this->airHumRat,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Air Relative Humidity", prefix),
                         Constant::Units::Perc,
                         this->airRelHum,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         name);
     SetupOutputVariable(state,
                         format("{} Mean Radiant Temperature", prefix),
                         Constant::Units::C,
                         this->MRT,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::State,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Average,
                         name);
 }
 
@@ -6071,22 +6071,22 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
                                 "Zone Oscillating Temperatures Time",
                                 Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillate(iZone),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 zone.Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures During Occupancy Time",
                                 Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateDuringOccupancy(iZone),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 zone.Name);
             SetupOutputVariable(state,
                                 "Zone Oscillating Temperatures in Deadband Time",
                                 Constant::Units::hr,
                                 state.dataZoneTempPredictorCorrector->ZoneTempOscillateInDeadband(iZone),
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 zone.Name);
         }
         // set up a variable covering all zones
@@ -6094,22 +6094,22 @@ void DetectOscillatingZoneTemp(EnergyPlusData &state)
                             "Facility Any Zone Oscillating Temperatures Time",
                             Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures During Occupancy Time",
                             Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateDuringOccupancy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "Facility");
         SetupOutputVariable(state,
                             "Facility Any Zone Oscillating Temperatures in Deadband Time",
                             Constant::Units::hr,
                             state.dataZoneTempPredictorCorrector->AnyZoneTempOscillateInDeadband,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "Facility");
         // test if the oscillation variables are even used
         if (ReportingThisVariable(state, "Zone Oscillating Temperatures Time") ||

@@ -4544,8 +4544,8 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -4566,8 +4566,8 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -4588,15 +4588,15 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.CompPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -4641,15 +4641,15 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.CompPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator(state,
@@ -4693,22 +4693,22 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.CompPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Dehumidification Induced Heating Demand Rate",
                                 Constant::Units::W,
                                 thisFurnace.DehumidInducedHeatingDemandRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
@@ -4732,43 +4732,43 @@ namespace Furnaces {
                                 "Unitary System Fan Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.FanPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Compressor Part Load Ratio",
                                 Constant::Units::None,
                                 thisFurnace.CompPartLoadRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Requested Sensible Cooling Rate",
                                 Constant::Units::W,
                                 thisFurnace.CoolingCoilSensDemand,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Requested Latent Cooling Rate",
                                 Constant::Units::W,
                                 thisFurnace.CoolingCoilLatentDemand,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Requested Heating Rate",
                                 Constant::Units::W,
                                 thisFurnace.HeatingCoilSensDemand,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
             SetupOutputVariable(state,
                                 "Unitary System Dehumidification Induced Heating Demand Rate",
                                 Constant::Units::W,
                                 thisFurnace.DehumidInducedHeatingDemandRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisFurnace.Name);
 
             if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
