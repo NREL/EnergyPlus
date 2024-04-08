@@ -512,7 +512,7 @@ namespace FanCoilUnits {
                 if (!Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
                     Fans::GetFanType(state, fanCoil.FanName, fanCoil.FanType_Num, errFlag, CurrentModuleObject, fanCoil.Name);
                     // need to grab fan index here
-                    // Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
+                    Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
                     fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanType, fanCoil.FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, fanCoil.Name));
