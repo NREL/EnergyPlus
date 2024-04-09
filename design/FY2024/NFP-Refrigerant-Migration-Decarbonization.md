@@ -7,6 +7,7 @@ New Feature for Plant Decarbonization
 **Florida Solar Energy Center***
 
  - Original Date: Feb 27, 2024
+ - Final NFP - updated Apr 9, 2024
 
 ## Justification for Feature Update
 
@@ -37,35 +38,36 @@ Figure 1. Operating envelope and conditions for refrigerant migration
 
 ### Approach
 
-This feature proposes to add 2 optional fields to chillers representing the refrigerant migration empirical model. Tentatively at the end of the object but these fields could be inserted near the capacity and COP inputs if that seems better placement. The curve is likely the only required input field to denote the use of this equipment enhancement (i.e., the resulting curve fraction will determine if the chiller can meet the load using only refrigerant migration), however, the zero crossing of the performance curve may not accurately represent the actual operating range and an additional field is suggested as Refrigerant Migration Minimum Temperature Difference (see following example for HeatPump:PlantLoop:EIR:Cooling). It is anticipated that both of these fields will be implemented in each chiller type.
+This feature proposes to add 2 optional fields to chillers representing the refrigerant migration (or generically a thermosiphon for passive heat exchange) empirical model. Tentatively at the end of the object but these fields could be inserted near the capacity and COP inputs if that seems better placement. The curve is likely the only required input field to denote the use of this equipment enhancement (i.e., the resulting curve fraction will determine if the chiller can meet the load using only refrigerant migration), however, the zero crossing of the performance curve may not accurately represent the actual operating range and an additional field is suggested as Refrigerant Migration Minimum Temperature Difference (see following example for HeatPump:PlantLoop:EIR:Cooling). It is anticipated that both of these fields will be implemented in each chiller type.
 
 ```
 HeatPump:PlantLoop:EIR:Cooling,
-  A13, \field Refrigerant Migration Temperature Difference Curve Name
+  A13, \field Thermosiphon Temperature Difference Curve Name
        \type object-list
        \object-list UniVariateFunctions
        \note quadratic curve = a + b * dT is typical, other univariate curves may be used
-  N10; \field Refrigerant Migration Minimum Temperature Difference
+       \note dT = evaporator outlet temperature minus condenser inlet temperature
+  N10; \field Thermosiphon Minimum Temperature Difference
        \type real
-       \minimum>=0
+       \minimum 0.0
        \default 0.0
-       \note refirgerant migration is disabled below this minimum limit and
+       \note thermosiphon model is disabled below this minimum limit and
        \note when the load is greater than calculated using the prevoius field.
 
 Chiller:Electric,
-  A14; \field Refrigerant Migration Temperature Difference Curve Name
+  A14; \field Thermosiphon Temperature Difference Curve Name
        \type object-list
        \object-list UniVariateFunctions
        \note quadratic curve = a + b * dT is typical, other univariate curves may be used
 
 Chiller:Electric:EIR,
-  A17; \field Refrigerant Migration Temperature Difference Curve Name
+  A17; \field Thermosiphon Temperature Difference Curve Name
        \type object-list
        \object-list UniVariateFunctions
        \note quadratic curve = a + b * dT is typical, other univariate curves may be used
 
 Chiller:Electric:Reformulated:EIR,
-  A16; \field Refrigerant Migration Temperature Difference Curve Name
+  A16; \field Thermosiphon Temperature Difference Curve Name
        \type object-list
        \object-list UniVariateFunctions
        \note quadratic curve = a + b * dT is typical, other univariate curves may be used

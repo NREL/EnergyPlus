@@ -8441,7 +8441,13 @@
     EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    0.2,                     !- Minimum Part Load Ratio
+    ,                        !- Minimum Source Inlet Temperature
+    ,                        !- Maximum Source Inlet Temperature
+    ,                        !- Minimum Supply Water Temperature Curve Name
+    ,                        !- Maximum Supply Water Temperature Curve Name
+    ThermosiphonCurve,       !- Thermosiphon Temperature Difference Curve Name
+    2.0;                     !- Thermosiphon Minimum Temperature Difference
 
   OutdoorAir:Node,
     AWHP_1 Cooling Side Condenser Air Inlet Node,
@@ -8465,7 +8471,22 @@
     EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                    !- Control Type
     VariableSpeedPumping,            !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    0.2,                     !- Minimum Part Load Ratio
+    ,                        !- Minimum Source Inlet Temperature
+    ,                        !- Maximum Source Inlet Temperature
+    ,                        !- Minimum Supply Water Temperature Curve Name
+    ,                        !- Maximum Supply Water Temperature Curve Name
+    ThermosiphonCurve,       !- Thermosiphon Temperature Difference Curve Name
+    2.0;                     !- Thermosiphon Minimum Temperature Difference
+
+  Curve:Linear,
+    ThermosiphonCurve,       !- Name
+    0,                       !- Coefficient1 Constant
+    0.06,                    !- Coefficient2 x
+    0,                       !- Minimum Value of x
+    30.0,                    !- Maximum Value of x
+    0.0,                     !- Minimum Curve Output
+    1.0;                     !- Maximum Curve Output
 
 !- ACX 140 Biquadratic cooling curves provided by Trane 
 Curve:Biquadratic,
@@ -10315,6 +10336,7 @@ Curve:Biquadratic,
   Output:Variable,*,Heat Pump Electricity Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Heat Pump Load Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,hourly; !- HVAC Average [kg/s]
+  Output:Variable,*,Heat Pump Thermosiphon Status,hourly; !- HVAC Average [kg/s]
 
   Output:Variable,*,Boiler Heating Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Boiler Inlet Temperature,hourly; !- HVAC Average [C]

@@ -5451,6 +5451,14 @@ This optional alpha field specifies the name of a univariate curve or table that
 
 This optional alpha field specifies the name of a univariate curve or table that defines the maximum supply water temperature.
 
+\paragraph{Field: Thermosiphon Temperature Difference Curve Name}\label{plhp_eir_cooling_inputs_thermosiphon_temperature_difference_curve_name}
+
+This optional alpha field specifies the name of a univariate curve or table that defines the thermosiphon capacity fraction as a function of temperature difference between the load side outlet node and source side inlet node. If this field is blank, the thermosiphon model is disabled.
+
+\paragraph{Field: Thermosiphon Minimum Temperature Difference}\label{plhp_eir_cooling_inputs_thermosiphon_minimum_temperature_difference}
+
+This optional numeric field specifies the temperature difference above which the thermosiphon model is active. The default value is 0. Above this temperature difference the heat pump compressor will be off.
+
 \subsection{HeatPump:PlantLoop:EIR:Heating}\label{plhp_eir_heating}
 
 The EIR-formulated heating model objects are described.
@@ -5694,6 +5702,13 @@ This section describes the outputs available for the water to water heat pump, e
     HVAC,Average,Heat Pump Load Side Mass Flow Rate {[}kg/s{]}
     \item
     HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
+\end{itemize}
+
+Outputs specific to HeatPump:PlantLoop:EIR:Cooling
+
+\begin{itemize}
+    \item
+    HVAC,Average,Heat Pump Thermosiphon Status  {[}{]}
 \end{itemize}
 
 Outputs specific to HeatPump:PlantLoop:EIR:Heating
