@@ -4536,9 +4536,9 @@ namespace ScheduleManager {
                 auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
                 for (int jType = 1; jType <= maxDayTypes; ++jType) {
                     if (dayTypeFilter[jType - 1]) {
-                        auto &daySch = state.dataScheduleMgr->DaySchedule;
-                        MinValue = min(MinValue, minval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
-                        MaxValue = max(MaxValue, maxval(daySch(weekSch.DaySchedulePointer(jType)).TSValue));
+                        auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
+                        MinValue = min(MinValue, minval(daySch.TSValue));
+                        MaxValue = max(MaxValue, maxval(daySch.TSValue));
                     }
                 }
             }
