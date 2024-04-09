@@ -1973,9 +1973,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 thisPrimaryAirSys.supFanModelType = ObjectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
-                thisPrimaryAirSys.supFanLocation = FanPlacement::DrawThru;
+                thisPrimaryAirSys.supFanPlace = DataHVACGlobals::FanPlace::DrawThru;
             } else {
-                thisPrimaryAirSys.supFanLocation = FanPlacement::BlowThru;
+                thisPrimaryAirSys.supFanPlace = DataHVACGlobals::FanPlace::BlowThru;
             }
 
             if (retFanModelType == StructArrayLegacyFanModels) {

@@ -113,7 +113,7 @@ namespace HVACMultiSpeedHeatPump {
         std::string FanName;                // Name of supply air fan
         int FanType;                        // Supply fan type
         int FanNum;                         // Supply fan number
-        int FanPlaceType;                   // Supply air fan placement: 1 Blow through; 2 Draw through
+        DataHVACGlobals::FanPlace fanPlace; // Supply air fan placement: 1 Blow through; 2 Draw through
         int FanInletNode;                   // Fan Inlet node
         int FanOutletNode;                  // Fan Outlet node
         Real64 FanVolFlow;                  // Supply fan volumetric flow rate
@@ -224,7 +224,7 @@ namespace HVACMultiSpeedHeatPump {
         // Default Constructor
         MSHeatPumpData()
             : AvaiSchedPtr(0), AirInletNodeNum(0), AirOutletNodeNum(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0), ZoneSequenceHeatingNum(0),
-              NodeNumOfControlledZone(0), FlowFraction(0.0), FanType(0), FanNum(0), FanPlaceType(0), FanInletNode(0), FanOutletNode(0),
+              NodeNumOfControlledZone(0), FlowFraction(0.0), FanType(0), FanNum(0), fanPlace(DataHVACGlobals::FanPlace::Invalid), FanInletNode(0), FanOutletNode(0),
               FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0),
               DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0),
               AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),

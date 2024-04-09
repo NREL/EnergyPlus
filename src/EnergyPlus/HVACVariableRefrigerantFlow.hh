@@ -672,7 +672,7 @@ namespace HVACVariableRefrigerantFlow {
         int FanIndex = 0;                          // Index to fan object
         Real64 FanPower = 0.0;                     // power reported by fan component
         int OpMode = 0;                            // operation mode: 1 = cycling fan, cycling coil 2 = constant fan, cycling coil
-        int FanPlace = 0;                          // fan placement; 1=blow through, 2=draw through
+        DataHVACGlobals::FanPlace fanPlace = DataHVACGlobals::FanPlace::Invalid; // fan placement; 1=blow through, 2=draw through
         Real64 ActualFanVolFlowRate = 0.0;         // volumetric flow rate from fan object
         std::string SuppHeatCoilType;              // type of supplemental heating coil
         std::string SuppHeatCoilName;              // name of supplemental heating coil

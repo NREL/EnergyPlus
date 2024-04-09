@@ -135,7 +135,7 @@ namespace Furnaces {
         //                 2 = continuous fan, cycling coils
         Furnaces::ModeOfOperation LastMode;    // last mode of operation, coolingmode or heatingmode
         AirFlowControlConstFan AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
-        int FanPlace;                          // fan placement; 1=blow through, 2=draw through
+        DataHVACGlobals::FanPlace fanPlace;                          // fan placement; 1=blow through, 2=draw through
         int NodeNumOfControlledZone;           // Node number of controlled zone air node
         int WatertoAirHPType;                  // Type of water to air heat pump model used
         Real64 CoolingConvergenceTolerance;    // Convergence tolerance for cooling,
@@ -250,7 +250,7 @@ namespace Furnaces {
               HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
               HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0),
-              LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), FanPlace(0), NodeNumOfControlledZone(0),
+              LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), fanPlace(DataHVACGlobals::FanPlace::Invalid), NodeNumOfControlledZone(0),
               WatertoAirHPType(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0),
               DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0),
               DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0), DesignFanVolFlowRateEMSOverrideOn(false),

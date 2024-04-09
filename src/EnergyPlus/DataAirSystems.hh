@@ -180,14 +180,6 @@ namespace DataAirSystems {
         Num
     };
 
-    enum class FanPlacement
-    {
-        Invalid = -1,
-        BlowThru,
-        DrawThru,
-        Num
-    };
-
     struct DefinePrimaryAirSystem // There is an array of these for each primary air system
     {
         // Members
@@ -230,7 +222,7 @@ namespace DataAirSystems {
         FanModelType supFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for supply fan, legacy or new OO
         int SupFanNum = 0;       // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
         int supFanVecIndex = -1; // index in fan object vector for supply fan when model type is ObjectVectorOOFanSystemModel, zero-based index
-        FanPlacement supFanLocation = FanPlacement::Invalid;  // location of fan relative to coil
+        DataHVACGlobals::FanPlace supFanPlace = DataHVACGlobals::FanPlace::Invalid;  // location of fan relative to coil
         FanModelType retFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for return fan, legacy or new OO
         int RetFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
         int retFanVecIndex = -1;     // index in fan object vector for return fan when model type is ObjectVectorOOFanSystemModel, zero-based index

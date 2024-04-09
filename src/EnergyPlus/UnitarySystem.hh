@@ -249,7 +249,7 @@ namespace UnitarySystems {
         bool m_SimASHRAEModel = false; // flag denoting that ASHRAE model (SZVAV) should be used
         bool m_setFaultModelInput = true;
         int m_FanIndex = 0;
-        FanPlace m_FanPlace = FanPlace::NotYetSet;
+        DataHVACGlobals::FanPlace m_FanPlace = DataHVACGlobals::FanPlace::Invalid;
         int m_FanOpModeSchedPtr = 0;
         bool m_FanExists = false;
         int m_FanType_Num = 0;

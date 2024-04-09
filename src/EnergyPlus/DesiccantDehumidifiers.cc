@@ -659,6 +659,9 @@ namespace DesiccantDehumidifiers {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
+
+            ErrorObjectHeader eoh{routineName, desicDehum.DehumType, Alphas(1)};
+            
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataDesiccantDehumidifiers->UniqueDesicDehumNames, Alphas(1), CurrentModuleObject, cAlphaFields(1), ErrorsFoundGeneric);
             desicDehum.Name = Alphas(1);
@@ -788,15 +791,11 @@ namespace DesiccantDehumidifiers {
                 ErrorsFoundGeneric = true;
             }
 
-            if (Util::SameString(Alphas(8), "DrawThrough")) {
-                desicDehum.RegenFanPlacement = DataHVACGlobals::DrawThru;
-            } else if (Util::SameString(Alphas(8), "BlowThrough")) {
-                desicDehum.RegenFanPlacement = DataHVACGlobals::BlowThru;
-            } else {
-                ShowWarningError(state, format("{} \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(8), Alphas(8)));
-                ShowContinueError(state, "...resetting to DEFAULT of DRAW THROUGH");
-                desicDehum.RegenFanPlacement = DataHVACGlobals::DrawThru;
+            
+            desicDehum.regenFanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(8)));
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::Invalid) {
+                ShowWarningInvalidKey(state, eoh, cAlphaFields(8), Alphas(8), "DrawThrough");
+                desicDehum.regenFanPlace = DataHVACGlobals::FanPlace::DrawThru;
             }
 
             ErrorsFound2 = false;
@@ -1074,7 +1073,7 @@ namespace DesiccantDehumidifiers {
                                                      RegenCoilOutlet);
             }
 
-            if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 desicDehum.RegenAirInNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                 RegenFanInlet,
                                                                                 ErrorsFound,
@@ -2452,7 +2451,7 @@ namespace DesiccantDehumidifiers {
 
                 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(desicDehum.CondenserInletNode).HumRat);
 
-                if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+                if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                     if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                     } else {
@@ -2542,7 +2541,7 @@ namespace DesiccantDehumidifiers {
                     if (RegenCoilIndex > 0) {
 
                         QRegen_OASysFanAdjust = QRegen;
-                        if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+                        if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                             if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                                 //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
                                 //             reduction through fan
@@ -2602,7 +2601,7 @@ namespace DesiccantDehumidifiers {
                 if (state.dataLoopNodes->Node(desicDehum.ProcAirInNode).HumRat > HumRatNeeded) {
 
                     //       Get Full load output of desiccant wheel
-                    if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+                    if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                         if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                             Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                         } else {
@@ -2621,7 +2620,7 @@ namespace DesiccantDehumidifiers {
                                       (RegenSetPointTemp - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).Temp)));
 
                         QRegen_OASysFanAdjust = QRegen;
-                        if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+                        if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                             if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                                 //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
                                 //             reduction through fan
@@ -2686,7 +2685,7 @@ namespace DesiccantDehumidifiers {
             }
 
             // Call regen fan, balanced desiccant HX and heating coil
-            if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
@@ -2699,7 +2698,7 @@ namespace DesiccantDehumidifiers {
                 //!   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
                 //    QRegen_OASysFanAdjust = QRegen * DDPartLoadRatio
 
-                if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+                if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                     if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                         //       For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot reduction through fan
                         QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(desicDehum.RegenFanOutNode).MassFlowRate /
@@ -2724,7 +2723,7 @@ namespace DesiccantDehumidifiers {
                                           _,
                                           desicDehum.coolingCoil_TypeNum);
 
-            if (desicDehum.RegenFanPlacement == DataHVACGlobals::DrawThru) {
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
@@ -2758,7 +2757,7 @@ namespace DesiccantDehumidifiers {
                 state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRateMaxAvail = 0.0;
             }
 
-            if (desicDehum.RegenFanPlacement == DataHVACGlobals::BlowThru) {
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
@@ -2783,7 +2782,7 @@ namespace DesiccantDehumidifiers {
                                           _,
                                           desicDehum.coolingCoil_TypeNum);
 
-            if (desicDehum.RegenFanPlacement == DataHVACGlobals::DrawThru) {
+            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 if (desicDehum.regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {

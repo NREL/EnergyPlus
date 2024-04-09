@@ -405,15 +405,9 @@ namespace OutdoorAirUnit {
                 }
             }
             // A6 :Fan Place
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "BlowThrough")) {
-                thisOutAirUnit.FanPlace = BlowThru;
-            }
-            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(6), "DrawThrough")) {
-                thisOutAirUnit.FanPlace = DrawThru;
-            }
-            if (thisOutAirUnit.FanPlace == 0) {
-                ShowSevereError(state, format("Invalid {} = {}", cAlphaFields(6), state.dataIPShortCut->cAlphaArgs(6)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            thisOutAirUnit.supFanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), state.dataIPShortCut->cAlphaArgs(6));
                 ErrorsFound = true;
             }
 
@@ -624,7 +618,7 @@ namespace OutdoorAirUnit {
 
             // When the fan position is "BlowThru", Each node is set up
 
-            if (thisOutAirUnit.FanPlace == BlowThru) {
+            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 SetUpCompSets(state,
                               CurrentModuleObject,
                               thisOutAirUnit.Name,
@@ -899,7 +893,7 @@ namespace OutdoorAirUnit {
 
                         // Add equipment to component sets array
                         // Node set up
-                        if (thisOutAirUnit.FanPlace == BlowThru) {
+                        if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                             if (InListNum == 1) { // the component is the first one
                                 SetUpCompSets(state,
                                               "ZoneHVAC:OutdoorAirUnit",
@@ -926,7 +920,7 @@ namespace OutdoorAirUnit {
                                               state.dataIPShortCut->cAlphaArgs(13));
                             }
                             // If fan is on the end of equipment.
-                        } else if (thisOutAirUnit.FanPlace == DrawThru) {
+                        } else if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                             if (InListNum == 1) {
                                 SetUpCompSets(state,
                                               "ZoneHVAC:OutdoorAirUnit",
@@ -961,7 +955,7 @@ namespace OutdoorAirUnit {
                     } // End Inlist
 
                     // In case of draw through, the last component is linked with the zone air supply node
-                    if (thisOutAirUnit.FanPlace == DrawThru) {
+                    if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                         SetUpCompSets(state,
                                       CurrentModuleObject,
                                       thisOutAirUnit.Name,
@@ -1482,11 +1476,7 @@ namespace OutdoorAirUnit {
             DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = thisOutAirUnit.SFan_Index;
-        if (thisOutAirUnit.FanPlace == BlowThru) {
-            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
-        } else if (thisOutAirUnit.FanPlace == DrawThru) {
-            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
-        }
+        state.dataSize->DataFanPlacement = thisOutAirUnit.supFanPlace;
 
         if (thisOutAirUnit.OutAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1744,7 +1734,7 @@ namespace OutdoorAirUnit {
             }
             state.dataLoopNodes->Node(OutletNode).Temp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
 
-            if (thisOutAirUnit.FanPlace == BlowThru) {
+            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _);
                 } else {
@@ -1760,7 +1750,7 @@ namespace OutdoorAirUnit {
                     }
                 }
 
-            } else if (thisOutAirUnit.FanPlace == DrawThru) {
+            } else if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _);
@@ -1806,14 +1796,14 @@ namespace OutdoorAirUnit {
                 }
             }
 
-            if (thisOutAirUnit.FanPlace == BlowThru) {
+            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _);
                 } else {
                     state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, _);
                 }
                 DesOATemp = state.dataLoopNodes->Node(SFanOutletNode).Temp;
-            } else if (thisOutAirUnit.FanPlace == DrawThru) {
+            } else if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 DesOATemp = state.dataLoopNodes->Node(OutsideAirNode).Temp;
             }
 
@@ -1870,7 +1860,7 @@ namespace OutdoorAirUnit {
             }
 
             // Fan positioning
-            if (thisOutAirUnit.FanPlace == DrawThru) {
+            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 if (thisOutAirUnit.SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, thisOutAirUnit.SFanName, FirstHVACIteration, thisOutAirUnit.SFan_Index, _);
                 } else {

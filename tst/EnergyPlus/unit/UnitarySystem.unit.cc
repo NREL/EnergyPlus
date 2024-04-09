@@ -463,7 +463,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanPlace = DataHVACGlobals::FanPlace::BlowThru;
     Real64 FanCoolLoad = Fans::FanDesHeatGain(*state, state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum, coil1CoolingAirFlowRate);
     WaterCoils::SizeWaterCoil(*state, CoilNum);
 
@@ -481,7 +481,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::Invalid;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::Invalid;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanPlace = DataHVACGlobals::FanPlace::Invalid;
 
     // size same coils in UnitarySystem
     int AirLoopNum(1);
@@ -531,7 +531,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     // add fan to UnitarySystem
     mySys->m_FanExists = true;
     mySys->m_FanIndex = 1;
-    mySys->m_FanPlace = UnitarySys::FanPlace::BlowThru;
+    mySys->m_FanPlace = DataHVACGlobals::FanPlace::BlowThru;
     // reset sizing information
     mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
     mySys->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
@@ -14300,7 +14300,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                         // checks air outlet node name
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                         // checks fan object type "FAN:ONOFF"
     EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                     // checks fan object name
-    EXPECT_TRUE(compare_enums(UnitarySys::FanPlace::DrawThru, thisSys->m_FanPlace));                 // checks fan placement, "DrawThrough"
+    EXPECT_EQ((int)DataHVACGlobals::FanPlace::DrawThru, (int)thisSys->m_FanPlace);                 // checks fan placement, "DrawThrough"
     EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
     EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName);               // checks heating coil object type
     EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName);                   // checks heating coil object type

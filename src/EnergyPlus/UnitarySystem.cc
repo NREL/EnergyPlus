@@ -1480,11 +1480,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
                 state.dataSize->DataFanIndex = this->m_FanIndex;
             }
-            if (this->m_FanPlace == FanPlace::BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
-            } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
-            }
+            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).supFanPlace = this->m_FanPlace;
         } else if (state.dataSize->CurZoneEqNum > 0 && this->m_FanExists) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
@@ -1492,11 +1488,7 @@ namespace UnitarySystems {
                 state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
             }
             state.dataSize->DataFanIndex = this->m_FanIndex;
-            if (this->m_FanPlace == FanPlace::BlowThru) {
-                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
-            } else if (this->m_FanPlace == FanPlace::DrawThru) {
-                state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
-            }
+            state.dataSize->DataFanPlacement = this->m_FanPlace;
         }
 
         if (this->ATMixerExists && state.dataSize->CurZoneEqNum > 0) { // set up ATMixer conditions for scalable capacity sizing
@@ -4188,9 +4180,8 @@ namespace UnitarySystems {
             this->m_FanCompNotSetYet = false;
         }
 
-        constexpr static std::array<std::string_view, static_cast<int>(FanPlace::Num)> FanPlaceNamesUC = {"NOTYETSET", "BLOWTHROUGH", "DRAWTHROUGH"};
-        this->m_FanPlace = static_cast<FanPlace>(getEnumValue(FanPlaceNamesUC, Util::makeUPPER(input_data.fan_placement)));
-        if ((this->m_FanPlace == FanPlace::NotYetSet || this->m_FanPlace == FanPlace::Invalid) && this->m_FanExists) {
+        this->m_FanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Util::makeUPPER(input_data.fan_placement)));
+        if (this->m_FanPlace == DataHVACGlobals::FanPlace::Invalid && this->m_FanExists) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
             ShowContinueError(state, format("Illegal Fan Placement = {}", input_data.fan_placement));
             errorsFound = true;
@@ -6227,11 +6218,11 @@ namespace UnitarySystems {
         //       Check placement of cooling coil with respect to fan placement and dehumidification control type
 
         if (this->m_FanExists) {
-            if (this->m_FanPlace == FanPlace::BlowThru) {
+            if (this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (FanOutletNode == HeatingCoilInletNode && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) {
                     this->m_CoolingCoilUpstream = false;
                 }
-            } else if (this->m_FanPlace == FanPlace::DrawThru) {
+            } else if (this->m_FanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 if (HeatingCoilOutletNode == CoolingCoilInletNode && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) {
                     this->m_CoolingCoilUpstream = false;
                 }
@@ -6250,7 +6241,7 @@ namespace UnitarySystems {
         }
 
         // check node connections
-        if (this->m_FanPlace == FanPlace::BlowThru) {
+        if (this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) {
 
             int tmpAirInletNode = this->AirInNode;
             if (this->OAMixerExists) {
@@ -6340,7 +6331,7 @@ namespace UnitarySystems {
                 }
             }
 
-        } else if (this->m_FanPlace == FanPlace::DrawThru) { // ELSE from IF(this->FanPlace .EQ. BlowThru)THEN
+        } else if (this->m_FanPlace == DataHVACGlobals::FanPlace::DrawThru) { // ELSE from IF(this->FanPlace .EQ. BlowThru)THEN
 
             int tmpAirInletNode = this->AirInNode;
             if (this->OAMixerExists) {
@@ -8025,7 +8016,7 @@ namespace UnitarySystems {
             // the PTHP does one or the other, but why can't an OA Mixer exist with the AT Mixer?
             MixedAir::SimOAMixer(state, blankStdString, this->OAMixerIndex);
         }
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
@@ -8118,7 +8109,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
@@ -11327,7 +11318,7 @@ namespace UnitarySystems {
             MixedAir::SimOAMixer(state, blankStdString, this->OAMixerIndex);
         }
 
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
@@ -11363,7 +11354,7 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
@@ -11413,7 +11404,7 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
@@ -11445,7 +11436,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
@@ -15471,7 +15462,7 @@ namespace UnitarySystems {
         Real64 CoilCoolHeatRat = 1.0;
         Real64 HeatCoilLoad = 0.0;
         // CALL the series of components that simulate a Unitary System
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::BlowThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
@@ -15521,7 +15512,7 @@ namespace UnitarySystems {
             }
         }
 
-        if (this->m_FanExists && this->m_FanPlace == FanPlace::DrawThru) {
+        if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (this->m_FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
@@ -16313,7 +16304,7 @@ namespace UnitarySystems {
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         switch (thisSys.m_CoolingCoilType_Num) {
         case DataHVACGlobals::CoilDX_CoolingTwoSpeed: {
-            if (thisSys.m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+            if (thisSys.m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
                 thisSys.m_CoolingCycRatio = CycRatio;
                 thisSys.m_CoolingPartLoadFrac = CycRatio;
                 thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);
@@ -16325,7 +16316,7 @@ namespace UnitarySystems {
         case DataHVACGlobals::CoilDX_MultiSpeedCooling: {
             OnOffAirFlowRatio = 1.0;
             thisSys.setAverageAirFlow(state, CycRatio, OnOffAirFlowRatio);
-            if (thisSys.m_FanPlace == FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+            if (thisSys.m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
                 thisSys.m_CoolingCycRatio = CycRatio;
                 thisSys.m_CoolingPartLoadFrac = CycRatio;
                 thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);

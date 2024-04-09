@@ -339,7 +339,7 @@ namespace WaterThermalTanks {
         std::string FanInletNode_str;                               // Fan inlet node name
         std::string FanOutletNode_str;                              // Fan outlet node name
         int FanNum;                                                 // Index of Fan
-        int FanPlacement;                                           // Location of Fan
+        DataHVACGlobals::FanPlace fanPlace;                         // Location of Fan
         int FanOutletNode;                                          // Outlet node of heat pump water heater fan
         int WaterHeaterTankNum;                                     // Index of Water Heater Tank
         int OutletAirSplitterSchPtr;                                // Index to air-side outlet air splitter schedule
@@ -431,7 +431,7 @@ namespace WaterThermalTanks {
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
               HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
               WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0),
-              FanNum(0), FanPlacement(0), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0),
+              FanNum(0), fanPlace(DataHVACGlobals::FanPlace::Invalid), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0),
               Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889),
               InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir),
               AmbientTempSchedule(0), AmbientRHSchedule(0), AmbientTempZone(0), CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule),

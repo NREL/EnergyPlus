@@ -675,20 +675,9 @@ namespace HVACMultiSpeedHeatPump {
             }
             
             // Get supply fan placement data
-            if (Util::SameString(Alphas(8), "BlowThrough") || Util::SameString(Alphas(8), "DrawThrough")) {
-                if (Util::SameString(Alphas(8), "BlowThrough")) {
-                    thisMSHP.FanPlaceType = DataHVACGlobals::BlowThru;
-                } else {
-                    thisMSHP.FanPlaceType = DataHVACGlobals::DrawThru;
-                }
-            } else {
-                ShowSevereError(state,
-                                format("{}, \"{}\", {} is not allowed = {}",
-                                       state.dataHVACMultiSpdHP->CurrentModuleObject,
-                                       thisMSHP.Name,
-                                       cAlphaFields(8),
-                                       Alphas(8)));
-                ShowContinueError(state, "Valid choices are BlowThrough or DrawThrough");
+            thisMSHP.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(8)));
+            if (thisMSHP.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(8), Alphas(8));
                 ErrorsFound = true;
             }
 
@@ -1461,7 +1450,7 @@ namespace HVACMultiSpeedHeatPump {
             }
 
             // Check node integrity
-            if (thisMSHP.FanPlaceType == DataHVACGlobals::BlowThru) {
+            if (thisMSHP.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (thisMSHP.FanInletNode != thisMSHP.AirInletNodeNum) {
                     ShowSevereError(state, format("For {} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name));
                     ShowContinueError(
@@ -2674,11 +2663,7 @@ namespace HVACMultiSpeedHeatPump {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = MSHeatPump.FanNum;
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
             }
-            if (MSHeatPump.FanPlaceType == DataHVACGlobals::BlowThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
-            } else if (MSHeatPump.FanPlaceType == DataHVACGlobals::DrawThru) {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation = DataAirSystems::FanPlacement::DrawThru;
-            }
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace = MSHeatPump.fanPlace;
         }
 
         NumOfSpeedCooling = MSHeatPump.NumOfSpeedCooling;
@@ -3672,7 +3657,7 @@ namespace HVACMultiSpeedHeatPump {
 
         AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
-        if (MSHeatPump.FanPlaceType == DataHVACGlobals::BlowThru) {
+        if (MSHeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
             if (QZnReq < (-1.0 * DataHVACGlobals::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {

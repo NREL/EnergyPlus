@@ -485,11 +485,11 @@ namespace WindowAC {
                 state.dataWindowAC->WindAC(WindACNum).OpMode = CycFanCycCoil;
             }
 
-            if (Util::SameString(Alphas(12), "BlowThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = BlowThru;
-            if (Util::SameString(Alphas(12), "DrawThrough")) state.dataWindowAC->WindAC(WindACNum).FanPlace = DrawThru;
-            if (state.dataWindowAC->WindAC(WindACNum).FanPlace == 0) {
-                ShowSevereError(state, format("Invalid {} = {}", cAlphaFields(12), Alphas(12)));
-                ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
+
+            state.dataWindowAC->WindAC(WindACNum).fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(12)));
+            
+            if (state.dataWindowAC->WindAC(WindACNum).fanPlace == DataHVACGlobals::FanPlace::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(12), Alphas(12));
                 ErrorsFound = true;
             }
 
@@ -510,7 +510,7 @@ namespace WindowAC {
             }
 
             // Add fan to component sets array
-            if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
+            if (state.dataWindowAC->WindAC(WindACNum).fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
 
                 // Window AC air inlet node must be the same as a zone exhaust node and the OA Mixer return node
                 // check that Window AC air inlet node is the same as a zone exhaust node.
@@ -996,11 +996,7 @@ namespace WindowAC {
             state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataWindowAC->WindAC(WindACNum).FanIndex;
-        if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
-            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
-        } else if (state.dataWindowAC->WindAC(WindACNum).FanPlace == DrawThru) {
-            state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::DrawThru;
-        }
+        state.dataSize->DataFanPlacement = state.dataWindowAC->WindAC(WindACNum).fanPlace;
 
         if (state.dataSize->CurZoneEqNum > 0) {
             if (state.dataWindowAC->WindAC(WindACNum).HVACSizingIndex > 0) {
@@ -1343,7 +1339,7 @@ namespace WindowAC {
         MixedAir::SimOAMixer(state, state.dataWindowAC->WindAC(WindACNum).OAMixName, state.dataWindowAC->WindAC(WindACNum).OAMixIndex);
 
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
-        if (state.dataWindowAC->WindAC(WindACNum).FanPlace == BlowThru) {
+        if (state.dataWindowAC->WindAC(WindACNum).fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (state.dataWindowAC->WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state,
                                             state.dataWindowAC->WindAC(WindACNum).FanName,
@@ -1391,7 +1387,7 @@ namespace WindowAC {
                       PartLoadFrac);
         }
 
-        if (state.dataWindowAC->WindAC(WindACNum).FanPlace == DrawThru) {
+        if (state.dataWindowAC->WindAC(WindACNum).fanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (state.dataWindowAC->WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
                 Fans::SimulateFanComponents(state,
                                             state.dataWindowAC->WindAC(WindACNum).FanName,

@@ -191,7 +191,7 @@ namespace DesiccantDehumidifiers {
         Real64 ExhaustFanPower;              // exhaust fan power for reporting [W]
         Real64 ExhaustFanElecConsumption;    // exhaust fan electric consumption for reporting [J]
         Real64 CompanionCoilCapacity;        // DX coil capacity for dehumidifier companion cooling coil [W]
-        int RegenFanPlacement;               // placement of the fan used for regeneration air flow
+        DataHVACGlobals::FanPlace regenFanPlace;               // placement of the fan used for regeneration air flow
         int ControlNodeNum;                  // node number of control node
         int ExhaustFanCurveIndex;            // exhaust fan curve object index
         int CompIndex;                       // index of HX component to call simheatrecovery
@@ -233,7 +233,7 @@ namespace DesiccantDehumidifiers {
               RegenCapErrorIndex4(0), RegenFanErrorIndex1(0), RegenFanErrorIndex2(0), RegenFanErrorIndex3(0), RegenFanErrorIndex4(0), HXTypeNum(0),
               coolingCoil_TypeNum(0), Preheat(Selection::Invalid), RegenSetPointTemp(0.0), ExhaustFanMaxVolFlowRate(0.0),
               ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0), ExhaustFanElecConsumption(0.0),
-              CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
+              CompanionCoilCapacity(0.0), regenFanPlace(DataHVACGlobals::FanPlace::Invalid), ControlNodeNum(0), ExhaustFanCurveIndex(0), CompIndex(0), CoolingCoilOutletNode(0),
               RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0), HXProcOutNode(0), HXRegenInNode(0),
               HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0), CoilUpstreamOfProcessSide(Selection::Invalid),
               RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0), HotWaterCoilMaxIterIndex(0),

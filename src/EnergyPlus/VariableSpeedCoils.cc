@@ -4817,11 +4817,11 @@ namespace VariableSpeedCoils {
                             DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
                         // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                            DataAirSystems::FanPlacement::BlowThru) {
+                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                            DataHVACGlobals::FanPlace::BlowThru) {
                             MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                        } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                   DataAirSystems::FanPlacement::DrawThru) {
+                        } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                                   DataHVACGlobals::FanPlace::DrawThru) {
                             SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                         }
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -4897,7 +4897,7 @@ namespace VariableSpeedCoils {
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
 
-                    if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                    if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);

@@ -401,7 +401,7 @@ void HeatPumpWaterHeaterData::simulate(
     int DXINletNodeSav = this->DXCoilAirInletNode;
     int IHPFanIndexSav = this->FanNum;
     std::string IHPFanNameSave = this->FanName;
-    int IHPFanplaceSav = this->FanPlacement;
+    DataHVACGlobals::FanPlace IHPFanplaceSav = this->fanPlace;
 
     if (this->bIsIHP) // pass the tank indexes to the IHP object
     {
@@ -430,7 +430,7 @@ void HeatPumpWaterHeaterData::simulate(
         {
             this->FanNum = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanID;
             this->FanName = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanName;
-            this->FanPlacement = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).IDFanPlace;
+            this->fanPlace = state.dataIntegratedHP->IntegratedHeatPumps(this->DXCoilNum).fanPlace;
         }
     }
 
@@ -443,7 +443,7 @@ void HeatPumpWaterHeaterData::simulate(
     this->DXCoilAirInletNode = DXINletNodeSav;
     this->FanNum = IHPFanIndexSav;
     this->FanName = IHPFanNameSave;
-    this->FanPlacement = IHPFanplaceSav;
+    this->fanPlace = IHPFanplaceSav;
     // reset caller loop num to 0 to mimic what plantloopequip was doing
     Tank.callerLoopNum = 0;
 }
@@ -1684,15 +1684,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // Fan Placement
-        if (Util::SameString(hpwhAlpha[24 + nAlphaOffset], "BlowThrough")) {
-            HPWH.FanPlacement = DataHVACGlobals::BlowThru;
-
-        } else if (Util::SameString(hpwhAlpha[24 + nAlphaOffset], "DrawThrough")) {
-            HPWH.FanPlacement = DataHVACGlobals::DrawThru;
-
-        } else {
-            ShowSevereError(state, format("{}=\"{}\", invalid ", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
-            ShowContinueError(state, format("{}=\"{}\".", hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]));
+        HPWH.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, hpwhAlpha[24 + nAlphaOffset]));
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::Invalid) { 
+            ShowSevereInvalidKey(state, eoh, hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]);
             ErrorsFound = true;
         }
 
@@ -2074,7 +2068,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         }
 
         // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
-        if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWH.FanOutletNode = HPWH.OutletAirSplitterNode;
             } else {
@@ -2084,7 +2078,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                     HPWH.FanOutletNode = HPWH.HeatPumpAirOutletNode;
                 }
             }
-        } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        } else if (HPWH.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
             if (bIsVScoil) {
                 if (HPWH.bIsIHP) {
@@ -2131,7 +2125,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 HPWHFanInletNodeNum = HPWH.HeatPumpAirInletNode;
             }
         }
-        if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (FanInletNodeNum != HPWHFanInletNodeNum) {
                 ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
@@ -2156,7 +2150,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         } else if (HPWH.DXCoilNum > 0) {
             DXCoilAirOutletNodeNum = state.dataDXCoils->DXCoil(HPWH.DXCoilNum).AirOutNode;
         }
-        if (HPWH.FanPlacement == DataHVACGlobals::DrawThru) {
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::DrawThru) {
             if (FanInletNodeNum != DXCoilAirOutletNodeNum) {
                 ShowSevereError(state, format("{}=\"{}\":", state.dataIPShortCut->cCurrentModuleObject, HPWH.Name));
                 ShowContinueError(state, "Heat pump water heater fan inlet node name does not match previous connected component.");
@@ -2168,7 +2162,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 }
                 ErrorsFound = true;
             }
-        } else if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        } else if (HPWH.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             int HPWHCoilOutletNodeNum(0);
             if (HPWH.OutletAirSplitterNode != 0) {
                 HPWHCoilOutletNodeNum = HPWH.OutletAirSplitterNode;
@@ -2197,7 +2191,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
             state.dataLoopNodes->Node(HPWH.FanOutletNode).MassFlowRateMax =
                 HPWH.OperatingAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-        if (HPWH.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             if (HPWH.InletAirMixerNode > 0) {
                 HPWH.FanInletNode_str = hpwhAlpha[26 + nAlphaOffset];
                 HPWH.FanOutletNode_str = "UNDEFINED";
@@ -9083,7 +9077,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             // set the SCWH mode
             Real64 SpeedRatio = 1.0; // speed ratio for interpolating between two speed levels
             int SpeedNum = 1;
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+            if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
                 } else {
@@ -9153,7 +9147,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
                 if (VSCoilNum > 0) // if DWH coil exists
                 {
-                    if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+                    if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                         if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                             state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
                         } else {
@@ -9194,7 +9188,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
 
         } else {
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+            if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
                 } else {
@@ -9893,7 +9887,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         if (HeatPump.bIsIHP) {
             // pass node information using resulting PLR
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+                if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
@@ -9972,7 +9966,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             }
         } else {
             // pass node information using resulting PLR
-            if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+            if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
@@ -10045,7 +10039,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
     } else { // single speed
 
         // pass node information using resulting PLR
-        if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
+        if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
             //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
             if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
@@ -12132,7 +12126,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                         MdotWater,
                         true);
                     //       simulate the HPWH coil/fan to find heating capacity
-                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
+                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                         //   simulate fan and DX coil twice
                         if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                             state.dataHVACFan->fanObjs[state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanNum]->simulate(state, _, _);
@@ -12224,7 +12218,7 @@ void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
                 } else {
                     bIsVSCoil = false;
                     //       simulate the HPWH coil/fan to find heating capacity
-                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
+                    if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                         if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                              // reset water inlet temp. If already sized, no harm.
                             if (state.dataWaterThermalTanks->HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
