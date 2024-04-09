@@ -4498,10 +4498,8 @@ namespace ScheduleManager {
         Real64 MinValue = Constant::BigNumber;
         Real64 MaxValue = -Constant::BigNumber;
         //  Sun    Mon   Tues  Wed   Thur  Fri   Sat    Hol    Summer Winter Cust1  Cust2
-        constexpr std::array<bool, maxDayTypes> dayTypeFilterWkDy = {
-            false, true, true, true, true, true, false, false, false, false, false, false};
-        constexpr std::array<bool, maxDayTypes> dayTypeFilterWeHo = {
-            true, false, false, false, false, false, true, true, false, false, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterWkDy = {false, true, true, true, true, true, false, false, false, false, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterWeHo = {true, false, false, false, false, false, true, true, false, false, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterDsDy = {
             false, false, false, false, false, false, false, false, true, true, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterNone = {
