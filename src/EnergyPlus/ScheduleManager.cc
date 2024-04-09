@@ -4497,24 +4497,16 @@ namespace ScheduleManager {
         // finds the minimum and maximum for a specific set of day types for a given schedule
         Real64 MinValue = Constant::BigNumber;
         Real64 MaxValue = -Constant::BigNumber;
-        //  Sun    Mon   Tues  Wed   Thur  Fri   Sat    Hol    Summer Winter Cust1  Cust2
+        //                                                           Sun    Mon   Tues  Wed    Thur  Fri   Sat    Hol   Summer Winter Cust1  Cust2
         constexpr std::array<bool, maxDayTypes> dayTypeFilterWkDy = {false, true, true, true, true, true, false, false, false, false, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterWeHo = {true, false, false, false, false, false, true, true, false, false, false, false};
+        //  Sun    Mon    Tues   Wed    Thur   Fri    Sat    Hol    Summer Winter Cust1  Cust2
         constexpr std::array<bool, maxDayTypes> dayTypeFilterDsDy = {
             false, false, false, false, false, false, false, false, true, true, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterNone = {
             false, false, false, false, false, false, false, false, false, false, false, false};
-        if (ScheduleIndex == -1) {
-            MinValue = 1.0;
-            MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
-            MinValue = 0.0;
-            MaxValue = 0.0;
-        } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
-            ShowFatalError(state, "getScheduleMinMaxByDayType called with ScheduleIndex out of range");
-        } else if (ScheduleIndex > 0) {
+        if (ScheduleIndex > 0 && ScheduleIndex <= state.dataScheduleMgr->NumSchedules) {
             std::array<bool, maxDayTypes> dayTypeFilter;
-            std::fill(dayTypeFilter.begin(), dayTypeFilter.end(), false);
             switch (days) {
             case DayTypeGroup::Weekday:
                 dayTypeFilter = dayTypeFilterWkDy;
@@ -4542,6 +4534,14 @@ namespace ScheduleManager {
             }
             if (MinValue == Constant::BigNumber) MinValue = 0;
             if (MaxValue == -Constant::BigNumber) MaxValue = 0;
+        } else if (ScheduleIndex == -1) {
+            MinValue = 1.0;
+            MaxValue = 1.0;
+        } else if (ScheduleIndex == 0) {
+            MinValue = 0.0;
+            MaxValue = 0.0;
+        } else {
+            ShowFatalError(state, "getScheduleMinMaxByDayType called with ScheduleIndex out of range");
         }
         return std::make_pair(MinValue, MaxValue);
     }
