@@ -4497,6 +4497,15 @@ namespace ScheduleManager {
         // finds the minimum and maximum for a specific set of day types for a given schedule
         Real64 MinValue = Constant::BigNumber;
         Real64 MaxValue = -Constant::BigNumber;
+        //  Sun    Mon   Tues  Wed   Thur  Fri   Sat    Hol    Summer Winter Cust1  Cust2
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterWkDy = {
+            false, true, true, true, true, true, false, false, false, false, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterWeHo = {
+            true, false, false, false, false, false, true, true, false, false, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterDsDy = {
+            false, false, false, false, false, false, false, false, true, true, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterNone = {
+            false, false, false, false, false, false, false, false, false, false, false, false};
         if (ScheduleIndex == -1) {
             MinValue = 1.0;
             MaxValue = 1.0;
@@ -4506,21 +4515,20 @@ namespace ScheduleManager {
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "getScheduleMinMaxByDayType called with ScheduleIndex out of range");
         } else if (ScheduleIndex > 0) {
-            std::vector<bool> dayTypeFilter(maxDayTypes);
+            std::array<bool, maxDayTypes> dayTypeFilter;
             std::fill(dayTypeFilter.begin(), dayTypeFilter.end(), false);
             switch (days) {
             case DayTypeGroup::Weekday:
-                //               Sun    Mon   Tues  Wed   Thur  Fri   Sat    Sun    Summer Winter Cust1  Cust2
-                dayTypeFilter = {false, true, true, true, true, true, false, false, false, false, false, false};
+                dayTypeFilter = dayTypeFilterWkDy;
                 break;
             case DayTypeGroup::WeekEndHoliday:
-                dayTypeFilter = {true, false, false, false, false, false, true, true, false, false, false, false};
+                dayTypeFilter = dayTypeFilterWeHo;
                 break;
             case DayTypeGroup::DesignDay:
-                dayTypeFilter = {false, false, false, false, false, false, false, false, true, true, false, false};
+                dayTypeFilter = dayTypeFilterDsDy;
                 break;
             default:
-                dayTypeFilter = {false, false, false, false, false, false, false, false, false, false, false, false};
+                dayTypeFilter = dayTypeFilterNone;
                 break;
             }
             for (int iDayOfYear = 1; iDayOfYear <= 366; ++iDayOfYear) {
