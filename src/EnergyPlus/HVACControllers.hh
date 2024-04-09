@@ -150,6 +150,7 @@ namespace HVACControllers {
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
         PlantLocation ActuatedNodePlantLoc; // Location for actuated node
+        DataPlant::PlantEquipmentType WaterCoilType = DataPlant::PlantEquipmentType::Invalid;
         // --------------------
         // Sensed variable
         // --------------------
