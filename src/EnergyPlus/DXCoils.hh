@@ -195,7 +195,7 @@ namespace DXCoils {
         Real64 InternalStaticPressureDrop; // for rating VAV system
         bool RateWithInternalStaticAndFanObject;
         int SupplyFanIndex;        // index of this fan in fan array or vector
-        int SupplyFan_TypeNum;     // type of fan, in DataHVACGlobals
+        DataHVACGlobals::FanType supplyFanType;     // type of fan, in DataHVACGlobals
         std::string SupplyFanName; // name of fan associated with this dx coil
         std::string CoilSystemName;
         // end of multi-speed compressor variables
@@ -471,7 +471,7 @@ namespace DXCoils {
               PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0),
               RatedAirVolFlowRate2(0.0), FanPowerPerEvapAirFlowRate_LowSpeed(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023_LowSpeed(MaxModes, 0.0),
               RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0),
-              RateWithInternalStaticAndFanObject(false), SupplyFanIndex(-1), SupplyFan_TypeNum(0), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0),
+              RateWithInternalStaticAndFanObject(false), SupplyFanIndex(-1), supplyFanType(DataHVACGlobals::FanType::Invalid), RatedEIR(MaxModes, 0.0), InletAirMassFlowRate(0.0),
               InletAirMassFlowRateMax(0.0), InletAirTemp(0.0), InletAirHumRat(0.0), InletAirEnthalpy(0.0), OutletAirTemp(0.0), OutletAirHumRat(0.0),
               OutletAirEnthalpy(0.0), PartLoadRatio(0.0), TotalCoolingEnergy(0.0), SensCoolingEnergy(0.0), LatCoolingEnergy(0.0),
               TotalCoolingEnergyRate(0.0), SensCoolingEnergyRate(0.0), LatCoolingEnergyRate(0.0), ElecCoolingConsumption(0.0), ElecCoolingPower(0.0),
@@ -705,8 +705,7 @@ namespace DXCoils {
 
     void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum);
 
-    void GetFanIndexForTwoSpeedCoil(
-        EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
+    void GetFanIndexForTwoSpeedCoil(EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, DataHVACGlobals::FanType &supplyFanType);
 
     void GetDXCoilIndex(EnergyPlusData &state,
                         std::string const &DXCoilName,
@@ -831,7 +830,7 @@ namespace DXCoils {
         ObjexxFCL::Optional<Real64> TotCap = _,
         ObjexxFCL::Optional_int SupplyFanIndex = _,
         ObjexxFCL::Optional_string SupplyFanName = _,
-        ObjexxFCL::Optional_int SupplyFan_TypeNum = _);
+        ObjexxFCL::Optional<DataHVACGlobals::FanType> supplyFanType = _);
 
     void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
                                     std::string const &CoilType, // must match coil types in this module

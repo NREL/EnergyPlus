@@ -185,7 +185,7 @@ namespace OutdoorAirUnit {
         int AirOutletNode;           // outlet air node number
         std::string SFanName;        // name of supply fan
         int SFan_Index;              // index in fan structure
-        int SFanType;                // type of fan in cFanTypes
+        DataHVACGlobals::FanType supFanType;                // type of fan in cFanTypes
         int SFanAvailSchedPtr;       // supply fan availability sched from fan object
         DataHVACGlobals::FanPlace supFanPlace;                // fan placement; blow through and draw through
         Real64 FanCorTemp;           // correction temperature
@@ -193,7 +193,7 @@ namespace OutdoorAirUnit {
         int SFanOutletNode;          // supply fan outlet node number
         std::string ExtFanName;      // name of exhaust fan
         int ExtFan_Index;            // index in fan structure
-        int ExtFanType;              // type of fan in cFanTypes
+        DataHVACGlobals::FanType extFanType;              // type of fan in cFanTypes
         int ExtFanAvailSchedPtr;     // exhaust fan availability sched from fan object
         bool ExtFan;                 // true if there is an exhaust fan
         std::string OutAirSchedName; // schedule of fraction for outside air (all controls)
@@ -244,7 +244,7 @@ namespace OutdoorAirUnit {
         // Default Constructor
         OAUnitData()
             : SchedPtr(0), ZonePtr(0), ZoneNodeNum(0), controlType(OAUnitCtrlType::Invalid), AirInletNode(0), AirOutletNode(0), SFan_Index(0),
-              SFanType(0), SFanAvailSchedPtr(0), supFanPlace(DataHVACGlobals::FanPlace::Invalid), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), ExtFanType(0),
+              supFanType(DataHVACGlobals::FanType::Invalid), SFanAvailSchedPtr(0), supFanPlace(DataHVACGlobals::FanPlace::Invalid), FanCorTemp(0.0), FanEffect(false), SFanOutletNode(0), ExtFan_Index(0), extFanType(DataHVACGlobals::FanType::Invalid),
               ExtFanAvailSchedPtr(0), ExtFan(false), OutAirSchedPtr(0), OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0),
               ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0), SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0),
               EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0), LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0),

@@ -127,7 +127,7 @@ namespace Furnaces {
         int SuppCoilControlNode;            // control node for steam and hot water heating coil
         std::string SuppHeatCoilName;       // name of supplemental heating coil
         std::string SuppHeatCoilType;       // type of supplemental heating coil
-        int FanType_Num;                    // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
+        DataHVACGlobals::FanType fanType;   // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
         int FanIndex;                       // Index to fan object
         int FurnaceInletNodeNum;            // Furnace inlet node number
         int FurnaceOutletNodeNum;           // Furnace inlet node number
@@ -249,7 +249,7 @@ namespace Furnaces {
               ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
               HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
               HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
-              SuppCoilControlNode(0), FanType_Num(0), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0),
+              SuppCoilControlNode(0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), OpMode(0),
               LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), fanPlace(DataHVACGlobals::FanPlace::Invalid), NodeNumOfControlledZone(0),
               WatertoAirHPType(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0),
               DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0),

@@ -49,6 +49,7 @@
 #define AIRFLOWNETWORK_ELEMENTS_HPP
 
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
@@ -1085,7 +1086,7 @@ namespace AirflowNetwork {
         // Members
         Real64 FlowRate;           // Air volume flow rate
         Real64 Ctrl;               // Control ratio
-        int FanTypeNum;            // Fan type: Constant volume or ONOFF
+        DataHVACGlobals::FanType fanType;            // Fan type: Constant volume or ONOFF
         int FanIndex;              // Fan index
         int InletNode;             // Inlet node number
         int OutletNode;            // Outlet node number
@@ -1095,7 +1096,7 @@ namespace AirflowNetwork {
 
         // Default Constructor
         ConstantVolumeFan()
-            : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
+            : FlowRate(0.0), Ctrl(0.0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
               FanModelFlag(false)
         {
         }

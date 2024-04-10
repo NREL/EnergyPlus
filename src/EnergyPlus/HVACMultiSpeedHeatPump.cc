@@ -661,14 +661,14 @@ namespace HVACMultiSpeedHeatPump {
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), Alphas(7));
                 ErrorsFound = true;
             } else {
-                thisMSHP.FanName = state.dataFans->Fan(thisMSHP.FanNum).FanName;
-                thisMSHP.FanType = state.dataFans->Fan(thisMSHP.FanNum).FanType_Num;
+                thisMSHP.FanName = state.dataFans->Fan(thisMSHP.FanNum).Name;
+                thisMSHP.fanType = state.dataFans->Fan(thisMSHP.FanNum).fanType;
                 thisMSHP.FanInletNode = state.dataFans->Fan(thisMSHP.FanNum).InletNodeNum;
                 thisMSHP.FanOutletNode = state.dataFans->Fan(thisMSHP.FanNum).OutletNodeNum;
                 BranchNodeConnections::SetUpCompSets(state,
                                                      state.dataHVACMultiSpdHP->CurrentModuleObject,
                                                      thisMSHP.Name,
-                                                     DataHVACGlobals::fanTypeNames[thisMSHP.FanType],
+                                                     DataHVACGlobals::fanTypeNames[(int)thisMSHP.fanType],
                                                      thisMSHP.FanName,
                                                      "UNDEFINED",
                                                      "UNDEFINED");
@@ -690,7 +690,7 @@ namespace HVACMultiSpeedHeatPump {
                 ErrorsFound = true;
             }
 
-            if (thisMSHP.FanSchedPtr > 0 && thisMSHP.FanType == DataHVACGlobals::FanType_SimpleConstVolume) {
+            if (thisMSHP.FanSchedPtr > 0 && thisMSHP.fanType == DataHVACGlobals::FanType::Constant) {
                 if (!ScheduleManager::CheckScheduleValueMinMax(state, thisMSHP.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name));
                     ShowContinueError(state,
@@ -2656,7 +2656,7 @@ namespace HVACMultiSpeedHeatPump {
 
         auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
         if (state.dataSize->CurSysNum > 0 && state.dataSize->CurOASysNum == 0) {
-            if (MSHeatPump.FanType == DataHVACGlobals::FanType_SystemModelObject) {
+            if (MSHeatPump.fanType == DataHVACGlobals::FanType::SystemModel) {
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = MSHeatPump.FanNum;
                 state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
             } else {

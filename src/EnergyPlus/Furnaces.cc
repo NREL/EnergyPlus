@@ -735,7 +735,6 @@ namespace Furnaces {
         std::string ReheatingCoilName; // Used in mining function CALLS
         std::string SuppHeatCoilType;  // Used in mining function CALLS
         std::string SuppHeatCoilName;  // Used in mining function CALLS
-        std::string FanType;           // Used in mining function CALLS
         std::string FanName;           // Used in mining function CALLS
         bool PrintMessage;             // Used in mining function CALLS
         int HeatingCoilPLFCurveIndex;  // index of heating coil PLF curve
@@ -960,18 +959,17 @@ namespace Furnaces {
             }
 
             // Get fan data
-            FanType = Alphas(7);
             FanName = Alphas(8);
             errFlag = false;
 
-            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
-            if (thisFurnace.FanType_Num == -1) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), FanType);
+            thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
                 ErrorsFound = true;
             }
             
-            if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
-                thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
+                thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
 
                 thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
                 if (thisFurnace.FanIndex == 0) {
@@ -984,7 +982,7 @@ namespace Furnaces {
                     thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
 
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
-                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
                         if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                             ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                             ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
@@ -993,7 +991,7 @@ namespace Furnaces {
                             ShowContinueError(state, "...schedule values must be (>0., <=1.)");
                             ErrorsFound = true;
                         }
-                    } else if (lAlphaBlanks(5) && thisFurnace.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff) {
+                    } else if (lAlphaBlanks(5) && thisFurnace.fanType != DataHVACGlobals::FanType::OnOff) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
                         ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
                         ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
@@ -1316,7 +1314,7 @@ namespace Furnaces {
                     ShowContinueError(state,
                                       format("... Entered value = {:.4R}... Fan [{} = {}] Max Value = {:.4R}",
                                              thisFurnace.DesignFanVolFlowRate,
-                                             FanType,
+                                             DataHVACGlobals::fanTypeNames[(int)thisFurnace.fanType],
                                              FanName,
                                              thisFurnace.ActualFanVolFlowRate));
                     ShowContinueError(state, " The HVAC system  flow rate is reset to the fan flow rate and the simulation continues.");
@@ -1505,18 +1503,17 @@ namespace Furnaces {
             }
 
             // Get fan data
-            FanType = Alphas(7);
             FanName = Alphas(8);
 
-            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
-            if (thisFurnace.FanType_Num == -1) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), FanType);
+            thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
                 ErrorsFound = true;
             }
 
 
-            if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
-                thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
+                thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
 
                 thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
                 if (thisFurnace.FanIndex == 0) {
@@ -1529,7 +1526,7 @@ namespace Furnaces {
                     thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
 
                     // Check fan's schedule for cycling fan operation if constant volume fan is used
-                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
                         if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                             ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                             ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
@@ -1538,7 +1535,7 @@ namespace Furnaces {
                             ShowContinueError(state, "...schedule values must be (>0., <=1.)");
                             ErrorsFound = true;
                         }
-                    } else if (lAlphaBlanks(5) && thisFurnace.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff) {
+                    } else if (lAlphaBlanks(5) && thisFurnace.fanType != DataHVACGlobals::FanType::OnOff) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
                         ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
                         ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
@@ -2798,19 +2795,18 @@ namespace Furnaces {
             }
 
             // Get fan data
-            FanType = Alphas(6);
             FanName = Alphas(7);
 
             errFlag = false;
             
-            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
-            if (thisFurnace.FanType_Num == -1) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), FanType);
+            thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
                 ErrorsFound = true;
             }
 
-            if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff ||
-                thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
+                thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
 
                 thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
                 if (thisFurnace.FanIndex == 0) {
@@ -3221,7 +3217,7 @@ namespace Furnaces {
                 ErrorsFound = true;
             } else if (lAlphaBlanks(15)) {
                 thisFurnace.OpMode = DataHVACGlobals::CycFanCycCoil;
-                if (thisFurnace.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff) {
+                if (thisFurnace.fanType != DataHVACGlobals::FanType::OnOff) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
                     ShowContinueError(state, format("{} = {}", cAlphaFields(6), Alphas(6)));
                     ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(15)));
@@ -3229,7 +3225,7 @@ namespace Furnaces {
                 }
             }
 
-            if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
                 if (thisFurnace.FanSchedPtr > 0) {
                     if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
@@ -3726,16 +3722,15 @@ namespace Furnaces {
             }
 
             // Get fan data
-            FanType = Alphas(6);
             FanName = Alphas(7);
             errFlag = false;
-            thisFurnace.FanType_Num = getEnumValue(DataHVACGlobals::fanTypeNamesUC, FanType);
-            if (thisFurnace.FanType_Num == -1) {
+            thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
                 ErrorsFound = true;
             }
             
-            if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
+            if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff) {
                 thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
                 if (thisFurnace.FanIndex == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
@@ -4078,7 +4073,7 @@ namespace Furnaces {
                 ErrorsFound = true;
             } else if (lAlphaBlanks(16)) {
                 thisFurnace.OpMode = DataHVACGlobals::CycFanCycCoil;
-                if (thisFurnace.FanType_Num != DataHVACGlobals::FanType_SimpleOnOff) {
+                if (thisFurnace.fanType != DataHVACGlobals::FanType::OnOff) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
                     ShowContinueError(state, format("{} = {}", cAlphaFields(6), Alphas(6)));
                     ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(16)));
@@ -4304,7 +4299,7 @@ namespace Furnaces {
                     ShowContinueError(state,
                                       format("... Entered value={:.2R}... Fan [{}:{}] Max Value={:.2R}",
                                              thisFurnace.DesignFanVolFlowRate,
-                                             FanType,
+                                             DataHVACGlobals::fanTypeNames[(int)thisFurnace.fanType],
                                              FanName,
                                              thisFurnace.ActualFanVolFlowRate));
                 }
@@ -4811,7 +4806,7 @@ namespace Furnaces {
                     ShowContinueError(state,
                                       format("... Entered value={:.2R}... Fan [{}] Max Value={:.2R}",
                                              thisFurnace.DesignFanVolFlowRate,
-                                             DataHVACGlobals::fanTypeNames[thisFurnace.FanType_Num],
+                                             DataHVACGlobals::fanTypeNames[(int)thisFurnace.fanType],
                                              thisFurnace.ActualFanVolFlowRate));
                 }
                 if (thisFurnace.DesignFanVolFlowRate <= 0.0) {
@@ -5061,14 +5056,13 @@ namespace Furnaces {
                     thisFurnace.CoolingSpeedRatio = thisFurnace.MaxCoolAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                     thisFurnace.NoHeatCoolSpeedRatio = thisFurnace.MaxNoCoolHeatAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                 }
-                std::string FanType; // used in warning messages
                 std::string FanName; // used in warning messages
                 if (Fans::GetFanSpeedRatioCurveIndex(state, thisFurnace.FanIndex) > 0) {
                     if (thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxHeatAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxCoolAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxNoCoolHeatAirVolFlow) {
                         ShowWarningError(state, format("{} \"{}\"", DataHVACGlobals::cFurnaceTypes(thisFurnace.FurnaceType_Num), thisFurnace.Name));
-                        ShowContinueError(state, format("...For fan type and name = {} \"{}\"", FanType, FanName));
+                        ShowContinueError(state, format("...For fan type and name = {} \"{}\"", DataHVACGlobals::fanTypeNames[(int)thisFurnace.fanType], FanName));
                         ShowContinueError(state,
                                           "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the same as "
                                           "the unitary system volumetric flow rate.");
@@ -5913,7 +5907,7 @@ namespace Furnaces {
         state.dataSize->SuppHeatCap = 0.0;
         auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
 
-        if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+        if (thisFurnace.fanType == DataHVACGlobals::FanType::SystemModel) {
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = thisFurnace.FanIndex;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
             state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
@@ -8729,7 +8723,7 @@ namespace Furnaces {
                 Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
 
                 //     For non-linear coils, simulate coil to update PLF used by the ONOFF Fan
-                if (thisFurnace.FanType_Num == DataHVACGlobals::FanType_SimpleOnOff) {
+                if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff) {
                     if (thisFurnace.FurnaceType_Num != DataHVACGlobals::UnitarySys_HeatOnly &&
                         thisFurnace.FurnaceType_Num != DataHVACGlobals::Furnace_HeatOnly) {
 

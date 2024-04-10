@@ -457,7 +457,7 @@ protected:
         VRFTU.HeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.MinOperatingPLR = 0.1;
-        VRFTU.fanType_Num = 0;
+        VRFTU.fanType = DataHVACGlobals::FanType::Invalid;
         VRFTU.FanOpModeSchedPtr = Sch2;
         VRFTU.FanAvailSchedPtr = Sch1;
         VRFTU.FanIndex = 0;
@@ -13896,8 +13896,7 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_EQ(1, state->dataHeatingCoils->NumHeatingCoils);
     EXPECT_TRUE(thisVRFTU.OAMixerUsed);
     ASSERT_EQ("TU1 OA MIXER", thisVRFTU.OAMixerName);
-    ASSERT_EQ(thisVRFTU.fanType_Num, DataHVACGlobals::FanType_SystemModelObject);
-    ASSERT_EQ("Fan:SystemModel", DataHVACGlobals::fanTypeNames[thisVRFTU.fanType_Num]);
+    ASSERT_EQ((int)thisVRFTU.fanType, (int)DataHVACGlobals::FanType::SystemModel);
     ASSERT_EQ((int)DataHVACGlobals::FanPlace::BlowThru, (int)thisVRFTU.fanPlace);
     EXPECT_TRUE(thisVRFTU.CoolingCoilPresent);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);

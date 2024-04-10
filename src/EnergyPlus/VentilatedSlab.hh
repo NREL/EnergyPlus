@@ -163,7 +163,7 @@ namespace VentilatedSlab {
         int MSlabOutNode;
         std::string FanName; // name of fan
         int Fan_Index;       // index of fan in array or vector
-        int FanType_Num;     // type of fan
+        DataHVACGlobals::FanType fanType;     // type of fan
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 MaxAirVolFlow;                        // m3/s
@@ -286,7 +286,7 @@ namespace VentilatedSlab {
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0),
               controlType(ControlType::Invalid), ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0),
-              Fan_Index(0), FanType_Num(0), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
+              Fan_Index(0), fanType(DataHVACGlobals::FanType::Invalid), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
               outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0),
               AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0),
               SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid),

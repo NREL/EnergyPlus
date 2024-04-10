@@ -628,7 +628,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                 state,
                 c->coilName_,
                 c->coilObjName,
-                state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum).FanName,
+                state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum).Name,
                 DataAirSystems::StructArrayLegacyFanModels,
                 state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum);
             break;
@@ -866,14 +866,14 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         // fill out some fan information
         switch (c->supFanModelType) {
         case DataAirSystems::StructArrayLegacyFanModels: {
-            int locFanTypeNum(0);
+            DataHVACGlobals::FanType locFanType = DataHVACGlobals::FanType::Invalid;
             bool errorsFound(false);
             if (c->supFanNum <= 0) {
                 c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
             }
 
-            locFanTypeNum = Fans::GetFanType(state, c->supFanNum);
-            c->fanTypeName = DataHVACGlobals::fanTypeNames[locFanTypeNum];
+            locFanType = Fans::GetFanType(state, c->supFanNum);
+            c->fanTypeName = DataHVACGlobals::fanTypeNames[(int)locFanType];
             c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state, c->supFanNum);
             c->fanSizeMaxAirMassFlow = state.dataFans->Fan(c->supFanNum).MaxAirMassFlowRate;
             break;

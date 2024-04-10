@@ -109,7 +109,6 @@ namespace DesiccantDehumidifiers {
         std::string Sched;                     // name of availability schedule
         std::string RegenCoilType;             // type of regen coil
         std::string RegenCoilName;             // name of regen coil
-        std::string RegenFanType;              // type of regen fan
         std::string RegenFanName;              // name of regen fan
         PerformanceModel PerformanceModel_Num; // type of performance model, default or user curves
         int ProcAirInNode;                     // process air inlet node of dehumidifier
@@ -125,7 +124,7 @@ namespace DesiccantDehumidifiers {
         Real64 NomRotorPower;           // rotor power consumption at full output [W]
         int RegenCoilIndex;             // Index for regen coil
         int RegenFanIndex;              // Index for regen fan
-        int regenFanType_Num;           // Fan type number (see DataHVACGlobals)
+        DataHVACGlobals::FanType regenFanType;               // Fan type number (see DataHVACGlobals)
         int ProcDryBulbCurvefTW;        // number of process leaving dry bulb f(edb,ew) curve
         int ProcDryBulbCurvefV;         // number of process leaving dry bulb f(v) curve
         int ProcHumRatCurvefTW;         // number of process leaving humidity ratio f(edb,ew) curve
@@ -222,7 +221,7 @@ namespace DesiccantDehumidifiers {
         DesiccantDehumidifierData()
             : PerformanceModel_Num(PerformanceModel::Invalid), ProcAirInNode(0), ProcAirOutNode(0), RegenAirInNode(0), RegenAirOutNode(0),
               RegenFanInNode(0), controlType(DesicDehumCtrlType::Invalid), HumRatSet(0.0), NomProcAirVolFlow(0.0), NomProcAirVel(0.0),
-              NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType_Num(0), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
+              NomRotorPower(0.0), RegenCoilIndex(0), RegenFanIndex(0), regenFanType(DataHVACGlobals::FanType::Invalid), ProcDryBulbCurvefTW(0), ProcDryBulbCurvefV(0),
               ProcHumRatCurvefTW(0), ProcHumRatCurvefV(0), RegenEnergyCurvefTW(0), RegenEnergyCurvefV(0), RegenVelCurvefTW(0), RegenVelCurvefV(0),
               NomRegenTemp(121.0), MinProcAirInTemp(-73.3), MaxProcAirInTemp(65.6), MinProcAirInHumRat(0.0), MaxProcAirInHumRat(0.21273), SchedPtr(0),
               NomProcAirMassFlow(0.0), NomRegenAirMassFlow(0.0), ProcAirInTemp(0.0), ProcAirInHumRat(0.0), ProcAirInEnthalpy(0.0),

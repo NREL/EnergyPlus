@@ -6141,7 +6141,7 @@ Curve:Biquadratic,
 
     // new tests for #5287, need to add an air loop to do this unit test justice
     EXPECT_TRUE(thisSys->m_FanIndex > 0);                                    // ZoneHVAC must contain a fan object to provide flow
-    EXPECT_EQ(thisSys->m_FanType_Num, DataHVACGlobals::FanType_SimpleOnOff); // fan must be FanOnOff when used with cycling fan
+    EXPECT_EQ((int)thisSys->m_FanType, (int)DataHVACGlobals::FanType::OnOff); // fan must be FanOnOff when used with cycling fan
 
     // switch to SingleZoneVAV control type and test that answer does not change since cycling fan is allowed but will not call the ASHRAE model
     // note that the input objects above show a constant fan operating mode, but since the schedules were never handled the schedule value = 0 which
@@ -13281,7 +13281,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
 
     // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in Sizer)
-    thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+    thisSys.m_FanType = DataHVACGlobals::FanType::SystemModel;
     thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
     Real64 expectedSize = 19658.4199 + locDesignHeatGain3;
 
@@ -13304,7 +13304,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     EXPECT_NEAR(fanDT, 0.17615, 0.0001);
 
     // With Test Fan 4 fan heat
-    thisSys.m_FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    thisSys.m_FanType = DataHVACGlobals::FanType::Constant;
     thisSys.m_FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
     expectedSize = 19658.4199 + locDesignHeatGain4;
 
@@ -14298,7 +14298,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                       // checks availability schedule name
     EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                          // checks air inlet node name
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                         // checks air outlet node name
-    EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, thisSys->m_FanType_Num);                         // checks fan object type "FAN:ONOFF"
+    EXPECT_EQ((int)DataHVACGlobals::FanType::OnOff, (int)thisSys->m_FanType);                         // checks fan object type "FAN:ONOFF"
     EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                     // checks fan object name
     EXPECT_EQ((int)DataHVACGlobals::FanPlace::DrawThru, (int)thisSys->m_FanPlace);                 // checks fan placement, "DrawThrough"
     EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
@@ -20975,7 +20975,7 @@ TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
 
     // unitary system
     UnitarySystems::UnitarySys thisSys;
-    thisSys.m_FanType_Num = DataHVACGlobals::FanType_SimpleVAV;
+    thisSys.m_FanType = DataHVACGlobals::FanType::VAV;
     thisSys.ControlZoneNum = 1;
     Real64 thisSysCoolMassFlowRate = 0.22951 * state->dataEnvrn->StdRhoAir;
     thisSys.m_NumOfSpeedCooling = 4;
@@ -21010,8 +21010,7 @@ TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
     state->dataFans->CheckEquipName.dimension(state->dataFans->NumFans, false);
     state->dataFans->MySizeFlag.dimension(state->dataFans->NumFans, false);
     auto &thisFan(state->dataFans->Fan(1));
-    thisFan.FanType = "Fan:VariableVolume";
-    thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleVAV;
+    thisFan.fanType = DataHVACGlobals::FanType::VAV;
     thisFan.MaxAirFlowRate = 0.22951;
     thisFan.DeltaPress = 600.0;
     thisFan.FanEff = 0.7;

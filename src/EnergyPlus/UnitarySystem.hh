@@ -252,7 +252,7 @@ namespace UnitarySystems {
         DataHVACGlobals::FanPlace m_FanPlace = DataHVACGlobals::FanPlace::Invalid;
         int m_FanOpModeSchedPtr = 0;
         bool m_FanExists = false;
-        int m_FanType_Num = 0;
+        DataHVACGlobals::FanType m_FanType = DataHVACGlobals::FanType::Invalid;
         bool m_RequestAutoSize = false;
         Real64 m_ActualFanVolFlowRate = 0.0;
         Real64 m_DesignFanVolFlowRate = 0.0;

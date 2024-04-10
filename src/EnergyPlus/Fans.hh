@@ -76,10 +76,9 @@ namespace Fans {
     struct FanEquipConditions
     {
         // Members
-        std::string FanName;               // Name of the fan
-        std::string FanType;               // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
+        std::string Name;               // Name of the fan
         std::string AvailSchedName;        // Fan Operation Schedule
-        int FanType_Num = 0;               // DataHVACGlobals fan type
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;               // DataHVACGlobals fan type
         int AvailSchedPtrNum = 0;          // Pointer to the availability schedule
         Real64 InletAirMassFlowRate = 0.0; // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
@@ -239,7 +238,7 @@ namespace Fans {
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
-    int GetFanType(EnergyPlusData &state, int FanIndex); 
+    DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex); 
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, int FanIndex);
 

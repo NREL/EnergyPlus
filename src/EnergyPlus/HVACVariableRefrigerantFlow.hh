@@ -666,7 +666,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 MaxOATSuppHeatingCoil = 0.0;        // maximum outdoor dry-bulb temperature for supplemental heating coil [C]
         Real64 SuppHeatPartLoadRatio = 0.0;        // supplemental heating coil part load ratio
         Real64 SuppHeatingCoilLoad = 0.0;          // supplemental heating coil heating load
-        int fanType_Num = 0;                       // index to fan type
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;                       // index to fan type
         int FanOpModeSchedPtr = 0;                 // Pointer to the correct fan operating mode schedule
         int FanAvailSchedPtr = -1;                 // Pointer to the correct fan availability schedule
         int FanIndex = 0;                          // Index to fan object

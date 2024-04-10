@@ -127,9 +127,6 @@ namespace DataHVACGlobals {
     int constexpr Cooling(2);
     int constexpr Heating(3);
 
-    // parameters describing fan types
-    int constexpr NumAllFanTypes(6);
-
     enum class FanType
     {
         Invalid = -1,
@@ -137,8 +134,8 @@ namespace DataHVACGlobals {
         VAV,
         OnOff,
         Exhaust,
-        Component,
-        System,
+        ComponentModel,
+        SystemModel,
         Num
     };
         
@@ -147,13 +144,6 @@ namespace DataHVACGlobals {
 
     static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
         "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
-
-    int constexpr FanType_SimpleConstVolume = 0;
-    int constexpr FanType_SimpleVAV = 1;
-    int constexpr FanType_SimpleOnOff = 2;
-    int constexpr FanType_ZoneExhaust = 3;
-    int constexpr FanType_ComponentModel = 4;
-    int constexpr FanType_SystemModelObject = 5;
 
     // Fan Minimum Flow Fraction Input Method
     int constexpr MinFrac(1);
@@ -172,8 +162,6 @@ namespace DataHVACGlobals {
 
     static constexpr std::array<std::string_view, (int)FanPlace::Num> fanPlaceNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
 
-    int constexpr BlowThru(0); // fan before coil
-    int constexpr DrawThru(1); // fan after coil
     // OA Controller Heat Recovery Bypass Control Types
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode

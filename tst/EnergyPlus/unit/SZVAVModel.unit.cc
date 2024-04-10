@@ -243,7 +243,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.m_MinOATCompressorCooling = -10.0;
     thisUnit.m_sysType = UnitarySystems::UnitarySys::SysType::Unitary;
     thisUnit.m_FanName = "TEST FAN";
-    thisUnit.m_FanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    thisUnit.m_FanType = DataHVACGlobals::FanType::OnOff;
     thisUnit.m_CoolingCoilName = "COOLINGCOIL";
     thisUnit.m_HeatingCoilName = "HEATINGCOIL";
     thisUnit.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
@@ -662,7 +662,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ("FAN:ONOFF", thisFanCoil.FanType);
+    EXPECT_EQ((int)DataHVACGlobals::FanType::OnOff, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     state->dataPlnt->TotNumLoops = 1;

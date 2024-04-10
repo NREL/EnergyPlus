@@ -333,8 +333,7 @@ namespace WaterThermalTanks {
         int DXCoilTypeNum;                                          // Type Number of DX coil
         int DXCoilAirInletNode;                                     // Inlet air node number of DX coil
         int DXCoilPLFFPLR;                                          // Index to HPWH's DX Coil PLF as a function of PLR curve
-        std::string FanType;                                        // Type of Fan (Fan:OnOff)
-        int FanType_Num;                                            // Integer type of fan (3 = Fan:OnOff)
+        DataHVACGlobals::FanType fanType;                                           // Integer type of fan (3 = Fan:OnOff)
         std::string FanName;                                        // Name of Fan
         std::string FanInletNode_str;                               // Fan inlet node name
         std::string FanOutletNode_str;                              // Fan outlet node name
@@ -430,7 +429,7 @@ namespace WaterThermalTanks {
               WHPLFCurve(0), OperatingAirFlowRate(0.0), OperatingAirMassFlowRate(0.0), OperatingWaterFlowRate(0.0), COP(0.0), SHR(0.0),
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
               HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
-              WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), FanType_Num(0),
+              WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0), fanType(DataHVACGlobals::FanType::Invalid),
               FanNum(0), fanPlace(DataHVACGlobals::FanPlace::Invalid), FanOutletNode(0), WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0),
               Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0), MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889),
               InletAirMixerNode(0), OutletAirSplitterNode(0), SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir),
@@ -450,7 +449,7 @@ namespace WaterThermalTanks {
               CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
-
+                                                                                                                                             
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void

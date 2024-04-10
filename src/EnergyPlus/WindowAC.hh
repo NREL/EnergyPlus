@@ -86,8 +86,7 @@ namespace WindowAC {
         std::string OAMixType; // type of outdoor air mixer
         int OAMixIndex;
         std::string FanName; // name of fan
-        std::string FanType; // type of fan
-        int FanType_Num;     // index to fan type
+        DataHVACGlobals::FanType fanType;     // index to fan type
         int FanIndex;
         std::string DXCoilName; // name of cooling coil
         std::string DXCoilType; // type of cooling coil,Coil:DX:CoolingBypassFactorEmpirical or
@@ -126,7 +125,7 @@ namespace WindowAC {
         // Default Constructor
         WindACData()
             : UnitType(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OutAirVolFlow(0.0),
-              OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), FanType_Num(0),
+              OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0), fanType(DataHVACGlobals::FanType::Invalid),
               FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0), OpMode(0), fanPlace(DataHVACGlobals::FanPlace::Invalid), MaxIterIndex1(0),
               MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0),
               TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0), SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0),
