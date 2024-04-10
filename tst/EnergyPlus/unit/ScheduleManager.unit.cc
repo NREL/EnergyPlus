@@ -1653,8 +1653,6 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
     EXPECT_EQ(0.15, schMin);
     EXPECT_EQ(0.95, schMax);
 
-
-
     index = GetScheduleIndex(*state, "HIGHLOW02");
 
     std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::Weekday);
