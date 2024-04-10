@@ -509,7 +509,6 @@ namespace FanCoilUnits {
             if (fanCoil.fanType == DataHVACGlobals::FanType::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(9), Alphas(9));
                 ErrorsFound = true;
-                
             } else if (fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
                 fanCoil.FanIndex = Fans::GetFanIndex(state, fanCoil.FanName);
                 if (fanCoil.FanIndex == 0) {

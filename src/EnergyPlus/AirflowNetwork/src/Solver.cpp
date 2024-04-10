@@ -1411,9 +1411,9 @@ namespace AirflowNetwork {
                     supplyFanType = fanType2;
                 }
 
-                if (!(fanType == DataHVACGlobals::FanType::Constant ||
-                      fanType == DataHVACGlobals::FanType::OnOff ||
-                      fanType == DataHVACGlobals::FanType::VAV)) {
+                if (!(fanType2 == DataHVACGlobals::FanType::Constant ||
+                      fanType2 == DataHVACGlobals::FanType::OnOff ||
+                      fanType2 == DataHVACGlobals::FanType::VAV)) {
                     ShowSevereError(m_state,
                                     format("{}The Supply Fan Object Type in {} = {} is not a valid fan type.",
                                            RoutineName, CurrentModuleObject, thisObjectName));
@@ -1454,7 +1454,7 @@ namespace AirflowNetwork {
                 DisSysCompCVFData(i).Ctrl = 1.0;      // Control ratio
                 DisSysCompCVFData(i).FanIndex = fanIndex;
                 DisSysCompCVFData(i).FlowRate = flowRate;
-                DisSysCompCVFData(i).fanType = fanType;
+                DisSysCompCVFData(i).fanType = fanType2;
                 DisSysCompCVFData(i).InletNode = inletNode;
                 DisSysCompCVFData(i).OutletNode = outletNode;
 
