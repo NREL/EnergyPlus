@@ -690,8 +690,16 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
             this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
         }
     }
-    // TODO, limit the HR CW outlet temp to the minimum allowed (CW Recovery)
-
+    // limit the HR CW outlet temp to the minimum allowed (CW Recovery)
+    if (this->heatRecoveryOutletTemp < this->minHeatRecoveryTempLimit) {
+        if (this->heatRecoveryInletTemp < this->minHeatRecoveryTempLimit) {
+            this->heatRecoveryOutletTemp = this->minHeatRecoveryTempLimit;
+            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
+        } else {
+            this->heatRecoveryRate = 0.0;
+            this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
+        }
+    }
     // report the net heat balance as source side heat transfer
     Real64 heatReoveryRateUnused = std::max(0.0, (heatRecoverRateTot - this->heatRecoveryRate));
     if (heatReoveryRateUnused > 0.0) {
