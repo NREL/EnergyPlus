@@ -485,14 +485,10 @@ namespace UnitarySystems {
                     this->m_CoolingFanSpeedRatio = this->m_MaxCoolAirVolFlow / this->m_ActualFanVolFlowRate;
                     this->m_NoHeatCoolSpeedRatio = this->m_MaxNoCoolHeatAirVolFlow / this->m_ActualFanVolFlowRate;
                     if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
-                        std::string FanType = ""; // used in warning messages
-                        std::string FanName = ""; // used in warning messages
                         bool fanHasPowerSpeedRatioCurve = false;
                         if (this->m_FanType == DataHVACGlobals::FanType::SystemModel) {
                             if (state.dataHVACFan->fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0)
                                 fanHasPowerSpeedRatioCurve = true;
-                            FanType = "Fan:SystemModel";
-                            FanName = this->m_FanName;
                         } else {
                             if (Fans::GetFanSpeedRatioCurveIndex(state, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
                         }
@@ -502,7 +498,9 @@ namespace UnitarySystems {
                                 this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
                                 this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
                                 ShowWarningError(state, format("{} \"{}\"", this->UnitType, this->Name));
-                                ShowContinueError(state, format("...For fan type and name = {} \"{}\"", FanType, FanName));
+                                ShowContinueError(state, format("...For fan type and name = {} \"{}\"",
+                                                                DataHVACGlobals::fanTypeNames[(int)this->m_FanType],
+                                                                this->m_FanName));
                                 ShowContinueError(state,
                                                   "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
                                                   "same as the unitary system volumetric flow rate.");
