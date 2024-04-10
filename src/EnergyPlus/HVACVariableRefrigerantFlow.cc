@@ -3400,7 +3400,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
                    
             if (thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel) {
-                thisVrfTU.FanIndex = HVACFan::getFanObjectVectorIndex(state, FanName);
+                thisVrfTU.FanIndex = HVACFan::getFanObjectVectorIndex(state, FanName, false);
                 if (thisVrfTU.FanIndex == -1) {
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, FanName));
                     thisVrfTU.FanIndex = state.dataHVACFan->fanObjs.size() - 1;

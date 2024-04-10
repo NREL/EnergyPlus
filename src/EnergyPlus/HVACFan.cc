@@ -95,6 +95,8 @@ namespace HVACFan {
                 }
             }
         }
+
+        // TODO: should not print error here
         if (!found && ErrorCheck) {
             ShowSevereError(state, format("getFanObjectVectorIndex: did not find Fan:SystemModel name ={}. Check inputs", objectName));
         }
