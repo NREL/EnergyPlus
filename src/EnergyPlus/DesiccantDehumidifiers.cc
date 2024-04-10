@@ -384,10 +384,7 @@ namespace DesiccantDehumidifiers {
             desicDehum.RegenCoilName = Alphas(9);
 
             desicDehum.regenFanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(10)));
-            if (desicDehum.regenFanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(10), Alphas(10));
-                ErrorsFound = true;
-            }
+            assert(desicDehum.regenFanType != DataHVACGlobals::FanType::Invalid);
             
             RegenCoilType = Alphas(8);
             RegenCoilName = Alphas(9);
@@ -787,10 +784,7 @@ namespace DesiccantDehumidifiers {
             }
 
             desicDehum.regenFanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
-            if (desicDehum.regenFanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
-                ErrorsFound = true;
-            }
+            assert(desicDehum.regenFanType != DataHVACGlobals::FanType::Invalid);
 
             desicDehum.RegenFanName = Alphas(7);
 

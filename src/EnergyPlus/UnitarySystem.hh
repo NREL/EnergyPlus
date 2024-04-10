@@ -205,15 +205,6 @@ namespace UnitarySystems {
             Num
         };
 
-        enum class FanPlace : int
-        {
-            Invalid = -1,
-            NotYetSet,
-            BlowThru,
-            DrawThru,
-            Num
-        };
-
         // Airflow control for constant fan mode
         enum class UseCompFlow
         {

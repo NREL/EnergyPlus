@@ -963,10 +963,7 @@ namespace Furnaces {
             errFlag = false;
 
             thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
-            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanType != DataHVACGlobals::FanType::Invalid);
             
             if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
                 thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
@@ -1007,10 +1004,7 @@ namespace Furnaces {
             } // IF (furnace%FanType_Num == FanType_SimpleOnOff .OR. &
 
             thisFurnace.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(9)));
-            if (thisFurnace.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(9), Alphas(9));
-                ErrorsFound = true;
-            }
+            assert (thisFurnace.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             // Get coil data
             HeatingCoilType = Alphas(10);
@@ -1506,11 +1500,7 @@ namespace Furnaces {
             FanName = Alphas(8);
 
             thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
-            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
-                ErrorsFound = true;
-            }
-
+            assert(thisFurnace.fanType != DataHVACGlobals::FanType::Invalid);
 
             if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
                 thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
@@ -1551,10 +1541,7 @@ namespace Furnaces {
             } //  IF (TFurnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &, etc.
 
             thisFurnace.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(9)));
-            if (thisFurnace.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(9), Alphas(9));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             // Get coil data
             HeatingCoilType = Alphas(10);
@@ -2800,10 +2787,7 @@ namespace Furnaces {
             errFlag = false;
             
             thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
-            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanType != DataHVACGlobals::FanType::Invalid);
 
             if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff ||
                 thisFurnace.fanType == DataHVACGlobals::FanType::Constant) {
@@ -3205,10 +3189,7 @@ namespace Furnaces {
             } // IF (Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingGasOrOtherFuel .OR. &, etc.
 
             thisFurnace.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(14)));
-            if (thisFurnace.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(14), Alphas(14));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             thisFurnace.FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(15));
             if (!lAlphaBlanks(15) && thisFurnace.FanSchedPtr == 0) {
@@ -3725,10 +3706,7 @@ namespace Furnaces {
             FanName = Alphas(7);
             errFlag = false;
             thisFurnace.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
-            if (thisFurnace.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), Alphas(6));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanType != DataHVACGlobals::FanType::Invalid);
             
             if (thisFurnace.fanType == DataHVACGlobals::FanType::OnOff) {
                 thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
@@ -4061,10 +4039,7 @@ namespace Furnaces {
             }
 
             thisFurnace.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(15)));
-            if (thisFurnace.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(15), Alphas(15));
-                ErrorsFound = true;
-            }
+            assert(thisFurnace.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             thisFurnace.FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(16));
             if (!lAlphaBlanks(16) && thisFurnace.FanSchedPtr == 0) {

@@ -374,10 +374,9 @@ namespace WindowAC {
 
             state.dataWindowAC->WindAC(WindACNum).fanType =
                 static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
-            if (state.dataWindowAC->WindAC(WindACNum).fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
-                FanErrFlag = true;
-            } else if (state.dataWindowAC->WindAC(WindACNum).fanType == DataHVACGlobals::FanType::SystemModel) {
+            assert(state.dataWindowAC->WindAC(WindACNum).fanType != DataHVACGlobals::FanType::Invalid);
+
+            if (state.dataWindowAC->WindAC(WindACNum).fanType == DataHVACGlobals::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, state.dataWindowAC->WindAC(WindACNum).FanName)); // call constructor
                 state.dataWindowAC->WindAC(WindACNum).FanIndex = 
                         HVACFan::getFanObjectVectorIndex(state, state.dataWindowAC->WindAC(WindACNum).FanName);
@@ -483,11 +482,7 @@ namespace WindowAC {
 
 
             state.dataWindowAC->WindAC(WindACNum).fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(12)));
-            
-            if (state.dataWindowAC->WindAC(WindACNum).fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(12), Alphas(12));
-                ErrorsFound = true;
-            }
+            assert(state.dataWindowAC->WindAC(WindACNum).fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             state.dataWindowAC->WindAC(WindACNum).ConvergenceTol = Numbers(3);
 

@@ -3472,10 +3472,9 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             bool errFlag = false;
 
             thisZoneEvapUnit.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(7)));
-            if (thisZoneEvapUnit.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(7), Alphas(7));
-                ErrorsFound = true;
-            } else if (thisZoneEvapUnit.fanType != DataHVACGlobals::FanType::SystemModel) {
+            assert(thisZoneEvapUnit.fanType != DataHVACGlobals::FanType::Invalid);
+
+            if (thisZoneEvapUnit.fanType != DataHVACGlobals::FanType::SystemModel) {
                 thisZoneEvapUnit.FanIndex = Fans::GetFanIndex(state, thisZoneEvapUnit.FanName);
                 if (thisZoneEvapUnit.FanIndex == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFields(8), thisZoneEvapUnit.FanName);
@@ -3509,10 +3508,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.DesignAirVolumeFlowRate = Numbers(1);
 
             thisZoneEvapUnit.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(9)));
-            if (thisZoneEvapUnit.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(9), Alphas(9));
-                ErrorsFound = true;
-            }
+            assert(thisZoneEvapUnit.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             // get the zone numer served by the zoneHVAC evaporative cooler
             for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {

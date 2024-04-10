@@ -506,16 +506,22 @@ namespace FanCoilUnits {
             }
 
             fanCoil.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(9)));
-            if (fanCoil.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(9), Alphas(9));
-                ErrorsFound = true;
-            } else if (fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
+            assert(fanCoil.fanType != DataHVACGlobals::FanType::Invalid);
+            
+            if (fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
                 fanCoil.FanIndex = Fans::GetFanIndex(state, fanCoil.FanName);
                 if (fanCoil.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFields(10), fanCoil.FanName);
+                    ShowSevereItemNotFound(state, eoh, cAlphaFields(10), Alphas(10));
                     ErrorsFound = true;    
                 } else {
-                    assert(fanCoil.fanType == Fans::GetFanType(state, fanCoil.FanIndex));
+                    DataHVACGlobals::FanType fanType2 = Fans::GetFanType(state, fanCoil.FanIndex);
+                    if (fanCoil.fanType != fanType2) {
+                        ShowSevereCustomMessage(state, eoh, format("{} was specified as having type {}, but has type {}",
+                                                                   fanCoil.FanName,
+                                                                   DataHVACGlobals::fanTypeNamesUC[(int)fanCoil.fanType],
+                                                                   DataHVACGlobals::fanTypeNamesUC[(int)fanType2]));
+                        ErrorsFound = true;
+                    }
                     fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanIndex);
                     switch (fanCoil.fanType) {
                     case DataHVACGlobals::FanType::Constant:

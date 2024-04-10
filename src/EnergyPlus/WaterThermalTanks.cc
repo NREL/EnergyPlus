@@ -1624,14 +1624,12 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         bool errFlag(false);
         
         HPWH.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, hpwhAlpha[22 + nAlphaOffset]));
-        if (HPWH.fanType == DataHVACGlobals::FanType::Invalid) {
-            ShowSevereInvalidKey(state, eoh, hpwhAlphaFieldNames[22 + nAlphaOffset], hpwhAlpha[22 + nAlphaOffset]);
-            ErrorsFound = true;
-        } else if (HPWH.fanType == DataHVACGlobals::FanType::SystemModel) {
+        assert(HPWH.fanType != DataHVACGlobals::FanType::Invalid);
+
+        if (HPWH.fanType == DataHVACGlobals::FanType::SystemModel) {
             state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
             HPWH.FanNum = HVACFan::getFanObjectVectorIndex(state, HPWH.FanName);
             FanVolFlow = state.dataHVACFan->fanObjs[HPWH.FanNum]->designAirVolFlowRate;
-
         } else {
             HPWH.FanNum = Fans::GetFanIndex(state, HPWH.FanName);
             if (HPWH.FanNum == 0) {

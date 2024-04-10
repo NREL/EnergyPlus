@@ -4128,6 +4128,7 @@ namespace UnitarySystems {
 
         if (!loc_m_FanName.empty() && !loc_fanType.empty()) {
             this->m_FanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Util::makeUPPER(loc_fanType)));
+            assert(this->m_FanType != DataHVACGlobals::FanType::Invalid);
             
             if (this->m_FanType == DataHVACGlobals::FanType::SystemModel) {
                 this->m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false);

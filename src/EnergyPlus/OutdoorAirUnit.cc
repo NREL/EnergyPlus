@@ -404,10 +404,8 @@ namespace OutdoorAirUnit {
             }
             // A6 :Fan Place
             thisOutAirUnit.supFanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
-            if (thisOutAirUnit.supFanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(6), state.dataIPShortCut->cAlphaArgs(6));
-                ErrorsFound = true;
-            }
+            assert(thisOutAirUnit.supFanPlace != DataHVACGlobals::FanPlace::Invalid);
+
 
             // A7
 

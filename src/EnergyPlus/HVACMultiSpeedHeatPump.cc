@@ -676,10 +676,7 @@ namespace HVACMultiSpeedHeatPump {
             
             // Get supply fan placement data
             thisMSHP.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(8)));
-            if (thisMSHP.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(8), Alphas(8));
-                ErrorsFound = true;
-            }
+            assert(thisMSHP.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
             thisMSHP.FanSchedule = Alphas(9);
             thisMSHP.FanSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(9));

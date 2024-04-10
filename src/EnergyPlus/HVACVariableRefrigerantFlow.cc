@@ -3384,20 +3384,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         thisVrfTU.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, cAlphaArgs(6)));
-        if (thisVrfTU.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
-            ShowSevereInvalidKey(state, eoh, cAlphaFieldNames(6), cAlphaArgs(6));
-            ErrorsFound = true;
-        }
+        assert(thisVrfTU.fanPlace != DataHVACGlobals::FanPlace::Invalid);
 
         if (!lAlphaFieldBlanks(7) && !lAlphaFieldBlanks(8)) {
             // Get fan data
             std::string FanName = cAlphaArgs(8);
 
             thisVrfTU.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, cAlphaArgs(7)));
-            if (thisVrfTU.fanType == DataHVACGlobals::FanType::Invalid) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFieldNames(7), cAlphaArgs(7));
-                ErrorsFound = true;
-            }
+            assert(thisVrfTU.fanType != DataHVACGlobals::FanType::Invalid);
                    
             if (thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel) {
                 thisVrfTU.FanIndex = HVACFan::getFanObjectVectorIndex(state, FanName, false);
