@@ -222,7 +222,6 @@ void EIRPlantLoopHeatPump::resetReportingVariables()
     this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
     this->heatRecoveryIsActive = false;
     this->heatRecoveryOperatingStatus = 0;
-
 }
 
 void EIRPlantLoopHeatPump::setOperatingFlowRatesWSHP(EnergyPlusData &state, bool FirstHVACIteration)
@@ -340,14 +339,6 @@ void EIRPlantLoopHeatPump::setOperatingFlowRatesASHP(EnergyPlusData &state, bool
 
             if (this->heatRecoveryIsActive) {
                 this->heatRecoveryMassFlowRate = this->heatRecoveryDesignMassFlowRate;
-                //if (!FirstHVACIteration && this->flowControl == DataPlant::FlowMode::VariableSpeedPump) {
-                //    if (this->loadVSBranchPump || this->loadVSLoopPump) {
-                //        this->heatRecoveryMassFlowRate *= std::max(this->partLoadRatio, this->minimumPLR);
-                //        if (this->loadVSBranchPump) {
-                //            this->heatRecoveryMassFlowRate = std::max(this->heatRecoveryMassFlowRate, this->loadVSPumpMinLimitMassFlow);
-                //        }
-                //    }
-                //}
                 PlantUtilities::SetComponentFlowRate(
                     state, this->heatRecoveryMassFlowRate, this->heatRecoveryNodes.inlet, this->heatRecoveryNodes.outlet, this->heatRecoveryPlantLoc);
             }
