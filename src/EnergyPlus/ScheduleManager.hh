@@ -69,6 +69,7 @@ struct EnergyPlusData;
 namespace ScheduleManager {
 
     constexpr int ScheduleAlwaysOn = -1;
+    constexpr int ScheduleAlwaysOff = 0;
 
     enum class DayType
     {
@@ -195,6 +196,9 @@ namespace ScheduleManager {
         bool MaxMinSet;                         // Max/min values have been stored for this schedule
         Real64 MaxValue;                        // Maximum value for this schedule
         Real64 MinValue;                        // Minimum value for this schedule
+        std::array<bool, static_cast<int>(DayType::Num)> MaxMinByDayTypeSet; // minimum and maximum values by daytype have been stored for this schedule
+        std::array<Real64, static_cast<int>(DayType::Num)> MinByDayType; // minimum values by daytype for this schedule
+        std::array<Real64, static_cast<int>(DayType::Num)> MaxByDayType;     // maximum values by daytype for this schedule
         Real64 CurrentValue;                    // For Reporting
         bool EMSActuatedOn;                     // indicates if EMS computed
         Real64 EMSValue;                        // EMS value
@@ -203,6 +207,7 @@ namespace ScheduleManager {
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
+              MaxMinByDayTypeSet{false}, MinByDayType{0.0}, MaxByDayType{0.0}, 
               EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }

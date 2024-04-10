@@ -1640,6 +1640,11 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
     EXPECT_EQ(0.40, schMin);
     EXPECT_EQ(0.87, schMax);
 
+    // repeat test to see if using cached values
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::Weekday);
+    EXPECT_EQ(0.40, schMin);
+    EXPECT_EQ(0.87, schMax);
+
     std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WeekEndHoliday);
     EXPECT_EQ(0.30, schMin);
     EXPECT_EQ(0.83, schMax);
@@ -1647,6 +1652,8 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
     std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::DesignDay);
     EXPECT_EQ(0.15, schMin);
     EXPECT_EQ(0.95, schMax);
+
+
 
     index = GetScheduleIndex(*state, "HIGHLOW02");
 

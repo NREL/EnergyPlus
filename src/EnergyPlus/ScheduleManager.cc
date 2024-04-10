@@ -2691,9 +2691,9 @@ namespace ScheduleManager {
         // na
 
         // Checking if valid index is passed is necessary
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             return 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             return 0.0;
         } else if (!state.dataScheduleMgr->Schedule(ScheduleIndex).EMSActuatedOn) {
             return state.dataScheduleMgr->Schedule(ScheduleIndex)
@@ -2771,9 +2771,9 @@ namespace ScheduleManager {
         // Return value
         Real64 scheduleValue(0.0);
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             return 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             return 0.0;
         }
 
@@ -2990,10 +2990,10 @@ namespace ScheduleManager {
             state.dataScheduleMgr->ScheduleInputProcessed = true;
         }
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = 1.0;
             return;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             DayValues({1, state.dataGlobal->NumOfTimeStepInHour}, {1, 24}) = 0.0;
             return;
         }
@@ -3744,10 +3744,10 @@ namespace ScheduleManager {
         Real64 MinValue(0.0); // For total minimum
         Real64 MaxValue(0.0); // For total maximum
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
             MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
             MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
@@ -3810,11 +3810,11 @@ namespace ScheduleManager {
         bool MinValueOk = true;
         bool MaxValueOk = true;
 
-        if (schedNum == -1) {
+        if (schedNum == ScheduleManager::ScheduleAlwaysOn) {
             assert(clusiveMin == Clusivity::Inclusive && clusiveMax == Clusivity::Inclusive);
             MinValueOk = (Minimum == 1.0);
             MaxValueOk = (Maximum == 1.0);
-        } else if (schedNum == 0) {
+        } else if (schedNum == ScheduleManager::ScheduleAlwaysOff) {
             assert(clusiveMin == Clusivity::Inclusive && clusiveMax == Clusivity::Inclusive);
             MinValueOk = (Minimum == 0.0);
             MaxValueOk = (Maximum == 0.0);
@@ -3853,9 +3853,9 @@ namespace ScheduleManager {
 
         Real64 MinValue(0.0); // For total minimum
 
-        if (schedNum == -1) {
+        if (schedNum == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
-        } else if (schedNum == 0) {
+        } else if (schedNum == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
         } else if (schedNum > 0 && schedNum > state.dataScheduleMgr->NumSchedules) {
             if (!state.dataScheduleMgr->Schedule(schedNum).MaxMinSet) { // Set Minimum/Maximums for this schedule
@@ -3893,10 +3893,10 @@ namespace ScheduleManager {
         bool MinValueOk;
         bool MaxValueOk;
 
-        if (schedNum == -1) {
+        if (schedNum == ScheduleManager::ScheduleAlwaysOn) {
             MinValueOk = (Minimum == 1.0);
             MaxValueOk = (Maximum == 1.0);
-        } else if (schedNum == 0) {
+        } else if (schedNum == ScheduleManager::ScheduleAlwaysOff) {
             MinValueOk = (Minimum == 0.0);
             MaxValueOk = (Maximum == 0.0);
         } else if (schedNum > 0 && schedNum <= state.dataScheduleMgr->NumSchedules) {
@@ -3962,9 +3962,9 @@ namespace ScheduleManager {
 
         CheckScheduleValue = false;
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             CheckScheduleValue = (Value == 1.0);
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             CheckScheduleValue = (Value == 0.0);
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValue called with ScheduleIndex out of range");
@@ -4034,9 +4034,9 @@ namespace ScheduleManager {
         int WkSch; // Pointer for WeekSchedule value
 
         CheckScheduleValue = false;
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             CheckScheduleValue = (Value == 1);
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             CheckScheduleValue = (Value == 0);
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "CheckScheduleValue called with ScheduleIndex out of range");
@@ -4109,10 +4109,10 @@ namespace ScheduleManager {
         bool MinValueOk;
         bool MaxValueOk;
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
             MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
             MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
@@ -4191,9 +4191,9 @@ namespace ScheduleManager {
         Real64 MinValue(0.0); // For total minimum
         bool MinValueOk;
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumDaySchedules) {
             ShowFatalError(state, "CheckDayScheduleValueMinMax called with ScheduleIndex out of range");
@@ -4260,7 +4260,7 @@ namespace ScheduleManager {
         int Hour;
         int TStep;
 
-        if (ScheduleIndex == -1 || ScheduleIndex == 0) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn || ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
 
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "HasFractionalScheduleValue called with ScheduleIndex out of range");
@@ -4351,10 +4351,10 @@ namespace ScheduleManager {
         int DayT;
         int Loop;
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
             MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
             MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
@@ -4442,10 +4442,10 @@ namespace ScheduleManager {
         int DayT;
         int Loop;
 
-        if (ScheduleIndex == -1) {
+        if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
             MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
             MaxValue = 0.0;
         } else if (ScheduleIndex < 1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
@@ -4506,38 +4506,50 @@ namespace ScheduleManager {
         constexpr std::array<bool, maxDayTypes> dayTypeFilterNone = {
             false, false, false, false, false, false, false, false, false, false, false, false};
         if (ScheduleIndex > 0 && ScheduleIndex <= state.dataScheduleMgr->NumSchedules) {
-            std::array<bool, maxDayTypes> dayTypeFilter;
-            switch (days) {
-            case DayTypeGroup::Weekday:
-                dayTypeFilter = dayTypeFilterWkDy;
-                break;
-            case DayTypeGroup::WeekEndHoliday:
-                dayTypeFilter = dayTypeFilterWeHo;
-                break;
-            case DayTypeGroup::DesignDay:
-                dayTypeFilter = dayTypeFilterDsDy;
-                break;
-            default:
-                dayTypeFilter = dayTypeFilterNone;
-                break;
-            }
-            for (int iDayOfYear = 1; iDayOfYear <= 366; ++iDayOfYear) {
-                int WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(iDayOfYear);
-                auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
-                for (int jType = 1; jType <= maxDayTypes; ++jType) {
-                    if (dayTypeFilter[jType - 1]) {
-                        auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
-                        MinValue = min(MinValue, minval(daySch.TSValue));
-                        MaxValue = max(MaxValue, maxval(daySch.TSValue));
+            int curDayTypeGroup = static_cast<int>(days);
+            auto &curSch = state.dataScheduleMgr->Schedule(ScheduleIndex);
+            if (!curSch.MaxMinByDayTypeSet[curDayTypeGroup]) {
+                std::array<bool, maxDayTypes> dayTypeFilter;
+                switch (days) {
+                case DayTypeGroup::Weekday:
+                    dayTypeFilter = dayTypeFilterWkDy;
+                    break;
+                case DayTypeGroup::WeekEndHoliday:
+                    dayTypeFilter = dayTypeFilterWeHo;
+                    break;
+                case DayTypeGroup::DesignDay:
+                    dayTypeFilter = dayTypeFilterDsDy;
+                    break;
+                default:
+                    dayTypeFilter = dayTypeFilterNone;
+                    break;
+                }
+                for (int iDayOfYear = 1; iDayOfYear <= 366; ++iDayOfYear) {
+                    int WkSch = curSch.WeekSchedulePointer(iDayOfYear);
+                    auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
+                    for (int jType = 1; jType <= maxDayTypes; ++jType) {
+                        if (dayTypeFilter[jType - 1]) {
+                            auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
+                            MinValue = min(MinValue, minval(daySch.TSValue));
+                            MaxValue = max(MaxValue, maxval(daySch.TSValue));
+                        }
                     }
                 }
+                if (MinValue == Constant::BigNumber) MinValue = 0;
+                if (MaxValue == -Constant::BigNumber) MaxValue = 0;
+                // store for the next call of the same schedule
+                curSch.MaxByDayType[curDayTypeGroup] = MaxValue;
+                curSch.MinByDayType[curDayTypeGroup] = MinValue;
+                curSch.MaxMinByDayTypeSet[curDayTypeGroup] = true;
+            } else {
+                // retrieve previously found min and max by day type
+                MaxValue = curSch.MaxByDayType[curDayTypeGroup];
+                MinValue = curSch.MinByDayType[curDayTypeGroup];
             }
-            if (MinValue == Constant::BigNumber) MinValue = 0;
-            if (MaxValue == -Constant::BigNumber) MaxValue = 0;
-        } else if (ScheduleIndex == -1) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             MinValue = 1.0;
             MaxValue = 1.0;
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             MinValue = 0.0;
             MaxValue = 0.0;
         } else {
@@ -4591,9 +4603,9 @@ namespace ScheduleManager {
 
         if (ScheduleIndex > 0) {
             ScheduleName = state.dataScheduleMgr->Schedule(ScheduleIndex).Name;
-        } else if (ScheduleIndex == -1) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOn) {
             ScheduleName = "Constant-1.0";
-        } else if (ScheduleIndex == 0) {
+        } else if (ScheduleIndex == ScheduleManager::ScheduleAlwaysOff) {
             ScheduleName = "Constant-0.0";
         } else {
             ScheduleName = "N/A-Invalid";
@@ -4749,7 +4761,7 @@ namespace ScheduleManager {
             DaysInYear = 365;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
+        if (ScheduleIndex < ScheduleManager::ScheduleAlwaysOn || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleAnnualFullLoadHours called with ScheduleIndex out of range");
         }
 
@@ -4796,7 +4808,7 @@ namespace ScheduleManager {
             WeeksInYear = 365.0 / 7.0;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
+        if (ScheduleIndex < ScheduleManager::ScheduleAlwaysOn || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleAverageHoursPerWeek called with ScheduleIndex out of range");
         }
 
@@ -4823,7 +4835,7 @@ namespace ScheduleManager {
             DaysInYear = 365;
         }
 
-        if (ScheduleIndex < -1 || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
+        if (ScheduleIndex < ScheduleManager::ScheduleAlwaysOn || ScheduleIndex > state.dataScheduleMgr->NumSchedules) {
             ShowFatalError(state, "ScheduleHoursGT1perc called with ScheduleIndex out of range");
         }
 
