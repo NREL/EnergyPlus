@@ -439,15 +439,9 @@ namespace Humidifiers {
 
             // A7; \field Inlet Water Temperature Option
             if (lAlphaBlanks(7)) {
-                Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
+                Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::FixedInletWaterTemperature;
             } else { // water from storage tank
-                if (Util::SameString(Alphas(7), "FixedInletWaterTemperature")) {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                } else if (Util::SameString(Alphas(7), "VariableInletWaterTemperature")) {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Variable;
-                } else {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                }
+                Humidifier(HumNum).InletWaterTempOption = static_cast<InletWaterTemp>(getEnumValue(inletWaterTempsUC, Alphas(7)));
             }
         }
 
@@ -1254,9 +1248,9 @@ namespace Humidifiers {
             AirOutHumRat = AirInHumRat;
         }
         if (WaterAdd > 0.0) {
-            if (InletWaterTempOption == InletWaterTemp::Fixed) {
+            if (InletWaterTempOption == InletWaterTemp::FixedInletWaterTemperature) {
                 GasUseRateAtRatedEff = (WaterAdd / NomCap) * NomPower;
-            } else if (InletWaterTempOption == InletWaterTemp::Variable) {
+            } else if (InletWaterTempOption == InletWaterTemp::VariableInletWaterTemperature) {
                 if (SuppliedByWaterSystem) { // use water use storage tank supply temperature
                     CurMakeupWaterTemp = state.dataWaterData->WaterStorage(WaterTankID).TwaterSupply(TankSupplyID);
                 } else { // use water main temperature

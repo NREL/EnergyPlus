@@ -78,10 +78,12 @@ namespace Humidifiers {
     enum class InletWaterTemp
     {
         Invalid = -1,
-        Fixed,
-        Variable,
+        FixedInletWaterTemperature,
+        VariableInletWaterTemperature,
         Num
     };
+    static constexpr std::array<std::string_view, static_cast<int>(InletWaterTemp::Num)> inletWaterTempsUC = {"FixedInletWaterTemperature",
+                                                                                                              "VariableInletWaterTemperature"};
 
     class HumidifierData
     {
