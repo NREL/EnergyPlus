@@ -512,7 +512,7 @@ namespace FanCoilUnits {
                 if (!Util::SameString(fanCoil.FanType, "Fan:SystemModel")) {
                     Fans::GetFanType(state, fanCoil.FanName, fanCoil.FanType_Num, errFlag, CurrentModuleObject, fanCoil.Name);
                     // need to grab fan index here
-                    // Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
+                    Fans::GetFanIndex(state, fanCoil.FanName, fanCoil.FanIndex, errFlag, fanCoil.FanType);
                     fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanType, fanCoil.FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, fanCoil.Name));
@@ -879,87 +879,87 @@ namespace FanCoilUnits {
                                 "Fan Coil Heating Rate",
                                 Constant::Units::W,
                                 fanCoil.HeatPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Heating Energy",
                                 Constant::Units::J,
                                 fanCoil.HeatEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Rate",
                                 Constant::Units::W,
                                 fanCoil.TotCoolPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Total Cooling Energy",
                                 Constant::Units::J,
                                 fanCoil.TotCoolEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Rate",
                                 Constant::Units::W,
                                 fanCoil.SensCoolPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Sensible Cooling Energy",
                                 Constant::Units::J,
                                 fanCoil.SensCoolEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Rate",
                                 Constant::Units::W,
                                 fanCoil.ElecPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
             SetupOutputVariable(state,
                                 "Fan Coil Fan Electricity Energy",
                                 Constant::Units::J,
                                 fanCoil.ElecEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 fanCoil.Name);
             if (fanCoil.CapCtrlMeth_Num == CCM::CycFan || fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                 SetupOutputVariable(state,
                                     "Fan Coil Runtime Fraction",
                                     Constant::Units::None,
                                     fanCoil.PLR,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanCoil.Name);
                 SetupOutputVariable(state,
                                     "Fan Coil Fan Speed Level",
                                     Constant::Units::None,
                                     fanCoil.SpeedFanSel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanCoil.Name);
                 if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                     SetupOutputVariable(state,
                                         "Fan Coil Speed Ratio",
                                         Constant::Units::None,
                                         fanCoil.SpeedRatio,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         fanCoil.Name);
                     SetupOutputVariable(state,
                                         "Fan Coil Part Load Ratio",
                                         Constant::Units::None,
                                         fanCoil.PLR,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         fanCoil.Name);
                 }
             }
@@ -968,16 +968,16 @@ namespace FanCoilUnits {
                                     "Fan Coil Part Load Ratio",
                                     Constant::Units::None,
                                     fanCoil.PLR,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanCoil.Name);
             }
             SetupOutputVariable(state,
                                 "Fan Coil Availability Status",
                                 Constant::Units::None,
                                 fanCoil.AvailStatus,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
 
             if (fanCoil.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {

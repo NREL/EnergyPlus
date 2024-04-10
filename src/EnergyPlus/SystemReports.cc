@@ -1615,16 +1615,16 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotHTNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotCLNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             // SYSTEM ENERGY USE REPORT
@@ -1632,56 +1632,56 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Hot Water Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotH2OHOT,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Steam Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotSteam,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Chilled Water Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotH2OCOLD,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System NaturalGas Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotNaturalGas,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Propane Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.TotPropane,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Water Volume",
                                 Constant::Units::m3,
                                 thisSysLoadRepVars.DomesticH2O,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             // SYSTEM COMPONENT LOAD REPORT
@@ -1689,96 +1689,96 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Fan Air Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.FANCompHTNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.CCCompCLNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompHTNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HeatExHTNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heat Exchanger Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HeatExCLNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.SolarCollectHeating,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Solar Collector Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.SolarCollectCooling,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.UserDefinedTerminalHeating,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System User Defined Air Terminal Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.UserDefinedTerminalCooling,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Total Heating Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HumidHTNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.EvapCLNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Total Cooling Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.DesDehumidCLNG,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             // SYSTEM COMPONENT ENERGY REPORT
@@ -1786,168 +1786,168 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Air System Fan Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.FANCompElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Hot Water Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompH2OHOT,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Cooling Coil Chilled Water Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.CCCompH2OCOLD,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System DX Heating Coil Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System DX Cooling Coil Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.CCCompElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompElecRes,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil NaturalGas Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompNaturalGas,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Propane Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompPropane,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Heating Coil Steam Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HCCompSteam,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HumidElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier NaturalGas Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HumidNaturalGas,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Humidifier Propane Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.HumidPropane,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Evaporative Cooler Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.EvapElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Desiccant Dehumidifier Electricity Energy",
                                 Constant::Units::J,
                                 thisSysLoadRepVars.DesDehumidElec,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Mechanical Ventilation Flow Rate",
                                 Constant::Units::m3_s,
                                 thisSysVentRepVars.MechVentFlow,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Natural Ventilation Flow Rate",
                                 Constant::Units::m3_s,
                                 thisSysVentRepVars.NatVentFlow,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Target Voz Ventilation Flow Rate",
                                 Constant::Units::m3_s,
                                 thisSysVentRepVars.TargetVentilationFlowVoz,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Below Target Voz Time",
                                 Constant::Units::hr,
                                 thisSysVentRepVars.TimeBelowVozDyn,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation At Target Voz Time",
                                 Constant::Units::hr,
                                 thisSysVentRepVars.TimeAtVozDyn,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation Above Target Voz Time",
                                 Constant::Units::hr,
                                 thisSysVentRepVars.TimeAboveVozDyn,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
 
             SetupOutputVariable(state,
                                 "Air System Ventilation When Unoccupied Time",
                                 Constant::Units::hr,
                                 thisSysVentRepVars.TimeVentUnocc,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 primaryAirSysName);
         }
     }
@@ -1962,64 +1962,64 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                                 "Zone Mechanical Ventilation No Load Heat Removal Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.NoLoadCoolingByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.CoolingLoadAddedByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Increase Due to Overheating Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.OverheatingByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Cooling Load Decrease Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.CoolingLoadMetByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
             // Heating Loads
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation No Load Heat Addition Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.NoLoadHeatingByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.HeatingLoadAddedByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Increase Due to Overcooling Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.OvercoolingByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
 
             SetupOutputVariable(state,
                                 "Zone Mechanical Ventilation Heating Load Decrease Energy",
                                 Constant::Units::J,
                                 thisZoneVentRepVars.HeatingLoadMetByVent,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisZoneName);
         }
 
@@ -2027,96 +2027,96 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                             "Zone Mechanical Ventilation Mass Flow Rate",
                             Constant::Units::kg_s,
                             thisZoneVentRepVars.OAMassFlow,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Mass",
                             Constant::Units::kg,
                             thisZoneVentRepVars.OAMass,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             thisZoneVentRepVars.OAVolFlowStdRho,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Standard Density Volume",
                             Constant::Units::m3,
                             thisZoneVentRepVars.OAVolStdRho,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume Flow Rate",
                             Constant::Units::m3_s,
                             thisZoneVentRepVars.OAVolFlowCrntRho,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Current Density Volume",
                             Constant::Units::m3,
                             thisZoneVentRepVars.OAVolCrntRho,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Mechanical Ventilation Air Changes per Hour",
                             Constant::Units::ach,
                             thisZoneVentRepVars.MechACH,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Target Voz Ventilation Flow Rate",
                             Constant::Units::m3_s,
                             thisZoneVentRepVars.TargetVentilationFlowVoz,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Below Target Voz Time",
                             Constant::Units::hr,
                             thisZoneVentRepVars.TimeBelowVozDyn,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation At Target Voz Time",
                             Constant::Units::hr,
                             thisZoneVentRepVars.TimeAtVozDyn,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation Above Target Voz Time",
                             Constant::Units::hr,
                             thisZoneVentRepVars.TimeAboveVozDyn,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
 
         SetupOutputVariable(state,
                             "Zone Ventilation When Unoccupied Time",
                             Constant::Units::hr,
                             thisZoneVentRepVars.TimeVentUnocc,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisZoneName);
     }
 
@@ -2125,32 +2125,32 @@ void AllocateAndSetUpVentReports(EnergyPlusData &state)
                         "Facility Any Zone Ventilation Below Target Voz Time",
                         Constant::Units::hr,
                         state.dataSysRpts->AnyZoneTimeBelowVozDyn,
-                        OutputProcessor::SOVTimeStepType::HVAC,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility All Zones Ventilation At Target Voz Time",
                         Constant::Units::hr,
                         state.dataSysRpts->AllZonesTimeAtVozDyn,
-                        OutputProcessor::SOVTimeStepType::HVAC,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility Any Zone Ventilation Above Target Voz Time",
                         Constant::Units::hr,
                         state.dataSysRpts->AnyZoneTimeAboveVozDyn,
-                        OutputProcessor::SOVTimeStepType::HVAC,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Facility");
 
     SetupOutputVariable(state,
                         "Facility Any Zone Ventilation When Unoccupied Time",
                         Constant::Units::hr,
                         state.dataSysRpts->AnyZoneTimeVentUnocc,
-                        OutputProcessor::SOVTimeStepType::HVAC,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         "Facility");
 }
 
@@ -2358,12 +2358,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             {
                                 thisComp.MeteredVar(VarNum) = meteredVars(VarNum); // Copy
                                 auto &thisVar = thisComp.MeteredVar(VarNum);
-                                if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                                if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                         thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
-                                } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                                } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                         thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                     }
@@ -2391,12 +2391,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                 {
                                     thisComp.SubComp(SubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                     auto &thisVar = thisComp.SubComp(SubCompNum).MeteredVar(VarNum);
-                                    if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                                    if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                             thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                         }
                                         ModeFlagOn = false;
-                                    } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                                    } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                         for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                             thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                         }
@@ -2427,13 +2427,13 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                                     {
                                         thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                         auto &thisVar = thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum);
-                                        if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                                        if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                                 thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
                                                     Constant::HeatOrCool::HeatingOnly;
                                             }
                                             ModeFlagOn = false;
-                                        } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                                        } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                                 thisComp.SubComp(SubCompNum).SubSubComp(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
                                                     Constant::HeatOrCool::CoolingOnly;
@@ -2507,12 +2507,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         {
                             thisEquipData.MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisEquipData.MeteredVar(VarNum);
-                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                            if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                            } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                 }
@@ -2637,12 +2637,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                     for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                         thisSubEquipData.MeteredVar(VarNum) = meteredVars(VarNum);
                         auto &thisVar = thisSubEquipData.MeteredVar(VarNum);
-                        if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                        if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                 thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                             }
                             ModeFlagOn = false;
-                        } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                        } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                             for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                 thisSubEquipData.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                             }
@@ -2670,13 +2670,13 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                             thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum);
-                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                            if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
                                         Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                            } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisSubEquipData.SubSubEquipData(SubSubCompNum).MeteredVar(VarNum1).heatOrCool =
                                         Constant::HeatOrCool::CoolingOnly;
@@ -2871,12 +2871,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                         for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                             thisComp.MeteredVar(VarNum) = meteredVars(VarNum);
                             auto &thisVar = thisComp.MeteredVar(VarNum);
-                            if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                            if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                 }
                                 ModeFlagOn = false;
-                            } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                            } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                 for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                     thisComp.MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                 }
@@ -2904,12 +2904,12 @@ void CreateEnergyReportStructure(EnergyPlusData &state)
                             for (VarNum = 1; VarNum <= NumVariables; ++VarNum) {
                                 thisComp.SubComp(SubCompNum).MeteredVar(VarNum) = meteredVars(VarNum);
                                 auto &thisVar = thisComp.SubComp(SubCompNum).MeteredVar(VarNum);
-                                if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::HeatingCoils && ModeFlagOn) {
+                                if (thisVar.endUseCat == OutputProcessor::EndUseCat::HeatingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                         thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::HeatingOnly;
                                     }
                                     ModeFlagOn = false;
-                                } else if (thisVar.sovEndUseCat == OutputProcessor::SOVEndUseCat::CoolingCoils && ModeFlagOn) {
+                                } else if (thisVar.endUseCat == OutputProcessor::EndUseCat::CoolingCoils && ModeFlagOn) {
                                     for (VarNum1 = 1; VarNum1 <= NumVariables; ++VarNum1) {
                                         thisComp.SubComp(SubCompNum).MeteredVar(VarNum1).heatOrCool = Constant::HeatOrCool::CoolingOnly;
                                     }
