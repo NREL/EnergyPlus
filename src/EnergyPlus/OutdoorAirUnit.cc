@@ -1255,14 +1255,10 @@ namespace OutdoorAirUnit {
 
             if (thisOutAirUnit.ExtFan) {
                 // set the exhaust air mass flow rate from input
-                if (thisOutAirUnit.ExtFan) {
-                    Real64 const EAFrac = GetCurrentScheduleValue(state, thisOutAirUnit.ExtOutAirSchedPtr);
-                    thisOutAirUnit.ExtAirMassFlow = RhoAir * EAFrac * thisOutAirUnit.ExtAirVolFlow;
-                    thisOutAirUnit.EMaxAirMassFlow = RhoAir * EAFrac * thisOutAirUnit.EFanMaxAirVolFlow;
-                } else if (!thisOutAirUnit.ExtFan) {
-                    thisOutAirUnit.ExtAirMassFlow = thisOutAirUnit.OutAirMassFlow;
-                    thisOutAirUnit.EMaxAirMassFlow = thisOutAirUnit.SMaxAirMassFlow;
-                }
+                Real64 const EAFrac = GetCurrentScheduleValue(state, thisOutAirUnit.ExtOutAirSchedPtr);
+                thisOutAirUnit.ExtAirMassFlow = RhoAir * EAFrac * thisOutAirUnit.ExtAirVolFlow;
+                thisOutAirUnit.EMaxAirMassFlow = RhoAir * EAFrac * thisOutAirUnit.EFanMaxAirVolFlow;
+
                 state.dataLoopNodes->Node(InNode).MassFlowRateMax = thisOutAirUnit.EMaxAirMassFlow;
                 state.dataLoopNodes->Node(InNode).MassFlowRateMin = 0.0;
             }

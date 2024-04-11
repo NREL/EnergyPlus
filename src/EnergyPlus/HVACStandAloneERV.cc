@@ -183,8 +183,6 @@ void GetStandAloneERV(EnergyPlusData &state)
     Array1D_string cNumericFields;
     Array1D_bool lAlphaBlanks;
     Array1D_bool lNumericBlanks;
-    int SAFanTypeNum; // Integer equivalent to fan type
-    int EAFanTypeNum; // Integer equivalent to fan type
     int NumArg;
     int NumAlphas;           // Number of Alphas for each GetObjectItem call
     int NumNumbers;          // Number of Numbers for each GetObjectItem call
@@ -478,7 +476,7 @@ void GetStandAloneERV(EnergyPlusData &state)
             ShowSevereError(state, format("{} \"{}\"", CurrentModuleObject, standAloneERV.Name));
             ShowContinueError(state,
                               format("... When autosizing ERV, supply air fan = {} \"{}\" must also be autosized.",
-                                     DataHVACGlobals::fanTypeNames[SAFanTypeNum],
+                                     DataHVACGlobals::fanTypeNames[(int)standAloneERV.supplyAirFanType],
                                      standAloneERV.SupplyAirFanName));
         }
 
@@ -486,7 +484,7 @@ void GetStandAloneERV(EnergyPlusData &state)
             ShowSevereError(state, format("{} \"{}\"", CurrentModuleObject, standAloneERV.Name));
             ShowContinueError(state,
                               format("... When autosizing ERV, exhaust air fan = {} \"{}\" must also be autosized.",
-                                     DataHVACGlobals::fanTypeNames[EAFanTypeNum],
+                                     DataHVACGlobals::fanTypeNames[(int)standAloneERV.exhaustAirFanType],
                                      standAloneERV.ExhaustAirFanName));
         }
 
@@ -519,7 +517,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                 ShowContinueError(state,
                                   format("... Entered value={:.2R}... Fan [{} \"{}\"] Max Value = {:.2R}",
                                          standAloneERV.SupplyAirVolFlow,
-                                         DataHVACGlobals::fanTypeNames[SAFanTypeNum],
+                                         DataHVACGlobals::fanTypeNames[(int)standAloneERV.supplyAirFanType],
                                          standAloneERV.SupplyAirFanName,
                                          standAloneERV.DesignSAFanVolFlowRate));
                 ShowContinueError(state,
@@ -903,7 +901,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                                       "Max Volume specified in the supply air fan object.");
                     ShowContinueError(state,
                                       format("... Associated fan object = {} \"{}\"",
-                                             DataHVACGlobals::fanTypeNames[SAFanTypeNum],
+                                             DataHVACGlobals::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).supplyAirFanType],
                                              state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirFanName));
                     ShowContinueError(state,
                                       format("... Modified value                   = {:.2R}",
@@ -927,7 +925,7 @@ void GetStandAloneERV(EnergyPlusData &state)
                                       "Max Volume specified in the exhaust air fan object.");
                     ShowContinueError(state,
                                       format("... Associated fan object = {} \"{}\"",
-                                             DataHVACGlobals::fanTypeNames[EAFanTypeNum],
+                                             DataHVACGlobals::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).exhaustAirFanType],
                                              state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirFanName));
                     ShowContinueError(state,
                                       format("... Modified value                    = {:.2R}",
