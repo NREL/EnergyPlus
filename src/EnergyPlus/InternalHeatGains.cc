@@ -3869,8 +3869,8 @@ namespace InternalHeatGains {
                       "Minimum Lighting Level for All Day Types {W},Maximum Lighting Level for All Day Types {W},"
                       "Minimum Lighting Level for Weekdays {W}, Maximum Lighting Level for Weekdays {W},"
                       "Minimum Lighting Level for Weekends/Holidays {W}, Maximum Lighting Level for Weekends /Holidays {W},"
-                      "Minimum Lighting Level for Summer Design Days, Maximum Lighting Level for Summer Design Days,"
-                      "Minimum Lighting Level for Winter Design Days, Maximum Lighting Level for WinterDesign Days");
+                      "Minimum Lighting Level for Summer Design Days {W}, Maximum Lighting Level for Summer Design Days {W},"
+                      "Minimum Lighting Level for Winter Design Days {W}, Maximum Lighting Level for WinterDesign Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
