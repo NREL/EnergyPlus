@@ -3728,7 +3728,7 @@ namespace InternalHeatGains {
                       "Minimum Number of People for Weekdays, Maximum Number of People for Weekdays, "
                       "Minimum Number of People for Weekends/Holidays, Maximum Number of People for Weekends /Holidays,"
                       "Minimum Number of People for Summer Design Days, Maximum Number of People for Summer Design Days,"
-                      "Minimum Number of People for Winter Design Days, Maximum Number of People for WinterDesign Days");
+                      "Minimum Number of People for Winter Design Days, Maximum Number of People for Winter Design Days");
                 if (state.dataHeatBal->People(Loop).Fanger || state.dataHeatBal->People(Loop).Pierce || state.dataHeatBal->People(Loop).KSU ||
                     state.dataHeatBal->People(Loop).CoolingEffectASH55 || state.dataHeatBal->People(Loop).AnkleDraftASH55) {
                     print(state.files.eio,
@@ -3870,7 +3870,7 @@ namespace InternalHeatGains {
                       "Minimum Lighting Level for Weekdays {W}, Maximum Lighting Level for Weekdays {W},"
                       "Minimum Lighting Level for Weekends/Holidays {W}, Maximum Lighting Level for Weekends /Holidays {W},"
                       "Minimum Lighting Level for Summer Design Days {W}, Maximum Lighting Level for Summer Design Days {W},"
-                      "Minimum Lighting Level for Winter Design Days {W}, Maximum Lighting Level for WinterDesign Days {W}\n");
+                      "Minimum Lighting Level for Winter Design Days {W}, Maximum Lighting Level for Winter Design Days {W}\n");
             }
 
             int ZoneNum = state.dataHeatBal->Lights(Loop).ZonePtr;
