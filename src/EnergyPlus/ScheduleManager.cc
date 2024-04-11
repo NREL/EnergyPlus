@@ -4501,8 +4501,10 @@ namespace ScheduleManager {
         constexpr std::array<bool, maxDayTypes> dayTypeFilterWkDy = {false, true, true, true, true, true, false, false, false, false, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterWeHo = {true, false, false, false, false, false, true, true, false, false, false, false};
         //  Sun    Mon    Tues   Wed    Thur   Fri    Sat    Hol    Summer Winter Cust1  Cust2
-        constexpr std::array<bool, maxDayTypes> dayTypeFilterDsDy = {
-            false, false, false, false, false, false, false, false, true, true, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterSumDsDy = {
+            false, false, false, false, false, false, false, false, true, false, false, false};
+        constexpr std::array<bool, maxDayTypes> dayTypeFilterWinDsDy = {
+            false, false, false, false, false, false, false, false, false, true, false, false};
         constexpr std::array<bool, maxDayTypes> dayTypeFilterNone = {
             false, false, false, false, false, false, false, false, false, false, false, false};
         if (ScheduleIndex > 0 && ScheduleIndex <= state.dataScheduleMgr->NumSchedules) {
@@ -4517,8 +4519,11 @@ namespace ScheduleManager {
                 case DayTypeGroup::WeekEndHoliday:
                     dayTypeFilter = dayTypeFilterWeHo;
                     break;
-                case DayTypeGroup::DesignDay:
-                    dayTypeFilter = dayTypeFilterDsDy;
+                case DayTypeGroup::SummerDesignDay:
+                    dayTypeFilter = dayTypeFilterSumDsDy;
+                    break;
+                case DayTypeGroup::WinterDesignDay:
+                    dayTypeFilter = dayTypeFilterWinDsDy;
                     break;
                 default:
                     dayTypeFilter = dayTypeFilterNone;

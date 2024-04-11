@@ -99,7 +99,8 @@ namespace ScheduleManager {
         Invalid = -1,
         Weekday = 1,
         WeekEndHoliday,
-        DesignDay,
+        SummerDesignDay,
+        WinterDesignDay,
         Num
     };
 

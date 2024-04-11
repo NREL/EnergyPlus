@@ -1589,8 +1589,10 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
         "  Until: 8:00,0.30,",
         "  Until: 24:00,0.83,",
         "  For: SummerDesignDay,",
+        "  Until: 8:00,0.85,",
         "  Until: 24:00,0.95,",
         "  For: WinterDesignDay,",
+        "  Until: 8:00,0.17,",
         "  Until: 24:00,0.15;",
         " ",
         "Schedule:Compact,",
@@ -1602,8 +1604,10 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
         "  For: Weekends Holiday,",
         "  Until: 24:00,0.65,",
         "  For: SummerDesignDay,",
+        "  Until: 24:00,0.76,",
         "  Until: 24:00,0.79,",
         "  For: WinterDesignDay,",
+        "  Until: 24:00,0.16,",
         "  Until: 24:00,0.18,",
         "  Through: 12/31,",
         "  For: WeekDays CustomDay1 CustomDay2,",
@@ -1611,8 +1615,10 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
         "  For: Weekends Holiday,",
         "  Until: 24:00,0.27,",
         "  For: SummerDesignDay,",
+        "  Until: 8:00,0.77,",
         "  Until: 24:00,0.85,",
         "  For: WinterDesignDay,",
+        "  Until: 8:00,0.19,",
         "  Until: 24:00,0.25;",
         " ",
     });
@@ -1649,9 +1655,13 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
     EXPECT_EQ(0.30, schMin);
     EXPECT_EQ(0.83, schMax);
 
-    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::DesignDay);
-    EXPECT_EQ(0.15, schMin);
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::SummerDesignDay);
+    EXPECT_EQ(0.85, schMin);
     EXPECT_EQ(0.95, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WinterDesignDay);
+    EXPECT_EQ(0.15, schMin);
+    EXPECT_EQ(0.17, schMax);
 
     index = GetScheduleIndex(*state, "HIGHLOW02");
 
@@ -1663,7 +1673,11 @@ TEST_F(EnergyPlusFixture, getScheduleMinMaxByDayType_test)
     EXPECT_EQ(0.27, schMin);
     EXPECT_EQ(0.65, schMax);
 
-    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::DesignDay);
-    EXPECT_EQ(0.18, schMin);
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::SummerDesignDay);
+    EXPECT_EQ(0.76, schMin);
     EXPECT_EQ(0.85, schMax);
+
+    std::tie(schMin, schMax) = getScheduleMinMaxByDayType(*state, index, DayTypeGroup::WinterDesignDay);
+    EXPECT_EQ(0.16, schMin);
+    EXPECT_EQ(0.25, schMax);
 }
