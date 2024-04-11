@@ -82,8 +82,8 @@ namespace Humidifiers {
         Variable,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(InletWaterTemp::Num)> inletWaterTempsUC = {"FixedInletWaterTemperature",
-                                                                                                              "VariableInletWaterTemperature"};
+    static constexpr std::array<std::string_view, static_cast<int>(InletWaterTemp::Num)> inletWaterTempsUC = {"FIXEDINLETWATERTEMPERATURE",
+                                                                                                              "VARIABLEINLETWATERTEMPERATURE"};
 
     class HumidifierData
     {
