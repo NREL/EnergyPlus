@@ -591,7 +591,7 @@ int CoilCoolingDX::getOpModeCapFTIndex(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum)
+void CoilCoolingDX::setData(int fanIndex, DataHVACGlobals::FanType fanType, std::string const &fanName, int _airLoopNum)
 {
     this->supplyFanIndex = fanIndex;
     this->supplyFanName = fanName;
@@ -820,7 +820,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                                                                   -999.0);
 
             // report out fan information
-            if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+            if (this->supplyFanType == DataHVACGlobals::FanType::SystemModel) {
                 if (this->supplyFanIndex >= 0) {
                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                              this->name,
@@ -834,7 +834,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataFans->Fan(this->supplyFanIndex).FanName,
+                                                                                             state.dataFans->Fan(this->supplyFanIndex).Name,
                                                                                              DataAirSystems::StructArrayLegacyFanModels,
                                                                                              this->supplyFanIndex);
                 }

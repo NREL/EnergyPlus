@@ -4287,7 +4287,7 @@ namespace VariableSpeedCoils {
             }
 
             // store fan info for coil
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).supplyFanType == DataHVACGlobals::FanType::SystemModel) {
                 if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                         state,
@@ -4817,11 +4817,11 @@ namespace VariableSpeedCoils {
                             DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
                         // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                            DataAirSystems::FanPlacement::BlowThru) {
+                        if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                            DataHVACGlobals::FanPlace::BlowThru) {
                             MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
-                        } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                   DataAirSystems::FanPlacement::DrawThru) {
+                        } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                                   DataHVACGlobals::FanPlace::DrawThru) {
                             SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                         }
                         MixWetBulb = Psychrometrics::PsyTwbFnTdbWPb(state, MixTemp, MixHumRat, state.dataEnvrn->StdBaroPress, RoutineName);
@@ -4897,7 +4897,7 @@ namespace VariableSpeedCoils {
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
 
-                    if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                    if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else {
                         SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate);
@@ -6821,7 +6821,7 @@ namespace VariableSpeedCoils {
         }
 
         Real64 locFanElecPower = 0.0; // local for fan electric power
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).supplyFanType == DataHVACGlobals::FanType::SystemModel) {
             if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
                 locFanElecPower = state.dataHVACFan->fanObjs[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex]->fanPower();
             }
@@ -7220,9 +7220,9 @@ namespace VariableSpeedCoils {
         }
     }
 
-    void setVarSpeedHPWHFanTypeNum(EnergyPlusData &state, int const dXCoilNum, int const fanTypeNum)
+    void setVarSpeedHPWHFanType(EnergyPlusData &state, int const dXCoilNum, DataHVACGlobals::FanType fanType)
     {
-        state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFan_TypeNum = fanTypeNum;
+        state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).supplyFanType = fanType;
     }
 
     void setVarSpeedHPWHFanIndex(EnergyPlusData &state, int const dXCoilNum, int const fanIndex)

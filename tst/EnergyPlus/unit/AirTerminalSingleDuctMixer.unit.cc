@@ -7692,7 +7692,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimFCU_ATMInletSideTest)
     EXPECT_EQ("INLET SIDE MIXER", thisATMixer.Name);                                                    // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, thisATMixer.MixerType);                               // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
+    EXPECT_EQ((int)DataHVACGlobals::FanType::VAV, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
@@ -8122,7 +8122,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("INLET SIDE MIXER", thisATMixer.Name);                                                    // single duct air terminal mixer name
     EXPECT_EQ(DataHVACGlobals::ATMixer_InletSide, thisATMixer.MixerType);                               // air terminal mixer connection type
     EXPECT_EQ("AIRTERMINAL:SINGLEDUCT:MIXER", state->dataDefineEquipment->AirDistUnit(1).EquipType(1)); // Air distribution unit equipment type
-    EXPECT_EQ("FAN:VARIABLEVOLUME", thisFanCoil.FanType);
+    EXPECT_EQ((int)DataHVACGlobals::FanType::VAV, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("FCU COOLING COIL", thisFanCoil.CCoilName);
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
