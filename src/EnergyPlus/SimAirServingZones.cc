@@ -1375,8 +1375,8 @@ void GetAirPathData(EnergyPlusData &state)
                             "Air System Simulation Cycle On Off Status",
                             Constant::Units::None,
                             state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name);
     }
 
@@ -1927,16 +1927,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
                                 if (thisPrimaryAirSys.Branch(BranchNum).DuctType != DataHVACGlobals::AirDuctType::Heating) {
-                                    Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                    SupFanIndex = Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                                     supFanModelType = StructArrayLegacyFanModels;
                                     goto EndOfAirLoop;
                                 }
                             } else {
-                                Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                RetFanIndex = Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                                 retFanModelType = StructArrayLegacyFanModels;
                             }
                         } else {
-                            Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                            SupFanIndex = Fans::GetFanIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                             supFanModelType = StructArrayLegacyFanModels;
                             goto EndOfAirLoop;
                         }
@@ -1973,9 +1973,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                 thisPrimaryAirSys.supFanModelType = ObjectVectorOOFanSystemModel;
             }
             if (FoundCentralCoolCoil) { // parent systems with fan will need to set the fan placement
-                thisPrimaryAirSys.supFanLocation = FanPlacement::DrawThru;
+                thisPrimaryAirSys.supFanPlace = DataHVACGlobals::FanPlace::DrawThru;
             } else {
-                thisPrimaryAirSys.supFanLocation = FanPlacement::BlowThru;
+                thisPrimaryAirSys.supFanPlace = DataHVACGlobals::FanPlace::BlowThru;
             }
 
             if (retFanModelType == StructArrayLegacyFanModels) {
@@ -2441,22 +2441,22 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                             "Air System Simulation Maximum Iteration Count",
                             Constant::Units::None,
                             state.dataSimAirServingZones->salIterMax,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Simulation Iteration Count",
                             Constant::Units::None,
                             state.dataSimAirServingZones->salIterTot,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimAir");
         SetupOutputVariable(state,
                             "Air System Component Model Simulation Calls",
                             Constant::Units::None,
                             state.dataSimAirServingZones->NumCallsTot,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimAir");
         state.dataSimAirServingZones->OutputSetupFlag = true;
     }

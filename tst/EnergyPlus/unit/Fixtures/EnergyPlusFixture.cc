@@ -202,6 +202,15 @@ bool EnergyPlusFixture::compare_err_stream(std::string const &expected_string, b
     return are_equal;
 }
 
+bool EnergyPlusFixture::compare_err_stream_substring(std::string const &search_string, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool const found = stream_str.find("Normalization divisor entered as zero") != std::string::npos;
+    EXPECT_TRUE(found);
+    if (reset_stream) this->err_stream->str(std::string());
+    return found;
+}
+
 bool EnergyPlusFixture::compare_cout_stream(std::string const &expected_string, bool reset_stream)
 {
     auto const stream_str = this->m_cout_buffer->str();

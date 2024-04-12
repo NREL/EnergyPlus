@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -70,14 +71,6 @@ namespace EvaporativeCoolers {
         Invalid = -1,
         FromMains,
         FromTank,
-        Num
-    };
-
-    enum class FanPlacement
-    {
-        Invalid = -1,
-        BlowThruFan,
-        DrawThruFan,
         Num
     };
 
@@ -250,8 +243,7 @@ namespace EvaporativeCoolers {
         int OAInletNodeNum;    // outdoor air inlet node index
         int UnitOutletNodeNum; // Unit air outlet (to zone) node index
         int UnitReliefNodeNum; // Unit relief air (from zone) node index (optional)
-        std::string FanObjectClassName;
-        int FanType_Num;
+        DataHVACGlobals::FanType fanType;
         std::string FanName;
         int FanIndex;
         Real64 ActualFanVolFlowRate;
@@ -263,7 +255,7 @@ namespace EvaporativeCoolers {
         Real64 DesignAirMassFlowRate;
         Real64 DesignFanSpeedRatio;
         Real64 FanSpeedRatio;
-        FanPlacement FanLocation;
+        DataHVACGlobals::FanPlace fanPlace;
         ControlType ControlSchemeType;
         Real64 TimeElapsed;
         Real64 ThrottlingRange; // temperature range for hystersis type tstat contorl [Delta C]
@@ -316,18 +308,19 @@ namespace EvaporativeCoolers {
         // Default Constructor
         ZoneEvapCoolerUnitStruct()
             : ZoneNodeNum(0), AvailSchedIndex(0), UnitIsAvailable(false), FanAvailStatus(0), OAInletNodeNum(0), UnitOutletNodeNum(0),
-              UnitReliefNodeNum(0), FanType_Num(0), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0), FanInletNodeNum(0),
-              FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0), FanSpeedRatio(0.0),
-              FanLocation(FanPlacement::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0), ThrottlingRange(0.0),
-              IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0), EvapCooler_1_Type_Num(EvapCoolerType::Invalid),
-              EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false), EvapCooler_2_Type_Num(EvapCoolerType::Invalid), EvapCooler_2_Index(0),
-              EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0), OAInletTemp(0.0), OAInletHumRat(0.0), OAInletMassFlowRate(0.0),
-              UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0), UnitReliefTemp(0.0), UnitReliefHumRat(0.0),
-              UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0), UnitSensibleCoolingRate(0.0),
-              UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0), UnitLatentCoolingRate(0.0),
-              UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0), UnitVSControlMaxIterErrorIndex(0),
-              UnitVSControlLimitsErrorIndex(0), UnitLoadControlMaxIterErrorIndex(0), UnitLoadControlLimitsErrorIndex(0), ZonePtr(0),
-              HVACSizingIndex(0), ShutOffRelativeHumidity(100.0), MySize(true), MyEnvrn(true), MyFan(true), MyZoneEq(true)
+              UnitReliefNodeNum(0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0),
+              FanInletNodeNum(0), FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0),
+              FanSpeedRatio(0.0), fanPlace(DataHVACGlobals::FanPlace::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0),
+              ThrottlingRange(0.0), IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0),
+              EvapCooler_1_Type_Num(EvapCoolerType::Invalid), EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false),
+              EvapCooler_2_Type_Num(EvapCoolerType::Invalid), EvapCooler_2_Index(0), EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0),
+              OAInletTemp(0.0), OAInletHumRat(0.0), OAInletMassFlowRate(0.0), UnitOutletTemp(0.0), UnitOutletHumRat(0.0), UnitOutletMassFlowRate(0.0),
+              UnitReliefTemp(0.0), UnitReliefHumRat(0.0), UnitReliefMassFlowRate(0.0), UnitTotalCoolingRate(0.0), UnitTotalCoolingEnergy(0.0),
+              UnitSensibleCoolingRate(0.0), UnitSensibleCoolingEnergy(0.0), UnitLatentHeatingRate(0.0), UnitLatentHeatingEnergy(0.0),
+              UnitLatentCoolingRate(0.0), UnitLatentCoolingEnergy(0.0), UnitFanSpeedRatio(0.0), UnitPartLoadRatio(0.0),
+              UnitVSControlMaxIterErrorIndex(0), UnitVSControlLimitsErrorIndex(0), UnitLoadControlMaxIterErrorIndex(0),
+              UnitLoadControlLimitsErrorIndex(0), ZonePtr(0), HVACSizingIndex(0), ShutOffRelativeHumidity(100.0), MySize(true), MyEnvrn(true),
+              MyFan(true), MyZoneEq(true)
         {
         }
     };
