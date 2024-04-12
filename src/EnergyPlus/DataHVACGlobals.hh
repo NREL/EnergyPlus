@@ -138,7 +138,7 @@ namespace DataHVACGlobals {
         SystemModel,
         Num
     };
-        
+
     static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
         "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
 
@@ -184,28 +184,28 @@ namespace DataHVACGlobals {
         "InterlockedWithMechanicalCooling",
     };
 
-    enum class UnitarySysType
-    {
-        Invalid = -1,
-        Furnace_HeatOnly,
-        Furnace_HeatCool,
-        HeatOnly,
-        HeatCool,
-        HeatPump_AirToAir,
-        HeatPump_WaterToAir,
-        AnyCoilType,
-        Num
-    };
-        
-    static constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
-        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
-        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-        "AirLoopHVAC:UnitaryHeatOnly",
-        "AirLoopHVAC:UnitaryHeatCool",
-        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-        "AirLoopHVAC:UnitarySystem"
-    };
+    //    enum class UnitarySysType
+    //    {
+    //        Invalid = -1,
+    //        Furnace_HeatOnly,
+    //        Furnace_HeatCool,
+    //        HeatOnly,
+    //        HeatCool,
+    //        HeatPump_AirToAir,
+    //        HeatPump_WaterToAir,
+    //        AnyCoilType,
+    //        Num
+    //    };
+    //
+    //    static constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
+    //        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
+    //        "AirLoopHVAC:Unitary:Furnace:HeatCool",
+    //        "AirLoopHVAC:UnitaryHeatOnly",
+    //        "AirLoopHVAC:UnitaryHeatCool",
+    //        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+    //        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+    //        "AirLoopHVAC:UnitarySystem"
+    //    };
 
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);

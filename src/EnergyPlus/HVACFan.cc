@@ -256,7 +256,8 @@ namespace HVACFan {
             } // end switch
 
             // report design power
-            BaseSizer::reportSizerOutput(state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, "Design Electric Power Consumption [W]", designElecPower);
+            BaseSizer::reportSizerOutput(
+                state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, "Design Electric Power Consumption [W]", designElecPower);
 
         } // end if power was autosized
 
@@ -366,8 +367,8 @@ namespace HVACFan {
     FanSystem::FanSystem(EnergyPlusData &state, std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), m_numSpeeds(0), fanIsSecondaryDriver(false),
-          m_fanType(DataHVACGlobals::FanType::Invalid), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
-          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
+          m_fanType(DataHVACGlobals::FanType::Invalid), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0),
+          m_motorInAirFrac(0.0), m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
           m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
           m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),

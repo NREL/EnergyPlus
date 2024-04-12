@@ -76,11 +76,11 @@ namespace Fans {
     struct FanEquipConditions
     {
         // Members
-        std::string Name;               // Name of the fan
-        std::string AvailSchedName;        // Fan Operation Schedule
-        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;               // DataHVACGlobals fan type
-        int AvailSchedPtrNum = 0;          // Pointer to the availability schedule
-        Real64 InletAirMassFlowRate = 0.0; // MassFlow through the Fan being Simulated [kg/Sec]
+        std::string Name;                                                     // Name of the fan
+        std::string AvailSchedName;                                           // Fan Operation Schedule
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // DataHVACGlobals fan type
+        int AvailSchedPtrNum = 0;                                             // Pointer to the availability schedule
+        Real64 InletAirMassFlowRate = 0.0;                                    // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
         Real64 MaxAirFlowRate = 0.0;                        // Max Specified Volume Flow Rate of Fan [m3/sec]
         bool MaxAirFlowRateIsAutosizable = false;           // if true, then this type of fan could be autosize
@@ -238,7 +238,7 @@ namespace Fans {
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
-    DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex); 
+    DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex);
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, int FanIndex);
 

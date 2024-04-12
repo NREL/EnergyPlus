@@ -3417,7 +3417,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
                                                                      cNumericFields);
 
             ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
-            
+
             auto &thisZoneEvapUnit = ZoneEvapUnit(UnitLoop);
             thisZoneEvapUnit.Name = Alphas(1);
             if (lAlphaBlanks(2)) {

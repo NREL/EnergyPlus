@@ -265,7 +265,7 @@ namespace FanCoilUnits {
                                                                      cNumericFields);
 
             ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
-            
+
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames.allocate(NumNumbers);
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = "";
             state.dataFanCoilUnits->FanCoilNumericFields(FanCoilIndex).FieldNames = cNumericFields;
@@ -507,19 +507,21 @@ namespace FanCoilUnits {
 
             fanCoil.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(9)));
             assert(fanCoil.fanType != DataHVACGlobals::FanType::Invalid);
-            
+
             if (fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
                 fanCoil.FanIndex = Fans::GetFanIndex(state, fanCoil.FanName);
                 if (fanCoil.FanIndex == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFields(10), Alphas(10));
-                    ErrorsFound = true;    
+                    ErrorsFound = true;
                 } else {
                     DataHVACGlobals::FanType fanType2 = Fans::GetFanType(state, fanCoil.FanIndex);
                     if (fanCoil.fanType != fanType2) {
-                        ShowSevereCustomMessage(state, eoh, format("{} was specified as having type {}, but has type {}",
-                                                                   fanCoil.FanName,
-                                                                   DataHVACGlobals::fanTypeNamesUC[(int)fanCoil.fanType],
-                                                                   DataHVACGlobals::fanTypeNamesUC[(int)fanType2]));
+                        ShowSevereCustomMessage(state,
+                                                eoh,
+                                                format("{} was specified as having type {}, but has type {}",
+                                                       fanCoil.FanName,
+                                                       DataHVACGlobals::fanTypeNamesUC[(int)fanCoil.fanType],
+                                                       DataHVACGlobals::fanTypeNamesUC[(int)fanType2]));
                         ErrorsFound = true;
                     }
                     fanCoil.fanAvailSchIndex = Fans::GetFanAvailSchPtr(state, fanCoil.FanIndex);
@@ -534,7 +536,8 @@ namespace FanCoilUnits {
                             ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
                             ShowContinueError(state, format("... {} is greater than the maximum fan flow rate.", cNumericFields(1)));
                             ShowContinueError(state, format("... Fan Coil Unit flow = {:.5T} m3/s.", fanCoil.MaxAirVolFlow));
-                            ShowContinueError(state, format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[(int)fanCoil.fanType], fanCoil.FanName));
+                            ShowContinueError(state,
+                                              format("... Fan = {}: {}", DataHVACGlobals::fanTypeNames[(int)fanCoil.fanType], fanCoil.FanName));
                             ShowContinueError(state, format("... Fan flow = {:.5T} m3/s.", fanCoil.FanAirVolFlow));
                             ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
                             fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;
@@ -579,10 +582,9 @@ namespace FanCoilUnits {
                     ShowContinueError(state, "... Fan Coil Unit flow rate reduced to match the fan flow rate and the simulation continues.");
                     fanCoil.MaxAirVolFlow = fanCoil.FanAirVolFlow;
                 }
-                
+
                 // check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
-                if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow ||
-                    fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow ||
+                if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow || fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow ||
                     fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
                     if (state.dataHVACFan->fanObjs[fanCoil.FanIndex]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous) {
                         ShowSevereError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
@@ -592,8 +594,8 @@ namespace FanCoilUnits {
                                                  fanCoil.FanName,
                                                  capCtrlMeth));
                         ShowContinueError(
-                                          state,
-                                          "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
+                            state,
+                            "...for VariableFanVariableFlow or VariableFanConstantFlow a Fan:SystemModel should have Continuous speed control.");
                         ErrorsFound = true;
                     }
                 }
@@ -767,8 +769,7 @@ namespace FanCoilUnits {
             if (fanCoil.CapCtrlMeth_Num == CCM::MultiSpeedFan) {
                 if (!lAlphaBlanks(17)) {
                     fanCoil.FanOpModeSchedPtr = ScheduleManager::GetScheduleIndex(state, Alphas(17));
-                    if (fanCoil.fanType != DataHVACGlobals::FanType::OnOff &&
-                        fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
+                    if (fanCoil.fanType != DataHVACGlobals::FanType::OnOff && fanCoil.fanType != DataHVACGlobals::FanType::SystemModel) {
                         ShowSevereError(state, format("{} = {}", CurrentModuleObject, fanCoil.Name));
                         ShowContinueError(state, format("For {} = {}", cAlphaFields(17), Alphas(17)));
                         ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(9), Alphas(9)));
@@ -782,8 +783,7 @@ namespace FanCoilUnits {
                         }
                     }
                 } else {
-                    if (fanCoil.fanType == DataHVACGlobals::FanType::OnOff ||
-                        fanCoil.fanType == DataHVACGlobals::FanType::SystemModel) {
+                    if (fanCoil.fanType == DataHVACGlobals::FanType::OnOff || fanCoil.fanType == DataHVACGlobals::FanType::SystemModel) {
                         fanCoil.FanOpMode = DataHVACGlobals::CycFanCycCoil;
                     }
                 }

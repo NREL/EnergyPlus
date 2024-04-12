@@ -379,7 +379,7 @@ namespace HVACUnitaryBypassVAV {
             thisCBVAV.Name = Alphas(1);
 
             ErrorObjectHeader eoh{routineName, CurrentModuleObject, thisCBVAV.Name};
-            
+
             thisCBVAV.UnitType = CurrentModuleObject;
             thisCBVAV.Sched = Alphas(2);
             if (lAlphaBlanks(2)) {
@@ -607,7 +607,7 @@ namespace HVACUnitaryBypassVAV {
             // required field must be Key=Fan:ConstantVolume, Fan:OnOff or Fan:SystemModel and read in as upper case
             thisCBVAV.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(10)));
             assert(thisCBVAV.fanType != DataHVACGlobals::FanType::Invalid);
-                                                                      
+
             thisCBVAV.FanName = Alphas(11);
             int fanOutletNode(0);
 
@@ -642,7 +642,7 @@ namespace HVACUnitaryBypassVAV {
             // required field must be Key=BlowThrough or DrawThrough and read in as BLOWTHROUGH or DRAWTHROUGH
             thisCBVAV.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(12)));
             assert(thisCBVAV.fanPlace != DataHVACGlobals::FanPlace::Invalid);
-            
+
             if (thisCBVAV.fanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                 if (thisCBVAV.SplitterOutletAirNode != fanOutletNode) {
                     ShowSevereError(state, format("{}: {}", CurrentModuleObject, thisCBVAV.Name));

@@ -317,10 +317,9 @@ void GetFanInput(EnergyPlusData &state)
         thisFan.DeltaPress = rNumericArgs(2);
         thisFan.MaxAirFlowRate = rNumericArgs(3);
         if (thisFan.MaxAirFlowRate == 0.0) {
-            ShowWarningError(state,
-                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
-                                    cCurrentModuleObject,
-                                    thisFan.Name));
+            ShowWarningError(
+                state,
+                format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, thisFan.Name));
         }
         thisFan.MaxAirFlowRateIsAutosizable = true;
         thisFan.MotEff = rNumericArgs(4);
@@ -398,10 +397,9 @@ void GetFanInput(EnergyPlusData &state)
         thisFan.DeltaPress = rNumericArgs(2);
         thisFan.MaxAirFlowRate = rNumericArgs(3);
         if (thisFan.MaxAirFlowRate == 0.0) {
-            ShowWarningError(state,
-                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
-                                    cCurrentModuleObject,
-                                    thisFan.Name));
+            ShowWarningError(
+                state,
+                format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, thisFan.Name));
         }
         thisFan.MaxAirFlowRateIsAutosizable = true;
         if (Util::SameString(cAlphaArgs(3), "Fraction")) {
@@ -509,10 +507,9 @@ void GetFanInput(EnergyPlusData &state)
         thisFan.MaxAirMassFlowRate = thisFan.MaxAirFlowRate * thisFan.RhoAirStdInit;
 
         if (thisFan.MaxAirFlowRate == 0.0) {
-            ShowWarningError(state,
-                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
-                                    cCurrentModuleObject,
-                                    thisFan.Name));
+            ShowWarningError(
+                state,
+                format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, thisFan.Name));
         }
 
         thisFan.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
@@ -694,10 +691,9 @@ void GetFanInput(EnergyPlusData &state)
         thisFan.DeltaPress = rNumericArgs(2);
         thisFan.MaxAirFlowRate = rNumericArgs(3);
         if (thisFan.MaxAirFlowRate == 0.0) {
-            ShowWarningError(state,
-                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
-                                    cCurrentModuleObject,
-                                    thisFan.Name));
+            ShowWarningError(
+                state,
+                format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, thisFan.Name));
         }
         thisFan.MaxAirFlowRateIsAutosizable = true;
         //       the following two structure variables are set here, as well as in InitFan, for the Heat Pump:Water Heater object
@@ -856,13 +852,11 @@ void GetFanInput(EnergyPlusData &state)
             }
         }
 
-
         thisFan.MaxAirFlowRate = rNumericArgs(1);
         if (thisFan.MaxAirFlowRate == 0.0) {
-            ShowWarningError(state,
-                             format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.",
-                                    cCurrentModuleObject,
-                                    thisFan.Name));
+            ShowWarningError(
+                state,
+                format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, thisFan.Name));
         }
         thisFan.MaxAirFlowRateIsAutosizable = true;
         thisFan.MinAirFlowRate = rNumericArgs(2);
@@ -915,17 +909,23 @@ void GetFanInput(EnergyPlusData &state)
             if (Fan(FanNum).InletNodeNum == Fan(checkNum).InletNodeNum) {
                 ErrorsFound = true;
                 ShowSevereError(state, "GetFanInput, duplicate fan inlet node names, must be unique for fans.");
-                ShowContinueError(
-                    state,
-                    format("Fan={}:{} and Fan={}:{}.", DataHVACGlobals::fanTypeNames[(int)Fan(FanNum).fanType], Fan(FanNum).Name, DataHVACGlobals::fanTypeNames[(int)Fan(checkNum).fanType], Fan(checkNum).Name));
+                ShowContinueError(state,
+                                  format("Fan={}:{} and Fan={}:{}.",
+                                         DataHVACGlobals::fanTypeNames[(int)Fan(FanNum).fanType],
+                                         Fan(FanNum).Name,
+                                         DataHVACGlobals::fanTypeNames[(int)Fan(checkNum).fanType],
+                                         Fan(checkNum).Name));
                 ShowContinueError(state, format("Inlet Node Name=\"{}\".", state.dataLoopNodes->NodeID(Fan(FanNum).InletNodeNum)));
             }
             if (Fan(FanNum).OutletNodeNum == Fan(checkNum).OutletNodeNum) {
                 ErrorsFound = true;
                 ShowSevereError(state, "GetFanInput, duplicate fan outlet node names, must be unique for fans.");
-                ShowContinueError(
-                    state,
-                    format("Fan={}:{} and Fan={}:{}.", DataHVACGlobals::fanTypeNames[(int)Fan(FanNum).fanType], Fan(FanNum).Name, DataHVACGlobals::fanTypeNames[(int)Fan(checkNum).fanType], Fan(checkNum).Name));
+                ShowContinueError(state,
+                                  format("Fan={}:{} and Fan={}:{}.",
+                                         DataHVACGlobals::fanTypeNames[(int)Fan(FanNum).fanType],
+                                         Fan(FanNum).Name,
+                                         DataHVACGlobals::fanTypeNames[(int)Fan(checkNum).fanType],
+                                         Fan(checkNum).Name));
                 ShowContinueError(state, format("Outlet Node Name=\"{}\".", state.dataLoopNodes->NodeID(Fan(FanNum).OutletNodeNum)));
             }
         }
@@ -998,11 +998,9 @@ void GetFanInput(EnergyPlusData &state)
             SetupEMSActuator(
                 state, "Fan", thisFan.Name, "Fan Air Mass Flow Rate", "[kg/s]", thisFan.EMSMaxMassFlowOverrideOn, thisFan.EMSAirMassFlowValue);
             SetupEMSInternalVariable(state, "Fan Nominal Pressure Rise", thisFan.Name, "[Pa]", thisFan.DeltaPress);
-            SetupEMSActuator(
-                state, "Fan", thisFan.Name, "Fan Pressure Rise", "[Pa]", thisFan.EMSFanPressureOverrideOn, thisFan.EMSFanPressureValue);
+            SetupEMSActuator(state, "Fan", thisFan.Name, "Fan Pressure Rise", "[Pa]", thisFan.EMSFanPressureOverrideOn, thisFan.EMSFanPressureValue);
             SetupEMSInternalVariable(state, "Fan Nominal Total Efficiency", thisFan.Name, "[fraction]", thisFan.FanEff);
-            SetupEMSActuator(
-                state, "Fan", thisFan.Name, "Fan Total Efficiency", "[fraction]", thisFan.EMSFanEffOverrideOn, thisFan.EMSFanEffValue);
+            SetupEMSActuator(state, "Fan", thisFan.Name, "Fan Total Efficiency", "[fraction]", thisFan.EMSFanEffOverrideOn, thisFan.EMSFanEffValue);
 
             SetupEMSActuator(state,
                              "Fan",
@@ -1064,7 +1062,9 @@ void InitFan(EnergyPlusData &state,
         state.dataFans->ZoneEquipmentListChecked = true;
         for (int Loop = 1; Loop <= state.dataFans->NumFans; ++Loop) {
             if (state.dataFans->Fan(Loop).fanType != DataHVACGlobals::FanType::Exhaust) continue;
-            if (DataZoneEquipment::CheckZoneEquipmentList(state, DataHVACGlobals::fanTypeNames[(int)state.dataFans->Fan(Loop).fanType], state.dataFans->Fan(Loop).Name)) continue;
+            if (DataZoneEquipment::CheckZoneEquipmentList(
+                    state, DataHVACGlobals::fanTypeNames[(int)state.dataFans->Fan(Loop).fanType], state.dataFans->Fan(Loop).Name))
+                continue;
             ShowSevereError(state,
                             format("InitFans: Fan=[{},{}] is not on any ZoneHVAC:EquipmentList.  It will not be simulated.",
                                    DataHVACGlobals::fanTypeNames[(int)state.dataFans->Fan(Loop).fanType],
@@ -1292,7 +1292,10 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Check for undersized belt and report design size with warning
         if (fan.FanTrq > (fan.BeltMaxTorque + 1.e-5)) {
-            ShowWarningError(state, format("Belt for {}: {} is undersized at design conditions -- check belt inputs", DataHVACGlobals::fanTypeNames[(int)fan.fanType], fan.Name));
+            ShowWarningError(state,
+                             format("Belt for {}: {} is undersized at design conditions -- check belt inputs",
+                                    DataHVACGlobals::fanTypeNames[(int)fan.fanType],
+                                    fan.Name));
             ShowContinueError(state, format("...Design belt output torque (without oversizing) [Nm]: {:.2R}", fan.FanTrq));
         }
 
@@ -1334,7 +1337,10 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Check for undersized motor and report design size with warning
         if (fan.BeltInputPower > (fan.MotorMaxOutPwr + 1.e-5)) {
-                ShowWarningError(state, format("Motor for {}: {} is undersized at design conditions -- check motor inputs", DataHVACGlobals::fanTypeNames[(int)fan.fanType], fan.Name));
+            ShowWarningError(state,
+                             format("Motor for {}: {} is undersized at design conditions -- check motor inputs",
+                                    DataHVACGlobals::fanTypeNames[(int)fan.fanType],
+                                    fan.Name));
             ShowContinueError(state, format("...Design motor output power (without oversizing) [W]: {:.2R}", fan.BeltInputPower));
         }
 
@@ -1376,7 +1382,9 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
                 // Check for undersized VFD and report design size with warning
                 if (fan.MotorInputPower > (fan.VFDMaxOutPwr + 1.e-5)) {
                     ShowWarningError(state,
-                                     format("VFD for {}: {} is undersized at design conditions -- check VFD inputs", DataHVACGlobals::fanTypeNames[(int)fan.fanType], fan.Name));
+                                     format("VFD for {}: {} is undersized at design conditions -- check VFD inputs",
+                                            DataHVACGlobals::fanTypeNames[(int)fan.fanType],
+                                            fan.Name));
                     ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", fan.MotorInputPower));
                 }
 
@@ -1399,7 +1407,7 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
         // Report fan, belt, motor, and VFD characteristics at design condition to .eio file
         std::string_view fanTypeName = DataHVACGlobals::fanTypeNames[(int)fan.fanType];
-        
+
         BaseSizer::reportSizerOutput(state, fanTypeName, fan.Name, "Design Fan Airflow [m3/s]", FanVolFlow);
         BaseSizer::reportSizerOutput(state, fanTypeName, fan.Name, "Design Fan Static Pressure Rise [Pa]", fan.DeltaPress);
         BaseSizer::reportSizerOutput(state, fanTypeName, fan.Name, "Design Fan Shaft Power [W]", fan.FanShaftPower);
@@ -1419,7 +1427,8 @@ void SizeFan(EnergyPlusData &state, int const FanNum)
 
     // Rearrange order to match table and use FanVolFlow to calculate RatedPower
     // ALSO generates values if Component Model fan, for which DeltaPress and FanEff vary with flow
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, fan.Name, DataHVACGlobals::fanTypeNames[(int)fan.fanType]);
+    OutputReportPredefined::PreDefTableEntry(
+        state, state.dataOutRptPredefined->pdchFanType, fan.Name, DataHVACGlobals::fanTypeNames[(int)fan.fanType]);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, fan.Name, fan.FanEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, fan.Name, fan.DeltaPress);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, fan.Name, FanVolFlow);
@@ -2358,7 +2367,7 @@ Real64 GetFanVolFlow(EnergyPlusData &state, int const FanIndex)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine gets the fan volumetric flow for use by zone equipment (e.g. Packaged Terminal Heat Pump)
     // Zone equipment must ensure that a properly sized fan is used to meet the maximum supply air flow rate
-        
+
     assert(FanIndex > 0 && FanIndex <= state.dataFans->Fan.size());
     return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
 }
@@ -2380,9 +2389,7 @@ Real64 GetFanPower(EnergyPlusData &state, int const FanIndex)
     }
 }
 
-DataHVACGlobals::FanType GetFanType(EnergyPlusData &state,
-                int FanIndex
-)
+DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2415,9 +2422,7 @@ Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
     return state.dataFans->Fan(FanIndex).MaxAirFlowRate;
 }
 
-int GetFanInletNode(EnergyPlusData &state,
-                    int FanIndex
-)
+int GetFanInletNode(EnergyPlusData &state, int FanIndex)
 {
 
     // FUNCTION INFORMATION:
@@ -2433,9 +2438,7 @@ int GetFanInletNode(EnergyPlusData &state,
     return state.dataFans->Fan(FanIndex).InletNodeNum;
 }
 
-int GetFanOutletNode(EnergyPlusData &state,
-                     int FanIndex
-)
+int GetFanOutletNode(EnergyPlusData &state, int FanIndex)
 {
 
     // FUNCTION INFORMATION:
@@ -2451,9 +2454,7 @@ int GetFanOutletNode(EnergyPlusData &state,
     return state.dataFans->Fan(FanIndex).OutletNodeNum;
 }
 
-int GetFanAvailSchPtr(EnergyPlusData &state,
-                      int FanIndex
-)
+int GetFanAvailSchPtr(EnergyPlusData &state, int FanIndex)
 {
 
     // FUNCTION INFORMATION:
@@ -2468,9 +2469,7 @@ int GetFanAvailSchPtr(EnergyPlusData &state,
     return state.dataFans->Fan(FanIndex).AvailSchedPtrNum;
 }
 
-int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                               int FanIndex
-)
+int GetFanSpeedRatioCurveIndex(EnergyPlusData &state, int FanIndex)
 {
 
     // FUNCTION INFORMATION:

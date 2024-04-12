@@ -1127,7 +1127,7 @@ bool getDesuperHtrInput(EnergyPlusData &state)
 bool getHPWaterHeaterInput(EnergyPlusData &state)
 {
 
-    static constexpr std::string_view routineName = "getHPWaterHeaterInput";    
+    static constexpr std::string_view routineName = "getHPWaterHeaterInput";
     bool ErrorsFound = false;
 
     int const NumPumpedCondenser = state.dataInputProcessing->inputProcessor->getNumObjectsFound(
@@ -1188,9 +1188,9 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
-        
-        // Copy those lists into C++ std::maps // Why, no really why?  This is really dumb 
-        std::map<int, std::string> hpwhAlpha; 
+
+        // Copy those lists into C++ std::maps // Why, no really why?  This is really dumb
+        std::map<int, std::string> hpwhAlpha;
         std::map<int, Real64> hpwhNumeric;
         std::map<int, bool> hpwhAlphaBlank;
         std::map<int, bool> hpwhNumericBlank;
@@ -1622,7 +1622,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         Real64 FanVolFlow = 0.0;
         bool errFlag(false);
-        
+
         HPWH.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, hpwhAlpha[22 + nAlphaOffset]));
         assert(HPWH.fanType != DataHVACGlobals::FanType::Invalid);
 
@@ -1682,7 +1682,7 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
 
         // Fan Placement
         HPWH.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, hpwhAlpha[24 + nAlphaOffset]));
-        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::Invalid) { 
+        if (HPWH.fanPlace == DataHVACGlobals::FanPlace::Invalid) {
             ShowSevereInvalidKey(state, eoh, hpwhAlphaFieldNames[24 + nAlphaOffset], hpwhAlpha[24 + nAlphaOffset]);
             ErrorsFound = true;
         }
@@ -2249,7 +2249,13 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 state, HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
         }
 
-        BranchNodeConnections::SetUpCompSets(state, HPWH.Type, HPWH.Name, DataHVACGlobals::fanTypeNames[(int)HPWH.fanType], HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
+        BranchNodeConnections::SetUpCompSets(state,
+                                             HPWH.Type,
+                                             HPWH.Name,
+                                             DataHVACGlobals::fanTypeNames[(int)HPWH.fanType],
+                                             HPWH.FanName,
+                                             HPWH.FanInletNode_str,
+                                             HPWH.FanOutletNode_str);
 
         // Control Logic Flag
         std::string CtrlLogicFlag = hpwhAlphaBlank[29 + nAlphaOffset] ? "SIMULTANEOUS" : hpwhAlpha[29 + nAlphaOffset];
@@ -9186,7 +9192,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         } else {
             if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
-                    if (HeatPump.fanType == DataHVACGlobals::FanType::SystemModel) {
+                if (HeatPump.fanType == DataHVACGlobals::FanType::SystemModel) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);
                 } else {
                     Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
@@ -9884,7 +9890,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
 
         if (HeatPump.bIsIHP) {
             // pass node information using resulting PLR
-                if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+            if (HeatPump.fanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                 if (HeatPump.fanType == DataHVACGlobals::FanType::SystemModel) {
                     state.dataHVACFan->fanObjs[HeatPump.FanNum]->simulate(state, _, _);

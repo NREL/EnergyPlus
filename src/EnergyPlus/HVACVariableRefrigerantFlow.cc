@@ -1420,7 +1420,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using WaterManager::SetupTankSupplyComponent;
 
     static constexpr std::string_view RoutineName("GetVRFInput: "); // include trailing blank space
-    static constexpr std::string_view routineName = "GetVRFInput"; 
+    static constexpr std::string_view routineName = "GetVRFInput";
 
     std::string cCurrentModuleObject;
 
@@ -3303,7 +3303,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                                                  cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
-        
+
         state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames.allocate(NumNums);
         state.dataHVACVarRefFlow->VRFTUNumericFields(VRFTUNum).FieldNames = cNumericFieldNames;
         Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
@@ -3392,7 +3392,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
 
             thisVrfTU.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, cAlphaArgs(7)));
             assert(thisVrfTU.fanType != DataHVACGlobals::FanType::Invalid);
-                   
+
             if (thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel) {
                 thisVrfTU.FanIndex = HVACFan::getFanObjectVectorIndex(state, FanName, false);
                 if (thisVrfTU.FanIndex == -1) {
@@ -3421,8 +3421,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             if (thisVrfTU.VRFSysNum > 0) {
                 // VRFTU Supply Air Fan Object Type must be Fan:VariableVolume if VRF Algorithm Type is AlgorithmTypeFluidTCtrl
                 if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).VRFAlgorithmType == AlgorithmType::FluidTCtrl &&
-                    !(thisVrfTU.fanType == DataHVACGlobals::FanType::VAV ||
-                      thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel)) {
+                    !(thisVrfTU.fanType == DataHVACGlobals::FanType::VAV || thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel)) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
                     ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
                     ShowContinueError(
@@ -3432,8 +3431,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
                 // VRFTU Supply Air Fan Object Type must be Fan:OnOff or Fan:ConstantVolume if VRF Algorithm Type is AlgorithmTypeSysCurve
                 if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).VRFAlgorithmType == AlgorithmType::SysCurve &&
-                    !(thisVrfTU.fanType == DataHVACGlobals::FanType::OnOff ||
-                      thisVrfTU.fanType == DataHVACGlobals::FanType::Constant ||
+                    !(thisVrfTU.fanType == DataHVACGlobals::FanType::OnOff || thisVrfTU.fanType == DataHVACGlobals::FanType::Constant ||
                       thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel)) {
                     ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
                     ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
@@ -3445,8 +3443,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
             }
 
-            if (thisVrfTU.fanType == DataHVACGlobals::FanType::OnOff ||
-                thisVrfTU.fanType == DataHVACGlobals::FanType::Constant ||
+            if (thisVrfTU.fanType == DataHVACGlobals::FanType::OnOff || thisVrfTU.fanType == DataHVACGlobals::FanType::Constant ||
                 thisVrfTU.fanType == DataHVACGlobals::FanType::VAV) {
 
                 thisVrfTU.fanInletNode = state.dataFans->Fan(thisVrfTU.FanIndex).InletNodeNum;
@@ -3470,7 +3467,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                 }
             } else if (thisVrfTU.fanType == DataHVACGlobals::FanType::SystemModel) {
-                if (thisVrfTU.FanIndex == -1) {                                                                             // mine data from fan object
+                if (thisVrfTU.FanIndex == -1) {                                                      // mine data from fan object
                     state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, FanName)); // call constructor
                     // Do we not need to set the FanIndex here?
                     thisVrfTU.ActualFanVolFlowRate = state.dataHVACFan->fanObjs[thisVrfTU.FanIndex]->designAirVolFlowRate;
@@ -3495,7 +3492,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                           FanName,
                           state.dataLoopNodes->NodeID(FanInletNodeNum),
                           state.dataLoopNodes->NodeID(FanOutletNodeNum));
-            
+
         } else {
             thisVrfTU.fanPlace = DataHVACGlobals::FanPlace::Invalid; // reset fan placement when fan is not used so as not to call the fan
         }
@@ -6683,7 +6680,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate =
                             state.dataHVACFan->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
                     } else {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate = GetFanVolFlow(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate =
+                            GetFanVolFlow(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
                     }
                 }
             } else {

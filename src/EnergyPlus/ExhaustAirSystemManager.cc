@@ -156,9 +156,8 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.ZoneMixerName = zoneMixerName;
                 thisExhSys.ZoneMixerIndex = zoneMixerIndex;
 
-                thisExhSys.centralFanType =
-                    static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC,
-                                                                       Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type"))));
+                thisExhSys.centralFanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(
+                    DataHVACGlobals::fanTypeNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type"))));
                 if (thisExhSys.centralFanType != DataHVACGlobals::FanType::SystemModel &&
                     thisExhSys.centralFanType != DataHVACGlobals::FanType::ComponentModel) {
                     ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
@@ -250,7 +249,7 @@ namespace ExhaustAirSystemManager {
                                                              centralFanName,
                                                              state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).InletNodeNum),
                                                              state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
-                        
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Mass Flow Rate",
                                             Constant::Units::kg_s,
@@ -258,7 +257,7 @@ namespace ExhaustAirSystemManager {
                                             OutputProcessor::TimeStepType::System,
                                             OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
-                        
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Standard",
                                             Constant::Units::m3_s,
@@ -266,7 +265,7 @@ namespace ExhaustAirSystemManager {
                                             OutputProcessor::TimeStepType::System,
                                             OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
-                        
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Volumetric Flow Rate Current",
                                             Constant::Units::m3_s,
@@ -274,7 +273,7 @@ namespace ExhaustAirSystemManager {
                                             OutputProcessor::TimeStepType::System,
                                             OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
-                        
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Power",
                                             Constant::Units::W,
@@ -282,7 +281,7 @@ namespace ExhaustAirSystemManager {
                                             OutputProcessor::TimeStepType::System,
                                             OutputProcessor::StoreType::Average,
                                             thisExhSys.Name);
-                        
+
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Energy",
                                             Constant::Units::J,

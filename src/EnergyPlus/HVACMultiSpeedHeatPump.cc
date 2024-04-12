@@ -542,7 +542,7 @@ namespace HVACMultiSpeedHeatPump {
             thisMSHP.Name = Alphas(1);
 
             ErrorObjectHeader eoh{routineName, state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name};
-            
+
             if (lAlphaBlanks(2)) {
                 thisMSHP.AvaiSchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -655,7 +655,7 @@ namespace HVACMultiSpeedHeatPump {
 
             // Get supply fan data
             bool errFound = false;
-            
+
             thisMSHP.FanNum = Fans::GetFanIndex(state, Alphas(7));
             if (thisMSHP.FanNum == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), Alphas(7));
@@ -673,7 +673,7 @@ namespace HVACMultiSpeedHeatPump {
                                                      "UNDEFINED",
                                                      "UNDEFINED");
             }
-            
+
             // Get supply fan placement data
             thisMSHP.fanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(8)));
             assert(thisMSHP.fanPlace != DataHVACGlobals::FanPlace::Invalid);

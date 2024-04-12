@@ -233,19 +233,19 @@ namespace UnitHeater {
         using WaterCoils::GetCoilWaterInletNode;
 
         static constexpr std::string_view RoutineName("GetUnitHeaterInput: "); // include trailing blank space
-        static constexpr std::string_view routineName = "GetUnitHeaterInput"; // include trailing blank space
-        
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool ErrorsFound(false);                                               // Set to true if errors in input, fatal at end of routine
-        int IOStatus;                                                          // Used in GetObjectItem
-        bool IsNotOK;                                                          // TRUE if there was a problem with a list name
-        bool errFlag(false);                                                   // interim error flag
-        int NumAlphas;                                                         // Number of Alphas for each GetObjectItem call
-        int NumNumbers;                                                        // Number of Numbers for each GetObjectItem call
-        int NumFields;                                                         // Total number of fields in object
-        int UnitHeatNum;                                                       // Item to be "gotten"
+        static constexpr std::string_view routineName = "GetUnitHeaterInput";  // include trailing blank space
 
-        Real64 FanVolFlow;                                                     // Fan volumetric flow rate
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        int IOStatus;            // Used in GetObjectItem
+        bool IsNotOK;            // TRUE if there was a problem with a list name
+        bool errFlag(false);     // interim error flag
+        int NumAlphas;           // Number of Alphas for each GetObjectItem call
+        int NumNumbers;          // Number of Numbers for each GetObjectItem call
+        int NumFields;           // Total number of fields in object
+        int UnitHeatNum;         // Item to be "gotten"
+
+        Real64 FanVolFlow; // Fan volumetric flow rate
         std::string CurrentModuleObject;
         Array1D_string Alphas;         // Alpha items for object
         Array1D<Real64> Numbers;       // Numeric items for object
@@ -294,7 +294,7 @@ namespace UnitHeater {
                                                                      cNumericFields);
 
             ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
-            
+
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames.allocate(NumNumbers);
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = "";
             state.dataUnitHeaters->UnitHeatNumericFields(UnitHeatNum).FieldNames = cNumericFields;
@@ -363,7 +363,8 @@ namespace UnitHeater {
                 ErrorsFound = true;
             } else {
                 if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != DataHVACGlobals::FanType::SystemModel) {
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index = Fans::GetFanIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index =
+                        Fans::GetFanIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index == 0) {
                         ShowSevereItemNotFound(state, eoh, cAlphaFields(6), state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
                         ErrorsFound = true;
@@ -382,7 +383,7 @@ namespace UnitHeater {
                             ErrorsFound = true;
                         } break;
                         } // swtich ()
-                        
+
                         FanVolFlow = GetFanVolFlow(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
 
                         if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize &&

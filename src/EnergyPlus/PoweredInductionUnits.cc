@@ -526,7 +526,7 @@ void GetPIUs(EnergyPlusData &state)
         auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUIndex + state.dataPowerInductionUnits->NumSeriesPIUs);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
-        
+
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPowerInductionUnits->PiuUniqueNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -653,7 +653,7 @@ void GetPIUs(EnergyPlusData &state)
                 thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisPIU.Fan_Index);
             }
         }
-        
+
         thisPIU.HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
         bool IsNotOK = false;
         ValidateComponent(state, HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], thisPIU.HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");

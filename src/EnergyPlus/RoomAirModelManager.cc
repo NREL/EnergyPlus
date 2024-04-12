@@ -2693,7 +2693,7 @@ namespace RoomAir {
         using Fans::GetFanOutletNode;
 
         static constexpr std::string_view routineName = "CheckEquipName";
-        
+
         // Return value
         bool EquipFind; // True if an error is found
 
@@ -2745,7 +2745,7 @@ namespace RoomAir {
         }
 
         ErrorObjectHeader eoh{routineName, equipTypeName, EquipName};
-        
+
         switch (zoneEquipType) {
         case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeName = Alphas(4);

@@ -1366,12 +1366,11 @@ namespace AirflowNetwork {
                 int inletNode;
                 int outletNode;
 
-                DataHVACGlobals::FanType fanType =
-                    static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC,
-                                                                       Util::makeUPPER(fields.at("supply_fan_object_type").get<std::string>())));
+                DataHVACGlobals::FanType fanType = static_cast<DataHVACGlobals::FanType>(
+                    getEnumValue(DataHVACGlobals::fanTypeNamesUC, Util::makeUPPER(fields.at("supply_fan_object_type").get<std::string>())));
 
                 DataHVACGlobals::FanType fanType2 = DataHVACGlobals::FanType::Invalid;
-                
+
                 if (fanType == DataHVACGlobals::FanType::SystemModel) {
                     m_state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(m_state, fan_name));
                     fanIndex = HVACFan::getFanObjectVectorIndex(m_state, fan_name);
@@ -1411,12 +1410,11 @@ namespace AirflowNetwork {
                     supplyFanType = fanType2;
                 }
 
-                if (!(fanType2 == DataHVACGlobals::FanType::Constant ||
-                      fanType2 == DataHVACGlobals::FanType::OnOff ||
+                if (!(fanType2 == DataHVACGlobals::FanType::Constant || fanType2 == DataHVACGlobals::FanType::OnOff ||
                       fanType2 == DataHVACGlobals::FanType::VAV)) {
-                    ShowSevereError(m_state,
-                                    format("{}The Supply Fan Object Type in {} = {} is not a valid fan type.",
-                                           RoutineName, CurrentModuleObject, thisObjectName));
+                    ShowSevereError(
+                        m_state,
+                        format("{}The Supply Fan Object Type in {} = {} is not a valid fan type.", RoutineName, CurrentModuleObject, thisObjectName));
                     ShowContinueError(m_state, "Valid fan types are  Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:SystemModel.");
                     success = false;
                 } else {
@@ -1437,7 +1435,7 @@ namespace AirflowNetwork {
                     outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
                 if (fanType2 == DataHVACGlobals::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode(m_state, fanIndex); 
+                    inletNode = GetFanInletNode(m_state, fanIndex);
                     outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
                 if (fanType2 == DataHVACGlobals::FanType::VAV && !DisSysCompCVFData(i).FanModelFlag) {

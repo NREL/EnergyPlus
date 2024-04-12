@@ -244,7 +244,7 @@ namespace OutdoorAirUnit {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetOutdoorAirUnitInputs: "); // include trailing blank space
-        static constexpr std::string_view routineName = "GetOutdoorAirUnitInputs"; // include trailing blank space
+        static constexpr std::string_view routineName = "GetOutdoorAirUnitInputs";  // include trailing blank space
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -388,7 +388,8 @@ namespace OutdoorAirUnit {
             if (HVACFan::checkIfFanNameIsAFanSystem(state, thisOutAirUnit.SFanName)) { // no object type in input, so check if Fan:SystemModel
                 thisOutAirUnit.supFanType = DataHVACGlobals::FanType::SystemModel;
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisOutAirUnit.SFanName)); // call constructor
-                thisOutAirUnit.SFan_Index = HVACFan::getFanObjectVectorIndex(state, thisOutAirUnit.SFanName); // If you just added this to the end, you don't have to search for it!
+                thisOutAirUnit.SFan_Index = HVACFan::getFanObjectVectorIndex(
+                    state, thisOutAirUnit.SFanName); // If you just added this to the end, you don't have to search for it!
                 thisOutAirUnit.SFanMaxAirVolFlow = state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->designAirVolFlowRate;
                 thisOutAirUnit.SFanAvailSchedPtr = state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->availSchedIndex;
             } else {
@@ -403,9 +404,9 @@ namespace OutdoorAirUnit {
                 }
             }
             // A6 :Fan Place
-            thisOutAirUnit.supFanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+            thisOutAirUnit.supFanPlace =
+                static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
             assert(thisOutAirUnit.supFanPlace != DataHVACGlobals::FanPlace::Invalid);
-
 
             // A7
 
@@ -1750,7 +1751,7 @@ namespace OutdoorAirUnit {
                     state.dataHVACFan->fanObjs[thisOutAirUnit.SFan_Index]->simulate(state, _, _);
                 }
                 if (thisOutAirUnit.ExtFan) {
-                   if (thisOutAirUnit.extFanType != DataHVACGlobals::FanType::SystemModel) {
+                    if (thisOutAirUnit.extFanType != DataHVACGlobals::FanType::SystemModel) {
                         Fans::SimulateFanComponents(state, thisOutAirUnit.ExtFanName, FirstHVACIteration, thisOutAirUnit.ExtFan_Index, _);
                     } else {
                         state.dataHVACFan->fanObjs[thisOutAirUnit.ExtFan_Index]->simulate(state, _, _);

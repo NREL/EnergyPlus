@@ -498,9 +498,10 @@ namespace UnitarySystems {
                                 this->m_ActualFanVolFlowRate == this->m_MaxCoolAirVolFlow &&
                                 this->m_ActualFanVolFlowRate == this->m_MaxNoCoolHeatAirVolFlow) {
                                 ShowWarningError(state, format("{} \"{}\"", this->UnitType, this->Name));
-                                ShowContinueError(state, format("...For fan type and name = {} \"{}\"",
-                                                                DataHVACGlobals::fanTypeNames[(int)this->m_FanType],
-                                                                this->m_FanName));
+                                ShowContinueError(state,
+                                                  format("...For fan type and name = {} \"{}\"",
+                                                         DataHVACGlobals::fanTypeNames[(int)this->m_FanType],
+                                                         this->m_FanName));
                                 ShowContinueError(state,
                                                   "...Fan power ratio function of speed ratio curve has no impact if fan volumetric flow rate is the "
                                                   "same as the unitary system volumetric flow rate.");
@@ -3486,7 +3487,7 @@ namespace UnitarySystems {
                                       int const ZoneOAUnitNum)
     {
         static constexpr std::string_view routineName = "UnitarySys::processInputSpec";
-            
+
         static constexpr std::string_view unitarySysHeatPumpPerformanceObjectType("UnitarySystemPerformance:Multispeed");
 
         std::string const &cCurrentModuleObject = input_data.system_type;
@@ -3495,7 +3496,7 @@ namespace UnitarySystems {
         std::string const &thisObjectName = input_data.name;
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, thisObjectName};
-        
+
         this->Name = Util::makeUPPER(thisObjectName);
         sysNum = getUnitarySystemIndex(state, thisObjectName);
         this->m_UnitarySysNum = sysNum;
@@ -4127,7 +4128,7 @@ namespace UnitarySystems {
         if (!loc_m_FanName.empty() && !loc_fanType.empty()) {
             this->m_FanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Util::makeUPPER(loc_fanType)));
             assert(this->m_FanType != DataHVACGlobals::FanType::Invalid);
-            
+
             if (this->m_FanType == DataHVACGlobals::FanType::SystemModel) {
                 this->m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false);
                 if (this->m_FanIndex == -1) {
@@ -4148,7 +4149,7 @@ namespace UnitarySystems {
                 if (this->m_FanIndex == 0) {
                     ShowSevereItemNotFound(state, eoh, "fan_name", loc_m_FanName);
                     errorsFound = true;
-                } else { 
+                } else {
                     auto const &fans = state.dataFans->Fan(this->m_FanIndex);
                     FanVolFlowRate = fans.MaxAirFlowRate;
                     if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
@@ -4179,7 +4180,8 @@ namespace UnitarySystems {
             this->m_FanCompNotSetYet = false;
         }
 
-        this->m_FanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Util::makeUPPER(input_data.fan_placement)));
+        this->m_FanPlace =
+            static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Util::makeUPPER(input_data.fan_placement)));
         if (this->m_FanPlace == DataHVACGlobals::FanPlace::Invalid && this->m_FanExists) {
             ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
             ShowContinueError(state, format("Illegal Fan Placement = {}", input_data.fan_placement));
@@ -4199,8 +4201,8 @@ namespace UnitarySystems {
                 this->m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
             } else {
                 this->m_FanOpMode = DataHVACGlobals::CycFanCycCoil;
-                if (this->m_FanType != DataHVACGlobals::FanType::OnOff &&
-                    this->m_FanType != DataHVACGlobals::FanType::SystemModel && this->m_FanExists) {
+                if (this->m_FanType != DataHVACGlobals::FanType::OnOff && this->m_FanType != DataHVACGlobals::FanType::SystemModel &&
+                    this->m_FanExists) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisObjectName));
                     // ShowContinueError(state, format("{} = {}", cAlphaFields(iFanTypeAlphaNum), Alphas(iFanTypeAlphaNum)));
                     // ShowContinueError(state, format("Fan type must be Fan:OnOff of Fan:SystemModel when {} =
@@ -4597,7 +4599,7 @@ namespace UnitarySystems {
                                         ? state.dataHVACFan->fanObjs[thisCoolCoil.SupplyFanIndex]->name
                                         : state.dataFans->Fan(thisCoolCoil.SupplyFanIndex).Name,
                                     (this->m_FanType == DataHVACGlobals::FanType::SystemModel) ? DataAirSystems::ObjectVectorOOFanSystemModel
-                                                                                                        : DataAirSystems::StructArrayLegacyFanModels,
+                                                                                               : DataAirSystems::StructArrayLegacyFanModels,
                                     thisCoolCoil.SupplyFanIndex);
                             }
                         }
@@ -6129,13 +6131,14 @@ namespace UnitarySystems {
                     }
                 }
                 // set fan info for cooling coils
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                    state,
-                    this->m_CoolingCoilName,
-                    input_data.cooling_coil_object_type,
-                    this->m_FanName,
-                    this->m_FanType == DataHVACGlobals::FanType::SystemModel ? DataAirSystems::ObjectVectorOOFanSystemModel : DataAirSystems::StructArrayLegacyFanModels,
-                    this->m_FanIndex);
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                         this->m_CoolingCoilName,
+                                                                                         input_data.cooling_coil_object_type,
+                                                                                         this->m_FanName,
+                                                                                         this->m_FanType == DataHVACGlobals::FanType::SystemModel
+                                                                                             ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                             : DataAirSystems::StructArrayLegacyFanModels,
+                                                                                         this->m_FanIndex);
             }
             if (this->m_HeatCoilExists) {
                 if (loc_m_HeatingSAFMethod.empty()) {
@@ -6156,14 +6159,14 @@ namespace UnitarySystems {
                     }
                 }
                 // set fan info for heating coils
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                    state,
-                    this->m_HeatingCoilName,
-                    this->m_HeatingCoilTypeName,
-                    this->m_FanName,
-                    this->m_FanType == DataHVACGlobals::FanType::SystemModel ? DataAirSystems::ObjectVectorOOFanSystemModel
-                                                                                      : DataAirSystems::StructArrayLegacyFanModels,
-                    this->m_FanIndex);
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                         this->m_HeatingCoilName,
+                                                                                         this->m_HeatingCoilTypeName,
+                                                                                         this->m_FanName,
+                                                                                         this->m_FanType == DataHVACGlobals::FanType::SystemModel
+                                                                                             ? DataAirSystems::ObjectVectorOOFanSystemModel
+                                                                                             : DataAirSystems::StructArrayLegacyFanModels,
+                                                                                         this->m_FanIndex);
             }
         }
 
@@ -11352,7 +11355,8 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru &&
+                state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType == DataHVACGlobals::FanType::SystemModel) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
@@ -11402,7 +11406,8 @@ namespace UnitarySystems {
             }
 
             // If blow thru fan is used, the fan must be simulated after coil sets OnOffFanPartLoadFraction
-            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru && state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
+            if (this->m_FanExists && this->m_FanPlace == DataHVACGlobals::FanPlace::BlowThru &&
+                state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType == DataHVACGlobals::FanType::SystemModel) {
                     state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
@@ -16302,7 +16307,8 @@ namespace UnitarySystems {
         UnitarySys &thisSys = state.dataUnitarySystems->unitarySys[UnitarySysNum];
         switch (thisSys.m_CoolingCoilType_Num) {
         case DataHVACGlobals::CoilDX_CoolingTwoSpeed: {
-            if (thisSys.m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+            if (thisSys.m_FanPlace ==
+                DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
                 thisSys.m_CoolingCycRatio = CycRatio;
                 thisSys.m_CoolingPartLoadFrac = CycRatio;
                 thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);
@@ -16314,7 +16320,8 @@ namespace UnitarySystems {
         case DataHVACGlobals::CoilDX_MultiSpeedCooling: {
             OnOffAirFlowRatio = 1.0;
             thisSys.setAverageAirFlow(state, CycRatio, OnOffAirFlowRatio);
-            if (thisSys.m_FanPlace == DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
+            if (thisSys.m_FanPlace ==
+                DataHVACGlobals::FanPlace::BlowThru) { // must simulate fan if blow through since OnOffFanPartLoadFrac affects fan heat
                 thisSys.m_CoolingCycRatio = CycRatio;
                 thisSys.m_CoolingPartLoadFrac = CycRatio;
                 thisSys.calcPassiveSystem(state, AirloopNum, FirstHVACIteration);

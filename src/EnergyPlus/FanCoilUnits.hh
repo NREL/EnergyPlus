@@ -110,12 +110,12 @@ namespace FanCoilUnits {
         // Members
         // Input data
         int UnitType_Num = 0;
-        std::string Sched;       // availability schedule
-        int SchedPtr = 0;        // index to schedule
-        std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
-        int SchedOutAirPtr = 0;  // index to outside air schedule
-        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;     // index to fan type
-        int SpeedFanSel = 0;     // Speed fan selected
+        std::string Sched;                                                    // availability schedule
+        int SchedPtr = 0;                                                     // index to schedule
+        std::string SchedOutAir;                                              // outside air schedule, multipliy maximum outdoor air flow rate
+        int SchedOutAirPtr = 0;                                               // index to outside air schedule
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // index to fan type
+        int SpeedFanSel = 0;                                                  // Speed fan selected
         CCM CapCtrlMeth_Num = CCM::Invalid;
         Real64 PLR = 0.0;             // Part Load Ratio, fraction of time step fancoil is on
         int MaxIterIndexH = 0;        // Maximum iterations exceeded for heating

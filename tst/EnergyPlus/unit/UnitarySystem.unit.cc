@@ -6140,7 +6140,7 @@ Curve:Biquadratic,
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // new tests for #5287, need to add an air loop to do this unit test justice
-    EXPECT_TRUE(thisSys->m_FanIndex > 0);                                    // ZoneHVAC must contain a fan object to provide flow
+    EXPECT_TRUE(thisSys->m_FanIndex > 0);                                     // ZoneHVAC must contain a fan object to provide flow
     EXPECT_EQ((int)thisSys->m_FanType, (int)DataHVACGlobals::FanType::OnOff); // fan must be FanOnOff when used with cycling fan
 
     // switch to SingleZoneVAV control type and test that answer does not change since cycling fan is allowed but will not call the ASHRAE model
@@ -14298,9 +14298,9 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     EXPECT_EQ(ScheduleManager::ScheduleAlwaysOn, thisSys->m_SysAvailSchedPtr);                       // checks availability schedule name
     EXPECT_EQ("NODE 29", state->dataLoopNodes->NodeID(thisSys->AirInNode));                          // checks air inlet node name
     EXPECT_EQ("NODE 30", state->dataLoopNodes->NodeID(thisSys->AirOutNode));                         // checks air outlet node name
-    EXPECT_EQ((int)DataHVACGlobals::FanType::OnOff, (int)thisSys->m_FanType);                         // checks fan object type "FAN:ONOFF"
+    EXPECT_EQ((int)DataHVACGlobals::FanType::OnOff, (int)thisSys->m_FanType);                        // checks fan object type "FAN:ONOFF"
     EXPECT_EQ("SUPPLY FAN", thisSys->m_FanName);                                                     // checks fan object name
-    EXPECT_EQ((int)DataHVACGlobals::FanPlace::DrawThru, (int)thisSys->m_FanPlace);                 // checks fan placement, "DrawThrough"
+    EXPECT_EQ((int)DataHVACGlobals::FanPlace::DrawThru, (int)thisSys->m_FanPlace);                   // checks fan placement, "DrawThrough"
     EXPECT_EQ(0, thisSys->m_FanOpModeSchedPtr);                                    // checks Supply Air Fan Operating Mode Schedule Name
     EXPECT_EQ("COIL:HEATING:WATER", thisSys->m_HeatingCoilTypeName);               // checks heating coil object type
     EXPECT_EQ("WATER HEATING COIL", thisSys->m_HeatingCoilName);                   // checks heating coil object type

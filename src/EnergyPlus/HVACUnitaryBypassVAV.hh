@@ -138,14 +138,14 @@ namespace HVACUnitaryBypassVAV {
         std::string FanName;                   // Name of fan
         DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;
         DataHVACGlobals::FanPlace fanPlace = DataHVACGlobals::FanPlace::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
-        int FanIndex = 0;                                                    // Index number to fan
-        int FanOpModeSchedPtr = 0;                                           // Fan operating mode schedule pointer
-        Real64 FanVolFlow = 0.0;                                             // Volumetric flow rate of system supply air fan [m3/s]
-        Real64 HeatingSpeedRatio = 1.0;                                      // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio = 1.0;                                      // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio = 1.0;                                   // Fan speed ratio when no cooling or heating
-        bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
-        std::string DXCoolCoilName;                                          // Name of DX cooling coil
+        int FanIndex = 0;                                                        // Index number to fan
+        int FanOpModeSchedPtr = 0;                                               // Fan operating mode schedule pointer
+        Real64 FanVolFlow = 0.0;                                                 // Volumetric flow rate of system supply air fan [m3/s]
+        Real64 HeatingSpeedRatio = 1.0;                                          // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio = 1.0;                                          // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio = 1.0;                                       // Fan speed ratio when no cooling or heating
+        bool CheckFanFlow = true;                                                // Check fan volumetric flow versus system flow in init routine.
+        std::string DXCoolCoilName;                                              // Name of DX cooling coil
         DataHVACGlobals::CoilType CoolCoilType = DataHVACGlobals::CoilType::Invalid;
         int CoolCoilCompIndex = 0;  // cooling coil component index number
         int DXCoolCoilIndexNum = 0; // actual DX cooling coil index number
