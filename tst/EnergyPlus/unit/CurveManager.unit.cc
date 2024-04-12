@@ -515,7 +515,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnlyButItIsZero)
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
     EXPECT_THROW(Curve::GetCurveInput(*state), std::runtime_error);
-    EXPECT_TRUE(this->err_stream->str().find("Normalization divisor entered as zero") != std::string::npos);
+    EXPECT_TRUE(this->compare_err_stream_substring("Normalization divisor entered as zero"));
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)

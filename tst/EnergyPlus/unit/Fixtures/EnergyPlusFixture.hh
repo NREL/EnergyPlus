@@ -197,6 +197,13 @@ protected:
     // Will return true if string matches the stream and false if it does not
     bool compare_err_stream(std::string const &expected_string, bool reset_stream = true);
 
+    // Check if ERR stream contains a substring. The default is to reset the ERR stream after every call.
+    // It is easier to test successive functions if the ERR stream is 'empty' before the next call.
+    // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
+    // if it makes sense for the unit test to continue after returning from function.
+    // Will return true if string is found in the stream and false if it is not
+    bool compare_err_stream_substring(std::string const &search_string, bool reset_stream = true);
+
     // Compare an expected string against the COUT stream. The default is to reset the COUT stream after every call.
     // It is easier to test successive functions if the COUT stream is 'empty' before the next call.
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
@@ -298,14 +305,13 @@ private:
     //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
+    std::ostringstream *err_stream;
+
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
-
-protected:
-    std::ostringstream *err_stream;
 };
 
 } // namespace EnergyPlus
