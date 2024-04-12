@@ -4673,10 +4673,10 @@ TEST_F(EnergyPlusFixture, Test_HeatRecoveryFlowSizing_AirSource)
     // check heat recovery input fields
     EXPECT_TRUE(thisCoolingPLHP->heatRecoveryAvailable);
     EXPECT_TRUE(thisHeatingPLHP->heatRecoveryAvailable);
-    EXPECT_TRUE(thisHeatingPLHP->heatRecoveryDesignVolFlowRateWasAutoSized);
+    EXPECT_TRUE(thisCoolingPLHP->heatRecoveryDesignVolFlowRateWasAutoSized);
     EXPECT_TRUE(thisHeatingPLHP->heatRecoveryDesignVolFlowRateWasAutoSized);
     EXPECT_EQ(thisHeatingPLHP->minHeatRecoveryTempLimit, 4.5);
-    EXPECT_EQ(thisHeatingPLHP->maxHeatRecoveryTempLimit, 60.0);
+    EXPECT_EQ(thisCoolingPLHP->maxHeatRecoveryTempLimit, 60.0);
 
     // We'll set up two plant loops: load heating loop and load side cooling loop
     state->dataPlnt->TotNumLoops = 2;
@@ -4958,14 +4958,16 @@ TEST_F(EnergyPlusFixture, CoolingwithHeatRecoverySimulate_AirSource)
         EXPECT_NEAR(0.5, thisCoolingPLHP->partLoadRatio, 0.001);
         EXPECT_NEAR(69993.3, thisCoolingPLHP->loadSideHeatTransfer, 0.001);
         EXPECT_NEAR(23331.1, thisCoolingPLHP->powerUsage, 0.001);
-        // heat balance or energy conservation
-        Real64 heatBalance = thisCoolingPLHP->loadSideHeatTransfer + thisCoolingPLHP->powerUsage;
+        // energy balance or energy conservation at the condenser
+        Real64 energyBalanceCondenser = thisCoolingPLHP->loadSideHeatTransfer + thisCoolingPLHP->powerUsage;
+        EXPECT_NEAR(93324.4, energyBalanceCondenser, 0.001);
         // heat rejected is split b/n heat recovery and source side heat transfer due to tem limit
         EXPECT_NEAR(34164.275, thisCoolingPLHP->heatRecoveryRate, 0.001);
         EXPECT_NEAR(59160.125, thisCoolingPLHP->sourceSideHeatTransfer, 0.001);
         Real64 totalHeatRejected = thisCoolingPLHP->heatRecoveryRate + thisCoolingPLHP->sourceSideHeatTransfer;
-        // check the heat rejected is accounted for
-        EXPECT_NEAR(heatBalance, totalHeatRejected, 0.001);
+        EXPECT_NEAR(93324.4, totalHeatRejected, 0.001);
+        // total heat rejected == energy balance at the condenser
+        EXPECT_NEAR(energyBalanceCondenser, totalHeatRejected, 0.001);
         EXPECT_NEAR(58.0, thisCoolingPLHP->heatRecoveryInletTemp, 0.001);
         // heat recovery outlet temperature is capped @ 60C.
         EXPECT_NEAR(60.0, thisCoolingPLHP->heatRecoveryOutletTemp, 0.001);
@@ -5157,6 +5159,43 @@ TEST_F(EnergyPlusFixture, HeatingwithHeatRecoverySimulate_AirSource)
         EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideHeatTransfer, 0.001);
         EXPECT_NEAR(15.0, thisHeatingPLHP->heatRecoveryInletTemp, 0.001);
         EXPECT_NEAR(11.655, thisHeatingPLHP->heatRecoveryOutletTemp, 0.001);
+    }
+
+    // now we can call it again from the load side, but this time there is heating load
+    {
+        firstHVAC = true;
+        curLoad = 69993.3; // current heating load
+        runFlag = true;
+        Real64 expectedLoadMassFlowRate = thisHeatingPLHP->loadSideDesignMassFlowRate;
+        Real64 constexpr expectedCp = 4182.3220354805;
+        Real64 constexpr specifiedLoadSetpoint = 55.0;
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 13;
+        state->dataLoopNodes->Node(thisHeatingPLHP->heatRecoveryNodes.inlet).Temp = 7.0;
+        thisHeatingPLHP->simulate(*state, myHeatingLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet the setpoint while operating at part load
+        EXPECT_NEAR(55.0, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(0.5, thisHeatingPLHP->partLoadRatio, 0.001);
+        EXPECT_NEAR(69982.238, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+        EXPECT_NEAR(23327.413, thisHeatingPLHP->powerUsage, 0.001);
+        EXPECT_NEAR(34956.434, thisHeatingPLHP->heatRecoveryRate, 0.001);
+        EXPECT_NEAR(11698.391, thisHeatingPLHP->sourceSideHeatTransfer, 0.001);
+        // heat balance or energy conservation applied at the evaporator (source side)
+        Real64 heatBalanceEvap = thisHeatingPLHP->loadSideHeatTransfer - thisHeatingPLHP->powerUsage;
+        EXPECT_NEAR(46654.825, heatBalanceEvap, 0.001);
+        // heat rejected is split b/n heat recovery and source side heat transfer due to temp limit
+        EXPECT_NEAR(34956.434, thisHeatingPLHP->heatRecoveryRate, 0.001);
+        EXPECT_NEAR(11698.391, thisHeatingPLHP->sourceSideHeatTransfer, 0.001);
+        // check the heat recovered at the evaporator (source) side
+        Real64 chilledWaterEnergyRecovered = thisHeatingPLHP->heatRecoveryRate + thisHeatingPLHP->sourceSideHeatTransfer;
+        EXPECT_NEAR(46654.825, chilledWaterEnergyRecovered, 0.001);
+        // check energy balance
+        EXPECT_NEAR(heatBalanceEvap, chilledWaterEnergyRecovered, 0.001);
+        EXPECT_NEAR(7.0, thisHeatingPLHP->heatRecoveryInletTemp, 0.001);
+        // heat recovery outlet temperature is capped @ 4.5C.
+        EXPECT_NEAR(4.5, thisHeatingPLHP->heatRecoveryOutletTemp, 0.001);
     }
 }
 

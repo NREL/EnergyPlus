@@ -683,9 +683,9 @@ void EIRPlantLoopHeatPump::calcHeatRecoveryHeatTransferASHP(EnergyPlusData &stat
     }
     // limit the HR CW outlet temp to the minimum allowed (CW Recovery)
     if (this->heatRecoveryOutletTemp < this->minHeatRecoveryTempLimit) {
-        if (this->heatRecoveryInletTemp < this->minHeatRecoveryTempLimit) {
+        if (this->heatRecoveryInletTemp > this->minHeatRecoveryTempLimit) {
             this->heatRecoveryOutletTemp = this->minHeatRecoveryTempLimit;
-            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryOutletTemp - this->heatRecoveryInletTemp);
+            this->heatRecoveryRate = hRecoveryMCp * (this->heatRecoveryInletTemp - this->heatRecoveryOutletTemp);
         } else {
             this->heatRecoveryRate = 0.0;
             this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;
