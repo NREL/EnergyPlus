@@ -4972,5 +4972,193 @@ TEST_F(EnergyPlusFixture, CoolingwithHeatRecoverySimulate_AirSource)
     }
 }
 
+TEST_F(EnergyPlusFixture, HeatingwithHeatRecoverySimulate_AirSource)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  AirSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  node 5,",
+                                                      "  node 6,",
+                                                      "  hp heating side,",
+                                                      "  0.005,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  3.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 7,",
+                                                      "  node 8,",
+                                                      "  AirSource,",
+                                                      "  node 9,",
+                                                      "  node 10,",
+                                                      "  node 11,",
+                                                      "  node 12,",
+                                                      "  hp cooling side,",
+                                                      "  0.005,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  Autosize,",
+                                                      "  3.0,",
+                                                      "  1,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  1,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(*state, DataPlant::PlantEquipmentType::HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(2u, state->dataEIRPlantLoopHeatPump->heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[0];
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &state->dataEIRPlantLoopHeatPump->heatPumps[1];
+
+    // check heat recovery input fields
+    EXPECT_TRUE(thisCoolingPLHP->heatRecoveryAvailable);
+    EXPECT_TRUE(thisHeatingPLHP->heatRecoveryAvailable);
+    EXPECT_TRUE(thisCoolingPLHP->heatRecoveryDesignVolFlowRateWasAutoSized);
+    EXPECT_TRUE(thisHeatingPLHP->heatRecoveryDesignVolFlowRateWasAutoSized);
+    EXPECT_EQ(thisHeatingPLHP->minHeatRecoveryTempLimit, 4.5);
+    EXPECT_EQ(thisCoolingPLHP->maxHeatRecoveryTempLimit, 60.0);
+
+    // We'll set up two plant loops: load heating loop and load side cooling loop
+    state->dataPlnt->TotNumLoops = 2;
+    state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
+    state->dataSize->PlantSizData.allocate(2);
+    // chilled water plant loop
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    auto &loop1supplyComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    auto &loop1demandComponent1 = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1);
+    loop1supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop1supplyComponent1.Name = thisCoolingPLHP->name;
+    loop1supplyComponent1.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+    // heat recovery component on the demand side of loop1
+    loop1demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop1demandComponent1.Name = thisHeatingPLHP->name;
+    loop1demandComponent1.NodeNumIn = thisHeatingPLHP->heatRecoveryNodes.inlet;
+    // assign the CW plant sizing data
+    state->dataPlnt->PlantLoop(1).PlantSizNum = 1;
+    state->dataSize->PlantSizData(1).DeltaT = 6.67;
+
+    state->dataPlnt->PlantLoop(1).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    auto &PLHPPlantLoadSideComp = state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+
+    // hot water plant loop
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).TotalBranches = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).TotalComponents = 1;
+    state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    auto &loop2supplyComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    auto &loop2demandComponent1 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1);
+    loop2supplyComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    loop2supplyComponent1.Name = thisHeatingPLHP->name;
+    loop2supplyComponent1.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
+    // heat recovery component on the demand side of loop2
+    loop2demandComponent1.Type = DataPlant::PlantEquipmentType::HeatPumpEIRCooling;
+    loop2demandComponent1.Name = thisCoolingPLHP->name;
+    loop2demandComponent1.NodeNumIn = thisCoolingPLHP->heatRecoveryNodes.inlet;
+    // assign the HW plant sizing data
+    state->dataPlnt->PlantLoop(2).PlantSizNum = 2;
+    state->dataSize->PlantSizData(2).DeltaT = 11.11;
+
+    // the init call expects a "from" calling point
+    PlantLocation myCoolingLoadLocation = PlantLocation(1, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myHWHeatRecoveryLocation = PlantLocation(2, DataPlant::LoopSideLocation::Demand, 1, 1);
+    PlantLocation myHeatingLoadLocation = PlantLocation(2, DataPlant::LoopSideLocation::Supply, 1, 1);
+    PlantLocation myCWHeatRecoveryLocation = PlantLocation(1, DataPlant::LoopSideLocation::Demand, 1, 1);
+
+    state->dataPlnt->PlantLoop(2).LoopDemandCalcScheme = DataPlant::LoopDemandCalcScheme::SingleSetPoint;
+    auto &PLHPPlantLoadSideComp2 = state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp2.Type = DataPlant::PlantEquipmentType::HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp2.CurOpSchemeType = DataPlant::OpScheme::CompSetPtBased;
+
+    // set a couple global flags
+    state->dataGlobal->BeginEnvrnFlag = true;
+    state->dataPlnt->PlantFinalSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToReport = true;
+    state->dataPlnt->PlantFirstSizesOkayToFinalize = true;
+    // initialize so the components can find themselves on the plant
+    thisCoolingPLHP->onInitLoopEquip(*state, myCoolingLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(*state, myHeatingLoadLocation);
+
+    // call from load side location, firsthvac, no load, not running, verify the unit doesn't have any values lingering
+    thisHeatingPLHP->loadSideHeatTransfer = 5000;
+    thisHeatingPLHP->loadSideInletTemp = 43.0;
+    thisHeatingPLHP->loadSideOutletTemp = 53.0;
+    thisHeatingPLHP->powerUsage = 200.0;
+    thisHeatingPLHP->sourceSideHeatTransfer = 5200.0;
+    thisHeatingPLHP->sourceSideInletTemp = 13.0;
+    thisHeatingPLHP->sourceSideOutletTemp = 8.0;
+    thisHeatingPLHP->heatRecoveryInletTemp = 15.0;
+    thisHeatingPLHP->heatRecoveryOutletTemp = 10.0;
+    thisHeatingPLHP->sysControlType = ControlType::Setpoint;
+    bool firstHVAC = true;
+    Real64 curLoad = 0.0;
+    bool runFlag = false;
+    thisHeatingPLHP->simulate(*state, myHeatingLoadLocation, firstHVAC, curLoad, runFlag);
+    EXPECT_NEAR(0.0, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideHeatTransfer, 0.001);
+    EXPECT_NEAR(0.0, thisHeatingPLHP->powerUsage, 0.001);
+    EXPECT_NEAR(0.0, thisHeatingPLHP->heatRecoveryRate, 0.001);
+    EXPECT_NEAR(thisHeatingPLHP->loadSideInletTemp, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+    EXPECT_NEAR(thisHeatingPLHP->sourceSideInletTemp, thisHeatingPLHP->sourceSideOutletTemp, 0.001);
+    EXPECT_NEAR(thisHeatingPLHP->heatRecoveryInletTemp, thisHeatingPLHP->heatRecoveryOutletTemp, 0.001);
+
+    // now we can call it again from the load side, but this time there is heating load
+    {
+        firstHVAC = true;
+        curLoad = 69993.3; // current heating load
+        runFlag = true;
+        Real64 expectedLoadMassFlowRate = thisHeatingPLHP->loadSideDesignMassFlowRate;
+        Real64 constexpr expectedCp = 4182.3220354805;
+        Real64 constexpr specifiedLoadSetpoint = 55.0;
+        Real64 const calculatedLoadInletTemp = specifiedLoadSetpoint - curLoad / (expectedLoadMassFlowRate * expectedCp);
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.outlet).TempSetPoint = specifiedLoadSetpoint;
+        state->dataLoopNodes->Node(thisHeatingPLHP->loadSideNodes.inlet).Temp = calculatedLoadInletTemp;
+        state->dataLoopNodes->Node(thisHeatingPLHP->sourceSideNodes.inlet).Temp = 13;
+        state->dataLoopNodes->Node(thisHeatingPLHP->heatRecoveryNodes.inlet).Temp = 15.0;
+        thisHeatingPLHP->simulate(*state, myHeatingLoadLocation, firstHVAC, curLoad, runFlag);
+        // expect it to meet the setpoint while operating at part load
+        EXPECT_NEAR(55.0, thisHeatingPLHP->loadSideOutletTemp, 0.001);
+        EXPECT_NEAR(0.5, thisHeatingPLHP->partLoadRatio, 0.001);
+        EXPECT_NEAR(69982.238, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+        EXPECT_NEAR(23327.413, thisHeatingPLHP->powerUsage, 0.001);
+        EXPECT_NEAR(46654.825, thisHeatingPLHP->heatRecoveryRate, 0.001);
+        EXPECT_NEAR(0.0, thisHeatingPLHP->sourceSideHeatTransfer, 0.001);
+        EXPECT_NEAR(15.0, thisHeatingPLHP->heatRecoveryInletTemp, 0.001);
+        EXPECT_NEAR(11.655, thisHeatingPLHP->heatRecoveryOutletTemp, 0.001);
+    }
+}
+
 #pragma clang diagnostic pop
 #pragma clang diagnostic pop
