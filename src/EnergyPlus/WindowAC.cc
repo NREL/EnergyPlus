@@ -71,7 +71,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -377,11 +376,11 @@ namespace WindowAC {
             assert(state.dataWindowAC->WindAC(WindACNum).fanType != HVAC::FanType::Invalid);
 
             if (state.dataWindowAC->WindAC(WindACNum).fanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs.emplace_back(
-                    new HVACFan::FanSystem(state, state.dataWindowAC->WindAC(WindACNum).FanName)); // call constructor
+                state.dataFans->fanObjs.emplace_back(
+                    new Fans::FanSystem(state, state.dataWindowAC->WindAC(WindACNum).FanName)); // call constructor
                 state.dataWindowAC->WindAC(WindACNum).FanIndex =
-                    HVACFan::getFanObjectVectorIndex(state, state.dataWindowAC->WindAC(WindACNum).FanName);
-                FanVolFlow = state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
+                    Fans::getFanObjectVectorIndex(state, state.dataWindowAC->WindAC(WindACNum).FanName);
+                FanVolFlow = state.dataFans->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->designAirVolFlowRate;
                 if (FanVolFlow != AutoSize) {
                     if (FanVolFlow < state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow) {
                         ShowWarningError(state,
@@ -398,7 +397,7 @@ namespace WindowAC {
                     }
                 }
                 state.dataWindowAC->WindAC(WindACNum).FanAvailSchedPtr =
-                    state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->availSchedIndex;
+                    state.dataFans->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->availSchedIndex;
 
             } else if ((state.dataWindowAC->WindAC(WindACNum).fanType == HVAC::FanType::OnOff) ||
                        (state.dataWindowAC->WindAC(WindACNum).fanType == HVAC::FanType::Constant)) {
@@ -1247,7 +1246,7 @@ namespace WindowAC {
         if (state.dataWindowAC->WindAC(WindACNum).fanType != HVAC::FanType::SystemModel) {
             locFanElecPower = Fans::GetFanPower(state, state.dataWindowAC->WindAC(WindACNum).FanIndex);
         } else {
-            locFanElecPower = state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->fanPower();
+            locFanElecPower = state.dataFans->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->fanPower();
         }
         state.dataWindowAC->WindAC(WindACNum).ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower;
 
@@ -1337,7 +1336,7 @@ namespace WindowAC {
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
                                             PartLoadFrac);
             } else {
-                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
+                state.dataFans->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
             }
         }
 
@@ -1385,7 +1384,7 @@ namespace WindowAC {
                                             state.dataWindowAC->WindAC(WindACNum).FanIndex,
                                             PartLoadFrac);
             } else {
-                state.dataHVACFan->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
+                state.dataFans->fanObjs[state.dataWindowAC->WindAC(WindACNum).FanIndex]->simulate(state, _, _);
             }
         }
 

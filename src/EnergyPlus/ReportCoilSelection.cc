@@ -62,7 +62,6 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -639,7 +638,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
                 state,
                 c->coilName_,
                 c->coilObjName,
-                state.dataHVACFan->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
+                state.dataFans->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
                 DataAirSystems::ObjectVectorOOFanSystemModel,
                 state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex);
             break;
@@ -881,10 +880,10 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         case DataAirSystems::ObjectVectorOOFanSystemModel: {
             c->fanTypeName = "Fan:SystemModel";
             if (c->supFanVecIndex < 0) {
-                c->supFanVecIndex = HVACFan::getFanObjectVectorIndex(state, c->fanAssociatedWithCoilName);
+                c->supFanVecIndex = Fans::getFanObjectVectorIndex(state, c->fanAssociatedWithCoilName);
             }
-            c->fanSizeMaxAirVolumeFlow = state.dataHVACFan->fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
-            c->fanSizeMaxAirMassFlow = state.dataHVACFan->fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
+            c->fanSizeMaxAirVolumeFlow = state.dataFans->fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
+            c->fanSizeMaxAirMassFlow = state.dataFans->fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
             break;
         }
         default:
@@ -2022,7 +2021,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
         c->supFanNum = locFanIndex;
     } else if (fanEnumType == DataAirSystems::ObjectVectorOOFanSystemModel) {
         if (fanIndex < 0) {
-            locFanIndex = HVACFan::getFanObjectVectorIndex(state, fanName);
+            locFanIndex = Fans::getFanObjectVectorIndex(state, fanName);
         } else {
             locFanIndex = fanIndex;
         }

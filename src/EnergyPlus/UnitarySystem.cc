@@ -76,7 +76,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -425,7 +424,7 @@ namespace UnitarySystems {
                                 this->m_CoolingCoilName,
                                 HVAC::cAllCoilTypes(this->m_CoolingCoilType_Num),
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
-                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    ? state.dataFans->fanObjs[primaryAirSystems.supFanVecIndex]->name
                                     : state.dataFans->Fan(primaryAirSystems.SupFanNum).Name,
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
@@ -439,7 +438,7 @@ namespace UnitarySystems {
                                 this->m_HeatingCoilName,
                                 HVAC::cAllCoilTypes(this->m_HeatingCoilType_Num),
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
-                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    ? state.dataFans->fanObjs[primaryAirSystems.supFanVecIndex]->name
                                     : state.dataFans->Fan(primaryAirSystems.SupFanNum).Name,
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
@@ -453,7 +452,7 @@ namespace UnitarySystems {
                                 this->m_SuppHeatCoilName,
                                 HVAC::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
-                                    ? state.dataHVACFan->fanObjs[primaryAirSystems.supFanVecIndex]->name
+                                    ? state.dataFans->fanObjs[primaryAirSystems.supFanVecIndex]->name
                                     : state.dataFans->Fan(primaryAirSystems.SupFanNum).Name,
                                 primaryAirSystems.supFanModelType == DataAirSystems::ObjectVectorOOFanSystemModel
                                     ? DataAirSystems::ObjectVectorOOFanSystemModel
@@ -487,7 +486,7 @@ namespace UnitarySystems {
                     if (this->m_FanExists && !this->m_MultiOrVarSpeedHeatCoil && !this->m_MultiOrVarSpeedCoolCoil) {
                         bool fanHasPowerSpeedRatioCurve = false;
                         if (this->m_FanType == HVAC::FanType::SystemModel) {
-                            if (state.dataHVACFan->fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0)
+                            if (state.dataFans->fanObjs[this->m_FanIndex]->powerModFuncFlowFractionCurveIndex > 0)
                                 fanHasPowerSpeedRatioCurve = true;
                         } else {
                             if (Fans::GetFanSpeedRatioCurveIndex(state, this->m_FanIndex) > 0) fanHasPowerSpeedRatioCurve = true;
@@ -535,7 +534,7 @@ namespace UnitarySystems {
             } else {
                 if (this->m_FanExists) {
                     if (this->m_FanType == HVAC::FanType::SystemModel) {
-                        this->m_ActualFanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+                        this->m_ActualFanVolFlowRate = state.dataFans->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
                         this->m_ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, this->m_FanIndex);
                     }
@@ -3034,7 +3033,7 @@ namespace UnitarySystems {
                 if (BranchNum > 0.0) BranchInputManager::GetBranchFanTypeName(state, BranchNum, FanType, m_FanName, ErrFound);
                 if (!ErrFound && BranchNum > 0) {
                     if (this->m_FanType == HVAC::FanType::SystemModel) {
-                        BranchFanFlow = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+                        BranchFanFlow = state.dataFans->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
                     } else {
                         BranchFanFlow = Fans::GetFanDesignVolumeFlowRate(state, this->m_FanIndex);
                     }
@@ -3126,7 +3125,7 @@ namespace UnitarySystems {
                             }
                         } else {
                             this->m_CoolVolumeFlowRate[i] =
-                                state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
+                                state.dataFans->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
                         }
                         this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                     }
@@ -3235,7 +3234,7 @@ namespace UnitarySystems {
                             }
                         } else {
                             this->m_HeatVolumeFlowRate[i] =
-                                state.dataHVACFan->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
+                                state.dataFans->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1] / state.dataEnvrn->StdRhoAir;
                         }
                         this->m_HeatMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                     }
@@ -4130,15 +4129,15 @@ namespace UnitarySystems {
             assert(this->m_FanType != HVAC::FanType::Invalid);
 
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                this->m_FanIndex = HVACFan::getFanObjectVectorIndex(state, loc_m_FanName, false);
+                this->m_FanIndex = Fans::getFanObjectVectorIndex(state, loc_m_FanName, false);
                 if (this->m_FanIndex == -1) {
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, loc_m_FanName)); // call constructor
-                    this->m_FanIndex = state.dataHVACFan->fanObjs.size() - 1;
+                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, loc_m_FanName)); // call constructor
+                    this->m_FanIndex = state.dataFans->fanObjs.size() - 1;
                 }
-                FanInletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->inletNodeNum;
-                FanOutletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->outletNodeNum;
-                this->m_FanAvailSchedPtr = state.dataHVACFan->fanObjs[this->m_FanIndex]->availSchedIndex;
-                FanVolFlowRate = state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
+                FanInletNode = state.dataFans->fanObjs[this->m_FanIndex]->inletNodeNum;
+                FanOutletNode = state.dataFans->fanObjs[this->m_FanIndex]->outletNodeNum;
+                this->m_FanAvailSchedPtr = state.dataFans->fanObjs[this->m_FanIndex]->availSchedIndex;
+                FanVolFlowRate = state.dataFans->fanObjs[this->m_FanIndex]->designAirVolFlowRate;
 
                 if (FanVolFlowRate == DataSizing::AutoSize) this->m_RequestAutoSize = true;
                 this->m_ActualFanVolFlowRate = FanVolFlowRate;
@@ -4596,7 +4595,7 @@ namespace UnitarySystems {
                                     thisCoolCoil.Name,
                                     thisCoolCoil.DXCoilType,
                                     (this->m_FanType == HVAC::FanType::SystemModel)
-                                        ? state.dataHVACFan->fanObjs[thisCoolCoil.SupplyFanIndex]->name
+                                        ? state.dataFans->fanObjs[thisCoolCoil.SupplyFanIndex]->name
                                         : state.dataFans->Fan(thisCoolCoil.SupplyFanIndex).Name,
                                     (this->m_FanType == HVAC::FanType::SystemModel) ? DataAirSystems::ObjectVectorOOFanSystemModel
                                                                                                : DataAirSystems::StructArrayLegacyFanModels,
@@ -6799,8 +6798,8 @@ namespace UnitarySystems {
         } else if (this->m_DesignSpecMultispeedHPType.empty() && this->m_DesignSpecMultispeedHPName.empty()) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
                 int FanIndex = this->m_FanIndex;
-                if (state.dataHVACFan->fanObjs[FanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Discrete) {
-                    int NumSpeeds = state.dataHVACFan->fanObjs[FanIndex]->m_numSpeeds;
+                if (state.dataFans->fanObjs[FanIndex]->speedControl == Fans::FanSystem::SpeedControlMethod::Discrete) {
+                    int NumSpeeds = state.dataFans->fanObjs[FanIndex]->m_numSpeeds;
                     if (NumSpeeds > 1) {
                         if ((this->m_CoolingCoilType_Num == HVAC::Coil_CoolingWaterToAirHPSimple ||
                              this->m_CoolingCoilType_Num == HVAC::Coil_CoolingWaterToAirHPVSEquationFit) &&
@@ -6811,11 +6810,11 @@ namespace UnitarySystems {
                             this->m_MSCoolingSpeedRatio.resize(NumSpeeds + 1);
                             this->m_MultiOrVarSpeedCoolCoil = true;
                             this->m_DiscreteSpeedCoolingCoil = true;
-                            if (state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
+                            if (state.dataFans->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
                                 if (this->m_MaxCoolAirVolFlow != DataSizing::AutoSize) {
                                     for (int i = 1; i <= this->m_NumOfSpeedCooling; ++i) {
-                                        this->m_CoolVolumeFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate *
-                                                                        state.dataHVACFan->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
+                                        this->m_CoolVolumeFlowRate[i] = state.dataFans->fanObjs[FanIndex]->designAirVolFlowRate *
+                                                                        state.dataFans->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
                                         this->m_CoolMassFlowRate[i] = this->m_CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                                         this->m_MSCoolingSpeedRatio[i] = 1.0;
                                     }
@@ -6837,11 +6836,11 @@ namespace UnitarySystems {
                             this->m_MSHeatingSpeedRatio.resize(NumSpeeds + 1);
                             this->m_MultiSpeedHeatingCoil = true;
                             this->m_MultiOrVarSpeedHeatCoil = true;
-                            if (state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
+                            if (state.dataFans->fanObjs[FanIndex]->designAirVolFlowRate > 0.0) {
                                 if (this->m_MaxHeatAirVolFlow != DataSizing::AutoSize) {
                                     for (int i = 1; i <= this->m_NumOfSpeedHeating; ++i) {
-                                        this->m_HeatVolumeFlowRate[i] = state.dataHVACFan->fanObjs[FanIndex]->designAirVolFlowRate *
-                                                                        state.dataHVACFan->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
+                                        this->m_HeatVolumeFlowRate[i] = state.dataFans->fanObjs[FanIndex]->designAirVolFlowRate *
+                                                                        state.dataFans->fanObjs[FanIndex]->m_flowFractionAtSpeed[i - 1];
                                         this->m_HeatMassFlowRate[i] = this->m_HeatVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                                         this->m_MSHeatingSpeedRatio[i] = 1.0;
                                     }
@@ -8019,7 +8018,7 @@ namespace UnitarySystems {
         }
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::BlowThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -8112,7 +8111,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::DrawThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, _, _);
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state, _, _);
             } else {
                 Fans::SimulateFanComponents(state, blankString, FirstHVACIteration, this->m_FanIndex, state.dataUnitarySystems->FanSpeedRatio);
             }
@@ -11321,7 +11320,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::BlowThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -11358,7 +11357,7 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::BlowThru &&
                 state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType == HVAC::FanType::SystemModel) {
-                    state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                    state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
                                                                            _,
                                                                            state.dataUnitarySystems->m_massFlow1,
@@ -11409,7 +11408,7 @@ namespace UnitarySystems {
             if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::BlowThru &&
                 state.dataHVACGlobal->OnOffFanPartLoadFraction < 1.0) {
                 if (this->m_FanType == HVAC::FanType::SystemModel) {
-                    state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                    state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                            _,
                                                                            _,
                                                                            state.dataUnitarySystems->m_massFlow1,
@@ -11441,7 +11440,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::DrawThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -15467,7 +15466,7 @@ namespace UnitarySystems {
         // CALL the series of components that simulate a Unitary System
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::BlowThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -15517,7 +15516,7 @@ namespace UnitarySystems {
 
         if (this->m_FanExists && this->m_FanPlace == HVAC::FanPlace::DrawThru) {
             if (this->m_FanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state,
+                state.dataFans->fanObjs[this->m_FanIndex]->simulate(state,
                                                                        _,
                                                                        _,
                                                                        state.dataUnitarySystems->m_massFlow1,
@@ -15689,7 +15688,7 @@ namespace UnitarySystems {
 
         Real64 locFanElecPower = 0.0;
         if (this->m_FanType == HVAC::FanType::SystemModel) {
-            locFanElecPower = state.dataHVACFan->fanObjs[this->m_FanIndex]->fanPower();
+            locFanElecPower = state.dataFans->fanObjs[this->m_FanIndex]->fanPower();
         } else {
             locFanElecPower = Fans::GetFanPower(state, this->m_FanIndex);
         }
@@ -17923,10 +17922,10 @@ namespace UnitarySystems {
         int FanInletNode = 0;
         int FanOutletNode = 0;
         if (this->m_FanType == HVAC::FanType::SystemModel) {
-            FanInletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->inletNodeNum;
-            FanOutletNode = state.dataHVACFan->fanObjs[this->m_FanIndex]->outletNodeNum;
+            FanInletNode = state.dataFans->fanObjs[this->m_FanIndex]->inletNodeNum;
+            FanOutletNode = state.dataFans->fanObjs[this->m_FanIndex]->outletNodeNum;
             state.dataLoopNodes->Node(FanInletNode).MassFlowRate = massFlowRate;
-            state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state, airFlowRatio, _, _, _, _, _);
+            state.dataFans->fanObjs[this->m_FanIndex]->simulate(state, airFlowRatio, _, _, _, _, _);
         } else {
             FanInletNode = state.dataFans->Fan(this->m_FanIndex).InletNodeNum;
             FanOutletNode = state.dataFans->Fan(this->m_FanIndex).OutletNodeNum;

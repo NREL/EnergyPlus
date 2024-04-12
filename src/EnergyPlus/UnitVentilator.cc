@@ -73,7 +73,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -436,10 +435,10 @@ namespace UnitVentilator {
                 }
             } else if (unitVent.fanType == HVAC::FanType::SystemModel) {
 
-                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
-                unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
-                unitVent.FanOutletNode = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->outletNodeNum;
-                FanVolFlow = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->designAirVolFlowRate;
+                state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, unitVent.FanName)); // call constructor
+                unitVent.Fan_Index = Fans::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
+                unitVent.FanOutletNode = state.dataFans->fanObjs[unitVent.Fan_Index]->outletNodeNum;
+                FanVolFlow = state.dataFans->fanObjs[unitVent.Fan_Index]->designAirVolFlowRate;
                 if (FanVolFlow != DataSizing::AutoSize && unitVent.MaxAirVolFlow != DataSizing::AutoSize && FanVolFlow < unitVent.MaxAirVolFlow) {
                     ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                     ShowContinueError(
@@ -460,7 +459,7 @@ namespace UnitVentilator {
                     ShowContinueError(state, "...the unit ventilator flow rate is autosized while the fan flow rate is not.");
                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                 }
-                unitVent.FanAvailSchedPtr = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->availSchedIndex;
+                unitVent.FanAvailSchedPtr = state.dataFans->fanObjs[unitVent.Fan_Index]->availSchedIndex;
             } else {
                 ShowSevereError(state, format("{}{}=\"{}\".", RoutineName, CurrentModuleObject, unitVent.Name));
                 ShowContinueError(state, "Fan Type must be Fan:OnOff, Fan:ConstantVolume or Fan:VariableVolume.");
@@ -2993,7 +2992,7 @@ namespace UnitVentilator {
         if (unitVent.fanType != HVAC::FanType::SystemModel) {
             unitVent.ElecPower = Fans::GetFanPower(state, unitVent.Fan_Index);
         } else {
-            unitVent.ElecPower = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->fanPower();
+            unitVent.ElecPower = state.dataFans->fanObjs[unitVent.Fan_Index]->fanPower();
         }
 
         PowerMet = QUnitOut;
@@ -3056,7 +3055,7 @@ namespace UnitVentilator {
                 Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
+                state.dataFans->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {
@@ -3143,7 +3142,7 @@ namespace UnitVentilator {
             if (unitVent.fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
-                state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
+                state.dataFans->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
             }
 
             if (unitVent.CCoilPresent) {

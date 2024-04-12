@@ -71,7 +71,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -407,11 +406,11 @@ void GetPIUs(EnergyPlusData &state)
 
         // find fan type
         // test if Fan:SystemModel fan of this name exists
-        if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
+        if (Fans::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
             thisPIU.fanType = HVAC::FanType::SystemModel;
-            state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
-            thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
-            thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
+            state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, thisPIU.FanName)); // call constructor
+            thisPIU.Fan_Index = Fans::getFanObjectVectorIndex(state, thisPIU.FanName);
+            thisPIU.FanAvailSchedPtr = state.dataFans->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
         } else {
             thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName);
             if (thisPIU.Fan_Index == 0) {
@@ -637,11 +636,11 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.FanName = state.dataIPShortCut->cAlphaArgs(8);   // name of fan object
         // find fan type
         // test if Fan:SystemModel fan of this name exists
-        if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
+        if (Fans::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
             thisPIU.fanType = HVAC::FanType::SystemModel;
-            state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
-            thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
-            thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
+            state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, thisPIU.FanName)); // call constructor
+            thisPIU.Fan_Index = Fans::getFanObjectVectorIndex(state, thisPIU.FanName);
+            thisPIU.FanAvailSchedPtr = state.dataFans->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
         } else {
             thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName);
             if (thisPIU.Fan_Index == 0) {
@@ -1652,7 +1651,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             if (thisPIU.fanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+                state.dataFans->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.fanType == HVAC::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
@@ -1697,7 +1696,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
     // fire the fan
     if (thisPIU.fanType == HVAC::FanType::SystemModel) {
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+        state.dataFans->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.fanType == HVAC::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
@@ -1926,7 +1925,7 @@ void CalcParallelPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
 
             if (thisPIU.fanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+                state.dataFans->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
             } else if (thisPIU.fanType == HVAC::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
@@ -1975,7 +1974,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     // fire the fan
 
     if (thisPIU.fanType == HVAC::FanType::SystemModel) {
-        state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+        state.dataFans->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
     } else if (thisPIU.fanType == HVAC::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }

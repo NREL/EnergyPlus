@@ -69,7 +69,6 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -4930,10 +4929,10 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRate = PrimaryAirMassFlowRate;
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
     // set fan parameters
-    state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMax = 1.0;
-    state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataHVACFan->fanObjs[thisSys.m_FanIndex]->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMax = 1.0;
+    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;

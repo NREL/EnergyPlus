@@ -51,7 +51,7 @@
 #include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
@@ -82,10 +82,10 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     ASSERT_TRUE(process_idf(idf_objects));
     state->dataEnvrn->StdRhoAir = 1.2;
     // call simulate to trigger sizing call
-    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "MyFan"));
+    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, "MyFan"));
     state->dataLoopNodes->Node(1).Press = 101325.0;
     state->dataLoopNodes->Node(1).Temp = 24.0;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    state->dataFans->fanObjs[0]->simulate(*state, _, _);
 
     // this global state is what would be set up by E+ currently
     static constexpr std::string_view routineName("HeatingCapacitySizingGauntlet");

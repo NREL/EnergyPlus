@@ -86,7 +86,6 @@
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
@@ -1172,14 +1171,14 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "FAN:SYSTEMMODEL") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_System_Object;
                         // Construct fan object
-                        if (HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
-                            state.dataHVACFan->fanObjs.emplace_back(
-                                new HVACFan::FanSystem(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name));
+                        if (Fans::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false) < 0) {
+                            state.dataFans->fanObjs.emplace_back(
+                                new Fans::FanSystem(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name));
                         }
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompIndex =
-                            HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name) +
+                            Fans::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name) +
                             1; // + 1 for shift from zero-based vector to 1-based compIndex
-                        state.dataHVACFan->fanObjs[HVACFan::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name)]
+                        state.dataFans->fanObjs[Fans::getFanObjectVectorIndex(state, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name)]
                             ->AirPathFlag = true;
                     } else if (componentType == "FAN:COMPONENTMODEL") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_ComponentModel;
@@ -1944,16 +1943,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
                                 if (thisPrimaryAirSys.Branch(BranchNum).DuctType != HVAC::AirDuctType::Heating) {
-                                    SupFanIndex = HVACFan::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
+                                    SupFanIndex = Fans::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                                     supFanModelType = ObjectVectorOOFanSystemModel;
                                     goto EndOfAirLoop;
                                 }
                             } else {
-                                RetFanIndex = HVACFan::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
+                                RetFanIndex = Fans::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                                 retFanModelType = ObjectVectorOOFanSystemModel;
                             }
                         } else {
-                            SupFanIndex = HVACFan::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
+                            SupFanIndex = Fans::getFanObjectVectorIndex(state, thisPrimaryAirSys.Branch(BranchNum).Comp(CompNum).Name);
                             supFanModelType = ObjectVectorOOFanSystemModel;
                             goto EndOfAirLoop;
                         }
@@ -3469,12 +3468,12 @@ void SimAirLoopComponent(EnergyPlusData &state,
     } break;
     case CompType::Fan_System_Object: {                                        // "Fan:SystemModel" new for V8.6
         if (CompIndex == 0) {                                                  // 0 means has not been filled because of 1-based arrays in old fortran
-            CompIndex = HVACFan::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
+            CompIndex = Fans::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
         }
         // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
         // involved but the fan should really run like constant volume and not cycle with compressor
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-        state.dataHVACFan->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+        state.dataFans->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
     } break;
     case CompType::Fan_ComponentModel: { // 'Fan:ComponentModel'
         Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);

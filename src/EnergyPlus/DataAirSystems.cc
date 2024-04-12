@@ -49,7 +49,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -106,7 +105,7 @@ namespace DataAirSystems {
             break;
         }
         case DataAirSystems::ObjectVectorOOFanSystemModel: {
-            fanDesHeatLoad = state.dataHVACFan->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
+            fanDesHeatLoad = state.dataFans->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
             break;
         }
         case DataAirSystems::Invalid: {

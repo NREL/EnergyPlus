@@ -65,7 +65,6 @@
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -170,11 +169,11 @@ namespace ExhaustAirSystemManager {
                 int centralFanIndex = -1; // zero based or 1 based
                 if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
                     // zero-based index
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, centralFanName));
+                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, centralFanName));
 
-                    centralFanIndex = HVACFan::getFanObjectVectorIndex(state, centralFanName); // zero-based
+                    centralFanIndex = Fans::getFanObjectVectorIndex(state, centralFanName); // zero-based
                     if (centralFanIndex >= 0) {
-                        thisExhSys.AvailScheduleNum = state.dataHVACFan->fanObjs[centralFanIndex]->availSchedIndex;
+                        thisExhSys.AvailScheduleNum = state.dataFans->fanObjs[centralFanIndex]->availSchedIndex;
                         // normal
 
                         BranchNodeConnections::SetUpCompSets(state,
@@ -182,8 +181,8 @@ namespace ExhaustAirSystemManager {
                                                              thisExhSys.Name,
                                                              HVAC::fanTypeNames[(int)thisExhSys.centralFanType],
                                                              centralFanName,
-                                                             state.dataLoopNodes->NodeID(state.dataHVACFan->fanObjs[centralFanIndex]->inletNodeNum),
-                                                             state.dataLoopNodes->NodeID(state.dataHVACFan->fanObjs[centralFanIndex]->outletNodeNum));
+                                                             state.dataLoopNodes->NodeID(state.dataFans->fanObjs[centralFanIndex]->inletNodeNum),
+                                                             state.dataLoopNodes->NodeID(state.dataFans->fanObjs[centralFanIndex]->outletNodeNum));
 
                         SetupOutputVariable(state,
                                             "Central Exhaust Fan Mass Flow Rate",
@@ -346,10 +345,10 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _);
+            state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _);
 
             // Update report variables
-            outletNode_Num = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;
+            outletNode_Num = state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;
 
             thisExhSys.centralFan_MassFlowRate = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
 
@@ -362,7 +361,7 @@ namespace ExhaustAirSystemManager {
             if (RhoAirCurrent <= 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
             thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / RhoAirCurrent;
 
-            thisExhSys.centralFan_Power = state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
+            thisExhSys.centralFan_Power = state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
 
             thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSysSec;
 
@@ -800,14 +799,14 @@ namespace ExhaustAirSystemManager {
 
         // then central exhasut fan sizing here:
         if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
-            if (state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate == DataSizing::AutoSize) {
-                state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
+            if (state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate == DataSizing::AutoSize) {
+                state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
             }
             BaseSizer::reportSizerOutput(state,
                                          "FAN:SYSTEMMODEL",
-                                         state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->name,
+                                         state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->name,
                                          "Design Fan Airflow [m3/s]",
-                                         state.dataHVACFan->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate);
+                                         state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate);
         } else if (thisExhSys.centralFanType == HVAC::FanType::ComponentModel) {
             if (state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate == DataSizing::AutoSize) {
                 state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =

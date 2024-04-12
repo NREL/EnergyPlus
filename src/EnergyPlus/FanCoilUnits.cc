@@ -75,7 +75,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -568,10 +567,10 @@ namespace FanCoilUnits {
                     }
                 }
             } else {
-                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, fanCoil.FanName)); // call constructor
-                fanCoil.FanIndex = HVACFan::getFanObjectVectorIndex(state, fanCoil.FanName);             // zero-based
-                fanCoil.fanAvailSchIndex = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->availSchedIndex;
-                fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
+                state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, fanCoil.FanName)); // call constructor
+                fanCoil.FanIndex = Fans::getFanObjectVectorIndex(state, fanCoil.FanName);             // zero-based
+                fanCoil.fanAvailSchIndex = state.dataFans->fanObjs[fanCoil.FanIndex]->availSchedIndex;
+                fanCoil.FanAirVolFlow = state.dataFans->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
                 // Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
                 if (fanCoil.MaxAirVolFlow > fanCoil.FanAirVolFlow && fanCoil.FanAirVolFlow != DataSizing::AutoSize) {
                     ShowWarningError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
@@ -586,7 +585,7 @@ namespace FanCoilUnits {
                 // check that for VariableFanVariableFlow or VariableFanConstantFlow that the fan speed control is continuous
                 if (fanCoil.CapCtrlMeth_Num == CCM::VarFanVarFlow || fanCoil.CapCtrlMeth_Num == CCM::VarFanConsFlow ||
                     fanCoil.CapCtrlMeth_Num == CCM::ASHRAE) { // then expect continuous speed control fan
-                    if (state.dataHVACFan->fanObjs[fanCoil.FanIndex]->speedControl != HVACFan::FanSystem::SpeedControlMethod::Continuous) {
+                    if (state.dataFans->fanObjs[fanCoil.FanIndex]->speedControl != Fans::FanSystem::SpeedControlMethod::Continuous) {
                         ShowSevereError(state, format("{}{}: {}", RoutineName, fanCoil.UnitType, fanCoil.Name));
                         ShowContinueError(state,
                                           format("...the fan type of the object : {} does not match with the capacity control method selected : "
@@ -1445,8 +1444,8 @@ namespace FanCoilUnits {
                         Fans::SimulateFanComponents(state, fanCoil.FanName, true, fanCoil.FanIndex);
                         fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanIndex);
                     } else {
-                        state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
-                        fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
+                        state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
+                        fanCoil.FanAirVolFlow = state.dataFans->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
                     }
                 }
                 //     Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -1485,8 +1484,8 @@ namespace FanCoilUnits {
                 Fans::SimulateFanComponents(state, fanCoil.FanName, true, fanCoil.FanIndex);
                 fanCoil.FanAirVolFlow = Fans::GetFanDesignVolumeFlowRate(state, fanCoil.FanIndex);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
-                fanCoil.FanAirVolFlow = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
+                state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
+                fanCoil.FanAirVolFlow = state.dataFans->fanObjs[fanCoil.FanIndex]->designAirVolFlowRate;
             }
             //   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
             if (fanCoil.MaxAirVolFlow > fanCoil.FanAirVolFlow) {
@@ -2429,7 +2428,7 @@ namespace FanCoilUnits {
             if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                 fanCoil.ElecPower = Fans::GetFanPower(state, fanCoil.FanIndex);
             } else {
-                fanCoil.ElecPower = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                fanCoil.ElecPower = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
             }
 
             PowerMet = QUnitOut;
@@ -2725,7 +2724,7 @@ namespace FanCoilUnits {
             if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                 fanCoil.ElecPower = Fans::GetFanPower(state, fanCoil.FanIndex);
             } else {
-                fanCoil.ElecPower = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                fanCoil.ElecPower = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
             }
             fanCoil.PLR = PLR;
             PowerMet = QUnitOut;
@@ -3029,7 +3028,7 @@ namespace FanCoilUnits {
             if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                 fanCoil.ElecPower = Fans::GetFanPower(state, fanCoil.FanIndex);
             } else {
-                fanCoil.ElecPower = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                fanCoil.ElecPower = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
             }
             fanCoil.PLR = PLR;
             PowerMet = QUnitOut;
@@ -3055,7 +3054,7 @@ namespace FanCoilUnits {
             if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                 fanCoil.ElecPower = Fans::GetFanPower(state, fanCoil.FanIndex);
             } else {
-                fanCoil.ElecPower = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                fanCoil.ElecPower = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
             }
             PowerMet = QUnitOut;
             LatOutputProvided = LatentOutput;
@@ -3338,27 +3337,27 @@ namespace FanCoilUnits {
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.LowSpeedRatio);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
+                    state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 2) {
 
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, fanCoil.MedSpeedRatio);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
+                    state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else if (fanCoil.SpeedFanSel == 3) {
 
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 1.0);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
+                    state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, _, _);
                 }
             } else { // using 1.0 here for fan speed ratio seems wrong if FCU max flow rate is different than the fan maximum flow rate
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, 0.0);
                 } else {
-                    state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, _);
+                    state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, 0.0, _);
                 }
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
@@ -3393,7 +3392,7 @@ namespace FanCoilUnits {
             } else {
                 // FanFlowRatio needs to be accurate here for new fan model
                 Real64 ActFanFlowRatio = state.dataFanCoilUnits->FanFlowRatio * PartLoad;
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, _);
+                state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, ActFanFlowRatio, _);
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
@@ -3438,7 +3437,7 @@ namespace FanCoilUnits {
             if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state, fanCoil.FanName, FirstHVACIteration, fanCoil.FanIndex, FanSpeedRatio);
             } else {
-                state.dataHVACFan->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, _);
+                state.dataFans->fanObjs[fanCoil.FanIndex]->simulate(state, FanSpeedRatio, _);
             }
 
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
@@ -3925,7 +3924,7 @@ namespace FanCoilUnits {
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     FanElecPowerLS = Fans::GetFanPower(state, fanCoil.FanIndex);
                 } else {
-                    FanElecPowerLS = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                    FanElecPowerLS = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
                 }
                 // get capacity at higher speed
                 fanCoil.SpeedFanRatSel = HighSpeedRatio;
@@ -3940,7 +3939,7 @@ namespace FanCoilUnits {
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     FanElecPowerHS = Fans::GetFanPower(state, fanCoil.FanIndex);
                 } else {
-                    FanElecPowerHS = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                    FanElecPowerHS = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
                 }
                 // calc speed ratio
                 if (std::abs(QZnReq) > std::abs(QUnitOutMaxHS)) {
@@ -4108,7 +4107,7 @@ namespace FanCoilUnits {
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     FanElecPowerLS = Fans::GetFanPower(state, fanCoil.FanIndex);
                 } else {
-                    FanElecPowerLS = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                    FanElecPowerLS = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
                 }
                 // get capacity at higher speed
                 fanCoil.SpeedFanRatSel = HighSpeedRatio;
@@ -4123,7 +4122,7 @@ namespace FanCoilUnits {
                 if (fanCoil.fanType != HVAC::FanType::SystemModel) {
                     FanElecPowerHS = Fans::GetFanPower(state, fanCoil.FanIndex);
                 } else {
-                    FanElecPowerHS = state.dataHVACFan->fanObjs[fanCoil.FanIndex]->fanPower();
+                    FanElecPowerHS = state.dataFans->fanObjs[fanCoil.FanIndex]->fanPower();
                 }
                 // calc speed ratio
                 if (std::abs(QZnReq) > std::abs(QUnitOutMaxHS)) {

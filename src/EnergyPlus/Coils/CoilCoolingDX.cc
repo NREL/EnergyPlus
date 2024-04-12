@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -825,7 +824,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                     state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                              this->name,
                                                                                              state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataHVACFan->fanObjs[this->supplyFanIndex]->name,
+                                                                                             state.dataFans->fanObjs[this->supplyFanIndex]->name,
                                                                                              DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                              this->supplyFanIndex);
                 }

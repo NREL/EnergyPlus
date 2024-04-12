@@ -75,7 +75,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -2103,17 +2102,17 @@ void GetSysInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
         if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType == HVAC::FanType::SystemModel) {
-            state.dataHVACFan->fanObjs.emplace_back(
-                new HVACFan::FanSystem(state,
+            state.dataFans->fanObjs.emplace_back(
+                new Fans::FanSystem(state,
                                        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI)
                                            .FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index =
-                HVACFan::getFanObjectVectorIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
+                Fans::getFanObjectVectorIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
-                state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
+                state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
-                state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
-            state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
+                state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
+            state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
         } else if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType == HVAC::FanType::VAV) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index =
                 Fans::GetFanIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
@@ -5364,14 +5363,14 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     if (fanType == HVAC::FanType::VAV && FanOn == 1) {
         Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
     } else if (fanType == HVAC::FanType::SystemModel && FanOn == 1) {
-        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
+        state.dataFans->fanObjs[this->Fan_Index]->simulate(state, _, _);
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
         if (fanType == HVAC::FanType::VAV) {
             Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
         } else if (fanType == HVAC::FanType::SystemModel) {
-            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
+            state.dataFans->fanObjs[this->Fan_Index]->simulate(state, _, _);
         }
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;

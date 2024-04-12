@@ -78,7 +78,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -9020,7 +9019,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
 
     Real64 locFanElecPower = 0.0;
     if (Coil.supplyFanType == HVAC::FanType::SystemModel) {
-        locFanElecPower = state.dataHVACFan->fanObjs[Coil.SupplyFanIndex]->fanPower();
+        locFanElecPower = state.dataFans->fanObjs[Coil.SupplyFanIndex]->fanPower();
     } else {
         locFanElecPower = Fans::GetFanPower(state, Coil.SupplyFanIndex);
     }
@@ -14444,8 +14443,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             }
             FanStaticPressureRise = ExternalStatic + thisDXCoil.InternalStaticPressureDrop;
             if (thisDXCoil.supplyFanType == HVAC::FanType::SystemModel) {
-                FanInletNode = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->inletNodeNum;
-                FanOutletNode = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->outletNodeNum;
+                FanInletNode = state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->inletNodeNum;
+                FanOutletNode = state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->outletNodeNum;
             } else {
                 FanInletNode = Fans::GetFanInletNode(state, thisDXCoil.SupplyFanIndex);
                 FanOutletNode = Fans::GetFanOutletNode(state, thisDXCoil.SupplyFanIndex);
@@ -14460,8 +14459,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             state.dataLoopNodes->Node(FanInletNode).Enthalpy =
                 PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
             if (thisDXCoil.supplyFanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
-                FanPowerCorrection = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
+                state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
+                FanPowerCorrection = state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
             } else {
                 Fans::SimulateFanComponents(state, thisDXCoil.SupplyFanName, true, thisDXCoil.SupplyFanIndex, _, FanStaticPressureRise);
                 FanPowerCorrection = Fans::GetFanPower(state, thisDXCoil.SupplyFanIndex);
@@ -14588,7 +14587,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                     inletNode.HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
                     inletNode.Enthalpy = PsyHFnTdbW(dbRated, inletNode.HumRat);
                     if (coil.supplyFanType == HVAC::FanType::SystemModel) {
-                        state.dataHVACFan->fanObjs[coil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
+                        state.dataFans->fanObjs[coil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
                     } else {
                         Fans::SimulateFanComponents(state, coil.SupplyFanName, true, coil.SupplyFanIndex, _, FanStaticPressureRise);
                     }
@@ -14664,8 +14663,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 state.dataLoopNodes->Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (thisDXCoil.supplyFanType == HVAC::FanType::SystemModel) {
-                    state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
-                    FanPowerCorrection = state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
+                    state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->simulate(state, _, FanStaticPressureRise);
+                    FanPowerCorrection = state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(state, thisDXCoil.SupplyFanName, true, thisDXCoil.SupplyFanIndex, _, FanStaticPressureRise);
                     FanPowerCorrection = Fans::GetFanPower(state, thisDXCoil.SupplyFanIndex);
@@ -15023,7 +15022,7 @@ void GetFanIndexForTwoSpeedCoil(
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
                                SimAirServingZones::CompType::Fan_System_Object) {
                         SupplyFanName = state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                        SupplyFanIndex = HVACFan::getFanObjectVectorIndex(state, SupplyFanName);
+                        SupplyFanIndex = Fans::getFanObjectVectorIndex(state, SupplyFanName);
                         supplyFanType = HVAC::FanType::SystemModel;
 
                     } else if (state.dataAirSystemsData->PrimaryAirSystems(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num ==
@@ -15979,7 +15978,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          thisDXCoil.Name,
                                                                                          thisDXCoil.DXCoilType,
-                                                                                         state.dataHVACFan->fanObjs[thisDXCoil.SupplyFanIndex]->name,
+                                                                                         state.dataFans->fanObjs[thisDXCoil.SupplyFanIndex]->name,
                                                                                          DataAirSystems::ObjectVectorOOFanSystemModel,
                                                                                          thisDXCoil.SupplyFanIndex);
             } else {

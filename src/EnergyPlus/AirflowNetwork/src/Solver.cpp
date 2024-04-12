@@ -86,7 +86,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -1372,18 +1371,18 @@ namespace AirflowNetwork {
                 HVAC::FanType fanType2 = HVAC::FanType::Invalid;
 
                 if (fanType == HVAC::FanType::SystemModel) {
-                    m_state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(m_state, fan_name));
-                    fanIndex = HVACFan::getFanObjectVectorIndex(m_state, fan_name);
+                    m_state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(m_state, fan_name));
+                    fanIndex = Fans::getFanObjectVectorIndex(m_state, fan_name);
                     if (fanIndex < 0) {
                         ShowSevereError(m_state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
                         success = false;
                     } else {
-                        flowRate = m_state.dataHVACFan->fanObjs[fanIndex]->designAirVolFlowRate;
+                        flowRate = m_state.dataFans->fanObjs[fanIndex]->designAirVolFlowRate;
                         flowRate *= m_state.dataEnvrn->StdRhoAir;
                         DisSysCompCVFData(i).FanModelFlag = true;
-                        inletNode = m_state.dataHVACFan->fanObjs[fanIndex]->inletNodeNum;
-                        outletNode = m_state.dataHVACFan->fanObjs[fanIndex]->outletNodeNum;
-                        if (m_state.dataHVACFan->fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
+                        inletNode = m_state.dataFans->fanObjs[fanIndex]->inletNodeNum;
+                        outletNode = m_state.dataFans->fanObjs[fanIndex]->outletNodeNum;
+                        if (m_state.dataFans->fanObjs[fanIndex]->speedControl == Fans::FanSystem::SpeedControlMethod::Continuous) {
                             fanType2 = HVAC::FanType::VAV;
                             VAVSystem = true;
                         } else {
@@ -10485,7 +10484,7 @@ namespace AirflowNetwork {
                 m_state.afn->DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).AirLoopNum =
                     AirflowNetworkLinkageData(i).AirLoopNum;
                 if (m_state.afn->DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
-                    m_state.dataHVACFan
+                    m_state.dataFans
                         ->fanObjs[m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                       .FanIndex]
                         ->AirLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
@@ -10897,8 +10896,8 @@ namespace AirflowNetwork {
                     break;
                 }
                 if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
-                    int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
-                    if (m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
+                    int fanIndex = Fans::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
+                    if (m_state.dataFans->fanObjs[fanIndex]->AirPathFlag) {
                         DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
                     } else {
                         OnOffFanFlag = true;
@@ -10972,8 +10971,8 @@ namespace AirflowNetwork {
         bool FanModelConstFlag = false;
         for (int i = 1; i <= DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanModelFlag) {
-                int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
-                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
+                int fanIndex = Fans::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && m_state.dataFans->fanObjs[fanIndex]->AirPathFlag) {
                     DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
                     supplyFanType = HVAC::FanType::Constant;
                     FanModelConstFlag = true;
@@ -11102,7 +11101,7 @@ namespace AirflowNetwork {
                 if (DisSysCompCVFData(typeNum).fanType == HVAC::FanType::VAV) {
                     if (DisSysCompCVFData(typeNum).FanModelFlag) {
                         DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                            m_state.dataHVACFan->fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * m_state.dataEnvrn->StdRhoAir;
+                            m_state.dataFans->fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * m_state.dataEnvrn->StdRhoAir;
                     } else {
                         Real64 FanFlow = GetFanVolFlow(m_state, DisSysCompCVFData(typeNum).FanIndex);
                         DisSysCompCVFData(typeNum).MaxAirMassFlowRate = FanFlow * m_state.dataEnvrn->StdRhoAir;

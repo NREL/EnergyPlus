@@ -69,7 +69,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -1579,7 +1578,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {
@@ -1725,7 +1724,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {
@@ -1862,7 +1861,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {
@@ -1986,7 +1985,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {
@@ -2452,7 +2451,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanHeatLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {
@@ -2571,7 +2570,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
+                                FanHeatLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::Invalid: {

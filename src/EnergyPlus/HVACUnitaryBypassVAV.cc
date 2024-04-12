@@ -73,7 +73,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -302,7 +301,7 @@ namespace HVACUnitaryBypassVAV {
 
         Real64 locFanElecPower = 0.0;
         if (changeOverByPassVAV.fanType == HVAC::FanType::SystemModel) {
-            locFanElecPower = state.dataHVACFan->fanObjs[changeOverByPassVAV.FanIndex]->fanPower();
+            locFanElecPower = state.dataFans->fanObjs[changeOverByPassVAV.FanIndex]->fanPower();
         } else {
             locFanElecPower = Fans::GetFanPower(state, changeOverByPassVAV.FanIndex);
         }
@@ -621,11 +620,11 @@ namespace HVACUnitaryBypassVAV {
                 thisCBVAV.FanVolFlow = 9999.0;
             } else {
                 if (thisCBVAV.fanType == HVAC::FanType::SystemModel) {
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisCBVAV.FanName)); // call constructor
-                    thisCBVAV.FanIndex = state.dataHVACFan->fanObjs.size() - 1;
-                    thisCBVAV.FanInletNodeNum = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
-                    fanOutletNode = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
-                    thisCBVAV.FanVolFlow = state.dataHVACFan->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
+                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, thisCBVAV.FanName)); // call constructor
+                    thisCBVAV.FanIndex = state.dataFans->fanObjs.size() - 1;
+                    thisCBVAV.FanInletNodeNum = state.dataFans->fanObjs[thisCBVAV.FanIndex]->inletNodeNum;
+                    fanOutletNode = state.dataFans->fanObjs[thisCBVAV.FanIndex]->outletNodeNum;
+                    thisCBVAV.FanVolFlow = state.dataFans->fanObjs[thisCBVAV.FanIndex]->designAirVolFlowRate;
                 } else {
                     thisCBVAV.FanIndex = Fans::GetFanIndex(state, thisCBVAV.FanName);
                     if (thisCBVAV.FanIndex == 0) {
@@ -2141,7 +2140,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (cBVAV.fanPlace == HVAC::FanPlace::BlowThru) {
             if (cBVAV.fanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
+                state.dataFans->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {
                 Fans::SimulateFanComponents(state, cBVAV.FanName, FirstHVACIteration, cBVAV.FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
             }
@@ -3421,7 +3420,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (cBVAV.fanPlace == HVAC::FanPlace::DrawThru) {
             if (cBVAV.fanType == HVAC::FanType::SystemModel) {
-                state.dataHVACFan->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
+                state.dataFans->fanObjs[cBVAV.FanIndex]->simulate(state, 1.0 / OnOffAirFlowRatio, _);
             } else {
                 Fans::SimulateFanComponents(state, cBVAV.FanName, FirstHVACIteration, cBVAV.FanIndex, state.dataHVACUnitaryBypassVAV->FanSpeedRatio);
             }

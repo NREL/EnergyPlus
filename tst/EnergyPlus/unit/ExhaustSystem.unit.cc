@@ -76,7 +76,6 @@
 
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/MixerComponent.hh>
 
 using namespace EnergyPlus;
@@ -376,8 +375,8 @@ TEST_F(EnergyPlusFixture, ExhaustSystemInputTest)
     // state->dataMixerComponent->MixerCond.allocate(2);
     // state->dataMixerComponent->MixerCond(1).MixerName = "MIXER1";
     // state->dataMixerComponent->MixerCond(2).MixerName = "MIXER2";
-    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
-    // state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
+    // state->dataFans->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan1"));
+    // state->dataFans->fanObjs.emplace_back(new HVACFan::FanSystem(*state, "CentralExhaustFan2"));
 
     ASSERT_TRUE(process_idf(idf_objects));
     ScheduleManager::ProcessScheduleInput(*state);

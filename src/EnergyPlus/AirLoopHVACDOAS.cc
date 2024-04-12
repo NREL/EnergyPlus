@@ -62,7 +62,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -526,12 +525,12 @@ namespace AirLoopHVACDOAS {
                     case ValidEquipListType::FanSystemModel:
                         thisDOAS.FanName = CompName;
                         thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_System_Object;
-                        thisDOAS.m_FanIndex = HVACFan::getFanObjectVectorIndex(state, CompName);
-                        thisOutsideAirSys.InletNodeNum(CompNum) = state.dataHVACFan->fanObjs[thisDOAS.m_FanIndex]->inletNodeNum;
+                        thisDOAS.m_FanIndex = Fans::getFanObjectVectorIndex(state, CompName);
+                        thisOutsideAirSys.InletNodeNum(CompNum) = state.dataFans->fanObjs[thisDOAS.m_FanIndex]->inletNodeNum;
                         if (thisOutsideAirSys.InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;
                         }
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = state.dataHVACFan->fanObjs[thisDOAS.m_FanIndex]->outletNodeNum;
+                        thisOutsideAirSys.OutletNodeNum(CompNum) = state.dataFans->fanObjs[thisDOAS.m_FanIndex]->outletNodeNum;
                         if (thisOutsideAirSys.OutletNodeNum(CompNum) == 0) {
                             OutletNodeErrFlag = true;
                         }
@@ -881,7 +880,7 @@ namespace AirLoopHVACDOAS {
                 std::string CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);
                 if (Util::SameString(CompType, "FAN:SYSTEMMODEL")) {
-                    state.dataHVACFan->fanObjs[this->m_FanIndex]->simulate(state);
+                    state.dataFans->fanObjs[this->m_FanIndex]->simulate(state);
                 }
                 if (Util::SameString(CompType, "FAN:COMPONENTMODEL")) {
                     Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, this->m_FanIndex);
@@ -995,7 +994,7 @@ namespace AirLoopHVACDOAS {
         this->GetDesignDayConditions(state);
 
         if (this->m_FanIndex > -1 && this->m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
-            state.dataHVACFan->fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
+            state.dataFans->fanObjs[this->m_FanIndex]->designAirVolFlowRate = sizingMassFlow / state.dataEnvrn->StdRhoAir;
             state.dataLoopNodes->Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             state.dataLoopNodes->Node(this->m_FanOutletNodeNum).MassFlowRateMax = sizingMassFlow;

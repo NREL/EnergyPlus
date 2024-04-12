@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -440,29 +439,29 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN 1";
-    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);                       // triggers sizing call
-    Real64 locFanSizeVdot = state->dataHVACFan->fanObjs[0]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain1 = state->dataHVACFan->fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    state->dataFans->fanObjs[0]->simulate(*state, _, _);                       // triggers sizing call
+    Real64 locFanSizeVdot = state->dataFans->fanObjs[0]->designAirVolFlowRate; // get function
+    Real64 locDesignHeatGain1 = state->dataFans->fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
     fanName = "TEST FAN 2";
-    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
-    state->dataHVACFan->fanObjs[1]->simulate(*state, _, _);                            // triggers sizing call
-    locFanSizeVdot = state->dataHVACFan->fanObjs[1]->designAirVolFlowRate;             // get function
-    Real64 locDesignHeatGain2 = state->dataHVACFan->fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
+    state->dataFans->fanObjs[1]->simulate(*state, _, _);                            // triggers sizing call
+    locFanSizeVdot = state->dataFans->fanObjs[1]->designAirVolFlowRate;             // get function
+    Real64 locDesignHeatGain2 = state->dataFans->fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
     fanName = "TEST FAN 3";
-    state->dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(*state, fanName)); // call constructor
+    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataHVACFan->fanObjs[2]->simulate(*state, _, _);                // triggers sizing call
-    locFanSizeVdot = state->dataHVACFan->fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = state->dataHVACFan->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    state->dataFans->fanObjs[2]->simulate(*state, _, _);                // triggers sizing call
+    locFanSizeVdot = state->dataFans->fanObjs[2]->designAirVolFlowRate; // get function
+    Real64 locDesignHeatGain3 = state->dataFans->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
 
     GetFanInput(*state);

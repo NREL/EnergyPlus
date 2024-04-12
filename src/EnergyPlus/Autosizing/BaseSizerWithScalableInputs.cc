@@ -50,7 +50,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <string>
 
 namespace EnergyPlus {
@@ -117,7 +116,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
                     state,
                     this->compName,
                     this->compType,
-                    state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
+                    state.dataFans->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
                     DataAirSystems::ObjectVectorOOFanSystemModel,
                     this->primaryAirSystem(this->curSysNum).supFanVecIndex);
             }

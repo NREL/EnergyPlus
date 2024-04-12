@@ -53,7 +53,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -296,7 +295,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             FanCoolLoad = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
                             this->dataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
                         } else if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_System_Object) {
-                            state.dataHVACFan->fanObjs[thisAirloopDOAS.m_FanIndex]->FanInputsForDesignHeatGain(
+                            state.dataFans->fanObjs[thisAirloopDOAS.m_FanIndex]->FanInputsForDesignHeatGain(
                                 state, this->deltaP, this->motEff, this->totEff, this->motInAirFrac);
                             Real64 const fanPowerTot = (DesVolFlow * this->deltaP) / this->totEff;
                             FanCoolLoad = this->motEff * fanPowerTot + (fanPowerTot - this->motEff * fanPowerTot) * this->motInAirFrac;
