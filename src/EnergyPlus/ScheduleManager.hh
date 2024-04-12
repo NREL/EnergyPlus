@@ -209,7 +209,7 @@ namespace ScheduleManager {
         // Default Constructor
         ScheduleData()
             : ScheduleTypePtr(0), WeekSchedulePointer(366, 0), Used(false), MaxMinSet(false), MaxValue(0.0), MinValue(0.0), CurrentValue(0.0),
-              EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
+              MaxMinByDayTypeSet{false}, MinByDayType{0.}, MaxByDayType{0.}, EMSActuatedOn(false), EMSValue(0.0), UseDaylightSaving(true)
         {
         }
     };
