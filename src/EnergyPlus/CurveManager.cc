@@ -2494,6 +2494,11 @@ namespace Curve {
 
                 if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
                     normalizationDivisor = fields.at("normalization_divisor").get<Real64>();
+                    if (fabs(normalizationDivisor) < std::numeric_limits<Real64>::min()) {
+                        ShowSevereError(
+                            state, format("Table:Lookup named \"{}\": Normalization divisor entered as zero, which is invalid", thisCurve->Name));
+                        ErrorsFound = true;
+                    }
                 }
 
                 std::vector<double> lookupValues;
