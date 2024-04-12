@@ -137,7 +137,7 @@ namespace DataAirSystems {
         Array1D_int LastCompIndex;  // Gives comp index in AllComp that corresponds to last subcomponent
         int NodeNumIn = 0;          // Branch inlet node number
         int NodeNumOut = 0;         // Branch outlet node number
-        DataHVACGlobals::AirDuctType DuctType = DataHVACGlobals::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
+        HVAC::AirDuctType DuctType = HVAC::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
         Array1D<AirLoopCompData> Comp;                                                 // Component list--high level components
         //  This list would include children, grandchildren, etc.
         int TotalNodes = 0;  // total number of nodes on branch
@@ -222,7 +222,7 @@ namespace DataAirSystems {
         FanModelType supFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for supply fan, legacy or new OO
         int SupFanNum = 0;       // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
         int supFanVecIndex = -1; // index in fan object vector for supply fan when model type is ObjectVectorOOFanSystemModel, zero-based index
-        DataHVACGlobals::FanPlace supFanPlace = DataHVACGlobals::FanPlace::Invalid; // location of fan relative to coil
+        HVAC::FanPlace supFanPlace = HVAC::FanPlace::Invalid; // location of fan relative to coil
         FanModelType retFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for return fan, legacy or new OO
         int RetFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
         int retFanVecIndex = -1;     // index in fan object vector for return fan when model type is ObjectVectorOOFanSystemModel, zero-based index

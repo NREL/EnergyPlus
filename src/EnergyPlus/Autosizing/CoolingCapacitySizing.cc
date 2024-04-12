@@ -121,7 +121,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         }
                     } else {
                         DesVolFlow = this->dataFlowUsedForSizing;
-                        if (DesVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
+                        if (DesVolFlow >= HVAC::SmallAirVolFlow) {
                             // each of these IFs now seem the same and can be condensed to just CoilInTemp = set() and CoilInHumRat = set()
                             if (state.dataSize->ZoneEqDXCoil) {
                                 // ATMixer has priority over Equipment OA vol flow
@@ -166,7 +166,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (DDNum > 0 && TimeStepNumAtMax > 0) {
                                 OutTemp = state.dataSize->DesDayWeath(DDNum).Temp(TimeStepNumAtMax);
                             }
-                            if (this->dataCoolCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                            if (this->dataCoolCoilType == HVAC::Coil_CoolingWaterToAirHPVSEquationFit) {
                                 OutTemp = VariableSpeedCoils::GetVSCoilRatedSourceTemp(state, this->dataCoolCoilIndex);
                             }
                             Real64 CoilInEnth = Psychrometrics::PsyHFnTdbW(CoilInTemp, CoilInHumRat);
@@ -178,9 +178,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(CoilInHumRat);
                             // adjust coil inlet/outlet temp with fan temperature rise
                             if (this->dataDesAccountForFanHeat) {
-                                if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::BlowThru) {
+                                if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                     CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
-                                } else if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::DrawThru) {
+                                } else if (state.dataSize->DataFanPlacement == HVAC::FanPlace::DrawThru) {
                                     CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 }
                             }
@@ -333,7 +333,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                                thisFinalSysSizing.CoolingTotalCapacity > 0.0) {
                         NominalCapacityDes = thisFinalSysSizing.CoolingTotalCapacity;
                         this->autoSizedValue = NominalCapacityDes;
-                    } else if (DesVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
+                    } else if (DesVolFlow >= HVAC::SmallAirVolFlow) {
                         if (DesVolFlow > 0.0) {
                             OutAirFrac = thisFinalSysSizing.DesOutAirVolFlow / DesVolFlow;
                         } else {
@@ -378,7 +378,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             if (this->dataDesInletAirHumRat > 0.0) CoilInHumRat = this->dataDesInletAirHumRat;
                         }
                         Real64 OutTemp = thisFinalSysSizing.OutTempAtCoolPeak;
-                        if (this->dataCoolCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) {
+                        if (this->dataCoolCoilType == HVAC::Coil_CoolingWaterToAirHPVSEquationFit) {
                             OutTemp = VariableSpeedCoils::GetVSCoilRatedSourceTemp(state, this->dataCoolCoilIndex);
                         }
                         CoilOutTemp = min(CoilInTemp, CoilOutTemp);
@@ -425,12 +425,12 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // adjust coil inlet/outlet temp with fan temperature rise
                         if (this->dataDesAccountForFanHeat) {
                             PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
-                            if (this->primaryAirSystem(this->curSysNum).supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+                            if (this->primaryAirSystem(this->curSysNum).supFanPlace == HVAC::FanPlace::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
                                 CoilInWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                                     state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
-                            } else if (this->primaryAirSystem(this->curSysNum).supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
+                            } else if (this->primaryAirSystem(this->curSysNum).supFanPlace == HVAC::FanPlace::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                             }
                         }
@@ -564,7 +564,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         if (this->isEpJSON) this->sizingString = "cooling_design_capacity [W]";
     }
     if (this->dataScalableCapSizingON) {
-        int const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
+        int const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(HVAC::CoolingCapacitySizing));
         if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
             this->sizingStringScalable = "(scaled by capacity / area) ";
         } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||

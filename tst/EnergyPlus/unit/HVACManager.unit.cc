@@ -481,7 +481,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
 
     state->dataFans->Fan.allocate(1);
     state->dataFans->NumFans = 1;
-    state->dataFans->Fan(1).fanType = DataHVACGlobals::FanType::Exhaust;
+    state->dataFans->Fan(1).fanType = HVAC::FanType::Exhaust;
     state->dataFans->Fan(1).OutletAirMassFlowRate = 1.0;
     state->dataFans->Fan(1).OutletAirTemp = 22.0;
     state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);

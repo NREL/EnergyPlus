@@ -230,9 +230,9 @@ namespace MixedAir {
         bool EMSOverrideOARate = false;         // if true, EMS is calling to override OA rate
         Real64 EMSOARateValue = 0.0;            // Value EMS is directing to use. [kg/s]
         int HeatRecoveryBypassControlType =
-            DataHVACGlobals::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
-        DataHVACGlobals::EconomizerStagingType EconomizerStagingType =
-            DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
+            HVAC::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
+        HVAC::EconomizerStagingType EconomizerStagingType =
+            HVAC::EconomizerStagingType::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
         bool ManageDemand = false;                                                    // Used by demand manager to manage ventilation
         Real64 DemandLimitFlowRate = 0.0;                                             // Current demand limit if demand manager is ON
         Real64 MaxOAFracBySetPoint = 0.0;                                             // The maximum OA fraction due to freezing cooling coil check

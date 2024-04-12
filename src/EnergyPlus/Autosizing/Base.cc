@@ -105,7 +105,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems;
     this->airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo;
     this->airloopDOAS = state.dataAirLoopHVACDOAS->airloopDOAS;
-    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
+    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of HVAC::cAllCoilTypes
         this->isCoilReportObject = true;
     }
     if (EnergyPlus::BaseSizer::isValidFanType(this->compType)) { // fan reports fail if compType is not a valid fan type
@@ -572,7 +572,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(EnergyPlusData &state, bool &erro
 bool BaseSizer::isValidCoilType(std::string const &_compType)
 {
     int coilNum = 0;
-    for (auto const &coilType : DataHVACGlobals::cAllCoilTypes) {
+    for (auto const &coilType : HVAC::cAllCoilTypes) {
         coilNum += 1;
         if (Util::SameString(_compType, coilType)) {
             this->coilType_Num = coilNum;
@@ -741,7 +741,7 @@ void BaseSizer::clearState()
     curSysNum = 0;
     curOASysNum = 0;
     curZoneEqNum = 0;
-    curDuctType = DataHVACGlobals::AirDuctType::Invalid;
+    curDuctType = HVAC::AirDuctType::Invalid;
     curTermUnitSizingNum = 0; // index in zone equipment vector - for single duct, IU, and PIU
     numPrimaryAirSys = 0;
     numSysSizInput = 0;
@@ -792,7 +792,7 @@ void BaseSizer::clearState()
     dataAirFlowUsedForSizing = 0.0;
     dataDesInletAirTemp = 0.0;
     dataDesAccountForFanHeat = false;
-    dataFanPlacement = DataHVACGlobals::FanPlace::Invalid;
+    dataFanPlacement = HVAC::FanPlace::Invalid;
     dataDesicRegCoil = false;
     dataHeatSizeRatio = 0.0;
     dataZoneUsedForSizing = 0;

@@ -133,7 +133,6 @@ namespace EnergyPlus::MixedAir {
 using namespace DataLoopNode;
 using namespace DataAirLoop;
 using namespace DataEnvironment;
-using namespace DataHVACGlobals;
 using namespace ScheduleManager;
 using namespace DataSizing;
 using namespace FaultsManager;
@@ -588,7 +587,7 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0)
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, CompName, FirstHVACIteration, CompressorOperation::On, 0.0, CompIndex, ContFanCycCoil);
+                    state, CompName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CompIndex, HVAC::ContFanCycCoil);
             // iterate on OA sys controller and water coil at the same time
             SimAirServingZones::SolveWaterCoilController(state,
                                                          FirstHVACIteration,
@@ -646,14 +645,14 @@ void SimOAComponent(EnergyPlusData &state,
         if (Sim) {
             Real64 AirloopPLR = 1;
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                FanOpMode = HVAC::ContFanCycCoil;
             } else {
-                if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                    FanOpMode = DataHVACGlobals::CycFanCycCoil;
+                if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::CycFanCycCoil) {
+                    FanOpMode = HVAC::CycFanCycCoil;
                 } else {
-                    FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                    FanOpMode = HVAC::ContFanCycCoil;
                 }
-                if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                if (FanOpMode == HVAC::CycFanCycCoil) {
                     // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                     // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
                     // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
@@ -800,7 +799,7 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
         bool sensLoadCtrlUnitarySystemFound = false;
         if (primaryAirSystems.EconomizerStagingCheckFlag == false) {
             OAControllerNum = Util::FindItemInList(CtrlName, state.dataMixedAir->OAController);
-            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingType == DataHVACGlobals::EconomizerStagingType::EconomizerFirst) {
+            if (state.dataMixedAir->OAController(OAControllerNum).EconomizerStagingType == HVAC::EconomizerStagingType::EconomizerFirst) {
                 for (int BranchNum = 1; BranchNum <= primaryAirSystems.NumBranches; ++BranchNum) {
                     for (int CompNum = 1; CompNum <= primaryAirSystems.Branch(BranchNum).TotalComponents; ++CompNum) {
                         if (primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num == SimAirServingZones::CompType::UnitarySystemModel) {
@@ -810,10 +809,10 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                             if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_ControlType ==
                                 UnitarySystems::UnitarySys::UnitarySysCtrlType::Load) {
                                 if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
-                                        DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                                        HVAC::CoilDX_MultiSpeedCooling ||
                                     state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
-                                        Coil_CoolingAirToAirVariableSpeed ||
-                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num == CoilDX_Cooling) {
+                                    HVAC::Coil_CoolingAirToAirVariableSpeed ||
+                                    state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                                     sensLoadCtrlUnitarySystemFound = true;
                                     break;
                                 }
@@ -1143,7 +1142,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = UnitarySystems::UnitarySys::factory(
-                    state, DataHVACGlobals::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                    state, HVAC::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
             }
         }
     }
@@ -2139,24 +2138,24 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
         state.dataMixedAir->OAController(OutAirNum).FixedMin = false;
     }
     if (lNumericBlanks(3)) {
-        state.dataMixedAir->OAController(OutAirNum).TempLim = BlankNumeric;
+        state.dataMixedAir->OAController(OutAirNum).TempLim = HVAC::BlankNumeric;
     } else {
         state.dataMixedAir->OAController(OutAirNum).TempLim = NumArray(3);
     }
 
     if (lNumericBlanks(4)) {
-        state.dataMixedAir->OAController(OutAirNum).EnthLim = BlankNumeric;
+        state.dataMixedAir->OAController(OutAirNum).EnthLim = HVAC::BlankNumeric;
     } else {
         state.dataMixedAir->OAController(OutAirNum).EnthLim = NumArray(4);
     }
     if (lNumericBlanks(5)) {
-        state.dataMixedAir->OAController(OutAirNum).DPTempLim = BlankNumeric;
+        state.dataMixedAir->OAController(OutAirNum).DPTempLim = HVAC::BlankNumeric;
     } else {
         state.dataMixedAir->OAController(OutAirNum).DPTempLim = NumArray(5);
     }
 
     if (lNumericBlanks(6)) {
-        state.dataMixedAir->OAController(OutAirNum).TempLowLim = BlankNumeric;
+        state.dataMixedAir->OAController(OutAirNum).TempLowLim = HVAC::BlankNumeric;
     } else {
         state.dataMixedAir->OAController(OutAirNum).TempLowLim = NumArray(6);
     }
@@ -2398,13 +2397,13 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     if (NumAlphas > 18) {
         if (!lAlphaBlanks(19)) {
             if (Util::SameString(AlphArray(19), "BypassWhenWithinEconomizerLimits")) {
-                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = BypassWhenWithinEconomizerLimits;
+                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = HVAC::BypassWhenWithinEconomizerLimits;
             } else if (Util::SameString(AlphArray(19), "BypassWhenOAFlowGreaterThanMinimum")) {
-                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = BypassWhenOAFlowGreaterThanMinimum;
+                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = HVAC::BypassWhenOAFlowGreaterThanMinimum;
             } else {
                 ShowWarningError(state, format("{}=\"{}\" invalid {}=\"{}\".", CurrentModuleObject, AlphArray(1), cAlphaFields(19), AlphArray(19)));
                 ShowContinueError(state, "...assuming \"BypassWhenWithinEconomizerLimits\" and the simulation continues.");
-                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = BypassWhenWithinEconomizerLimits;
+                state.dataMixedAir->OAController(OutAirNum).HeatRecoveryBypassControlType = HVAC::BypassWhenWithinEconomizerLimits;
             }
         }
     }
@@ -2412,10 +2411,10 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
     if (NumAlphas > 19) {
         if (!lAlphaBlanks(20)) {
             if (Util::SameString(AlphArray(20), "EconomizerFirst")) {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = DataHVACGlobals::EconomizerStagingType::EconomizerFirst;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = HVAC::EconomizerStagingType::EconomizerFirst;
             } else {
                 state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType =
-                    DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling;
+                    HVAC::EconomizerStagingType::InterlockedWithMechanicalCooling;
             }
         }
     }
@@ -2599,7 +2598,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanNotLockoutEcono = true;
             }
         }
-        if ((thisOAController.MaxOA - thisOAController.MinOA) < -SmallAirVolFlow) {
+        if ((thisOAController.MaxOA - thisOAController.MinOA) < -HVAC::SmallAirVolFlow) {
             ShowSevereError(state, format("For Controller:OutdoorAir: {}", thisOAController.Name));
             ShowContinueError(state,
                               format("  maximum outdoor air flow rate ({:.4R}) < minimum outdoor air flow rate ({:.4R})",
@@ -3362,7 +3361,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     bool HighHumidityOperationFlag = false; // TRUE if zone humidistat senses a high humidity condition
 
     if (AirLoopNum > 0) {
-        AirLoopCyclingFan = (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == CycFanCycCoil);
+        AirLoopCyclingFan = (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::CycFanCycCoil);
     } else {
         AirLoopCyclingFan = false;
     }
@@ -3370,7 +3369,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     this->OALimitingFactor = OALimitFactor::None; // oa controller limiting factor
 
     // Check for no flow
-    if (this->MixMassFlow <= SmallMassFlow) {
+    if (this->MixMassFlow <= HVAC::SmallMassFlow) {
 
         this->OAMassFlow = 0.0;     // outside air mass flow rate
         this->RelMassFlow = 0.0;    // relief air mass flow rate
@@ -3407,11 +3406,11 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     Real64 OutAirMinFrac = 0.0; // Local variable used to calculate min OA fraction
     if (AirLoopNum > 0) {
         auto &curAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
-        if (curAirLoopFlow.DesSupply >= SmallAirVolFlow) {
+        if (curAirLoopFlow.DesSupply >= HVAC::SmallAirVolFlow) {
             OutAirMinFrac = this->MinOAMassFlowRate / curAirLoopFlow.DesSupply;
         }
     } else {
-        if (this->MaxOA >= SmallAirVolFlow) {
+        if (this->MaxOA >= HVAC::SmallAirVolFlow) {
             OutAirMinFrac = this->MinOA / this->MaxOA;
         }
     }
@@ -4303,7 +4302,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         this->CoolCoilFreezeCheck = false;
     }
 
-    if (std::abs(this->RetTemp - this->InletTemp) > SmallTempDiff) {
+    if (std::abs(this->RetTemp - this->InletTemp) > HVAC::SmallTempDiff) {
         OutAirSignal = (this->RetTemp - this->MixSetTemp) / (this->RetTemp - this->InletTemp);
         if (this->CoolCoilFreezeCheck) {
             this->MaxOAFracBySetPoint = 0.0;
@@ -4332,7 +4331,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         EconomizerOperationFlag = false;
         EconomizerAirFlowScheduleValue = 0.0;
         HighHumidityOperationFlag = false;
-    } else if (this->MaxOA < SmallAirVolFlow) {
+    } else if (this->MaxOA < HVAC::SmallAirVolFlow) {
         OutAirSignal = OutAirMinFrac;
         EconomizerOperationFlag = false;
         EconomizerAirFlowScheduleValue = 0.0;
@@ -4395,7 +4394,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
             this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
         }
 
-        if (this->TempLowLim != BlankNumeric && this->OATemp < this->TempLowLim) {
+        if (this->TempLowLim != HVAC::BlankNumeric && this->OATemp < this->TempLowLim) {
             OutAirSignal = OutAirMinFrac;
             EconomizerOperationFlag = false;
         }
@@ -4407,7 +4406,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
                 //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                 //     if indoor humrat is less than or equal to outdoor humrat
                 if (!this->ModifyDuringHighOAMoisture &&
-                    (state.dataLoopNodes->Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
+                    (state.dataLoopNodes->Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= HVAC::SmallHumRatDiff) {
                     HighHumidityOperationFlag = false;
                 } else {
                     HighHumidityOperationFlag = true;
@@ -4433,7 +4432,7 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
     // OutAirSignal will not give exactly the correct mixed air temperature (equal to the setpoint) since
     // it was calculated using the approximate method of sensible energy balance. Now we have to get the
     // accurate result using a full mass, enthalpy and moisture balance and iteration.
-    if (OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > VerySmallMassFlow &&
+    if (OutAirSignal > OutAirMinFrac && OutAirSignal < 1.0 && this->MixMassFlow > HVAC::VerySmallMassFlow &&
         this->ControllerType == MixedAirControllerType::ControllerOutsideAir && !AirLoopNightVent) {
 
         if (AirLoopNum > 0) {
@@ -4589,10 +4588,10 @@ void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state,
         state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = false;
         this->HeatRecoveryBypassStatus = 0;
         if (EconomizerOperationFlag) {
-            if (this->HeatRecoveryBypassControlType == BypassWhenWithinEconomizerLimits) {
+            if (this->HeatRecoveryBypassControlType == HVAC::BypassWhenWithinEconomizerLimits) {
                 state.dataAirLoop->AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                 this->HeatRecoveryBypassStatus = 1;
-            } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
+            } else if (this->HeatRecoveryBypassControlType == HVAC::BypassWhenOAFlowGreaterThanMinimum) {
                 Real64 OAMassFlowMin = OutAirMinFrac * state.dataAirLoop->AirLoopFlow(AirLoopNum).DesSupply;
                 Real64 OAMassFlowActual = OASignal * this->MixMassFlow;
                 Real64 reasonablySmallMassFlow = 1e-6;
@@ -4671,7 +4670,7 @@ void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum)
     // The recirculation air and the outside air are mixed to form the mixed air stream
     state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate = state.dataMixedAir->OAMixer(OAMixerNum).OAMassFlowRate + RecircMassFlowRate;
     // Check for zero flow
-    if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+    if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= HVAC::VerySmallMassFlow) {
         state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy = state.dataMixedAir->OAMixer(OAMixerNum).RetEnthalpy;
         state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat = state.dataMixedAir->OAMixer(OAMixerNum).RetHumRat;
         state.dataMixedAir->OAMixer(OAMixerNum).MixPressure = state.dataMixedAir->OAMixer(OAMixerNum).RetPressure;
@@ -4731,14 +4730,14 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             case MixedAirControllerType::ControllerOutsideAir: {
                 CheckSysSizing(state, CurrentModuleObject, this->Name);
                 switch (state.dataSize->CurDuctType) {
-                case DataHVACGlobals::AirDuctType::Cooling: {
+                case HVAC::AirDuctType::Cooling: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                 } break;
-                case DataHVACGlobals::AirDuctType::Heating: {
+                case HVAC::AirDuctType::Heating: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
                 } break;
-                case DataHVACGlobals::AirDuctType::Main:
-                case DataHVACGlobals::AirDuctType::Other:
+                case HVAC::AirDuctType::Main:
+                case HVAC::AirDuctType::Other:
                 default: {
                     this->MaxOA = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                 } break;
@@ -4765,7 +4764,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
             }
         }
 
-        if (this->MaxOA < SmallAirVolFlow) {
+        if (this->MaxOA < HVAC::SmallAirVolFlow) {
             this->MaxOA = 0.0;
         }
 
@@ -4777,7 +4776,7 @@ void OAControllerProps::SizeOAController(EnergyPlusData &state)
         if (state.dataSize->CurSysNum > 0) {
 
             CheckSysSizing(state, CurrentModuleObject, this->Name);
-            if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= SmallAirVolFlow) {
+            if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow >= HVAC::SmallAirVolFlow) {
                 this->MinOA = min(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesOutAirVolFlow, this->MaxOA);
             } else {
                 this->MinOA = 0.0;
@@ -4912,7 +4911,7 @@ void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         state.dataLoopNodes->Node(RelNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
-        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= HVAC::VerySmallMassFlow) {
             state.dataLoopNodes->Node(MixNode).CO2 = state.dataLoopNodes->Node(RetNode).CO2;
         } else {
             state.dataLoopNodes->Node(MixNode).CO2 =
@@ -4925,7 +4924,7 @@ void UpdateOAMixer(EnergyPlusData &state, int const OAMixerNum)
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         state.dataLoopNodes->Node(RelNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
-        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= VerySmallMassFlow) {
+        if (state.dataMixedAir->OAMixer(OAMixerNum).MixMassFlowRate <= HVAC::VerySmallMassFlow) {
             state.dataLoopNodes->Node(MixNode).GenContam = state.dataLoopNodes->Node(RetNode).GenContam;
         } else {
             state.dataLoopNodes->Node(MixNode).GenContam =
@@ -5490,17 +5489,17 @@ void OAControllerProps::Checksetpoints(EnergyPlusData &state,
     // This subroutine checks the setpoints of the upper limits of temperatures, limit enthalpy
     // Limit dew point, Enthalpy curve
 
-    if (this->TempLim != BlankNumeric && this->OATemp > this->TempLim) {
+    if (this->TempLim != HVAC::BlankNumeric && this->OATemp > this->TempLim) {
         OutAirSignal = OutAirMinFrac;
         EconomizerOperationFlag = false;
     }
     // Outside air enthalpy limit
-    if (this->EnthLim != BlankNumeric && this->OAEnth > this->EnthLim) {
+    if (this->EnthLim != HVAC::BlankNumeric && this->OAEnth > this->EnthLim) {
         OutAirSignal = OutAirMinFrac;
         EconomizerOperationFlag = false;
     }
 
-    if (this->DPTempLim != BlankNumeric) {
+    if (this->DPTempLim != HVAC::BlankNumeric) {
         Real64 OADPTemp = Psychrometrics::PsyTdpFnWPb(state, this->OAHumRat, this->OAPress);
         if (OADPTemp > this->DPTempLim) {
             OutAirSignal = OutAirMinFrac;

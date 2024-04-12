@@ -81,13 +81,13 @@ namespace HVACStandAloneERV {
         std::string SupplyAirFanName;               // fan name in the supply air stream of the ERV
         int SupplyAirFanIndex;                      // index to supply air fan
         int SupplyAirFanSchPtr;                     // index to supply air fan schedule
-        DataHVACGlobals::FanType supplyAirFanType;  // parameter equivalent of fan type
+        HVAC::FanType supplyAirFanType;  // parameter equivalent of fan type
         int ExhaustAirInletNode;                    // exhaust air inlet node for the stand alone ERV
         int ExhaustAirOutletNode;                   // exhaust air outlet node for the stand alone ERV
         std::string ExhaustAirFanName;              // fan name in exhaust air stream of the ERV
         int ExhaustAirFanIndex;                     // index to exhaust air fan
         int ExhaustAirFanSchPtr;                    // index to exhaust air fan schedule
-        DataHVACGlobals::FanType exhaustAirFanType; // paramter equivalent of fan type
+        HVAC::FanType exhaustAirFanType; // paramter equivalent of fan type
         Real64 SupplyAirVolFlow;                    // volumetric flow rate through the supply side of the ERV
         Real64 ExhaustAirVolFlow;                   // volumetric flow rate through the exhaust side of the ERV
         std::string ControllerName;                 // name of the controller for the stand alone ERV
@@ -128,8 +128,8 @@ namespace HVACStandAloneERV {
         // Default Constructor
         StandAloneERVData()
             : SchedPtr(0), HeatExchangerIndex(0), HeatExchangerTypeNum(0), SupplyAirInletNode(0), SupplyAirOutletNode(0), SupplyAirFanIndex(0),
-              SupplyAirFanSchPtr(0), supplyAirFanType(DataHVACGlobals::FanType::Invalid), ExhaustAirInletNode(0), ExhaustAirOutletNode(0),
-              ExhaustAirFanIndex(0), ExhaustAirFanSchPtr(0), exhaustAirFanType(DataHVACGlobals::FanType::Invalid), SupplyAirVolFlow(0.0),
+              SupplyAirFanSchPtr(0), supplyAirFanType(HVAC::FanType::Invalid), ExhaustAirInletNode(0), ExhaustAirOutletNode(0),
+              ExhaustAirFanIndex(0), ExhaustAirFanSchPtr(0), exhaustAirFanType(HVAC::FanType::Invalid), SupplyAirVolFlow(0.0),
               ExhaustAirVolFlow(0.0), ControllerNameDefined(false), ControlledZoneNum(0), ControllerIndex(0), MaxSupAirMassFlow(0.0),
               MaxExhAirMassFlow(0.0), HighRHOAFlowRatio(1.0), DesignSAFanVolFlowRate(0.0), DesignEAFanVolFlowRate(0.0), DesignHXVolFlowRate(0.0),
               DesignSAFanMassFlowRate(0.0), DesignEAFanMassFlowRate(0.0), AirVolFlowPerFloorArea(0.0), AirVolFlowPerOccupant(0.0),

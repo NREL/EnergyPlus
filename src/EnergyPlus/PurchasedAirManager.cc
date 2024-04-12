@@ -112,7 +112,6 @@ namespace EnergyPlus::PurchasedAirManager {
 // humidity ratio are adjusted to meet the zone load.
 
 // Using/Aliasing
-using namespace DataHVACGlobals;
 using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
@@ -1436,9 +1435,9 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
 
     // Using/Aliasing
     using namespace DataSizing;
-    using DataHVACGlobals::CoolingCapacitySizing;
-    using DataHVACGlobals::HeatingAirflowSizing;
-    using DataHVACGlobals::HeatingCapacitySizing;
+    using HVAC::CoolingCapacitySizing;
+    using HVAC::HeatingAirflowSizing;
+    using HVAC::HeatingCapacitySizing;
     using Psychrometrics::CPCW;
     using Psychrometrics::CPHW;
     using Psychrometrics::PsyCpAirFnW;
@@ -1614,7 +1613,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneHeatingOnlyFan = false;
-                if (MaxHeatSensCapDes < SmallLoad) {
+                if (MaxHeatSensCapDes < HVAC::SmallLoad) {
                     MaxHeatSensCapDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -1784,7 +1783,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneCoolingOnlyFan = false;
-                if (MaxCoolTotCapDes < SmallLoad) {
+                if (MaxCoolTotCapDes < HVAC::SmallLoad) {
                     MaxCoolTotCapDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -1891,7 +1890,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 MaxHeatSensCapDes = sizerHeatingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneHeatingOnlyFan = false;
             }
-            if (MaxHeatSensCapDes < SmallLoad) {
+            if (MaxHeatSensCapDes < HVAC::SmallLoad) {
                 MaxHeatSensCapDes = 0.0;
             }
             if (IsAutoSize) {
@@ -1995,7 +1994,7 @@ void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
                 MaxCoolTotCapDes = sizerCoolingCapacity.size(state, TempSize, ErrorsFound);
                 state.dataSize->ZoneCoolingOnlyFan = false;
             }
-            if (MaxCoolTotCapDes < SmallLoad) {
+            if (MaxCoolTotCapDes < HVAC::SmallLoad) {
                 MaxCoolTotCapDes = 0.0;
             }
             if (IsAutoSize) {
@@ -2072,8 +2071,8 @@ void CalcPurchAirLoads(EnergyPlusData &state,
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using DataHVACGlobals::ForceOff;
-    using DataHVACGlobals::SmallLoad;
+    using HVAC::ForceOff;
+    using HVAC::SmallLoad;
     auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2204,7 +2203,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
 
         // Cooling operation
         if ((MinOASensOutput >= QZnCoolSP) &&
-            (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating)) {
+            (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::ThermostatType::SingleHeating)) {
             OperatingMode = OpMode::Cool;
             // Calculate supply mass flow, temp and humidity with the following constraints:
             //  Min cooling supply temp
@@ -2251,7 +2250,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                         // Calculate supply MassFlowRate based on sensible load but limit to Max Cooling Supply Air Flow Rate if specified
                         CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                         DeltaT = (state.dataLoopNodes->Node(OANodeNum).Temp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                        if (DeltaT < -SmallTempDiff) {
+                        if (DeltaT < -HVAC::SmallTempDiff) {
                             SupplyMassFlowRate = QZnCoolSP / CpAir / DeltaT;
                             if (((PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRate) ||
                                  (PurchAir(PurchAirNum).CoolingLimit == LimitType::LimitFlowRateAndCapacity)) &&
@@ -2274,7 +2273,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if (CoolOn) {
                 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MinCoolSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                if (DeltaT < -SmallTempDiff) {
+                if (DeltaT < -HVAC::SmallTempDiff) {
                     SupplyMassFlowRateForCool = QZnCoolSP / CpAir / DeltaT;
                 }
             }
@@ -2330,7 +2329,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 SupplyMassFlowRate = min(SupplyMassFlowRate, PurchAir(PurchAirNum).MaxCoolMassFlowRate);
             }
 
-            if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
+            if (SupplyMassFlowRate <= HVAC::VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
             // Calculate mixed air conditions
             CalcPurchAirMixedAir(state,
@@ -2516,7 +2515,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             // Heating or no-load operation
         } else { // Heating or no-load case
             if ((MinOASensOutput < QZnHeatSP) &&
-                (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
+                (state.dataHeatBalFanSys->TempControlType(ControlledZoneNum) != HVAC::ThermostatType::SingleCooling)) {
                 OperatingMode = OpMode::Heat;
             } else { // DeadBand mode shuts off heat recovery and economizer
                 OperatingMode = OpMode::DeadBand;
@@ -2563,7 +2562,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
             if ((HeatOn) && (OperatingMode == OpMode::Heat)) {
                 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 DeltaT = (PurchAir(PurchAirNum).MaxHeatSuppAirTemp - state.dataLoopNodes->Node(ZoneNodeNum).Temp);
-                if (DeltaT > SmallTempDiff) {
+                if (DeltaT > HVAC::SmallTempDiff) {
                     SupplyMassFlowRateForHeat = QZnHeatSP / CpAir / DeltaT;
                 }
             }
@@ -2620,7 +2619,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
                 SupplyMassFlowRate = min(SupplyMassFlowRate, PurchAir(PurchAirNum).MaxHeatMassFlowRate);
             }
 
-            if (SupplyMassFlowRate <= VerySmallMassFlow) SupplyMassFlowRate = 0.0;
+            if (SupplyMassFlowRate <= HVAC::VerySmallMassFlow) SupplyMassFlowRate = 0.0;
 
             // Calculate mixed air conditions
             CalcPurchAirMixedAir(state,
@@ -2983,7 +2982,7 @@ void CalcPurchAirMinOAMassFlow(EnergyPlusData &state,
             OAMassFlowRate = max(OAMassFlowRate, state.dataContaminantBalance->ZoneSysContDemand(ZoneNum).OutputRequiredToCO2SP);
         }
 
-        if (OAMassFlowRate <= VerySmallMassFlow) OAMassFlowRate = 0.0;
+        if (OAMassFlowRate <= HVAC::VerySmallMassFlow) OAMassFlowRate = 0.0;
 
     } else { // No outdoor air
         OAMassFlowRate = 0.0;

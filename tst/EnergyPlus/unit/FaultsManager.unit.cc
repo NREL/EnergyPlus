@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Inputs:
     FanNum = 1;
     state->dataFans->Fan(FanNum).Name = "Fan_1";
-    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
+    state->dataFans->Fan(FanNum).fanType = HVAC::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
@@ -120,7 +120,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     FanNum = 2;
     state->dataFans->Fan(FanNum).Name = "Fan_2";
-    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
+    state->dataFans->Fan(FanNum).fanType = HVAC::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
@@ -360,7 +360,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     // Inputs: fans
     FanNum = 1;
     state->dataFans->Fan(FanNum).Name = "Fan_1";
-    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
+    state->dataFans->Fan(FanNum).fanType = HVAC::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
 

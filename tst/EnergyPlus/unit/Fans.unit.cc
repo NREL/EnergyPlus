@@ -60,7 +60,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Fans;
 
 TEST_F(EnergyPlusFixture, Fans_FanSizing)
@@ -75,7 +74,7 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 
     int FanNum = 1;
     state->dataFans->Fan(FanNum).Name = "Test Fan";
-    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::OnOff;
+    state->dataFans->Fan(FanNum).fanType = HVAC::FanType::OnOff;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = AutoSize;
     state->dataFans->Fan(FanNum).DeltaPress = 500.0;
     state->dataFans->Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
@@ -111,7 +110,7 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.Name = "Test Fan";
-    thisFan.fanType = DataHVACGlobals::FanType::Constant;
+    thisFan.fanType = HVAC::FanType::Constant;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;
@@ -157,7 +156,7 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.Name = "Test Fan";
-    thisFan.fanType = DataHVACGlobals::FanType::OnOff;
+    thisFan.fanType = HVAC::FanType::OnOff;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;
@@ -203,7 +202,7 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
     thisFan.Name = "Test Fan";
-    thisFan.fanType = DataHVACGlobals::FanType::VAV;
+    thisFan.fanType = HVAC::FanType::VAV;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;

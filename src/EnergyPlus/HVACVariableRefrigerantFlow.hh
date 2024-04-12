@@ -666,13 +666,13 @@ namespace HVACVariableRefrigerantFlow {
         Real64 MaxOATSuppHeatingCoil = 0.0;     // maximum outdoor dry-bulb temperature for supplemental heating coil [C]
         Real64 SuppHeatPartLoadRatio = 0.0;     // supplemental heating coil part load ratio
         Real64 SuppHeatingCoilLoad = 0.0;       // supplemental heating coil heating load
-        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // index to fan type
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // index to fan type
         int FanOpModeSchedPtr = 0;                                            // Pointer to the correct fan operating mode schedule
         int FanAvailSchedPtr = -1;                                            // Pointer to the correct fan availability schedule
         int FanIndex = 0;                                                     // Index to fan object
         Real64 FanPower = 0.0;                                                // power reported by fan component
         int OpMode = 0; // operation mode: 1 = cycling fan, cycling coil 2 = constant fan, cycling coil
-        DataHVACGlobals::FanPlace fanPlace = DataHVACGlobals::FanPlace::Invalid; // fan placement; 1=blow through, 2=draw through
+        HVAC::FanPlace fanPlace = HVAC::FanPlace::Invalid; // fan placement; 1=blow through, 2=draw through
         Real64 ActualFanVolFlowRate = 0.0;                                       // volumetric flow rate from fan object
         std::string SuppHeatCoilType;                                            // type of supplemental heating coil
         std::string SuppHeatCoilName;                                            // name of supplemental heating coil

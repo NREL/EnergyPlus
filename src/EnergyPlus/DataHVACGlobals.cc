@@ -50,7 +50,7 @@
 
 namespace EnergyPlus {
 
-namespace DataHVACGlobals {
+namespace HVAC {
 
     // MODULE INFORMATION:
     //       MODIFIED       Craig Wray 22Aug2010 Added Fan Component Model

@@ -633,7 +633,7 @@ namespace AirLoopHVACDOAS {
                         if (thisOutsideAirSys.compPointer[CompNum] == nullptr) {
                             UnitarySystems::UnitarySys thisSys;
                             thisOutsideAirSys.compPointer[CompNum] =
-                                UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, CompName, false, 0);
+                                UnitarySystems::UnitarySys::factory(state, HVAC::UnitarySys_AnyCoilType, CompName, false, 0);
                         }
                         thisOutsideAirSys.InletNodeNum(CompNum) =
                             thisOutsideAirSys.compPointer[CompNum]->getAirInNode(state, CompName, 0, InletNodeErrFlag);

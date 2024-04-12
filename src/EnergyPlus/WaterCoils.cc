@@ -120,7 +120,6 @@ namespace EnergyPlus::WaterCoils {
 // manage the WaterCoil System Component
 
 using namespace DataLoopNode;
-using namespace DataHVACGlobals;
 
 using FluidProperties::GetDensityGlycol;
 using FluidProperties::GetSpecificHeatGlycol;
@@ -199,7 +198,7 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
     if (present(FanOpMode)) {
         OpMode = FanOpMode;
     } else {
-        OpMode = ContFanCycCoil;
+        OpMode = HVAC::ContFanCycCoil;
     }
     if (present(PartLoadRatio)) {
         PartLoadFrac = PartLoadRatio;
@@ -1020,14 +1019,14 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 std::string const &CompName = state.dataWaterCoils->WaterCoil(tempCoilNum).Name;
                 if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
-                    CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater);
+                    CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater);
                 } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType ==
                            DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
-                    CompType = cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
+                    CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWaterDetailed);
                 } else if (state.dataWaterCoils->WaterCoil(tempCoilNum).WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                     CoilTypeNum = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
-                    CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+                    CompType = HVAC::cAllCoilTypes(HVAC::Coil_HeatingWater);
                 }
                 WaterCoilOnAirLoop = true;
                 SimAirServingZones::CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
@@ -1266,9 +1265,9 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                             // update outlet air conditions used for sizing
                             std::string CompType;
                             if (waterCoil.WaterCoilModel == CoilModel::CoolingDetailed) {
-                                CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);
+                                CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWaterDetailed);
                             } else {
-                                CompType = cAllCoilTypes(Coil_CoolingWater);
+                                CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater);
                             }
                             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(
                                 state, waterCoil.Name, CompType, state.dataWaterCoils->TOutNew);
@@ -1468,7 +1467,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 int FanOpMode;
                 Real64 PartLoadRatio;
 
-                FanOpMode = ContFanCycCoil;
+                FanOpMode = HVAC::ContFanCycCoil;
                 PartLoadRatio = 1.0;
                 auto &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
                 waterCoil.UACoilExternal = UA;
@@ -1547,21 +1546,21 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
         state.dataWaterCoils->CMin = min(CapacitanceAir, state.dataWaterCoils->CapacitanceWater);
         if (state.dataWaterCoils->CMin > 0.0) {
             if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
-                CoolingCoil(state, CoilNum, FirstHVACIteration, state.dataWaterCoils->DesignCalc, ContFanCycCoil, 1.0);
+                CoolingCoil(state, CoilNum, FirstHVACIteration, state.dataWaterCoils->DesignCalc, HVAC::ContFanCycCoil, 1.0);
                 state.dataWaterCoils->CoilEffectiveness = (waterCoil.InletAirTemp - waterCoil.OutletAirTemp) /
                                                           (waterCoil.InletAirTemp - waterCoil.InletWaterTemp) *
                                                           (CapacitanceAir / state.dataWaterCoils->CMin);
                 state.dataWaterCoils->RatedLatentCapacity = waterCoil.TotWaterCoolingCoilRate - waterCoil.SenWaterCoolingCoilRate;
                 state.dataWaterCoils->RatedSHR = waterCoil.SenWaterCoolingCoilRate / waterCoil.TotWaterCoolingCoilRate;
             } else if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
-                CalcDetailFlatFinCoolingCoil(state, CoilNum, state.dataWaterCoils->DesignCalc, ContFanCycCoil, 1.0);
+                CalcDetailFlatFinCoolingCoil(state, CoilNum, state.dataWaterCoils->DesignCalc, HVAC::ContFanCycCoil, 1.0);
                 state.dataWaterCoils->CoilEffectiveness = (waterCoil.InletAirTemp - waterCoil.OutletAirTemp) /
                                                           (waterCoil.InletAirTemp - waterCoil.InletWaterTemp) *
                                                           (CapacitanceAir / state.dataWaterCoils->CMin);
                 state.dataWaterCoils->RatedLatentCapacity = waterCoil.TotWaterCoolingCoilRate - waterCoil.SenWaterCoolingCoilRate;
                 state.dataWaterCoils->RatedSHR = waterCoil.SenWaterCoolingCoilRate / waterCoil.TotWaterCoolingCoilRate;
             } else if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-                CalcSimpleHeatingCoil(state, CoilNum, ContFanCycCoil, 1.0, state.dataWaterCoils->DesignCalc);
+                CalcSimpleHeatingCoil(state, CoilNum, HVAC::ContFanCycCoil, 1.0, state.dataWaterCoils->DesignCalc);
                 state.dataWaterCoils->CoilEffectiveness = (waterCoil.OutletAirTemp - waterCoil.InletAirTemp) /
                                                           (waterCoil.InletWaterTemp - waterCoil.InletAirTemp) *
                                                           (CapacitanceAir / state.dataWaterCoils->CMin);
@@ -1758,13 +1757,13 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
             std::string coilTypeName(" ");
             // calculate coil sim model at rating point, full load, continuous fan
             if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
-                CalcDetailFlatFinCoolingCoil(state, CoilNum, state.dataWaterCoils->SimCalc, ContFanCycCoil, 1.0);
+                CalcDetailFlatFinCoolingCoil(state, CoilNum, state.dataWaterCoils->SimCalc, HVAC::ContFanCycCoil, 1.0);
                 coilTypeName = "Coil:Cooling:Water:DetailedGeometry";
             } else if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
-                CoolingCoil(state, CoilNum, FirstHVACIteration, state.dataWaterCoils->SimCalc, ContFanCycCoil, 1.0);
+                CoolingCoil(state, CoilNum, FirstHVACIteration, state.dataWaterCoils->SimCalc, HVAC::ContFanCycCoil, 1.0);
                 coilTypeName = "Coil:Cooling:Water";
             } else if (waterCoil.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
-                CalcSimpleHeatingCoil(state, CoilNum, ContFanCycCoil, 1.0, state.dataWaterCoils->SimCalc);
+                CalcSimpleHeatingCoil(state, CoilNum, HVAC::ContFanCycCoil, 1.0, state.dataWaterCoils->SimCalc);
                 coilTypeName = "Coil:Heating:Water";
             }
 
@@ -2082,9 +2081,9 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             state.dataSize->DataWaterLoopNum = waterCoil.WaterPlantLoc.loopNum;
 
             if (waterCoil.WaterCoilModel == CoilModel::CoolingDetailed) { // 'DETAILED FLAT FIN'
-                CompType = cAllCoilTypes(Coil_CoolingWaterDetailed);      // Coil:Cooling:Water:DetailedGeometry
+                CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWaterDetailed);      // Coil:Cooling:Water:DetailedGeometry
             } else {
-                CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
+                CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater); // Coil:Cooling:Water
             }
 
             bool bPRINT = false; // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
@@ -2472,7 +2471,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             bool bPRINT = false;                         // do not print this sizing request
             TempSize = DataSizing::AutoSize;             // get the autosized air volume flow rate for use in other calculations
             SizingString.clear();                        // doesn't matter
-            CompType = cAllCoilTypes(Coil_HeatingWater); // "Coil:Heating:Water"
+            CompType = HVAC::cAllCoilTypes(HVAC::Coil_HeatingWater); // "Coil:Heating:Water"
             std::string const &CompName = waterCoil.Name;
             if (waterCoil.DesiccantRegenerationCoil) {
                 state.dataSize->DataDesicRegCoil = true;
@@ -2546,7 +2545,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             TempSize = waterCoil.MaxWaterVolFlowRate;
 
             if (waterCoil.CoilPerfInpMeth == state.dataWaterCoils->NomCap && NomCapUserInp) {
-                if (waterCoil.DesTotWaterCoilLoad > SmallLoad) {
+                if (waterCoil.DesTotWaterCoilLoad > HVAC::SmallLoad) {
                     waterCoil.MaxWaterVolFlowRate =
                         state.dataSize->DataCapacityUsedForSizing / (Cp * rho * (waterCoil.DesInletWaterTemp - waterCoil.DesOutletWaterTemp));
                 } else {
@@ -2648,7 +2647,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             bPRINT = true; // report to eio the UA value
             SizingString = state.dataWaterCoils->WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [W/K]";
             state.dataSize->DataCoilNum = CoilNum;
-            state.dataSize->DataFanOpMode = ContFanCycCoil;
+            state.dataSize->DataFanOpMode = HVAC::ContFanCycCoil;
             if (waterCoil.CoilPerfInpMeth == state.dataWaterCoils->NomCap && NomCapUserInp) {
                 TempSize = DataSizing::AutoSize;
             } else {
@@ -2657,7 +2656,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
 
             state.dataSize->DataFlowUsedForSizing = waterCoil.InletAirMassFlowRate;
             DesCoilWaterInTempSaved = state.dataWaterCoils->WaterCoil(state.dataSize->DataCoilNum).InletWaterTemp;
-            if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
+            if (DesCoilWaterInTempSaved < HVAC::DesCoilHWInletTempMin) {
                 // at low coil design water inlet temp, sizing has convergence issue hence slightly higher water inlet temperature
                 // is estimated in "EstimateCoilInletWaterTemp" and used for UA autosizing only
                 EstimateCoilInletWaterTemp(state,
@@ -2673,7 +2672,7 @@ void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
             WaterHeatingCoilUASizer sizerHWCoilUA;
             sizerHWCoilUA.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
             waterCoil.UACoil = sizerHWCoilUA.size(state, TempSize, ErrorsFound);
-            if (DesCoilWaterInTempSaved < DesCoilHWInletTempMin) {
+            if (DesCoilWaterInTempSaved < HVAC::DesCoilHWInletTempMin) {
                 ShowWarningError(state, format("Autosizing of heating coil UA for Coil:Heating:Water \"{}\"", CompName));
                 ShowContinueError(state,
                                   format(" Plant design loop exit temperature = {:.2T} C",
@@ -2812,7 +2811,7 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
     TempWaterIn = waterCoil.InletWaterTemp;
 
     // adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         if (PartLoadRatio > 0.0) {
             AirMassFlow = waterCoil.InletAirMassFlowRate / PartLoadRatio;
             WaterMassFlowRate = min(waterCoil.InletWaterMassFlowRate / PartLoadRatio, waterCoil.MaxWaterMassFlowRate);
@@ -2885,7 +2884,7 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
         waterCoil.OutletWaterMassFlowRate = 0.0;
     }
 
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         HeatingCoilLoad *= PartLoadRatio;
     }
 
@@ -3049,7 +3048,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
     TempWaterIn = waterCoil.InletWaterTemp;
 
     //  adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         if (PartLoadRatio > 0.0) {
             AirMassFlow = waterCoil.InletAirMassFlowRate / PartLoadRatio;
             WaterMassFlowRate = min(waterCoil.InletWaterMassFlowRate / PartLoadRatio, waterCoil.MaxWaterMassFlowRate);
@@ -3505,7 +3504,7 @@ void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
             SenWaterCoilLoad = AirMassFlow * (PsyCpAirFnW(InletAirHumRat) * TempAirIn - PsyCpAirFnW(OutletAirHumRat) * TempAirOut) * ConvK;
         }
 
-        if (FanOpMode == CycFanCycCoil) {
+        if (FanOpMode == HVAC::CycFanCycCoil) {
             TotWaterCoilLoad *= PartLoadRatio;
             SenWaterCoilLoad *= PartLoadRatio;
         }
@@ -3599,7 +3598,7 @@ void CoolingCoil(EnergyPlusData &state,
     SurfAreaWetFraction = 0.0;  // Fraction of surface area wet
 
     auto &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
-    if (FanOpMode == CycFanCycCoil && PartLoadRatio > 0.0) { // FB Start
+    if (FanOpMode == HVAC::CycFanCycCoil && PartLoadRatio > 0.0) { // FB Start
         AirMassFlowRate = waterCoil.InletAirMassFlowRate / PartLoadRatio;
     } else {
         AirMassFlowRate = waterCoil.InletAirMassFlowRate;
@@ -3727,7 +3726,7 @@ void CoolingCoil(EnergyPlusData &state,
         waterCoil.OutletWaterTemp = OutletWaterTemp;
         // Report output results if the coil was operating
 
-        if (FanOpMode == CycFanCycCoil) {
+        if (FanOpMode == HVAC::CycFanCycCoil) {
             TotWaterCoilLoad *= PartLoadRatio;
             SenWaterCoilLoad *= PartLoadRatio;
         }
@@ -3802,7 +3801,7 @@ void CoilCompletelyDry(EnergyPlusData &state,
 
     auto const &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
     //  adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         if (PartLoadRatio > 0.0) {
             AirMassFlow = waterCoil.InletAirMassFlowRate / PartLoadRatio;
             WaterMassFlowRate = min(waterCoil.InletWaterMassFlowRate / PartLoadRatio, waterCoil.MaxWaterMassFlowRate);
@@ -3923,7 +3922,7 @@ void CoilCompletelyWet(EnergyPlusData &state,
 
     auto const &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
     //  adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         if (PartLoadRatio > 0.0) {
             AirMassFlow = waterCoil.InletAirMassFlowRate / PartLoadRatio;
             WaterMassFlowRate = min(waterCoil.InletWaterMassFlowRate / PartLoadRatio, waterCoil.MaxWaterMassFlowRate);
@@ -6268,13 +6267,13 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
     Real64 Cp;
 
     UA = UAMax;
-    DesCoilInletWaterTempUsed = DesCoilHWInletTempMin;
+    DesCoilInletWaterTempUsed = HVAC::DesCoilHWInletTempMin;
     auto const &waterCoil = state.dataWaterCoils->WaterCoil(CoilNum);
     TempAirIn = waterCoil.InletAirTemp;
     Win = waterCoil.InletAirHumRat;
     TempWaterIn = waterCoil.InletWaterTemp;
     // adjust mass flow rates for cycling fan cycling coil operation
-    if (FanOpMode == CycFanCycCoil) {
+    if (FanOpMode == HVAC::CycFanCycCoil) {
         if (PartLoadRatio > 0.0) {
             AirMassFlow = waterCoil.InletAirMassFlowRate / PartLoadRatio;
             WaterMassFlowRate = min(waterCoil.InletWaterMassFlowRate / PartLoadRatio, waterCoil.MaxWaterMassFlowRate);
@@ -6331,7 +6330,7 @@ void EstimateCoilInletWaterTemp(EnergyPlusData &state,
         // this formulation assumes coil effectiveness of 0.80 to increase the estimated coil water inlet temperatures
         DesCoilInletWaterTempUsed = CapacitanceAir * (TempAirOut - TempAirIn) / (CapacitanceMin * EffectivenessMaxAssumed) + TempAirIn;
         // water coil should not be sized at coil water inlet temperature lower than 46.0C (for convergence problem in Regulafalsi)
-        DesCoilInletWaterTempUsed = max(DesCoilInletWaterTempUsed, DesCoilHWInletTempMin);
+        DesCoilInletWaterTempUsed = max(DesCoilInletWaterTempUsed, HVAC::DesCoilHWInletTempMin);
     }
 }
 

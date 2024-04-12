@@ -109,10 +109,10 @@ namespace EnergyPlus::PoweredInductionUnits {
 
 // Using/Aliasing
 using namespace DataLoopNode;
-using DataHVACGlobals::SmallAirVolFlow;
-using DataHVACGlobals::SmallLoad;
-using DataHVACGlobals::SmallMassFlow;
-using DataHVACGlobals::SmallTempDiff;
+using HVAC::SmallAirVolFlow;
+using HVAC::SmallLoad;
+using HVAC::SmallMassFlow;
+using HVAC::SmallTempDiff;
 using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
@@ -408,7 +408,7 @@ void GetPIUs(EnergyPlusData &state)
         // find fan type
         // test if Fan:SystemModel fan of this name exists
         if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
-            thisPIU.fanType = DataHVACGlobals::FanType::SystemModel;
+            thisPIU.fanType = HVAC::FanType::SystemModel;
             state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
             thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
             thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
@@ -419,7 +419,7 @@ void GetPIUs(EnergyPlusData &state)
                 ErrorsFound = true;
             } else {
                 thisPIU.fanType = Fans::GetFanType(state, thisPIU.Fan_Index);
-                assert(thisPIU.fanType == DataHVACGlobals::FanType::Constant);
+                assert(thisPIU.fanType == HVAC::FanType::Constant);
                 thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisPIU.Fan_Index);
             }
         }
@@ -638,7 +638,7 @@ void GetPIUs(EnergyPlusData &state)
         // find fan type
         // test if Fan:SystemModel fan of this name exists
         if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
-            thisPIU.fanType = DataHVACGlobals::FanType::SystemModel;
+            thisPIU.fanType = HVAC::FanType::SystemModel;
             state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
             thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
             thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
@@ -1651,9 +1651,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
-            if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
+            if (thisPIU.fanType == HVAC::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-            } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
+            } else if (thisPIU.fanType == HVAC::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
             }
@@ -1696,9 +1696,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
     // fire the fan
-    if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
+    if (thisPIU.fanType == HVAC::FanType::SystemModel) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-    } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
+    } else if (thisPIU.fanType == HVAC::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // the heating load seen by the reheat coil [W]
@@ -1707,7 +1707,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                            (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     // check if heating coil is off
     if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
@@ -1925,9 +1925,9 @@ void CalcParallelPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
 
-            if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
+            if (thisPIU.fanType == HVAC::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-            } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
+            } else if (thisPIU.fanType == HVAC::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
             }
@@ -1974,9 +1974,9 @@ void CalcParallelPIU(EnergyPlusData &state,
     // now that inlet airflows have been set, the terminal box components can be simulated.
     // fire the fan
 
-    if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
+    if (thisPIU.fanType == HVAC::FanType::SystemModel) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-    } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
+    } else if (thisPIU.fanType == HVAC::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // fire the mixer
@@ -1987,7 +1987,7 @@ void CalcParallelPIU(EnergyPlusData &state,
                            (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     // check if heating coil is off
     if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }

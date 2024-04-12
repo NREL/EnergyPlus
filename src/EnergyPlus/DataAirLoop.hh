@@ -86,7 +86,7 @@ namespace DataAirLoop {
         Array1D_int TermUnitHeatInletNodes;                   // Air terminal unit heating inlet node numbers for this air loop
         Array1D_int TermUnitCoolSizingIndex;                  // Air terminal sizing numbers for zones cooled by this air loop
         Array1D_int TermUnitHeatSizingIndex;                  // Air terminal sizing numbers for zones heated by this air loop
-        Array1D<DataHVACGlobals::AirDuctType> SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
+        Array1D<HVAC::AirDuctType> SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
     };
 
     struct AirLoopOutsideAirConnectData

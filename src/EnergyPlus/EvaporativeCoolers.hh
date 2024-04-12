@@ -243,7 +243,7 @@ namespace EvaporativeCoolers {
         int OAInletNodeNum;    // outdoor air inlet node index
         int UnitOutletNodeNum; // Unit air outlet (to zone) node index
         int UnitReliefNodeNum; // Unit relief air (from zone) node index (optional)
-        DataHVACGlobals::FanType fanType;
+        HVAC::FanType fanType;
         std::string FanName;
         int FanIndex;
         Real64 ActualFanVolFlowRate;
@@ -255,7 +255,7 @@ namespace EvaporativeCoolers {
         Real64 DesignAirMassFlowRate;
         Real64 DesignFanSpeedRatio;
         Real64 FanSpeedRatio;
-        DataHVACGlobals::FanPlace fanPlace;
+        HVAC::FanPlace fanPlace;
         ControlType ControlSchemeType;
         Real64 TimeElapsed;
         Real64 ThrottlingRange; // temperature range for hystersis type tstat contorl [Delta C]
@@ -308,9 +308,9 @@ namespace EvaporativeCoolers {
         // Default Constructor
         ZoneEvapCoolerUnitStruct()
             : ZoneNodeNum(0), AvailSchedIndex(0), UnitIsAvailable(false), FanAvailStatus(0), OAInletNodeNum(0), UnitOutletNodeNum(0),
-              UnitReliefNodeNum(0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0),
+              UnitReliefNodeNum(0), fanType(HVAC::FanType::Invalid), FanIndex(0), ActualFanVolFlowRate(0.0), FanAvailSchedPtr(0),
               FanInletNodeNum(0), FanOutletNodeNum(0), OpMode(0), DesignAirVolumeFlowRate(0.0), DesignAirMassFlowRate(0.0), DesignFanSpeedRatio(0.0),
-              FanSpeedRatio(0.0), fanPlace(DataHVACGlobals::FanPlace::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0),
+              FanSpeedRatio(0.0), fanPlace(HVAC::FanPlace::Invalid), ControlSchemeType(ControlType::Invalid), TimeElapsed(0.0),
               ThrottlingRange(0.0), IsOnThisTimestep(false), WasOnLastTimestep(false), ThresholdCoolingLoad(0.0),
               EvapCooler_1_Type_Num(EvapCoolerType::Invalid), EvapCooler_1_Index(0), EvapCooler_1_AvailStatus(false),
               EvapCooler_2_Type_Num(EvapCoolerType::Invalid), EvapCooler_2_Index(0), EvapCooler_2_AvailStatus(false), OAInletRho(0.0), OAInletCp(0.0),

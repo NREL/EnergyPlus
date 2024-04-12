@@ -67,7 +67,6 @@
 using namespace EnergyPlus;
 using namespace HVACStandAloneERV;
 using namespace DataHeatBalance;
-using namespace DataHVACGlobals;
 using namespace DataZoneEquipment;
 using namespace DataSizing;
 using namespace Fans;
@@ -115,7 +114,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHeatBal->Zone(1).Name = state->dataZoneEquip->ZoneEquipConfig(1).ZoneName;
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->CurZoneEqNum = 1;
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
 
     state->dataHeatBal->TotPeople = 2; // Total number of people statements
     state->dataHeatBal->People.allocate(state->dataHeatBal->TotPeople);
@@ -133,10 +132,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).supplyAirFanType = DataHVACGlobals::FanType::OnOff;
+    state->dataHVACStandAloneERV->StandAloneERV(1).supplyAirFanType = HVAC::FanType::OnOff;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = "ERV SUPPLY FAN";
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).exhaustAirFanType = DataHVACGlobals::FanType::OnOff;
+    state->dataHVACStandAloneERV->StandAloneERV(1).exhaustAirFanType = HVAC::FanType::OnOff;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -227,7 +226,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.0;
@@ -252,7 +251,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 0.01;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 0.0;

@@ -86,7 +86,6 @@ using namespace DataEnvironment;
 using namespace DataHeatBalance;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::FanCoilUnits;
@@ -243,19 +242,19 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.m_MinOATCompressorCooling = -10.0;
     thisUnit.m_sysType = UnitarySystems::UnitarySys::SysType::Unitary;
     thisUnit.m_FanName = "TEST FAN";
-    thisUnit.m_FanType = DataHVACGlobals::FanType::OnOff;
+    thisUnit.m_FanType = HVAC::FanType::OnOff;
     thisUnit.m_CoolingCoilName = "COOLINGCOIL";
     thisUnit.m_HeatingCoilName = "HEATINGCOIL";
-    thisUnit.m_CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-    thisUnit.m_HeatingCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+    thisUnit.m_CoolingCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
+    thisUnit.m_HeatingCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     thisUnit.m_CoolingCoilIndex = 1;
     thisUnit.m_HeatingCoilIndex = 2;
     thisUnit.m_FanIndex = 1;
     thisUnit.m_SysAvailSchedPtr = 1;
     thisUnit.m_FanAvailSchedPtr = 1;
-    thisUnit.m_FanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    thisUnit.m_FanPlace = HVAC::FanPlace::BlowThru;
     // ensure constant fan mode is used
-    thisUnit.m_FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    thisUnit.m_FanOpMode = HVAC::ContFanCycCoil;
     state->dataUnitarySystems->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
     state->dataUnitarySystems->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
     state->dataUnitarySystems->unitarySys.push_back(thisUnit);
@@ -286,7 +285,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 1;
     Real64 PLR = 0.0;
-    DataHVACGlobals::CompressorOperation CompressorOnFlag = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOnFlag = HVAC::CompressorOperation::On;
     state->dataGlobal->BeginEnvrnFlag = true;
 
     auto &SZVAVModel(thisUnit);
@@ -502,7 +501,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    CompressorOperation CompressorOnFlag(CompressorOperation::Off);
+    HVAC::CompressorOperation CompressorOnFlag(HVAC::CompressorOperation::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -662,7 +661,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     EXPECT_TRUE(compare_enums(CCM::ASHRAE, thisFanCoil.CapCtrlMeth_Num));
     EXPECT_EQ("OUTDOORAIR:MIXER", thisFanCoil.OAMixType);
-    EXPECT_EQ((int)DataHVACGlobals::FanType::OnOff, (int)thisFanCoil.fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)thisFanCoil.fanType);
     EXPECT_EQ("COIL:COOLING:WATER", thisFanCoil.CCoilType);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisFanCoil.HCoilType);
     state->dataPlnt->TotNumLoops = 1;
@@ -765,7 +764,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = CompressorOperation::Off;
+    CompressorOnFlag = HVAC::CompressorOperation::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

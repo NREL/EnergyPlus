@@ -106,7 +106,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     NominalCapacityDes = this->dataCoolCoilCap;
                     DesVolFlow = this->dataFlowUsedForSizing;
                 } else if (int(this->finalZoneSizing.size()) > 0 &&
-                           this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
+                           this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow >= HVAC::SmallMassFlow) {
                     if (this->dataFlowUsedForSizing > 0.0) {
                         DesVolFlow = this->dataFlowUsedForSizing;
                     }
@@ -224,21 +224,21 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     } else if (this->unitarySysEqSizing(this->curSysNum).HeatingAirFlow) {
                         DesVolFlow = this->unitarySysEqSizing(this->curSysNum).HeatingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
+                        if (this->curDuctType == HVAC::AirDuctType::Main) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Cooling) {
                             if (this->finalSysSizing(this->curSysNum).SysAirMinFlowRat > 0.0 && !this->dataDesicRegCoil) {
                                 DesVolFlow =
                                     this->finalSysSizing(this->curSysNum).SysAirMinFlowRat * this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             } else {
                                 DesVolFlow = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
                             }
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Heating) {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
                         } else {
                             DesVolFlow = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -316,7 +316,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             !Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                             NominalCapacityDes = this->unitaryHeatCap;
                         } else {
-                            if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                            if (DesCoilLoad >= HVAC::SmallLoad) {
                                 NominalCapacityDes = DesCoilLoad;
                             } else {
                                 NominalCapacityDes = 0.0;
@@ -334,7 +334,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 } else {
                     if (this->dataCoolCoilCap > 0.0) { // this line can't get executed with same logic above else
                         NominalCapacityDes = this->dataCoolCoilCap;
-                    } else if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                    } else if (DesCoilLoad >= HVAC::SmallLoad) {
                         NominalCapacityDes = DesCoilLoad;
                     } else {
                         NominalCapacityDes = 0.0;
@@ -436,7 +436,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
         }
     }
     if (this->dataScalableCapSizingON) {
-        switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing)) {
+        switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(HVAC::HeatingCapacitySizing)) {
         case DataSizing::CapacityPerFloorArea: {
             this->sizingStringScalable = "(scaled by capacity / area) ";
         } break;

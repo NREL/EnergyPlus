@@ -107,7 +107,7 @@ protected:
         state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(state->dataGlobal->NumOfZones);
         state->dataZoneEquip->ZoneEquipList.allocate(state->dataGlobal->NumOfZones);
-        state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, DataHVACGlobals::NoAction);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(state->dataGlobal->NumOfZones, HVAC::NoAction);
         state->dataHeatBal->Zone(1).Name = "EAST ZONE";
         state->dataZoneEquip->NumOfZoneEquipLists = 1;
         state->dataHeatBal->Zone(1).IsControlled = true;
@@ -232,19 +232,19 @@ protected:
         state->dataHeatBal->HeatReclaimDXCoil.allocate(1);
 
         cbvav.DXCoolCoilName = "MyDXCoolCoil";
-        state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+        state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
         state->dataHeatingCoils->HeatingCoil.allocate(1);
         state->dataHeatingCoils->HeatingCoilNumericFields.allocate(1);
         state->dataHeatingCoils->HeatingCoilNumericFields(1).FieldNames.allocate(20);
         state->dataHeatingCoils->HeatingCoil(1).Name = "MyHeatingCoil";
-        state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+        state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num = HVAC::Coil_HeatingElectric;
         state->dataHeatingCoils->NumHeatingCoils = 1;
         state->dataHeatingCoils->ValidSourceType.dimension(state->dataHeatingCoils->NumHeatingCoils, false);
         state->dataHeatingCoils->GetCoilsInputFlag = false;
         state->dataSize->UnitarySysEqSizing.allocate(1);
         cbvav.HeatCoilName = "MyHeatingCoil";
-        cbvav.CoolCoilType = DataHVACGlobals::CoilType::DXCoolingSingleSpeed;
-        cbvav.HeatCoilType = DataHVACGlobals::CoilType::HeatingElectric;
+        cbvav.CoolCoilType = HVAC::CoilType::DXCoolingSingleSpeed;
+        cbvav.HeatCoilType = HVAC::CoilType::HeatingElectric;
         cbvav.minModeChangeTime = 0.0;
         cbvav.AirInNode = 1;
         cbvav.AirOutNode = 2;
@@ -729,7 +729,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = DataSizing::AutoSize;
     state->dataDXCoils->DXCoil(1).RatedTotCap(1) = DataSizing::AutoSize;
 
-    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil;           // must set one type of fan operating mode to initialize CalcSetPointTempTarget
+    cbvav.OpMode = HVAC::CycFanCycCoil;           // must set one type of fan operating mode to initialize CalcSetPointTempTarget
     state->dataLoopNodes->Node(cbvav.AirInNode).Temp = 24.0; // initialize inlet node temp used to initialize CalcSetPointTempTarget
     cbvav.AirLoopNumber = 1;
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
@@ -777,7 +777,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
 
-    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
+    cbvav.OpMode = HVAC::CycFanCycCoil; // set fan operating mode
     cbvav.AirLoopNumber = 1;
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
@@ -872,7 +872,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
 
-    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
+    cbvav.OpMode = HVAC::CycFanCycCoil; // set fan operating mode
     cbvav.AirLoopNumber = 1;
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
@@ -962,7 +962,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRateMax = 0.61;
     state->dataLoopNodes->Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
 
-    cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
+    cbvav.OpMode = HVAC::CycFanCycCoil; // set fan operating mode
 
     HVACUnitaryBypassVAV::InitCBVAV(*state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, 0);

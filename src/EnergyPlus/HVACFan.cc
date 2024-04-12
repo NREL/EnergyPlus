@@ -223,7 +223,7 @@ namespace HVACFan {
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
-        sizerSystemAirFlow.initializeWithinEP(state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, bPRINT, routineName);
+        sizerSystemAirFlow.initializeWithinEP(state, HVAC::fanTypeNames[(int)m_fanType], name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
         state.dataSize->DataAutosizable = true; // should be false?
@@ -257,7 +257,7 @@ namespace HVACFan {
 
             // report design power
             BaseSizer::reportSizerOutput(
-                state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, "Design Electric Power Consumption [W]", designElecPower);
+                state, HVAC::fanTypeNames[(int)m_fanType], name, "Design Electric Power Consumption [W]", designElecPower);
 
         } // end if power was autosized
 
@@ -294,7 +294,7 @@ namespace HVACFan {
         Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
         m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, DataHVACGlobals::fanTypeNames[(int)m_fanType]);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, HVAC::fanTypeNames[(int)m_fanType]);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, name, m_fanTotalEff);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, name, deltaPress);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, name, designAirVolFlowRate);
@@ -367,7 +367,7 @@ namespace HVACFan {
     FanSystem::FanSystem(EnergyPlusData &state, std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), m_numSpeeds(0), fanIsSecondaryDriver(false),
-          m_fanType(DataHVACGlobals::FanType::Invalid), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0),
+          m_fanType(HVAC::FanType::Invalid), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0),
           m_motorInAirFrac(0.0), m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
           m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
@@ -422,7 +422,7 @@ namespace HVACFan {
 
         name = alphaArgs(1);
         // TODO how to check for unique names across objects during get input?
-        m_fanType = DataHVACGlobals::FanType::SystemModel;
+        m_fanType = HVAC::FanType::SystemModel;
         if (isAlphaFieldBlank(2)) {
             availSchedIndex = ScheduleManager::ScheduleAlwaysOn;
         } else {

@@ -101,9 +101,9 @@ namespace EnergyPlus::Pumps {
 // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 // Using/Aliasing
-using DataHVACGlobals::CycleOn;
-using DataHVACGlobals::ForceOff;
-using DataHVACGlobals::SmallWaterVolFlow;
+using HVAC::CycleOn;
+using HVAC::ForceOff;
+using HVAC::SmallWaterVolFlow;
 using DataLoopNode::ObjectIsNotParent;
 
 static constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {

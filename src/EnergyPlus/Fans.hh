@@ -78,7 +78,7 @@ namespace Fans {
         // Members
         std::string Name;                                                     // Name of the fan
         std::string AvailSchedName;                                           // Fan Operation Schedule
-        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // DataHVACGlobals fan type
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // DataHVACGlobals fan type
         int AvailSchedPtrNum = 0;                                             // Pointer to the availability schedule
         Real64 InletAirMassFlowRate = 0.0;                                    // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
@@ -89,7 +89,7 @@ namespace Fans {
         Real64 MinAirFlowRate = 0.0;                        // Min Specified Volume Flow Rate of Fan [m3/sec]
         Real64 MaxAirMassFlowRate = 0.0;                    // Max flow rate of fan in kg/sec
         Real64 MinAirMassFlowRate = 0.0;                    // Min flow rate of fan in kg/sec
-        int FanMinAirFracMethod = DataHVACGlobals::MinFrac; // parameter for what method is used for min flow fraction
+        int FanMinAirFracMethod = HVAC::MinFrac; // parameter for what method is used for min flow fraction
         Real64 FanMinFrac = 0.0;                            // Minimum fan air flow fraction
         Real64 FanFixedMin = 0.0;                           // Absolute minimum fan air flow [m3/s]
         bool EMSMaxMassFlowOverrideOn = false;              // if true, then EMS is calling to override mass flow
@@ -238,7 +238,7 @@ namespace Fans {
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
-    DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex);
+    HVAC::FanType GetFanType(EnergyPlusData &state, int FanIndex);
 
     Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, int FanIndex);
 

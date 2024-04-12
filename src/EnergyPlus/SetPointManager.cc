@@ -6228,8 +6228,8 @@ void DefineSZReheatSetPointManager::calculate(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
     using Psychrometrics::PsyTdbFnHW;
 
     // Locals
@@ -6370,8 +6370,8 @@ void DefineSZHeatingSetPointManager::calculate(EnergyPlusData &state)
     // From the heating load of the control zone, calculate the supply air setpoint
     // needed to meet that zone load (based on CalcSingZoneRhSetPoint)
 
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     Real64 ZoneLoadtoHeatSP; // required zone load to zone heating setpoint [W]
     Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -6411,8 +6411,8 @@ void DefineSZCoolingSetPointManager::calculate(EnergyPlusData &state)
     // From the Cooling load of the control zone, calculate the supply air setpoint
     // needed to meet that zone load (based on CalcSingZoneRhSetPoint)
 
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     Real64 ZoneLoadtoCoolSP; // required zone load to zone Cooling setpoint [W]
     Real64 ZoneMassFlow;     // zone inlet mass flow rate [kg/s]
@@ -6501,7 +6501,7 @@ void DefineSZMinHumSetPointManager::calculate(EnergyPlusData &state)
     // needed to meet minimum zone relative humidity requirement
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallMassFlow;
     using Psychrometrics::PsyWFnTdbRhPb;
 
     Real64 MoistureLoad; // Zone moisture load (kg moisture/second) required to meet the relative humidity setpoint
@@ -6543,7 +6543,7 @@ void DefineSZMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // needed to meet maximum zone relative humidity requirement
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallMassFlow;
     using Psychrometrics::PsyWFnTdbRhPb;
 
     int ZoneNode;        // Control zone air node number
@@ -6823,8 +6823,8 @@ void DefineWarmestSetPointManager::calculate(EnergyPlusData &state)
     // Zone sensible heat balance
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
@@ -6884,8 +6884,8 @@ void DefineColdestSetPointManager::calculate(EnergyPlusData &state)
     // Zone sensible heat balance
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
@@ -6966,8 +6966,8 @@ void DefWarmestSetPtManagerTempFlow::calculate(EnergyPlusData &state)
     // Zone sensible heat balance
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;         // required zone load [W]
@@ -7145,8 +7145,8 @@ void DefMultiZoneAverageHeatingSetPointManager::calculate(EnergyPlusData &state)
     // Zone sensible (heating load) heat balance around the zones served by a central air system
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -7229,8 +7229,8 @@ void DefMultiZoneAverageCoolingSetPointManager::calculate(EnergyPlusData &state)
     // Zone sensible (cooling load) heat balance around the zones served by a central air system
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 ZoneLoad;                 // zone load predicted to the setpoint [W]
@@ -7306,8 +7306,8 @@ void DefMultiZoneAverageMinHumSetPointManager::calculate(EnergyPlusData &state)
     // Zone latent load balance around the zones served by a central air system
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -7374,8 +7374,8 @@ void DefMultiZoneAverageMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // Zone latent load balance around the zones served by a central air system
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
@@ -7444,8 +7444,8 @@ void DefMultiZoneMinHumSetPointManager::calculate(EnergyPlusData &state)
     // on a zone with the highest humidity ratio setpoint requirement:
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
@@ -7510,8 +7510,8 @@ void DefMultiZoneMaxHumSetPointManager::calculate(EnergyPlusData &state)
     // based on a zone with the lowest humidity ratio setpoint requirement:
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]

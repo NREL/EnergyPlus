@@ -71,7 +71,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Fans;
 using namespace EnergyPlus::Psychrometrics;
@@ -336,7 +335,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
 
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
-    SizingType = DataHVACGlobals::CoolingCapacitySizing;
+    SizingType = HVAC::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -515,7 +514,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     // Without fan heat
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
-    SizingType = DataHVACGlobals::CoolingCapacitySizing;
+    SizingType = HVAC::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -537,7 +536,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
-    SizingType = DataHVACGlobals::CoolingCapacitySizing;
+    SizingType = HVAC::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -558,7 +557,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
-    SizingType = DataHVACGlobals::CoolingCapacitySizing;
+    SizingType = HVAC::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -613,7 +612,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingZone)
 
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
-    SizingType = DataHVACGlobals::CoolingCapacitySizing;
+    SizingType = HVAC::CoolingCapacitySizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -937,7 +936,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
 
     CompType = "Fan:ConstantVolume";
     CompName = "My Fan";
-    SizingType = DataHVACGlobals::SystemAirflowSizing;
+    SizingType = HVAC::SystemAirflowSizing;
     SizingString = "Nominal Capacity";
     SizingResult = DataSizing::AutoSize;
     PrintWarning = true;
@@ -970,7 +969,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_FanPeak)
     state->dataSize->ZoneSizingInput(1).ZoneNum = ZoneNum;
     state->dataSize->NumZoneSizingInput = 1;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(SizingType) = DataSizing::SupplyAirFlowRate;
 
     // Now, we're ready to call the function

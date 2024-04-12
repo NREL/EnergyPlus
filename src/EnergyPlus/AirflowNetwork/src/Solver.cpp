@@ -134,8 +134,8 @@ namespace AirflowNetwork {
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using DataHVACGlobals::ContFanCycCoil;
-    using DataHVACGlobals::CycFanCycCoil;
+    using HVAC::ContFanCycCoil;
+    using HVAC::CycFanCycCoil;
     using DataSurfaces::cExtBoundCondition;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::OtherSideCoefNoCalcExt;
@@ -172,7 +172,7 @@ namespace AirflowNetwork {
 
         // Locals
         int i;
-        DataHVACGlobals::FanType AFNSupplyFanType = DataHVACGlobals::FanType::Invalid;
+        HVAC::FanType AFNSupplyFanType = HVAC::FanType::Invalid;
 
         if (AirflowNetworkGetInputFlag) {
             get_input();
@@ -213,31 +213,31 @@ namespace AirflowNetwork {
             }
             Real64 FanMassFlowRate = 0.0;
             int FanOperModeCyc = 0;
-            AFNSupplyFanType = DataHVACGlobals::FanType::Invalid;
+            AFNSupplyFanType = HVAC::FanType::Invalid;
 
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
                 AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                 FanMassFlowRate = max(FanMassFlowRate, m_state.dataLoopNodes->Node(DisSysCompCVFData(i).OutletNode).MassFlowRate);
                 // VAV take high priority
-                if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::VAV) {
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::VAV) {
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     break;
                 }
-                if (FanMassFlowRate > DataHVACGlobals::VerySmallMassFlow &&
+                if (FanMassFlowRate > HVAC::VerySmallMassFlow &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = CycFanCycCoil;
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
-                    if (AFNSupplyFanType == DataHVACGlobals::FanType::OnOff) {
+                    if (AFNSupplyFanType == HVAC::FanType::OnOff) {
                         break;
                     }
                 }
             }
             //            Revised to meet heat exchanger requirement
-            if ((FanMassFlowRate > DataHVACGlobals::VerySmallMassFlow) && (!FirstHVACIteration)) {
-                if (AFNSupplyFanType == DataHVACGlobals::FanType::OnOff && FanOperModeCyc == CycFanCycCoil) {
+            if ((FanMassFlowRate > HVAC::VerySmallMassFlow) && (!FirstHVACIteration)) {
+                if (AFNSupplyFanType == HVAC::FanType::OnOff && FanOperModeCyc == CycFanCycCoil) {
                     AirflowNetworkFanActivated = true;
-                } else if (AFNSupplyFanType == DataHVACGlobals::FanType::VAV) {
+                } else if (AFNSupplyFanType == HVAC::FanType::VAV) {
                     if (present(Iter) && Iter > 1) AirflowNetworkFanActivated = true;
                 } else if (AirflowNetworkUnitarySystem) {
                     if (present(Iter) && Iter > 1) AirflowNetworkFanActivated = true;
@@ -255,10 +255,10 @@ namespace AirflowNetwork {
         }
 
         if (present(Iter) && present(ResimulateAirZone) && distribution_simulated) {
-            if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == DataHVACGlobals::FanType::OnOff) {
+            if (AirflowNetworkFanActivated && Iter < 3 && AFNSupplyFanType == HVAC::FanType::OnOff) {
                 ResimulateAirZone = true;
             }
-            if (AFNSupplyFanType == DataHVACGlobals::FanType::VAV) {
+            if (AFNSupplyFanType == HVAC::FanType::VAV) {
                 if (!AirflowNetworkFanActivated && Iter < 3) ResimulateAirZone = true;
             }
             if (AirflowNetworkUnitarySystem) {
@@ -486,8 +486,8 @@ namespace AirflowNetwork {
                 if (nodeErrorsFound) {
                     success = false;
                 }
-                DataHVACGlobals::FanType fanType = GetFanType(m_state, fanIndex);
-                if (fanType != DataHVACGlobals::FanType::Exhaust) {
+                HVAC::FanType fanType = GetFanType(m_state, fanIndex);
+                if (fanType != HVAC::FanType::Exhaust) {
                     ShowSevereError(m_state,
                                     format("{}: {} = {}. The specified Name is not found as a valid Fan:ZoneExhaust object.",
                                            RoutineName,
@@ -1366,12 +1366,12 @@ namespace AirflowNetwork {
                 int inletNode;
                 int outletNode;
 
-                DataHVACGlobals::FanType fanType = static_cast<DataHVACGlobals::FanType>(
-                    getEnumValue(DataHVACGlobals::fanTypeNamesUC, Util::makeUPPER(fields.at("supply_fan_object_type").get<std::string>())));
+                HVAC::FanType fanType = static_cast<HVAC::FanType>(
+                    getEnumValue(HVAC::fanTypeNamesUC, Util::makeUPPER(fields.at("supply_fan_object_type").get<std::string>())));
 
-                DataHVACGlobals::FanType fanType2 = DataHVACGlobals::FanType::Invalid;
+                HVAC::FanType fanType2 = HVAC::FanType::Invalid;
 
-                if (fanType == DataHVACGlobals::FanType::SystemModel) {
+                if (fanType == HVAC::FanType::SystemModel) {
                     m_state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(m_state, fan_name));
                     fanIndex = HVACFan::getFanObjectVectorIndex(m_state, fan_name);
                     if (fanIndex < 0) {
@@ -1384,10 +1384,10 @@ namespace AirflowNetwork {
                         inletNode = m_state.dataHVACFan->fanObjs[fanIndex]->inletNodeNum;
                         outletNode = m_state.dataHVACFan->fanObjs[fanIndex]->outletNodeNum;
                         if (m_state.dataHVACFan->fanObjs[fanIndex]->speedControl == HVACFan::FanSystem::SpeedControlMethod::Continuous) {
-                            fanType2 = DataHVACGlobals::FanType::VAV;
+                            fanType2 = HVAC::FanType::VAV;
                             VAVSystem = true;
                         } else {
-                            fanType2 = DataHVACGlobals::FanType::OnOff;
+                            fanType2 = HVAC::FanType::OnOff;
                         }
                         supplyFanType = fanType2;
                     }
@@ -1410,35 +1410,35 @@ namespace AirflowNetwork {
                     supplyFanType = fanType2;
                 }
 
-                if (!(fanType2 == DataHVACGlobals::FanType::Constant || fanType2 == DataHVACGlobals::FanType::OnOff ||
-                      fanType2 == DataHVACGlobals::FanType::VAV)) {
+                if (!(fanType2 == HVAC::FanType::Constant || fanType2 == HVAC::FanType::OnOff ||
+                      fanType2 == HVAC::FanType::VAV)) {
                     ShowSevereError(
                         m_state,
                         format("{}The Supply Fan Object Type in {} = {} is not a valid fan type.", RoutineName, CurrentModuleObject, thisObjectName));
                     ShowContinueError(m_state, "Valid fan types are  Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:SystemModel.");
                     success = false;
                 } else {
-                    if (fanType == DataHVACGlobals::FanType::Constant && fanType2 == DataHVACGlobals::FanType::OnOff) {
+                    if (fanType == HVAC::FanType::Constant && fanType2 == HVAC::FanType::OnOff) {
                         ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:ConstantVolume");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:OnOff");
                         success = false;
                     }
-                    if (fanType == DataHVACGlobals::FanType::OnOff && fanType2 == DataHVACGlobals::FanType::Constant) {
+                    if (fanType == HVAC::FanType::OnOff && fanType2 == HVAC::FanType::Constant) {
                         ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:SimpleOnOff");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:ConstantVolume");
                         success = false;
                     }
                 }
                 bool ErrorsFound{false};
-                if (fanType2 == DataHVACGlobals::FanType::Constant) {
+                if (fanType2 == HVAC::FanType::Constant) {
                     inletNode = GetFanInletNode(m_state, fanIndex);
                     outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
-                if (fanType2 == DataHVACGlobals::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
+                if (fanType2 == HVAC::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
                     inletNode = GetFanInletNode(m_state, fanIndex);
                     outletNode = GetFanOutletNode(m_state, fanIndex);
                 }
-                if (fanType2 == DataHVACGlobals::FanType::VAV && !DisSysCompCVFData(i).FanModelFlag) {
+                if (fanType2 == HVAC::FanType::VAV && !DisSysCompCVFData(i).FanModelFlag) {
                     inletNode = GetFanInletNode(m_state, fanIndex);
                     outletNode = GetFanOutletNode(m_state, fanIndex);
                     VAVSystem = true;
@@ -5263,7 +5263,7 @@ namespace AirflowNetwork {
         if (initializeOneTimeFlag) {
             exchangeData.allocate(m_state.dataGlobal->NumOfZones); // AirflowNetwork exchange data due to air-forced system
             for (i = 1; i <= DisSysNumOfCVFs; i++) {
-                if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff) {
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                     multiExchangeData.allocate(m_state.dataGlobal->NumOfZones);
                     break;
                 }
@@ -5541,7 +5541,7 @@ namespace AirflowNetwork {
         linkReport.allocate(AirflowNetworkNumOfLinks);             // Report link simulation variable in air distribution system
 
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 nodeReport.allocate(AirflowNetworkNumOfZones);
                 linkReport1.allocate(AirflowNetworkNumOfSurfaces);
                 break;
@@ -5565,7 +5565,7 @@ namespace AirflowNetwork {
 
         bool OnOffFanFlag = false;
         for (i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 OnOffFanFlag = true;
             }
         }
@@ -5604,7 +5604,7 @@ namespace AirflowNetwork {
                                     OutputProcessor::StoreType::Average,
                                     AirflowNetworkNodeData(i).Name);
             }
-            if (!(supplyFanType == DataHVACGlobals::FanType::OnOff && i <= AirflowNetworkNumOfZones)) {
+            if (!(supplyFanType == HVAC::FanType::OnOff && i <= AirflowNetworkNumOfZones)) {
                 SetupOutputVariable(m_state,
                                     "AFN Node Total Pressure",
                                     Constant::Units::Pa,
@@ -5625,7 +5625,7 @@ namespace AirflowNetwork {
         }
 
         for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
-            if (!(supplyFanType == DataHVACGlobals::FanType::OnOff && i <= AirflowNetworkNumOfSurfaces)) {
+            if (!(supplyFanType == HVAC::FanType::OnOff && i <= AirflowNetworkNumOfSurfaces)) {
                 SetupOutputVariable(m_state,
                                     "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                     Constant::Units::kg_s,
@@ -6320,7 +6320,7 @@ namespace AirflowNetwork {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
+        using HVAC::VerySmallMassFlow;
         using General::SolveRoot;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -8903,7 +8903,7 @@ namespace AirflowNetwork {
             for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
-            if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                 LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                 // ON Cycle calculation
                 onceZoneFlag = false;
@@ -9223,7 +9223,7 @@ namespace AirflowNetwork {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) {
                     Tamb = OutDryBulbTempAt(m_state, AirflowNetworkLinkageData(i).NodeHeights[0]);
                     AirDensity = PsyRhoAirFnPbTdbW(m_state, m_state.dataEnvrn->OutBaroPress, Tamb, m_state.dataEnvrn->OutHumRat);
-                    if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                    if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                         LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                         linkReport(i).VolFLOW = linkReport1(i).FLOW / AirDensity;
                         linkReport(i).VolFLOW2 = linkReport1(i).FLOW2 / AirDensity;
@@ -9246,7 +9246,7 @@ namespace AirflowNetwork {
                                               (AirflowNetworkNodeSimu(n).PZ + AirflowNetworkNodeSimu(M).PZ) / 2.0 + m_state.dataEnvrn->OutBaroPress,
                                               (AirflowNetworkNodeSimu(n).TZ + AirflowNetworkNodeSimu(M).TZ) / 2.0,
                                               (AirflowNetworkNodeSimu(n).WZ + AirflowNetworkNodeSimu(M).WZ) / 2.0);
-                        if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
+                        if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopOnOffFanRunTimeFraction(AirLoopNum) < 1.0 &&
                             LoopOnOffFanRunTimeFraction(AirLoopNum) > 0.0) {
                             linkReport(i).VolFLOW = linkReport(i).FLOW / AirDensity * (1.0 - LoopOnOffFanRunTimeFraction(AirLoopNum));
                             linkReport(i).VolFLOW2 = linkReport(i).FLOW2 / AirDensity * (1.0 - LoopOnOffFanRunTimeFraction(AirLoopNum));
@@ -9275,7 +9275,7 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         auto &NumPrimaryAirSys = m_state.dataHVACGlobal->NumPrimaryAirSys;
-        using DataHVACGlobals::VerySmallMassFlow;
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int n;
@@ -9432,7 +9432,7 @@ namespace AirflowNetwork {
         // Save zone loads from multizone calculation for later summation
         bool OnOffFanFlag = false;
         for (int i = 1; i <= DisSysNumOfCVFs; i++) {
-            if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff) {
+            if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                 OnOffFanFlag = true;
                 break;
             }
@@ -9531,7 +9531,7 @@ namespace AirflowNetwork {
             OnOffFanRunTimeFraction = 1.0;
             LoopOnOffFanRunTimeFraction(AirLoopNum) = 1.0;
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
-            if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff &&
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
                 m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                 // Hard code here
@@ -9546,7 +9546,7 @@ namespace AirflowNetwork {
             }
             m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
-            if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff && LoopPartLoadRatio(AirLoopNum) < 1.0) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && LoopPartLoadRatio(AirLoopNum) < 1.0) {
                 for (std::size_t i = 0; i < linkReport.size(); ++i) {
                     auto &r(linkReport[i]);
                     auto const &s(AirflowNetworkLinkSimu[i]);
@@ -9573,7 +9573,7 @@ namespace AirflowNetwork {
                 for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
-                if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff &&
+                if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff &&
                     m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
                     OnOffRatio = std::abs((m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate -
                                            m_state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
@@ -9786,7 +9786,7 @@ namespace AirflowNetwork {
             for (FanNum = 1; FanNum <= DisSysNumOfCVFs; ++FanNum) {
                 if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
             }
-            if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff && OnOffFanRunTimeFraction < 1.0) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff && OnOffFanRunTimeFraction < 1.0) {
                 for (int i = 1; i <= m_state.dataGlobal->NumOfZones; ++i) {
                     exchangeData(i).MultiZoneSen *= OnOffFanRunTimeFraction;
                     exchangeData(i).MultiZoneLat *= OnOffFanRunTimeFraction;
@@ -9840,7 +9840,7 @@ namespace AirflowNetwork {
                 }
             }
 
-            if (DisSysCompCVFData(FanNum).fanType == DataHVACGlobals::FanType::OnOff) {
+            if (DisSysCompCVFData(FanNum).fanType == HVAC::FanType::OnOff) {
                 for (int i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                     if (AirflowNetworkNodeData(i).AirLoopNum == AirLoopNum) {
                         nodeReport(i).PZ = AirflowNetworkNodeSimu(i).PZ * LoopPartLoadRatio(AirLoopNum) +
@@ -10671,7 +10671,7 @@ namespace AirflowNetwork {
                 if (LocalError) ErrorsFound = true;
                 if (VAVSystem) {
                     for (int j = 1; j <= DisSysNumOfCVFs; j++) {
-                        if (DisSysCompCVFData(j).fanType == DataHVACGlobals::FanType::VAV) {
+                        if (DisSysCompCVFData(j).fanType == HVAC::FanType::VAV) {
                             if (DisSysCompCVFData(j).AirLoopNum == DisSysCompTermUnitData(i).AirLoopNum &&
                                 !Util::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                                 ShowSevereError(m_state,
@@ -10892,14 +10892,14 @@ namespace AirflowNetwork {
         if (DisSysNumOfCVFs > 1) {
             bool OnOffFanFlag = false;
             for (int i = 1; i <= DisSysNumOfCVFs; i++) {
-                if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && !DisSysCompCVFData(i).FanModelFlag) {
                     OnOffFanFlag = true;
                     break;
                 }
-                if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff) {
+                if (DisSysCompCVFData(i).FanModelFlag && DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff) {
                     int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
                     if (m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
-                        DisSysCompCVFData(i).fanType = DataHVACGlobals::FanType::Constant;
+                        DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
                     } else {
                         OnOffFanFlag = true;
                         break;
@@ -10911,7 +10911,7 @@ namespace AirflowNetwork {
                     if (!m_state.dataZoneEquip->ZoneEquipConfig(AirflowNetworkNodeData(j).EPlusZoneNum).IsControlled) continue;
                     for (int i = 1; i <= DisSysNumOfCVFs; i++) {
                         if (DisSysCompCVFData(i).AirLoopNum == AirflowNetworkNodeData(j).AirLoopNum &&
-                            DisSysCompCVFData(i).fanType != DataHVACGlobals::FanType::OnOff) {
+                            DisSysCompCVFData(i).fanType != HVAC::FanType::OnOff) {
                             SetupOutputVariable(m_state,
                                                 "AFN Node Total Pressure",
                                                 Constant::Units::Pa,
@@ -10928,7 +10928,7 @@ namespace AirflowNetwork {
                         continue;
                     for (int j = 1; j <= DisSysNumOfCVFs; j++) {
                         if (DisSysCompCVFData(j).AirLoopNum == AirflowNetworkNodeData(AirflowNetworkLinkageData(i).NodeNums[0]).AirLoopNum &&
-                            DisSysCompCVFData(j).fanType != DataHVACGlobals::FanType::OnOff) {
+                            DisSysCompCVFData(j).fanType != HVAC::FanType::OnOff) {
                             SetupOutputVariable(m_state,
                                                 "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                                 Constant::Units::kg_s,
@@ -10973,9 +10973,9 @@ namespace AirflowNetwork {
         for (int i = 1; i <= DisSysNumOfCVFs; i++) {
             if (DisSysCompCVFData(i).FanModelFlag) {
                 int fanIndex = HVACFan::getFanObjectVectorIndex(m_state, DisSysCompCVFData(i).name);
-                if (DisSysCompCVFData(i).fanType == DataHVACGlobals::FanType::OnOff && m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
-                    DisSysCompCVFData(i).fanType = DataHVACGlobals::FanType::Constant;
-                    supplyFanType = DataHVACGlobals::FanType::Constant;
+                if (DisSysCompCVFData(i).fanType == HVAC::FanType::OnOff && m_state.dataHVACFan->fanObjs[fanIndex]->AirPathFlag) {
+                    DisSysCompCVFData(i).fanType = HVAC::FanType::Constant;
+                    supplyFanType = HVAC::FanType::Constant;
                     FanModelConstFlag = true;
                     break;
                 }
@@ -10983,7 +10983,7 @@ namespace AirflowNetwork {
         }
         if (FanModelConstFlag) {
             for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-                if (supplyFanType == DataHVACGlobals::FanType::Constant) {
+                if (supplyFanType == HVAC::FanType::Constant) {
                     SetupOutputVariable(m_state,
                                         "AFN Linkage Node 1 to Node 2 Mass Flow Rate",
                                         Constant::Units::kg_s,
@@ -11099,7 +11099,7 @@ namespace AirflowNetwork {
             switch (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum) {
             case iComponentTypeNum::CVF: { // 'CVF'
                 int typeNum = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
-                if (DisSysCompCVFData(typeNum).fanType == DataHVACGlobals::FanType::VAV) {
+                if (DisSysCompCVFData(typeNum).fanType == HVAC::FanType::VAV) {
                     if (DisSysCompCVFData(typeNum).FanModelFlag) {
                         DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
                             m_state.dataHVACFan->fanObjs[DisSysCompCVFData(typeNum).FanIndex]->designAirVolFlowRate * m_state.dataEnvrn->StdRhoAir;
@@ -12866,19 +12866,19 @@ namespace AirflowNetwork {
         }
 
         switch (state.dataHeatBalFanSys->TempControlType(ZoneNum)) {
-        case DataHVACGlobals::ThermostatType::SingleHeating:
+        case HVAC::ThermostatType::SingleHeating:
             if (thisZoneHB.MAT <= state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::ThermostatType::SingleCooling:
+        case HVAC::ThermostatType::SingleCooling:
             if (thisZoneHB.MAT >= state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;
             }
             break;
-        case DataHVACGlobals::ThermostatType::SingleHeatCool:
+        case HVAC::ThermostatType::SingleHeatCool:
             return false;
-        case DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand:
+        case HVAC::ThermostatType::DualSetPointWithDeadBand:
             if (thisZoneHB.MAT < state.dataHeatBalFanSys->ZoneThermostatSetPointLo(ZoneNum) ||
                 thisZoneHB.MAT > state.dataHeatBalFanSys->ZoneThermostatSetPointHi(ZoneNum)) {
                 return false;

@@ -3001,9 +3001,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.1;
     // set coil parameters
-    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int const CyclingScheme = HVAC::ContFanCycCoil;
     int DXCoilNum = 1;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off;
     int constexpr SpeedCal = 1;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;
@@ -3018,7 +3018,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
     // test 1: compressor is On but PLR = 0
-    CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = HVAC::CompressorOperation::On;
     PartLoadFrac = 0.0;
     // set coil inlet air flow rate to speed 1
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
@@ -3038,7 +3038,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
     ;
     // test 2: compressor is On and PLR > 0
-    CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = HVAC::CompressorOperation::On;
     PartLoadFrac = 0.1;
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
@@ -6911,7 +6911,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     // Set coil parameters
     int DXCoilNum = 1;
-    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int const CyclingScheme = HVAC::ContFanCycCoil;
 
     int constexpr SpeedCal = 1;
     Real64 SpeedRatio = 0.2;
@@ -6927,7 +6927,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     state->dataEnvrn->OutDryBulbTemp = -5.0;
 
     // Run a compressor "On" scenario first
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
@@ -6946,7 +6946,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
     // Otherwise the problem reported in Issue 10108 will show up.
 
-    CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    CompressorOp = HVAC::CompressorOperation::Off;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,

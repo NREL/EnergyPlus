@@ -59,7 +59,7 @@
 
 namespace EnergyPlus {
 
-namespace DataHVACGlobals {
+namespace HVAC {
 
     // Using/Aliasing
 
@@ -471,14 +471,14 @@ namespace DataHVACGlobals {
         On,  // normal compressor operation
         Num
     };
-} // namespace DataHVACGlobals
+} // namespace HVAC
 
 struct HVACGlobalsData : BaseGlobalStruct
 {
     // Object Data
-    Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
-    DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
-    Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
+    Array1D<HVAC::ZoneCompTypeData> ZoneComp;
+    HVAC::OptStartDataType OptStartData; // For optimum start
+    Array1D<HVAC::ComponentSetPtData> CompSetPtEquip;
 
     // Hybrid ventilation control part
     int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control
@@ -509,15 +509,15 @@ struct HVACGlobalsData : BaseGlobalStruct
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
     Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
+        Array1D<Real64>(2, {HVAC::MaxRatedVolFlowPerRatedTotCap1, HVAC::MaxRatedVolFlowPerRatedTotCap2});
     Array1D<Real64> MinRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
+        Array1D<Real64>(2, {HVAC::MinRatedVolFlowPerRatedTotCap1, HVAC::MinRatedVolFlowPerRatedTotCap2});
     Array1D<Real64> MaxHeatVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
+        Array1D<Real64>(2, {HVAC::MaxHeatVolFlowPerRatedTotCap1, HVAC::MaxHeatVolFlowPerRatedTotCap2});
     Array1D<Real64> MaxCoolVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
+        Array1D<Real64>(2, {HVAC::MaxCoolVolFlowPerRatedTotCap1, HVAC::MaxCoolVolFlowPerRatedTotCap2});
     Array1D<Real64> MinOperVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
+        Array1D<Real64>(2, {HVAC::MinOperVolFlowPerRatedTotCap1, HVAC::MinOperVolFlowPerRatedTotCap2});
 
     int DXCT = 1;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step

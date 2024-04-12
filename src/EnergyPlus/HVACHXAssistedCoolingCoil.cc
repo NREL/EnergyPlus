@@ -96,7 +96,7 @@ namespace HVACHXAssistedCoolingCoil {
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
                                   std::string_view HXAssistedCoilName,                     // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,                           // FirstHVACIteration flag
-                                  DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                  HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,                              // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                         // Allows the parent object to control fan operation
@@ -167,7 +167,7 @@ namespace HVACHXAssistedCoolingCoil {
             HXUnitOn = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (CompressorOp == HVAC::CompressorOperation::Off) {
             HXUnitOn = false;
         }
 
@@ -178,7 +178,7 @@ namespace HVACHXAssistedCoolingCoil {
             AirFlowRatio = 1.0;
         }
         if (present(DehumidificationMode) && present(LoadSHR) &&
-            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+            state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
             CalcHXAssistedCoolingCoil(state,
                                       HXAssistedCoilNum,
                                       FirstHVACIteration,
@@ -306,11 +306,11 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.HeatExchangerName = AlphArray(3);
 
             if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
-                thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_GENERIC;
+                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_GENERIC;
             } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
-                thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_FLATPLATE;
+                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_FLATPLATE;
             } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow")) {
-                thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_DESICCANT_BALANCED;
+                thisHXCoil.HeatExchangerType_Num = HVAC::HX_DESICCANT_BALANCED;
             } else {
                 ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                 ShowContinueError(state, format("Invalid {}=\"{}\"", cAlphaFields(2), thisHXCoil.HeatExchangerType));
@@ -321,9 +321,9 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.CoolingCoilName = AlphArray(5);
 
             if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
-                thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
+                thisHXCoil.CoolingCoilType_Num = HVAC::CoilDX_Cooling;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
-                thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
+                thisHXCoil.HXAssistedCoilType_Num = HVAC::CoilDX_CoolingHXAssisted;
 
                 CoolingCoilErrFlag = false;
                 int coolingCoilIndex_temp = CoilCoolingDX::factory(state, thisHXCoil.CoolingCoilName);
@@ -343,9 +343,9 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
             } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
-                thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+                thisHXCoil.CoolingCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
-                thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
+                thisHXCoil.HXAssistedCoilType_Num = HVAC::CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
                 DXCoils::GetDXCoilIndex(
                     state, thisHXCoil.CoolingCoilName, thisHXCoil.CoolingCoilIndex, CoolingCoilErrFlag, thisHXCoil.CoolingCoilType);
@@ -354,9 +354,9 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
             } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
-                thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+                thisHXCoil.CoolingCoilType_Num = HVAC::Coil_CoolingAirToAirVariableSpeed;
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
-                thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilDX_CoolingHXAssisted;
+                thisHXCoil.HXAssistedCoilType_Num = HVAC::CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
                 thisHXCoil.CoolingCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, AlphArray(4), AlphArray(5), CoolingCoilErrFlag);
 
@@ -637,9 +637,9 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.HeatExchangerName = AlphArray(3);
 
             if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
-                thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_GENERIC;
+                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_GENERIC;
             } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
-                thisHXCoil.HeatExchangerType_Num = DataHVACGlobals::HX_AIRTOAIR_FLATPLATE;
+                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_FLATPLATE;
                 //       balanced desiccant HX not allowed with water coils at this time
                 //       ELSEIF(Util::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
                 //       THEN
@@ -680,13 +680,13 @@ namespace HVACHXAssistedCoolingCoil {
             if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water") ||
                 Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
                 if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                    thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterDetailed;
+                    thisHXCoil.CoolingCoilType_Num = HVAC::Coil_CoolingWaterDetailed;
                 } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:Water")) {
-                    thisHXCoil.CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
+                    thisHXCoil.CoolingCoilType_Num = HVAC::Coil_CoolingWater;
                 }
 
                 thisHXCoil.HXAssistedCoilType = CurrentModuleObject;
-                thisHXCoil.HXAssistedCoilType_Num = DataHVACGlobals::CoilWater_CoolingHXAssisted;
+                thisHXCoil.HXAssistedCoilType_Num = HVAC::CoilWater_CoolingHXAssisted;
 
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
@@ -853,16 +853,16 @@ namespace HVACHXAssistedCoolingCoil {
         auto &thisHXCoil = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum);
         thisHXCoil.MassFlowRate = state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).MassFlowRate;
 
-        if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+        if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
             //
             // state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex]
             //     .outletAirDryBulbTemp = 0.0;
             // state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].outletAirHumRat =
             //     0.0;
-        } else if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+        } else if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
             state.dataDXCoils->DXCoilFullLoadOutAirTemp(thisHXCoil.CoolingCoilIndex) = 0.0;
             state.dataDXCoils->DXCoilFullLoadOutAirHumRat(thisHXCoil.CoolingCoilIndex) = 0.0;
-        } else if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+        } else if (thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
             //
         }
     }
@@ -873,7 +873,7 @@ namespace HVACHXAssistedCoolingCoil {
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,                             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,                           // FirstHVACIteration flag
-                                   DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                   HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,                              // Cooling coil part load ratio
                                    bool const HXUnitOn,                                     // Flag to enable heat exchanger
                                    int const FanOpMode,                                     // Allows parent object to control fan operation
@@ -907,9 +907,9 @@ namespace HVACHXAssistedCoolingCoil {
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
         state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
 
-        if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling ||
-            thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
-            thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+        if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling ||
+            thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
+            thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
             CompanionCoilIndexNum = thisHXCoil.CoolingCoilIndex;
         } else {
             CompanionCoilIndexNum = 0;
@@ -946,7 +946,7 @@ namespace HVACHXAssistedCoolingCoil {
                                           _,
                                           thisHXCoil.CoolingCoilType_Num);
 
-            if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+            if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
 
                 int coolingCoilIndex = thisHXCoil.CoolingCoilIndex;
 
@@ -956,28 +956,28 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                               .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
 
-                int OperationMode = DataHVACGlobals::coilNormalMode;
+                int OperationMode = HVAC::coilNormalMode;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
-                    OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
+                    OperationMode = HVAC::coilSubcoolReheatMode;
                 } else if (DehumidificationMode == 1) {
-                    OperationMode = DataHVACGlobals::coilEnhancedMode;
+                    OperationMode = HVAC::coilEnhancedMode;
                 }
 
                 Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 mCoolCompPartLoadRatio = (CompressorOp == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                Real64 mCoolCompPartLoadRatio = (CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0;
 
                 Real64 CoilPLR;
                 if (mCoolingSpeedNum > 1) {
                     if (mSingleMode == 0) {
-                        mCoolCompPartLoadRatio = (CompressorOp == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0;
+                        mCoolCompPartLoadRatio = (CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0;
                     } else {
-                        mCoolCompPartLoadRatio = PartLoadRatio * ((CompressorOp == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0);
+                        mCoolCompPartLoadRatio = PartLoadRatio * ((CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0);
                         mCoolingSpeedRatio = 1.0;
                     }
                     CoilPLR = 1.0;
                 } else {
                     mCoolingSpeedRatio = 1.0;
-                    CoilPLR = PartLoadRatio * ((CompressorOp == DataHVACGlobals::CompressorOperation::On) ? 1.0 : 0.0);
+                    CoilPLR = PartLoadRatio * ((CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0);
                 }
 
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(
@@ -989,7 +989,7 @@ namespace HVACHXAssistedCoolingCoil {
                     FanOpMode,
                     singleMode); //
 
-            } else if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+            } else if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
                 DXCoils::SimDXCoil(state,
                                    thisHXCoil.CoolingCoilName,
                                    CompressorOp,
@@ -998,12 +998,12 @@ namespace HVACHXAssistedCoolingCoil {
                                    FanOpMode,
                                    PartLoadRatio,
                                    OnOffAirFlow);
-            } else if (thisHXCoil.CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+            } else if (thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                 Real64 QZnReq(-1.0);           // Zone load (W), input to variable-speed DX coil
                 Real64 QLatReq(0.0);           // Zone latent load, input to variable-speed DX coil
                 Real64 OnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
-                DataHVACGlobals::CompressorOperation CompressorOn = CompressorOp;
-                if (PartLoadRatio == 0.0) CompressorOn = DataHVACGlobals::CompressorOperation::Off;
+                HVAC::CompressorOperation CompressorOn = CompressorOp;
+                if (PartLoadRatio == 0.0) CompressorOn = HVAC::CompressorOperation::Off;
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           thisHXCoil.CoolingCoilName,
                                                           thisHXCoil.CoolingCoilIndex,
@@ -1190,16 +1190,16 @@ namespace HVACHXAssistedCoolingCoil {
             if (WhichCoil != 0) {
                 // coil does not have capacity in input so mine information from DX cooling coil
 
-                if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                     int coolingCoilDXIndex = state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilIndex;
                     CoilCapacity = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilDXIndex].performance.normalMode.ratedGrossTotalCap;
-                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
+                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
                     CoilCapacity = DXCoils::GetCoilCapacity(state,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                             errFlag);
                 } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num ==
-                           DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                           HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     CoilCapacity =
                         VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
                                                                          state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
@@ -1396,12 +1396,12 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (WhichCoil != 0) {
-            if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
+            if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::Coil_CoolingWater) {
                 NodeNumber = WaterCoils::GetCoilWaterInletNode(state,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                                ErrorsFound);
-            } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
+            } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::Coil_CoolingWaterDetailed) {
                 NodeNumber = WaterCoils::GetCoilWaterInletNode(state,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                                                state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,

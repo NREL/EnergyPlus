@@ -376,7 +376,7 @@ namespace UnitVentilator {
                                    unitVent.ATMixerSecNode,
                                    unitVent.ATMixerOutNode,
                                    unitVent.AirOutNode);
-            if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide || unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+            if (unitVent.ATMixerType == HVAC::ATMixer_InletSide || unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
                 unitVent.ATMixerExists = true;
             }
             unitVent.ZonePtr =
@@ -398,12 +398,12 @@ namespace UnitVentilator {
             }
 
             unitVent.FanName = Alphas(12);
-            unitVent.fanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(11)));
-            if (unitVent.fanType == DataHVACGlobals::FanType::Invalid) {
+            unitVent.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(11)));
+            if (unitVent.fanType == HVAC::FanType::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(11), Alphas(11));
                 ErrorsFound = true;
-            } else if ((unitVent.fanType == DataHVACGlobals::FanType::Constant) || (unitVent.fanType == DataHVACGlobals::FanType::VAV) ||
-                       (unitVent.fanType == DataHVACGlobals::FanType::OnOff)) {
+            } else if ((unitVent.fanType == HVAC::FanType::Constant) || (unitVent.fanType == HVAC::FanType::VAV) ||
+                       (unitVent.fanType == HVAC::FanType::OnOff)) {
                 FanIndex = Fans::GetFanIndex(state, unitVent.FanName);
                 if (FanIndex == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFields(12), unitVent.FanName);
@@ -434,7 +434,7 @@ namespace UnitVentilator {
                         ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                     }
                 }
-            } else if (unitVent.fanType == DataHVACGlobals::FanType::SystemModel) {
+            } else if (unitVent.fanType == HVAC::FanType::SystemModel) {
 
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, unitVent.FanName)); // call constructor
                 unitVent.Fan_Index = HVACFan::getFanObjectVectorIndex(state, unitVent.FanName);           // zero-based
@@ -541,7 +541,7 @@ namespace UnitVentilator {
                                                      state.dataLoopNodes->NodeID(unitVent.OAMixerOutNode),
                                                      state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
             } else {
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
                     // Add fan to component sets array
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -551,7 +551,7 @@ namespace UnitVentilator {
                                                          state.dataLoopNodes->NodeID(unitVent.ATMixerOutNode),
                                                          state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
                 }
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
                     // Add fan to component sets array
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -585,15 +585,15 @@ namespace UnitVentilator {
                 ShowSevereError(state, format("{} \"{}\" {} not found: {}", CurrentModuleObject, unitVent.Name, cAlphaFields(14), Alphas(14)));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(14)) {
-                if (unitVent.fanType == DataHVACGlobals::FanType::OnOff || unitVent.fanType == DataHVACGlobals::FanType::SystemModel) {
-                    unitVent.OpMode = DataHVACGlobals::CycFanCycCoil;
+                if (unitVent.fanType == HVAC::FanType::OnOff || unitVent.fanType == HVAC::FanType::SystemModel) {
+                    unitVent.OpMode = HVAC::CycFanCycCoil;
                 } else {
-                    unitVent.OpMode = DataHVACGlobals::ContFanCycCoil;
+                    unitVent.OpMode = HVAC::ContFanCycCoil;
                 }
             }
 
             // Check fan's schedule for cycling fan operation if constant volume fan is used
-            if (unitVent.FanSchedPtr > 0 && unitVent.fanType == DataHVACGlobals::FanType::Constant) {
+            if (unitVent.FanSchedPtr > 0 && unitVent.fanType == HVAC::FanType::Constant) {
                 if (!ScheduleManager::CheckScheduleValueMinMax(state, unitVent.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("For {} = {}", cAlphaFields(11), Alphas(11)));
@@ -771,7 +771,7 @@ namespace UnitVentilator {
                     ErrorsFound = true;
                 }
             } else {
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
                     for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInletNodes; ++NodeNum) {
@@ -803,7 +803,7 @@ namespace UnitVentilator {
                         ErrorsFound = true;
                     }
                 }
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
                     // check that the mixer secondary air node is the unit ventilator air outlet node
                     if (unitVent.AirOutNode != unitVent.ATMixerSecNode) {
                         ShowSevereError(
@@ -994,7 +994,7 @@ namespace UnitVentilator {
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 unitVent.Name);
-            if (unitVent.fanType == DataHVACGlobals::FanType::OnOff) {
+            if (unitVent.fanType == HVAC::FanType::OnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Ventilator Fan Part Load Ratio",
                                     Constant::Units::None,
@@ -1010,7 +1010,7 @@ namespace UnitVentilator {
             auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
             auto &coilReportObj = state.dataRptCoilSelection->coilSelectionReportObj;
 
-            if (unitVent.fanType == DataHVACGlobals::FanType::SystemModel) {
+            if (unitVent.fanType == HVAC::FanType::SystemModel) {
                 if (unitVent.HCoilPresent) {
                     coilReportObj->setCoilSupplyFanInfo(state,
                                                         unitVent.HCoilName,
@@ -1234,16 +1234,16 @@ namespace UnitVentilator {
 
         if (unitVent.FanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanSchedPtr) == 0.0) {
-                unitVent.OpMode = DataHVACGlobals::CycFanCycCoil;
+                unitVent.OpMode = HVAC::CycFanCycCoil;
             } else {
-                unitVent.OpMode = DataHVACGlobals::ContFanCycCoil;
+                unitVent.OpMode = HVAC::ContFanCycCoil;
             }
         }
 
         if (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) > 0) {
             if ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) > 0 || state.dataHVACGlobal->TurnFansOn) &&
                 !state.dataHVACGlobal->TurnFansOff) {
-                if ((std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < DataHVACGlobals::SmallLoad) ||
+                if ((std::abs(state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired) < HVAC::SmallLoad) ||
                     (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum))) {
                     SetMassFlowRateToZero = true;
                 }
@@ -1385,14 +1385,14 @@ namespace UnitVentilator {
         state.dataSize->DataZoneNumber = unitVent.ZonePtr;
         bool DoWaterCoilSizing = false;
 
-        if (unitVent.fanType == DataHVACGlobals::FanType::SystemModel) {
+        if (unitVent.fanType == HVAC::FanType::SystemModel) {
             state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
             state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = unitVent.Fan_Index;
         // unit ventilator is always blow thru
-        state.dataSize->DataFanPlacement = DataHVACGlobals::FanPlace::BlowThru;
+        state.dataSize->DataFanPlacement = HVAC::FanPlace::BlowThru;
 
         state.dataSize->ZoneCoolingOnlyFan = (unitVent.CoilOption == CoilsUsed::Both) || (unitVent.CoilOption == CoilsUsed::Cooling);
         state.dataSize->ZoneHeatingOnlyFan = (unitVent.CoilOption == CoilsUsed::Both) || (unitVent.CoilOption == CoilsUsed::Heating);
@@ -1418,7 +1418,7 @@ namespace UnitVentilator {
                 if (zoneHVACSizing.CoolingSAFMethod > 0 && state.dataSize->ZoneCoolingOnlyFan && !state.dataSize->ZoneHeatingOnlyFan) {
 
                     SAFMethod = zoneHVACSizing.CoolingSAFMethod;
-                    SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+                    SizingMethod = HVAC::CoolingAirflowSizing;
                     ZoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                     switch (SAFMethod) {
                     case DataSizing::None:
@@ -1458,7 +1458,7 @@ namespace UnitVentilator {
                         CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                     } break;
                     case DataSizing::FlowPerCoolingCapacity: {
-                        SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                        SizingMethod = HVAC::CoolingCapacitySizing;
                         TempSize = DataSizing::AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
@@ -1483,7 +1483,7 @@ namespace UnitVentilator {
                     // DataScalableSizingON = false;
 
                 } else if (zoneHVACSizing.HeatingSAFMethod > 0 && state.dataSize->ZoneHeatingOnlyFan && !state.dataSize->ZoneCoolingOnlyFan) {
-                    SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                    SizingMethod = HVAC::HeatingAirflowSizing;
                     SAFMethod = zoneHVACSizing.HeatingSAFMethod;
                     ZoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                     switch (SAFMethod) {
@@ -1524,7 +1524,7 @@ namespace UnitVentilator {
                         HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                     } break;
                     case DataSizing::FlowPerHeatingCapacity: {
-                        SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                        SizingMethod = HVAC::HeatingCapacitySizing;
                         TempSize = DataSizing::AutoSize;
                         PrintFlag = false;
                         state.dataSize->DataScalableSizingON = true;
@@ -1534,7 +1534,7 @@ namespace UnitVentilator {
                         sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                         state.dataSize->DataFlowPerHeatingCapacity = zoneHVACSizing.MaxHeatAirVolFlow;
-                        SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                        SizingMethod = HVAC::HeatingAirflowSizing;
                         PrintFlag = true;
                         TempSize = DataSizing::AutoSize;
                         errorsFound = false;
@@ -1554,7 +1554,7 @@ namespace UnitVentilator {
                     if (unitVent.CoilOption != CoilsUsed::None) {
                         if (zoneHVACSizing.CoolingSAFMethod > 0) {
                             SAFMethod = zoneHVACSizing.CoolingSAFMethod;
-                            SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+                            SizingMethod = HVAC::CoolingAirflowSizing;
                             ZoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                             switch (SAFMethod) {
                             case DataSizing::None:
@@ -1594,7 +1594,7 @@ namespace UnitVentilator {
                                 CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(state, TempSize, errorsFound);
                             } break;
                             case DataSizing::FlowPerCoolingCapacity: {
-                                SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                                SizingMethod = HVAC::CoolingCapacitySizing;
                                 TempSize = DataSizing::AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
@@ -1617,7 +1617,7 @@ namespace UnitVentilator {
                             } break;
                             }
                         } else if (zoneHVACSizing.HeatingSAFMethod > 0) {
-                            SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                            SizingMethod = HVAC::HeatingAirflowSizing;
                             SAFMethod = zoneHVACSizing.HeatingSAFMethod;
                             ZoneEqSizing.SizingMethod(SizingMethod) = SAFMethod;
                             switch (SAFMethod) {
@@ -1658,7 +1658,7 @@ namespace UnitVentilator {
                                 HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(state, TempSize, errorsFound);
                             } break;
                             case DataSizing::FlowPerHeatingCapacity: {
-                                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                                SizingMethod = HVAC::HeatingCapacitySizing;
                                 TempSize = DataSizing::AutoSize;
                                 PrintFlag = false;
                                 state.dataSize->DataScalableSizingON = true;
@@ -1668,7 +1668,7 @@ namespace UnitVentilator {
                                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                                 state.dataSize->DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(state, TempSize, errorsFound);
                                 state.dataSize->DataFlowPerHeatingCapacity = zoneHVACSizing.MaxHeatAirVolFlow;
-                                SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
+                                SizingMethod = HVAC::HeatingAirflowSizing;
                                 PrintFlag = true;
                                 TempSize = DataSizing::AutoSize;
                                 errorsFound = false;
@@ -1807,7 +1807,7 @@ namespace UnitVentilator {
             } else {
                 CheckZoneSizing(state, state.dataUnitVentilators->cMO_UnitVentilator, unitVent.Name);
                 MinOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, unitVent.MaxAirVolFlow);
-                if (MinOutAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
+                if (MinOutAirVolFlowDes < HVAC::SmallAirVolFlow) {
                     MinOutAirVolFlowDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -1887,8 +1887,8 @@ namespace UnitVentilator {
                         }
 
                         if (DoWaterCoilSizing) {
-                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= HVAC::SmallAirVolFlow) {
+                                SizingMethod = HVAC::HeatingCapacitySizing;
                                 if (unitVent.HVACSizingIndex > 0) {
                                     auto &zoneHVACSizing = state.dataSize->ZoneHVACSizing(unitVent.HVACSizingIndex);
                                     CapSizingMethod = zoneHVACSizing.HeatingCapMethod;
@@ -2023,8 +2023,8 @@ namespace UnitVentilator {
                         PltSizHeatNum = PlantUtilities::MyPlantSizingIndex(
                             state, "Coil:Heating:Steam", unitVent.HCoilName, unitVent.HotControlNode, CoilSteamOutletNode, ErrorsFound);
                         if (PltSizHeatNum > 0) {
-                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                                SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow >= HVAC::SmallAirVolFlow) {
+                                SizingMethod = HVAC::HeatingCapacitySizing;
                                 if (unitVent.HVACSizingIndex > 0) {
                                     auto &zoneHVACSizing = state.dataSize->ZoneHVACSizing(unitVent.HVACSizingIndex);
                                     CapSizingMethod = zoneHVACSizing.HeatingCapMethod;
@@ -2184,8 +2184,8 @@ namespace UnitVentilator {
                             }
                         }
                         if (DoWaterCoilSizing) {
-                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow >= DataHVACGlobals::SmallAirVolFlow) {
-                                SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+                            if (state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolMassFlow >= HVAC::SmallAirVolFlow) {
+                                SizingMethod = HVAC::CoolingCapacitySizing;
                                 if (unitVent.HVACSizingIndex > 0) {
                                     auto &zoneHVACSizing = state.dataSize->ZoneHVACSizing(unitVent.HVACSizingIndex);
                                     CapSizingMethod = zoneHVACSizing.CoolingCapMethod;
@@ -2457,7 +2457,7 @@ namespace UnitVentilator {
         auto &outletNode(state.dataLoopNodes->Node(unitVent.AirOutNode));
         auto &outsideAirNode(state.dataLoopNodes->Node(unitVent.OutsideAirNode));
 
-        if ((std::abs(state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) ||
+        if ((std::abs(state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) ||
             (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
             (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) <= 0) ||
             ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !state.dataHVACGlobal->TurnFansOn) ||
@@ -2476,7 +2476,7 @@ namespace UnitVentilator {
                 PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
             }
 
-            if (OpMode == DataHVACGlobals::CycFanCycCoil) {
+            if (OpMode == HVAC::CycFanCycCoil) {
                 CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
                 if (inletNode.MassFlowRateMax > 0.0) {
                     unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
@@ -2487,7 +2487,7 @@ namespace UnitVentilator {
         } else { // Unit is on-->this section is intended to control the outside air and the main
             //              result is to set the outside air flow rate variable OAMassFlowRate
             unitVent.FanPartLoadRatio = 1.0;
-            if (state.dataUnitVentilators->QZnReq > DataHVACGlobals::SmallLoad) { // HEATING MODE
+            if (state.dataUnitVentilators->QZnReq > HVAC::SmallLoad) { // HEATING MODE
 
                 ControlNode = unitVent.HotControlNode;
                 ControlOffset = unitVent.HotControlOffset;
@@ -2598,7 +2598,7 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == DataHVACGlobals::CycFanCycCoil) {
+                    if (OpMode == HVAC::CycFanCycCoil) {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
                         if (inletNode.MassFlowRateMax > 0.0) {
                             unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
@@ -2680,16 +2680,16 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == DataHVACGlobals::CycFanCycCoil) {
+                    if (OpMode == HVAC::CycFanCycCoil) {
 
                         // Find part load ratio of unit ventilator coils
                         PartLoadFrac = 0.0;
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, OpMode, PartLoadFrac);
-                        if ((NoOutput - state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) {
+                        if ((NoOutput - state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) {
                             // Unit ventilator is unable to meet the load with coil off, set PLR = 1
                             PartLoadFrac = 1.0;
                             CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
-                            if ((FullOutput - state.dataUnitVentilators->QZnReq) > DataHVACGlobals::SmallLoad) {
+                            if ((FullOutput - state.dataUnitVentilators->QZnReq) > HVAC::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                                 auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
@@ -2841,7 +2841,7 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == DataHVACGlobals::CycFanCycCoil) {
+                    if (OpMode == HVAC::CycFanCycCoil) {
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
                         if (inletNode.MassFlowRateMax > 0.0) {
                             unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
@@ -2921,17 +2921,17 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == DataHVACGlobals::CycFanCycCoil) {
+                    if (OpMode == HVAC::CycFanCycCoil) {
 
                         state.dataUnitVentilators->HCoilOn = false;
                         // Find part load ratio of unit ventilator coils
                         PartLoadFrac = 0.0;
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, OpMode, PartLoadFrac);
-                        if ((NoOutput - state.dataUnitVentilators->QZnReq) > DataHVACGlobals::SmallLoad) {
+                        if ((NoOutput - state.dataUnitVentilators->QZnReq) > HVAC::SmallLoad) {
                             // Unit ventilator is unable to meet the load with coil off, set PLR = 1
                             PartLoadFrac = 1.0;
                             CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
-                            if ((FullOutput - state.dataUnitVentilators->QZnReq) < DataHVACGlobals::SmallLoad) {
+                            if ((FullOutput - state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                                 auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
@@ -2973,7 +2973,7 @@ namespace UnitVentilator {
                                           _,
                                           unitVent.CWPlantLoc);
 
-                    } // end from IF (OpMode .EQ. DataHVACGlobals::CycFanCycCoil) THEN
+                    } // end from IF (OpMode .EQ. HVAC::CycFanCycCoil) THEN
                 }
 
             } // ...end of HEATING/COOLING IF-THEN block
@@ -2990,7 +2990,7 @@ namespace UnitVentilator {
         unitVent.HeatPower = max(0.0, QUnitOut);
         unitVent.SensCoolPower = std::abs(min(0.0, QUnitOut));
         unitVent.TotCoolPower = std::abs(min(0.0, QTotUnitOut));
-        if (unitVent.fanType != DataHVACGlobals::FanType::SystemModel) {
+        if (unitVent.fanType != HVAC::FanType::SystemModel) {
             unitVent.ElecPower = Fans::GetFanPower(state, unitVent.Fan_Index);
         } else {
             unitVent.ElecPower = state.dataHVACFan->fanObjs[unitVent.Fan_Index]->fanPower();
@@ -3035,12 +3035,12 @@ namespace UnitVentilator {
         state.dataUnitVentilators->ZoneNode = state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ZoneNode;
         Real64 QCoilReq = state.dataUnitVentilators->QZnReq;
 
-        if (OpMode != DataHVACGlobals::CycFanCycCoil) {
+        if (OpMode != HVAC::CycFanCycCoil) {
 
             if (unitVent.ATMixerExists) {
                 state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
                 state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
                     // set the primary air inlet mass flow rate
                     state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
                         min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
@@ -3052,7 +3052,7 @@ namespace UnitVentilator {
             } else {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
-            if (unitVent.fanType != DataHVACGlobals::FanType::SystemModel) {
+            if (unitVent.fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
                 state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
@@ -3064,10 +3064,10 @@ namespace UnitVentilator {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         unitVent.CCoilName,
                                                                         FirstHVACIteration,
-                                                                        DataHVACGlobals::CompressorOperation::On,
+                                                                        HVAC::CompressorOperation::On,
                                                                         0.0,
                                                                         unitVent.CCoil_Index,
-                                                                        DataHVACGlobals::ContFanCycCoil);
+                                                                        HVAC::ContFanCycCoil);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index);
                 }
@@ -3128,7 +3128,7 @@ namespace UnitVentilator {
             if (unitVent.ATMixerExists) {
                 state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
                 state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
                     // set the primary air inlet mass flow rate
                     state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
                         min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
@@ -3140,7 +3140,7 @@ namespace UnitVentilator {
             } else {
                 SimUnitVentOAMixer(state, UnitVentNum, OpMode);
             }
-            if (unitVent.fanType != DataHVACGlobals::FanType::SystemModel) {
+            if (unitVent.fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state, unitVent.FanName, FirstHVACIteration, unitVent.Fan_Index, _);
             } else {
                 state.dataHVACFan->fanObjs[unitVent.Fan_Index]->simulate(state, _, _);
@@ -3156,7 +3156,7 @@ namespace UnitVentilator {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         unitVent.CCoilName,
                                                                         FirstHVACIteration,
-                                                                        DataHVACGlobals::CompressorOperation::On,
+                                                                        HVAC::CompressorOperation::On,
                                                                         PartLoadFrac,
                                                                         unitVent.CCoil_Index,
                                                                         OpMode);
@@ -3233,7 +3233,7 @@ namespace UnitVentilator {
         if (unitVent.ATMixerExists) {
             auto &ATMixOutNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixOutNode));
             auto &ATMixerPriNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode));
-            if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+            if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
                 // set the primary air inlet mass flow rate
                 ATMixerPriNode.MassFlowRate = min(ATMixerPriNode.MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
@@ -3288,7 +3288,7 @@ namespace UnitVentilator {
         Real64 OutAirMassFlowRate = state.dataUnitVentilators->OAMassFlowRate;
 
         // Limit the outdoor air mass flow rate if cycling fan
-        if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+        if (FanOpMode == HVAC::CycFanCycCoil) {
             OutAirMassFlowRate = min(state.dataUnitVentilators->OAMassFlowRate, inletNode.MassFlowRate);
         }
 
@@ -3475,11 +3475,11 @@ namespace UnitVentilator {
                 EnthDiffAcrossFan =
                     state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.OAMixerOutNode).Enthalpy;
             } else {
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
                     EnthDiffAcrossFan =
                         state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.ATMixerOutNode).Enthalpy;
                 }
-                if (unitVent.ATMixerType == DataHVACGlobals::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
                     EnthDiffAcrossFan =
                         state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.AirInNode).Enthalpy;
                 }
@@ -3516,7 +3516,7 @@ namespace UnitVentilator {
         Real64 CpAirZn = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(AirInNode).HumRat);
         QCoilReq = QZnReq - state.dataLoopNodes->Node(CCoilInAirNode).MassFlowRate * CpAirZn *
                                 (state.dataLoopNodes->Node(CCoilInAirNode).Temp - state.dataLoopNodes->Node(AirInNode).Temp);
-        if (QCoilReq > -DataHVACGlobals::SmallLoad) {
+        if (QCoilReq > -HVAC::SmallLoad) {
             QCoilReq = 0.0;
             mdot = 0.0;
         }

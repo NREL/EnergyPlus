@@ -99,7 +99,6 @@ using namespace EnergyPlus::BranchInputManager;
 using namespace EnergyPlus::Curve;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
@@ -154,11 +153,11 @@ protected:
         state->dataLoopNodes->NodeID.allocate(50);
 
         state->dataHeatBalFanSys->TempControlType.allocate(numZones);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+        state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
-        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, HVAC::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         state->dataSize->FinalZoneSizing.allocate(numZones);
         state->dataSize->FinalSysSizing.allocate(numAirloops);
@@ -228,7 +227,7 @@ protected:
 
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
         state->dataSize->ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
-        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+        state->dataSize->ZoneEqSizing(zoneNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
         auto &thisZoneEqConfig(state->dataZoneEquip->ZoneEquipConfig(zoneNum));
         thisZoneEqConfig.IsControlled = true;
@@ -434,7 +433,7 @@ protected:
         state->dataMixedAir->OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
 
         VRFTU.Name = "VRFTU1";
-        VRFTU.VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
+        VRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
         VRFTU.SchedPtr = Sch1;
         VRFTU.VRFSysNum = numVRFCond;
         VRFTU.TUListIndex = TUNum;
@@ -457,11 +456,11 @@ protected:
         VRFTU.HeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.MinOperatingPLR = 0.1;
-        VRFTU.fanType = DataHVACGlobals::FanType::Invalid;
+        VRFTU.fanType = HVAC::FanType::Invalid;
         VRFTU.FanOpModeSchedPtr = Sch2;
         VRFTU.FanAvailSchedPtr = Sch1;
         VRFTU.FanIndex = 0;
-        VRFTU.fanPlace = DataHVACGlobals::FanPlace::Invalid;
+        VRFTU.fanPlace = HVAC::FanPlace::Invalid;
         VRFTU.OAMixerName = "OAMixer1";
         VRFTU.OAMixerIndex = 1;
         VRFTU.OAMixerUsed = true;
@@ -471,8 +470,8 @@ protected:
         VRFTU.HeatCoilIndex = heatCoilIndex;
         VRFTU.heatCoilAirInNode = heatCoilAirInNode;
         VRFTU.heatCoilAirOutNode = heatCoilAirOutNode;
-        VRFTU.DXCoolCoilType_Num = DataHVACGlobals::CoilVRF_Cooling;
-        VRFTU.DXHeatCoilType_Num = DataHVACGlobals::CoilVRF_Heating;
+        VRFTU.DXCoolCoilType_Num = HVAC::CoilVRF_Cooling;
+        VRFTU.DXHeatCoilType_Num = HVAC::CoilVRF_Heating;
         VRFTU.CoolingCoilPresent = true;
         VRFTU.HeatingCoilPresent = true;
         VRFTU.HVACSizingIndex = 0;
@@ -484,7 +483,7 @@ protected:
         state->dataDXCoils->DXCoil(1).DXCoilType = "Coil:Cooling:DX:VariableRefrigerantFlow";
         state->dataDXCoils->DXCoil(1).AirInNode = coolCoilAirInNode;
         state->dataDXCoils->DXCoil(1).AirOutNode = coolCoilAirOutNode;
-        state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilVRF_Cooling;
+        state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilVRF_Cooling;
         state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate = DataSizing::AutoSize;
         state->dataDXCoils->DXCoil(1).RatedTotCap = DataSizing::AutoSize;
         state->dataDXCoils->DXCoil(1).RatedSHR = DataSizing::AutoSize;
@@ -502,7 +501,7 @@ protected:
         state->dataDXCoils->DXCoil(2).DXCoilType = "Coil:Heating:DX:VariableRefrigerantFlow";
         state->dataDXCoils->DXCoil(2).AirInNode = heatCoilAirInNode;
         state->dataDXCoils->DXCoil(2).AirOutNode = heatCoilAirOutNode;
-        state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilVRF_Heating;
+        state->dataDXCoils->DXCoil(2).DXCoilType_Num = HVAC::CoilVRF_Heating;
         state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate = DataSizing::AutoSize;
         state->dataDXCoils->DXCoil(2).RatedTotCap = DataSizing::AutoSize;
         state->dataDXCoils->DXCoil(2).RatedSHR = DataSizing::AutoSize;
@@ -3123,8 +3122,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
     state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
     state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
-    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
-    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = HVAC::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = HVAC::FanPlace::BlowThru;
     // system is on in cooling mode
     state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
     // fan heat added to coil inlet temp, coil surface temp should also be lower to overcome additional heat tranfer
@@ -3132,8 +3131,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     // default value, coil inlet temps lower than default
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);
 
-    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::DrawThru;
-    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::DrawThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = HVAC::FanPlace::DrawThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = HVAC::FanPlace::DrawThru;
     // rest coil inlet temps
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(1).Temp;
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(1).HumRat;
@@ -3154,8 +3153,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     Real64 saveHeatingCondTemp = state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp;
 
     // test blow thru fan
-    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
-    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = HVAC::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = HVAC::FanPlace::BlowThru;
     // adjust coil inlet temps for fan heat
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
@@ -3764,7 +3763,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -4024,7 +4023,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(1);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo = 21.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).ZT = 25.0;
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
@@ -4233,7 +4232,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // Test node connection function
     auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
     // current configuration is draw through fan
-    EXPECT_EQ((int)thisTU.fanPlace, (int)DataHVACGlobals::FanPlace::DrawThru);
+    EXPECT_EQ((int)thisTU.fanPlace, (int)HVAC::FanPlace::DrawThru);
     EXPECT_FALSE(ErrorsFound);
     CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
@@ -4263,7 +4262,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     thisTU.heatCoilAirOutNode += 1; // revert previous change
 
     // switch fan placement
-    thisTU.fanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    thisTU.fanPlace = HVAC::FanPlace::BlowThru;
     EXPECT_TRUE(thisTU.OAMixerUsed);
     // correct node connections
     thisTU.fanInletNode = thisTU.VRFTUOAMixerMixedNodeNum;
@@ -4863,7 +4862,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -5713,7 +5712,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
@@ -5916,7 +5915,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
               0.0); // flow should be = 0 for cycling fan mode
 
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0; // set constant fan operating mode
@@ -6648,7 +6647,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0;                                                                                       // set continuous fan operating mode
     InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);             // Initialize all VRFTU related parameters
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, HVAC::ContFanCycCoil); // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AverageOAMassFlow = state->dataEnvrn->StdRhoAir * state->dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
@@ -8129,9 +8128,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     thisVRFTU.Name = "TU1";
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
     thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
-    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
-    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
-    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingElectric;
+    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -8194,9 +8193,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     thisVRFTU.Name = "TU2";
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:FUEL";
     thisVRFTU.SuppHeatCoilName = "TU2 SUPP HEATING COIL";
-    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
-    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
-    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
+    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -8259,9 +8258,9 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     thisVRFTU.Name = "TU3";
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:WATER";
     thisVRFTU.SuppHeatCoilName = "TU3 SUPP HEATING COIL";
-    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
-    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
-    thisVRFTU.VRFTUType_Num = VRFTUType_ConstVolume;
+    thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingWater;
+    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -8378,8 +8377,8 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     thisVRFTU.Name = "TU4";
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:STEAM";
     thisVRFTU.SuppHeatCoilName = "TU4 SUPP HEATING COIL";
-    thisVRFTU.SuppHeatCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
-    thisVRFTU.OpMode = DataHVACGlobals::ContFanCycCoil;
+    thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingSteam;
+    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -11385,7 +11384,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
@@ -13121,7 +13120,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
@@ -13896,8 +13895,8 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_EQ(1, state->dataHeatingCoils->NumHeatingCoils);
     EXPECT_TRUE(thisVRFTU.OAMixerUsed);
     ASSERT_EQ("TU1 OA MIXER", thisVRFTU.OAMixerName);
-    ASSERT_EQ((int)thisVRFTU.fanType, (int)DataHVACGlobals::FanType::SystemModel);
-    ASSERT_EQ((int)DataHVACGlobals::FanPlace::BlowThru, (int)thisVRFTU.fanPlace);
+    ASSERT_EQ((int)thisVRFTU.fanType, (int)HVAC::FanType::SystemModel);
+    ASSERT_EQ((int)HVAC::FanPlace::BlowThru, (int)thisVRFTU.fanPlace);
     EXPECT_TRUE(thisVRFTU.CoolingCoilPresent);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     EXPECT_TRUE(thisVRFTU.HeatingCoilPresent);
@@ -15211,7 +15210,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, DataHVACGlobals::ContFanCycCoil); // continuous fan cycling coil operating mode
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, HVAC::ContFanCycCoil); // continuous fan cycling coil operating mode
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
@@ -15803,7 +15802,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing.allocate(1);
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolVolFlow = 0.566337;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesHeatVolFlow = 0.566337;
@@ -18092,13 +18091,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
 
     // state->dataSize->CurZoneEqNum = zone_num_TU1;
     state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(zone_num_TU1).DesCoolVolFlow = 0.50;
     state->dataSize->FinalZoneSizing(zone_num_TU1).DesHeatVolFlow = 0.50;
 
     // state->dataSize->CurZoneEqNum = zone_num_TU2;
     state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(zone_num_TU2).DesCoolVolFlow = 0.50;
     state->dataSize->FinalZoneSizing(zone_num_TU2).DesHeatVolFlow = 0.50;
 
@@ -20205,13 +20204,13 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
 
     // state->dataSize->CurZoneEqNum = zone_num_TU1;
     state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(zone_num_TU1).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(zone_num_TU1).DesCoolVolFlow = 0.50;
     state->dataSize->FinalZoneSizing(zone_num_TU1).DesHeatVolFlow = 0.50;
 
     // state->dataSize->CurZoneEqNum = zone_num_TU2;
     state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(zone_num_TU2).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->FinalZoneSizing(zone_num_TU2).DesCoolVolFlow = 0.50;
     state->dataSize->FinalZoneSizing(zone_num_TU2).DesHeatVolFlow = 0.50;
 

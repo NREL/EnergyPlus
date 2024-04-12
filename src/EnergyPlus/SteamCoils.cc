@@ -96,7 +96,6 @@ namespace SteamCoils {
     // manage the SteamCoil System Component.
 
     using namespace DataLoopNode;
-    using namespace DataHVACGlobals;
     using namespace Psychrometrics;
     using namespace FluidProperties;
 
@@ -175,7 +174,7 @@ namespace SteamCoils {
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
         } else {
-            OpMode = ContFanCycCoil;
+            OpMode = HVAC::ContFanCycCoil;
         }
         if (present(PartLoadRatio)) {
             PartLoadFrac = PartLoadRatio;
@@ -766,16 +765,16 @@ namespace SteamCoils {
 
                     // Set the duct flow rate
                     switch (state.dataSize->CurDuctType) {
-                    case DataHVACGlobals::AirDuctType::Main:
+                    case HVAC::AirDuctType::Main:
                         DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesMainVolFlow;
                         break;
-                    case DataHVACGlobals::AirDuctType::Cooling:
+                    case HVAC::AirDuctType::Cooling:
                         DesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesCoolVolFlow;
                         break;
-                    case DataHVACGlobals::AirDuctType::Heating:
+                    case HVAC::AirDuctType::Heating:
                         DesVolFlow = finalSysSizing.DesHeatVolFlow;
                         break;
-                    case DataHVACGlobals::AirDuctType::Other:
+                    case HVAC::AirDuctType::Other:
                         DesVolFlow = finalSysSizing.DesMainVolFlow;
                         break;
                     default:
@@ -813,7 +812,7 @@ namespace SteamCoils {
                         DesCoilLoad = CpAirStd * DesMassFlow * (finalSysSizing.HeatSupTemp - CoilInTemp);
                     }
                     // AUTOSTEAMCOIL
-                    if (DesCoilLoad >= SmallLoad) {
+                    if (DesCoilLoad >= HVAC::SmallLoad) {
                         // TempSteamIn=SteamCoil(CoilNum)%InletSteamTemp
                         // TempSteamIn=PlantSizData(PltSizSteamNum)%ExitTemp
                         TempSteamIn = 100.0; // Should be from the PlantSizing object (ExitTemp) instead of hardwired to 100?
@@ -902,7 +901,7 @@ namespace SteamCoils {
                         DesMassFlow = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatMassFlow;
                         DesVolFlow = DesMassFlow / RhoAirStd;
                         DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
-                        if (DesCoilLoad >= SmallLoad) {
+                        if (DesCoilLoad >= HVAC::SmallLoad) {
                             TempSteamIn = 100.0;
                             // RefrigIndex is set during GetInput for this module
                             EnthSteamInDry = GetSatEnthalpyRefrig(
@@ -1049,7 +1048,7 @@ namespace SteamCoils {
         // desired is input by the user, which is used to calculate water outlet temp.
         // Heat exchange is = Latent Heat + Sensible heat,coil effectivness is 1.0
 
-        using DataHVACGlobals::TempControlTol;
+        using HVAC::TempControlTol;
         using PlantUtilities::SetComponentFlowRate;
 
         static constexpr std::string_view RoutineName("CalcSteamAirCoil");
@@ -1101,7 +1100,7 @@ namespace SteamCoils {
         }
 
         //  adjust mass flow rates for cycling fan cycling coil operation
-        if (FanOpMode == CycFanCycCoil) {
+        if (FanOpMode == HVAC::CycFanCycCoil) {
             if (PartLoadRatio > 0.0) {
                 AirMassFlow = state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
                 SteamMassFlowRate = min(state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate / PartLoadRatio,
@@ -1425,7 +1424,7 @@ namespace SteamCoils {
             assert(false);
         }
 
-        if (FanOpMode == CycFanCycCoil) {
+        if (FanOpMode == HVAC::CycFanCycCoil) {
             HeatingCoilLoad *= PartLoadRatio;
         }
 

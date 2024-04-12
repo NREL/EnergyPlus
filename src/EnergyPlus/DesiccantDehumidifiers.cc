@@ -383,8 +383,8 @@ namespace DesiccantDehumidifiers {
             desicDehum.RegenCoilType = Alphas(8);
             desicDehum.RegenCoilName = Alphas(9);
 
-            desicDehum.regenFanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(10)));
-            assert(desicDehum.regenFanType != DataHVACGlobals::FanType::Invalid);
+            desicDehum.regenFanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(10)));
+            assert(desicDehum.regenFanType != HVAC::FanType::Invalid);
 
             RegenCoilType = Alphas(8);
             RegenCoilName = Alphas(9);
@@ -392,16 +392,16 @@ namespace DesiccantDehumidifiers {
             if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric") ||
                 Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel")) {
                 if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric"))
-                    desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingElectric;
                 if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel"))
-                    desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
+                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
                 ValidateComponent(state, desicDehum.RegenCoilType, desicDehum.RegenCoilName, ErrorsFound2, CurrentModuleObject + '=' + Alphas(1));
                 if (ErrorsFound2) ErrorsFound = true;
                 HeatingCoils::GetCoilIndex(state, desicDehum.RegenCoilName, desicDehum.RegenCoilIndex, ErrorsFound2);
                 if (ErrorsFound2) ErrorsFound = true;
 
             } else if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Water")) {
-                desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingWater;
                 ValidateComponent(state, RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -450,7 +450,7 @@ namespace DesiccantDehumidifiers {
                     }
                 }
             } else if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Steam")) {
-                desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+                desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingSteam;
                 ValidateComponent(state, Alphas(8), RegenCoilName, IsNotOK, CurrentModuleObject);
                 if (IsNotOK) {
                     ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -573,10 +573,10 @@ namespace DesiccantDehumidifiers {
                 desicDehum.NomRegenTemp = Numbers(5);
 
                 // Validate regen fan type, for user defined curves, can be constant or variable volume
-                if (desicDehum.regenFanType == DataHVACGlobals::FanType::Constant || desicDehum.regenFanType == DataHVACGlobals::FanType::VAV ||
-                    desicDehum.regenFanType == DataHVACGlobals::FanType::SystemModel) {
+                if (desicDehum.regenFanType == HVAC::FanType::Constant || desicDehum.regenFanType == HVAC::FanType::VAV ||
+                    desicDehum.regenFanType == HVAC::FanType::SystemModel) {
                     ValidateComponent(state,
-                                      DataHVACGlobals::fanTypeNamesUC[(int)desicDehum.regenFanType],
+                                      HVAC::fanTypeNamesUC[(int)desicDehum.regenFanType],
                                       desicDehum.RegenFanName,
                                       ErrorsFound2,
                                       CurrentModuleObject + " = " + Alphas(1));
@@ -615,9 +615,9 @@ namespace DesiccantDehumidifiers {
                     ShowContinueError(state, "DEFAULT performance curves not valid outside 2.032 to 4.064 m/s (400 to 800 fpm).");
                 }
                 // Validate regen fan type, for default curves, can only variable volume
-                if (desicDehum.regenFanType == DataHVACGlobals::FanType::VAV || desicDehum.regenFanType == DataHVACGlobals::FanType::SystemModel) {
+                if (desicDehum.regenFanType == HVAC::FanType::VAV || desicDehum.regenFanType == HVAC::FanType::SystemModel) {
                     ValidateComponent(state,
-                                      DataHVACGlobals::fanTypeNamesUC[(int)desicDehum.regenFanType],
+                                      HVAC::fanTypeNamesUC[(int)desicDehum.regenFanType],
                                       desicDehum.RegenFanName,
                                       ErrorsFound2,
                                       CurrentModuleObject + " = " + Alphas(1));
@@ -632,7 +632,7 @@ namespace DesiccantDehumidifiers {
             // process regen fan
             ErrorsFound2 = false;
 
-            if (desicDehum.regenFanType == DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanType == HVAC::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, desicDehum.RegenFanName)); // call constructor
                 desicDehum.RegenFanIndex = HVACFan::getFanObjectVectorIndex(state, desicDehum.RegenFanName);
                 desicDehum.RegenFanInNode = state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->inletNodeNum;
@@ -790,34 +790,34 @@ namespace DesiccantDehumidifiers {
                 ErrorsFoundGeneric = true;
             }
 
-            desicDehum.regenFanType = static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(6)));
-            assert(desicDehum.regenFanType != DataHVACGlobals::FanType::Invalid);
+            desicDehum.regenFanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(6)));
+            assert(desicDehum.regenFanType != HVAC::FanType::Invalid);
 
             desicDehum.RegenFanName = Alphas(7);
 
-            if (desicDehum.regenFanType == DataHVACGlobals::FanType::OnOff || desicDehum.regenFanType == DataHVACGlobals::FanType::Constant ||
-                desicDehum.regenFanType == DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanType == HVAC::FanType::OnOff || desicDehum.regenFanType == HVAC::FanType::Constant ||
+                desicDehum.regenFanType == HVAC::FanType::SystemModel) {
                 ErrorsFound2 = false;
                 ValidateComponent(state,
-                                  DataHVACGlobals::fanTypeNamesUC[(int)desicDehum.regenFanType],
+                                  HVAC::fanTypeNamesUC[(int)desicDehum.regenFanType],
                                   desicDehum.RegenFanName,
                                   ErrorsFound2,
                                   desicDehum.DehumType + " \"" + desicDehum.Name + "\"");
                 if (ErrorsFound2) ErrorsFoundGeneric = true;
             } else {
                 ShowSevereError(state, format("{} \"{}\"", desicDehum.DehumType, desicDehum.Name));
-                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(6), DataHVACGlobals::fanTypeNamesUC[(int)desicDehum.regenFanType]));
+                ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(6), HVAC::fanTypeNamesUC[(int)desicDehum.regenFanType]));
                 ErrorsFoundGeneric = true;
             }
 
-            desicDehum.regenFanPlace = static_cast<DataHVACGlobals::FanPlace>(getEnumValue(DataHVACGlobals::fanPlaceNamesUC, Alphas(8)));
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::Invalid) {
+            desicDehum.regenFanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, Alphas(8)));
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::Invalid) {
                 ShowWarningInvalidKey(state, eoh, cAlphaFields(8), Alphas(8), "DrawThrough");
-                desicDehum.regenFanPlace = DataHVACGlobals::FanPlace::DrawThru;
+                desicDehum.regenFanPlace = HVAC::FanPlace::DrawThru;
             }
 
             ErrorsFound2 = false;
-            if (desicDehum.regenFanType == DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanType == HVAC::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, desicDehum.RegenFanName)); // call constructor
                 desicDehum.RegenFanIndex = HVACFan::getFanObjectVectorIndex(state, desicDehum.RegenFanName);
                 desicDehum.RegenFanInNode = state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->inletNodeNum;
@@ -845,9 +845,9 @@ namespace DesiccantDehumidifiers {
                 if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric") ||
                     Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel")) {
                     if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric"))
-                        desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingElectric;
+                        desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingElectric;
                     if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel"))
-                        desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingGasOrOtherFuel;
+                        desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
                     ErrorsFound2 = false;
                     ValidateComponent(state, RegenCoilType, RegenCoilName, ErrorsFound2, desicDehum.DehumType + " \"" + desicDehum.Name + "\"");
                     if (ErrorsFound2) ErrorsFoundGeneric = true;
@@ -907,7 +907,7 @@ namespace DesiccantDehumidifiers {
                     }
 
                 } else if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Water")) {
-                    desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
+                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingWater;
                     ValidateComponent(state, RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -969,7 +969,7 @@ namespace DesiccantDehumidifiers {
                         }
                     }
                 } else if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Steam")) {
-                    desicDehum.RegenCoilType_Num = DataHVACGlobals::Coil_HeatingSteam;
+                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingSteam;
                     ValidateComponent(state, RegenCoilType, RegenCoilName, IsNotOK, CurrentModuleObject);
                     if (IsNotOK) {
                         ShowContinueError(state, format("...occurs in {} = {}", CurrentModuleObject, Alphas(1)));
@@ -1080,7 +1080,7 @@ namespace DesiccantDehumidifiers {
             BranchNodeConnections::SetUpCompSets(state,
                                                  desicDehum.DehumType,
                                                  desicDehum.Name,
-                                                 DataHVACGlobals::fanTypeNamesUC[(int)desicDehum.regenFanType],
+                                                 HVAC::fanTypeNamesUC[(int)desicDehum.regenFanType],
                                                  desicDehum.RegenFanName,
                                                  RegenFanInlet,
                                                  RegenFanOutlet);
@@ -1095,7 +1095,7 @@ namespace DesiccantDehumidifiers {
                                                      RegenCoilOutlet);
             }
 
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
                 desicDehum.RegenAirInNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                 RegenFanInlet,
                                                                                 ErrorsFound,
@@ -1145,7 +1145,7 @@ namespace DesiccantDehumidifiers {
                         ErrorsFoundGeneric = true;
                     }
                 }
-            } else { // ELSE for IF (desicDehum%RegenFanPlacement == DataHVACGlobals::BlowThru)THEN
+            } else { // ELSE for IF (desicDehum%RegenFanPlacement == HVAC::BlowThru)THEN
                 desicDehum.RegenAirOutNode = NodeInputManager::GetOnlySingleNode(state,
                                                                                  RegenFanOutlet,
                                                                                  ErrorsFound,
@@ -1213,11 +1213,11 @@ namespace DesiccantDehumidifiers {
                     if (ErrorsFound2) ErrorsFoundGeneric = true;
 
                     if ((Util::SameString(desicDehum.CoolingCoilType, "COIL:COOLING:DX:SINGLESPEED"))) {
-                        desicDehum.coolingCoil_TypeNum = DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+                        desicDehum.coolingCoil_TypeNum = HVAC::CoilDX_CoolingSingleSpeed;
                     } else if ((Util::SameString(desicDehum.CoolingCoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE"))) {
-                        desicDehum.coolingCoil_TypeNum = DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl;
+                        desicDehum.coolingCoil_TypeNum = HVAC::CoilDX_CoolingTwoStageWHumControl;
                     } else if ((Util::SameString(desicDehum.CoolingCoilType, "COIL:COOLING:DX:VARIABLESPEED"))) {
-                        desicDehum.coolingCoil_TypeNum = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+                        desicDehum.coolingCoil_TypeNum = HVAC::Coil_CoolingAirToAirVariableSpeed;
                     }
 
                 } else {
@@ -1226,8 +1226,8 @@ namespace DesiccantDehumidifiers {
                     ErrorsFoundGeneric = true;
                 }
 
-                if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                    (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                     ErrorsFound2 = false;
                     desicDehum.CoolingCoilOutletNode =
                         DXCoils::GetCoilOutletNode(state, desicDehum.CoolingCoilType, desicDehum.CoolingCoilName, ErrorsFound2);
@@ -1238,7 +1238,7 @@ namespace DesiccantDehumidifiers {
                     ErrorsFound2 = false;
                     DXCoils::GetDXCoilIndex(state, desicDehum.CoolingCoilName, desicDehum.DXCoilIndex, ErrorsFound2, desicDehum.CoolingCoilType);
                     if (ErrorsFound2) ShowContinueError(state, format("...occurs in {} \"{}\"", desicDehum.DehumType, desicDehum.CoolingCoilName));
-                } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
                     desicDehum.CoolingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
                         state, desicDehum.CoolingCoilType, desicDehum.CoolingCoilName, ErrorsFound2);
@@ -1303,12 +1303,12 @@ namespace DesiccantDehumidifiers {
                         //          ErrorsFoundGeneric = .TRUE.
                     }
                 }
-                if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                    (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                     ErrorsFound2 = false;
                     desicDehum.CondenserInletNode =
                         DXCoils::GetCoilCondenserInletNode(state, desicDehum.CoolingCoilType, desicDehum.CoolingCoilName, ErrorsFound2);
-                } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
                     desicDehum.CondenserInletNode = VariableSpeedCoils::GetVSCoilCondenserInletNode(state, desicDehum.CoolingCoilName, ErrorsFound2);
                 }
@@ -1362,12 +1362,12 @@ namespace DesiccantDehumidifiers {
             }
 
             if (desicDehum.DXCoilIndex > 0 && desicDehum.CoilUpstreamOfProcessSide == Selection::Yes) {
-                if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                    (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                     ErrorsFound2 = false;
                     CoilBypassedFlowFrac =
                         DXCoils::GetDXCoilBypassedFlowFrac(state, desicDehum.CoolingCoilType, desicDehum.CoolingCoilName, ErrorsFound2);
-                } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
                     CoilBypassedFlowFrac = 0.0; // bypass flow fraction not in VS coil model
                 }
@@ -1650,9 +1650,9 @@ namespace DesiccantDehumidifiers {
         }
 
         if (state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingWater) ||
-                (desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingSteam)) {
-                if (desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+            if ((desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) ||
+                (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingSteam)) {
+                if (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) {
                     ErrorFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
                                                             desicDehum.RegenCoilName,
@@ -1680,7 +1680,7 @@ namespace DesiccantDehumidifiers {
                         desicDehum.MaxCoilFluidFlow *= FluidDensity;
                     }
 
-                } else if (desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                } else if (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingSteam) {
 
                     ErrorFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,
@@ -1778,7 +1778,7 @@ namespace DesiccantDehumidifiers {
                 if (desicDehum.CoilControlNode > 0) {
                     //    If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
                     if (desicDehum.MaxCoilFluidFlow == DataSizing::AutoSize) {
-                        if (desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+                        if (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) {
                             WaterCoils::SimulateWaterCoilComponents(state, desicDehum.RegenCoilName, FirstHVACIteration, desicDehum.RegenCoilIndex);
                             ErrorFlag = false;
                             Real64 CoilMaxVolFlowRate =
@@ -1796,7 +1796,7 @@ namespace DesiccantDehumidifiers {
                                 desicDehum.MaxCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                             }
                         }
-                        if (desicDehum.RegenCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
+                        if (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingSteam) {
                             SteamCoils::SimulateSteamCoilComponents(state,
                                                                     desicDehum.RegenCoilName,
                                                                     FirstHVACIteration,
@@ -1902,7 +1902,7 @@ namespace DesiccantDehumidifiers {
         case DesicDehumType::Solid: {
             if (desicDehum.HumRatSet <= 0.0) UnitOn = false;
             ProcAirMassFlowRate = desicDehum.ProcAirInMassFlowRate;
-            if (ProcAirMassFlowRate <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
+            if (ProcAirMassFlowRate <= HVAC::SmallMassFlow) UnitOn = false;
 
             if (ScheduleManager::GetCurrentScheduleValue(state, desicDehum.SchedPtr) <= 0.0) UnitOn = false;
 
@@ -1948,7 +1948,7 @@ namespace DesiccantDehumidifiers {
         } break;
         case DesicDehumType::Generic: {
             ProcAirMassFlowRate = state.dataLoopNodes->Node(desicDehum.ProcAirInNode).MassFlowRate;
-            if (ProcAirMassFlowRate <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
+            if (ProcAirMassFlowRate <= HVAC::SmallMassFlow) UnitOn = false;
 
             if (ScheduleManager::GetCurrentScheduleValue(state, desicDehum.SchedPtr) <= 0.0) UnitOn = false;
 
@@ -2306,7 +2306,7 @@ namespace DesiccantDehumidifiers {
         state.dataLoopNodes->Node(desicDehum.RegenFanInNode).MassFlowRate = RegenAirMassFlowRate;
         state.dataLoopNodes->Node(desicDehum.RegenFanInNode).MassFlowRateMaxAvail = RegenAirMassFlowRate;
         // Call regen fan
-        if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+        if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
             Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
         } else {
             state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2324,7 +2324,7 @@ namespace DesiccantDehumidifiers {
             ShowRecurringContinueErrorAtEnd(state, desicDehum.DehumType + '=' + desicDehum.Name, desicDehum.RegenFanErrorIndex2);
             ShowRecurringContinueErrorAtEnd(
                 state,
-                format("Flow requested [m3/s] from {} = {}", DataHVACGlobals::fanTypeNames[(int)desicDehum.regenFanType], desicDehum.RegenFanName),
+                format("Flow requested [m3/s] from {} = {}", HVAC::fanTypeNames[(int)desicDehum.regenFanType], desicDehum.RegenFanName),
                 desicDehum.RegenFanErrorIndex3,
                 (RegenAirMassFlowRate / state.dataEnvrn->StdRhoAir));
             ShowRecurringContinueErrorAtEnd(
@@ -2440,8 +2440,8 @@ namespace DesiccantDehumidifiers {
         }
 
         if (desicDehum.CoilUpstreamOfProcessSide == Selection::Yes) {
-            if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+            if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                 if (state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex) == 0.0) {
                     UnitOn = false;
                 }
@@ -2463,19 +2463,19 @@ namespace DesiccantDehumidifiers {
             if (desicDehum.Preheat == Selection::Yes) {
 
                 //     condenser waste heat is proportional to DX coil PLR
-                if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                    (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                     CondenserWasteHeat = state.dataHeatBal->HeatReclaimDXCoil(desicDehum.DXCoilIndex).AvailCapacity;
                     state.dataHeatBal->HeatReclaimDXCoil(desicDehum.DXCoilIndex).AvailCapacity = 0.0;
-                } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     CondenserWasteHeat = state.dataHeatBal->HeatReclaimVS_DXCoil(desicDehum.DXCoilIndex).AvailCapacity;
                     state.dataHeatBal->HeatReclaimVS_DXCoil(desicDehum.DXCoilIndex).AvailCapacity = 0.0;
                 }
 
                 CpAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(desicDehum.CondenserInletNode).HumRat);
 
-                if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
-                    if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+                if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
+                    if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                         Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                     } else {
                         state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2490,10 +2490,10 @@ namespace DesiccantDehumidifiers {
                 if (CompanionCoilIndexNum > 0) {
 
                     //     calculate PLR and actual condenser outlet node (regen inlet node) temperature
-                    if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                        (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                    if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                        (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                         DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex);
-                        if (state.dataDXCoils->DXCoilFanOpMode(desicDehum.DXCoilIndex) == DataHVACGlobals::ContFanCycCoil) {
+                        if (state.dataDXCoils->DXCoilFanOpMode(desicDehum.DXCoilIndex) == HVAC::ContFanCycCoil) {
                             NewRegenInTemp =
                                 state.dataLoopNodes->Node(desicDehum.CondenserInletNode).Temp +
                                 CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) * DDPartLoadRatio);
@@ -2502,7 +2502,7 @@ namespace DesiccantDehumidifiers {
                             NewRegenInTemp = state.dataLoopNodes->Node(desicDehum.CondenserInletNode).Temp +
                                              CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate));
                         }
-                    } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                         DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                         NewRegenInTemp = state.dataLoopNodes->Node(desicDehum.CondenserInletNode).Temp +
                                          CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate));
@@ -2564,7 +2564,7 @@ namespace DesiccantDehumidifiers {
                     if (RegenCoilIndex > 0) {
 
                         QRegen_OASysFanAdjust = QRegen;
-                        if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+                        if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
                             if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                                 //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
                                 //             reduction through fan
@@ -2580,7 +2580,7 @@ namespace DesiccantDehumidifiers {
                                                   desicDehum.HXName,
                                                   FirstHVACIteration,
                                                   desicDehum.CompIndex,
-                                                  DataHVACGlobals::ContFanCycCoil,
+                                                  HVAC::ContFanCycCoil,
                                                   1.0,
                                                   true,
                                                   CompanionCoilIndexNum,
@@ -2624,8 +2624,8 @@ namespace DesiccantDehumidifiers {
                 if (state.dataLoopNodes->Node(desicDehum.ProcAirInNode).HumRat > HumRatNeeded) {
 
                     //       Get Full load output of desiccant wheel
-                    if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
-                        if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+                    if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
+                        if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                             Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                         } else {
                             state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2643,7 +2643,7 @@ namespace DesiccantDehumidifiers {
                                       (RegenSetPointTemp - state.dataLoopNodes->Node(desicDehum.RegenAirInNode).Temp)));
 
                         QRegen_OASysFanAdjust = QRegen;
-                        if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+                        if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
                             if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                                 //             For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot
                                 //             reduction through fan
@@ -2662,7 +2662,7 @@ namespace DesiccantDehumidifiers {
                                                       desicDehum.HXName,
                                                       FirstHVACIteration,
                                                       desicDehum.CompIndex,
-                                                      DataHVACGlobals::ContFanCycCoil,
+                                                      HVAC::ContFanCycCoil,
                                                       1.0,
                                                       true,
                                                       CompanionCoilIndexNum,
@@ -2682,10 +2682,10 @@ namespace DesiccantDehumidifiers {
                             DDPartLoadRatio = 1.0;
                         }
                     } else {
-                        if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                            (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                        if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                            (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                             DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex);
-                        } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                        } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                             DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                         }
                     }
@@ -2708,8 +2708,8 @@ namespace DesiccantDehumidifiers {
             }
 
             // Call regen fan, balanced desiccant HX and heating coil
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
-                if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
+                if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
                     state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2721,7 +2721,7 @@ namespace DesiccantDehumidifiers {
                 //!   adjust regen heating coil capacity based on desiccant cycling ratio (PLR)
                 //    QRegen_OASysFanAdjust = QRegen * DDPartLoadRatio
 
-                if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
+                if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
                     if (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate > 0.0) {
                         //       For VAV systems, fan may restrict air flow during iteration. Adjust QRegen proportional to Mdot reduction through fan
                         QRegen_OASysFanAdjust *= state.dataLoopNodes->Node(desicDehum.RegenFanOutNode).MassFlowRate /
@@ -2737,7 +2737,7 @@ namespace DesiccantDehumidifiers {
                                           desicDehum.HXName,
                                           FirstHVACIteration,
                                           desicDehum.CompIndex,
-                                          DataHVACGlobals::ContFanCycCoil,
+                                          HVAC::ContFanCycCoil,
                                           DDPartLoadRatio,
                                           true,
                                           CompanionCoilIndexNum,
@@ -2746,8 +2746,8 @@ namespace DesiccantDehumidifiers {
                                           _,
                                           desicDehum.coolingCoil_TypeNum);
 
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
-                if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::DrawThru) {
+                if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
                     state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2762,11 +2762,11 @@ namespace DesiccantDehumidifiers {
             // If preheat is Yes, exhaust fan is condenser fan, if CoilUpstreamOfProcessSide is No, DD runs an its own PLR
             if (desicDehum.Preheat == Selection::Yes && desicDehum.CoilUpstreamOfProcessSide == Selection::No) {
                 //    should actually use DX coil RTF instead of PLR since fan power is being calculated
-                if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                    (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                    (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                     desicDehum.ExhaustFanPower += max(
                         0.0, (desicDehum.ExhaustFanMaxPower * (state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex) - DDPartLoadRatio)));
-                } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     desicDehum.ExhaustFanPower += max(0.0, (desicDehum.ExhaustFanMaxPower * (1.0 - DDPartLoadRatio)));
                 }
             }
@@ -2780,8 +2780,8 @@ namespace DesiccantDehumidifiers {
                 state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRateMaxAvail = 0.0;
             }
 
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
-                if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::BlowThru) {
+                if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
                     state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2796,7 +2796,7 @@ namespace DesiccantDehumidifiers {
                                           desicDehum.HXName,
                                           FirstHVACIteration,
                                           desicDehum.CompIndex,
-                                          DataHVACGlobals::ContFanCycCoil,
+                                          HVAC::ContFanCycCoil,
                                           0.0,
                                           false,
                                           CompanionCoilIndexNum,
@@ -2805,8 +2805,8 @@ namespace DesiccantDehumidifiers {
                                           _,
                                           desicDehum.coolingCoil_TypeNum);
 
-            if (desicDehum.regenFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
-                if (desicDehum.regenFanType != DataHVACGlobals::FanType::SystemModel) {
+            if (desicDehum.regenFanPlace == HVAC::FanPlace::DrawThru) {
+                if (desicDehum.regenFanType != HVAC::FanType::SystemModel) {
                     Fans::SimulateFanComponents(state, desicDehum.RegenFanName, FirstHVACIteration, desicDehum.RegenFanIndex);
                 } else {
                     state.dataHVACFan->fanObjs[desicDehum.RegenFanIndex]->simulate(state, _, _);
@@ -2816,10 +2816,10 @@ namespace DesiccantDehumidifiers {
             // Turn on exhaust fan if DX Coil is operating
             if (desicDehum.ExhaustFanMaxVolFlowRate > 0) {
                 if (desicDehum.DXCoilIndex > 0) {
-                    if ((desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-                        (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
+                    if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
+                        (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                         DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex);
-                    } else if (desicDehum.coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
+                    } else if (desicDehum.coolingCoil_TypeNum == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                         DDPartLoadRatio = 1.0; // condenser waste heat already includes modulation down
                     }
                     desicDehum.ExhaustFanPower = desicDehum.ExhaustFanMaxPower * DDPartLoadRatio;
@@ -2985,14 +2985,14 @@ namespace DesiccantDehumidifiers {
         auto &desicDehum = state.dataDesiccantDehumidifiers->DesicDehum(DesicDehumNum);
 
         RegenCoilActual = 0.0;
-        if (RegenCoilLoad > DataHVACGlobals::SmallLoad) {
+        if (RegenCoilLoad > HVAC::SmallLoad) {
             switch (desicDehum.RegenCoilType_Num) {
-            case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
-            case DataHVACGlobals::Coil_HeatingElectric: {
+            case HVAC::Coil_HeatingGasOrOtherFuel:
+            case HVAC::Coil_HeatingElectric: {
                 HeatingCoils::SimulateHeatingCoilComponents(
                     state, desicDehum.RegenCoilName, FirstHVACIteration, RegenCoilLoad, desicDehum.RegenCoilIndex, RegenCoilActual);
             } break;
-            case DataHVACGlobals::Coil_HeatingWater: {
+            case HVAC::Coil_HeatingWater: {
                 MaxHotWaterFlow = desicDehum.MaxCoilFluidFlow;
                 PlantUtilities::SetComponentFlowRate(
                     state, MaxHotWaterFlow, desicDehum.CoilControlNode, desicDehum.CoilOutletNode, desicDehum.plantLoc);
@@ -3001,7 +3001,7 @@ namespace DesiccantDehumidifiers {
                 WaterCoils::SimulateWaterCoilComponents(
                     state, desicDehum.RegenCoilName, FirstHVACIteration, desicDehum.RegenCoilIndex, RegenCoilActual);
 
-                if (RegenCoilActual > (RegenCoilLoad + DataHVACGlobals::SmallLoad)) {
+                if (RegenCoilActual > (RegenCoilLoad + HVAC::SmallLoad)) {
                     // control water flow to obtain output matching RegenCoilLoad
                     int SolFlag = 0;
                     MinWaterFlow = 0.0;
@@ -3072,7 +3072,7 @@ namespace DesiccantDehumidifiers {
                         state, desicDehum.RegenCoilName, FirstHVACIteration, desicDehum.RegenCoilIndex, RegenCoilActual);
                 }
             } break;
-            case DataHVACGlobals::Coil_HeatingSteam: {
+            case HVAC::Coil_HeatingSteam: {
                 mdot = desicDehum.MaxCoilFluidFlow;
                 PlantUtilities::SetComponentFlowRate(state, mdot, desicDehum.CoilControlNode, desicDehum.CoilOutletNode, desicDehum.plantLoc);
                 // simulate the regenerator steam heating coil
@@ -3084,12 +3084,12 @@ namespace DesiccantDehumidifiers {
             }
         } else {
             switch (desicDehum.RegenCoilType_Num) {
-            case DataHVACGlobals::Coil_HeatingGasOrOtherFuel:
-            case DataHVACGlobals::Coil_HeatingElectric: {
+            case HVAC::Coil_HeatingGasOrOtherFuel:
+            case HVAC::Coil_HeatingElectric: {
                 HeatingCoils::SimulateHeatingCoilComponents(
                     state, desicDehum.RegenCoilName, FirstHVACIteration, RegenCoilLoad, desicDehum.RegenCoilIndex, RegenCoilActual);
             } break;
-            case DataHVACGlobals::Coil_HeatingWater: {
+            case HVAC::Coil_HeatingWater: {
                 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(state, mdot, desicDehum.CoilControlNode, desicDehum.CoilOutletNode, desicDehum.plantLoc);
                 RegenCoilActual = RegenCoilLoad;
@@ -3097,7 +3097,7 @@ namespace DesiccantDehumidifiers {
                 WaterCoils::SimulateWaterCoilComponents(
                     state, desicDehum.RegenCoilName, FirstHVACIteration, desicDehum.RegenCoilIndex, RegenCoilActual);
             } break;
-            case DataHVACGlobals::Coil_HeatingSteam: {
+            case HVAC::Coil_HeatingSteam: {
                 mdot = 0.0;
                 PlantUtilities::SetComponentFlowRate(state, mdot, desicDehum.CoilControlNode, desicDehum.CoilOutletNode, desicDehum.plantLoc);
                 // simulate the regenerator steam heating coil

@@ -114,11 +114,11 @@ namespace UnitHeater {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::ContFanCycCoil;
-    using DataHVACGlobals::CycFanCycCoil;
-    using DataHVACGlobals::SmallAirVolFlow;
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::ContFanCycCoil;
+    using HVAC::CycFanCycCoil;
+    using HVAC::SmallAirVolFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
     using namespace ScheduleManager;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
@@ -342,9 +342,9 @@ namespace UnitHeater {
 
             // Fan information:
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType =
-                static_cast<DataHVACGlobals::FanType>(getEnumValue(DataHVACGlobals::fanTypeNamesUC, Alphas(5)));
+                static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(5)));
 
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::Invalid) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::Invalid) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5));
                 ErrorsFound = true;
             }
@@ -354,7 +354,7 @@ namespace UnitHeater {
 
             errFlag = false;
             ValidateComponent(state,
-                              DataHVACGlobals::fanTypeNames[(int)state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType],
+                              HVAC::fanTypeNames[(int)state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType],
                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                               errFlag,
                               CurrentModuleObject);
@@ -362,7 +362,7 @@ namespace UnitHeater {
                 ShowContinueError(state, format("specified in {} = \"{}\".", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                 ErrorsFound = true;
             } else {
-                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != DataHVACGlobals::FanType::SystemModel) {
+                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != HVAC::FanType::SystemModel) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index =
                         Fans::GetFanIndex(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName);
                     if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index == 0) {
@@ -370,9 +370,9 @@ namespace UnitHeater {
                         ErrorsFound = true;
                     } else {
                         switch (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType) {
-                        case DataHVACGlobals::FanType::Constant:
-                        case DataHVACGlobals::FanType::VAV:
-                        case DataHVACGlobals::FanType::OnOff: {
+                        case HVAC::FanType::Constant:
+                        case HVAC::FanType::VAV:
+                        case HVAC::FanType::OnOff: {
                             // Get fan outlet node
                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode =
                                 GetFanOutletNode(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
@@ -523,8 +523,8 @@ namespace UnitHeater {
                                        Alphas(9)));
                 ErrorsFound = true;
             } else if (lAlphaBlanks(9)) {
-                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::OnOff ||
-                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::SystemModel) {
+                if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::OnOff ||
+                    state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::SystemModel) {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = CycFanCycCoil;
                 } else {
                     state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = ContFanCycCoil;
@@ -533,7 +533,7 @@ namespace UnitHeater {
 
             // Check fan's schedule for cycling fan operation if constant volume fan is used
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr > 0 &&
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::Constant) {
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::Constant) {
                 if (!CheckScheduleValueMinMax(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr, ">", 0.0, "<=", 1.0)) {
                     ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                     ShowContinueError(state, format("For {} = {}", cAlphaFields(5), Alphas(5)));
@@ -631,7 +631,7 @@ namespace UnitHeater {
             SetUpCompSets(state,
                           CurrentModuleObject,
                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name,
-                          DataHVACGlobals::fanTypeNamesUC[(int)state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType],
+                          HVAC::fanTypeNamesUC[(int)state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType],
                           state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                           state.dataLoopNodes->NodeID(state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode),
                           state.dataLoopNodes->NodeID(state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanOutletNode));
@@ -694,7 +694,7 @@ namespace UnitHeater {
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::OnOff) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::OnOff) {
                 SetupOutputVariable(state,
                                     "Zone Unit Heater Fan Part Load Ratio",
                                     Constant::Units::None,
@@ -706,7 +706,7 @@ namespace UnitHeater {
         }
 
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::SystemModel) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::SystemModel) {
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilName,
                                                                                          state.dataUnitHeaters->UnitHeat(UnitHeatNum).HCoilTypeCh,
@@ -899,7 +899,7 @@ namespace UnitHeater {
         state.dataUnitHeaters->QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // zone load needed
         if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr > 0) {
             if (GetCurrentScheduleValue(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanSchedPtr) == 0.0 &&
-                state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::OnOff) {
+                state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::OnOff) {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = CycFanCycCoil;
             } else {
                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).OpMode = ContFanCycCoil;
@@ -974,8 +974,8 @@ namespace UnitHeater {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingAirflowSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
+        using HVAC::HeatingAirflowSizing;
+        using HVAC::HeatingCapacitySizing;
         using PlantUtilities::MyPlantSizingIndex;
         using Psychrometrics::CPHW;
         using SteamCoils::GetCoilSteamInletNode;
@@ -1042,14 +1042,14 @@ namespace UnitHeater {
         CompType = "ZoneHVAC:UnitHeater";
         CompName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name;
         state.dataSize->DataZoneNumber = state.dataUnitHeaters->UnitHeat(UnitHeatNum).ZonePtr;
-        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == DataHVACGlobals::FanType::SystemModel) {
+        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType == HVAC::FanType::SystemModel) {
             state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
         } else {
             state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
         }
         state.dataSize->DataFanIndex = state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index;
         // unit heater is always blow thru
-        state.dataSize->DataFanPlacement = DataHVACGlobals::FanPlace::BlowThru;
+        state.dataSize->DataFanPlacement = HVAC::FanPlace::BlowThru;
 
         if (CurZoneEqNum > 0) {
             if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
@@ -1734,7 +1734,7 @@ namespace UnitHeater {
 
         // Report variables...
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower = max(0.0, QUnitOut);
-        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != DataHVACGlobals::FanType::SystemModel) {
+        if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != HVAC::FanType::SystemModel) {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower = Fans::GetFanPower(state, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index);
         } else {
             state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower =
@@ -1789,7 +1789,7 @@ namespace UnitHeater {
         QCoilReq = 0.0;
 
         if (OpMode != CycFanCycCoil) {
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != DataHVACGlobals::FanType::SystemModel) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,
@@ -1867,7 +1867,7 @@ namespace UnitHeater {
             state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail = AirMassFlow;
 
             if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != DataHVACGlobals::FanType::SystemModel) {
+            if (state.dataUnitHeaters->UnitHeat(UnitHeatNum).fanType != HVAC::FanType::SystemModel) {
                 Fans::SimulateFanComponents(state,
                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
                                             FirstHVACIteration,

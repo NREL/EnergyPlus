@@ -866,14 +866,14 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         // fill out some fan information
         switch (c->supFanModelType) {
         case DataAirSystems::StructArrayLegacyFanModels: {
-            DataHVACGlobals::FanType locFanType = DataHVACGlobals::FanType::Invalid;
+            HVAC::FanType locFanType = HVAC::FanType::Invalid;
             bool errorsFound(false);
             if (c->supFanNum <= 0) {
                 c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
             }
 
             locFanType = Fans::GetFanType(state, c->supFanNum);
-            c->fanTypeName = DataHVACGlobals::fanTypeNames[(int)locFanType];
+            c->fanTypeName = HVAC::fanTypeNames[(int)locFanType];
             c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state, c->supFanNum);
             c->fanSizeMaxAirMassFlow = state.dataFans->Fan(c->supFanNum).MaxAirMassFlowRate;
             break;
@@ -995,11 +995,11 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
         bool found(false);
         bool locIsCooling(false);
         bool locIsHeating(false);
-        for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-            if (Util::SameString(coilType, DataHVACGlobals::cAllCoilTypes(loop))) {
+        for (int loop = 1; loop <= HVAC::NumAllCoilTypes; ++loop) {
+            if (Util::SameString(coilType, HVAC::cAllCoilTypes(loop))) {
                 found = true;
-                locIsCooling = Util::SameString(coilType, DataHVACGlobals::cCoolingCoilTypes(loop));
-                locIsHeating = Util::SameString(coilType, DataHVACGlobals::cHeatingCoilTypes(loop));
+                locIsCooling = Util::SameString(coilType, HVAC::cCoolingCoilTypes(loop));
+                locIsHeating = Util::SameString(coilType, HVAC::cHeatingCoilTypes(loop));
                 break;
             }
         }
@@ -1846,7 +1846,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->coilDesVolFlow = state.dataSize->DataFlowUsedForSizing;
         } else if (curZoneEqNum > 0 && allocated(state.dataSize->FinalZoneSizing)) {
             auto &finalZoneSizing = state.dataSize->FinalZoneSizing(curZoneEqNum);
-            if (finalZoneSizing.DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
+            if (finalZoneSizing.DesHeatMassFlow >= HVAC::SmallMassFlow) {
                 c->coilDesMassFlow = finalZoneSizing.DesHeatMassFlow;
                 c->coilDesVolFlow = c->coilDesMassFlow / state.dataEnvrn->StdRhoAir;
             }
@@ -1872,21 +1872,21 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                         c->coilDesVolFlow = unitarySysEqSizing.HeatingAirVolFlow;
                     }
                 } else {
-                    if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Main) {
+                    if (state.dataSize->CurDuctType == HVAC::AirDuctType::Main) {
                         if (finalSysSizing.SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
                             c->coilDesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesMainVolFlow;
                         } else {
                             c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
                         }
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Cooling) {
+                    } else if (state.dataSize->CurDuctType == HVAC::AirDuctType::Cooling) {
                         if (finalSysSizing.SysAirMinFlowRat > 0.0 && !state.dataSize->DataDesicRegCoil) {
                             c->coilDesVolFlow = finalSysSizing.SysAirMinFlowRat * finalSysSizing.DesCoolVolFlow;
                         } else {
                             c->coilDesVolFlow = finalSysSizing.DesCoolVolFlow;
                         }
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                    } else if (state.dataSize->CurDuctType == HVAC::AirDuctType::Heating) {
                         c->coilDesVolFlow = finalSysSizing.DesHeatVolFlow;
-                    } else if (state.dataSize->CurDuctType == DataHVACGlobals::AirDuctType::Other) {
+                    } else if (state.dataSize->CurDuctType == HVAC::AirDuctType::Other) {
                         c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
                     } else {
                         c->coilDesVolFlow = finalSysSizing.DesMainVolFlow;
@@ -2085,8 +2085,8 @@ bool ReportCoilSelection::isCompTypeCoil(std::string const &compType // string c
 {
     // if compType name is one of the coil objects, then return true
     bool found(false);
-    for (int loop = 1; loop <= DataHVACGlobals::NumAllCoilTypes; ++loop) {
-        if (Util::SameString(compType, DataHVACGlobals::cAllCoilTypes(loop))) {
+    for (int loop = 1; loop <= HVAC::NumAllCoilTypes; ++loop) {
+        if (Util::SameString(compType, HVAC::cAllCoilTypes(loop))) {
             found = true;
             break;
         }

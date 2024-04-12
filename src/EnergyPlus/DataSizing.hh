@@ -1168,7 +1168,7 @@ struct SizingData : BaseGlobalStruct
     int CurZoneEqNum = 0;           // Current Zone Equipment index (0 if not simulating ZoneEq)
     int CurTermUnitSizingNum = 0;   // Current terminal unit sizing index for TermUnitSizing and TermUnitFinalZoneSizing
     int CurBranchNum = 0;           // Index of branch being simulated (or 0 if not air loop)
-    DataHVACGlobals::AirDuctType CurDuctType = DataHVACGlobals::AirDuctType::Invalid; // Duct type of current branch
+    HVAC::AirDuctType CurDuctType = HVAC::AirDuctType::Invalid; // Duct type of current branch
     int CurLoopNum = 0;                                                               // the current plant loop index
     int CurCondLoopNum = 0;                                                           // the current condenser loop number
     int CurEnvirNumSimDay = 0;                                                        // current environment number for day simulated
@@ -1260,7 +1260,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                       // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                             // Fan type used during sizing
     int DataFanIndex = -1;                                // Fan index used during sizing
-    DataHVACGlobals::FanPlace DataFanPlacement = DataHVACGlobals::FanPlace::Invalid; // identifies location of fan wrt coil
+    HVAC::FanPlace DataFanPlacement = HVAC::FanPlace::Invalid; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     int DataCoolCoilType = -1;
     int DataCoolCoilIndex = -1;

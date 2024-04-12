@@ -189,7 +189,7 @@ namespace HVACFan {
             Num
         };
 
-        DataHVACGlobals::FanType m_fanType;      // DataHVACGlobals fan type
+        HVAC::FanType m_fanType;      // DataHVACGlobals fan type
         bool m_designAirVolFlowRateWasAutosized; // true if design max volume flow rate was autosize on input
         Real64 m_minPowerFlowFrac;               // Minimum fan air flow fraction for power calculation
         Real64 m_motorEff;                       // Fan motor efficiency

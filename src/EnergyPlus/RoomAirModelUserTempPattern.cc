@@ -620,8 +620,8 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // sets values in Heat balance variables
 
     // Using/Aliasing
-    using DataHVACGlobals::RetTempMax;
-    using DataHVACGlobals::RetTempMin;
+    using HVAC::RetTempMax;
+    using HVAC::RetTempMin;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
