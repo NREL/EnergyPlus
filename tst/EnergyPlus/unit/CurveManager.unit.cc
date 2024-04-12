@@ -476,6 +476,53 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     }
 }
 
+TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnlyButItIsZero)
+{
+    std::string const idf_objects = delimited_string({"Table:Lookup,",
+                                                      "y_values,                              !- Name",
+                                                      "y_values_list,                         !- Independent Variable List Name",
+                                                      "DivisorOnly,                           !- Normalization Method",
+                                                      "0.0,                                   !- Normalization Divisor",
+                                                      "2.0,                                   !- Minimum Output",
+                                                      "21.0,                                  !- Maximum Output",
+                                                      "Dimensionless,                         !- Output Unit Type",
+                                                      ",                                      !- External File Name",
+                                                      ",                                      !- External File Column Number",
+                                                      ",                                      !- External File Starting Row Number",
+                                                      "2.0,                                   !- Value 1",
+                                                      "4.0;                                   !- Value 2",
+
+                                                      "Table:IndependentVariableList,",
+                                                      "y_values_list,                         !- Name",
+                                                      "x_values_1;                            !- Independent Variable Name 1",
+
+                                                      "Table:IndependentVariable,",
+                                                      "x_values_1,                            !- Name",
+                                                      ",                                      !- Interpolation Method",
+                                                      ",                                      !- Extrapolation Method",
+                                                      ",                                      !- Minimum value",
+                                                      ",                                      !- Maximum value",
+                                                      ",                                      !- Normalization Reference Value",
+                                                      "Dimensionless                          !- Output Unit Type",
+                                                      ",                                      !- External File Name",
+                                                      ",                                      !- External File Column Number",
+                                                      ",                                      !- External File Starting Row Number",
+                                                      ",",
+                                                      "2.0,                                   !- Value 1",
+                                                      "3.0;                                   !- Value 3"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_EQ(0, state->dataCurveManager->NumCurves);
+
+    Curve::GetCurveInput(*state);
+    state->dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
+
+    auto const x = Curve::CurveValue(*state, 1, 1.0);
+    bool isValid = (!std::isinf(x)) && (!std::isnan(x));
+    ASSERT_TRUE(isValid);
+}
+
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
 {
     //    /*
