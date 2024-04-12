@@ -292,19 +292,20 @@ private:
     // This function should be called by process_idf() so unit tests can take advantage of caching
     // To test this function use InputProcessorFixture
     // This calls EXPECT_* within the function as well as returns a boolean so you can call [ASSERT/EXPECT]_[TRUE/FALSE] depending
-    // if it makes sense for the unit test to continue after retrning from function.
+    // if it makes sense for the unit test to continue after returning from function.
     // Will return false if no errors found and true if errors found
 
     //    static bool process_idd(std::string const &idd, bool &errors_found);
 
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
-    std::ostringstream *err_stream;
-
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;
     std::unique_ptr<RedirectCout> m_redirect_cout;
     std::unique_ptr<RedirectCerr> m_redirect_cerr;
+
+protected:
+    std::ostringstream *err_stream;
 };
 
 } // namespace EnergyPlus

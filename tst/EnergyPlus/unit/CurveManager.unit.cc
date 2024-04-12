@@ -514,13 +514,8 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnlyButItIsZero)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, state->dataCurveManager->NumCurves);
 
-    Curve::GetCurveInput(*state);
-    state->dataCurveManager->GetCurvesInputFlag = false;
-    ASSERT_EQ(1, state->dataCurveManager->NumCurves);
-
-    auto const x = Curve::CurveValue(*state, 1, 1.0);
-    bool isValid = (!std::isinf(x)) && (!std::isnan(x));
-    ASSERT_TRUE(isValid);
+    EXPECT_THROW(Curve::GetCurveInput(*state), std::runtime_error);
+    EXPECT_TRUE(this->err_stream->str().find("Normalization divisor entered as zero") != std::string::npos);
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
