@@ -57,11 +57,11 @@ from ctypes import cdll, c_char_p, c_void_p
 import os
 import sys
 
-from pyenergyplus.func import Functional
-from pyenergyplus.datatransfer import DataExchange
-from pyenergyplus.runtime import Runtime
-from pyenergyplus.state import StateManager
-# from pyenergyplus.autosizing import Autosizing
+from .func import Functional
+from .datatransfer import DataExchange
+from .runtime import Runtime
+from .state import StateManager
+# from .autosizing import Autosizing
 
 
 def api_path() -> str:

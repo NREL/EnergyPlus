@@ -1,0 +1,41 @@
+[build-system]
+requires = ["scikit-build-core"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "energyplus-core"
+dynamic = ["version"]
+description = "EnergyPlus Python Bindings"
+requires-python = ">=3.8"
+readme = "README.md"
+license = {text = "Modified BSD"}
+authors = [{name = "United States Department of Energy"}]
+urls = {homepage = "https://github.com/NREL/EnergyPlus"}
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[tool.scikit-build]
+cmake.source-dir = "."
+wheel.py-api = "cp38"
+# create a namespace package
+wheel.install-dir = "energyplus/core/"
+# use git tags for versioning
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+
+[tool.scikit-build.cmake.define]
+# this is required for pyenergyplus to be included
+BUILD_PACKAGE = "ON"
+# optional switches
+BUILD_FORTRAN = "OFF"
+DOCUMENTATION_BUILD = "DoNotBuild"
+
+# NOTE section required by metadata.version.provider
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"

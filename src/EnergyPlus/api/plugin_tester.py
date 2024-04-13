@@ -65,7 +65,7 @@ import sys
 from importlib import util as import_util
 from unittest.mock import Mock
 
-from pyenergyplus.plugin import EnergyPlusPlugin
+from .plugin import EnergyPlusPlugin
 
 
 def generate_mock_api(bare_mock_api_instance: Mock) -> Mock:

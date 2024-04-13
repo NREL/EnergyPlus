@@ -54,7 +54,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from ctypes import cdll, c_int, c_char_p, c_void_p, POINTER, Structure, byref
-from pyenergyplus.common import RealEP, EnergyPlusException, is_number
+from .common import RealEP, EnergyPlusException, is_number
 from typing import List, Union
 
 
