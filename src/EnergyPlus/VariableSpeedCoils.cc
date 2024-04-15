@@ -359,8 +359,8 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = NumArray(3);
-            setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
-                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag =
+                setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
@@ -917,8 +917,8 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = NumArray(3);
-            setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal,
-                                         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag);
+            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag =
+                setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
 
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(5);
@@ -8229,12 +8229,14 @@ namespace VariableSpeedCoils {
         return RatedSourceTemp;
     }
 
-    void setVarSpeedCoilOperationFlag(Real64 const userSuppliedTotCoolCap, bool &opFlag)
+    bool setVarSpeedCoilOperationFlag(Real64 const userSuppliedTotCoolCap)
     {
         // Defect Issue #10360: When user enters a zero value for the total cooling capacity of a variable speed coil,
         // a divide by zero takes place during simulation.  The setting of the operation flag to false correctly skips
         // the simulation of a coil with no capacity (same thing as it not being there).
+        bool opFlag = true;
         if ((userSuppliedTotCoolCap <= 0.0) && (userSuppliedTotCoolCap != AutoSize)) opFlag = false;
+        return opFlag;
     }
 
     void SetVarSpeedCoilData(EnergyPlusData &state,
