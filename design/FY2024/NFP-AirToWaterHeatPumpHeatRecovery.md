@@ -624,11 +624,11 @@ The EIR-formulated cooling model objects are described.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{plhp_eir_cooling_inputs_heat_recovery_inlet_node}
 
-This alpha field contains the heat pump's heat recovery inlet node name. This field is autosizable.
+This alpha field contains the heat pump's heat recovery inlet node name.
 
 \paragraph{Field: Heat Recovery Outlet Node Name}\label{plhp_eir_cooling_inputs_heat_recovery_outlet_node}
 
-This alpha field contains the heat pump's heat recovery outlet node name. This field is autosizable.
+This alpha field contains the heat pump's heat recovery outlet node name.
 
 \paragraph{Field: Heat Recovery Reference Flow Rate}\label{plhp_eir_cooling_inputs_heat_recovery_flow}
 
@@ -636,7 +636,7 @@ This autosizable field defines the heat recovery reference flow rate for the hea
 
 \paragraph{Field: Maximum Heat Recovery Outlet Temperature}\label{plhp_eir_cooling_inputs_maximum_heat_recovery_outlet_temperature}
 
-This optional numeric field specifies the maximum leaving water temperature at the heat recovery outlet node. The hot water temperature is not allowed to exceed this value. The default value is 60. The units for this field are [C].
+This optional numeric field specifies the maximum leaving water temperature at the heat recovery outlet node. The hot water temperature is not allowed to exceed this value. The default value is 60. The units for this field are [C]. If the heat recovery coil entering hot water temperature is at or exceeds this temperature limit, the heat recovery operation is disabled, and the heat pump operates in cooling-only mode.
 
 \paragraph{Field: Heat Recovery Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_cooling_inputs_heat_recovery_capft}
 
@@ -659,11 +659,11 @@ The EIR-formulated heating model objects are described.
 
 \paragraph{Field: Heat Recovery Inlet Node Name}\label{plhp_eir_heating_inputs_heat_recovery_inlet_node}
 
-This alpha field contains the heat pump's heat recovery inlet node name. This field is autosizable.
+This alpha field contains the heat pump's heat recovery inlet node name.
 
 \paragraph{Field: Heat Recovery Outlet Node Name}\label{plhp_eir_heating_inputs_heat_recovery_outlet_node}
 
-This alpha field contains the heat pump's heat recovery outlet node name. This field is autosizable.
+This alpha field contains the heat pump's heat recovery outlet node name.
 
 \paragraph{Field: Heat Recovery Reference Flow Rate}\label{plhp_eir_heating_inputs_heat_recovery_flow}
 
@@ -671,7 +671,7 @@ This autosizable field defines the heat recovery reference flow rate for the hea
 
 \paragraph{Field: Minimum Heat Recovery Outlet Temperature}\label{plhp_eir_heating_inputs_minimum_heat_recovery_outlet_temperature}
 
-This optional numeric field specifies the minimum leaving water temperature at the heat recovery outlet node. The chilled water temperature is not allowed to drop below this value. The default value is 4.5. The units for this field is [C].
+This optional numeric field specifies the minimum leaving water temperature at the heat recovery outlet node. The chilled water temperature is not allowed to drop below this value. The default value is 4.5. The units for this field is [C]. If the chilled water recovery coil entering water temperature is at or below this temperature limit, the heat recovery operation is disabled, and the heat pump operates in heating-only mode.
 
 \paragraph{Field: Heat Recovery Capacity Modifier Function of Temperature Curve Name}\label{plhp_eir_heating_inputs_heat_recovery_capft}
 
