@@ -6963,4 +6963,30 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 0.0, 1e-3);
 }
 
+TEST_F(EnergyPlusFixture, setVarSpeedCoilOperationFlagTest)
+{
+    Real64 userVarSpeedCoilCoolCap;
+    bool functionResult;
+
+    // Case 1: coil capacity is positive-->result is true
+    userVarSpeedCoilCoolCap = 12345.6789;
+    functionResult = VariableSpeedCoils::setVarSpeedCoilOperationFlag(userVarSpeedCoilCoolCap);
+    EXPECT_TRUE(functionResult);
+
+    // Case 2: coil capacity is autosized-->result is true
+    userVarSpeedCoilCoolCap = DataSizing::AutoSize;
+    functionResult = VariableSpeedCoils::setVarSpeedCoilOperationFlag(userVarSpeedCoilCoolCap);
+    EXPECT_TRUE(functionResult);
+
+    // Case 3: coil capacity is zero-->result is false
+    userVarSpeedCoilCoolCap = 0.0;
+    functionResult = VariableSpeedCoils::setVarSpeedCoilOperationFlag(userVarSpeedCoilCoolCap);
+    EXPECT_FALSE(functionResult);
+
+    // Case 4: coil capacity is negative but not AutoSize-->result is false
+    userVarSpeedCoilCoolCap = -123.456;
+    functionResult = VariableSpeedCoils::setVarSpeedCoilOperationFlag(userVarSpeedCoilCoolCap);
+    EXPECT_FALSE(functionResult);
+}
+
 } // namespace EnergyPlus
