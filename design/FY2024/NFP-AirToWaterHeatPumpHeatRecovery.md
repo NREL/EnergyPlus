@@ -709,6 +709,8 @@ Adds five output variables.
     HVAC,Average,Heat Pump Heat Recovery Inlet Temperature {[}$^\circ$C{]}
     \item
     HVAC,Average,Heat Pump Heat Recovery Mass Flow Rate {[}kg/s{]}
+	\item
+	HVAC,Average,Heat Pump Heat Recovery Operation Status {[}{]}
 \end{itemize}
 
 ...
@@ -733,6 +735,9 @@ This output variable represents the average fluid temperature entering the heat 
 
 This output variable represents the average fluid flow rate through the heat recovery coil. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
+\paragraph{Heat Pump Heat Recovery Operation Status {[}{]}}\label{water-to-water-heat-pump-heat-recovery-operating-status}
+
+This output variable represents the average operating status of heat recovery operation. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. 0 means the heat recovery operation is off or disabled, 1 means the heat recovery operation is active.
 
 ## References ##
 NA
@@ -766,6 +771,7 @@ The following changes are required to implement the new feature
 	   Real64 heatRecoveryMassFlowRate = 0.0;   
 	   bool heatRecoveryIsActive = false;
 	   bool heatRecoveryAvailable = false;
+	   int heatRecoveryOperatingStatus = 0;
 		
 		
    EIRPlantLoopHeatPump::resetReportingVariables()
@@ -779,6 +785,7 @@ The following changes are required to implement the new feature
 	 `this->heatRecoveryMassFlowRate = 0.0;`
      `this->heatRecoveryOutletTemp = this->heatRecoveryInletTemp;`
 	 `this->heatRecoveryIsActive = false;`
+	 `this->heatRecoveryOperatingStatus = 0;`
     }
 	
 	
@@ -941,3 +948,4 @@ The following changes are required to implement the new feature
    `* Heat Pump Heat Recovery Heat Transfer Energy *`
    `* Heat Pump Heat Recovery Inlet Temperature *`
    `* Heat Pump Heat Recovery Outlet Temperature *`
+   `* Heat Pump Heat Recovery Operation Status *`
