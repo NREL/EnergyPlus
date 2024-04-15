@@ -126,12 +126,10 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 
     auto &thisIntGain = state.dataHeatBal->spaceIntGainDevices(spaceNum);
     for (int IntGainsNum = 1; IntGainsNum <= thisIntGain.numberOfDevices; ++IntGainsNum) {
-        if ((thisIntGain.device(IntGainsNum).CompObjectType == DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)]) &&
-            (thisIntGain.device(IntGainsNum).CompType == IntGainCompType)) {
-            if (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName) {
-                FoundDuplicate = true;
-                break;
-            }
+        if ((thisIntGain.device(IntGainsNum).CompType == IntGainCompType) &&
+            (thisIntGain.device(IntGainsNum).CompObjectName == UpperCaseObjectName)) {
+            FoundDuplicate = true;
+            break;
         }
     }
 
@@ -154,7 +152,6 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
     }
     ++thisIntGain.numberOfDevices;
 
-    thisIntGain.device(thisIntGain.numberOfDevices).CompObjectType = DataHeatBalance::IntGainTypeNamesUC[static_cast<int>(IntGainCompType)];
     thisIntGain.device(thisIntGain.numberOfDevices).CompObjectName = UpperCaseObjectName;
     thisIntGain.device(thisIntGain.numberOfDevices).CompType = IntGainCompType;
     thisIntGain.device(thisIntGain.numberOfDevices).spaceGainFrac = spaceGainFraction;

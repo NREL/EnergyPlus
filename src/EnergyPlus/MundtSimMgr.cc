@@ -271,8 +271,8 @@ namespace RoomAir {
                                                     "Room Air Node Air Temperature",
                                                     Constant::Units::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                                    OutputProcessor::SOVStoreType::Average,
+                                                    OutputProcessor::TimeStepType::System,
+                                                    OutputProcessor::StoreType::Average,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;

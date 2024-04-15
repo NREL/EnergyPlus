@@ -611,14 +611,14 @@ void GetControllerInput(EnergyPlusData &state)
     // check that actuator nodes are matched by a water coil inlet node
     for (int Num = 1; Num <= NumSimpleControllers; ++Num) {
         auto &controllerProps = state.dataHVACControllers->ControllerProps(Num);
-        DataPlant::PlantEquipmentType WaterCoilType{};
-        WaterCoils::CheckActuatorNode(state, controllerProps.ActuatedNode, WaterCoilType, ActuatorNodeNotFound);
+        WaterCoils::CheckActuatorNode(state, controllerProps.ActuatedNode, controllerProps.WaterCoilType, ActuatorNodeNotFound);
         if (ActuatorNodeNotFound) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}{}=\"{}\":", RoutineName, CurrentModuleObject, controllerProps.ControllerName));
             ShowContinueError(state, "...the actuator node must also be a water inlet node of a water coil");
         } else { // Node found, check type and action
-            if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling) {
+            if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling ||
+                controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
                 if (controllerProps.Action == ControllerAction::NoAction) {
                     controllerProps.Action = ControllerAction::Reverse;
                 } else if (controllerProps.Action == ControllerAction::NormalAction) {
@@ -627,7 +627,7 @@ void GetControllerInput(EnergyPlusData &state)
                     ShowContinueError(state, "...overriding user input action with Reverse Action.");
                     controllerProps.Action = ControllerAction::Reverse;
                 }
-            } else if (WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
+            } else if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
                 if (controllerProps.Action == ControllerAction::NoAction) {
                     controllerProps.Action = ControllerAction::NormalAction;
                 } else if (controllerProps.Action == ControllerAction::Reverse) {
@@ -1487,14 +1487,22 @@ void FindRootSimpleController(EnergyPlusData &state,
                 ShowContinueError(state, format("Controller humidity ratio setpoint = {:.2T} [kgWater/kgDryAir]", controllerProps.SetPointValue));
                 ShowContinueError(state, format("Controller sensed humidity ratio = {:.2T} [kgWater/kgDryAir]", controllerProps.SensedValue));
             } else if (controllerProps.ControlVar == CtrlVarType::TemperatureAndHumidityRatio) {
-                ShowContinueError(state, format("Controller temperature setpoint = {:.2T} [C]", controllerProps.SetPointValue));
-                ShowContinueError(state, format("Controller sensed temperature = {:.2T} [C]", controllerProps.SensedValue));
-                ShowContinueError(state,
-                                  format("Controller humidity ratio setpoint = {:.2T} [kgWater/kgDryAir]",
-                                         state.dataLoopNodes->Node(controllerProps.SensedNode).HumRatMax));
-                ShowContinueError(state,
-                                  format("Controller sensed humidity ratio = {:.2T} [kgWater/kgDryAir]",
-                                         state.dataLoopNodes->Node(controllerProps.SensedNode).HumRat));
+                if (controllerProps.HumRatCtrlOverride) {
+                    ShowContinueError(state, "Humidity control is active.");
+                    ShowContinueError(state, format("Controller humidity ratio setpoint = {:.2T} [kgWater/kgDryAir]", controllerProps.SetPointValue));
+                    ShowContinueError(state, format("Controller sensed humidity ratio = {:.2T} [kgWater/kgDryAir]", controllerProps.SensedValue));
+                    ShowContinueError(state,
+                                      format("Controller humidity ratio setpoint dew-point temperature = {:.2T} [C]",
+                                             Psychrometrics::PsyTdpFnWPb(state, controllerProps.SetPointValue, state.dataEnvrn->OutBaroPress)));
+                    ShowContinueError(
+                        state,
+                        format("Controller temperature setpoint = {:.2T} [C]", state.dataLoopNodes->Node(controllerProps.SensedNode).TempSetPoint));
+                    ShowContinueError(
+                        state, format("Controller sensed temperature = {:.2T} [C]", state.dataLoopNodes->Node(controllerProps.SensedNode).Temp));
+                } else {
+                    ShowContinueError(state, format("Controller temperature setpoint = {:.2T} [C]", controllerProps.SetPointValue));
+                    ShowContinueError(state, format("Controller sensed temperature = {:.2T} [C]", controllerProps.SensedValue));
+                }
             } else if (controllerProps.ControlVar == CtrlVarType::Flow) {
                 ShowContinueError(state, format("Controller mass flow rate setpoint = {:.2T} [kg/s]", controllerProps.SetPointValue));
                 ShowContinueError(state, format("Controller sensed mass flow rate = {:.2T} [kg/s]", controllerProps.SensedValue));
@@ -1503,13 +1511,25 @@ void FindRootSimpleController(EnergyPlusData &state,
             }
             if (controllerProps.ActuatorVar == CtrlVarType::Flow) {
                 ShowContinueError(state, format("Controller actuator mass flow rate set to {:.2T} [kg/s]", controllerProps.MaxAvailActuated));
-                if (controllerProps.ControlVar == CtrlVarType::Temperature) {
+                if (controllerProps.ControlVar == CtrlVarType::Temperature ||
+                    controllerProps.ControlVar == CtrlVarType::TemperatureAndHumidityRatio) {
                     ShowContinueError(
                         state, format("Controller actuator temperature = {:.2T} [C]", state.dataLoopNodes->Node(controllerProps.ActuatedNode).Temp));
-                    ShowContinueError(state, "  Note: Chilled water coils should be reverse action and the entering chilled");
-                    ShowContinueError(state, "        water temperature (controller actuator temperature) should be below the setpoint temperature");
-                    ShowContinueError(state, "  Note: Hot water coils should be normal action and the entering hot");
-                    ShowContinueError(state, "        water temperature (controller actuator temperature) should be above the setpoint temperature");
+                    if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterCooling ||
+                        controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling) {
+                        if (controllerProps.HumRatCtrlOverride) {
+                            ShowContinueError(state,
+                                              "The entering chilled water temperature (controller actuator temperature) should be below the humidity "
+                                              "ratio setpoint dew-point temperature.");
+                        } else {
+                            ShowContinueError(
+                                state,
+                                "The entering chilled water temperature (controller actuator temperature) should be below the setpoint temperature.");
+                        }
+                    } else if (controllerProps.WaterCoilType == DataPlant::PlantEquipmentType::CoilWaterSimpleHeating) {
+                        ShowContinueError(
+                            state, "The entering hot water temperature (controller actuator temperature) should be above the setpoint temperature");
+                    }
                 }
             } else {
                 // bad actuator variable input checked in input routine
