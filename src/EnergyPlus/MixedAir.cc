@@ -4693,6 +4693,15 @@ void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum)
     // Mixed air temperature is calculated from the mixed air enthalpy and humidity ratio.
     state.dataMixedAir->OAMixer(OAMixerNum).MixTemp =
         Psychrometrics::PsyTdbFnHW(state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat);
+
+    // Check for saturation temperature > dry-bulb temperature and modify temperature at constant enthalpy
+    auto T_sat =
+        Psychrometrics::PsyTsatFnHPb(state, state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixPressure);
+    if (state.dataMixedAir->OAMixer(OAMixerNum).MixTemp < T_sat) {
+        state.dataMixedAir->OAMixer(OAMixerNum).MixTemp = T_sat;
+        state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat =
+            Psychrometrics::PsyWFnTdbH(state, T_sat, state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy);
+    }
 }
 
 // End of Calculation/Simulation Section of the Module
