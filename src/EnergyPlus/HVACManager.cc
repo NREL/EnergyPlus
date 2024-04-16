@@ -715,29 +715,29 @@ void SimHVAC(EnergyPlusData &state)
                             "HVAC System Solver Iteration Count",
                             Constant::Units::None,
                             state.dataHVACMgr->HVACManageIteration,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Solver Iteration Count",
                             Constant::Units::None,
                             state.dataHVACMgr->RepIterAir,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACReliefHeatLoss,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "HVAC System Total Heat Rejection Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACRejectHeatLoss,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetPointManager::ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
         PlantManager::GetPlantLoopData(state);
@@ -754,15 +754,15 @@ void SimHVAC(EnergyPlusData &state)
                                 "Plant Solver Sub Iteration Count",
                                 Constant::Units::None,
                                 state.dataPlnt->PlantManageSubIterations,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "SimHVAC");
             SetupOutputVariable(state,
                                 "Plant Solver Half Loop Calls Count",
                                 Constant::Units::None,
                                 state.dataPlnt->PlantManageHalfLoopCalls,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "SimHVAC");
             for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
@@ -2374,7 +2374,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             auto const &thisFan = state.dataFans->Fan(FanNum);
             //  Add reportable vars
-            if (thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
+            if (thisFan.fanType == DataHVACGlobals::FanType::Exhaust) {
                 for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
                     if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
                         znAirRpt.ExhTotalLoss +=

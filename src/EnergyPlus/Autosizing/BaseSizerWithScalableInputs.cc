@@ -105,7 +105,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
                 state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
                                                                                          this->compName,
                                                                                          this->compType,
-                                                                                         state.dataFans->Fan(SupFanNum).FanName,
+                                                                                         state.dataFans->Fan(SupFanNum).Name,
                                                                                          DataAirSystems::StructArrayLegacyFanModels,
                                                                                          this->primaryAirSystem(this->curSysNum).SupFanNum);
             }

@@ -372,7 +372,7 @@ TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
 
     EXPECT_EQ(state->dataOutputProcessor->meters[3]->Name, "General:WaterSystems:MainsWater");
     EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater));
-    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem));
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->endUseCat, OutputProcessor::EndUseCat::WaterSystem));
     EXPECT_EQ(state->dataOutputProcessor->meters[3]->EndUseSub, "General");
-    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovGroup, OutputProcessor::SOVGroup::Invalid));
+    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->group, OutputProcessor::Group::Invalid));
 }

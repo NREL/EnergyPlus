@@ -73,7 +73,7 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
         std::string name;
         std::string type;
         std::string key;
-        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type)
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _type, std::string _key)
             : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key))
         {
         }
