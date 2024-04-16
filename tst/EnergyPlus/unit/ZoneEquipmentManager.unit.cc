@@ -3624,6 +3624,15 @@ TEST_F(EnergyPlusFixture, ZoneAirMassFlowBalance_wAdjustReturnThenMixing)
     // zone mixing object is defined in the receiving zone and the flow is not adjusted
     EXPECT_NEAR(state->dataZoneTempPredictorCorrector->zoneHeatBalance(2).MixingMassFlowZone, 0.586632, 0.000001);
     EXPECT_EQ(state->dataHeatBal->MassConservation(2).InfiltrationMassFlowRate, 0.0);
+    EXPECT_FALSE(state->dataGlobal->DoingSizing);
+    int airLoopNum1 = state->dataZoneEquip->ZoneEquipConfig(1).ReturnNodeAirLoopNum(1);
+    int returnNodeNum1 = state->dataZoneEquip->ZoneEquipConfig(1).ReturnNode(1);
+    EXPECT_GT(state->dataZoneEquip->ZoneEquipConfig(airLoopNum1).AirLoopDesSupply, state->dataLoopNodes->Node(returnNodeNum1).MassFlowRate);
+    EXPECT_GT(state->dataLoopNodes->Node(returnNodeNum1).MassFlowRate, 0.0);
+    int airLoopNum2 = state->dataZoneEquip->ZoneEquipConfig(2).ReturnNodeAirLoopNum(1);
+    int returnNodeNum2 = state->dataZoneEquip->ZoneEquipConfig(2).ReturnNode(1);
+    EXPECT_GT(state->dataZoneEquip->ZoneEquipConfig(airLoopNum2).AirLoopDesSupply, state->dataLoopNodes->Node(returnNodeNum2).MassFlowRate);
+    EXPECT_GT(state->dataLoopNodes->Node(returnNodeNum2).MassFlowRate, 0.0);
 
     // Test 2: set receiving zone exhaust fan flow 2 times supply flow rate
     // set source zone exhaust fan flow to zero and receiving zone exhaust fan flow to 2.0
