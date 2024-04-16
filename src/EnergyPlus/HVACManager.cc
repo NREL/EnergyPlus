@@ -599,6 +599,10 @@ void ManageHVAC(EnergyPlusData &state)
                     print(state.files.debug, "{}: Enth,", state.dataLoopNodes->NodeID(NodeNum));
                     print(state.files.debug, "{}: HumRat,", state.dataLoopNodes->NodeID(NodeNum));
                     print(state.files.debug, "{}: Fluid Type,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                        print(state.files.debug, "{}: CO2Conc,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                        print(state.files.debug, "{}: GenericContamConc,", state.dataLoopNodes->NodeID(NodeNum));
                     if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
                 }
                 state.dataHVACMgr->DebugNamesReported = true;
@@ -610,9 +614,10 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataGlobal->HourOfDay,
                       state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
             }
+            static constexpr std::string_view Format_20{
+                " {:8.2F},  {:8.3F},  {:8.3F},  {:8.2F}, {:13.2F}, {:13.2F}, {:13.2F}, {:13.2F},  {:#7.0F},  {:11.2F},  {:9.5F},  {},"};
+            static constexpr std::string_view Format_21{" {:8.2F},"};
             for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr std::string_view Format_20{
-                    " {:8.2F},  {:8.3F},  {:8.3F},  {:8.2F}, {:13.2F}, {:13.2F}, {:13.2F}, {:13.2F},  {:#7.0F},  {:11.2F},  {:9.5F},  {},"};
 
                 print(state.files.debug,
                       Format_20,
@@ -628,6 +633,10 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataLoopNodes->Node(NodeNum).Enthalpy,
                       state.dataLoopNodes->Node(NodeNum).HumRat,
                       DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).CO2);
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).GenContam);
                 if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
             }
         }
