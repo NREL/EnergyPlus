@@ -3871,7 +3871,8 @@ namespace WindowManager {
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                (1 - TransRefl);
+                    (1 - TransRefl) +
+                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
             state.dataSurface->SurfWinHeatGain(SurfNum) -=
                 (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
                  state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);

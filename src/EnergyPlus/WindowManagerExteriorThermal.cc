@@ -242,9 +242,10 @@ namespace WindowManager {
             state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
         }
 
-        Real64 TransDiff = construction.TransDiff;
+        Real64 TransRefl = construction.ReflectSolDiffBack;
         state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
-            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+            state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * surface.Area * (1 - TransRefl) +
+            state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
         state.dataSurface->SurfWinHeatGain(SurfNum) -=
             (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) + state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * surface.Area);
 

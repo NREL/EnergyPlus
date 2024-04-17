@@ -3339,7 +3339,8 @@ namespace WindowComplexManager {
             // END IF
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                (1 - ReflDiff);
+                    (1 - ReflDiff) +
+                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
             state.dataSurface->SurfWinHeatGain(SurfNum) -=
                 (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
                  state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);

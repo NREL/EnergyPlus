@@ -7463,6 +7463,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 state.dataSolarShading->SurfWinAbsBeam.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
                                 Real64 TransBeamWin = 0.0;  // Beam solar transmittance of a window
                                 Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
+                                Real64 reflBeamWin = 0.0;   // Beam solar reflectance of a window back surface
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                 // or interior window WITHOUT SHADING this timestep
@@ -7472,6 +7473,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).AbsBeamBackCoef(Lay));
                                     }
                                     TransBeamWin = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef);
+                                    reflBeamWin = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).ReflSolBeamBackCoef);
                                 }
 
                                 // Interior beam absorptance of glass layers and beam transmittance
@@ -7962,6 +7964,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
 
                                 // To BABSZon, add interior beam glass absorption and overall beam transmission for this back window
                                 BABSZone += BOverlap * (AbsBeamTotWin + TransBeamWin);
+                                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(BackSurfNum) +=
+                                    BOverlap * (1 - reflBeamWin) * state.dataEnvrn->BeamSolarRad; //[W]
                                 // Interior beam transmitted to adjacent zone through an interior back window (assumed unshaded);
                                 // this beam radiation is categorized as diffuse radiation in the adjacent zone.
                                 int AdjSurfNum = state.dataSurface->Surface(BackSurfNum).ExtBoundCond;

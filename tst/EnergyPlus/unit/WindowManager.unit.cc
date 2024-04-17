@@ -589,6 +589,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
     state->dataHeatBalSurf->SurfQAirExtReport.allocate(3);
     state->dataHeatBalSurf->SurfQHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(3, 0.0);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;

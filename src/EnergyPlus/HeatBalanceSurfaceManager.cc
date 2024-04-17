@@ -1427,6 +1427,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadLightsInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -2569,6 +2570,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) = 0.0;
                     state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) = 0.0;
                     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) = 0.0;
+                    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum) = 0.0;
                     state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -8108,7 +8110,8 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum)));
                 state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                     state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                    (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack);
+                        (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack) +
+                    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
 
                 // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                 state.dataSurface->SurfWinHeatGain(SurfNum) =
@@ -8796,7 +8799,8 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                              (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum)));
                         state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) =
                             state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                            (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack);
+                                (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack) +
+                            state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(surfNum);
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
                         state.dataSurface->SurfWinHeatGain(surfNum) =
