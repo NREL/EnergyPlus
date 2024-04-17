@@ -142,7 +142,6 @@ void EIRPlantLoopHeatPump::simulate(
     if (this->running) {
         if (this->sysControlType == ControlType::Setpoint) {
             Real64 leavingSetpoint = state.dataLoopNodes->Node(this->loadSideNodes.outlet).TempSetPoint;
-            if (leavingSetpoint == -999.0) leavingSetpoint = this->getLoadSideOutletSetPointTemp(state);
             Real64 CurSpecHeat = FluidProperties::GetSpecificHeatGlycol(state,
                                                                         state.dataPlnt->PlantLoop(this->loadSidePlantLoc.loopNum).FluidName,
                                                                         loadSideInletTemp,
