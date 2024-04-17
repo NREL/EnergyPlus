@@ -74,9 +74,8 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     state->dataFans->FanNumericFields(state->dataFans->NumFans).FieldNames.allocate(3);
 
     int FanNum = 1;
-    state->dataFans->Fan(FanNum).FanName = "Test Fan";
-    state->dataFans->Fan(FanNum).FanType = "Fan:OnOff";
-    state->dataFans->Fan(FanNum).FanType_Num = FanType_SimpleOnOff;
+    state->dataFans->Fan(FanNum).Name = "Test Fan";
+    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::OnOff;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = AutoSize;
     state->dataFans->Fan(FanNum).DeltaPress = 500.0;
     state->dataFans->Fan(FanNum).FanEff = 0.4; // Prevent divide by zero computing RatedPower
@@ -111,9 +110,8 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
-    thisFan.FanName = "Test Fan";
-    thisFan.FanType = "Fan:ConstantVolume";
-    thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    thisFan.Name = "Test Fan";
+    thisFan.fanType = DataHVACGlobals::FanType::Constant;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;
@@ -158,9 +156,8 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
-    thisFan.FanName = "Test Fan";
-    thisFan.FanType = "Fan:OnOff";
-    thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    thisFan.Name = "Test Fan";
+    thisFan.fanType = DataHVACGlobals::FanType::OnOff;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;
@@ -205,9 +202,8 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     state->dataFans->FanNumericFields(FanNum).FieldNames(1) = "Fan Total Efficiency";
     state->dataFans->FanNumericFields(FanNum).FieldNames(2) = "Pressure Rise";
     auto &thisFan(state->dataFans->Fan(FanNum));
-    thisFan.FanName = "Test Fan";
-    thisFan.FanType = "Fan:VariableVolume";
-    thisFan.FanType_Num = DataHVACGlobals::FanType_SimpleVAV;
+    thisFan.Name = "Test Fan";
+    thisFan.fanType = DataHVACGlobals::FanType::VAV;
     thisFan.MaxAirFlowRate = AutoSize;
     thisFan.DeltaPress = 300.0;
     thisFan.FanEff = 1.0;

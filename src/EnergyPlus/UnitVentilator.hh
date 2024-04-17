@@ -110,8 +110,8 @@ namespace UnitVentilator {
         int AirOutNode = 0;    // outlet air node number
         int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
-        int FanType_Num = 0; // Fan type number (see DataHVACGlobals)
-        std::string FanName; // name of fan
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // Fan type number (see DataHVACGlobals)
+        std::string FanName;                                                  // name of fan
         int Fan_Index = 0;
         int FanSchedPtr = 0;      // index to fan operating mode schedule
         int FanAvailSchedPtr = 0; // index to fan availability schedule

@@ -545,13 +545,13 @@ namespace AirLoopHVACDOAS {
 
                     case ValidEquipListType::FanComponentModel:
                         thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_ComponentModel;
-                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
+                        thisDOAS.m_FanIndex = Fans::GetFanIndex(state, CompName);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBeforeCoolingCoilFlag = true;
                         }
-                        thisOutsideAirSys.InletNodeNum(CompNum) = Fans::GetFanInletNode(state, typeNameUC, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = Fans::GetFanOutletNode(state, typeNameUC, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) = Fans::GetFanInletNode(state, thisDOAS.m_FanIndex);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) = Fans::GetFanOutletNode(state, thisDOAS.m_FanIndex);
                         thisDOAS.m_FanInletNodeNum = thisOutsideAirSys.InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = thisOutsideAirSys.OutletNodeNum(CompNum);
                         FanOrder = CompNum;

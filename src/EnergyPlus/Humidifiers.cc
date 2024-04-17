@@ -441,13 +441,7 @@ namespace Humidifiers {
             if (lAlphaBlanks(7)) {
                 Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
             } else { // water from storage tank
-                if (Alphas(7) == "FixedInletWaterTemperature") {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                } else if (Alphas(7) == "VariableInletWaterTemperature") {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Variable;
-                } else {
-                    Humidifier(HumNum).InletWaterTempOption = InletWaterTemp::Fixed;
-                }
+                Humidifier(HumNum).InletWaterTempOption = static_cast<InletWaterTemp>(getEnumValue(inletWaterTempsUC, Alphas(7)));
             }
         }
 
