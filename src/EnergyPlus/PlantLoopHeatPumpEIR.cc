@@ -2086,7 +2086,7 @@ void EIRPlantLoopHeatPump::checkConcurrentOperation(EnergyPlusData &state)
         if (!thisPLHP.companionHeatPumpCoil) {
             continue;
         }
-        if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running) {
+        if (thisPLHP.running && thisPLHP.companionHeatPumpCoil->running && !thisPLHP.companionHeatPumpCoil->heatRecoveryAvailable) {
             ShowRecurringWarningErrorAtEnd(state,
                                            "Companion heat pump objects running concurrently, check operation.  Base object name: " + thisPLHP.name,
                                            thisPLHP.recurringConcurrentOperationWarningIndex);
