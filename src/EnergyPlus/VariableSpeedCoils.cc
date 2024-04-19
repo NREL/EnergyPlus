@@ -3987,10 +3987,7 @@ namespace VariableSpeedCoils {
             !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
             ErrorsFound = false;
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0 ||
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal == AutoSize) {
-                SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
-            }
+            SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
             if (ErrorsFound) {
                 ShowFatalError(state, format("{}: Failed to size variable speed coil.", RoutineName));
             }
@@ -4001,6 +3998,9 @@ namespace VariableSpeedCoils {
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed)) {
                 for (Mode = 1; Mode <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
+                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0 &&
+                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != AutoSize)
+                        break;
                     // Check for zero capacity or zero max flow rate
                     if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) <= 0.0) {
                         ShowSevereError(state,
@@ -5830,28 +5830,30 @@ namespace VariableSpeedCoils {
                 DefrostControl = StandardRatings::HPdefrostControl::Timed;
                 break;
             }
-            StandardRatings::CalcDXCoilStandardRating(state,
-                                                      varSpeedCoil.Name,
-                                                      varSpeedCoil.VarSpeedCoilType,
-                                                      varSpeedCoil.VSCoilType,
-                                                      varSpeedCoil.NumOfSpeeds,
-                                                      varSpeedCoil.MSRatedTotCap,
-                                                      varSpeedCoil.MSRatedCOP,
-                                                      varSpeedCoil.MSCCapAirFFlow,
-                                                      varSpeedCoil.MSCCapFTemp,
-                                                      varSpeedCoil.MSEIRAirFFlow,
-                                                      varSpeedCoil.MSEIRFTemp,
-                                                      varSpeedCoil.PLFFPLR,
-                                                      varSpeedCoil.MSRatedAirVolFlowRate,
-                                                      varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2017,
-                                                      varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
-                                                      CondenserType,
-                                                      0, // varSpeedCoil.RegionNum, // ??
-                                                      varSpeedCoil.MinOATCompressor,
-                                                      varSpeedCoil.OATempCompressorOn,
-                                                      false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
-                                                      DefrostControl,
-                                                      ObjexxFCL::Optional_bool_const());
+            if (varSpeedCoil.RatedCapCoolTotal > 0.0 || varSpeedCoil.RatedCapCoolTotal == AutoSize) {
+                StandardRatings::CalcDXCoilStandardRating(state,
+                                                          varSpeedCoil.Name,
+                                                          varSpeedCoil.VarSpeedCoilType,
+                                                          varSpeedCoil.VSCoilType,
+                                                          varSpeedCoil.NumOfSpeeds,
+                                                          varSpeedCoil.MSRatedTotCap,
+                                                          varSpeedCoil.MSRatedCOP,
+                                                          varSpeedCoil.MSCCapAirFFlow,
+                                                          varSpeedCoil.MSCCapFTemp,
+                                                          varSpeedCoil.MSEIRAirFFlow,
+                                                          varSpeedCoil.MSEIRFTemp,
+                                                          varSpeedCoil.PLFFPLR,
+                                                          varSpeedCoil.MSRatedAirVolFlowRate,
+                                                          varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2017,
+                                                          varSpeedCoil.MSRatedEvaporatorFanPowerPerVolumeFlowRate2023,
+                                                          CondenserType,
+                                                          0, // varSpeedCoil.RegionNum, // ??
+                                                          varSpeedCoil.MinOATCompressor,
+                                                          varSpeedCoil.OATempCompressorOn,
+                                                          false, // varSpeedCoil.OATempCompressorOnOffBlank, // ??
+                                                          DefrostControl,
+                                                          ObjexxFCL::Optional_bool_const());
+            }
             break;
         default:
             break;
