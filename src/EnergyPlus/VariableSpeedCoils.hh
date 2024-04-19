@@ -459,8 +459,6 @@ namespace VariableSpeedCoils {
 
     Real64 GetVSCoilRatedSourceTemp(EnergyPlusData &state, int const CoilIndex);
 
-    bool setVarSpeedCoilOperationFlag(Real64 const userSuppliedTotCoolCap);
-
     void SetVarSpeedCoilData(EnergyPlusData &state,
                              int const WSHPNum,                                   // Number of OA Controller
                              bool &ErrorsFound,                                   // Set to true if certain errors found

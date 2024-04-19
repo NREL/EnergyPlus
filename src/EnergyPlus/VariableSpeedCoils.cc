@@ -189,13 +189,9 @@ namespace VariableSpeedCoils {
         if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
             (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed)) {
             // Cooling mode
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag) {
-                InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-                CalcVarSpeedCoilCooling(
-                    state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-            } else {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
-            }
+            InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedCoilCooling(
+                state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_HeatingAirToAirVariableSpeed)) {
@@ -357,11 +353,7 @@ namespace VariableSpeedCoils {
                 DataHVACGlobals::cAllCoilTypes(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds = int(NumArray(1));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
-
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = NumArray(3);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag =
-                setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(6);
@@ -915,11 +907,7 @@ namespace VariableSpeedCoils {
                 DataHVACGlobals::cAllCoilTypes(Coil_CoolingAirToAirVariableSpeed);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds = int(NumArray(1));
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NormSpedLevel = int(NumArray(2));
-
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal = NumArray(3);
-            state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).coilOperationFlag =
-                setVarSpeedCoilOperationFlag(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal);
-
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedAirVolFlowRate = NumArray(4);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Twet_Rated = NumArray(5);
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Gamma_Rated = NumArray(6);
@@ -3999,7 +3987,10 @@ namespace VariableSpeedCoils {
             !state.dataVariableSpeedCoils->MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
             ErrorsFound = false;
-            SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal > 0.0 ||
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal == AutoSize) {
+                SizeVarSpeedCoil(state, DXCoilNum, ErrorsFound);
+            }
             if (ErrorsFound) {
                 ShowFatalError(state, format("{}: Failed to size variable speed coil.", RoutineName));
             }
@@ -5986,6 +5977,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->CpAir_Init = PsyCpAirFnW(state.dataVariableSpeedCoils->LoadSideInletHumRat_Init);
             state.dataVariableSpeedCoils->firstTime = false;
         }
+
         state.dataVariableSpeedCoils->LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(state,
                                                                                 state.dataVariableSpeedCoils->LoadSideInletDBTemp_Init,
                                                                                 state.dataVariableSpeedCoils->LoadSideInletHumRat_Init,
@@ -6117,7 +6109,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
-        if (CompressorOp == CompressorOperation::Off) {
+        if (CompressorOp == CompressorOperation::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -7398,7 +7390,7 @@ namespace VariableSpeedCoils {
             return;
         }
 
-        if (CompressorOp == CompressorOperation::Off) {
+        if (CompressorOp == CompressorOperation::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -8229,16 +8221,6 @@ namespace VariableSpeedCoils {
         return RatedSourceTemp;
     }
 
-    bool setVarSpeedCoilOperationFlag(Real64 const userSuppliedTotCoolCap)
-    {
-        // Defect Issue #10360: When user enters a zero value for the total cooling capacity of a variable speed coil,
-        // a divide by zero takes place during simulation.  The setting of the operation flag to false correctly skips
-        // the simulation of a coil with no capacity (same thing as it not being there).
-        bool opFlag = true;
-        if ((userSuppliedTotCoolCap <= 0.0) && (userSuppliedTotCoolCap != AutoSize)) opFlag = false;
-        return opFlag;
-    }
-
     void SetVarSpeedCoilData(EnergyPlusData &state,
                              int const WSHPNum,                               // Number of OA Controller
                              bool &ErrorsFound,                               // Set to true if certain errors found
@@ -8335,13 +8317,6 @@ namespace VariableSpeedCoils {
             varSpeedCoil.COP = 0.0;
             varSpeedCoil.RunFrac = 0.0;
             varSpeedCoil.PartLoadRatio = 0.0;
-
-            int inNode = varSpeedCoil.AirInletNodeNum;
-            if (inNode > 0) {
-                varSpeedCoil.InletAirDBTemp = state.dataLoopNodes->Node(inNode).Temp;
-                varSpeedCoil.InletAirHumRat = state.dataLoopNodes->Node(inNode).HumRat;
-                varSpeedCoil.InletAirEnthalpy = state.dataLoopNodes->Node(inNode).Enthalpy;
-            }
 
             varSpeedCoil.OutletAirDBTemp = varSpeedCoil.InletAirDBTemp;
             varSpeedCoil.OutletAirHumRat = varSpeedCoil.InletAirHumRat;
