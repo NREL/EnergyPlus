@@ -960,12 +960,15 @@ namespace VentilatedSlab {
             if ((ventSlab.Fan_Index = Fans::GetFanIndex(state, ventSlab.FanName)) == 0) {
                 ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(25), state.dataIPShortCut->cAlphaArgs(25));
                 ErrorsFound = true;
-            } else if ((ventSlab.fanType = state.dataFans->fans(ventSlab.Fan_Index)->type) != HVAC::FanType::Constant) {
-                ShowSevereCustomMessage(state, eoh, format("Only fans of type Fan:Component are supported.  {} is of type {}",
-                                                           ventSlab.FanName, HVAC::fanTypeNames[(int)ventSlab.fanType]));
-                ErrorsFound = true;
+            } else {
+                ventSlab.fanType = state.dataFans->fans(ventSlab.Fan_Index)->type;
+                if (ventSlab.fanType != HVAC::FanType::Constant && ventSlab.fanType != HVAC::FanType::SystemModel) {
+                    ShowSevereCustomMessage(state, eoh,
+                                            format("Only fans of type Fan:ConstantVolume and Fan:SystemModel are supported.  {} is of type {}",
+                                                   ventSlab.FanName, HVAC::fanTypeNames[(int)ventSlab.fanType]));
+                    ErrorsFound = true;
+                }
             }
-
             if (ventSlab.outsideAirControlType == OutsideAirControlType::FixedOAControl) {
                 ventSlab.OutAirVolFlow = ventSlab.MinOutAirVolFlow;
                 ventSlab.MaxOASchedPtr = ventSlab.MinOASchedPtr;

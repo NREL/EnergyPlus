@@ -479,6 +479,11 @@ void SimOAComponent(EnergyPlusData &state,
     case SimAirServingZones::CompType::Fan_System_Object:  // Fan:SystemModel
     case SimAirServingZones::CompType::Fan_ComponentModel: { // Fan:ComponentModel
         if (Sim) {
+            if (CompIndex == 0) { // TODO: get rid of this stuff
+                CompIndex = Fans::GetFanIndex(state, CompName);
+                assert(CompIndex > 0);
+            }
+                
             state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration); 
         }
     } break;
