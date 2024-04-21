@@ -7822,6 +7822,7 @@ namespace Window {
             for (int j = N; j >= 1; --j) {
                 for (int i = M; i >= 1; --i) {
                     // Integrate transmittance using coordinate transform
+                    // TODO: switch to interpolation?
                     CalcScreenTransmittance(state, 0.0, matScreen, relativeAltitude(i, j), relativeAzimuth(i, j), btar);
                     SumTrans += (btar.BmTrans + btar.DfTrans) * skyArea[i - 1];
                     SumTransVis += (btar.BmTransVis + btar.DfTransVis) * skyArea[i - 1];
@@ -7850,9 +7851,9 @@ namespace Window {
 
             // Initialize incident-angle dependent beam matrix (will interpolate from this)
             for (int ip = 0; ip < Material::maxIPhi; ++ip) {
-                Real64 Phi = ip * matScreen->dPhi * Constant::DegToRadians;
+                Real64 Phi = ip * matScreen->dPhi;
                 for (int it = 0; it < Material::maxITheta; ++it) {
-                    Real64 Theta = it * matScreen->dTheta * Constant::DegToRadians;
+                    Real64 Theta = it * matScreen->dTheta;
                     CalcScreenTransmittance(state, 0.0, matScreen, Phi, Theta, matScreen->btars[ip][it]);
                 }
             }
@@ -7892,8 +7893,8 @@ namespace Window {
                 for (int it = 0; it <= maxIPrint; ++it) {
                     print(screenCsvFile, "{}", it * screen->mapDegResolution);
                     for (int ip = maxIPrint; ip >= 0; --ip) {
-                        Real64 phi = ip * screen->mapDegResolution;
-                        Real64 theta = it * screen->mapDegResolution;
+                        Real64 phi = ip * screen->mapDegResolution * Constant::DegToRad;
+                        Real64 theta = it * screen->mapDegResolution * Constant::DegToRad;
                         int ip1, ip2, it1, it2;
                         General::BilinearInterpCoeffs coeffs;
                         Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
@@ -7922,8 +7923,8 @@ namespace Window {
                 for (int it = 0; it <= maxIPrint; ++it) {
                     print(screenCsvFile, "{}", it * screen->mapDegResolution);
                     for (int ip = 0; ip <= maxIPrint; ++ip) {
-                        Real64 phi = ip * screen->mapDegResolution;
-                        Real64 theta = it * screen->mapDegResolution;
+                        Real64 phi = ip * screen->mapDegResolution * Constant::DegToRad;
+                        Real64 theta = it * screen->mapDegResolution * Constant::DegToRad;
                         int ip1, ip2, it1, it2;
                         General::BilinearInterpCoeffs coeffs;
                         Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);

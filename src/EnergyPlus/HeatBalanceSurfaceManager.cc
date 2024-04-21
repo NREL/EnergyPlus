@@ -3545,15 +3545,12 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     assert(screen != nullptr);
 
                                     auto &surf = state.dataSurface->Surface(SurfNum);
-                                    Real64 phiWin = std::asin(surf.OutNormVec(3)); 
-                                    Real64 phiSun = std::asin(state.dataEnvrn->SOLCOS.z); // Altitude and azimuth angle of sun (radians)
-                                    Real64 thetaWin = std::atan2(surf.OutNormVec(2), surf.OutNormVec(1));
-                                    Real64 thetaSun = std::atan2(state.dataEnvrn->SOLCOS.y, state.dataEnvrn->SOLCOS.x);
-                                    Real64 phi = phiSun - phiWin; 
-                                    Real64 theta = thetaSun - thetaWin;
+                                    Real64 phi, theta;
+                                    Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
+                                                                  phi, theta);
+#ifdef GET_OUT
                                     int ip1, ip2, it1, it2; // hi/lo phi and theta map indices
                                     General::BilinearInterpCoeffs coeffs;
-                                    Material::NormalizePhiTheta(phi, theta);
                                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
                                     GetBilinearInterpCoeffs(
                                         phi, theta, ip1 * screen->dPhi, ip2 * screen->dPhi, it1 * screen->dTheta, it2 * screen->dTheta, coeffs);
@@ -3568,6 +3565,18 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarInBm + DivIncSolarInDif);
+#else // GET_OUT
+                                    Material::ScreenBmTransAbsRef btar;
+
+                                    Material::CalcScreenTransmittance(state, 0.0, screen, phi, theta, btar);
+                                    Real64 BmDfTrans = btar.DfTrans;
+                                    Real64 BmBmTrans = btar.BmTrans;
+                        
+                                    state.dataSurface->SurfWinDividerQRadOutAbs(SurfNum) =
+                                        DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
+                                    state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
+                                        DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarInBm + DivIncSolarInDif);
+#endif // GET_OUT
                                 }
                             }
                         }
