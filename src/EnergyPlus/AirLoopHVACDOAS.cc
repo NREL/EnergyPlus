@@ -247,7 +247,15 @@ namespace AirLoopHVACDOAS {
                     for (auto const &NodeDOASName : NodeArray) {
                         num += 1;
                         std::string name = Util::makeUPPER(NodeDOASName.at("inlet_node_name").get<std::string>());
-                        int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
+                        int NodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          name,
+                                                                          errorsFound,
+                                                                          DataLoopNode::ConnectionObjectType::AirLoopHVACMixer,
+                                                                          thisObjectName,
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::ConnectionType::Inlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
+                                                                          DataLoopNode::ObjectIsParent);
                         if (NodeNum > 0 && num <= thisMixer.numOfInletNodes) {
                             thisMixer.InletNodeName.push_back(name);
                             thisMixer.InletNodeNum.push_back(NodeNum);
@@ -383,7 +391,15 @@ namespace AirLoopHVACDOAS {
 
                 thisSplitter.name = Util::makeUPPER(thisObjectName);
                 thisSplitter.InletNodeName = Util::makeUPPER(fields.at("inlet_node_name").get<std::string>());
-                thisSplitter.InletNodeNum = Util::FindItemInList(thisSplitter.InletNodeName, state.dataLoopNodes->NodeID);
+                thisSplitter.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                                thisSplitter.InletNodeName,
+                                                                                errorsFound,
+                                                                                DataLoopNode::ConnectionObjectType::AirLoopHVACSplitter,
+                                                                                thisObjectName,
+                                                                                DataLoopNode::NodeFluidType::Air,
+                                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                                DataLoopNode::ObjectIsParent);
                 thisSplitter.m_AirLoopSplitter_Num = AirLoopSplitterNum - 1;
 
                 auto NodeNames = fields.find("nodes");
@@ -395,7 +411,15 @@ namespace AirLoopHVACDOAS {
                         num += 1;
 
                         std::string name = Util::makeUPPER(NodeDOASName.at("outlet_node_name").get<std::string>());
-                        int NodeNum = Util::FindItemInList(name, state.dataLoopNodes->NodeID);
+                        int NodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          name,
+                                                                          errorsFound,
+                                                                          DataLoopNode::ConnectionObjectType::AirLoopHVACSplitter,
+                                                                          thisObjectName,
+                                                                          DataLoopNode::NodeFluidType::Air,
+                                                                          DataLoopNode::ConnectionType::Inlet,
+                                                                          NodeInputManager::CompFluidStream::Primary,
+                                                                          DataLoopNode::ObjectIsParent);
                         if (NodeNum > 0 && num <= thisSplitter.numOfOutletNodes) {
                             thisSplitter.OutletNodeName.push_back(name);
                             thisSplitter.OutletNodeNum.push_back(NodeNum);
@@ -521,13 +545,13 @@ namespace AirLoopHVACDOAS {
 
                     case ValidEquipListType::FanComponentModel:
                         thisDOAS.m_FanTypeNum = SimAirServingZones::CompType::Fan_ComponentModel;
-                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
+                        thisDOAS.m_FanIndex = Fans::GetFanIndex(state, CompName);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBeforeCoolingCoilFlag = true;
                         }
-                        thisOutsideAirSys.InletNodeNum(CompNum) = Fans::GetFanInletNode(state, typeNameUC, CompName, InletNodeErrFlag);
-                        thisOutsideAirSys.OutletNodeNum(CompNum) = Fans::GetFanOutletNode(state, typeNameUC, CompName, OutletNodeErrFlag);
+                        thisOutsideAirSys.InletNodeNum(CompNum) = Fans::GetFanInletNode(state, thisDOAS.m_FanIndex);
+                        thisOutsideAirSys.OutletNodeNum(CompNum) = Fans::GetFanOutletNode(state, thisDOAS.m_FanIndex);
                         thisDOAS.m_FanInletNodeNum = thisOutsideAirSys.InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = thisOutsideAirSys.OutletNodeNum(CompNum);
                         FanOrder = CompNum;
@@ -853,7 +877,6 @@ namespace AirLoopHVACDOAS {
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
             bool ErrorsFound = false;
             Real64 rho;
-            state.dataSize->CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
                 std::string CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);

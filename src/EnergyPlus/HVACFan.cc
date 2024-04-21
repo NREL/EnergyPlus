@@ -95,6 +95,8 @@ namespace HVACFan {
                 }
             }
         }
+
+        // TODO: should not print error here
         if (!found && ErrorCheck) {
             ShowSevereError(state, format("getFanObjectVectorIndex: did not find Fan:SystemModel name ={}. Check inputs", objectName));
         }
@@ -221,7 +223,7 @@ namespace HVACFan {
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
-        sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
+        sizerSystemAirFlow.initializeWithinEP(state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, bPRINT, routineName);
         designAirVolFlowRate = sizerSystemAirFlow.size(state, tempFlow, errorsFound);
 
         state.dataSize->DataAutosizable = true; // should be false?
@@ -254,7 +256,8 @@ namespace HVACFan {
             } // end switch
 
             // report design power
-            BaseSizer::reportSizerOutput(state, m_fanType, name, "Design Electric Power Consumption [W]", designElecPower);
+            BaseSizer::reportSizerOutput(
+                state, DataHVACGlobals::fanTypeNames[(int)m_fanType], name, "Design Electric Power Consumption [W]", designElecPower);
 
         } // end if power was autosized
 
@@ -291,7 +294,7 @@ namespace HVACFan {
         Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
         m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
 
-        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, m_fanType);
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, DataHVACGlobals::fanTypeNames[(int)m_fanType]);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, name, m_fanTotalEff);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanDeltaP, name, deltaPress);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanVolFlow, name, designAirVolFlowRate);
@@ -364,8 +367,8 @@ namespace HVACFan {
     FanSystem::FanSystem(EnergyPlusData &state, std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
           designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), m_numSpeeds(0), fanIsSecondaryDriver(false),
-          m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
-          m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
+          m_fanType(DataHVACGlobals::FanType::Invalid), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0),
+          m_motorInAirFrac(0.0), m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::Invalid), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
           m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::Invalid), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
           m_inletAirMassFlowRate(0.0), m_outletAirMassFlowRate(0.0), m_maxAirMassFlowRate(0.0), m_inletAirTemp(0.0), m_outletAirTemp(0.0),
@@ -419,8 +422,7 @@ namespace HVACFan {
 
         name = alphaArgs(1);
         // TODO how to check for unique names across objects during get input?
-        m_fanType = locCurrentModuleObject;
-        m_fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+        m_fanType = DataHVACGlobals::FanType::SystemModel;
         if (isAlphaFieldBlank(2)) {
             availSchedIndex = ScheduleManager::ScheduleAlwaysOn;
         } else {
@@ -607,48 +609,48 @@ namespace HVACFan {
                             "Fan Electricity Rate",
                             Constant::Units::W,
                             m_fanPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Rise in Air Temperature",
                             Constant::Units::deltaC,
                             m_deltaTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Heat Gain to Air",
                             Constant::Units::W,
                             m_powerLossToAir,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name);
         SetupOutputVariable(state,
                             "Fan Electricity Energy",
                             Constant::Units::J,
                             m_fanEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             name,
                             Constant::eResource::Electricity,
-                            OutputProcessor::SOVEndUseCat::Fans,
-                            m_endUseSubcategoryName,
-                            OutputProcessor::SOVGroup::HVAC);
+                            OutputProcessor::Group::HVAC,
+                            OutputProcessor::EndUseCat::Fans,
+                            m_endUseSubcategoryName);
         SetupOutputVariable(state,
                             "Fan Air Mass Flow Rate",
                             Constant::Units::kg_s,
                             m_outletAirMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             name);
         if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds == 1) {
             SetupOutputVariable(state,
                                 "Fan Runtime Fraction",
                                 Constant::Units::None,
                                 m_fanRunTimeFractionAtSpeed[0],
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 name);
         } else if (speedControl == SpeedControlMethod::Discrete && m_numSpeeds > 1) {
             for (int speedLoop = 0; speedLoop < m_numSpeeds; ++speedLoop) {
@@ -656,8 +658,8 @@ namespace HVACFan {
                                     "Fan Runtime Fraction Speed " + fmt::to_string(speedLoop + 1),
                                     Constant::Units::None,
                                     m_fanRunTimeFractionAtSpeed[speedLoop],
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     name);
             }
         }

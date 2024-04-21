@@ -4105,7 +4105,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             // Economics Results Summary Report
             //---------------------------------
             OutputReportTabular::WriteReportHeaders(
-                state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
+                state, "Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Average);
 
             for (int iUnitSystem = 0; iUnitSystem <= 1; iUnitSystem++) {
                 OutputReportTabular::UnitsStyle unitsStyle_cur = state.dataOutRptTab->unitsStyle;
@@ -4121,7 +4121,8 @@ void WriteTabularTariffReports(EnergyPlusData &state)
 
                 // do unit conversions if necessary
                 std::string perAreaUnitName;
-                if (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) {
+                if ((unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPound) ||
+                    (unitsStyle_cur == OutputReportTabular::UnitsStyle::InchPoundExceptElectricity)) {
                     int unitConvIndex = 0;
                     std::string SIunit = "[~~$~~/m2]";
                     OutputReportTabular::LookupSItoIP(state, SIunit, unitConvIndex, perAreaUnitName);
@@ -4274,7 +4275,7 @@ void WriteTabularTariffReports(EnergyPlusData &state)
             for (int iTariff = 1; iTariff <= state.dataEconTariff->numTariff; ++iTariff) {
                 auto const &tariff = state.dataEconTariff->tariff(iTariff);
                 auto const &computation = state.dataEconTariff->computation(iTariff);
-                OutputReportTabular::WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Averaged);
+                OutputReportTabular::WriteReportHeaders(state, "Tariff Report", tariff.tariffName, OutputProcessor::StoreType::Average);
                 rowHead.allocate(7);
                 columnHead.allocate(1);
                 columnWidth.allocate(1);

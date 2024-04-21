@@ -189,8 +189,7 @@ namespace HVACFan {
             Num
         };
 
-        std::string m_fanType;                   // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-        int m_fanType_Num;                       // DataHVACGlobals fan type
+        DataHVACGlobals::FanType m_fanType;      // DataHVACGlobals fan type
         bool m_designAirVolFlowRateWasAutosized; // true if design max volume flow rate was autosize on input
         Real64 m_minPowerFlowFrac;               // Minimum fan air flow fraction for power calculation
         Real64 m_motorEff;                       // Fan motor efficiency

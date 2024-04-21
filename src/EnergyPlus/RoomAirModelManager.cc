@@ -1722,22 +1722,22 @@ namespace RoomAir {
                                     "RoomAirflowNetwork Node Temperature",
                                     Constant::Units::C,
                                     roomAFNZoneNode.AirTemp,
-                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     roomAFNZoneNode.Name);
                 SetupOutputVariable(state,
                                     "RoomAirflowNetwork Node Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     roomAFNZoneNode.HumRat,
-                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     roomAFNZoneNode.Name);
                 SetupOutputVariable(state,
                                     "RoomAirflowNetwork Node Relative Humidity",
                                     Constant::Units::Perc,
                                     roomAFNZoneNode.RelHumidity,
-                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     roomAFNZoneNode.Name);
             } // for (iAirNodE)
         }     // for (iZone)
@@ -2139,71 +2139,71 @@ namespace RoomAir {
                                         "Room Air Zone Mixed Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTMX(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTOC(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Floor Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTFloor(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         Constant::Units::m,
                                         state.dataRoomAir->HeightTransition(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recommended Minimum Flow Fraction",
                                         Constant::Units::None,
                                         state.dataRoomAir->FracMinFlow(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneDispVent3NodeMixedFlagRep(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         Constant::Units::K_m,
                                         state.dataRoomAir->AvgTempGrad(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Maximum Temperature Gradient",
                                         Constant::Units::K_m,
                                         state.dataRoomAir->MaxTempGrad(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermal Comfort Effective Air Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->TCMF(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         Constant::Units::C,
                                         state.dataHeatBalFanSys->TempTstatAir(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         state.dataHeatBal->Zone(iZone).Name);
                 } // for (iZone)
             }     // if (any(IsZoneDV))
@@ -2232,71 +2232,71 @@ namespace RoomAir {
                                         "Room Air Zone Mixed Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTMX(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTOC(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         Constant::Units::m,
                                         state.dataRoomAir->HeightTransition(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneUFADMixedFlagRep(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         Constant::Units::K_m,
                                         state.dataRoomAir->AvgTempGrad(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->TCMF(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         Constant::Units::C,
                                         state.dataHeatBalFanSys->TempTstatAir(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneUFADGamma(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataRoomAir->ZoneUFADPowInPlumes(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         Constant::Units::None,
                                         state.dataRoomAir->Phi(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
 
                     // set zone equip pointer in the UCSDUI data structure
@@ -2311,78 +2311,78 @@ namespace RoomAir {
                                         "Room Air Zone Mixed Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTMX(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Occupied Subzone Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTOC(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height",
                                         Constant::Units::m,
                                         state.dataRoomAir->HeightTransition(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixed Status",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneUFADMixedFlagRep(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Average Temperature Gradient",
                                         Constant::Units::K_m,
                                         state.dataRoomAir->AvgTempGrad(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Effective Comfort Air Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->TCMF(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Thermostat Temperature",
                                         Constant::Units::C,
                                         state.dataHeatBalFanSys->TempTstatAir(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Transition Height Gamma Value",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneUFADGamma(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Plume Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataRoomAir->ZoneUFADPowInPlumes(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Window Plume Heat Transfer Rate",
                                         Constant::Units::W,
                                         state.dataRoomAir->ZoneUFADPowInPlumesfromWindows(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Temperature Stratification Fraction",
                                         Constant::Units::None,
                                         state.dataRoomAir->Phi(iZone),
-                                        OutputProcessor::SOVTimeStepType::HVAC,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     // set zone equip pointer in the UCSDUE data structure
                     state.dataRoomAir->ZoneUFAD(state.dataRoomAir->ZoneUFADPtr(iZone)).ZoneEquipPtr = iZone;
@@ -2454,64 +2454,64 @@ namespace RoomAir {
                                         "Room Air Zone Jet Region Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTJET(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Temperature",
                                         Constant::Units::C,
                                         state.dataRoomAir->ZTREC(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Jet Region Average Air Velocity",
                                         Constant::Units::m_s,
                                         state.dataRoomAir->Ujet(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation Region Average Air Velocity",
                                         Constant::Units::m_s,
                                         state.dataRoomAir->Urec(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Recirculation and Inflow Rate Ratio",
                                         Constant::Units::None,
                                         state.dataRoomAir->RecInflowRatio(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Inflow Opening Area",
                                         Constant::Units::m2,
                                         state.dataRoomAir->Ain(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Room Length",
                                         Constant::Units::m,
                                         state.dataRoomAir->Dstar(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::Average,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Mixing Status",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneCrossVentIsMixing(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     SetupOutputVariable(state,
                                         "Room Air Zone Is Recirculating Status",
                                         Constant::Units::None,
                                         state.dataRoomAir->ZoneCrossVentHasREC(iZone),
-                                        OutputProcessor::SOVTimeStepType::Zone,
-                                        OutputProcessor::SOVStoreType::State,
+                                        OutputProcessor::TimeStepType::Zone,
+                                        OutputProcessor::StoreType::Average,
                                         zone.Name);
                     for (int i = 1; i <= state.dataRoomAir->AFNSurfaceCrossVent(0, ZoneNum); ++i) {
                         int N = state.afn->AirflowNetworkLinkageData(i).CompNum;
@@ -2520,8 +2520,8 @@ namespace RoomAir {
                                                 "Room Air Window Jet Region Average Air Velocity",
                                                 Constant::Units::m_s,
                                                 state.dataRoomAir->CrossVentJetRecFlows(i, iZone).Ujet,
-                                                OutputProcessor::SOVTimeStepType::Zone,
-                                                OutputProcessor::SOVStoreType::Average,
+                                                OutputProcessor::TimeStepType::Zone,
+                                                OutputProcessor::StoreType::Average,
                                                 state.afn->MultizoneSurfaceData(i).SurfName);
                         }
                     }
@@ -2692,6 +2692,8 @@ namespace RoomAir {
         // Using/Aliasing
         using Fans::GetFanOutletNode;
 
+        static constexpr std::string_view routineName = "CheckEquipName";
+
         // Return value
         bool EquipFind; // True if an error is found
 
@@ -2742,13 +2744,21 @@ namespace RoomAir {
             }
         }
 
+        ErrorObjectHeader eoh{routineName, equipTypeName, EquipName};
+
         switch (zoneEquipType) {
         case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeName = Alphas(4);
             ReturnNodeName = ""; // Zone return node
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            int nodeNum = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
+            int fanIndex = Fans::GetFanIndex(state, Alphas(4));
+            if (fanIndex == 0) {
+                ShowSevereItemNotFound(state, eoh, "", Alphas(4));
+                errorfound = true;
+            }
+
+            int nodeNum = GetFanOutletNode(state, fanIndex);
             if (errorfound) {
             }
             SupplyNodeName = state.dataLoopNodes->NodeID(nodeNum); // ?????
