@@ -242,8 +242,6 @@ void GetSysInput(EnergyPlusData &state)
     using WaterCoils::GetCoilWaterInletNode;
     auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
     auto &GetHeatingCoilOutletNode(HeatingCoils::GetCoilOutletNode);
-    using Fans::GetFanInletNode;
-    using Fans::GetFanOutletNode;
     using namespace DataHeatBalance;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -2080,52 +2078,30 @@ void GetSysInput(EnergyPlusData &state)
                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
             ErrorsFound = true;
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType =
-            static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(5)));
 
-        if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType != HVAC::FanType::VAV &&
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType != HVAC::FanType::SystemModel) {
-            ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5));
+        auto &airTerm = state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI);
+        airTerm.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(5)));
+
+        if (airTerm.fanType != HVAC::FanType::VAV && airTerm.fanType != HVAC::FanType::SystemModel) {
+            ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5), "Support fan types are Fan:VAV and Fan:SystemModel");
+            
             ErrorsFound = true;
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName = Alphas(6);
-        ValidateComponent(state,
-                          HVAC::fanTypeNamesUC[(int)state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType],
-                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName,
-                          IsNotOK,
-                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType);
-        if (IsNotOK) {
-            ShowContinueError(state,
-                              format("In {} = {}",
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
+
+        airTerm.FanName = Alphas(6);
+
+        airTerm.Fan_Index = Fans::GetFanIndex(state, airTerm.FanName);
+        if (airTerm.Fan_Index == 0) {
+            ShowSevereItemNotFound(state, eoh, cAlphaFields(6), airTerm.FanName);
             ErrorsFound = true;
         }
-        if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType == HVAC::FanType::SystemModel) {
-            state.dataFans->fanObjs.emplace_back(
-                new Fans::FanSystem(state,
-                                       state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI)
-                                           .FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index =
-                Fans::getFanObjectVectorIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
-                state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
-                state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
-            state.dataFans->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
-        } else if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).fanType == HVAC::FanType::VAV) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index =
-                Fans::GetFanIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
-            if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index == 0) {
-                ShowSevereItemNotFound(state, eoh, cAlphaFields(6), state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
-                ErrorsFound = true;
-            }
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
-                GetFanOutletNode(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index);
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
-                GetFanInletNode(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index);
-        }
+        airTerm.OutletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->outletNodeNum;
+        airTerm.InletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->inletNodeNum;
 
+        if (airTerm.fanType == HVAC::FanType::SystemModel) {
+            dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(airTerm.Fan_Index))->isSecondaryDriver = true;
+        }
+        
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -5360,18 +5336,12 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     AirMassFlow = AirFlow;
     state.dataLoopNodes->Node(FanInNode).MassFlowRate = AirMassFlow;
     CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
-    if (fanType == HVAC::FanType::VAV && FanOn == 1) {
-        Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
-    } else if (fanType == HVAC::FanType::SystemModel && FanOn == 1) {
-        state.dataFans->fanObjs[this->Fan_Index]->simulate(state, _, _);
+    if (FanOn == 1) {
+        state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
-        if (fanType == HVAC::FanType::VAV) {
-            Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
-        } else if (fanType == HVAC::FanType::SystemModel) {
-            state.dataFans->fanObjs[this->Fan_Index]->simulate(state, _, _);
-        }
+        state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail;

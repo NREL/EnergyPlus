@@ -1719,7 +1719,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     state->dataGlobal->SysSizingCalc = true;
     state->dataGlobal->BeginEnvrnFlag = true;
     // set local variables for convenience
-    auto &supplyFan = state->dataFans->Fan(1);
+    auto *supplyFan = state->dataFans->fans(1);
     auto &dxClgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(1);
     auto &dxHtgCoilMain = state->dataVariableSpeedCoils->VarSpeedCoil(2);
     // initialize priority control
@@ -1745,11 +1745,11 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     HVACUnitaryBypassVAV::SimCBVAV(*state, CBVAVNum, firstHVACIteration, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
     // calculate expected result
     Real64 result_BypassVAV_ElectricityRate =
-        supplyFan.FanPower + dxClgCoilMain.Power + dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower + state->dataHVACGlobal->DefrostElecPower;
+        supplyFan->totalPower + dxClgCoilMain.Power + dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower + state->dataHVACGlobal->DefrostElecPower;
     // test the components and total electricity rate results
     EXPECT_NEAR(2160.62, BypassVAV.ElecPower, 0.01);
     EXPECT_NEAR(2160.62, result_BypassVAV_ElectricityRate, 0.01);
-    EXPECT_NEAR(685.71, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(685.71, supplyFan->totalPower, 0.01);
     EXPECT_NEAR(0.0, dxClgCoilMain.Power, 0.01);
     EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
     EXPECT_NEAR(1453.86, dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower, 0.01);

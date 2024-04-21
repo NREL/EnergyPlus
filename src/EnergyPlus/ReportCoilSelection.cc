@@ -96,7 +96,7 @@ CoilSelectionData::CoilSelectionData( // constructor
       ratedCoilInEnth(-999.0), ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0),
       ratedCoilEff(-999.0), ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
 
-      supFanModelType(DataAirSystems::Invalid), supFanNum(0), supFanVecIndex(-1), fanSizeMaxAirVolumeFlow(-999.0), fanSizeMaxAirMassFlow(-999.0),
+      supFanType(HVAC::FanType::Invalid), supFanNum(0), fanSizeMaxAirVolumeFlow(-999.0), fanSizeMaxAirMassFlow(-999.0),
       fanHeatGainIdealPeak(-999.0), coilAndFanNetTotalCapacityIdealPeak(-999.0), plantDesMaxMassFlowRate(-999.0), plantDesRetTemp(-999.0),
       plantDesSupTemp(-999.0), plantDesDeltaTemp(-999.0), plantDesCapacity(-999.0), coilCapPrcntPlantCap(-999.0), coilFlowPrcntPlantFlow(-999.0),
       coilUA(-999.0)
@@ -620,33 +620,14 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
             }
         }
         // fill out supply fan info
-        switch (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanModelType) {
-        case DataAirSystems::StructArrayLegacyFanModels: {
-
-            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+        auto *fan = state.dataFans->fans(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanNum);
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
                 state,
                 c->coilName_,
                 c->coilObjName,
-                state.dataFans->Fan(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum).Name,
-                DataAirSystems::StructArrayLegacyFanModels,
-                state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).SupFanNum);
-            break;
-        }
-        case DataAirSystems::ObjectVectorOOFanSystemModel: {
-
-            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                state,
-                c->coilName_,
-                c->coilObjName,
-                state.dataFans->fanObjs[state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex]->name,
-                DataAirSystems::ObjectVectorOOFanSystemModel,
-                state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanVecIndex);
-            break;
-        }
-        default:
-            // do nothing
-            break;
-        } // end switch
+                fan->Name,
+                fan->type,
+                state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanNum);
     }
 
     if (c->zoneEqNum > 0) {
@@ -863,33 +844,19 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             }
         }
         // fill out some fan information
-        switch (c->supFanModelType) {
-        case DataAirSystems::StructArrayLegacyFanModels: {
-            HVAC::FanType locFanType = HVAC::FanType::Invalid;
-            bool errorsFound(false);
-            if (c->supFanNum <= 0) {
-                c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
-            }
+        HVAC::FanType locFanType = HVAC::FanType::Invalid;
+        bool errorsFound(false);
+        if (c->supFanNum == 0) {
+            c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
+        }
 
-            locFanType = Fans::GetFanType(state, c->supFanNum);
+        if (c->supFanNum != 0) {
+            auto *fan = state.dataFans->fans(c->supFanNum);
+            locFanType = fan->type;
             c->fanTypeName = HVAC::fanTypeNames[(int)locFanType];
-            c->fanSizeMaxAirVolumeFlow = Fans::GetFanDesignVolumeFlowRate(state, c->supFanNum);
-            c->fanSizeMaxAirMassFlow = state.dataFans->Fan(c->supFanNum).MaxAirMassFlowRate;
-            break;
+            c->fanSizeMaxAirVolumeFlow = fan->maxAirFlowRate;
+            c->fanSizeMaxAirMassFlow = fan->maxAirMassFlowRate;
         }
-        case DataAirSystems::ObjectVectorOOFanSystemModel: {
-            c->fanTypeName = "Fan:SystemModel";
-            if (c->supFanVecIndex < 0) {
-                c->supFanVecIndex = Fans::getFanObjectVectorIndex(state, c->fanAssociatedWithCoilName);
-            }
-            c->fanSizeMaxAirVolumeFlow = state.dataFans->fanObjs[c->supFanVecIndex]->designAirVolFlowRate;
-            c->fanSizeMaxAirMassFlow = state.dataFans->fanObjs[c->supFanVecIndex]->maxAirMassFlowRate();
-            break;
-        }
-        default:
-            // do nothing
-            break;
-        } // end switch
 
         c->coilAndFanNetTotalCapacityIdealPeak = c->coilTotCapAtPeak - c->fanHeatGainIdealPeak;
 
@@ -2000,7 +1967,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
                                                std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType, // idf input object class name of coil
                                                std::string const &fanName,
-                                               DataAirSystems::FanModelType fanEnumType,
+                                               HVAC::FanType fanType,
                                                int fanIndex)
 {
     if (fanName.empty()) {
@@ -2009,24 +1976,10 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->fanAssociatedWithCoilName = fanName;
-    c->supFanModelType = fanEnumType;
-    int locFanIndex(-1);
-    if (fanEnumType == DataAirSystems::StructArrayLegacyFanModels) {
-        if (fanIndex <= 0) {
-            bool errorsFound(false);
-            locFanIndex = Fans::GetFanIndex(state, fanName);
-        } else {
-            locFanIndex = fanIndex;
-        }
-        c->supFanNum = locFanIndex;
-    } else if (fanEnumType == DataAirSystems::ObjectVectorOOFanSystemModel) {
-        if (fanIndex < 0) {
-            locFanIndex = Fans::getFanObjectVectorIndex(state, fanName);
-        } else {
-            locFanIndex = fanIndex;
-        }
-        c->supFanVecIndex = locFanIndex;
-    }
+    c->supFanType = fanType;
+    c->supFanNum = fanIndex;
+    if (c->supFanNum == 0)
+        c->supFanNum = Fans::GetFanIndex(state, fanName);
 }
 
 std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const timeStepAtPeak)

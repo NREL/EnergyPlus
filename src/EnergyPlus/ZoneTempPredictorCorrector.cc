@@ -3842,14 +3842,14 @@ void CalcZoneAirTempSetPoints(EnergyPlusData &state)
                                      state.dataFaultsMgr->FaultsThermostatOffset(iFault).FaultyThermostatName)) {
 
                     // Check fault availability schedules
-                    if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                    if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).availSchedNum) > 0.0) {
 
                         // Check fault severity schedules to update the reference thermostat offset
                         double rSchVal = 1.0;
                         double offsetUpdated;
-                        if (state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr >= 0) {
+                        if (state.dataFaultsMgr->FaultsThermostatOffset(iFault).severitySchedNum >= 0) {
                             rSchVal =
-                                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).SeveritySchedPtr);
+                                ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsThermostatOffset(iFault).severitySchedNum);
                         }
                         offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFault).Offset;
 
@@ -3944,13 +3944,13 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
 
                                     // Check fault availability schedules
                                     if (ScheduleManager::GetCurrentScheduleValue(
-                                            state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).AvaiSchedPtr) > 0.0) {
+                                            state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).availSchedNum) > 0.0) {
 
                                         // Check fault severity schedules to update the reference thermostat offset
                                         double rSchVal = 1.0;
-                                        if (state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr >= 0) {
+                                        if (state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).severitySchedNum >= 0) {
                                             rSchVal = ScheduleManager::GetCurrentScheduleValue(
-                                                state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).SeveritySchedPtr);
+                                                state, state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).severitySchedNum);
                                         }
                                         offsetThermostat = rSchVal * state.dataFaultsMgr->FaultsThermostatOffset(iFaultThermo).Offset;
                                     }
@@ -3999,14 +3999,14 @@ void ZoneSpaceHeatBalanceData::calcPredictedHumidityRatio(EnergyPlusData &state,
                         // For Humidistat Offset Type II: ThermostatOffsetIndependent
 
                         // Check fault availability schedules
-                        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).AvaiSchedPtr) > 0.0) {
+                        if (ScheduleManager::GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).availSchedNum) > 0.0) {
 
                             // Check fault severity schedules to update the reference humidistat offset
                             double rSchVal = 1.0;
                             double offsetUpdated;
-                            if (state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr >= 0) {
+                            if (state.dataFaultsMgr->FaultsHumidistatOffset(iFault).severitySchedNum >= 0) { 
                                 rSchVal = ScheduleManager::GetCurrentScheduleValue(
-                                    state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).SeveritySchedPtr);
+                                    state, state.dataFaultsMgr->FaultsHumidistatOffset(iFault).severitySchedNum);
                             }
                             offsetUpdated = rSchVal * state.dataFaultsMgr->FaultsHumidistatOffset(iFault).Offset;
 

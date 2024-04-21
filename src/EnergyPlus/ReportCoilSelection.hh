@@ -197,9 +197,8 @@ public:                                  // data
 
     std::string fanAssociatedWithCoilName;        // name of fan found to be associated with this coil
     std::string fanTypeName;                      // type of fan found to be associated with this coil
-    DataAirSystems::FanModelType supFanModelType; // indicates which type of fan model for supply fan, legacy or new OO
-    int supFanNum;                                // index pointing to this fan in legacy fan data structure, 1-based struct array
-    int supFanVecIndex;                           // index pointing to this fan in new OO fan object array, 0-based
+    HVAC::FanType supFanType; // indicates which type of fan model for supply fan, legacy or new OO
+    int supFanNum = 0;                                // index pointing to this fan in legacy fan data structure, 1-based struct array
     Real64 fanSizeMaxAirVolumeFlow;               // the size of the fan in terms of volume flow rate [m3/s]
     Real64 fanSizeMaxAirMassFlow;                 // the size of the fan in terms of mass flow rate [kg/s]
     Real64 fanHeatGainIdealPeak;                  // Fan heat gain to air during Ideal loads peak sizing [W]
@@ -402,7 +401,7 @@ public: // methods
                               std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
-                              DataAirSystems::FanModelType fanEnumType,
+                              HVAC::FanType fanType,
                               int fanIndex);
 
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);

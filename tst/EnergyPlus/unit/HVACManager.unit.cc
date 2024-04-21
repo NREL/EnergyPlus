@@ -479,14 +479,18 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->NumFans = 1;
-    state->dataFans->Fan(1).fanType = HVAC::FanType::Exhaust;
-    state->dataFans->Fan(1).OutletAirMassFlowRate = 1.0;
-    state->dataFans->Fan(1).OutletAirTemp = 22.0;
-    state->dataFans->Fan(1).OutletAirEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataFans->Fan(1).OutletAirTemp, 0.0005);
-    state->dataFans->Fan(1).InletNodeNum = 1;
+    auto *fan1 = new Fans::FanComponent;
+    fan1->Name = "EXHAUST FAN 1";
 
+    fan1->type = HVAC::FanType::Exhaust;
+    fan1->outletAirMassFlowRate = 1.0;
+    fan1->outletAirTemp = 22.0;
+    fan1->outletAirEnthalpy = Psychrometrics::PsyHFnTdbW(fan1->outletAirTemp, 0.0005);
+    fan1->inletNodeNum = 1;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
+    
     state->dataLoopNodes->Node.allocate(1);
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
 

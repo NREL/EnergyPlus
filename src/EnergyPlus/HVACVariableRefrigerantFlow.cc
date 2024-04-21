@@ -1390,12 +1390,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
     using DXCoils::GetDXCoilIndex;
-    using Fans::GetFanAvailSchPtr;
-    using Fans::GetFanDesignVolumeFlowRate;
-    using Fans::GetFanIndex;
-    using Fans::GetFanInletNode;
-    using Fans::GetFanOutletNode;
-    using Fans::GetFanType;
 
     using DataSizing::AutoSize;
     using DXCoils::GetCoilCondenserInletNode;
@@ -3390,31 +3384,22 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             std::string FanName = cAlphaArgs(8);
 
             thisVrfTU.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, cAlphaArgs(7)));
-            assert(thisVrfTU.fanType != HVAC::FanType::Invalid);
 
-            if (thisVrfTU.fanType == HVAC::FanType::SystemModel) {
-                thisVrfTU.FanIndex = Fans::getFanObjectVectorIndex(state, FanName, false);
-                if (thisVrfTU.FanIndex == -1) {
-                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, FanName));
-                    thisVrfTU.FanIndex = state.dataFans->fanObjs.size() - 1;
-                    thisVrfTU.ActualFanVolFlowRate = state.dataFans->fanObjs[thisVrfTU.FanIndex]->designAirVolFlowRate;
-                    FanInletNodeNum = state.dataFans->fanObjs[thisVrfTU.FanIndex]->inletNodeNum;
-                    FanOutletNodeNum = state.dataFans->fanObjs[thisVrfTU.FanIndex]->outletNodeNum;
-                    thisVrfTU.FanAvailSchedPtr = state.dataFans->fanObjs[thisVrfTU.FanIndex]->availSchedIndex;
-                    thisVrfTU.fanInletNode = FanInletNodeNum;
-                    thisVrfTU.fanOutletNode = FanOutletNodeNum;
-                }
-            } else {
-                thisVrfTU.FanIndex = Fans::GetFanIndex(state, FanName);
-                if (thisVrfTU.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(8), FanName);
-                    ErrorsFound = true;
-                } else if (thisVrfTU.fanType != Fans::GetFanType(state, thisVrfTU.FanIndex)) {
-                    ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
-                    ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
-                    ShowContinueError(state, format("Actual type of fan {} = {}", FanName, HVAC::fanTypeNames[(int)thisVrfTU.fanType]));
-                    ErrorsFound = true;
-                }
+            if (thisVrfTU.fanType != HVAC::FanType::OnOff && thisVrfTU.fanType != HVAC::FanType::Constant &&
+                thisVrfTU.fanType != HVAC::FanType::VAV && thisVrfTU.fanType != HVAC::FanType::SystemModel) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFieldNames(7), cAlphaArgs(7), "Only types Fan:ConstantVolume, Fan:VAV, Fan:OnOff, and Fan:SystemModel are supported");
+                ErrorsFound = true;
+            }
+
+            if ((thisVrfTU.FanIndex = Fans::GetFanIndex(state, FanName)) == 0) { 
+                ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(8), FanName);
+                ErrorsFound = true;
+
+            } else if (thisVrfTU.fanType != state.dataFans->fans(thisVrfTU.FanIndex)->type) {
+                ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
+                ShowContinueError(state, "Fan type specified = " + cAlphaArgs(7));
+                ShowContinueError(state, format("Actual type of fan {} = {}", FanName, HVAC::fanTypeNames[(int)thisVrfTU.fanType]));
+                ErrorsFound = true;
             }
 
             if (thisVrfTU.VRFSysNum > 0) {
@@ -3442,45 +3427,27 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
             }
 
-            if (thisVrfTU.fanType == HVAC::FanType::OnOff || thisVrfTU.fanType == HVAC::FanType::Constant ||
-                thisVrfTU.fanType == HVAC::FanType::VAV) {
-
-                thisVrfTU.fanInletNode = state.dataFans->Fan(thisVrfTU.FanIndex).InletNodeNum;
-                thisVrfTU.fanOutletNode = state.dataFans->Fan(thisVrfTU.FanIndex).OutletNodeNum;
-
-                Real64 FanVolFlowRate = GetFanDesignVolumeFlowRate(state, thisVrfTU.FanIndex);
-                thisVrfTU.ActualFanVolFlowRate = FanVolFlowRate;
-                FanInletNodeNum = GetFanInletNode(state, thisVrfTU.FanIndex);
-                FanOutletNodeNum = GetFanOutletNode(state, thisVrfTU.FanIndex);
-                thisVrfTU.FanAvailSchedPtr = GetFanAvailSchPtr(state, thisVrfTU.FanIndex);
-
-                // Check fan's schedule for cycling fan operation if constant volume fan is used
-                if (thisVrfTU.FanOpModeSchedPtr > 0 && thisVrfTU.fanType == HVAC::FanType::Constant) {
-                    if (!CheckScheduleValueMinMax(state, thisVrfTU.FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
-                        ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
-                        ShowContinueError(state, format("For fan type = {}", HVAC::fanTypeNames[(int)HVAC::FanType::Constant]));
-                        ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                        ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(5), cAlphaArgs(5)));
-                        ShowContinueError(state, "...schedule values must be (>0., <=1.)");
-                        ErrorsFound = true;
-                    }
+            auto *fan = state.dataFans->fans(thisVrfTU.FanIndex);
+            
+            thisVrfTU.fanInletNode = fan->inletNodeNum;
+            thisVrfTU.fanOutletNode = fan->outletNodeNum;
+            
+            Real64 FanVolFlowRate = fan->maxAirFlowRate;
+            thisVrfTU.ActualFanVolFlowRate = FanVolFlowRate;
+            FanInletNodeNum = fan->inletNodeNum;
+            FanOutletNodeNum = fan->outletNodeNum;
+            thisVrfTU.FanAvailSchedPtr = fan->availSchedNum;
+            
+            // Check fan's schedule for cycling fan operation if constant volume fan is used
+            if (thisVrfTU.FanOpModeSchedPtr > 0 && thisVrfTU.fanType == HVAC::FanType::Constant) {
+                if (!CheckScheduleValueMinMax(state, thisVrfTU.FanOpModeSchedPtr, ">", 0.0, "<=", 1.0)) {
+                    ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
+                    ShowContinueError(state, format("For fan type = {}", HVAC::fanTypeNames[(int)HVAC::FanType::Constant]));
+                    ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
+                    ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(5), cAlphaArgs(5)));
+                    ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                    ErrorsFound = true;
                 }
-            } else if (thisVrfTU.fanType == HVAC::FanType::SystemModel) {
-                if (thisVrfTU.FanIndex == -1) {                                                      // mine data from fan object
-                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, FanName)); // call constructor
-                    // Do we not need to set the FanIndex here?
-                    thisVrfTU.ActualFanVolFlowRate = state.dataFans->fanObjs[thisVrfTU.FanIndex]->designAirVolFlowRate;
-                    FanInletNodeNum = state.dataFans->fanObjs[thisVrfTU.FanIndex]->inletNodeNum;
-                    FanOutletNodeNum = state.dataFans->fanObjs[thisVrfTU.FanIndex]->outletNodeNum;
-                    thisVrfTU.FanAvailSchedPtr = state.dataFans->fanObjs[thisVrfTU.FanIndex]->availSchedIndex;
-                    thisVrfTU.fanInletNode = FanInletNodeNum;
-                    thisVrfTU.fanOutletNode = FanOutletNodeNum;
-                }
-            } else { // IF (FanType_Num == HVAC::FanType_SimpleOnOff .OR. FanType_Num ==
-                     // HVAC::FanType_SimpleConstVolume)THEN
-                ShowSevereError(state, cCurrentModuleObject + " = " + thisVrfTU.Name);
-                ShowContinueError(state, "Illegal " + cAlphaFieldNames(7) + " = " + cAlphaArgs(7));
-                ErrorsFound = true;
             } // IF (FanType_Num == HVAC::FanType_SimpleOnOff .OR. FanType_Num == HVAC::FanType_SimpleConstVolume)THEN
 
             // Add TU to component sets array
@@ -3594,20 +3561,12 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).VRFIUPtr = VRFTUNum;
                             state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).VRFOUPtr = thisVrfTU.VRFSysNum;
                             state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).SupplyFanIndex = thisVrfTU.FanIndex;
-                            if (thisVrfTU.fanType == HVAC::FanType::SystemModel) {
-                                if (thisVrfTU.FanIndex > -1) {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) =
-                                        state.dataFans->fanObjs[thisVrfTU.FanIndex]->designAirVolFlowRate;
-                                } else {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
-                                }
+
+                            if (thisVrfTU.FanIndex > 0) {
+                                state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) =
+                                    state.dataFans->fans(thisVrfTU.FanIndex)->maxAirFlowRate;
                             } else {
-                                if (thisVrfTU.FanIndex > 0) {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) =
-                                        state.dataFans->Fan(thisVrfTU.FanIndex).MaxAirFlowRate;
-                                } else {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
-                                }
+                                state.dataDXCoils->DXCoil(thisVrfTU.CoolCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                             }
 
                         } else {
@@ -3888,21 +3847,14 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                             state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).VRFIUPtr = VRFTUNum;
                             state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).VRFOUPtr = thisVrfTU.VRFSysNum;
                             state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).SupplyFanIndex = thisVrfTU.FanIndex;
-                            if (thisVrfTU.fanType == HVAC::FanType::SystemModel) {
-                                if (thisVrfTU.FanIndex > -1) {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) =
-                                        state.dataFans->fanObjs[thisVrfTU.FanIndex]->designAirVolFlowRate;
-                                } else {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
-                                }
+
+                            if (thisVrfTU.FanIndex > 0) {
+                                state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) =
+                                    state.dataFans->fans(thisVrfTU.FanIndex)->maxAirFlowRate;
                             } else {
-                                if (thisVrfTU.FanIndex > 0) {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) =
-                                        state.dataFans->Fan(thisVrfTU.FanIndex).MaxAirFlowRate;
-                                } else {
-                                    state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
-                                }
+                                state.dataDXCoils->DXCoil(thisVrfTU.HeatCoilIndex).RatedAirVolFlowRate(1) = AutoSize;
                             }
+
 
                             // Terminal unit heating to cooling sizing ratio has precedence over VRF system sizing ratio
                             if (thisVrfTU.HeatingCapacitySizeRatio > 1.0) {
@@ -4461,33 +4413,35 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             }
         } else {
             if (vrfTU.fanType == HVAC::FanType::SystemModel) {
+                auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(vrfTU.FanIndex));
+                assert(fanSystem != nullptr);
+                
                 int FanIndex = vrfTU.FanIndex;
-                if (state.dataFans->fanObjs[FanIndex]->speedControl == Fans::FanSystem::SpeedControlMethod::Discrete) {
-                    int NumSpeeds = state.dataFans->fanObjs[FanIndex]->m_numSpeeds;
-                    if (NumSpeeds > 1) {
+                if (fanSystem->speedControl == Fans::SpeedControl::Discrete) {
+                    if (fanSystem->numSpeeds > 1) {
                         if (vrfTU.DXCoolCoilType_Num == HVAC::CoilVRF_Cooling) {
-                            vrfTU.NumOfSpeedCooling = NumSpeeds;
-                            vrfTU.CoolVolumeFlowRate.resize(NumSpeeds + 1);
-                            vrfTU.CoolMassFlowRate.resize(NumSpeeds + 1);
+                            vrfTU.NumOfSpeedCooling = fanSystem->numSpeeds;
+                            vrfTU.CoolVolumeFlowRate.resize(fanSystem->numSpeeds + 1);
+                            vrfTU.CoolMassFlowRate.resize(fanSystem->numSpeeds + 1);
                             if (vrfTU.MaxCoolAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= vrfTU.NumOfSpeedCooling; ++i) {
-                                    vrfTU.CoolMassFlowRate[i] = state.dataFans->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
+                                    vrfTU.CoolMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                                 }
                             }
                         }
                         if (vrfTU.DXHeatCoilType_Num == HVAC::CoilVRF_Heating) {
-                            vrfTU.NumOfSpeedHeating = NumSpeeds;
-                            vrfTU.HeatVolumeFlowRate.resize(NumSpeeds + 1);
-                            vrfTU.HeatMassFlowRate.resize(NumSpeeds + 1);
+                            vrfTU.NumOfSpeedHeating = fanSystem->numSpeeds;
+                            vrfTU.HeatVolumeFlowRate.resize(fanSystem->numSpeeds + 1);
+                            vrfTU.HeatMassFlowRate.resize(fanSystem->numSpeeds + 1);
                             if (vrfTU.MaxHeatAirVolFlow != DataSizing::AutoSize) {
                                 for (int i = 1; i <= vrfTU.NumOfSpeedCooling; ++i) {
-                                    vrfTU.HeatMassFlowRate[i] = state.dataFans->fanObjs[FanIndex]->m_massFlowAtSpeed[i - 1];
+                                    vrfTU.HeatMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                                 }
                             }
                         }
                         ShowWarningError(state,
                                          cCurrentModuleObject + " = " + thisVrfTU.Name + " with Fan:SystemModel is used in  " + cAlphaArgs(8) + "\"");
-                        ShowContinueError(state, format("...The number of speed = {:.0R}.", double(NumSpeeds)));
+                        ShowContinueError(state, format("...The number of speed = {:.0R}.", double(fanSystem->numSpeeds)));
                         ShowContinueError(state, "...Multiple speed fan will be applied to this unit. The speed number is determined by load.");
                     }
                 }
@@ -5596,7 +5550,6 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     using DataSizing::AutoSize;
     using DataZoneEquipment::CheckZoneEquipmentList;
-    using Fans::GetFanVolFlow;
     using FluidProperties::GetDensityGlycol;
 
     using PlantUtilities::InitComponentNodes;
@@ -6108,20 +6061,11 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         ShowContinueError(state, "Illegal Supply Air Fan Placement.");
                         ErrorsFound = true;
                     }
-                    if (state.dataHVACVarRefFlow->VRFTU(TUIndex).fanType == HVAC::FanType::SystemModel) {
-                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).FanIndex == -1) {
-                            ShowSevereError(
-                                state, format("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = {}", state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
-                            ShowContinueError(state, "VRF Terminal Unit fan is required when used as zone equipment.");
-                            ErrorsFound = true;
-                        }
-                    } else {
-                        if (state.dataHVACVarRefFlow->VRFTU(TUIndex).FanIndex == 0) {
-                            ShowSevereError(
-                                state, format("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = {}", state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
-                            ShowContinueError(state, "VRF Terminal Unit fan is required when used as zone equipment.");
-                            ErrorsFound = true;
-                        }
+                    if (state.dataHVACVarRefFlow->VRFTU(TUIndex).FanIndex == 0) {
+                        ShowSevereError(
+                                        state, format("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = {}", state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
+                        ShowContinueError(state, "VRF Terminal Unit fan is required when used as zone equipment.");
+                        ErrorsFound = true;
                     }
                 }
 
@@ -6675,13 +6619,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
                     state.dataHVACVarRefFlow->MyVRFFlag(VRFTUNum) = false;
                 } else {
-                    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate =
-                            state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->designAirVolFlowRate;
-                    } else {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate =
-                            GetFanVolFlow(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
-                    }
+                    state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate =
+                        state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex)->maxAirFlowRate;
                 }
             } else {
                 state.dataHVACVarRefFlow->MyVRFFlag(VRFTUNum) = false;
@@ -7739,28 +7678,15 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
     CompName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name;
     state.dataSize->DataZoneNumber = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum;
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
+            state.dataSize->DataFanType = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType;
             state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             state.dataSize->DataFanPlacement = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanPlace;
         } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelType =
-                DataAirSystems::ObjectVectorOOFanSystemModel;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanVecIndex =
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanPlace =
-                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanPlace;
-        }
-    } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex > 0) {
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone) {
-            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-            state.dataSize->DataFanIndex = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
-            state.dataSize->DataFanPlacement = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanPlace;
-        } else if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInAirLoop) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanModelType =
-                DataAirSystems::StructArrayLegacyFanModels;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanVecIndex =
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanType =
+                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanNum =
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).airLoopNum).supFanPlace =
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanPlace;
@@ -7864,9 +7790,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                 } else {
+                    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex));
+                    assert(fanSystem != nullptr);
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] == 0.0) {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                            state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -7949,9 +7876,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                 } else {
+                    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex));
+                    assert(fanSystem != nullptr);
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] == 0.0) {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
-                            state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -8133,9 +8061,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                 } else {
+                    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex));
+                    assert(fanSystem != nullptr);
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] == 0.0) {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] =
-                            state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -8171,9 +8100,10 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                     state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] * state.dataEnvrn->StdRhoAir;
                 } else {
+                    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex));
+                    assert(fanSystem != nullptr);
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] == 0.0) {
-                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] =
-                            state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->m_massFlowAtSpeed[i - 1];
+                        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] = fanSystem->massFlowAtSpeed[i - 1];
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatVolumeFlowRate[i] =
                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatMassFlowRate[i] / state.dataEnvrn->StdRhoAir;
                     }
@@ -9609,12 +9539,12 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->fanPlace == HVAC::FanPlace::BlowThru) {
         if (this->fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataFans->fanObjs[this->FanIndex]->simulate(state, _, _);
+                state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, _, _);
             } else {
-                state.dataFans->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
+                state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
         } else {
-            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
+            state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
@@ -9670,22 +9600,18 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->fanPlace == HVAC::FanPlace::DrawThru) {
         if (this->fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataFans->fanObjs[this->FanIndex]->simulate(state, _, _);
+                state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, _, _);
             } else {
-                state.dataFans->fanObjs[this->FanIndex]->simulate(state, PartLoadRatio, _);
+                state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
 
         } else {
-            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
+            state.dataFans->fans(this->FanIndex)->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
     // track fan power per terminal unit for calculating COP
-    if (this->fanType == HVAC::FanType::SystemModel) {
-        this->FanPower = state.dataFans->fanObjs[this->FanIndex]->fanPower();
-    } else {
-        this->FanPower = Fans::GetFanPower(state, this->FanIndex);
-    }
+    this->FanPower = (this->FanIndex == 0) ? 0.0 : state.dataFans->fans(this->FanIndex)->totalPower;
 
     // run supplemental heating coil
     if (this->SuppHeatingCoilPresent) {
@@ -12885,12 +12811,12 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->fanPlace == HVAC::FanPlace::BlowThru) {
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
+                state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex)->simulate(state, FirstHVACIteration, _, _);
             } else {
-                state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
+                state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex)->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
         } else {
-            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
+            state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex)->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
     if (this->CoolingCoilPresent) {
@@ -12942,24 +12868,20 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 
     // if draw through, simulate coils then fan
     if (this->fanPlace == HVAC::FanPlace::DrawThru) {
+        auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
             if (OnOffAirFlowRatio > 0.0) {
-                state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
+                fan->simulate(state, FirstHVACIteration, _, _);
             } else {
-                state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
+                fan->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
-
         } else {
-            Fans::SimulateFanComponents(state, "", FirstHVACIteration, this->FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
+            fan->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio);
         }
     }
 
     // track fan power per terminal unit for calculating COP
-    if (this->fanType == HVAC::FanType::SystemModel) {
-        this->FanPower = state.dataFans->fanObjs[this->FanIndex]->fanPower();
-    } else {
-        this->FanPower = Fans::GetFanPower(state, this->FanIndex);
-    }
+    this->FanPower = state.dataFans->fans(this->FanIndex)->totalPower;
 
     // run supplemental heating coil
     if (this->SuppHeatingCoilPresent) {
@@ -13094,7 +13016,6 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
 
     auto f = [&state, VRFTUNum, DXCoilNum, QCoilReq, TeTc, PartLoadRatio](Real64 const FanSpdRatio) {
         using DXCoils::ControlVRFIUCoil;
-        using Fans::SimulateFanComponents;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
 
@@ -13139,15 +13060,15 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
         }
         // Simulate the blow-through fan if there is any
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanPlace == HVAC::FanPlace::BlowThru) {
+            auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::SystemModel) {
                 if (temp > 0) {
-                    state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, _, _);
+                    fan->simulate(state, false, _, _);
                 } else {
-                    state.dataFans->fanObjs[state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex]->simulate(state, PartLoadRatio, _);
+                    fan->simulate(state, false, _, _, PartLoadRatio);
                 }
             } else {
-                Fans::SimulateFanComponents(
-                    state, "", false, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex, state.dataHVACVarRefFlow->FanSpeedRatio);
+                fan->simulate(state, false, state.dataHVACVarRefFlow->FanSpeedRatio);
             }
             Tin = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).Temp;
             Win = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOutletNode).HumRat;

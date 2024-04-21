@@ -224,6 +224,7 @@ namespace VentilatedSlab {
         // Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
         // Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
+        static constexpr std::string_view routineName = "GetVentilatedSlabInput";
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using NodeInputManager::GetOnlySingleNode;
@@ -322,6 +323,8 @@ namespace VentilatedSlab {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+            
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames.allocate(NumNumbers);
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames = cNumericFields;
             Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
@@ -954,18 +957,13 @@ namespace VentilatedSlab {
             // Fan information:
             ventSlab.FanName = state.dataIPShortCut->cAlphaArgs(25);
 
-            if (Fans::checkIfFanNameIsAFanSystem(state, ventSlab.FanName)) {
-                ventSlab.fanType = HVAC::FanType::SystemModel;
-                state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, ventSlab.FanName));
-                ventSlab.Fan_Index = Fans::getFanObjectVectorIndex(state, ventSlab.FanName);
-            } else {
-                bool isNotOkay(false);
-                ValidateComponent(state, "FAN:CONSTANTVOLUME", ventSlab.FanName, isNotOkay, "GetPIUs");
-                if (isNotOkay) {
-                    ShowContinueError(state, format("In {} = {}", CurrentModuleObject, ventSlab.Name));
-                    ErrorsFound = true;
-                }
-                ventSlab.fanType = HVAC::FanType::Constant;
+            if ((ventSlab.Fan_Index = Fans::GetFanIndex(state, ventSlab.FanName)) == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(25), state.dataIPShortCut->cAlphaArgs(25));
+                ErrorsFound = true;
+            } else if ((ventSlab.fanType = state.dataFans->fans(ventSlab.Fan_Index)->type) != HVAC::FanType::Constant) {
+                ShowSevereCustomMessage(state, eoh, format("Only fans of type Fan:Component are supported.  {} is of type {}",
+                                                           ventSlab.FanName, HVAC::fanTypeNames[(int)ventSlab.fanType]));
+                ErrorsFound = true;
             }
 
             if (ventSlab.outsideAirControlType == OutsideAirControlType::FixedOAControl) {
@@ -1884,11 +1882,7 @@ namespace VentilatedSlab {
         CompType = cMO_VentilatedSlab;
         CompName = ventSlab.Name;
         state.dataSize->DataZoneNumber = ventSlab.ZonePtr;
-        if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
-        } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-        }
+        state.dataSize->DataFanType = ventSlab.fanType;
         state.dataSize->DataFanIndex = ventSlab.Fan_Index;
         // ventilated slab unit is always blow thru
         state.dataSize->DataFanPlacement = HVAC::FanPlace::BlowThru;
@@ -3108,11 +3102,7 @@ namespace VentilatedSlab {
 
                     SimVentSlabOAMixer(state, Item);
 
-                    if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-                        state.dataFans->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-                    } else if (ventSlab.fanType == HVAC::FanType::Constant) {
-                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-                    }
+                    state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
                     QZnReq =
@@ -3378,11 +3368,7 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->HCoilOn = false;
 
                     SimVentSlabOAMixer(state, Item);
-                    if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-                        state.dataFans->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-                    } else if (ventSlab.fanType == HVAC::FanType::Constant) {
-                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-                    }
+                    state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
                     QZnReq =
@@ -3417,12 +3403,8 @@ namespace VentilatedSlab {
         // Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab
         // in CalcVentilatedSlabRadComps
         AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-        Real64 locFanElecPower = 0.0;
-        if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-            locFanElecPower = state.dataFans->fanObjs[ventSlab.Fan_Index]->fanPower();
-        } else {
-            locFanElecPower = Fans::GetFanPower(state, ventSlab.Fan_Index);
-        }
+        Real64 locFanElecPower = state.dataFans->fans(ventSlab.Fan_Index)->totalPower;
+
         if ((AirMassFlow <= 0.0) && (locFanElecPower > 0.0)) {
             state.dataLoopNodes->Node(MixoutNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(MixoutNode).MassFlowRateMaxAvail = 0.0;
@@ -3430,11 +3412,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMaxAvail = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMinAvail = 0.0;
-            if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-                state.dataFans->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-            } else if (ventSlab.fanType == HVAC::FanType::Constant) {
-                Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-            }
+            state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         }
 
         CalcVentilatedSlabCoilOutput(state, Item, PowerMet, LatOutputProvided);
@@ -3485,11 +3463,8 @@ namespace VentilatedSlab {
         // unused1208  REAL(r64)           :: RadInTemp       ! Set temperature for "Slab In Node"
 
         SimVentSlabOAMixer(state, Item);
-        if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-            state.dataFans->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-        } else if (ventSlab.fanType == HVAC::FanType::Constant) {
-            Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-        }
+        state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+
         if ((ventSlab.coolingCoilPresent) && (ventSlab.coolingCoilSchedValue >= 0.0)) {
             if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
                 SimHXAssistedCoolingCoil(state,
@@ -3608,11 +3583,8 @@ namespace VentilatedSlab {
         ventSlab.SensCoolCoilPower = std::abs(min(0.0, QUnitOut));
         ventSlab.TotCoolCoilPower = std::abs(min(0.0, QTotUnitOut));
         ventSlab.LateCoolCoilPower = ventSlab.TotCoolCoilPower - ventSlab.SensCoolCoilPower;
-        if (ventSlab.fanType == HVAC::FanType::SystemModel) {
-            ventSlab.ElecFanPower = state.dataFans->fanObjs[ventSlab.Fan_Index]->fanPower();
-        } else {
-            ventSlab.ElecFanPower = Fans::GetFanPower(state, ventSlab.Fan_Index);
-        }
+        ventSlab.ElecFanPower = (ventSlab.Fan_Index == 0) ? 0.0 : state.dataFans->fans(ventSlab.Fan_Index)->totalPower;
+
         ventSlab.AirMassFlowRate = AirMassFlow;
 
         SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;

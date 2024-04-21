@@ -1358,11 +1358,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp = 16.6;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp,
-                                   state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Temp = 16.6;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).HumRat);
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;

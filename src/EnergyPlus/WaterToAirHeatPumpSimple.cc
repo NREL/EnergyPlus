@@ -1571,21 +1571,9 @@ namespace WaterToAirHeatPumpSimple {
                         // determine the coil ratio of coil dT with system air flow to design heating air flow
                         dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
                                 HVAC::FanPlace::BlowThru) {
@@ -1717,21 +1705,9 @@ namespace WaterToAirHeatPumpSimple {
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         // determine the coil ratio of coil dH with system air flow to design heating air flow
                         dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
@@ -1854,21 +1830,9 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
                                 HVAC::FanPlace::BlowThru) {
@@ -1978,21 +1942,9 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                             if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
@@ -2444,21 +2396,9 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
                                         (HeatSupTemp - HeatMixTemp);                                     // heating coil load
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // remove fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanHeatLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // remove fan heat to coil load
+                            FanHeatLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(HeatMixHumRat);
                             if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
                                 HVAC::FanPlace::BlowThru) {
@@ -2563,21 +2503,9 @@ namespace WaterToAirHeatPumpSimple {
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
                                         (HeatSupTemp - HeatMixTemp);                                     // heating coil load
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanHeatLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataFans->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanHeatLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(HeatMixHumRat);
                             if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 HeatMixTemp += FanHeatLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil

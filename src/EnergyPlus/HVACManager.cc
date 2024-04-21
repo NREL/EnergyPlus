@@ -2356,16 +2356,16 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         znAirRpt.ExhTotalLoss = 0;
         znAirRpt.ExhSensiLoss = 0;
 
-        for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            auto const &thisFan = state.dataFans->Fan(FanNum);
+        for (int FanNum = 1; FanNum <= state.dataFans->fans.size(); ++FanNum) {
+            auto const *thisFan = state.dataFans->fans(FanNum);
             //  Add reportable vars
-            if (thisFan.fanType == HVAC::FanType::Exhaust) {
+            if (thisFan->type == HVAC::FanType::Exhaust) {
                 for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
-                    if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
+                    if (thisFan->inletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
                         znAirRpt.ExhTotalLoss +=
-                            thisFan.OutletAirMassFlowRate * (thisFan.OutletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
+                            thisFan->outletAirMassFlowRate * (thisFan->outletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
                         znAirRpt.ExhSensiLoss +=
-                            thisFan.OutletAirMassFlowRate * CpAir * (thisFan.OutletAirTemp - zone.OutDryBulbTemp) * ADSCorrectionFactor;
+                            thisFan->outletAirMassFlowRate * CpAir * (thisFan->outletAirTemp - zone.OutDryBulbTemp) * ADSCorrectionFactor;
                         break;
                     }
                 }

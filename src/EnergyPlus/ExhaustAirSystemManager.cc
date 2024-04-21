@@ -166,135 +166,66 @@ namespace ExhaustAirSystemManager {
                 }
 
                 std::string centralFanName = ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_name");
-                int centralFanIndex = -1; // zero based or 1 based
-                if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
-                    // zero-based index
-                    state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, centralFanName));
 
-                    centralFanIndex = Fans::getFanObjectVectorIndex(state, centralFanName); // zero-based
-                    if (centralFanIndex >= 0) {
-                        thisExhSys.AvailScheduleNum = state.dataFans->fanObjs[centralFanIndex]->availSchedIndex;
-                        // normal
-
-                        BranchNodeConnections::SetUpCompSets(state,
-                                                             cCurrentModuleObject,
-                                                             thisExhSys.Name,
-                                                             HVAC::fanTypeNames[(int)thisExhSys.centralFanType],
-                                                             centralFanName,
-                                                             state.dataLoopNodes->NodeID(state.dataFans->fanObjs[centralFanIndex]->inletNodeNum),
-                                                             state.dataLoopNodes->NodeID(state.dataFans->fanObjs[centralFanIndex]->outletNodeNum));
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Mass Flow Rate",
-                                            Constant::Units::kg_s,
-                                            thisExhSys.centralFan_MassFlowRate,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Volumetric Flow Rate Standard",
-                                            Constant::Units::m3_s,
-                                            thisExhSys.centralFan_VolumeFlowRate_Std,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Volumetric Flow Rate Current",
-                                            Constant::Units::m3_s,
-                                            thisExhSys.centralFan_VolumeFlowRate_Cur,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Power",
-                                            Constant::Units::W,
-                                            thisExhSys.centralFan_Power,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Energy",
-                                            Constant::Units::J,
-                                            thisExhSys.centralFan_Energy,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Sum,
-                                            thisExhSys.Name);
-
-                    } else {
-                        centralFanIndex = -1;
-                        ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
-                        ShowContinueError(state, format("Fan Name ={} not found.", centralFanName));
-                        ErrorsFound = true;
-                    }
-                } else if (thisExhSys.centralFanType == HVAC::FanType::ComponentModel) {
-                    // 1-based index.
-                    ErrorObjectHeader eoh{routineName, cCurrentModuleObject, thisExhSys.Name};
-                    centralFanIndex = Fans::GetFanIndex(state, centralFanName);
-                    if (centralFanIndex == 0) {
-                        ShowSevereItemNotFound(state, eoh, "fan_name", centralFanName);
-                        ErrorsFound = true;
-                    } else {
-
-                        thisExhSys.AvailScheduleNum = state.dataFans->Fan(centralFanIndex).AvailSchedPtrNum;
-
-                        BranchNodeConnections::SetUpCompSets(state,
-                                                             cCurrentModuleObject,
-                                                             thisExhSys.Name,
-                                                             HVAC::fanTypeNames[(int)thisExhSys.centralFanType],
-                                                             centralFanName,
-                                                             state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).InletNodeNum),
-                                                             state.dataLoopNodes->NodeID(state.dataFans->Fan(centralFanIndex).OutletNodeNum));
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Mass Flow Rate",
-                                            Constant::Units::kg_s,
-                                            thisExhSys.centralFan_MassFlowRate,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Volumetric Flow Rate Standard",
-                                            Constant::Units::m3_s,
-                                            thisExhSys.centralFan_VolumeFlowRate_Std,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Volumetric Flow Rate Current",
-                                            Constant::Units::m3_s,
-                                            thisExhSys.centralFan_VolumeFlowRate_Cur,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Power",
-                                            Constant::Units::W,
-                                            thisExhSys.centralFan_Power,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Average,
-                                            thisExhSys.Name);
-
-                        SetupOutputVariable(state,
-                                            "Central Exhaust Fan Energy",
-                                            Constant::Units::J,
-                                            thisExhSys.centralFan_Energy,
-                                            OutputProcessor::TimeStepType::System,
-                                            OutputProcessor::StoreType::Sum,
-                                            thisExhSys.Name);
-                    }
+                ErrorObjectHeader eoh{routineName, cCurrentModuleObject, thisExhSys.Name};
+                int centralFanIndex = Fans::GetFanIndex(state, centralFanName);
+                if (centralFanIndex == 0) {
+                     ShowSevereItemNotFound(state, eoh, "fan_name", centralFanName);
+                     ErrorsFound = true;
                 } else {
-                    ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
-                    ShowContinueError(state, format("Fan Type ={} is not supported.", HVAC::fanTypeNames[(int)thisExhSys.centralFanType]));
-                    ShowContinueError(state, "It needs to be either a Fan:SystemModel or a Fan:ComponentModel type.");
-                    ErrorsFound = true;
+                    auto *fan = state.dataFans->fans(centralFanIndex);
+                    
+                    thisExhSys.AvailScheduleNum = fan->availSchedNum;
+
+                    BranchNodeConnections::SetUpCompSets(state,
+                                                         cCurrentModuleObject,
+                                                         thisExhSys.Name,
+                                                         HVAC::fanTypeNames[(int)thisExhSys.centralFanType],
+                                                         centralFanName,
+                                                         state.dataLoopNodes->NodeID(fan->inletNodeNum),
+                                                         state.dataLoopNodes->NodeID(fan->outletNodeNum));
+
+                    SetupOutputVariable(state,
+                                        "Central Exhaust Fan Mass Flow Rate",
+                                        Constant::Units::kg_s,
+                                        thisExhSys.centralFan_MassFlowRate,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        thisExhSys.Name);
+
+                    SetupOutputVariable(state,
+                                        "Central Exhaust Fan Volumetric Flow Rate Standard",
+                                        Constant::Units::m3_s,
+                                        thisExhSys.centralFan_VolumeFlowRate_Std,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        thisExhSys.Name);
+                    
+                    SetupOutputVariable(state,
+                                        "Central Exhaust Fan Volumetric Flow Rate Current",
+                                        Constant::Units::m3_s,
+                                        thisExhSys.centralFan_VolumeFlowRate_Cur,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        thisExhSys.Name);
+                    
+                    SetupOutputVariable(state,
+                                        "Central Exhaust Fan Power",
+                                        Constant::Units::W,
+                                        thisExhSys.centralFan_Power,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Average,
+                                        thisExhSys.Name);
+                    
+                    SetupOutputVariable(state,
+                                        "Central Exhaust Fan Energy",
+                                        Constant::Units::J,
+                                        thisExhSys.centralFan_Energy,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Sum,
+                                        thisExhSys.Name);
                 }
+
                 thisExhSys.CentralFanName = centralFanName;
                 thisExhSys.CentralFanIndex = centralFanIndex;
 
@@ -345,10 +276,10 @@ namespace ExhaustAirSystemManager {
 
         if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-            state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->simulate(state, _, _);
+            state.dataFans->fans(thisExhSys.CentralFanIndex)->simulate(state, false, _, _);
 
             // Update report variables
-            outletNode_Num = state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->outletNodeNum;
+            outletNode_Num = state.dataFans->fans(thisExhSys.CentralFanIndex)->outletNodeNum;
 
             thisExhSys.centralFan_MassFlowRate = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate;
 
@@ -361,33 +292,32 @@ namespace ExhaustAirSystemManager {
             if (RhoAirCurrent <= 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
             thisExhSys.centralFan_VolumeFlowRate_Cur = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate / RhoAirCurrent;
 
-            thisExhSys.centralFan_Power = state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->fanPower();
+            thisExhSys.centralFan_Power = state.dataFans->fans(thisExhSys.CentralFanIndex)->totalPower;
 
             thisExhSys.centralFan_Energy = thisExhSys.centralFan_Power * state.dataHVACGlobal->TimeStepSysSec;
 
         } else if (thisExhSys.centralFanType == HVAC::FanType::ComponentModel) {
-            Fans::SimulateFanComponents(state, thisExhSys.CentralFanName, FirstHVACIteration,
-                                        thisExhSys.CentralFanIndex); //,
+            auto *fan = state.dataFans->fans(thisExhSys.CentralFanIndex);
+            fan->simulate(state, FirstHVACIteration);
 
             // Update output variables
-            auto const &fancomp = state.dataFans->Fan(thisExhSys.CentralFanIndex);
 
-            outletNode_Num = fancomp.OutletNodeNum;
+            outletNode_Num = fan->outletNodeNum;
 
-            thisExhSys.centralFan_MassFlowRate = fancomp.OutletAirMassFlowRate;
+            thisExhSys.centralFan_MassFlowRate = fan->outletAirMassFlowRate;
 
-            thisExhSys.centralFan_VolumeFlowRate_Std = fancomp.OutletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
+            thisExhSys.centralFan_VolumeFlowRate_Std = fan->outletAirMassFlowRate / state.dataEnvrn->StdRhoAir;
 
             RhoAirCurrent = EnergyPlus::Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                                           state.dataEnvrn->OutBaroPress,
                                                                           state.dataLoopNodes->Node(outletNode_Num).Temp,
                                                                           state.dataLoopNodes->Node(outletNode_Num).HumRat);
             if (RhoAirCurrent <= 0.0) RhoAirCurrent = state.dataEnvrn->StdRhoAir;
-            thisExhSys.centralFan_VolumeFlowRate_Cur = fancomp.OutletAirMassFlowRate / RhoAirCurrent;
+            thisExhSys.centralFan_VolumeFlowRate_Cur = fan->outletAirMassFlowRate / RhoAirCurrent;
 
-            thisExhSys.centralFan_Power = fancomp.FanPower * 1000.0;
+            thisExhSys.centralFan_Power = fan->totalPower * 1000.0;
 
-            thisExhSys.centralFan_Energy = fancomp.FanEnergy * 1000.0;
+            thisExhSys.centralFan_Energy = fan->totalEnergy * 1000.0;
         }
         thisExhSys.exhTotalHVACReliefHeatLoss = state.dataLoopNodes->Node(outletNode_Num).MassFlowRate *
                                                 (state.dataLoopNodes->Node(outletNode_Num).Enthalpy - state.dataEnvrn->OutEnthalpy);
@@ -797,26 +727,26 @@ namespace ExhaustAirSystemManager {
         int outletNode_index = state.dataMixerComponent->MixerCond(thisExhSys.ZoneMixerIndex).OutletNode;
         state.dataLoopNodes->Node(outletNode_index).MassFlowRateMaxAvail = outletFlowMaxAvail;
 
+        auto *fan = state.dataFans->fans(thisExhSys.CentralFanIndex);
         // then central exhasut fan sizing here:
         if (thisExhSys.centralFanType == HVAC::FanType::SystemModel) {
-            if (state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate == DataSizing::AutoSize) {
-                state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
+            if (fan->maxAirFlowRate == DataSizing::AutoSize) {
+                fan->maxAirFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
             }
             BaseSizer::reportSizerOutput(state,
                                          "FAN:SYSTEMMODEL",
-                                         state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->name,
+                                         fan->Name,
                                          "Design Fan Airflow [m3/s]",
-                                         state.dataFans->fanObjs[thisExhSys.CentralFanIndex]->designAirVolFlowRate);
+                                         fan->maxAirFlowRate);
         } else if (thisExhSys.centralFanType == HVAC::FanType::ComponentModel) {
-            if (state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate == DataSizing::AutoSize) {
-                state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate =
-                    outletFlowMaxAvail * state.dataFans->Fan(thisExhSys.CentralFanIndex).FanSizingFactor;
+            if (fan->maxAirMassFlowRate == DataSizing::AutoSize) {
+                fan->maxAirMassFlowRate = outletFlowMaxAvail * dynamic_cast<Fans::FanComponent*>(fan)->sizingFactor;
             }
             BaseSizer::reportSizerOutput(state,
-                                         HVAC::fanTypeNames[(int)state.dataFans->Fan(thisExhSys.CentralFanIndex).fanType],
-                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).Name,
+                                         HVAC::fanTypeNames[(int)fan->type],
+                                         fan->Name,
                                          "Design Fan Airflow [m3/s]",
-                                         state.dataFans->Fan(thisExhSys.CentralFanIndex).MaxAirMassFlowRate / state.dataEnvrn->StdRhoAir);
+                                         fan->maxAirMassFlowRate / state.dataEnvrn->StdRhoAir);
         } else {
             //
         }

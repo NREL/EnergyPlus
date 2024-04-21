@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -299,13 +299,15 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -575,7 +577,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::MultiSpeedFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -621,13 +623,14 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -893,7 +896,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -945,13 +948,14 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -1291,7 +1295,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -1341,13 +1345,14 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMax = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(1).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(1).UACoilExternal = 611.0;
@@ -1618,7 +1623,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::ConsFanVarFlow, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -1671,13 +1676,14 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).CoolCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).HeatCoilFluidInletNode).MassFlowRateMaxAvail = 0.14;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -1989,7 +1995,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::ASHRAE, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -2035,13 +2041,14 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).NodeNumOfControlledZone).Temp = 22.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;
@@ -2719,7 +2726,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanInput(*state);
-    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->Fan(1).fanType);
+    EXPECT_EQ((int)HVAC::FanType::OnOff, (int)state->dataFans->fans(1)->type);
 
     GetFanCoilUnits(*state);
     EXPECT_TRUE(compare_enums(CCM::CycFan, state->dataFanCoilUnits->FanCoil(1).CapCtrlMeth_Num));
@@ -2764,13 +2771,14 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     state->dataFanCoilUnits->FanCoil(1).MaxAirMassFlow = MaxAirMassFlow;
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
-    state->dataFans->Fan(1).InletAirMassFlowRate = AirMassFlow;
-    state->dataFans->Fan(1).MaxAirMassFlowRate = MaxAirMassFlow;
+    auto *fan1 = state->dataFans->fans(1);
+    fan1->inletAirMassFlowRate = AirMassFlow;
+    fan1->maxAirMassFlowRate = MaxAirMassFlow;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRate = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMin = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMax = AirMassFlow;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRate = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMin = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMax = AirMassFlow;
+    state->dataLoopNodes->Node(fan1->inletNodeNum).MassFlowRateMaxAvail = AirMassFlow;
 
     state->dataWaterCoils->WaterCoil(2).UACoilTotal = 470.0;
     state->dataWaterCoils->WaterCoil(2).UACoilExternal = 611.0;

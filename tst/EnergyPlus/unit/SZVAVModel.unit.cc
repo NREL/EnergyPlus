@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool errFlag;
     UnitarySystems::UnitarySys thisUnit;
     int FanIndex = Fans::GetFanIndex(*state, "TEST FAN");
-    thisUnit.AirInNode = Fans::GetFanInletNode(*state, FanIndex);
+    thisUnit.AirInNode = state->dataFans->fans(FanIndex)->inletNodeNum;
     thisUnit.CoolCoilInletNodeNum = DXCoils::GetCoilInletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
     thisUnit.CoolCoilOutletNodeNum = DXCoils::GetCoilOutletNode(*state, "Coil:Cooling:DX:SingleSpeed", "COOLINGCOIL", errFlag);
     thisUnit.HeatCoilInletNodeNum = thisUnit.CoolCoilOutletNodeNum;

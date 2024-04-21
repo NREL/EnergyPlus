@@ -475,27 +475,13 @@ void SimOAComponent(EnergyPlusData &state,
         break;
     }
     case SimAirServingZones::CompType::Fan_Simple_CV:    // Fan:ConstantVolume
-    case SimAirServingZones::CompType::Fan_Simple_VAV: { // Fan:VariableVolume
-        if (Sim) {
-            Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
-        }
-        break;
-    }
-    case SimAirServingZones::CompType::Fan_System_Object: {                    // Fan:SystemModel
-        if (CompIndex == 0) {                                                  // 0 means has not been filled because of 1-based arrays in old fortran
-            CompIndex = Fans::getFanObjectVectorIndex(state, CompName) + 1; // + 1 for shift from zero-based vector to 1-based compIndex
-        }
-        if (Sim) {
-            state.dataFans->fanObjs[CompIndex - 1]->simulate(state, _, _); // vector is 0 based, but CompIndex is 1 based so shift
-        }
-        break;
-    }
+    case SimAirServingZones::CompType::Fan_Simple_VAV:  // Fan:VariableVolume
+    case SimAirServingZones::CompType::Fan_System_Object:  // Fan:SystemModel
     case SimAirServingZones::CompType::Fan_ComponentModel: { // Fan:ComponentModel
         if (Sim) {
-            Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
+            state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration); 
         }
-        break;
-    }
+    } break;
     case SimAirServingZones::CompType::WaterCoil_Cooling: { // Coil:Cooling:Water
         if (Sim) {
             // get water coil and controller data if not called previously
@@ -1084,8 +1070,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
             OASys.ComponentTypeEnum(CompNum) = static_cast<SimAirServingZones::CompType>(getEnumValue(CompTypeNamesUC, OASys.ComponentType(CompNum)));
             if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::Fan_System_Object) {
                 // construct fan object
-                state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, OASys.ComponentName(CompNum)));
-                OASys.ComponentIndex(CompNum) = state.dataFans->fanObjs.size();
+                OASys.ComponentIndex(CompNum) = Fans::GetFanIndex(state, OASys.ComponentName(CompNum));
             } else if (OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::CoilSystemWater ||
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                        OASys.ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
@@ -3207,10 +3192,10 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
         for (int i = 1; i <= thisOAController.NumFaultyEconomizer; ++i) {
             int j = thisOAController.EconmizerFaultNum(i);
             Real64 rSchVal = 0.0;
-            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).AvaiSchedPtr) > 0.0) {
+            if (GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).availSchedNum) > 0.0) {
                 rSchVal = 1.0;
-                if (state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr > 0) {
-                    rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).SeveritySchedPtr);
+                if (state.dataFaultsMgr->FaultsEconomizer(j).severitySchedNum > 0) {
+                    rSchVal = GetCurrentScheduleValue(state, state.dataFaultsMgr->FaultsEconomizer(j).severitySchedNum);
                 }
             } else {
                 continue; // no fault
@@ -3227,7 +3212,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             case EconoOp::FixedDewPointAndDryBulb:
             case EconoOp::ElectronicEnthalpy:
             case EconoOp::DifferentialDryBulbAndEnthalpy: {
-                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_OutdoorAir) {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).type == FaultType::TemperatureSensorOffset_OutdoorAir) {
                     // FaultModel:TemperatureSensorOffset:OutdoorAir
                     thisOAController.OATemp += rOffset;
                     thisOAController.InletTemp += rOffset;
@@ -3241,7 +3226,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             switch (iEco) {
             case EconoOp::FixedDewPointAndDryBulb:
             case EconoOp::ElectronicEnthalpy: {
-                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::HumiditySensorOffset_OutdoorAir) {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).type == FaultType::HumiditySensorOffset_OutdoorAir) {
                     // FaultModel:HumiditySensorOffset:OutdoorAir
                     thisOAController.OAHumRat += rOffset;
                     thisOAController.InletHumRat += rOffset;
@@ -3256,7 +3241,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             case EconoOp::FixedEnthalpy:
             case EconoOp::ElectronicEnthalpy:
             case EconoOp::DifferentialDryBulbAndEnthalpy: {
-                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_OutdoorAir) {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).type == FaultType::EnthalpySensorOffset_OutdoorAir) {
                     // FaultModel:EnthalpySensorOffset:OutdoorAir
                     thisOAController.OAEnth += rOffset;
                     thisOAController.InletEnth += rOffset;
@@ -3270,7 +3255,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             switch (iEco) {
             case EconoOp::DifferentialDryBulb:
             case EconoOp::DifferentialDryBulbAndEnthalpy: {
-                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::TemperatureSensorOffset_ReturnAir) {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).type == FaultType::TemperatureSensorOffset_ReturnAir) {
                     // FaultModel:TemperatureSensorOffset:ReturnAir
                     thisOAController.RetTemp += rOffset;
                 }
@@ -3283,7 +3268,7 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
             switch (iEco) {
             case EconoOp::ElectronicEnthalpy:
             case EconoOp::DifferentialDryBulbAndEnthalpy: {
-                if (state.dataFaultsMgr->FaultsEconomizer(j).FaultTypeEnum == Fault::EnthalpySensorOffset_ReturnAir) {
+                if (state.dataFaultsMgr->FaultsEconomizer(j).type == FaultType::EnthalpySensorOffset_ReturnAir) {
                     // FaultModel:EnthalpySensorOffset:ReturnAir
                     thisOAController.RetEnth += rOffset;
                 }

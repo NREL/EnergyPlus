@@ -1258,7 +1258,7 @@ struct SizingData : BaseGlobalStruct
     Real64 DataWaterCoilSizCoolDeltaT = 0.0;              // used for sizing cooling coil water design flow rate
     Real64 DataWaterCoilSizHeatDeltaT = 0.0;              // used for sizing heating coil water design flow rate
     bool DataNomCapInpMeth = false;                       // True if heating coil is sized by CoilPerfInpMeth == NomCa
-    int DataFanEnumType = -1;                             // Fan type used during sizing
+    HVAC::FanType DataFanType = HVAC::FanType::Invalid;                             // Fan type used during sizing
     int DataFanIndex = -1;                                // Fan index used during sizing
     HVAC::FanPlace DataFanPlacement = HVAC::FanPlace::Invalid; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;

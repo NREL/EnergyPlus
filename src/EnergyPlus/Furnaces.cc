@@ -300,7 +300,7 @@ namespace Furnaces {
 
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
                 // simulate fan
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
 
             // simulate furnace heating coil
@@ -309,7 +309,7 @@ namespace Furnaces {
 
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
                 // simulate fan
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
         } break;
             // Simulate HeatCool sytems:
@@ -370,7 +370,7 @@ namespace Furnaces {
 
                 if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
                     // simulate fan
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
 
                 if (!thisFurnace.CoolingCoilUpstream) {
@@ -411,7 +411,7 @@ namespace Furnaces {
 
                 if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
                     // simulate fan
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
 
                 // Simulate furnace reheat coil if a humidistat is used or if the reheat coil is present
@@ -482,7 +482,7 @@ namespace Furnaces {
                 }
 
                 if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
 
                 if (thisFurnace.CoolingCoilType_Num == HVAC::CoilDX_CoolingHXAssisted) {
@@ -515,7 +515,7 @@ namespace Furnaces {
                                    thisFurnace.HeatPartLoadRatio,
                                    OnOffAirFlowRatio);
                 if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
 
                 // Simulate furnace reheat coil if a humidistat is present, the dehumidification type of coolreheat and
@@ -579,7 +579,7 @@ namespace Furnaces {
                                                  HXUnitOn);
                 }
                 if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
 
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
@@ -602,7 +602,7 @@ namespace Furnaces {
                                                                 FirstHVACIteration);
 
                 if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 }
                 if (thisFurnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
                     SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
@@ -961,44 +961,39 @@ namespace Furnaces {
             errFlag = false;
 
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(7)));
-            assert(thisFurnace.fanType != HVAC::FanType::Invalid);
-
-            if (thisFurnace.fanType == HVAC::FanType::OnOff || thisFurnace.fanType == HVAC::FanType::Constant) {
-
-                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
-                if (thisFurnace.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
-                    ErrorsFound = true;
-                } else {
-                    thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
-                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
-                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
-
-                    // Check fan's schedule for cycling fan operation if constant volume fan is used
-                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == HVAC::FanType::Constant) {
-                        if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                            ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
-                            ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                            ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(5), Alphas(5)));
-                            ShowContinueError(state, "...schedule values must be (>0., <=1.)");
-                            ErrorsFound = true;
-                        }
-                    } else if (lAlphaBlanks(5) && thisFurnace.fanType != HVAC::FanType::OnOff) {
-                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
-                        ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
-                        ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
-                        ErrorsFound = true;
-                    }
-
-                } // IF (IsNotOK) THEN
-
-            } else { // wrong fan type
+            if (thisFurnace.fanType != HVAC::FanType::OnOff && thisFurnace.fanType != HVAC::FanType::Constant) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(7), Alphas(7)));
                 ErrorsFound = true;
-            } // IF (furnace%FanType_Num == FanType_SimpleOnOff .OR. &
+
+            } else if ((thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName)) == 0) { 
+                ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
+                ErrorsFound = true;
+
+            } else {
+                auto *fan = state.dataFans->fans(thisFurnace.FanIndex);
+                thisFurnace.ActualFanVolFlowRate = fan->maxAirFlowRate;
+                FanInletNode = fan->inletNodeNum;
+                FanOutletNode = fan->outletNodeNum;
+                thisFurnace.FanAvailSchedPtr = fan->availSchedNum;
+                
+                // Check fan's schedule for cycling fan operation if constant volume fan is used
+                if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == HVAC::FanType::Constant) {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ScheduleManager::Clusivity::Exclusive, 0.0, ScheduleManager::Clusivity::Inclusive, 1.0)) {
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
+                        ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
+                        ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
+                        ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(5), Alphas(5)));
+                        ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                        ErrorsFound = true;
+                    }
+                } else if (lAlphaBlanks(5) && thisFurnace.fanType != HVAC::FanType::OnOff) {
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
+                    ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
+                    ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
+                    ErrorsFound = true;
+                }
+            } 
 
             thisFurnace.fanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, Alphas(9)));
             assert(thisFurnace.fanPlace != HVAC::FanPlace::Invalid);
@@ -1497,44 +1492,40 @@ namespace Furnaces {
             FanName = Alphas(8);
 
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(7)));
-            assert(thisFurnace.fanType != HVAC::FanType::Invalid);
 
-            if (thisFurnace.fanType == HVAC::FanType::OnOff || thisFurnace.fanType == HVAC::FanType::Constant) {
-
-                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
-                if (thisFurnace.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
-                    ErrorsFound = true;
-                } else {
-                    thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
-                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
-                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
-
-                    // Check fan's schedule for cycling fan operation if constant volume fan is used
-                    if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == HVAC::FanType::Constant) {
-                        if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ">", 0.0, "<=", 1.0)) {
-                            ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
-                            ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
-                            ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
-                            ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(5), Alphas(5)));
-                            ShowContinueError(state, "...schedule values must be (>0., <=1.)");
-                            ErrorsFound = true;
-                        }
-                    } else if (lAlphaBlanks(5) && thisFurnace.fanType != HVAC::FanType::OnOff) {
-                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
-                        ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
-                        ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
-                        ErrorsFound = true;
-                    }
-
-                } // IF (IsNotOK) THEN
-
-            } else {
+            if (thisFurnace.fanType != HVAC::FanType::OnOff && thisFurnace.fanType != HVAC::FanType::Constant) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(7), Alphas(7)));
                 ErrorsFound = true;
-            } //  IF (TFurnace(FurnaceNum)%FanType_Num == FanType_SimpleOnOff .OR. &, etc.
+
+            } else if ((thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName)) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFields(8), FanName);
+                ErrorsFound = true;
+
+            } else {
+                auto *fan = state.dataFans->fans(thisFurnace.FanIndex);
+                thisFurnace.ActualFanVolFlowRate = fan->maxAirFlowRate;
+                FanInletNode = fan->inletNodeNum;
+                FanOutletNode = fan->outletNodeNum;
+                thisFurnace.FanAvailSchedPtr = fan->availSchedNum;
+                
+                // Check fan's schedule for cycling fan operation if constant volume fan is used
+                if (thisFurnace.FanSchedPtr > 0 && thisFurnace.fanType == HVAC::FanType::Constant) {
+                    if (!ScheduleManager::CheckScheduleValueMinMax(state, thisFurnace.FanSchedPtr, ScheduleManager::Clusivity::Exclusive, 0.0, ScheduleManager::Clusivity::Inclusive, 1.0)) {
+                        ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
+                        ShowContinueError(state, format("For {} = {}", cAlphaFields(7), Alphas(7)));
+                        ShowContinueError(state, "Fan operating mode must be continuous (fan operating mode schedule values > 0).");
+                        ShowContinueError(state, format("Error found in {} = {}", cAlphaFields(5), Alphas(5)));
+                        ShowContinueError(state, "...schedule values must be (>0., <=1.)");
+                        ErrorsFound = true;
+                    }
+                } else if (lAlphaBlanks(5) && thisFurnace.fanType != HVAC::FanType::OnOff) {
+                    ShowSevereError(state, format("{} = {}", CurrentModuleObject, thisFurnace.Name));
+                    ShowContinueError(state, format("{} = {}", cAlphaFields(7), Alphas(7)));
+                    ShowContinueError(state, format("Fan type must be Fan:OnOff when {} = Blank.", cAlphaFields(5)));
+                    ErrorsFound = true;
+                }
+            }
 
             thisFurnace.fanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, Alphas(9)));
             assert(thisFurnace.fanPlace != HVAC::FanPlace::Invalid);
@@ -2783,19 +2774,18 @@ namespace Furnaces {
             errFlag = false;
 
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(6)));
-            assert(thisFurnace.fanType != HVAC::FanType::Invalid);
 
             if (thisFurnace.fanType == HVAC::FanType::OnOff || thisFurnace.fanType == HVAC::FanType::Constant) {
 
-                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
-                if (thisFurnace.FanIndex == 0) {
+                if ((thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName)) == 0) { 
                     ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
                     ErrorsFound = true;
                 } else {
-                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
-                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
-                    thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+                    auto *fan = state.dataFans->fans(thisFurnace.FanIndex);
+                    FanInletNode = fan->inletNodeNum;
+                    FanOutletNode = fan->outletNodeNum;
+                    thisFurnace.FanAvailSchedPtr = fan->availSchedNum;
+                    thisFurnace.ActualFanVolFlowRate = fan->maxAirFlowRate;
                 }
             }
 
@@ -3701,22 +3691,21 @@ namespace Furnaces {
             FanName = Alphas(7);
             errFlag = false;
             thisFurnace.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(6)));
-            assert(thisFurnace.fanType != HVAC::FanType::Invalid);
 
-            if (thisFurnace.fanType == HVAC::FanType::OnOff) {
-                thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName);
-                if (thisFurnace.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
-                    ErrorsFound = true;
-                } else {
-                    FanInletNode = Fans::GetFanInletNode(state, thisFurnace.FanIndex);
-                    FanOutletNode = Fans::GetFanOutletNode(state, thisFurnace.FanIndex);
-                    thisFurnace.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisFurnace.FanIndex);
-                }
-            } else {
+            if (thisFurnace.fanType != HVAC::FanType::OnOff) {
                 ShowSevereError(state, format("{} = {}", CurrentModuleObject, Alphas(1)));
                 ShowContinueError(state, format("Illegal {} = {}", cAlphaFields(6), Alphas(6)));
                 ErrorsFound = true;
+
+            } else if ((thisFurnace.FanIndex = Fans::GetFanIndex(state, FanName)) == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFields(7), FanName);
+                ErrorsFound = true;
+
+            } else {
+                auto *fan = state.dataFans->fans(thisFurnace.FanIndex);
+                FanInletNode = fan->inletNodeNum;
+                FanOutletNode = fan->outletNodeNum;
+                thisFurnace.FanAvailSchedPtr = fan->availSchedNum;
             }
 
             // Get heating coil type and name data
@@ -4222,7 +4211,7 @@ namespace Furnaces {
             BranchNodeConnections::SetUpCompSets(state, CurrentModuleObject, Alphas(1), Alphas(12), Alphas(13), "UNDEFINED", Alphas(4));
 
             // Set the Design Fan Volume Flow Rate
-            thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+            thisFurnace.ActualFanVolFlowRate = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
 
             // CR8094 - simple water to air heat pump MUST operate at the same flow rate specified in the coil objects
             //        Furnace(FurnaceNum)%DesignFanVolFlowRate = Numbers(1)
@@ -4762,7 +4751,7 @@ namespace Furnaces {
         if (!state.dataGlobal->DoingSizing && state.dataFurnaces->MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
-            thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+            thisFurnace.ActualFanVolFlowRate = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
             if (errFlag) {
                 ShowContinueError(state,
                                   format("...occurs in {} ={}", HVAC::cFurnaceTypes(thisFurnace.FurnaceType_Num), thisFurnace.Name));
@@ -5027,7 +5016,7 @@ namespace Furnaces {
                     thisFurnace.NoHeatCoolSpeedRatio = thisFurnace.MaxNoCoolHeatAirVolFlow / thisFurnace.ActualFanVolFlowRate;
                 }
                 std::string FanName; // used in warning messages
-                if (Fans::GetFanSpeedRatioCurveIndex(state, thisFurnace.FanIndex) > 0) {
+                if (dynamic_cast<Fans::FanComponent *>(state.dataFans->fans(thisFurnace.FanIndex))->powerRatioAtSpeedRatioCurveNum > 0) {
                     if (thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxHeatAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxCoolAirVolFlow &&
                         thisFurnace.ActualFanVolFlowRate == thisFurnace.MaxNoCoolHeatAirVolFlow) {
@@ -5043,7 +5032,7 @@ namespace Furnaces {
                 }
                 state.dataFurnaces->MyFanFlag(FurnaceNum) = false;
             } else {
-                thisFurnace.ActualFanVolFlowRate = Fans::GetFanDesignVolumeFlowRate(state, thisFurnace.FanIndex);
+                thisFurnace.ActualFanVolFlowRate = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
             }
         }
 
@@ -5306,7 +5295,7 @@ namespace Furnaces {
             // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
             if (thisFurnace.CheckFanFlow) {
                 state.dataFurnaces->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:VariableSpeed";
-                thisFurnace.FanVolFlow = Fans::GetFanVolFlow(state, thisFurnace.FanIndex);
+                thisFurnace.FanVolFlow = state.dataFans->fans(thisFurnace.FanIndex)->maxAirFlowRate;
 
                 if (thisFurnace.FanVolFlow != DataSizing::AutoSize) {
                     //     Check fan versus system supply air flow rates
@@ -5878,17 +5867,10 @@ namespace Furnaces {
         state.dataSize->SuppHeatCap = 0.0;
         auto &thisFurnace = state.dataFurnaces->Furnace(FurnaceNum);
 
-        if (thisFurnace.fanType == HVAC::FanType::SystemModel) {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = thisFurnace.FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
-            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
-            state.dataSize->DataFanIndex = thisFurnace.FanIndex;
-        } else {
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = thisFurnace.FanIndex;
-            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
-            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-            state.dataSize->DataFanIndex = thisFurnace.FanIndex;
-        }
+        state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanNum = thisFurnace.FanIndex;
+        state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanType = thisFurnace.fanType;
+        state.dataSize->DataFanType = thisFurnace.fanType;
+        state.dataSize->DataFanIndex = thisFurnace.FanIndex;
 
         state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace = thisFurnace.fanPlace;
 
@@ -8515,7 +8497,7 @@ namespace Furnaces {
         if (thisFurnace.FurnaceType_Num == HVAC::UnitarySys_HeatPump_AirToAir) {
             //   Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 if (CoolingCoilType_Num == HVAC::CoilDX_CoolingHXAssisted) {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
@@ -8545,7 +8527,7 @@ namespace Furnaces {
                                    FanOpMode,
                                    HeatPartLoadRatio,
                                    OnOffAirFlowRatio);
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate cooling and heating coils
             if (CoolingCoilType_Num == HVAC::CoilDX_CoolingHXAssisted) {
@@ -8573,7 +8555,7 @@ namespace Furnaces {
                 state, BlankString, CompressorOp, FirstHVACIteration, thisFurnace.HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
             //   Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate the supplemental heating coil
             if (thisFurnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
@@ -8589,7 +8571,7 @@ namespace Furnaces {
                    thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple) {
             //    Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 // COIL:WATERTOAIRHPSIMPLE:COOLING
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                                 BlankString,
@@ -8612,7 +8594,7 @@ namespace Furnaces {
                                                                 HeatPartLoadRatio,
                                                                 FirstHVACIteration); // HeatPartLoadRatio
                 //      Simulate the whole thing a second time so that the correct PLF required by the coils is used by the Fan. *******
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             // COIL:WATERTOAIRHPSIMPLE:COOLING
@@ -8638,7 +8620,7 @@ namespace Furnaces {
                                                             FirstHVACIteration); // HeatPartLoadRatio
             //     Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //     Simulate the supplemental heating coil
             if (thisFurnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat && ReheatCoilLoad > 0.0) {
@@ -8653,7 +8635,7 @@ namespace Furnaces {
                    thisFurnace.WatertoAirHPType == HVAC::WatertoAir_ParEst) {
             //    Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             WaterToAirHeatPump::SimWatertoAirHP(state,
@@ -8681,7 +8663,7 @@ namespace Furnaces {
                                                 HeatPartLoadRatio);
             //    Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //    Simulate the supplemental heating coil
             HeatingCoils::SimulateHeatingCoilComponents(
@@ -8691,7 +8673,7 @@ namespace Furnaces {
             //   Simulate blow-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
 
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
 
                 //     For non-linear coils, simulate coil to update PLF used by the ONOFF Fan
                 if (thisFurnace.fanType == HVAC::FanType::OnOff) {
@@ -8731,7 +8713,7 @@ namespace Furnaces {
                         bool SuppHeatingCoilFlag = false; // if false simulates heating coil
                         CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
                     }
-                    Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                    state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
                 } // Simple OnOff fan
 
             } // Blow thru fan
@@ -8775,7 +8757,7 @@ namespace Furnaces {
             }
             //   Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
-                Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+                state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             if (thisFurnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat || thisFurnace.SuppHeatCoilIndex > 0) {
                 bool SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
@@ -10129,7 +10111,7 @@ namespace Furnaces {
         Real64 AirMassFlow = state.dataLoopNodes->Node(thisFurnace.FurnaceInletNodeNum).MassFlowRate;
         // if blow through, simulate fan then coils
         if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
-            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+            state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
 
             if ((!thisFurnace.CoolingCoilUpstream) && (thisFurnace.FurnaceType_Num == HVAC::UnitarySys_HeatCool)) {
                 // simulate thisFurnace heating coil
@@ -10263,7 +10245,7 @@ namespace Furnaces {
             }
 
             // Call twice to ensure the fan outlet conditions are updated
-            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+            state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
 
             if ((!thisFurnace.CoolingCoilUpstream) && (thisFurnace.FurnaceType_Num == HVAC::UnitarySys_HeatCool)) {
                 // simulate thisFurnace heating coil
@@ -10533,7 +10515,7 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, thisFurnace.OpMode, QCoilActual);
             }
 
-            Fans::SimulateFanComponents(state, BlankString, FirstHVACIteration, thisFurnace.FanIndex, state.dataFurnaces->FanSpeedRatio);
+            state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (thisFurnace.SuppHeatCoilIndex > 0) {
                 bool SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil

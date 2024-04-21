@@ -222,7 +222,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
@@ -447,7 +447,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
@@ -715,7 +715,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, PIUNum, FirstHVACIteration);
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     state->dataHVACGlobal->TurnFansOn = true;

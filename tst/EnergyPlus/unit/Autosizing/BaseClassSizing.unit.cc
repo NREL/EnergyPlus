@@ -315,8 +315,8 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystem)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = 0;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -438,34 +438,33 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string fanName = "TEST FAN 1";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
+    Fans::GetFanInput(*state);
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataFans->fanObjs[0]->simulate(*state, _, _);                       // triggers sizing call
-    Real64 locFanSizeVdot = state->dataFans->fanObjs[0]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain1 = state->dataFans->fanObjs[0]->getFanDesignHeatGain(*state, locFanSizeVdot);
+
+    auto *fan1 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 1"));
+    fan1->simulate(*state, false, _, _);                       // triggers sizing call
+    Real64 locFanSizeVdot = fan1->maxAirFlowRate; // get function
+    Real64 locDesignHeatGain1 = fan1->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
-    fanName = "TEST FAN 2";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
-    state->dataFans->fanObjs[1]->simulate(*state, _, _);                            // triggers sizing call
-    locFanSizeVdot = state->dataFans->fanObjs[1]->designAirVolFlowRate;             // get function
-    Real64 locDesignHeatGain2 = state->dataFans->fanObjs[1]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    auto *fan2 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 2"));
+    fan2->simulate(*state, false, _, _);                            // triggers sizing call
+    locFanSizeVdot = fan2->maxAirFlowRate;             // get function
+    Real64 locDesignHeatGain2 = fan2->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
-    fanName = "TEST FAN 3";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
+    auto *fan3 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 3"));
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataFans->fanObjs[2]->simulate(*state, _, _);                // triggers sizing call
-    locFanSizeVdot = state->dataFans->fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = state->dataFans->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
+    fan3->simulate(*state, false, _, _);                // triggers sizing call
+    locFanSizeVdot = state->dataFans->fans(3)->maxAirFlowRate; // get function
+    Real64 locDesignHeatGain3 = fan3->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
 
-    GetFanInput(*state);
-    Real64 locDesignHeatGain4 = FanDesHeatGain(*state, 1, locFanSizeVdot);
+    auto *fan4 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 4"));
+    Real64 locDesignHeatGain4 = fan4->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.0, 0.1);
 
     std::string CompName;       // component name
@@ -492,9 +491,9 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::Invalid;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanType = HVAC::FanType::Invalid;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -530,9 +529,9 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     Real64 dxCoilSizeNoFan = SizingResult;
 
     // With Test Fan 4 fan heat
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = Fans::GetFanIndex(*state, "TEST FAN 4");
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanType = HVAC::FanType::Constant;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = HVAC::CoolingCapacitySizing;
@@ -550,10 +549,9 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 2;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanVecIndex = 2;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = Fans::GetFanIndex(*state, "TEST FAN 3");
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanType = HVAC::FanType::SystemModel;
     CompType = "COIL:COOLING:DX:SINGLESPEED";
     CompName = "Single Speed DX Cooling Coil";
     SizingType = HVAC::CoolingCapacitySizing;

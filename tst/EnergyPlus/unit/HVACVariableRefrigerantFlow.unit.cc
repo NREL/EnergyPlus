@@ -2376,7 +2376,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     // #6218 Fan:SystemModel is used and DX coil RatedVolAirFlowRate was not set equal to system fan designAirVolFlowRate
     EXPECT_EQ(state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1), 1.0);
     EXPECT_EQ(state->dataDXCoils->DXCoil(2).RatedAirVolFlowRate(1), 1.0);
-    EXPECT_EQ(state->dataFans->fanObjs[state->dataHVACVarRefFlow->VRFTU(1).FanIndex]->designAirVolFlowRate, 1.0);
+    EXPECT_EQ(state->dataFans->fans(state->dataHVACVarRefFlow->VRFTU(1).FanIndex)->maxAirFlowRate, 1.0);
 
     // Run and Check: GetSupHeatTempRefrig
     {
@@ -10800,11 +10800,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
-    Real64 Result_AirMassFlowRateDesign = state->dataFans->fanObjs[0]->maxAirMassFlowRate();
+    Real64 Result_AirMassFlowRateDesign = state->dataFans->fans(1)->maxAirMassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
-    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataFans->fanObjs[0]->outletNodeNum).MassFlowRate;
+    Real64 Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
-    Real64 Result_FanPower = state->dataFans->fanObjs[0]->fanPower();
+    Real64 Result_FanPower = state->dataFans->fans(1)->totalPower;
     EXPECT_NEAR(Result_FanPower, 39.593, 0.001);
 
     // test no load mode fan operation
@@ -10818,11 +10818,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     EXPECT_EQ(QZnReq, 0.0);
     SimVRF(*state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check no load fan operation
-    Result_AirMassFlowRateDesign = state->dataFans->fanObjs[0]->maxAirMassFlowRate();
+    Result_AirMassFlowRateDesign = state->dataFans->fans(1)->maxAirMassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
-    Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataFans->fanObjs[0]->outletNodeNum).MassFlowRate;
+    Result_AirMassFlowRate = state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRate;
     EXPECT_EQ(Result_AirMassFlowRate, 0.0);
-    Result_FanPower = state->dataFans->fanObjs[0]->fanPower();
+    Result_FanPower = state->dataFans->fans(1)->totalPower;
     EXPECT_EQ(Result_FanPower, 0.0);
 }
 
@@ -11441,7 +11441,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(state->dataFans->Fan(1));
+    auto *thisFan = state->dataFans->fans(1);
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -11467,7 +11467,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
-    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(1, state->dataFans->fans.size());
     ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -11478,8 +11478,8 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
-    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+    EXPECT_NEAR(368.0386, thisFan->totalPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
@@ -13179,7 +13179,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
 
     // set pointer to components
-    auto &thisFan(state->dataFans->Fan(1));
+    auto *thisFan = state->dataFans->fans(1);
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -13205,7 +13205,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
-    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(1, state->dataFans->fans.size());
     ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -13216,8 +13216,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5125.0840, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(4999.8265, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(125.2573, thisFan.FanPower, 0.0001);
-    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+    EXPECT_NEAR(125.2573, thisFan->totalPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
 }
 
 // Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
@@ -15859,7 +15859,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesTemp = 13.1;
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).CoolDesHumRat = 0.0095;
     // set pointer to components
-    auto &thisFan(state->dataFans->Fan(1));
+    auto *thisFan = state->dataFans->fans(1);
     auto &thisDXCoolingCoil(state->dataDXCoils->DXCoil(1));
     auto &thisDXHeatingCoil(state->dataDXCoils->DXCoil(2));
     // run the model
@@ -15885,7 +15885,7 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     // check model inputs
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFTU);
-    ASSERT_EQ(1, state->dataFans->NumFans);
+    ASSERT_EQ(1, state->dataFans->fans.size());
     ASSERT_EQ(2, state->dataDXCoils->NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -15896,8 +15896,8 @@ TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
     EXPECT_NEAR(5367.7328, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
     EXPECT_NEAR(4999.6942, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.0386, thisFan.FanPower, 0.0001);
-    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
+    EXPECT_NEAR(368.0386, thisFan->totalPower, 0.0001);
+    EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan->totalPower), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, VRF_Condenser_Calc_EIRFPLR_Bound_Test)
@@ -18190,12 +18190,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     // check model inputs
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(2, state->dataHVACVarRefFlow->NumVRFTU);
-    ASSERT_EQ(2, state->dataFans->NumFans);
+    ASSERT_EQ(2, state->dataFans->fans.size());
     ASSERT_EQ(4, state->dataDXCoils->NumDXCoils);
 
     // set pointer to components
-    auto &TU1_fan(state->dataFans->Fan(1));
-    auto &TU2_fan(state->dataFans->Fan(2));
+    auto *TU1_fan = state->dataFans->fans(1);
+    auto *TU2_fan = state->dataFans->fans(2);
     auto &TU1_dx_clg_coil(state->dataDXCoils->DXCoil(1));
     auto &TU2_dx_clg_coil(state->dataDXCoils->DXCoil(2));
     auto &TU1_dx_htg_coil(state->dataDXCoils->DXCoil(3));
@@ -18221,7 +18221,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU1 outputs; TU1 provides cooling
-    EXPECT_NEAR(156.0, TU1_fan.FanPower, 0.1);
+    EXPECT_NEAR(156.0, TU1_fan->totalPower, 0.1);
     EXPECT_NEAR(6153.6, TU1_dx_clg_coil.SensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(6723.6, VRFTU1.TotalCoolingRate, 0.1);
     EXPECT_NEAR(-5997.6, VRFTU1.TerminalUnitSensibleRate, 0.1);
@@ -18243,7 +18243,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_SupplementalHtgCoilTest)
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU2 outputs; TU2 supp heating coil provides the heating requirement
-    EXPECT_NEAR(27.1, TU2_fan.FanPower, 0.1); // 212.3
+    EXPECT_NEAR(27.1, TU2_fan->totalPower, 0.1); // 212.3
     EXPECT_EQ(0.0, TU2_dx_clg_coil.SensCoolingEnergyRate);
     EXPECT_EQ(0.0, VRFTU2.TotalCoolingRate);
     EXPECT_NEAR(2500.0, VRFTU2.TerminalUnitSensibleRate, 0.1);
@@ -20303,12 +20303,12 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     // check model inputs
     ASSERT_EQ(1, state->dataHVACVarRefFlow->NumVRFCond);
     ASSERT_EQ(2, state->dataHVACVarRefFlow->NumVRFTU);
-    ASSERT_EQ(2, state->dataFans->NumFans);
+    ASSERT_EQ(2, state->dataFans->fans.size());
     ASSERT_EQ(4, state->dataDXCoils->NumDXCoils);
 
     // set pointer to components
-    auto &TU1_fan(state->dataFans->Fan(1));
-    auto &TU2_fan(state->dataFans->Fan(2));
+    auto *TU1_fan = state->dataFans->fans(1);
+    auto *TU2_fan = state->dataFans->fans(2);
     auto &TU1_dx_clg_coil(state->dataDXCoils->DXCoil(1));
     auto &TU2_dx_clg_coil(state->dataDXCoils->DXCoil(2));
     auto &TU1_dx_htg_coil(state->dataDXCoils->DXCoil(3));
@@ -20334,7 +20334,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU1 outputs; TU1 provides cooling with supp heating coil scheduled off
-    EXPECT_NEAR(156.0, TU1_fan.FanPower, 0.1);
+    EXPECT_NEAR(156.0, TU1_fan->totalPower, 0.1);
     EXPECT_NEAR(6153.6, TU1_dx_clg_coil.SensCoolingEnergyRate, 0.1);
     EXPECT_NEAR(6723.6, VRFTU1.TotalCoolingRate, 0.1);
     EXPECT_NEAR(-5997.6, VRFTU1.TerminalUnitSensibleRate, 0.1);
@@ -20357,14 +20357,14 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_offSupplementalHtgCoilTest)
     ReportVRFTerminalUnit(*state, VRFTUNum);
 
     // test the TU2 outputs; TU2 supp heating coil scheduled off
-    EXPECT_NEAR(27.1, TU2_fan.FanPower, 0.1);
+    EXPECT_NEAR(27.1, TU2_fan->totalPower, 0.1);
     EXPECT_EQ(0.0, TU2_dx_clg_coil.SensCoolingEnergyRate);
     EXPECT_NEAR(2085.6, VRFTU2.SensibleCoolingRate, 0.1);
     EXPECT_NEAR(3961.64, VRFTU2.TotalCoolingRate, 0.1);
     EXPECT_NEAR(VRFTU2.TotalCoolingRate, VRFTU2.SensibleCoolingRate + VRFTU2.LatentCoolingRate, 0.1);
     EXPECT_NEAR(-2085.6, VRFTU2.TerminalUnitSensibleRate, 0.1);
     EXPECT_EQ(0.0, TU2_dx_htg_coil.TotalHeatingEnergyRate);
-    EXPECT_NEAR(27.1, TU2_fan.FanPower + TU2_supp_htg_coil.HeatingCoilRate, 0.1);
+    EXPECT_NEAR(27.1, TU2_fan->totalPower + TU2_supp_htg_coil.HeatingCoilRate, 0.1);
     EXPECT_NEAR(0.0, TU2_supp_htg_coil.HeatingCoilRate, 0.1);
     EXPECT_NEAR(4585.6, VRFTU2.SuppHeatingCoilLoad, 0.1);
     EXPECT_NEAR(VRFTU2.SuppHeatingCoilLoad,

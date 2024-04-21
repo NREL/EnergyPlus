@@ -185,8 +185,8 @@ struct BaseSizer
     // HeatingWaterDesCoilWaterVolFlowUsedForUASizer, HeaterWaterflowSizing
     int dataWaterLoopNum = 0;
     // CoolingWaterflowSizing, CoolingWaterDesAirInletTempSizer
-    int dataFanIndex = -1;
-    int dataFanEnumType = -1;
+    int dataFanIndex = 0;
+    HVAC::FanType dataFanType = HVAC::FanType::Invalid;
     // CoolingWaterflowSizing
     Real64 dataWaterCoilSizCoolDeltaT = 0.0;
     // HeaterWaterflowSizing

@@ -3456,10 +3456,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
 
-                Fans::SimulateFanComponents(state,
-                                            state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
-                                            FirstHVACIteration,
-                                            zoneEquipList.EquipIndex(EquipPtr));
+                if (zoneEquipList.EquipIndex(EquipPtr) == 0) { // TODO: Get rid of this
+                    zoneEquipList.EquipIndex(EquipPtr) = Fans::GetFanIndex(state, zoneEquipList.EquipName(EquipPtr));
+                }
+                        
+                state.dataFans->fans(zoneEquipList.EquipIndex(EquipPtr))->simulate(state, FirstHVACIteration);
 
             } break;
 

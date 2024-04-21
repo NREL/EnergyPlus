@@ -453,17 +453,23 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // resize cooling coil with fan on branch
     CoilNum = 1;
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->Fan(1).DeltaPress = 600.0;
-    state->dataFans->Fan(1).FanEff = 0.9;
-    state->dataFans->Fan(1).MotEff = 0.7;
-    state->dataFans->Fan(1).MotInAirFrac = 1.0;
 
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanVecIndex = 1;
-    state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
+    auto *fan1 = new Fans::FanComponent;
+    fan1->Name = "FAN1";
+
+    fan1->type = HVAC::FanType::Constant;
+    fan1->deltaPress = 600.0;
+    fan1->totalEff = 0.9;
+    fan1->motorEff = 0.7;
+    fan1->motorInAirFrac = 1.0;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
+
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanType = HVAC::FanType::Constant;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanNum = Fans::GetFanIndex(*state, "FAN1");
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanPlace = HVAC::FanPlace::BlowThru;
-    Real64 FanCoolLoad = Fans::FanDesHeatGain(*state, state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum, coil1CoolingAirFlowRate);
+    Real64 FanCoolLoad = fan1->getDesignHeatGain(*state, coil1CoolingAirFlowRate);
     WaterCoils::SizeWaterCoil(*state, CoilNum);
 
     EXPECT_NEAR(FanCoolLoad, 106.0, 1.0); // make sure there is enough fan heat to change results
@@ -479,7 +485,7 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     state->dataWaterCoils->WaterCoil(CoilNum).DesOutletAirHumRat = DataSizing::AutoSize;
     state->dataWaterCoils->WaterCoil(CoilNum).MaxWaterVolFlowRate = DataSizing::AutoSize;
     // reset primary air system fan type and location as if is doesn't exist
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::Invalid;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanType = HVAC::FanType::Invalid;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanPlace = HVAC::FanPlace::Invalid;
 
     // size same coils in UnitarySystem
@@ -529,7 +535,8 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
 
     // add fan to UnitarySystem
     mySys->m_FanExists = true;
-    mySys->m_FanIndex = 1;
+    mySys->m_FanIndex = Fans::GetFanIndex(*state, "FAN1");
+    mySys->m_FanType = HVAC::FanType::Constant;
     mySys->m_FanPlace = HVAC::FanPlace::BlowThru;
     // reset sizing information
     mySys->m_MaxCoolAirVolFlow = DataSizing::AutoSize;
@@ -7594,10 +7601,13 @@ Curve:Biquadratic,
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    Real64 FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
+   
+    Real64 FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->fans(1)->maxAirMassFlowRate;
     Real64 FanRTF = FanPLR / state->dataHVACGlobal->OnOffFanPartLoadFraction;
     EXPECT_DOUBLE_EQ(FanRTF, FanPLR);
-    EXPECT_DOUBLE_EQ(FanRTF, state->dataFans->Fan(1).FanRuntimeFraction);
+    auto *fan1 = dynamic_cast<Fans::FanComponent*>(state->dataFans->fans(1));
+    assert(fan1 != nullptr);
+    EXPECT_DOUBLE_EQ(FanRTF, fan1->runtimeFrac);
     EXPECT_DOUBLE_EQ(state->dataHVACGlobal->OnOffFanPartLoadFraction, 1.0);
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlZoneNum).RemainingOutputRequired = -1000.0; // cooling load
@@ -7644,11 +7654,13 @@ Curve:Biquadratic,
     EXPECT_DOUBLE_EQ(state->dataLoopNodes->Node(InletNode).MassFlowRate, state->dataLoopNodes->Node(OutletNode).MassFlowRate);
 
     // compare fan RTF with fan PLR and global PLF
-    FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->Fan(1).MaxAirMassFlowRate;
+    FanPLR = state->dataLoopNodes->Node(InletNode).MassFlowRate / state->dataFans->fans(1)->maxAirMassFlowRate;
     // blow thru fan resets OnOffFanPartLoadFraction = 1 so other equipment not using PLF are not affected. OnOffFanPartLoadFraction = 1 here.
     // Unitary System also sets OnOffFanPartLoadFraction = 1 (see end of ReportUnitarySystem) so this variable will = 1
     EXPECT_EQ(1.0, state->dataHVACGlobal->OnOffFanPartLoadFraction);
-    EXPECT_GT(state->dataFans->Fan(1).FanRuntimeFraction, FanPLR);
+    auto *fan2 = dynamic_cast<Fans::FanComponent*>(state->dataFans->fans(1));
+    assert(fan2 != nullptr);
+    EXPECT_GT(fan1->runtimeFrac, FanPLR);
 }
 
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
@@ -13199,25 +13211,21 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    std::string fanName = "TEST FAN 1";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
+    Fans::GetFanInput(*state);
 
-    fanName = "TEST FAN 2";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
-
-    fanName = "TEST FAN 3";
-    state->dataFans->fanObjs.emplace_back(new Fans::FanSystem(*state, fanName)); // call constructor
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
-    state->dataFans->fanObjs[2]->simulate(*state, _, _);                       // triggers sizing call
-    Real64 locFanSizeVdot = state->dataFans->fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = state->dataFans->fanObjs[2]->getFanDesignHeatGain(*state, locFanSizeVdot);
+   
+    auto *fan3 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 3"));
+    fan3->simulate(*state, false, _, _);                       // triggers sizing call
+    Real64 locFanSizeVdot = fan3->maxAirFlowRate; // get function
+    Real64 locDesignHeatGain3 = fan3->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 402.0, 0.1);
 
-    Fans::GetFanInput(*state);
-    Real64 locDesignHeatGain4 = Fans::FanDesHeatGain(*state, 1, locFanSizeVdot);
+    auto *fan4 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 4"));
+    Real64 locDesignHeatGain4 = fan4->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.25, 0.1);
 
     state->dataSize->DataTotCapCurveIndex = 0;
@@ -13234,9 +13242,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanModelType = DataAirSystems::Invalid;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanType = HVAC::FanType::Invalid;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -13281,7 +13289,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
 
     // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in Sizer)
     thisSys.m_FanType = HVAC::FanType::SystemModel;
-    thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
+    thisSys.m_FanIndex = Fans::GetFanIndex(*state, "TEST FAN 3");
     Real64 expectedSize = 19658.4199 + locDesignHeatGain3;
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
@@ -13304,7 +13312,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
 
     // With Test Fan 4 fan heat
     thisSys.m_FanType = HVAC::FanType::Constant;
-    thisSys.m_FanIndex = 1; // Fan:ConstantVolume is one-based subscripts, so 1 is 1
+    thisSys.m_FanIndex = Fans::GetFanIndex(*state, "TEST FAN 4");
     expectedSize = 19658.4199 + locDesignHeatGain4;
 
     mySys->sizeSystem(*state, FirstHVACIteration, AirLoopNum);
@@ -20972,6 +20980,30 @@ TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
     // 4: mixed air node and fan inlet
     state->dataLoopNodes->Node.allocate(4);
 
+    // fan
+    state->dataFans->GetFanInputFlag = false;
+
+    auto *thisFan = new Fans::FanComponent;
+    thisFan->Name = "VAV FAN 1";
+    thisFan->type = HVAC::FanType::VAV;
+    thisFan->maxAirFlowRate = 0.22951;
+    thisFan->deltaPress = 600.0;
+    thisFan->totalEff = 0.7;
+    thisFan->motorEff = 0.9;
+    thisFan->motorInAirFrac = 1.0;
+    thisFan->availSchedNum = 0;
+    thisFan->minAirMassFlowRate = 0.0;
+    thisFan->coeffs[0] = 0.0015302446;
+    thisFan->coeffs[1] = 0.0052080574;
+    thisFan->coeffs[2] = 1.1086242;
+    thisFan->coeffs[3] = -0.11635563;
+    thisFan->coeffs[4] = 0.000;
+    thisFan->inletNodeNum = 4;
+    thisFan->outletNodeNum = 2;
+
+    state->dataFans->fans.push_back(thisFan);
+    state->dataFans->fanMap.insert_or_assign(thisFan->Name, state->dataFans->fans.size());
+
     // unitary system
     UnitarySystems::UnitarySys thisSys;
     thisSys.m_FanType = HVAC::FanType::VAV;
@@ -20983,7 +21015,7 @@ TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
     thisSys.m_CoolMassFlowRate[2] = thisSysCoolMassFlowRate * 0.5;
     thisSys.m_CoolMassFlowRate[3] = thisSysCoolMassFlowRate * 0.75;
     thisSys.m_CoolMassFlowRate[4] = thisSysCoolMassFlowRate;
-    thisSys.m_FanIndex = 1;
+    thisSys.m_FanIndex = Fans::GetFanIndex(*state, "VAV FAN 1");
 
     // controller outdoor air
     MixedAir::GetOAControllerInputs(*state);
@@ -21002,28 +21034,6 @@ TEST_F(EnergyPlusFixture, SetEconomizerStagingOperationSpeedTest)
     state->dataLoopNodes->Node(4).Temp = state->dataLoopNodes->Node(1).Temp;
     state->dataLoopNodes->Node(4).Enthalpy = state->dataLoopNodes->Node(1).Enthalpy;
 
-    // fan
-    state->dataFans->GetFanInputFlag = false;
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->NumFans = 1;
-    state->dataFans->CheckEquipName.dimension(state->dataFans->NumFans, false);
-    state->dataFans->MySizeFlag.dimension(state->dataFans->NumFans, false);
-    auto &thisFan(state->dataFans->Fan(1));
-    thisFan.fanType = HVAC::FanType::VAV;
-    thisFan.MaxAirFlowRate = 0.22951;
-    thisFan.DeltaPress = 600.0;
-    thisFan.FanEff = 0.7;
-    thisFan.MotEff = 0.9;
-    thisFan.MotInAirFrac = 1.0;
-    thisFan.AvailSchedPtrNum = -1.0;
-    thisFan.MinAirMassFlowRate = 0.0;
-    thisFan.FanCoeff(1) = 0.0015302446;
-    thisFan.FanCoeff(2) = 0.0052080574;
-    thisFan.FanCoeff(3) = 1.1086242;
-    thisFan.FanCoeff(4) = -0.11635563;
-    thisFan.FanCoeff(5) = 0.000;
-    thisFan.InletNodeNum = 4;
-    thisFan.OutletNodeNum = 2;
     state->dataLoopNodes->Node(4).MassFlowRateMaxAvail = thisSysCoolMassFlowRate;
     state->dataLoopNodes->Node(2).MassFlowRateMax = thisSysCoolMassFlowRate;
 

@@ -157,14 +157,20 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 4 - Zone Equipment, Single Duct TU, add fan heat
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->Fan(1).DeltaPress = 600.0;
-    state->dataFans->Fan(1).MotEff = 0.9;
-    state->dataFans->Fan(1).FanEff = 0.6;
-    state->dataFans->Fan(1).MotInAirFrac = 0.5;
-    state->dataFans->Fan(1).fanType = HVAC::FanType::Constant;
-    state->dataSize->DataFanIndex = 1;
-    state->dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
+    auto *fan1 = new Fans::FanComponent;
+
+    fan1->Name = "CONSTANT FAN 1";
+    fan1->deltaPress = 600.0;
+    fan1->motorEff = 0.9;
+    fan1->totalEff = 0.6;
+    fan1->motorInAirFrac = 0.5;
+    fan1->type = HVAC::FanType::Constant;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
+    
+    state->dataSize->DataFanIndex = Fans::GetFanIndex(*state, "CONSTANT FAN 1");
+    state->dataSize->DataFanType = HVAC::FanType::Constant;
     sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType)); // missing Data* globals and Plant data

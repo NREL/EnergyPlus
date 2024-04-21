@@ -437,7 +437,7 @@ namespace HVACMultiSpeedHeatPump {
         multiSpeedHeatPump.AuxElecPower = multiSpeedHeatPump.AuxOnCyclePower * state.dataHVACMultiSpdHP->SaveCompressorPLR +
                                           multiSpeedHeatPump.AuxOffCyclePower * (1.0 - state.dataHVACMultiSpdHP->SaveCompressorPLR);
         Real64 locFanElecPower = 0.0;
-        locFanElecPower = Fans::GetFanPower(state, multiSpeedHeatPump.FanNum);
+        locFanElecPower = state.dataFans->fans(multiSpeedHeatPump.FanNum)->totalPower;
         multiSpeedHeatPump.ElecPower = locFanElecPower + state.dataHVACGlobal->DXElecCoolingPower + state.dataHVACGlobal->DXElecHeatingPower +
                                        state.dataHVACGlobal->ElecHeatingCoilPower + state.dataHVACGlobal->SuppHeatingCoilPower +
                                        state.dataHVACGlobal->DefrostElecPower + multiSpeedHeatPump.AuxElecPower;
@@ -661,10 +661,11 @@ namespace HVACMultiSpeedHeatPump {
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), Alphas(7));
                 ErrorsFound = true;
             } else {
-                thisMSHP.FanName = state.dataFans->Fan(thisMSHP.FanNum).Name;
-                thisMSHP.fanType = state.dataFans->Fan(thisMSHP.FanNum).fanType;
-                thisMSHP.FanInletNode = state.dataFans->Fan(thisMSHP.FanNum).InletNodeNum;
-                thisMSHP.FanOutletNode = state.dataFans->Fan(thisMSHP.FanNum).OutletNodeNum;
+                auto *fan = state.dataFans->fans(thisMSHP.FanNum);
+                thisMSHP.FanName = fan->Name;
+                thisMSHP.fanType = fan->type;
+                thisMSHP.FanInletNode = fan->inletNodeNum;
+                thisMSHP.FanOutletNode = fan->outletNodeNum;
                 BranchNodeConnections::SetUpCompSets(state,
                                                      state.dataHVACMultiSpdHP->CurrentModuleObject,
                                                      thisMSHP.Name,
@@ -1953,7 +1954,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (!state.dataGlobal->SysSizingCalc && MSHeatPump(MSHeatPumpNum).MySizeFlag) {
-            MSHeatPump(MSHeatPumpNum).FanVolFlow = Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum);
+                MSHeatPump(MSHeatPumpNum).FanVolFlow = state.dataFans->fans(MSHeatPump(MSHeatPumpNum).FanNum)->maxAirFlowRate;
             SizeMSHeatPump(state, MSHeatPumpNum);
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
@@ -2177,7 +2178,7 @@ namespace HVACMultiSpeedHeatPump {
         // IF MSHP system was not autosized and the fan is autosized, check that fan volumetric flow rate is greater than MSHP flow rates
         if (!state.dataGlobal->DoingSizing && MSHeatPump(MSHeatPumpNum).CheckFanFlow) {
             state.dataHVACMultiSpdHP->CurrentModuleObject = "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed";
-            MSHeatPump(MSHeatPumpNum).FanVolFlow = Fans::GetFanVolFlow(state, MSHeatPump(MSHeatPumpNum).FanNum);
+            MSHeatPump(MSHeatPumpNum).FanVolFlow = state.dataFans->fans(MSHeatPump(MSHeatPumpNum).FanNum)->maxAirFlowRate;
             if (MSHeatPump(MSHeatPumpNum).FanVolFlow != DataSizing::AutoSize) {
                 //     Check fan versus system supply air flow rates
                 if (MSHeatPump(MSHeatPumpNum).FanVolFlow < MSHeatPump(MSHeatPumpNum).CoolVolumeFlowRate(NumOfSpeedCooling)) {
@@ -2653,13 +2654,8 @@ namespace HVACMultiSpeedHeatPump {
 
         auto &MSHeatPump = state.dataHVACMultiSpdHP->MSHeatPump(MSHeatPumpNum);
         if (state.dataSize->CurSysNum > 0 && state.dataSize->CurOASysNum == 0) {
-            if (MSHeatPump.fanType == HVAC::FanType::SystemModel) {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanVecIndex = MSHeatPump.FanNum;
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::ObjectVectorOOFanSystemModel;
-            } else {
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).SupFanNum = MSHeatPump.FanNum;
-                state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
-            }
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanNum = MSHeatPump.FanNum;
+            state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanType = MSHeatPump.fanType;
             state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace = MSHeatPump.fanPlace;
         }
 
@@ -3655,7 +3651,7 @@ namespace HVACMultiSpeedHeatPump {
         AirMassFlow = state.dataLoopNodes->Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
         if (MSHeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
-            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            state.dataFans->fans(MSHeatPump.FanNum)->simulate(state, FirstHVACIteration, state.dataHVACMultiSpdHP->FanSpeedRatio);
             if (QZnReq < (-1.0 * HVAC::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {
                     DXCoils::SimDXCoilMultiSpeed(state,
@@ -3712,7 +3708,7 @@ namespace HVACMultiSpeedHeatPump {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump.OpMode, QCoilActual, PartLoadFrac);
             }
             // Call twice to ensure the fan outlet conditions are updated
-            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            state.dataFans->fans(MSHeatPump.FanNum)->simulate(state, FirstHVACIteration, state.dataHVACMultiSpdHP->FanSpeedRatio);
             if (QZnReq < (-1.0 * HVAC::SmallLoad)) {
                 if (OutsideDryBulbTemp > MSHeatPump.MinOATCompressorCooling) {
                     DXCoils::SimDXCoilMultiSpeed(state,
@@ -3828,7 +3824,7 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump.OpMode, QCoilActual, PartLoadFrac);
             }
-            Fans::SimulateFanComponents(state, MSHeatPump.FanName, FirstHVACIteration, MSHeatPump.FanNum, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            state.dataFans->fans(MSHeatPump.FanNum)->simulate(state,  FirstHVACIteration, state.dataHVACMultiSpdHP->FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (MSHeatPump.SuppHeatCoilNum > 0) {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump.OpMode, QCoilActual);

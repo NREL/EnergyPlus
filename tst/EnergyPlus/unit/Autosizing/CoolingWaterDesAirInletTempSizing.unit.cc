@@ -178,14 +178,20 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     sizer.autoSizedValue = 0.0; // reset for next test
 
     // Test 6 - Zone Equipment, Induction Unit, add fan heat
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->Fan(1).DeltaPress = 600.0;
-    state->dataFans->Fan(1).MotEff = 0.9;
-    state->dataFans->Fan(1).FanEff = 0.6;
-    state->dataFans->Fan(1).MotInAirFrac = 0.5;
-    state->dataFans->Fan(1).fanType = HVAC::FanType::Constant;
-    state->dataSize->DataFanIndex = 1;
-    state->dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
+    auto *fan1 = new Fans::FanComponent;
+    fan1->Name = "CONSTANT FAN 1";
+    
+    fan1->deltaPress = 600.0;
+    fan1->motorEff = 0.9;
+    fan1->totalEff = 0.6;
+    fan1->motorInAirFrac = 0.5;
+    fan1->type = HVAC::FanType::Constant;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
+    
+    state->dataSize->DataFanIndex = Fans::GetFanIndex(*state, "CONSTANT FAN 1");
+    state->dataSize->DataFanType = HVAC::FanType::Constant;
     state->dataSize->DataFanPlacement = HVAC::FanPlace::BlowThru;
     state->dataSize->DataDesInletAirHumRat = 0.008;
     state->dataSize->DataAirFlowUsedForSizing = state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).DesCoolMassFlow;
@@ -200,7 +206,7 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(22.5464, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
-    state->dataSize->DataFanIndex = -1;
+    state->dataSize->DataFanIndex = 0;
 
     // Test 7 - Zone Equipment, Zone Eq Fan Coil, no fan heat
     state->dataSize->TermUnitIU = false;

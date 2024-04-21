@@ -3230,8 +3230,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -3455,8 +3455,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -4589,8 +4589,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
@@ -4874,8 +4874,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
@@ -5516,19 +5516,19 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
     int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
+    int fanIndex = Fans::GetFanIndex(*state, "FAN VARIABLE VOLUME");
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
-    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    auto *supplyFan = state->dataFans->fans(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
-    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan->Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan->type;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
-    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
-    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
-    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    supplyFan->maxAirMassFlowRate = supplyFan->maxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan->inletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan->outletNodeNum);
     InletNode.MassFlowRate = 1.0;
     InletNode.MassFlowRateMax = 1.0;
     InletNode.MassFlowRateMaxAvail = 1.0;
@@ -5754,19 +5754,19 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
     int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
+    int fanIndex = Fans::GetFanIndex(*state, "FAN VARIABLE VOLUME");
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
-    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    auto *supplyFan = state->dataFans->fans(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
-    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan->Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan->type;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
-    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
-    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
-    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    supplyFan->maxAirMassFlowRate = supplyFan->maxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan->inletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan->outletNodeNum);
     InletNode.MassFlowRate = 1.0;
     InletNode.MassFlowRateMax = 1.0;
     InletNode.MassFlowRateMaxAvail = 1.0;

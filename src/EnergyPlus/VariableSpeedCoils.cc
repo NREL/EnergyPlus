@@ -4285,27 +4285,14 @@ namespace VariableSpeedCoils {
             }
 
             // store fan info for coil
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).supplyFanType == HVAC::FanType::SystemModel) {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                        state,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanName,
-                        DataAirSystems::ObjectVectorOOFanSystemModel,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
-                }
-
-            } else {
-                if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                        state,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanName,
-                        DataAirSystems::StructArrayLegacyFanModels,
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
-                }
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                    state,
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanName,
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).supplyFanType,
+                    state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
             }
         }
 
@@ -4812,7 +4799,7 @@ namespace VariableSpeedCoils {
 
                         // design fan heat will be added to coil load
                         Real64 FanCoolLoad =
-                            DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
+                            DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                         // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                         Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
                         if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
@@ -4891,7 +4878,7 @@ namespace VariableSpeedCoils {
 
                     // design fan heat will be added to coil load
                     Real64 FanCoolLoad =
-                        DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanEnumType, state.dataSize->DataFanIndex, VolFlowRate);
+                        DataAirSystems::calcFanDesignHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
                     Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
 
@@ -6821,16 +6808,9 @@ namespace VariableSpeedCoils {
         }
 
         Real64 locFanElecPower = 0.0; // local for fan electric power
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).supplyFanType == HVAC::FanType::SystemModel) {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > -1) {
-                locFanElecPower = state.dataFans->fanObjs[state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex]->fanPower();
-            }
-        } else {
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
-                locFanElecPower = Fans::GetFanPower(state, state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex);
-            }
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex > 0) {
+            locFanElecPower = state.dataFans->fans(state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SupplyFanIndex)->totalPower;
         }
-
         if ((SpeedNum == 1) || (SpeedNum > MaxSpeed) || (SpeedRatio == 1.0)) {
             AirMassFlowRatio =
                 state.dataVariableSpeedCoils->LoadSideMassFlowRate / state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DesignAirMassFlowRate;
@@ -7229,7 +7209,7 @@ namespace VariableSpeedCoils {
     {
         state.dataVariableSpeedCoils->VarSpeedCoil(dXCoilNum).SupplyFanIndex = fanIndex;
     }
-
+    
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
                                  int const DXCoilNum,                             // Heat Pump Number
                                  int const CyclingScheme,                         // Fan/Compressor cycling scheme indicator

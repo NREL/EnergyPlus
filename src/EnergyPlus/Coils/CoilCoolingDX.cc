@@ -819,24 +819,14 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                                                                   -999.0);
 
             // report out fan information
-            if (this->supplyFanType == HVAC::FanType::SystemModel) {
-                if (this->supplyFanIndex >= 0) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->name,
-                                                                                             state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataFans->fanObjs[this->supplyFanIndex]->name,
-                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
-                                                                                             this->supplyFanIndex);
-                }
-            } else {
-                if (this->supplyFanIndex >= 1) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->name,
-                                                                                             state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataFans->Fan(this->supplyFanIndex).Name,
-                                                                                             DataAirSystems::StructArrayLegacyFanModels,
-                                                                                             this->supplyFanIndex);
-                }
+            // should work for all fan types
+            if (this->supplyFanIndex > 0) {
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                         this->name,
+                                                                                         state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                                         state.dataFans->fans(this->supplyFanIndex)->Name,
+                                                                                         state.dataFans->fans(this->supplyFanIndex)->type,
+                                                                                         this->supplyFanIndex);
             }
 
             // report out coil rating conditions, just create a set of dummy nodes and run calculate on them

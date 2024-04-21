@@ -3473,25 +3473,17 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
             thisZoneEvapUnit.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(7)));
             assert(thisZoneEvapUnit.fanType != HVAC::FanType::Invalid);
 
-            if (thisZoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-                thisZoneEvapUnit.FanIndex = Fans::GetFanIndex(state, thisZoneEvapUnit.FanName);
-                if (thisZoneEvapUnit.FanIndex == 0) {
-                    ShowSevereItemNotFound(state, eoh, cAlphaFields(8), thisZoneEvapUnit.FanName);
-                    ErrorsFound = true;
-                } else {
-                    assert(thisZoneEvapUnit.fanType == Fans::GetFanType(state, thisZoneEvapUnit.FanIndex));
-                    thisZoneEvapUnit.FanInletNodeNum = Fans::GetFanInletNode(state, thisZoneEvapUnit.FanIndex);
-                    thisZoneEvapUnit.FanOutletNodeNum = Fans::GetFanOutletNode(state, thisZoneEvapUnit.FanIndex);
-                    thisZoneEvapUnit.ActualFanVolFlowRate = Fans::GetFanVolFlow(state, thisZoneEvapUnit.FanIndex);
-                    thisZoneEvapUnit.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisZoneEvapUnit.FanIndex);
-                }
+            thisZoneEvapUnit.FanIndex = Fans::GetFanIndex(state, thisZoneEvapUnit.FanName);
+            if (thisZoneEvapUnit.FanIndex == 0) {
+                ShowSevereItemNotFound(state, eoh, cAlphaFields(8), thisZoneEvapUnit.FanName);
+                ErrorsFound = true;
             } else {
-                state.dataFans->fanObjs.emplace_back(new Fans::FanSystem(state, thisZoneEvapUnit.FanName)); // call constructor
-                thisZoneEvapUnit.FanIndex = state.dataFans->fanObjs.size() - 1;
-                thisZoneEvapUnit.FanInletNodeNum = state.dataFans->fanObjs[thisZoneEvapUnit.FanIndex]->inletNodeNum;
-                thisZoneEvapUnit.FanOutletNodeNum = state.dataFans->fanObjs[thisZoneEvapUnit.FanIndex]->outletNodeNum;
-                thisZoneEvapUnit.ActualFanVolFlowRate = state.dataFans->fanObjs[thisZoneEvapUnit.FanIndex]->designAirVolFlowRate;
-                thisZoneEvapUnit.FanAvailSchedPtr = state.dataFans->fanObjs[thisZoneEvapUnit.FanIndex]->availSchedIndex;
+                auto *fan = state.dataFans->fans(thisZoneEvapUnit.FanIndex);
+                assert(thisZoneEvapUnit.fanType == fan->type);
+                thisZoneEvapUnit.FanInletNodeNum = fan->inletNodeNum;
+                thisZoneEvapUnit.FanOutletNodeNum = fan->outletNodeNum;
+                thisZoneEvapUnit.ActualFanVolFlowRate = fan->maxAirFlowRate;
+                thisZoneEvapUnit.FanAvailSchedPtr = fan->availSchedNum;
             }
 
             // set evap unit to cycling mode for all fan types. Note OpMode var is not used
@@ -3800,11 +3792,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
             zoneEvapUnit.MyFan = false;
         } else {
-            if (zoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-                zoneEvapUnit.ActualFanVolFlowRate = Fans::GetFanVolFlow(state, zoneEvapUnit.FanIndex);
-            } else {
-                zoneEvapUnit.ActualFanVolFlowRate = state.dataFans->fanObjs[zoneEvapUnit.FanIndex]->designAirVolFlowRate;
-            }
+            zoneEvapUnit.ActualFanVolFlowRate = state.dataFans->fans(zoneEvapUnit.FanIndex)->maxAirFlowRate;
         }
     }
 
@@ -4181,11 +4169,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
     if (zoneEvapUnit.fanPlace == HVAC::FanPlace::BlowThru) {
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
         state.dataLoopNodes->Node(FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(OAInletNodeNum).MassFlowRate;
-        if (zoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
-        } else {
-            state.dataFans->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
-        }
+        state.dataFans->fans(zoneEvapUnit.FanIndex)->simulate(state, false, _, _);
     }
 
     if (zoneEvapUnit.EvapCooler_1_AvailStatus) {
@@ -4196,11 +4180,7 @@ void CalcZoneEvapUnitOutput(EnergyPlusData &state,
         SimEvapCooler(state, zoneEvapUnit.EvapCooler_2_Name, zoneEvapUnit.EvapCooler_2_Index, PartLoadRatio);
     }
     if (zoneEvapUnit.fanPlace == HVAC::FanPlace::DrawThru) {
-        if (zoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
-        } else {
-            state.dataFans->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
-        }
+        state.dataFans->fans(zoneEvapUnit.FanIndex)->simulate(state, false, _, _);
     }
 
     // calculate sensible and latent outputs delivered
@@ -4307,11 +4287,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
         state.dataLoopNodes->Node(zoneEvapUnit.FanOutletNodeNum).MassFlowRateMaxAvail =
             state.dataLoopNodes->Node(zoneEvapUnit.OAInletNodeNum).MassFlowRate;
-        if (zoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
-        } else {
-            state.dataFans->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
-        }
+        state.dataFans->fans(zoneEvapUnit.FanIndex)->simulate(state, false, _, _);
     }
 
     if (zoneEvapUnit.EvapCooler_1_AvailStatus) {
@@ -4322,11 +4298,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
         SimEvapCooler(state, zoneEvapUnit.EvapCooler_2_Name, zoneEvapUnit.EvapCooler_2_Index);
     }
     if (zoneEvapUnit.fanPlace == HVAC::FanPlace::DrawThru) {
-        if (zoneEvapUnit.fanType != HVAC::FanType::SystemModel) {
-            Fans::SimulateFanComponents(state, zoneEvapUnit.FanName, false, zoneEvapUnit.FanIndex, _);
-        } else {
-            state.dataFans->fanObjs[zoneEvapUnit.FanIndex]->simulate(state, _, _);
-        }
+        state.dataFans->fans(zoneEvapUnit.FanIndex)->simulate(state, false, _, _);
     }
 
     // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
@@ -4352,11 +4324,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
             if (unit.fanPlace == HVAC::FanPlace::BlowThru) {
                 state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRate = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
                 state.dataLoopNodes->Node(unit.FanOutletNodeNum).MassFlowRateMaxAvail = state.dataLoopNodes->Node(unit.OAInletNodeNum).MassFlowRate;
-                if (unit.fanType != HVAC::FanType::SystemModel) {
-                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
-                } else {
-                    state.dataFans->fanObjs[unit.FanIndex]->simulate(state, _, _);
-                }
+                state.dataFans->fans(unit.FanIndex)->simulate(state, false, _, _);
             }
 
             if (unit.EvapCooler_1_AvailStatus) {
@@ -4367,11 +4335,7 @@ void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state,
                 SimEvapCooler(state, unit.EvapCooler_2_Name, unit.EvapCooler_2_Index, FanSpeedRatio);
             }
             if (unit.fanPlace == HVAC::FanPlace::DrawThru) {
-                if (unit.fanType != HVAC::FanType::SystemModel) {
-                    Fans::SimulateFanComponents(state, unit.FanName, false, unit.FanIndex, _);
-                } else {
-                    state.dataFans->fanObjs[unit.FanIndex]->simulate(state, _, _);
-                }
+                state.dataFans->fans(unit.FanIndex)->simulate(state, false, _, _);
             }
 
             Real64 const MinHumRat =

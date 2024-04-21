@@ -123,7 +123,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     state.dataSize->DataFractionUsedForSizing = 0.0;
 
     this->dataFanIndex = state.dataSize->DataFanIndex;
-    this->dataFanEnumType = state.dataSize->DataFanEnumType;
+    this->dataFanType = state.dataSize->DataFanType;
 
     // global Data* sizing constants
     this->dataPltSizHeatNum = state.dataSize->DataPltSizHeatNum;
@@ -776,7 +776,7 @@ void BaseSizer::clearState()
     dataPltSizHeatNum = 0;
     dataWaterLoopNum = 0;
     dataFanIndex = -1;
-    dataFanEnumType = -1;
+    dataFanType = HVAC::FanType::Invalid;
     dataWaterCoilSizCoolDeltaT = 0.0;
     dataWaterCoilSizHeatDeltaT = 0.0;
     dataCapacityUsedForSizing = 0.0;

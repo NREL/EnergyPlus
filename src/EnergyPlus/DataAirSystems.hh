@@ -172,14 +172,6 @@ namespace DataAirSystems {
         Array1D_string NodeNameIn; // Node names for the inlets to the mixer
     };
 
-    enum FanModelType
-    {
-        Invalid = -1,
-        StructArrayLegacyFanModels,
-        ObjectVectorOOFanSystemModel,
-        Num
-    };
-
     struct DefinePrimaryAirSystem // There is an array of these for each primary air system
     {
         // Members
@@ -219,13 +211,11 @@ namespace DataAirSystems {
         int NumOAHeatCoils = 0;                               // number of heating coils in the outside air system
         int NumOAHXs = 0;                                     // number of heat exchangers in the outside air system
         bool SizeAirloopCoil = true;                          // simulates air loop coils before calling controllers
-        FanModelType supFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for supply fan, legacy or new OO
-        int SupFanNum = 0;       // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
-        int supFanVecIndex = -1; // index in fan object vector for supply fan when model type is ObjectVectorOOFanSystemModel, zero-based index
+        HVAC::FanType supFanType = HVAC::FanType::Invalid; // indicates which type of fan model to call for supply fan, legacy or new OO
+        int supFanNum = 0;       // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
         HVAC::FanPlace supFanPlace = HVAC::FanPlace::Invalid; // location of fan relative to coil
-        FanModelType retFanModelType = FanModelType::Invalid; // indicates which type of fan model to call for return fan, legacy or new OO
-        int RetFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
-        int retFanVecIndex = -1;     // index in fan object vector for return fan when model type is ObjectVectorOOFanSystemModel, zero-based index
+        HVAC::FanType retFanType = HVAC::FanType::Invalid; // indicates which type of fan model to call for return fan, legacy or new OO
+        int retFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
         Real64 FanDesCoolLoad = 0.0; // design fan heat gain for the air loop [W]
         bool EconomizerStagingCheckFlag = false; // flag to indicate that the applicability of the selected economizer staging operation mode is valid
     };
@@ -326,7 +316,7 @@ namespace DataAirSystems {
         int LastDemandSidePtr = 0;
     };
 
-    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int dataFanEnumType, int dataFanIndex, Real64 desVolFlow);
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int dataFanIndex, Real64 desVolFlow);
 
 } // namespace DataAirSystems
 

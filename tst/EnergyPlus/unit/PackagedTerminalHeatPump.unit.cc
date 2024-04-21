@@ -577,12 +577,12 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     // this same ratio should also equal the internal flow per capacity variable used to back calculate operating air flow rate
     EXPECT_EQ(sizingAirflowCapacityRatio, state->dataVariableSpeedCoils->VarSpeedCoil(2).MSRatedAirVolFlowPerRatedTotCap(9));
 
-    SizeFan(*state, 1);
+    state->dataFans->fans(1)->set_size(*state);
     // the fan vol flow rate should equal the max of cooling and heating coil flow rates
     Real64 maxCoilAirFlow =
         max(state->dataVariableSpeedCoils->VarSpeedCoil(1).RatedAirVolFlowRate, state->dataVariableSpeedCoils->VarSpeedCoil(2).RatedAirVolFlowRate);
-    EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, maxCoilAirFlow, 0.000001);
-    EXPECT_NEAR(state->dataFans->Fan(1).MaxAirFlowRate, max(thisSys.m_MaxCoolAirVolFlow, thisSys.m_MaxHeatAirVolFlow), 0.000001);
+    EXPECT_NEAR(state->dataFans->fans(1)->maxAirFlowRate, maxCoilAirFlow, 0.000001);
+    EXPECT_NEAR(state->dataFans->fans(1)->maxAirFlowRate, max(thisSys.m_MaxCoolAirVolFlow, thisSys.m_MaxHeatAirVolFlow), 0.000001);
 
     // Also set BeginEnvrnFlag so code is tested for coil initialization and does not crash
     state->dataGlobal->BeginEnvrnFlag = true;
@@ -610,8 +610,8 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_FALSE(state->dataSize->ZoneEqSizing(1).HeatingAirFlow);
     EXPECT_EQ(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, thisSys.m_MaxCoolAirVolFlow);
     EXPECT_LT(state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow, thisSys.m_MaxHeatAirVolFlow);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
-    EXPECT_EQ(state->dataFans->Fan(1).MaxAirFlowRate,
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate, state->dataSize->ZoneEqSizing(1).AirVolFlow);
+    EXPECT_EQ(state->dataFans->fans(1)->maxAirFlowRate,
               max(state->dataSize->ZoneEqSizing(1).CoolingAirVolFlow, state->dataSize->ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
@@ -889,11 +889,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
 
     // set fan parameters
-    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -1237,11 +1237,11 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     state->dataScheduleMgr->Schedule(thisSys.m_FanAvailSchedPtr).CurrentValue = 1.0;  // fan is always available
 
     // set fan parameters
-    state->dataFans->Fan(1).MaxAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).InletAirMassFlowRate = HVACInletMassFlowRate;
-    state->dataFans->Fan(1).RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).OutletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->maxAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->inletAirMassFlowRate = HVACInletMassFlowRate;
+    state->dataFans->fans(1)->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->outletNodeNum).MassFlowRateMax = HVACInletMassFlowRate;
 
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
@@ -4648,7 +4648,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     Real64 latOut = 0.0;
     Real64 constexpr OAUCoilOutTemp = 0.0;
     // set local variables for convenience
-    auto &supplyFan = state->dataFans->Fan(1);
+    auto *supplyFan = state->dataFans->fans(1);
     auto &dxClgCoilMain = state->dataDXCoils->DXCoil(1);
     auto &dxHtgCoilMain = state->dataDXCoils->DXCoil(2);
     auto &elecHtgCoilSupp = state->dataHeatingCoils->HeatingCoil(1);
@@ -4670,13 +4670,13 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     EXPECT_TRUE(state->dataUnitarySystems->HeatingLoad);
     EXPECT_FALSE(state->dataUnitarySystems->CoolingLoad);
 
-    Real64 result_pthp_ElectricityRate = supplyFan.FanPower + state->dataHVACGlobal->DXElecCoolingPower + state->dataHVACGlobal->DXElecHeatingPower +
+    Real64 result_pthp_ElectricityRate = supplyFan->totalPower + state->dataHVACGlobal->DXElecCoolingPower + state->dataHVACGlobal->DXElecHeatingPower +
                                          state->dataHVACGlobal->DefrostElecPower + state->dataHVACGlobal->ElecHeatingCoilPower +
                                          state->dataHVACGlobal->SuppHeatingCoilPower + thisSys.m_TotalAuxElecPower;
     // test results
     EXPECT_NEAR(30636.88, thisSys.m_ElecPower, 0.01);
     EXPECT_NEAR(30636.88, result_pthp_ElectricityRate, 0.01);
-    EXPECT_NEAR(857.14, supplyFan.FanPower, 0.01);
+    EXPECT_NEAR(857.14, supplyFan->totalPower, 0.01);
     EXPECT_NEAR(0.0, dxClgCoilMain.ElecCoolingPower, 0.01);
     EXPECT_NEAR(0.0, state->dataHVACGlobal->DXElecCoolingPower, 0.01);
     EXPECT_NEAR(4327.88, dxHtgCoilMain.ElecHeatingPower, 0.01);
@@ -4929,10 +4929,10 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRate = PrimaryAirMassFlowRate;
     state->dataLoopNodes->Node(thisSys.m_OAMixerNodes[0]).MassFlowRateMaxAvail = PrimaryAirMassFlowRate;
     // set fan parameters
-    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMax = 1.0;
-    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
-    state->dataLoopNodes->Node(state->dataFans->fanObjs[thisSys.m_FanIndex]->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMax = 1.0;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRate = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->inletNodeNum).MassFlowRateMaxAvail = HVACInletMassFlowRate;
+    state->dataLoopNodes->Node(state->dataFans->fans(thisSys.m_FanIndex)->outletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     // set DX coil rated performance parameters
     state->dataDXCoils->DXCoil(1).RatedCBF(1) = 0.05;
     state->dataDXCoils->DXCoil(1).RatedAirMassFlowRate(1) = HVACInletMassFlowRate;
