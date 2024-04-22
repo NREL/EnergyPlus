@@ -3998,9 +3998,7 @@ namespace VariableSpeedCoils {
             if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) ||
                 (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == Coil_CoolingAirToAirVariableSpeed)) {
                 for (Mode = 1; Mode <= state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++Mode) {
-                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0 &&
-                        state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != AutoSize)
-                        break;
+                    if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) break;
                     // Check for zero capacity or zero max flow rate
                     if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedTotCap(Mode) <= 0.0) {
                         ShowSevereError(state,
@@ -5830,7 +5828,7 @@ namespace VariableSpeedCoils {
                 DefrostControl = StandardRatings::HPdefrostControl::Timed;
                 break;
             }
-            if (varSpeedCoil.RatedCapCoolTotal > 0.0 || varSpeedCoil.RatedCapCoolTotal == AutoSize) {
+            if (varSpeedCoil.RatedCapCoolTotal > 0.0) {
                 StandardRatings::CalcDXCoilStandardRating(state,
                                                           varSpeedCoil.Name,
                                                           varSpeedCoil.VarSpeedCoilType,
@@ -6111,9 +6109,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
-        if (CompressorOp == CompressorOperation::Off ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0 &&
-             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != DataSizing::AutoSize)) {
+        if (CompressorOp == CompressorOperation::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -7394,9 +7390,7 @@ namespace VariableSpeedCoils {
             return;
         }
 
-        if (CompressorOp == CompressorOperation::Off ||
-            (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0 &&
-             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal != DataSizing::AutoSize)) {
+        if (CompressorOp == CompressorOperation::Off) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
