@@ -237,6 +237,11 @@ struct CoilCoolingDXCurveFitPerformance : public CoilCoolingDXPerformanceBase
         return normalMode.speeds[speed].evap_condenser_effectiveness;
     }
 
+    Real64 EvaporatorAirFlowFractionAtMinSpeed() override
+    {
+        return normalMode.speeds.front().original_input_specs.evaporator_air_flow_fraction;
+    }
+
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     bool mySizeFlag = true;
 

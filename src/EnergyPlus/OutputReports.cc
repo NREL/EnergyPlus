@@ -57,12 +57,12 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DXFEarClipping.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -418,9 +418,9 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
     static constexpr std::string_view Format_709("  0\nCIRCLE\n  8\n{}\n 62\n{:3}\n 10\n{:15.5F}\n 20\n{:15.5F}\n 30\n{:15.5F}\n 40\n{:15.5F}\n");
 
     // Do any daylighting reference points on layer for zone
-    if ((int)state.dataDaylightingData->DaylRefPt.size() > 0) {
-        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDaylightingData->daylightControl.size(); ++daylightCtrlNum) {
-            auto &thisDaylightControl = state.dataDaylightingData->daylightControl(daylightCtrlNum);
+    if ((int)state.dataDayltg->DaylRefPt.size() > 0) {
+        for (int daylightCtrlNum = 1; daylightCtrlNum <= (int)state.dataDayltg->daylightControl.size(); ++daylightCtrlNum) {
+            auto &thisDaylightControl = state.dataDayltg->daylightControl(daylightCtrlNum);
             DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
             std::string refPtType;
             if (thisDaylightControl.DaylightMethod == Dayltg::DaylightingMethod::DElight) {
@@ -429,19 +429,15 @@ static void DXFDaylightingReferencePoints(EnergyPlusData &state, InputOutputFile
                 refPtType = "DayRefPt";
             }
 
-            for (int refpt = 1; refpt <= thisDaylightControl.TotalDaylRefPoints; ++refpt) {
-                print<FormatSyntax::FMT>(of,
-                                         "999\n{}:{}:{}\n",
-                                         thisDaylightControl.ZoneName,
-                                         refPtType,
-                                         state.dataDaylightingData->DaylRefPt(thisDaylightControl.DaylRefPtNum(refpt)).Name);
+            for (auto const &refPt : thisDaylightControl.refPts) {
+                print<FormatSyntax::FMT>(of, "999\n{}:{}:{}\n", thisDaylightControl.ZoneName, refPtType, state.dataDayltg->DaylRefPt(refPt.num).Name);
                 print<check_syntax(Format_709)>(of,
                                                 Format_709,
                                                 normalizeName(thisDaylightControl.ZoneName),
                                                 state.dataSurfColor->DXFcolorno[static_cast<int>(curcolorno)],
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).x,
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).y,
-                                                thisDaylightControl.DaylRefPtAbsCoord(refpt).z,
+                                                refPt.absCoords.x,
+                                                refPt.absCoords.y,
+                                                refPt.absCoords.z,
                                                 0.2);
                 curcolorno = DataSurfaceColors::ColorNo::DaylSensor2; // ref pts 2 and later are this color
             }
@@ -530,7 +526,7 @@ void DXFOut(EnergyPlusData &state,
     print(dxffile, Format_708, "Program Version", ",", state.dataStrGlobals->VerStringVar);
 
     if (PolygonAction.empty()) {
-        print(dxffile, Format_708, "Polygon Action", ",", "ThickPolyline");
+        print(dxffile, Format_708, "Polygon Action", ",", "Triangulate3DFace");
     } else {
         print(dxffile, Format_708, "Polygon Action", ",", PolygonAction);
     }
@@ -626,14 +622,10 @@ void DXFOut(EnergyPlusData &state,
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = DataSurfaceColors::ColorNo::Floor;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = DataSurfaceColors::ColorNo::Door;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::Window)
-                    colorindex = DataSurfaceColors::ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::GlassDoor)
-                    colorindex = DataSurfaceColors::ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Dome)
-                    colorindex = DataSurfaceColors::ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Diffuser)
-                    colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::Window) colorindex = DataSurfaceColors::ColorNo::Window;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::GlassDoor) colorindex = DataSurfaceColors::ColorNo::GlassDoor;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = DataSurfaceColors::ColorNo::TDDDome;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
             }
             if (state.dataSurface->SurfIsPV(surf)) colorindex = DataSurfaceColors::ColorNo::PV;
 
@@ -776,17 +768,18 @@ void DXFOut(EnergyPlusData &state,
     for (int zones = 1; zones <= state.dataGlobal->NumOfZones; ++zones) {
         const DataSurfaceColors::ColorNo curcolorno = DataSurfaceColors::ColorNo::DaylSensor1;
 
-        for (int mapnum = 1; mapnum <= (int)state.dataDaylightingData->IllumMap.size(); ++mapnum) {
-            if (state.dataDaylightingData->IllumMapCalc(mapnum).zoneIndex != zones) continue;
-            for (int refpt = 1; refpt <= state.dataDaylightingData->IllumMapCalc(mapnum).TotalMapRefPoints; ++refpt) {
-                print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, refpt));
+        for (auto const &illumMap : state.dataDayltg->illumMaps) {
+            if (illumMap.zoneIndex != zones) continue;
+            int numRefPt = 0;
+            for (auto const &refPt : illumMap.refPts) {
+                print(dxffile, Format_710, format("{}:MapRefPt:{}", state.dataHeatBal->Zone(zones).Name, ++numRefPt));
                 print(dxffile,
                       Format_709,
                       normalizeName(state.dataHeatBal->Zone(zones).Name),
                       DXFcolorno[static_cast<int>(curcolorno)],
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).x,
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).y,
-                      state.dataDaylightingData->IllumMapCalc(mapnum).MapRefPtAbsCoord(refpt).z,
+                      refPt.absCoords.x,
+                      refPt.absCoords.y,
+                      refPt.absCoords.z,
                       0.05);
             }
         }
@@ -886,14 +879,10 @@ void DXFOutWireFrame(EnergyPlusData &state, std::string const &ColorScheme)
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Floor) colorindex = DataSurfaceColors::ColorNo::Floor;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Door) colorindex = DataSurfaceColors::ColorNo::Door;
             if (thisSurface.Class == DataSurfaces::SurfaceClass::Window) {
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::Window)
-                    colorindex = DataSurfaceColors::ColorNo::Window;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::GlassDoor)
-                    colorindex = DataSurfaceColors::ColorNo::GlassDoor;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Dome)
-                    colorindex = DataSurfaceColors::ColorNo::TDDDome;
-                if (state.dataSurface->SurfWinOriginalClass(surf) == DataSurfaces::SurfaceClass::TDD_Diffuser)
-                    colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::Window) colorindex = DataSurfaceColors::ColorNo::Window;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::GlassDoor) colorindex = DataSurfaceColors::ColorNo::GlassDoor;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Dome) colorindex = DataSurfaceColors::ColorNo::TDDDome;
+                if (thisSurface.OriginalClass == DataSurfaces::SurfaceClass::TDD_Diffuser) colorindex = DataSurfaceColors::ColorNo::TDDDiffuser;
             }
             if (state.dataSurface->SurfIsPV(surf)) colorindex = DataSurfaceColors::ColorNo::PV;
             ++surfcount;

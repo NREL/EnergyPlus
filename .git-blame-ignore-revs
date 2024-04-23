@@ -202,6 +202,50 @@ d3608dbbdce2ee659e9a6d55f4683d2f8d7b05b0
 83e29cd9a81cd098e76bd79b0cc7ce00277c181c
 # 761 files changed, 795 insertions(+), 795 deletions(-)
 
+# Update the license year to 2021 [Jason W. DeGraw, 2021-01-02]
+669aaac766488b51bc0c4fe58e5b1664ee4e61f1
+#    926 files changed, 926 insertions(+), 926 deletions(-)
+
+# Add license to workflows [Jason W. DeGraw, 2021-01-07]
+79c028afaf6471e002800289b35a041287300787
+#    7 files changed, 332 insertions(+), 1 deletion(-)
+
+# Add license to api .py files, skip empty files [Jason W. DeGraw, 2021-01-07]
+84234c0f29bd770d858cfcf4f67f8dc6f96902b3
+#    11 files changed, 448 insertions(+), 4 deletions(-)
+
+# Expand the search scope, add license to more files [Jason W. DeGraw, 2021-01-14]
+d19e62bc7bb73bf9f72fb19ec85387a15bee019e
+#    36 files changed, 1898 insertions(+), 5 deletions(-)
+
+# Merge pull request #8445 from NREL/update-license-year [Edwin Lee, 2021-01-14]
+a9778bafea2ee3e92c6671144fa08d1394f11099
+
+# update license year to 2022 [Matt Mitchell, 2022-01-02]
+5d3c8b45c75dd22205bafe8d0fe05ee922025af6
+#    911 files changed, 4192 insertions(+), 4192 deletions(-)
+
+# Merge pull request #9219 from NREL/update-license-year-2022 [Edwin Lee, 2022-01-03]
+6d809760dc125f5a07348108716f328b5ce46c17
+
+# Update the license year [Jason W. DeGraw, 2023-01-03]
+64b07699758bdf5f8bcd1211338e0428c80684c3
+#    1005 files changed, 1006 insertions(+), 1006 deletions(-)
+
+# Merge pull request #9781 from NREL/update-license-year [Michael J. Witte, 2023-01-04]
+0ff3e33ff6d1d60abcaeb02f021f459840a2faa2
+
+# fix license text and clang-format [Yujie Xu, 2023-03-07]
+4d31ee6fb5c634f309f04d77040950a3c91d87e1
+#    14 files changed, 135 insertions(+), 159 deletions(-)
+
+# Update the license year to 2024 [Jason W. DeGraw, 2024-01-02]
+41b316c883dfa574a1c32310cf96fc1fa9b2d994
+#    1021 files changed, 1022 insertions(+), 1022 deletions(-)
+
+# Merge pull request #10352 from NREL/update-license-year-2024 [Edwin Lee, 2024-01-02]
+6fafbb763fe676012f5db10da7b3e8449f578094
+
 #######################################################################
 #                         S T Y L E    B O T                          #
 #######################################################################
@@ -454,3 +498,10 @@ c8f9fbba47a5425fbb4220285f70d0017f6f65b4
 33b71ed598f37c10e9bfb6492e2a2103ba24e3dd
 # 762 files changed, 397748 insertions(+), 351788 deletions(-)
 
+# `python change_version.py ../../ 9.3 9.4` [chore] [Julien Marrec, 2020-04-10]
+07ff20c0f9d89bde22c8f0b7a9dbbfe716339afd
+#    761 files changed, 795 insertions(+), 795 deletions(-)
+
+# [chore] clang-format the FMI and FMUParser directories, hard to read. [Julien Marrec, 2020-11-24]
+98dbfac765fbcf327681ecb13fb79a368363be9e
+#    26 files changed, 4230 insertions(+), 3938 deletions(-)

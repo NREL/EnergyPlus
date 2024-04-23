@@ -73,7 +73,7 @@ APIDataEntry *getAPIData(EnergyPlusState state, unsigned int *resultingSize)
         std::string name;
         std::string type;
         std::string key;
-        LocalAPIDataEntry(std::string _what, std::string _name, std::string _key, std::string _type)
+        LocalAPIDataEntry(std::string _what, std::string _name, std::string _type, std::string _key)
             : what(std::move(_what)), name(std::move(_name)), type(std::move(_type)), key(std::move(_key))
         {
         }
@@ -221,7 +221,7 @@ void resetErrorFlag(EnergyPlusState state)
     thisState->dataPluginManager->apiErrorFlag = false;
 }
 
-const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
+char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize)
 {
     auto *thisState = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     auto &epjson = thisState->dataInputProcessing->inputProcessor->epJSON;
@@ -232,16 +232,18 @@ const char **getObjectNames(EnergyPlusState state, const char *objectType, unsig
     }
     auto &instancesValue = instances.value();
     *resultingSize = instancesValue.size();
-    auto *data = new const char *[*resultingSize];
+    char **data = new char *[*resultingSize];
     unsigned int i = -1;
     for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
         i++;
-        data[i] = instance.key().data();
+        std::string s = std::string(instance.key().data());
+        data[i] = new char[std::strlen(instance.key().data()) + 1];
+        std::strcpy(data[i], instance.key().data());
     }
     return data;
 }
 
-void freeObjectNames(const char **objectNames, unsigned int arraySize)
+void freeObjectNames(char **objectNames, unsigned int arraySize)
 {
     // as of right now we don't actually need to free the underlying strings, they exist in the epJSON instance, so just delete our array of pointers
     (void)arraySize; // no op to avoid compiler warning that this variable is unused, in the future, this may be needed so keeping it in the API now

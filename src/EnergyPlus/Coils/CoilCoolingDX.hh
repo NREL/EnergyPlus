@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXPerformanceBase.hh>
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -88,7 +89,7 @@ struct CoilCoolingDX
     void oneTimeInit(EnergyPlusData &state);
     void
     simulate(EnergyPlusData &state, int useAlternateMode, int speedNum, Real64 speedRatio, int fanOpMode, bool singleMode, Real64 LoadSHR = -1.0);
-    void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
+    void setData(int fanIndex, DataHVACGlobals::FanType fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,
                       int &condInletNodeIndex,
@@ -127,7 +128,7 @@ struct CoilCoolingDX
     Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
     int supplyFanIndex = 0;
-    int supplyFanType = 0;
+    DataHVACGlobals::FanType supplyFanType = DataHVACGlobals::FanType::Invalid;
     std::string supplyFanName = "";
     bool SubcoolReheatFlag = false; // Subcool reheat coil control
 

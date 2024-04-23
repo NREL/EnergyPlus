@@ -8,6 +8,9 @@ target_compile_definitions(
         INTERFACE
         JSON_USE_IMPLICIT_CONVERSIONS=1
 )
+if(NOT MSVC)  # This is really only needed with newer Clang, but gcc is fine with it
+  target_compile_options(nlohmann_json INTERFACE -Wno-deprecated-declarations)
+endif()
 target_include_directories(
         nlohmann_json
         SYSTEM INTERFACE
@@ -156,6 +159,7 @@ set_target_properties(re2 PROPERTIES FOLDER ThirdParty/re2)
 add_subdirectory(fmt-8.0.1)
 target_compile_definitions(fmt PRIVATE FMT_USE_FULL_CACHE_DRAGONBOX=1)
 set_target_properties(fmt PROPERTIES FOLDER ThirdParty/fmt)
+mark_as_advanced(FORCE FMT_SYSTEM_HEADERS)
 
 add_subdirectory(cpgfunctionEP)
 set_target_properties(cpgfunctionEP PROPERTIES FOLDER ThirdParty/cpgfunctionEP)
@@ -192,6 +196,9 @@ set(BUILD_BTWXT_TESTING
     CACHE BOOL "" FORCE)
 add_subdirectory(btwxt)
 set_target_properties(btwxt PROPERTIES FOLDER ThirdParty/Btwxt)
+mark_as_advanced(FORCE btwxt_STATIC_LIB)
+mark_as_advanced(FORCE btwxt_COVERAGE)
+mark_as_advanced(FORCE btwxt_BUILD_TESTING)
 
 if(OPENGL_FOUND)
   set(BUILD_PENUMBRA_TESTING
@@ -202,6 +209,8 @@ if(OPENGL_FOUND)
   set_target_properties(glad PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(penumbra PROPERTIES FOLDER ThirdParty/Penumbra)
   set_target_properties(tess2 PROPERTIES FOLDER ThirdParty/Penumbra)
+  mark_as_advanced(FORCE penumbra_STATIC_LIB)
+  mark_as_advanced(FORCE penumbra_COVERAGE)
 endif()
 
 # libtk205
@@ -212,3 +221,7 @@ set(libtk205_USE_SUBMODULES
         OFF
         CACHE BOOL "" FORCE)
 add_subdirectory(libtk205)
+mark_as_advanced(FORCE libtk205_STATIC_LIB)
+mark_as_advanced(FORCE libtk205_COVERAGE)
+mark_as_advanced(FORCE libtk205_BUILD_TESTING)
+

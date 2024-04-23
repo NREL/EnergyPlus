@@ -2674,6 +2674,7 @@
     ,                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation {m3/s-W}
     ,                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     80;                      !- Maximum Supply Air Temperature {C}
 
   Coil:Heating:Fuel,
@@ -2736,12 +2737,8 @@
     autosize,                !- Nominal Supply Air Flow Rate {m3/s}
     0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.70000,                 !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0.650000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.70000,                 !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0.650000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     Main Cooling Coil 1 Inlet Node,  !- Supply Air Inlet Node Name
     Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name
     Heat Recovery Exhuast Inlet Node,  !- Exhaust Air Inlet Node Name
@@ -2753,7 +2750,11 @@
     1.7,                     !- Threshold Temperature {C}
     0.083,                   !- Initial Defrost Time Fraction {dimensionless}
     0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}
-    Yes;                     !- Economizer Lockout
+    Yes,                     !- Economizer Lockout
+    ,                        !- Sensible Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Latent Effectiveness of Heating Air Flow Curve Name
+    ,                        !- Sensible Effectiveness of Cooling Air Flow Curve Name
+    ;                        !- Latent Effectiveness of Cooling Air Flow Curve Name
 
   Coil:Cooling:DX:VariableSpeed,
     Main Cooling Coil 1,     !- Name

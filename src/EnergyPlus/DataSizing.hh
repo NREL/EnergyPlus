@@ -120,6 +120,7 @@ namespace DataSizing {
     // parameters for sizing
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
+    constexpr int Combination(3);
 
     // parameters for Cooling Peak Load Type
     enum class PeakLoad
@@ -258,15 +259,6 @@ namespace DataSizing {
     constexpr int GlobalHeatingSizingFactorMode(102);
     constexpr int GlobalCoolingSizingFactorMode(103);
     constexpr int LoopComponentSizingFactorMode(104);
-
-    enum class ZoneFanPlacement
-    {
-        Invalid = -1,
-        NotSet,
-        BlowThru,
-        DrawThru,
-        Num
-    };
 
     enum class ZoneSizing
     {
@@ -654,6 +646,16 @@ namespace DataSizing {
         Real64 applyTermUnitSizingHeatFlow(Real64 heatFlowWithOA, // Heating flow rate with MinOA limit applied
                                            Real64 heatFlowNoOA    // Heating flow rate without MinOA limit applied
         );
+
+        Real64 applyTermUnitSizingCoolLoad(Real64 coolLoad) const
+        {
+            return coolLoad * this->SpecDesSensCoolingFrac; // Apply DesignSpecification:AirTerminal:Sizing to cooling load
+        }
+
+        Real64 applyTermUnitSizingHeatLoad(Real64 heatLoad) const
+        {
+            return heatLoad * this->SpecDesSensHeatingFrac; // Apply DesignSpecification:AirTerminal:Sizing to heating load
+        }
     };
 
     struct ZoneEqSizingData // data saved from zone eq component sizing and passed to subcomponents
@@ -1258,7 +1260,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                       // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                             // Fan type used during sizing
     int DataFanIndex = -1;                                // Fan index used during sizing
-    DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
+    DataHVACGlobals::FanPlace DataFanPlacement = DataHVACGlobals::FanPlace::Invalid; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     int DataCoolCoilType = -1;
     int DataCoolCoilIndex = -1;

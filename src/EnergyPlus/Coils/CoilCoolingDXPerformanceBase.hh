@@ -218,6 +218,11 @@ struct CoilCoolingDXPerformanceBase
     {
         return 0.0;
     }
+
+    virtual Real64 EvaporatorAirFlowFractionAtMinSpeed()
+    {
+        return 0.0;
+    }
 };
 
 } // namespace EnergyPlus
