@@ -2494,6 +2494,11 @@ namespace Curve {
 
                 if (normalizeMethod != NM_NONE && fields.count("normalization_divisor")) {
                     normalizationDivisor = fields.at("normalization_divisor").get<Real64>();
+                    if (std::abs(normalizationDivisor) < std::numeric_limits<Real64>::min()) {
+                        ShowSevereError(
+                            state, format("Table:Lookup named \"{}\": Normalization divisor entered as zero, which is invalid", thisCurve->Name));
+                        ErrorsFound = true;
+                    }
                 }
 
                 std::vector<double> lookupValues;
@@ -2723,8 +2728,8 @@ namespace Curve {
                                     format("Performance Curve Input Variable {} Value", numStr),
                                     Constant::Units::None,
                                     thisCurve->inputs[dim - 1],
-                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     thisCurve->Name);
             }
             // set the output up last so it shows up after the input in the csv file
@@ -2732,8 +2737,8 @@ namespace Curve {
                                 "Performance Curve Output Value",
                                 Constant::Units::None,
                                 thisCurve->output,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisCurve->Name);
         }
 
@@ -2742,29 +2747,29 @@ namespace Curve {
                                 "Performance Curve Input Variable 1 Value",
                                 Constant::Units::None,
                                 thisPressCurve.CurveInput1,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 2 Value",
                                 Constant::Units::None,
                                 thisPressCurve.CurveInput2,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Input Variable 3 Value",
                                 Constant::Units::None,
                                 thisPressCurve.CurveInput3,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
             SetupOutputVariable(state,
                                 "Performance Curve Output Value",
                                 Constant::Units::None,
                                 thisPressCurve.CurveOutput,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPressCurve.Name);
         }
 
