@@ -3326,7 +3326,6 @@ namespace WindowComplexManager {
             // IF(ShadeFlag <= 0) THEN
             // TransDiff = Construct(ConstrNum).TransDiff;
             int IState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.NumStates;
-            // Real64 TransDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinDiffTrans;
             Real64 ReflDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinBkHemRefl;
             // ELSE IF(ShadeFlag==WinShadingType::IntShade .OR. ShadeFlag==WinShadingType::ExtShade) THEN
             //  TransDiff = Construct(ConstrNum)%TransDiff

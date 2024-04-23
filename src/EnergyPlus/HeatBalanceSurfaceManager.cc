@@ -8118,7 +8118,7 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
                     state.dataSurface->SurfWinTransSolar(SurfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) +
                     state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) -
                     surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum);
-                // Net ransmitted solar | Convection | IR exchange | IR
+                // Net transmitted solar | Convection | IR exchange | IR
                 // Zone diffuse interior shortwave reflected back into the TDD
 
             } else {                                                // Regular window
@@ -8807,7 +8807,7 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state.dataSurface->SurfWinTransSolar(surfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) +
                             state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) -
                             surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(surfNum);
-                        // Net ransmitted solar | Convection | IR exchange | IR
+                        // Net transmitted solar | Convection | IR exchange | IR
                         // Zone diffuse interior shortwave reflected back into the TDD
                     } else {                                                // Regular window
                         if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once

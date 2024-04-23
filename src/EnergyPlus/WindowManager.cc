@@ -3841,37 +3841,30 @@ namespace WindowManager {
             int const ConstrNum = state.dataSurface->SurfActiveConstruction(SurfNum);
             int const ConstrNumSh = state.dataSurface->SurfWinActiveShadedConstruction(SurfNum);
 
-            // Real64 TransDiff = 0.0; // Diffuse shortwave transmittance
-            //  TransDiff = state.dataConstruction->Construct(ConstrNum).TransDiff; // Default value for TransDiff here
-            Real64 TransRefl = 0.0; // Diffuse shortwave back reflectance
+            Real64 reflDiff = 0.0; // Diffuse shortwave back reflectance
             if (NOT_SHADED(ShadeFlag)) {
-                TransRefl = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
+                reflDiff = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
             } else if (ANY_SHADE_SCREEN(ShadeFlag)) {
-                TransRefl = state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack;
+                reflDiff = state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack;
             } else if (ANY_BLIND(ShadeFlag)) {
                 if (state.dataSurface->SurfWinMovableSlats(SurfNum)) {
-                    // TransDiff =
-                    //     General::Interp(state.dataConstruction->Construct(ConstrNumSh).BlTransDiff(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
-                    //                     state.dataConstruction->Construct(ConstrNumSh)
-                    //                         .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
-                    //                     state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
-                    TransRefl = General::Interp(
+                    reflDiff = General::Interp(
                         state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(state.dataSurface->SurfWinSlatsAngIndex(SurfNum)),
                         state.dataConstruction->Construct(ConstrNumSh)
                             .BlTransDiff(std::min(Material::MaxSlatAngs, state.dataSurface->SurfWinSlatsAngIndex(SurfNum) + 1)),
                         state.dataSurface->SurfWinSlatsAngInterpFac(SurfNum));
                 } else {
-                    TransRefl = state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(1);
+                    reflDiff = state.dataConstruction->Construct(ConstrNumSh).BlReflectSolDiffBack(1);
                 }
             } else if (ShadeFlag == WinShadingType::SwitchableGlazing) {
-                TransRefl = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
-                                     state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack,
-                                     state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack);
+                reflDiff = InterpSw(state.dataSurface->SurfWinSwitchingFactor(SurfNum),
+                                    state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack,
+                                    state.dataConstruction->Construct(ConstrNumSh).ReflectSolDiffBack);
             }
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                    (1 - TransRefl) +
+                    (1 - reflDiff) +
                 state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
             state.dataSurface->SurfWinHeatGain(SurfNum) -=
                 (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +

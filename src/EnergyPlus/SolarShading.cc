@@ -7461,9 +7461,9 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 int ConstrNumBackShRaw = state.dataSurface->SurfWinActiveShadedConstruction(BackSurfNum);
                                 int const ConstrNumBackSh = ConstrNumBackShRaw == 0 ? ConstrNumBack : ConstrNumBackShRaw;
                                 state.dataSolarShading->SurfWinAbsBeam.dimension(state.dataHeatBal->MaxSolidWinLayers, 0.0);
-                                Real64 TransBeamWin = 0.0;  // Beam solar transmittance of a window
-                                Real64 AbsBeamTotWin = 0.0; // Sum of window glass layer beam solar absorptances
-                                Real64 backSurfBeamSolInTrans = 0.0;
+                                Real64 TransBeamWin = 0.0;           // Beam solar transmittance of a window
+                                Real64 AbsBeamTotWin = 0.0;          // Sum of window glass layer beam solar absorptances
+                                Real64 backSurfBeamSolInTrans = 0.0; // Fraction of BeamSolarRad transmitted out through window inside face [W]
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                 // or interior window WITHOUT SHADING this timestep
@@ -7492,7 +7492,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                     BABSZone += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
-                                    backSurfBeamSolInTrans += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade; //[W]
+                                    backSurfBeamSolInTrans += BOverlap * state.dataConstruction->Construct(ConstrNumBackSh).AbsDiffBackShade;
                                 } else if (ShadeFlagBack ==
                                            WinShadingType::ExtShade) { // Interior beam absorbed by EXTERIOR SHADE of back exterior window
                                     Real64 RGlFront = state.dataConstruction->Construct(ConstrNumBack).ReflectSolDiffFront;
@@ -7504,7 +7504,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 AShBack = POLYF(CosIncBack, state.dataConstruction->Construct(ConstrNumBack).TransSolBeamCoef) * AbsSh /
                                                      (1.0 - RGlFront * RhoSh);
                                     BABSZone += BOverlap * AShBack;
-                                    backSurfBeamSolInTrans += BOverlap * AShBack; //[W]
+                                    backSurfBeamSolInTrans += BOverlap * AShBack;
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AShBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -7538,7 +7538,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AShBack / state.dataSurface->Surface(BackSurfNum).Area;
                                     BABSZone += BOverlap * AShBack;
-                                    backSurfBeamSolInTrans += BOverlap * AShBack; //[W]
+                                    backSurfBeamSolInTrans += BOverlap * AShBack;
                                 }
 
                                 // Interior beam absorptance of glass layers and beam absorbed in blind
@@ -7665,7 +7665,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                             BOverlap * ABlBack /
                                             (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
                                         BABSZone += BOverlap * ABlBack;
-                                        backSurfBeamSolInTrans += BOverlap * ABlBack; //[W]
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
 
                                     } else if (ShadeFlagBack == WinShadingType::ExtBlind) {
 
@@ -7729,7 +7729,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                                     TBlDifDif * RhoBlBmDifBk * RGlDifFr / (1.0 - RhoBlDifDifBk * RGlDifFr));
                                         // Interior beam absorbed by EXTERIOR BLIND on exterior back window
                                         BABSZone += BOverlap * ABlBack;
-                                        backSurfBeamSolInTrans += BOverlap * ABlBack; //[W]
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
                                         state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                             BOverlap * ABlBack /
                                             (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -7893,7 +7893,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         }
 
                                         BABSZone += BOverlap * ABlBack;
-                                        backSurfBeamSolInTrans += BOverlap * ABlBack; //[W]
+                                        backSurfBeamSolInTrans += BOverlap * ABlBack;
                                         state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                             BOverlap * ABlBack / state.dataSurface->Surface(BackSurfNum).Area;
 
@@ -7938,7 +7938,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         (AbsScBack + RScBack * RGlDiffFront * AbsScDiffBack /
                                                          (1.0 - RScDiffBack * RGlDiffFront)); // Screen solar back absorptance for interior solar
                                     BABSZone += BOverlap * AScBack;
-                                    backSurfBeamSolInTrans += BOverlap * AScBack; //[W]
+                                    backSurfBeamSolInTrans += BOverlap * AScBack;
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AScBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
@@ -8186,8 +8186,8 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 //  Note in equivalent layer window model if storm window exists it is defined as part of
                                 //  window construction, hence it does not require a separate treatment
                                 state.dataSolarShading->SurfWinAbsBeamEQL = 0.0;
-                                Real64 TransBeamWin = 0.0; // Beam solar transmittance of a window
-                                Real64 backSurfBeamSolInTrans = 0.0;
+                                Real64 TransBeamWin = 0.0;           // Beam solar transmittance of a window
+                                Real64 backSurfBeamSolInTrans = 0.0; // Fraction of BeamSolarRad transmitted out through window inside face [W]
 
                                 // Interior beam absorptance of glass layers and beam transmittance of back exterior  &
                                 // or interior window (treates windows with/without shades as defined) for this timestep
@@ -12142,8 +12142,7 @@ void CalcWinTransDifSolInitialDistribution(EnergyPlusData &state)
                             // Transmitted diffuse solar [W] = current exterior window transmitted diffuse solar
                             //    * view factor from current (sending) window DifTransSurfNum to current
                             //    (receiving) surface HeatTransSurfNum
-                            Real64 DifSolarTransW; // temp var for diffuse solar transmitted through interior window surface [W]
-                            DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
+                            Real64 DifSolarTransW = AbsSolDiffBackEQL(2, state.dataWindowEquivLayer->CFS(EQLNum).NL + 1) * ViewFactor;
                             // int AdjConstrNum = Surface(AdjSurfNum).Construction;
                             // Get the adjacent zone index
                             int adjEnclosureNum = state.dataSurface->Surface(AdjSurfNum).SolarEnclIndex;
