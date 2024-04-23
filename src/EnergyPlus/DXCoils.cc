@@ -14913,12 +14913,16 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
           SupAirMdot_TestPoint(3),
           SupAirMdot_TestPoint(4));
 
-    static constexpr std::string_view Format_994(
-        "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-        "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
-        "IEER "
-        "{Btu/W-h}");
-    print(state.files.eio, "{}\n", Format_994);
+    if (state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag) {
+
+        static constexpr std::string_view Format_994(
+            "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+            "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, "
+            "IEER "
+            "{Btu/W-h}");
+        print(state.files.eio, "{}\n", Format_994);
+        state.dataHVACGlobal->StandardRatingsMyCoolOneTimeFlag = false;
+    }
     static constexpr std::string_view Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {}, {}, {}\n");
     print(state.files.eio,
           Format_995,
