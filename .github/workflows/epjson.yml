@@ -34,7 +34,7 @@ jobs:
           echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
           choco install ninja
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          export MACOSX_DEPLOYMENT_TARGET=12.1
+          echo MACOSX_DEPLOYMENT_TARGET=12.1 >> $GITHUB_ENV
         fi;
         pip install pytest pytest-timeout
 
