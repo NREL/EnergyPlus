@@ -176,10 +176,6 @@ jobs:
     needs: build_installer_artifact
     runs-on: windows-2019
 
-    permissions:
-      # Needed permission to upload the release asset
-      contents: write
-
     steps:
       - uses: actions/checkout@v3  # Still need E+ checked out to get testing scripts
         with:

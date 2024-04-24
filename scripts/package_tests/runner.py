@@ -55,7 +55,7 @@
 
 
 import argparse
-from os import chdir, devnull, scandir
+from os import chdir, devnull, scandir, getcwd
 from pathlib import Path
 from re import search
 from shutil import rmtree
@@ -66,8 +66,144 @@ this_file_path = Path(__file__).resolve()
 package_test_root_dir = this_file_path.parent
 path.insert(0, str(package_test_root_dir))
 
-from ep_testing.config import CONFIGURATIONS, TestConfiguration, OS
-from ep_testing.tester import Tester
+from ep_testing.tests.api import TestPythonAPIAccess, TestCAPIAccess, TestCppAPIDelayedAccess
+from ep_testing.tests.energyplus import TestPlainDDRunEPlusFile
+from ep_testing.tests.expand_objects import TestExpandObjectsAndRun
+from ep_testing.tests.hvacdiagram import HVACDiagram
+from ep_testing.tests.transition import TransitionOldFile
+
+
+class OS:
+    Windows = 1
+    Linux = 2
+    Mac = 3
+
+
+CONFIGURATIONS = {
+    'ubuntu2004': {
+        'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu20.04-x86_64.tar.gz', 'os_version': '20.04'
+    },
+    'ubuntu2204': {
+        'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu22.04-x86_64.tar.gz', 'os_version': '22.04'
+    },
+    'mac11': {
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.6'
+    },
+    'mac12': {
+        'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
+    },
+    'mac12-arm64': {
+        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS12.1-arm64.tar.gz', 'os_version': '12'
+    },
+    'mac13-arm64': {
+        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS13-arm64.tar.gz', 'os_version': '13'
+    },
+    'win32': {
+        'os': OS.Windows, 'bitness': 'x32', 'asset_pattern': 'Windows-i386.zip', 'os_version': '10'
+    },
+    'win64': {
+        'os': OS.Windows, 'bitness': 'x64', 'asset_pattern': 'Windows-x86_64.zip', 'os_version': '10'
+    },
+    'win64-2022server': {
+        'os': OS.Windows, 'bitness': 'x64', 'asset_pattern': 'Windows-x86_64.zip', 'os_version': '2022'
+    },
+}
+
+
+class TestRunner:
+
+    def __init__(self, run_config_key: str, this_version: str, last_version: str, last_tag: str, msvc_version=None):
+
+        # invalid keys are protected in the command's finalize_options method
+        this_config = CONFIGURATIONS[run_config_key]
+        self.os_version = this_config['os_version']
+        self.os = this_config['os']
+        self.msvc_version = None
+        if msvc_version in ['16', '17', '18']:
+            self.msvc_version = msvc_version
+        elif self.os == OS.Windows and self.os_version == '2022':
+            self.msvc_version = 17
+        elif self.os == OS.Windows:
+            self.msvc_version = 16
+        self.asset_pattern = this_config['asset_pattern']
+        self.bitness = this_config['bitness']
+
+        self.this_version = this_version
+        # self.tag_this_version = 'v24.1.0-RC2'
+        self.last_version = last_version
+        self.tag_last_version = last_tag
+
+    def find_and_extract_package(self, artifact_folder: Path) -> str:
+        extract_path = Path.cwd() / 'ep_package'
+        saved_working_directory = Path.cwd()
+        chdir(artifact_folder)
+        package_file_name = str(list(artifact_folder.rglob('*'))[0])
+        if self.os == OS.Linux:
+            # tar -xzf ep.tar.gz -C ep_package
+            extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
+        elif self.os == OS.Mac:
+            # tar -xzf ep.tar.gz -C ep_package
+            extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
+        else:  # if config.os == OS.Windows:
+            # 7z x ep.zip -oep_package
+            extract_command = ['7z.exe', 'x', package_file_name, '-o' + str(extract_path)]
+        if extract_path.exists():
+            rmtree(extract_path)
+        try:
+            extract_path.mkdir(parents=True)
+        except Exception as e:
+            raise Exception('Could not create extraction path at %s; error: %s' % (extract_path, str(e)))
+        try:
+            print("Extracting asset...")
+            dev_null = open(devnull, 'w')
+            check_call(extract_command, stdout=dev_null, stderr=STDOUT)
+            print(" ...Extraction Complete")
+        except CalledProcessError as e:
+            raise Exception("Extraction failed with this error: " + str(e))
+        # should result in a single new directory inside the extract path, like: /extract/path/EnergyPlus-V1-abc-Linux
+        all_sub_folders = [f.path for f in scandir(extract_path) if f.is_dir()]
+        if len(all_sub_folders) > 1:
+            raise Exception('Extracted EnergyPlus package has more than one directory, problem.')
+        chdir(saved_working_directory)
+        return all_sub_folders[0]
+
+
+    def run_all_tests(self, install_path_path: Path, verbose: bool) -> int:
+        saved_path = getcwd()
+        install_path = str(install_path_path)
+        TestPlainDDRunEPlusFile().run(
+            install_path, verbose, {'test_file': '1ZoneUncontrolled.idf'}
+        )
+        TestPlainDDRunEPlusFile().run(
+            install_path, verbose, {'test_file': 'PythonPluginCustomOutputVariable.idf'}
+        )
+        TestExpandObjectsAndRun().run(
+            install_path, verbose, {'test_file': 'HVACTemplate-5ZoneFanCoil.idf'}
+        )
+        TransitionOldFile().run(
+            install_path, verbose, {'last_version': self.tag_last_version}
+        )
+        HVACDiagram().run(
+            install_path, verbose, {}
+        )
+        if self.os == OS.Windows:
+            print("Windows Symlink runs are not testable on Travis, I think the user needs symlink privilege.")
+        else:
+            TestPlainDDRunEPlusFile().run(
+                install_path, verbose, {'test_file': '1ZoneUncontrolled.idf', 'binary_sym_link': True}
+            )
+        TestCAPIAccess().run(
+            install_path, verbose, {'os': self.os, 'bitness': self.bitness, 'msvc_version': self.msvc_version}
+        )
+        TestCppAPIDelayedAccess().run(
+            install_path, verbose, {'os': self.os, 'bitness': self.bitness, 'msvc_version': self.msvc_version}
+        )
+        if self.bitness == 'x32':
+            print("Travis does not have a 32-bit Python package readily available, so not testing Python API")
+        else:
+            TestPythonAPIAccess().run(install_path, verbose, {'os': self.os})
+        chdir(saved_path)
+        return 0  # do better?
 
 
 def get_version_info() -> tuple:
@@ -85,50 +221,8 @@ def get_version_info() -> tuple:
     return this_version, last_version, last_tag
 
 
-def find_and_extract_package(config: TestConfiguration, artifact_folder: Path) -> str:
-    extract_path = Path.cwd() / 'ep_package'
-    saved_working_directory = Path.cwd()
-    chdir(artifact_folder)
-    package_file_name = str(list(artifact_folder.rglob('*'))[0])
-    if config.os == OS.Linux:
-        # tar -xzf ep.tar.gz -C ep_package
-        extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
-    elif config.os == OS.Mac:
-        # tar -xzf ep.tar.gz -C ep_package
-        extract_command = ['tar', '-xzf', package_file_name, '-C', str(extract_path)]
-    else:  # if config.os == OS.Windows:
-        # 7z x ep.zip -oep_package
-        extract_command = ['7z.exe', 'x', package_file_name, '-o' + str(extract_path)]
-    if extract_path.exists():
-        rmtree(extract_path)
-    try:
-        extract_path.mkdir(parents=True)
-    except Exception as e:
-        raise Exception('Could not create extraction path at %s; error: %s' % (extract_path, str(e)))
-    try:
-        print("Extracting asset...")
-        dev_null = open(devnull, 'w')
-        check_call(extract_command, stdout=dev_null, stderr=STDOUT)
-        print(" ...Extraction Complete")
-    except CalledProcessError as e:
-        raise Exception("Extraction failed with this error: " + str(e))
-    # should result in a single new directory inside the extract path, like: /extract/path/EnergyPlus-V1-abc-Linux
-    all_sub_folders = [f.path for f in scandir(extract_path) if f.is_dir()]
-    if len(all_sub_folders) > 1:
-        raise Exception('Extracted EnergyPlus package has more than one directory, problem.')
-    chdir(saved_working_directory)
-    return all_sub_folders[0]
-
-
-def run(config: str, this: str, last: str, last_tag: str, package_dir: Path, msvc: str, verbose: bool) -> int:
-    c = TestConfiguration(config, this, last, last_tag, msvc)
-    extracted_package_dir = find_and_extract_package(c, package_dir)
-    t = Tester(c, Path(extracted_package_dir), verbose)
-    t.run()
-    return 0  # TODO: be better about the exit code
-
-
 def main() -> int:
+    # Handle some command line arguments
     parser = argparse.ArgumentParser(description="Run Package Tests on EnergyPlus")
     arg = parser.add_argument  # readability
     arg('config', choices=CONFIGURATIONS.keys(), help="Specify the run configuration")
@@ -136,11 +230,17 @@ def main() -> int:
     arg('--msvc', type=str, default='', help="For MSVC builds, this is the VS 'year', like '2022'")
     arg('--verbose', action='store_true', help="If specified, get verbose output")
     args = parser.parse_args()
+    # Dynamically get the version information instead of hard-coding it
     this, last, last_tag = get_version_info()
+    # Validate the path and prepare it for operations
     tentative_path = Path(args.package_dir)
-    p = tentative_path if tentative_path.is_absolute() else Path(Path.cwd()) / tentative_path
-    r = run(args.config, this, last, last_tag, p, args.msvc, args.verbose)
-    return r
+    raw_artifact_path = tentative_path if tentative_path.is_absolute() else Path(Path.cwd()) / tentative_path
+    # Instantiate the runner class based on the command line arguments
+    runner = TestRunner(args.config, this, last, last_tag, args.msvc)
+    # Extract the package using the runner utility
+    extracted_package_dir = runner.find_and_extract_package(raw_artifact_path)
+    # Run all tests and return an exit code
+    return runner.run_all_tests(Path(extracted_package_dir), args.verbose)
 
 
 if __name__ == "__main__":
