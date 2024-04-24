@@ -155,8 +155,5 @@ jobs:
         working-directory: package
         run: ls
 
-      #      - name: Setup tmate session
-      #        uses: mxschmitt/action-tmate@v3
-
       - name: Run Package Tests
         run: python checkout/scripts/package_tests/runner.py --verbose ${{ matrix.test_key }} package/
