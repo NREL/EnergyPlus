@@ -61,7 +61,6 @@ import subprocess
 from tempfile import mkdtemp, mkstemp
 from typing import List
 
-from ep_testing.config import OS
 from ep_testing.tests.base import BaseTest
 
 
@@ -129,9 +128,9 @@ class TestPythonAPIAccess(BaseTest):
             #    py = 'C:\\Python36\\Python.exe'
             py = sys.executable
             my_env = os.environ.copy()
-            if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
+            if platform.system() == 'Windows':  # my local comp didn't have cmake in path except in interact shells
                 my_env["PATH"] = install_root + ";" + my_env["PATH"]
-            if self.os == OS.Mac:
+            if platform.system() == 'Darwin':
                 # while it runs OK locally, for some reason on GHA, running a Plugin file from the Python API seg-faults
                 idf_to_run = os.path.join(install_root, 'ExampleFiles', '1ZoneUncontrolled.idf')
             else:
@@ -143,14 +142,14 @@ class TestPythonAPIAccess(BaseTest):
             raise e
 
 
-def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, this_os: int, bitness: str, msvc_version: int):
+def make_build_dir_and_build(cmake_build_dir: str, verbose: bool, bitness: str, msvc_version: int):
     try:
         os.makedirs(cmake_build_dir)
         my_env = os.environ.copy()
-        if this_os == OS.Mac:  # my local comp didn't have cmake in path except in interact shells
+        if platform.system() == 'Darwin':  # my local comp didn't have cmake in path except in interact shells
             my_env["PATH"] = "/usr/local/bin:" + my_env["PATH"]
         command_line = ['cmake', '..']
-        if this_os == OS.Windows:
+        if platform.system() == 'Windows':
             if bitness not in ['x32', 'x64']:
                 raise Exception('Bad bitness sent to make_build_dir_and_build, should be x32 or x64')
             if msvc_version == 15:
@@ -248,10 +247,10 @@ class TestCAPIAccess(BaseTest):
             f.write(self._api_fixup_content())
         print(' [FIXUP CMAKE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.bitness, self.msvc_version)
         try:
             new_binary_path = os.path.join(cmake_build_dir, self.target_name)
-            if self.os == OS.Windows:  # override the path/name for Windows
+            if platform.system() == 'Windows':  # override the path/name for Windows
                 new_binary_path = os.path.join(cmake_build_dir, 'Release', self.target_name + '.exe')
             command_line = [new_binary_path]
             my_check_call(self.verbose, command_line, cwd=install_root)
@@ -323,13 +322,13 @@ class TestCppAPIDelayedAccess(BaseTest):
             f.write(self._api_cmakelists_content())
         print(' [CMAKE FILE WRITTEN] ', end='')
         cmake_build_dir = os.path.join(build_dir, 'build')
-        make_build_dir_and_build(cmake_build_dir, self.verbose, self.os, self.bitness, self.msvc_version)
+        make_build_dir_and_build(cmake_build_dir, self.verbose, self.bitness, self.msvc_version)
         if platform.system() == 'Windows':
             built_binary_path = os.path.join(cmake_build_dir, 'Release', 'TestCAPIAccess')
         else:
             built_binary_path = os.path.join(cmake_build_dir, 'TestCAPIAccess')
         my_env = os.environ.copy()
-        if self.os == OS.Windows:  # my local comp didn't have cmake in path except in interact shells
+        if platform.system() == 'Windows':  # my local comp didn't have cmake in path except in interact shells
             my_env["PATH"] = install_root + ";" + my_env["PATH"]
         try:
             my_check_call(self.verbose, [built_binary_path], env=my_env)

@@ -158,8 +158,5 @@ jobs:
       #      - name: Setup tmate session
       #        uses: mxschmitt/action-tmate@v3
 
-      - name: Add Package Test Dir to PYTHONPATH
-        run: echo "PYTHONPATH=checkout/scripts/package_tests" >> $GITHUB_ENV
-
       - name: Run Package Tests
         run: python checkout/scripts/package_tests/runner.py --verbose ${{ matrix.test_key }} package/
