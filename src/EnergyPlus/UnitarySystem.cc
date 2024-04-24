@@ -1034,13 +1034,6 @@ namespace UnitarySystems {
             } // from IF(UnitarySystem(UnitarySysNum)%HeatingCoilType_Num == Coil_HeatingSteam) THEN
             if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
 
-                // set air-side mass flow rate
-                Real64 saveCoilAirflow = state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate;
-                if (this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat && state.dataUnitarySystems->MoistureLoad < 0.0) {
-                    state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate = this->MaxCoolAirMassFlow;
-                } else {
-                    state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate = this->MaxHeatAirMassFlow;
-                }
                 //     set steam-side mass flow rates
                 Real64 mdot = this->m_MaxSuppCoilFluidFlow;
                 PlantUtilities::SetComponentFlowRate(
@@ -1057,7 +1050,6 @@ namespace UnitarySystems {
                 } else {
                     this->m_DesignSuppHeatingCapacity = 0.0;
                 }
-                state.dataLoopNodes->Node(this->m_SuppCoilAirInletNode).MassFlowRate = saveCoilAirflow;
 
             } // from IF(UnitarySystem(UnitarySysNum)%SuppHeatCoilType_Num == Coil_HeatingWater) THEN
 
@@ -12178,45 +12170,35 @@ namespace UnitarySystems {
                                                         this->m_SuppHeatPartLoadFrac);
         } break;
         case DataHVACGlobals::Coil_HeatingWater: {
-            // if (present(SuppCoilLoad)) {
+            // see if HW coil has enough capacity to meet the load
             if (SuppHeatCoilLoad > 0.0) {
-                // see if HW coil has enough capacity to meet the load
                 mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail, this->m_MaxSuppCoilFluidFlow);
-                state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-                //     simulate water coil to find operating capacity
-                WaterCoils::SimulateWaterCoilComponents(state,
-                                                        this->m_SuppHeatCoilName,
-                                                        FirstHVACIteration,
-                                                        this->m_SuppHeatCoilIndex,
-                                                        QActual,
-                                                        this->m_FanOpMode,
-                                                        this->m_SuppHeatPartLoadFrac);
-                if (QActual > SuppHeatCoilLoad) {
-                    auto f = [&state, this, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
-                        Real64 mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
-                                          this->m_MaxSuppCoilFluidFlow * PartLoadFrac);
-                        state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-                        WaterCoils::SimulateWaterCoilComponents(
-                            state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex, 0.0, this->m_FanOpMode, PartLoadFrac);
-                        return SuppHeatCoilLoad;
-                    };
-                    int SolFla; // Flag of solver, num iterations if >0, else error index
-                    General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
-                    this->m_SuppHeatPartLoadFrac = PartLoadFrac;
-                } else {
-                    this->m_SuppHeatPartLoadFrac = 1.0;
-                }
             } else {
                 mdot = 0.0;
-                state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
-                //     simulate water coil to find operating capacity
-                WaterCoils::SimulateWaterCoilComponents(state,
-                                                        this->m_SuppHeatCoilName,
-                                                        FirstHVACIteration,
-                                                        this->m_SuppHeatCoilIndex,
-                                                        QActual,
-                                                        this->m_FanOpMode,
-                                                        this->m_SuppHeatPartLoadFrac);
+            }
+            state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
+            //     simulate water coil to find operating capacity
+            WaterCoils::SimulateWaterCoilComponents(state,
+                                                    this->m_SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    this->m_SuppHeatCoilIndex,
+                                                    QActual,
+                                                    this->m_FanOpMode,
+                                                    this->m_SuppHeatPartLoadFrac);
+            if (QActual > SuppHeatCoilLoad) {
+                auto f = [&state, this, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
+                    Real64 mdot = min(state.dataLoopNodes->Node(this->m_SuppCoilFluidOutletNodeNum).MassFlowRateMaxAvail,
+                                      this->m_MaxSuppCoilFluidFlow * PartLoadFrac);
+                    state.dataLoopNodes->Node(this->m_SuppCoilFluidInletNode).MassFlowRate = mdot;
+                    WaterCoils::SimulateWaterCoilComponents(
+                        state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex, 0.0, this->m_FanOpMode, PartLoadFrac);
+                    return SuppHeatCoilLoad;
+                };
+                int SolFla; // Flag of solver, num iterations if >0, else error index
+                General::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
+                this->m_SuppHeatPartLoadFrac = PartLoadFrac;
+            } else {
+                this->m_SuppHeatPartLoadFrac = (SuppHeatCoilLoad > 0.0) ? 1.0 : 0.0;
             }
         } break;
         case DataHVACGlobals::Coil_HeatingSteam: {
