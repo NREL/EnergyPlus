@@ -185,6 +185,7 @@ void GetZoneEquipment(EnergyPlusData &state)
 
     if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
         GetZoneEquipmentData(state);
+        state.dataZoneEquip->ZoneEquipInputsFilled = true;
     }
 
     state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;

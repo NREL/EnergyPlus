@@ -1438,12 +1438,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     int MaxAlphas = 0;
     int MaxNumbers = 0;
 
-    // Get zone equipment data in case it didn't get picked up somewhere else
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        DataZoneEquipment::GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     {
         // Terminal Units
 
