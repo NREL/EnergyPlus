@@ -196,8 +196,8 @@ CHECKED_AND_OKED = {
         ]
     },
     "Fans.cc": {
-        "FanInputsForDesHeatGain": [
-            "fanCompModel"
+        "FanComponent::getInputsForDesignHeatGain": [
+            "_fanCompModel"
         ]
     },
     "FaultsManager.cc": {

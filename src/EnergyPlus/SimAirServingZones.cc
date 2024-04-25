@@ -1930,6 +1930,9 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                     SupFanIndex = comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
                                     supFanType = state.dataFans->fans(SupFanIndex)->type;
                                     goto EndOfAirLoop;
+                                } else {
+                                    // Grab CompIndex but don't set airLoop.supFanType or retFanType?
+                                    comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
                                 }
                             } else {
                                 RetFanIndex = comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
