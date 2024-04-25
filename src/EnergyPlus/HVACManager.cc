@@ -2359,7 +2359,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             auto const &thisFan = state.dataFans->Fan(FanNum);
             //  Add reportable vars
-            if (thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
+            if (thisFan.fanType == DataHVACGlobals::FanType::Exhaust) {
                 for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
                     if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
                         znAirRpt.ExhTotalLoss +=
