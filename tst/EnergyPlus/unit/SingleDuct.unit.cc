@@ -3053,7 +3053,7 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     sdat(1).MaxAirVolFlowRateDuringReheat = 0.25;
     sdat(1).OARequirementsPtr = 0;
     sdat(1).ReheatComp = "watercoil";
-    sdat(1).FanType = "variable";
+    sdat(1).fanType = DataHVACGlobals::FanType::VAV;
     sdat(1).FanName = "FanA";
 
     sdat(1).reportTerminalUnit(*state);
@@ -3072,7 +3072,7 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU a"));
     EXPECT_EQ("watercoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU a"));
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU a"));
-    EXPECT_EQ("variable", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
+    EXPECT_EQ("Fan:VariableVolume", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU a"));
     EXPECT_EQ("FanA", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU a"));
 
     adu(2).Name = "ADU b";
@@ -3092,7 +3092,7 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     sdat(2).MaxAirVolFlowRateDuringReheat = 0.26;
     sdat(2).OARequirementsPtr = 1;
     sdat(2).ReheatComp = "furncoil";
-    sdat(2).FanType = "single";
+    sdat(2).fanType = DataHVACGlobals::FanType::OnOff;
     sdat(2).FanName = "FanB";
 
     auto &oa = state->dataSize->OARequirements;
@@ -3115,6 +3115,6 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     EXPECT_EQ("schB", RetrievePreDefTableEntry(*state, orp.pdchAirTermMinOAflowSch, "ADU b"));
     EXPECT_EQ("furncoil", RetrievePreDefTableEntry(*state, orp.pdchAirTermHeatCoilType, "ADU b"));
     EXPECT_EQ("n/a", RetrievePreDefTableEntry(*state, orp.pdchAirTermCoolCoilType, "ADU b"));
-    EXPECT_EQ("single", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU b"));
+    EXPECT_EQ("Fan:OnOff", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanType, "ADU b"));
     EXPECT_EQ("FanB", RetrievePreDefTableEntry(*state, orp.pdchAirTermFanName, "ADU b"));
 }

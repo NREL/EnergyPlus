@@ -415,7 +415,6 @@ namespace DataHVACGlobals {
 
     int constexpr MaxSpeedLevels = 10;
 
-    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;

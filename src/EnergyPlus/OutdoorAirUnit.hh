@@ -185,7 +185,7 @@ namespace OutdoorAirUnit {
         int AirOutletNode;                     // outlet air node number
         std::string SFanName;                  // name of supply fan
         int SFan_Index;                        // index in fan structure
-        DataHVACGlobals::FanType supFanType;   // type of fan in cFanTypes
+        DataHVACGlobals::FanType supFanType;   // type of fan in fanTypeNames
         int SFanAvailSchedPtr;                 // supply fan availability sched from fan object
         DataHVACGlobals::FanPlace supFanPlace; // fan placement; blow through and draw through
         Real64 FanCorTemp;                     // correction temperature
@@ -193,7 +193,7 @@ namespace OutdoorAirUnit {
         int SFanOutletNode;                    // supply fan outlet node number
         std::string ExtFanName;                // name of exhaust fan
         int ExtFan_Index;                      // index in fan structure
-        DataHVACGlobals::FanType extFanType;   // type of fan in cFanTypes
+        DataHVACGlobals::FanType extFanType;   // type of fan in fanTypeNames
         int ExtFanAvailSchedPtr;               // exhaust fan availability sched from fan object
         bool ExtFan;                           // true if there is an exhaust fan
         std::string OutAirSchedName;           // schedule of fraction for outside air (all controls)

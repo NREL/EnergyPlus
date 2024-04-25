@@ -1999,7 +1999,7 @@ TEST_F(EnergyPlusFixture, PIU_reportTerminalUnit)
     piu(1).MaxPriAirVolFlow = 0.30;
     piu(1).MaxSecAirVolFlow = 0.25;
     piu(1).HCoilType = PoweredInductionUnits::HtgCoilType::Electric;
-    piu(1).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    piu(1).fanType = DataHVACGlobals::FanType::Constant;
     piu(1).FanName = "FanA";
 
     piu(1).reportTerminalUnit(*state);

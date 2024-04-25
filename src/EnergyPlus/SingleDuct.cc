@@ -6523,7 +6523,11 @@ void SingleDuctAirTerminal::reportTerminalUnit(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermMinOAflowSch, adu.Name, schName);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermHeatCoilType, adu.Name, this->ReheatComp);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermCoolCoilType, adu.Name, "n/a");
-    OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, this->FanType);
+    if ((int)this->fanType >= 0) {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, DataHVACGlobals::fanTypeNames[(int)this->fanType]);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanType, adu.Name, "n/a");
+    }
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchAirTermFanName, adu.Name, this->FanName);
 }
 
