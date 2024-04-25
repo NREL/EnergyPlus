@@ -11964,6 +11964,10 @@ Real64 CalcCBF(EnergyPlusData &state,
 
     auto &DXCT = state.dataHVACGlobal->DXCT;
 
+    if (AirVolFlowRate <= 0.0 || TotCap <= 0.0) { // Coil not running or has no capacity, don't calculate CBF
+        return CBF;
+    }
+
     AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(state, DataEnvironment::StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName);
     DeltaH = TotCap / AirMassFlowRate;
     InletAirEnthalpy = PsyHFnTdbW(InletAirTemp, InletAirHumRat);
