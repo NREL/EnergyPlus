@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,24.1;
+  Version,24.2;
 
   Building,
     Building,                !- Name
