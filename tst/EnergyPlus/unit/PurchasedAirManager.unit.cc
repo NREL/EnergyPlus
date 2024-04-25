@@ -406,6 +406,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -518,6 +519,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -644,6 +646,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
     bool SimAir(false);
 
     EnergyPlus::SizingManager::GetOARequirements(*state);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -921,7 +924,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,

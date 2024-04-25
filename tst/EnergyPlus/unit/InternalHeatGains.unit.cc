@@ -72,6 +72,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -1339,6 +1340,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHeatBal->Zone(1).FloorArea = 20.0;
     state->dataHeatBal->space(1).FloorArea = 5.0;

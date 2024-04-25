@@ -725,7 +725,6 @@ void SimHVAC(EnergyPlusData &state)
                             OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetPointManager::ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
-        ZoneEquipmentManager::GetZoneEquipment(state);
         PlantManager::GetPlantLoopData(state);
         PlantManager::GetPlantInput(state);
         PlantManager::SetupInitialPlantCallingOrder(state);

@@ -84,6 +84,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -14040,6 +14041,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestIntraZoneLinkageZoneIndex)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     HeatBalanceManager::GetWindowGlassSpectralData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     Material::GetMaterialData(*state, ErrorsFound);

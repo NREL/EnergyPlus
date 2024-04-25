@@ -152,12 +152,6 @@ void ManageZoneEquipment(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // Calls the zone thermal control simulations and the interfaces (water-air, refrigerant-air, steam-air, electric-electric, water-water, etc)
 
-    if (state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag) {
-        GetZoneEquipment(state);
-        state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag = false;
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     InitZoneEquipment(state, FirstHVACIteration);
 
     if (state.dataGlobal->ZoneSizingCalc) {
@@ -183,20 +177,21 @@ void GetZoneEquipment(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // Get all the system related equipment which may be attached to a zone
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
+    if (state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag) {
         GetZoneEquipmentData(state);
+        state.dataZoneEquipmentManager->GetZoneEquipmentInputFlag = false;
         state.dataZoneEquip->ZoneEquipInputsFilled = true;
+
+        state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
+
+        int MaxNumOfEquipTypes = 0;
+        for (int Counter = 1; Counter <= state.dataGlobal->NumOfZones; ++Counter) {
+            if (!state.dataZoneEquip->ZoneEquipConfig(Counter).IsControlled) continue;
+            MaxNumOfEquipTypes = max(MaxNumOfEquipTypes, state.dataZoneEquip->ZoneEquipList(Counter).NumOfEquipTypes);
+        }
+
+        state.dataZoneEquipmentManager->PrioritySimOrder.allocate(MaxNumOfEquipTypes);
     }
-
-    state.dataZoneEquipmentManager->NumOfTimeStepInDay = state.dataGlobal->NumOfTimeStepInHour * 24;
-
-    int MaxNumOfEquipTypes = 0;
-    for (int Counter = 1; Counter <= state.dataGlobal->NumOfZones; ++Counter) {
-        if (!state.dataZoneEquip->ZoneEquipConfig(Counter).IsControlled) continue;
-        MaxNumOfEquipTypes = max(MaxNumOfEquipTypes, state.dataZoneEquip->ZoneEquipList(Counter).NumOfEquipTypes);
-    }
-
-    state.dataZoneEquipmentManager->PrioritySimOrder.allocate(MaxNumOfEquipTypes);
 }
 
 void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // unused 1208

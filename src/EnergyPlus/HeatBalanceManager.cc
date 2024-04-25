@@ -108,6 +108,7 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
@@ -1970,6 +1971,8 @@ namespace HeatBalanceManager {
         // The GetObjectItem routines are employed to retrieve the data.
 
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
+
+        ZoneEquipmentManager::GetZoneEquipment(state);
 
         SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
     }
