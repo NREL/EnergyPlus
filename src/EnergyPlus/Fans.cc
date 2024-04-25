@@ -119,6 +119,10 @@ void FanBase::simulate(EnergyPlusData &state,
     // With the correct FanNum Initialize
     init(state);
 
+    // It looks like the behavior is different for system and
+    // non-system fans?  Non-system fans can simulate without being
+    // sized first?
+
     // if (sizingFlag) return;
     
     // Calculate the Correct Fan Model with the current FanNum
