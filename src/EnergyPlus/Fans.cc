@@ -123,8 +123,6 @@ void FanBase::simulate(EnergyPlusData &state,
     // non-system fans?  Non-system fans can simulate without being
     // sized first?
 
-    // if (sizingFlag) return;
-    
     // Calculate the Correct Fan Model with the current FanNum
     if (type != HVAC::FanType::SystemModel) {
         auto *_thisFan = dynamic_cast<FanComponent*>(this);
@@ -149,9 +147,12 @@ void FanBase::simulate(EnergyPlusData &state,
         } break;
         default: {
         } break;
-        } // switch (m_type)
+        } // switch (type)
         
-    } else {
+    } else { // FanType::SystemModel
+
+        if (sizingFlag) return;
+    
         auto *_thisFan = dynamic_cast<FanSystem*>(this);
         assert(_thisFan != nullptr);
 

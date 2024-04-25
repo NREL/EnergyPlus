@@ -435,7 +435,6 @@ struct FansData : BaseGlobalStruct
     bool GetFanInputFlag = true; // Flag set to make sure you get input once
     bool MyOneTimeFlag = true;
     bool ZoneEquipmentListChecked = false;
-    Array1D_bool CheckEquipName;
 
     Array1D<Fans::NightVentPerfData> NightVentPerf;
     int ErrCount = 0;
@@ -450,6 +449,8 @@ struct FansData : BaseGlobalStruct
             
         fans.clear();
         fanMap.clear();
+
+        new (this) FansData();
     }
 };
 

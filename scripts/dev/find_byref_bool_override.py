@@ -196,6 +196,7 @@ CHECKED_AND_OKED = {
         ]
     },
     "Fans.cc": {
+        # Apparently I don't know how to use this thing.  Maybe it doesn't work with methods, only functions?
         "FanComponent::getInputsForDesignHeatGain": [
             "_fanCompModel"
         ]
