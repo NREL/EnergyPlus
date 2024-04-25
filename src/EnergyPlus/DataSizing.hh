@@ -271,15 +271,6 @@ namespace DataSizing {
     constexpr int GlobalCoolingSizingFactorMode(103);
     constexpr int LoopComponentSizingFactorMode(104);
 
-    enum class ZoneFanPlacement
-    {
-        Invalid = -1,
-        NotSet,
-        BlowThru,
-        DrawThru,
-        Num
-    };
-
     enum class ZoneSizing
     {
         Invalid = -1,
@@ -1280,7 +1271,7 @@ struct SizingData : BaseGlobalStruct
     bool DataNomCapInpMeth = false;                       // True if heating coil is sized by CoilPerfInpMeth == NomCa
     int DataFanEnumType = -1;                             // Fan type used during sizing
     int DataFanIndex = -1;                                // Fan index used during sizing
-    DataSizing::ZoneFanPlacement DataFanPlacement = DataSizing::ZoneFanPlacement::NotSet; // identifies location of fan wrt coil
+    DataHVACGlobals::FanPlace DataFanPlacement = DataHVACGlobals::FanPlace::Invalid; // identifies location of fan wrt coil
     int DataDXSpeedNum = 0;
     int DataCoolCoilType = -1;
     int DataCoolCoilIndex = -1;

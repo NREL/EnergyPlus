@@ -133,9 +133,6 @@ namespace DataHVACGlobals {
     int constexpr Cooling(2);
     int constexpr Heating(3);
 
-    // parameters describing fan types
-    int constexpr NumAllFanTypes(6);
-
     enum class FanType
     {
         Invalid = -1,
@@ -143,19 +140,16 @@ namespace DataHVACGlobals {
         VAV,
         OnOff,
         Exhaust,
-        Component,
-        System,
+        ComponentModel,
+        SystemModel,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNamesUC = {
-        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
-    int constexpr FanType_SimpleConstVolume(1);
-    int constexpr FanType_SimpleVAV(2);
-    int constexpr FanType_SimpleOnOff(3);
-    int constexpr FanType_ZoneExhaust(4);
-    int constexpr FanType_ComponentModel(5);
-    int constexpr FanType_SystemModelObject(6);
+    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
+        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
+
+    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
     // Fan Minimum Flow Fraction Input Method
     int constexpr MinFrac(1);
@@ -164,17 +158,16 @@ namespace DataHVACGlobals {
     int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
-    enum class FanLoc
+    enum class FanPlace
     {
         Invalid = -1,
-        BlowThrough,
-        DrawThrough,
+        BlowThru,
+        DrawThru,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
 
-    int constexpr BlowThru(1); // fan before coil
-    int constexpr DrawThru(2); // fan after coil
+    static constexpr std::array<std::string_view, (int)FanPlace::Num> fanPlaceNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+
     // OA Controller Heat Recovery Bypass Control Types
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
@@ -187,14 +180,38 @@ namespace DataHVACGlobals {
         InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeUC = {
+
+    static constexpr std::array<std::string_view, (int)EconomizerStagingType::Num> economizerStagingTypeNamesUC = {
         "ECONOMIZERFIRST",
         "INTERLOCKEDWITHMECHANICALCOOLING",
     };
-    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeCC = {
+    static constexpr std::array<std::string_view, (int)EconomizerStagingType::Num> economizerStagingTypeNames = {
         "EconomizerFirst",
         "InterlockedWithMechanicalCooling",
     };
+
+    //    enum class UnitarySysType
+    //    {
+    //        Invalid = -1,
+    //        Furnace_HeatOnly,
+    //        Furnace_HeatCool,
+    //        HeatOnly,
+    //        HeatCool,
+    //        HeatPump_AirToAir,
+    //        HeatPump_WaterToAir,
+    //        AnyCoilType,
+    //        Num
+    //    };
+    //
+    //    static constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
+    //        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
+    //        "AirLoopHVAC:Unitary:Furnace:HeatCool",
+    //        "AirLoopHVAC:UnitaryHeatOnly",
+    //        "AirLoopHVAC:UnitaryHeatCool",
+    //        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+    //        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+    //        "AirLoopHVAC:UnitarySystem"
+    //    };
 
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
@@ -398,7 +415,7 @@ namespace DataHVACGlobals {
 
     int constexpr MaxSpeedLevels = 10;
 
-    extern Array1D_string const cFanTypes;
+    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
