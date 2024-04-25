@@ -1972,9 +1972,9 @@ namespace HeatBalanceManager {
 
         GetZoneData(state, ErrorsFound); // Read Zone data from input file
 
-        ZoneEquipmentManager::GetZoneEquipment(state);
-
         SurfaceGeometry::SetupZoneGeometry(state, ErrorsFound);
+
+        ZoneEquipmentManager::GetZoneEquipment(state);
     }
 
     void GetZoneData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
