@@ -4510,6 +4510,9 @@ namespace ScheduleManager {
         if (ScheduleIndex > 0 && ScheduleIndex <= state.dataScheduleMgr->NumSchedules) {
             int curDayTypeGroup = static_cast<int>(days);
             auto &curSch = state.dataScheduleMgr->Schedule(ScheduleIndex);
+            if (!curSch.MaxMinSet) {
+                SetScheduleMinMax(state, ScheduleIndex);
+            }
             if (!curSch.MaxMinByDayTypeSet[curDayTypeGroup]) {
                 std::array<bool, maxDayTypes> dayTypeFilter;
                 switch (days) {
@@ -4529,15 +4532,20 @@ namespace ScheduleManager {
                     dayTypeFilter = dayTypeFilterNone;
                     break;
                 }
+                int prevWkSch = -999; // set to a value that would never occur
                 for (int iDayOfYear = 1; iDayOfYear <= 366; ++iDayOfYear) {
                     int WkSch = curSch.WeekSchedulePointer(iDayOfYear);
-                    auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
-                    for (int jType = 1; jType <= maxDayTypes; ++jType) {
-                        if (dayTypeFilter[jType - 1]) {
-                            auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
-                            MinValue = min(MinValue, minval(daySch.TSValue));
-                            MaxValue = max(MaxValue, maxval(daySch.TSValue));
+                    if (WkSch != prevWkSch) { // skip if same as previous week (very common)
+                        auto &weekSch = state.dataScheduleMgr->WeekSchedule(WkSch);
+                        for (int jType = 1; jType <= maxDayTypes; ++jType) {
+                            if (dayTypeFilter[jType - 1]) {
+                                auto &daySch = state.dataScheduleMgr->DaySchedule(weekSch.DaySchedulePointer(jType));
+                                // use precalcuated min and max from SetScheduleMinMax
+                                MinValue = min(MinValue, daySch.TSValMin);
+                                MaxValue = max(MaxValue, daySch.TSValMax);
+                            }
                         }
+                        prevWkSch - WkSch;
                     }
                 }
                 if (MinValue == Constant::BigNumber) MinValue = 0;
