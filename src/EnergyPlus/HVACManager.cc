@@ -576,7 +576,11 @@ void ManageHVAC(EnergyPlusData &state)
             ReportDebug = !state.dataGlobal->WarmupFlag;
         }
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
+            // report node name list and column header each time number of nodes changes
+            static int numNodes = 0;
+            if (isize(state.dataLoopNodes->Node) > numNodes) state.dataHVACMgr->DebugNamesReported = false;
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
+                numNodes = isize(state.dataLoopNodes->Node);
                 print(state.files.debug, "{}\n", "node #   Node Type      Name");
                 for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
                     print(state.files.debug,
