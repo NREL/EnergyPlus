@@ -3706,12 +3706,17 @@ namespace ScheduleManager {
             MinValue = min(MinValue, daySched.TSValMin);
             MaxValue = max(MaxValue, daySched.TSValMax);
         }
+        int prevWkSch = -999; // set to a value that would never occur
         for (int Loop = 2; Loop <= 366; ++Loop) {
-            auto const &wkSched = state.dataScheduleMgr->WeekSchedule(sched.WeekSchedulePointer(Loop));
-            for (int DayT = 1; DayT <= maxDayTypes; ++DayT) {
-                auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
-                MinValue = min(MinValue, daySched.TSValMin);
-                MaxValue = max(MaxValue, daySched.TSValMax);
+            int WkSch = sched.WeekSchedulePointer(Loop);
+            if (WkSch != prevWkSch) { // skip if same as previous week (very common)
+                auto const &wkSched = state.dataScheduleMgr->WeekSchedule(WkSch);
+                for (int DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                    auto const &daySched = state.dataScheduleMgr->DaySchedule(wkSched.DaySchedulePointer(DayT));
+                    MinValue = min(MinValue, daySched.TSValMin);
+                    MaxValue = max(MaxValue, daySched.TSValMax);
+                }
+                prevWkSch = WkSch;
             }
         }
         sched.MaxMinSet = true;
@@ -4374,15 +4379,21 @@ namespace ScheduleManager {
                         max(MaxValue,
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
+                int prevWkSch = -999; // set to a value that would never occur
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
-                        MinValue = min(
-                            MinValue,
-                            minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(
-                            MaxValue,
-                            maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    if (WkSch != prevWkSch) { // skip if same as previous week (very common)
+                        for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                            MinValue = min(
+                                MinValue,
+                                minval(
+                                    state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                            MaxValue = max(
+                                MaxValue,
+                                maxval(
+                                    state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        }
+                        prevWkSch = WkSch;
                     }
                 }
                 state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
@@ -4465,15 +4476,21 @@ namespace ScheduleManager {
                         max(MaxValue,
                             maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
                 }
+                int prevWkSch = -999; // set to a value that would never occur
                 for (Loop = 2; Loop <= 366; ++Loop) {
                     WkSch = state.dataScheduleMgr->Schedule(ScheduleIndex).WeekSchedulePointer(Loop);
-                    for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
-                        MinValue = min(
-                            MinValue,
-                            minval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
-                        MaxValue = max(
-                            MaxValue,
-                            maxval(state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                    if (WkSch != prevWkSch) { // skip if same as previous week (very common)
+                        for (DayT = 1; DayT <= maxDayTypes; ++DayT) {
+                            MinValue = min(
+                                MinValue,
+                                minval(
+                                    state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                            MaxValue = max(
+                                MaxValue,
+                                maxval(
+                                    state.dataScheduleMgr->DaySchedule(state.dataScheduleMgr->WeekSchedule(WkSch).DaySchedulePointer(DayT)).TSValue));
+                        }
+                        prevWkSch = WkSch;
                     }
                 }
                 state.dataScheduleMgr->Schedule(ScheduleIndex).MaxMinSet = true;
