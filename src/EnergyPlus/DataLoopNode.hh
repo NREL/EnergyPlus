@@ -447,7 +447,7 @@ namespace DataLoopNode {
         Real64 MassFlowRateMaxAvail = 0.0;              // {kg/s}
         Real64 MassFlowRateSetPoint = 0.0;              // {kg/s}
         Real64 Quality = 0.0;                           // {0.0-1.0 vapor fraction/percent}
-        Real64 Press = 0.0;                             // {Pa}
+        Real64 Press = 101325;                             // {Pa}
         Real64 Enthalpy = 0.0;                          // {J/kg}
         Real64 EnthalpyLastTimestep = 0.0;              // {J/kg}
         Real64 HumRat = 0.0;                            // {}
