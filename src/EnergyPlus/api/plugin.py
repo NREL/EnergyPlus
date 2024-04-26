@@ -59,7 +59,7 @@ if not hasattr(sys, 'argv'):
 
 from typing import List
 
-from pyenergyplus.api import EnergyPlusAPI
+from .api import EnergyPlusAPI
 
 
 class EnergyPlusPlugin(object):

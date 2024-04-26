@@ -54,7 +54,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from ctypes import cdll, c_char_p, c_int, c_void_p
-from pyenergyplus.common import RealEP
+from .common import RealEP
 
 
 class BaseSizerWorker:

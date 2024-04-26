@@ -55,7 +55,7 @@
 
 from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
 from types import FunctionType
-from pyenergyplus.common import RealEP
+from .common import RealEP
 
 # CFUNCTYPE wrapped Python callbacks need to be kept in memory explicitly, otherwise GC takes it
 # This causes undefined behavior but generally segfaults and illegal access violations
