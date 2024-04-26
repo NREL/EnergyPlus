@@ -5319,12 +5319,23 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_GetZoneEquipmentTest)
     EXPECT_TRUE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
 
     // Test 1: This should return no errors and the get flag should now be false.
+    //         In addition, it should have populated arrays and set the time steps correctly.
+    state->dataGlobal->NumOfTimeStepInHour = 1;
     GetZoneData(*state, ErrorsFound);
     AllocateHeatBalArrays(*state);
     GetZoneEquipment(*state);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_GT(int(state->dataZoneEquip->ZoneEquipConfig.size()), 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode, 3);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
 
-    // Test 2: Call the get routine again...it should run without a crash because it does nothing
+    // Test 2: Call the get routine again...it should run without a crash because it does nothing.
+    //         The get flag should still be false and the number of time steps in a day should NOT change.
+    //         In essence, this tests to make sure that GetZoneEquipment doesn't do anything after the
+    //         first time it is called.
+    state->dataGlobal->NumOfTimeStepInHour = 2;
     GetZoneEquipment(*state);
+    EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
 }
