@@ -291,8 +291,7 @@ namespace HVACFan {
                 }
             }
         }
-        Real64 rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, m_inletAirTemp, m_inletAirHumRat);
-        m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, rhoAir);
+        m_designPointFEI = report_fei(state, designAirVolFlowRate, designElecPower, deltaPress, state.dataEnvrn->StdRhoAir);
 
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, name, DataHVACGlobals::fanTypeNames[(int)m_fanType]);
         OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, name, m_fanTotalEff);
