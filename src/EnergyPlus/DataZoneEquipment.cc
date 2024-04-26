@@ -1426,11 +1426,6 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
     // This function returns the index into the Controlled Zone Equipment structure
     // of the indicated zone.
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     return Util::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
