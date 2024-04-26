@@ -21076,7 +21076,14 @@
     EIRCurveFuncPLR,         !- Electric Input to Output Ratio Modifier Function of Part Load Ratio Curve Name
     Setpoint,                !- Control Type
     VariableSpeedPumping,    !- Flow Mode
-    0.2;                     !- Minimum Part Load Ratio
+    0.2,                     !- Minimum Part Load Ratio
+    ,                        !- Minimum Source Inlet Temperature
+    ,                        !- Maximum Source Inlet Temperature
+    ,                        !- Minimum Supply Water Temperature Curve Name
+    ,                        !- Maximum Supply Water Temperature Curve Name
+    60.0,                    !- Maximum Heat Recovery Outlet Temperature
+    CoolCapCurveFuncTempHR,  !- Heat Recovery Capacity Modifier Function of Temperature Curve Name
+    CoolEIRCurveFuncTempHR;  !- Heat Recovery Electric Input to Output Ratio Modifier Function of Temperature Curve Name
 
   OutdoorAir:NodeList,
     AWHP 1 Cooling Coil OA Inlet Node; !- Node or NodeList Name 1
@@ -21151,6 +21158,42 @@
     0.0,                     !- Coefficient3 x**2
     0.0,                     !- Minimum Value of x
     1.0;                     !- Maximum Value of x
+
+  Curve:Biquadratic,
+    CoolCapCurveFuncTempHR,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    5.0,                     !- Minimum Value of x
+    10.0,                    !- Maximum Value of x
+    24.0,                    !- Minimum Value of y
+    35.0,                    !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
+
+  Curve:Biquadratic,
+    CoolEIRCurveFuncTempHR,  !- Name
+    1.0,                     !- Coefficient1 Constant
+    0.0,                     !- Coefficient2 x
+    0.0,                     !- Coefficient3 x**2
+    0.0,                     !- Coefficient4 y
+    0.0,                     !- Coefficient5 y**2
+    0.0,                     !- Coefficient6 x*y
+    5.0,                     !- Minimum Value of x
+    10.0,                    !- Maximum Value of x
+    24.0,                    !- Minimum Value of y
+    35.0,                    !- Maximum Value of y
+    ,                        !- Minimum Curve Output
+    ,                        !- Maximum Curve Output
+    Temperature,             !- Input Unit Type for X
+    Temperature,             !- Input Unit Type for Y
+    Dimensionless;           !- Output Unit Type
 
   SetpointManager:Scheduled,
     AWHP Cool Chiller Setpoint Manager,  !- Name
