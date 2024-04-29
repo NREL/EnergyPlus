@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,59 +53,51 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is just a small script that allows for easily running EnergyPlus for API calling debugging purposes
-# It is currently set up for a Unix-ish environment, but could be adapted for all platforms
-# To start debugging, follow these simple steps
-# - You probably want to run from within a Python venv, so that you can quickly install custom dependencies.
-#   To do that, just run `python -m venv /path/to/venv`
-#   Then activate it with `. /path/to/venv/bin/activate`
-#   Then pip install whatever you want with `pip install something` or `pip install -r requirements.txt`
-# - Next prepare this file, setting the build directory, products directory, and IDF to test
-# - Next prepare the build folder, make sure cmake is set up and run and it builds OK already
-# - Now run the debugger by simply passing the Python binary to it: `gdb /path/to/venv/bin/python`
-# - Inside the debugger, you set the command line args to run this file with `set args /path/to/this/file.py`
-# - You can try to immediately run and see what happens by entering `r`, it should run EnergyPlus straight through
-# - You can add breakpoints at any time, like `break SimulationManager.cc:188`, though it may ask you to confirm
-# - You can change the E+ code in this repo, kill the current Python run with `k`, and then re-run this script with `r`
-#   Because this script starts with a make command, it will then build the updated code before trying to call the API
-#   This allows for rapid debugging iteration
 
-from os import cpu_count
-from pathlib import Path
-from subprocess import check_call
-from sys import exit, path
-from tempfile import mkdtemp
+import os
+from subprocess import check_call, CalledProcessError, STDOUT
 
-DO_BUILD = False
-
-repo_root = Path(__file__).resolve().parent.parent.parent
-file_to_run = repo_root / 'testfiles' / 'PythonPluginCustomOutputVariable.idf'
-
-if DO_BUILD:
-    build_dir = repo_root / 'cmake-build-debug'
-    products_dir = build_dir / 'Products'
-    make_tool = '/snap/clion/current/bin/ninja/linux/x64/ninja'  # 'make'
-
-    # this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
-    check_call([make_tool, '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
-else:
-    products_dir = '/tmp/EnergyPlus-24.1.0-241fc81186-Linux-Ubuntu22.04-x86_64'
+from ep_testing.tests.base import BaseTest
 
 
-path.insert(0, str(products_dir))
-from pyenergyplus.api import EnergyPlusAPI
+class TestVersionInfoInDocumentation(BaseTest):
 
-api = EnergyPlusAPI()
-state = api.state_manager.new_state()
-run_dir = mkdtemp()
-print(f"EnergyPlus starting with outputs in directory: {run_dir}")
-return_value = api.runtime.run_energyplus(
-    state, [
-        '-d',
-        run_dir,
-        '-D',
-        str(file_to_run)
-    ]
-)
-print(f"EnergyPlus finished with outputs in directory: {run_dir}")
-exit(return_value)
+    def name(self):
+        return 'Verify contents in a PDF'
+
+    def run(self, install_root: str, verbose: bool, kwargs: dict):
+        if 'pdf_file' not in kwargs:
+            raise Exception('Bad call to %s -- must pass pdf_file in kwargs' % self.__class__.__name__)
+        if 'version_string' not in kwargs:
+            raise Exception('Bad call to %s -- must pass version_string in kwargs' % self.__class__.__name__)
+        pdf_file = kwargs['pdf_file']
+        version_string = kwargs['version_string']
+        print('* Running test class "%s" on file "%s"... ' % (self.__class__.__name__, pdf_file), end='')
+        documentation_dir = os.path.join(install_root, 'Documentation')
+        saved_dir = os.getcwd()
+        os.chdir(documentation_dir)
+        original_pdf_path = os.path.join(documentation_dir, pdf_file)
+        target_pdf_path = os.path.join(documentation_dir, 'FirstPage_%s' % pdf_file)
+        dev_null = open(os.devnull, 'w')
+        try:
+            check_call(
+                ['pdftk', original_pdf_path, 'cat', '1', 'output', target_pdf_path], stdout=dev_null, stderr=STDOUT
+            )
+            print(' [PAGE1_EXTRACTED] ', end='')
+        except CalledProcessError:
+            raise Exception('PdfTk Page 1 extraction failed!')
+        target_txt_path = target_pdf_path + '.txt'
+        try:
+            check_call(['pdftotext', target_pdf_path, target_txt_path], stdout=dev_null, stderr=STDOUT)
+            print(' [PAGE1_CONVERTED] ', end='')
+        except CalledProcessError:
+            raise Exception('PdfToText Page 1 conversion failed!')
+        with open(target_txt_path) as f:
+            contents = f.read()
+            if version_string in contents:
+                print(' [FOUND VERSION STRING, DONE]!')
+            else:
+                raise Exception(
+                    'Did not find matching version string in PDF front page, page contents = \n%s' % contents
+                )
+        os.chdir(saved_dir)
