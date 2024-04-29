@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,59 +53,58 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is just a small script that allows for easily running EnergyPlus for API calling debugging purposes
-# It is currently set up for a Unix-ish environment, but could be adapted for all platforms
-# To start debugging, follow these simple steps
-# - You probably want to run from within a Python venv, so that you can quickly install custom dependencies.
-#   To do that, just run `python -m venv /path/to/venv`
-#   Then activate it with `. /path/to/venv/bin/activate`
-#   Then pip install whatever you want with `pip install something` or `pip install -r requirements.txt`
-# - Next prepare this file, setting the build directory, products directory, and IDF to test
-# - Next prepare the build folder, make sure cmake is set up and run and it builds OK already
-# - Now run the debugger by simply passing the Python binary to it: `gdb /path/to/venv/bin/python`
-# - Inside the debugger, you set the command line args to run this file with `set args /path/to/this/file.py`
-# - You can try to immediately run and see what happens by entering `r`, it should run EnergyPlus straight through
-# - You can add breakpoints at any time, like `break SimulationManager.cc:188`, though it may ask you to confirm
-# - You can change the E+ code in this repo, kill the current Python run with `k`, and then re-run this script with `r`
-#   Because this script starts with a make command, it will then build the updated code before trying to call the API
-#   This allows for rapid debugging iteration
 
-from os import cpu_count
-from pathlib import Path
-from subprocess import check_call
-from sys import exit, path
-from tempfile import mkdtemp
+import os
+from subprocess import check_call, CalledProcessError, STDOUT
+from urllib import request
 
-DO_BUILD = False
-
-repo_root = Path(__file__).resolve().parent.parent.parent
-file_to_run = repo_root / 'testfiles' / 'PythonPluginCustomOutputVariable.idf'
-
-if DO_BUILD:
-    build_dir = repo_root / 'cmake-build-debug'
-    products_dir = build_dir / 'Products'
-    make_tool = '/snap/clion/current/bin/ninja/linux/x64/ninja'  # 'make'
-
-    # this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
-    check_call([make_tool, '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
-else:
-    products_dir = '/tmp/EnergyPlus-24.1.0-241fc81186-Linux-Ubuntu22.04-x86_64'
+from ep_testing.tests.base import BaseTest
 
 
-path.insert(0, str(products_dir))
-from pyenergyplus.api import EnergyPlusAPI
+class TransitionOldFile(BaseTest):
 
-api = EnergyPlusAPI()
-state = api.state_manager.new_state()
-run_dir = mkdtemp()
-print(f"EnergyPlus starting with outputs in directory: {run_dir}")
-return_value = api.runtime.run_energyplus(
-    state, [
-        '-d',
-        run_dir,
-        '-D',
-        str(file_to_run)
-    ]
-)
-print(f"EnergyPlus finished with outputs in directory: {run_dir}")
-exit(return_value)
+    def name(self):
+        return 'Test running 1ZoneUncontrolled.idf and make sure it exits OK'
+
+    def run(self, install_root: str, verbose: bool, kwargs: dict):
+        if 'last_version' not in kwargs:
+            raise Exception('Bad call to %s -- must pass last_version in kwargs' % self.__class__.__name__)
+        last_version = kwargs['last_version']
+        test_file = kwargs.get('test_file', '1ZoneUncontrolled.idf')
+        print('* Running test class "%s" on file "%s"... ' % (self.__class__.__name__, test_file), end='')
+        transition_dir = os.path.join(install_root, 'PreProcess', 'IDFVersionUpdater')
+        all_transition_binaries = [
+            f.path for f in os.scandir(transition_dir) if f.is_file() and f.name.startswith('Transition-')
+        ]
+        if len(all_transition_binaries) < 1:
+            raise Exception('Could not find any transition binaries...weird')
+        all_transition_binaries.sort()
+        most_recent_binary = all_transition_binaries[-1]
+        idf_url = 'https://raw.githubusercontent.com/NREL/EnergyPlus/%s/testfiles/%s' % (last_version, test_file)
+        saved_dir = os.getcwd()
+        os.chdir(transition_dir)
+        idf_path = os.path.join(transition_dir, test_file)
+        dev_null = open(os.devnull, 'w')
+        try:
+            r = request.Request(idf_url)
+            response = request.urlopen(r)
+            data = response.read()
+            with open(idf_path, 'wb') as f:
+                f.write(data)
+        except Exception as e:
+            raise Exception(
+                'Could not download file from prior release at %s; error: %s' % (idf_url, str(e))
+            ) from None
+        try:
+            check_call([most_recent_binary, os.path.basename(idf_path)], stdout=dev_null, stderr=STDOUT)
+            print(' [TRANSITIONED] ', end='')
+        except CalledProcessError:
+            raise Exception('Transition failed!') from None
+        os.chdir(install_root)
+        eplus_binary = os.path.join(install_root, 'energyplus')
+        try:
+            check_call([eplus_binary, '-D', idf_path], stdout=dev_null, stderr=STDOUT)
+            print(' [DONE]!')
+        except CalledProcessError:
+            raise Exception('EnergyPlus failed!') from None
+        os.chdir(saved_dir)

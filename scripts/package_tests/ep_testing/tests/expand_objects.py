@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,59 +53,52 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is just a small script that allows for easily running EnergyPlus for API calling debugging purposes
-# It is currently set up for a Unix-ish environment, but could be adapted for all platforms
-# To start debugging, follow these simple steps
-# - You probably want to run from within a Python venv, so that you can quickly install custom dependencies.
-#   To do that, just run `python -m venv /path/to/venv`
-#   Then activate it with `. /path/to/venv/bin/activate`
-#   Then pip install whatever you want with `pip install something` or `pip install -r requirements.txt`
-# - Next prepare this file, setting the build directory, products directory, and IDF to test
-# - Next prepare the build folder, make sure cmake is set up and run and it builds OK already
-# - Now run the debugger by simply passing the Python binary to it: `gdb /path/to/venv/bin/python`
-# - Inside the debugger, you set the command line args to run this file with `set args /path/to/this/file.py`
-# - You can try to immediately run and see what happens by entering `r`, it should run EnergyPlus straight through
-# - You can add breakpoints at any time, like `break SimulationManager.cc:188`, though it may ask you to confirm
-# - You can change the E+ code in this repo, kill the current Python run with `k`, and then re-run this script with `r`
-#   Because this script starts with a make command, it will then build the updated code before trying to call the API
-#   This allows for rapid debugging iteration
 
-from os import cpu_count
-from pathlib import Path
-from subprocess import check_call
-from sys import exit, path
-from tempfile import mkdtemp
+import os
+from shutil import copyfile
+from subprocess import check_call, CalledProcessError, STDOUT
 
-DO_BUILD = False
-
-repo_root = Path(__file__).resolve().parent.parent.parent
-file_to_run = repo_root / 'testfiles' / 'PythonPluginCustomOutputVariable.idf'
-
-if DO_BUILD:
-    build_dir = repo_root / 'cmake-build-debug'
-    products_dir = build_dir / 'Products'
-    make_tool = '/snap/clion/current/bin/ninja/linux/x64/ninja'  # 'make'
-
-    # this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
-    check_call([make_tool, '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
-else:
-    products_dir = '/tmp/EnergyPlus-24.1.0-241fc81186-Linux-Ubuntu22.04-x86_64'
+from ep_testing.tests.base import BaseTest
 
 
-path.insert(0, str(products_dir))
-from pyenergyplus.api import EnergyPlusAPI
+class TestExpandObjectsAndRun(BaseTest):
 
-api = EnergyPlusAPI()
-state = api.state_manager.new_state()
-run_dir = mkdtemp()
-print(f"EnergyPlus starting with outputs in directory: {run_dir}")
-return_value = api.runtime.run_energyplus(
-    state, [
-        '-d',
-        run_dir,
-        '-D',
-        str(file_to_run)
-    ]
-)
-print(f"EnergyPlus finished with outputs in directory: {run_dir}")
-exit(return_value)
+    def name(self):
+        return 'Test running ExpandObjects on a template file and make sure it exits OK'
+
+    def run(self, install_root: str, verbose: bool, kwargs: dict):
+        if 'test_file' not in kwargs:
+            raise Exception('Bad call to %s -- must pass test_file in kwargs' % self.__class__.__name__)
+        test_file = kwargs['test_file']
+        print('* Running test class "%s" on file "%s"... ' % (self.__class__.__name__, test_file), end='')
+        original_idf_path = os.path.join(install_root, 'ExampleFiles', test_file)
+        target_idf_path = os.path.join(os.getcwd(), 'in.idf')
+        try:
+            copyfile(original_idf_path, target_idf_path)
+        except Exception as e:
+            raise Exception(
+                'Could not copy file for expansion, original file "%s", target file "%s", reason: %s' % (
+                    original_idf_path, target_idf_path, str(e)
+                )
+            ) from None
+        expand_objects_binary = os.path.join(install_root, 'ExpandObjects')
+        dev_null = open(os.devnull, 'w')
+        try:
+            check_call([expand_objects_binary], stdout=dev_null, stderr=STDOUT)
+        except CalledProcessError:
+            raise Exception('ExpandObjects failed!') from None
+        expanded_idf_path = os.path.join(os.getcwd(), 'expanded.idf')
+        if os.path.exists(expanded_idf_path):
+            print(' [EXPANDED] ', end='')
+        else:
+            raise Exception(
+                'ExpandObjects did not produce an expanded idf at "%s", aborting' % expanded_idf_path
+            )
+        os.remove(target_idf_path)
+        copyfile(expanded_idf_path, target_idf_path)
+        eplus_binary = os.path.join(install_root, 'energyplus')
+        try:
+            check_call([eplus_binary, '-D', target_idf_path], stdout=dev_null, stderr=STDOUT)
+            print(' [DONE]!')
+        except CalledProcessError:
+            raise Exception('EnergyPlus failed!') from None
