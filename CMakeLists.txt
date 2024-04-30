@@ -219,7 +219,7 @@ if(BUILD_TESTING)
         "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}"
         CACHE STRING "Identifier for this device configuration")
   endif()
-
+  set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)  # This avoids all the CTest Nightly, Continuous, etc. tests.
   enable_testing()
 endif()
 

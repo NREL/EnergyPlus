@@ -54,59 +54,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is just a small script that allows for easily running EnergyPlus for API calling debugging purposes
-# It is currently set up for a Unix-ish environment, but could be adapted for all platforms
-# To start debugging, follow these simple steps
-# - You probably want to run from within a Python venv, so that you can quickly install custom dependencies.
-#   To do that, just run `python -m venv /path/to/venv`
-#   Then activate it with `. /path/to/venv/bin/activate`
-#   Then pip install whatever you want with `pip install something` or `pip install -r requirements.txt`
-# - Next prepare this file, setting the build directory, products directory, and IDF to test
-# - Next prepare the build folder, make sure cmake is set up and run and it builds OK already
-# - Now run the debugger by simply passing the Python binary to it: `gdb /path/to/venv/bin/python`
-# - Inside the debugger, you set the command line args to run this file with `set args /path/to/this/file.py`
-# - You can try to immediately run and see what happens by entering `r`, it should run EnergyPlus straight through
-# - You can add breakpoints at any time, like `break SimulationManager.cc:188`, though it may ask you to confirm
-# - You can change the E+ code in this repo, kill the current Python run with `k`, and then re-run this script with `r`
-#   Because this script starts with a make command, it will then build the updated code before trying to call the API
-#   This allows for rapid debugging iteration
 
-from os import cpu_count
-from pathlib import Path
-from subprocess import check_call
-from sys import exit, path
-from tempfile import mkdtemp
-
-DO_BUILD = False
-
-repo_root = Path(__file__).resolve().parent.parent.parent
-file_to_run = repo_root / 'testfiles' / 'PythonPluginCustomOutputVariable.idf'
-
-if DO_BUILD:
-    build_dir = repo_root / 'cmake-build-debug'
-    products_dir = build_dir / 'Products'
-    make_tool = '/snap/clion/current/bin/ninja/linux/x64/ninja'  # 'make'
-
-    # this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
-    check_call([make_tool, '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
-else:
-    products_dir = '/tmp/EnergyPlus-24.1.0-241fc81186-Linux-Ubuntu22.04-x86_64'
-
-
-path.insert(0, str(products_dir))
-from pyenergyplus.api import EnergyPlusAPI
-
+import sys
+sys.path.insert(0, '%s')
+from pyenergyplus.api import EnergyPlusAPI  # noqa: E402
 api = EnergyPlusAPI()
 state = api.state_manager.new_state()
-run_dir = mkdtemp()
-print(f"EnergyPlus starting with outputs in directory: {run_dir}")
-return_value = api.runtime.run_energyplus(
-    state, [
-        '-d',
-        run_dir,
-        '-D',
-        str(file_to_run)
-    ]
-)
-print(f"EnergyPlus finished with outputs in directory: {run_dir}")
-exit(return_value)
+glycol = api.functional.glycol(state, u"water")
+for t in [5.0, 15.0, 25.0]:
+    cp = glycol.specific_heat(state, t)
+    rho = glycol.density(state, t)
+state2 = api.state_manager.new_state()
+api.runtime.set_console_output_status(state2, False)
+sys.exit(api.runtime.run_energyplus(state2, sys.argv[1:]))
