@@ -621,7 +621,7 @@ struct LoopNodeData : BaseGlobalStruct
         0.0,
         0.0,
         0.0,
-        101325,
+        101325.0,
         0.0,
         0.0,
         0.0,

@@ -11856,6 +11856,12 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     });
 
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    state->dataEnvrn->OutDryBulbTemp = 35.0; // initialize weather before input processing
+    state->dataEnvrn->OutHumRat = 0.1;
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutWetBulbTemp = 30.0;
+
     state->dataLoopNodes->Node.allocate(10);
     state->dataSize->ZoneEqSizing.deallocate();
     state->dataSize->ZoneEqSizing.allocate(1);
@@ -11923,11 +11929,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     state->dataLoopNodes->Node(ControlZoneNodeNum).Temp =
         24.0; // set zone temperature during cooling season used to determine system delivered capacity
     state->dataLoopNodes->Node(ControlZoneNodeNum).HumRat =
-        0.001;                               // set zone temperature during cooling season used to determine system delivered capacity
-    state->dataEnvrn->OutDryBulbTemp = 35.0; // initialize weather
-    state->dataEnvrn->OutHumRat = 0.1;
-    state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataEnvrn->OutWetBulbTemp = 30.0;
+        0.001; // set zone temperature during cooling season used to determine system delivered capacity
 
     state->dataAirLoop->AirLoopControlInfo.allocate(1);
     state->dataGlobal->SysSizingCalc = true;
