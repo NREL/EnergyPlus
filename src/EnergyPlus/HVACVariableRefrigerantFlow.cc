@@ -14569,7 +14569,6 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                                               RoutineName);
     C_cap_operation = this->VRFOU_CapModFactor(
         state, Pipe_h_comp_in, Pipe_h_out_ave, max(min(MinOutdoorUnitPe, RefPHigh), RefPLow), T_suction + this->SH, T_suction + 8, IUMaxCondTemp - 5);
-    C_cap_operation = 1.0;
 
     // Perform iterations to find the compressor speed that can meet the required heating load, Iteration DoName2
     for (CounterCompSpdTemp = 1; CounterCompSpdTemp <= NumOfCompSpdInput; CounterCompSpdTemp++) {
