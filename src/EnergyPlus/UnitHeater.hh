@@ -85,13 +85,13 @@ namespace UnitHeater {
     {
         // Members
         // Input data
-        std::string Name;                 // name of unit
-        std::string SchedName;            // availability schedule
-        int SchedPtr;                     // index to schedule
-        int AirInNode;                    // inlet air node number
-        int AirOutNode;                   // outlet air node number
+        std::string Name;      // name of unit
+        std::string SchedName; // availability schedule
+        int SchedPtr;          // index to schedule
+        int AirInNode;         // inlet air node number
+        int AirOutNode;        // outlet air node number
         HVAC::FanType fanType; // Fan type number (see DataHVACGlobals)
-        std::string FanName;              // name of fan
+        std::string FanName;   // name of fan
         int Fan_Index;
         int FanSchedPtr;      // index to fan operating mode schedule
         int FanAvailSchedPtr; // index to fan availability schedule
@@ -186,11 +186,11 @@ namespace UnitHeater {
     );
 
     void CalcUnitHeaterComponents(EnergyPlusData &state,
-                                  int const UnitHeatNum,                              // Unit index in unit heater array
-                                  bool const FirstHVACIteration,                      // flag for 1st HVAV iteration in the time step
-                                  Real64 &LoadMet,                                    // load met by unit (watts)
+                                  int const UnitHeatNum,                   // Unit index in unit heater array
+                                  bool const FirstHVACIteration,           // flag for 1st HVAV iteration in the time step
+                                  Real64 &LoadMet,                         // load met by unit (watts)
                                   int const OpMode = HVAC::ContFanCycCoil, // fan operating mode
-                                  Real64 const PartLoadRatio = 1.0                    // part-load ratio
+                                  Real64 const PartLoadRatio = 1.0         // part-load ratio
     );
 
     // SUBROUTINE UpdateUnitHeater

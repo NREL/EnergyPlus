@@ -4366,10 +4366,8 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     for (int iCoil = 1; iCoil <= state.dataDXCoils->NumDXCoils; ++iCoil) {
         auto const &thisDXCoil = state.dataDXCoils->DXCoil(iCoil);
 
-        if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
-            thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoSpeed ||
-            thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedCooling ||
-            thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoStageWHumControl) {
+        if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoSpeed ||
+            thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedCooling || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_CoolingTwoStageWHumControl) {
             if (thisDXCoil.CondenserType(1) == DataHeatBalance::RefrigCondenserType::Air) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.ElecCoolingConsumption + thisDXCoil.DefrostConsumption +
                                                                  thisDXCoil.CrankcaseHeaterConsumption + thisDXCoil.TotalCoolingEnergy;
@@ -4380,8 +4378,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
             if (thisDXCoil.FuelType != Constant::eFuel::Electricity) {
                 state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.MSFuelWasteHeat * TimeStepSysSec;
             }
-        } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_HeatingEmpirical ||
-                   thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedHeating) {
+        } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilDX_HeatingEmpirical || thisDXCoil.DXCoilType_Num == HVAC::CoilDX_MultiSpeedHeating) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisDXCoil.ElecHeatingConsumption + thisDXCoil.DefrostConsumption +
                                                              thisDXCoil.FuelConsumed + thisDXCoil.CrankcaseHeaterConsumption -
                                                              thisDXCoil.TotalHeatingEnergy;
@@ -4409,8 +4406,7 @@ void CalcHeatEmissionReport(EnergyPlusData &state)
     for (int iCoil = 1; iCoil <= state.dataHeatingCoils->NumHeatingCoils; ++iCoil) {
         auto const &thisCoil = state.dataHeatingCoils->HeatingCoil(iCoil);
 
-        if (thisCoil.HCoilType_Num == HVAC::Coil_HeatingGas_MultiStage ||
-            thisCoil.HCoilType_Num == HVAC::Coil_HeatingGasOrOtherFuel) {
+        if (thisCoil.HCoilType_Num == HVAC::Coil_HeatingGas_MultiStage || thisCoil.HCoilType_Num == HVAC::Coil_HeatingGasOrOtherFuel) {
             state.dataHeatBal->SysTotalHVACRejectHeatLoss += thisCoil.FuelUseLoad + thisCoil.ParasiticFuelConsumption - thisCoil.HeatingCoilLoad;
         }
     }

@@ -78,7 +78,7 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataEnvrn->StdRhoAir = 1.2;
 
     state->dataSize->CurZoneEqNum = 0;
@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     fan1->simulateConstant(*state);
-    
+
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
     Real64 Result_FanPower = max(0.0, fan1->maxAirMassFlowRate * fan1->deltaPress / (fan1->totalEff * fan1->rhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result_FanPower, fan1->totalPower); // expects 300 W
@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     state->dataEnvrn->StdRhoAir = 1.0;
     // set fan model inputs
     auto *fan1 = new Fans::FanComponent;
-    
+
     fan1->Name = "Test Fan";
     fan1->type = HVAC::FanType::OnOff;
     fan1->sizingPrefix = "Fan Total Efficiency"; // "Pressure Rise"
@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataHVACGlobal->TurnFansOn = true;
     state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
@@ -212,15 +212,15 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataHVACGlobal->TurnFansOn = true;
     state->dataHVACGlobal->TurnFansOff = false;
     // simulate the fan
     fan1->simulateVAV(*state);
     // fan power = PartLoadFrac * MassFlow * DeltaPress / (FanEff * RhoAir)
     Real64 FlowRatio = 1.0;
-    Real64 PartLoadFrac = fan1->coeffs[0] + fan1->coeffs[1] * FlowRatio + fan1->coeffs[2] * FlowRatio * FlowRatio +
-                          fan1->coeffs[3] * FlowRatio * FlowRatio * FlowRatio;
+    Real64 PartLoadFrac =
+        fan1->coeffs[0] + fan1->coeffs[1] * FlowRatio + fan1->coeffs[2] * FlowRatio * FlowRatio + fan1->coeffs[3] * FlowRatio * FlowRatio * FlowRatio;
 
     Real64 Result_FanPower = max(0.0, PartLoadFrac * fan1->maxAirMassFlowRate * fan1->deltaPress / (fan1->totalEff * fan1->rhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result_FanPower, fan1->totalPower); // expects 300 W
@@ -231,7 +231,6 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     // simulate the fan with negative pressure rise
     // set using fans EMS actuator for Pressure Rise
     fan1->simulateVAV(*state);
-    Real64 Result2_FanPower =
-        max(0.0, PartLoadFrac * fan1->maxAirMassFlowRate * fan1->EMSPressureValue / (fan1->totalEff * fan1->rhoAirStdInit));
+    Real64 Result2_FanPower = max(0.0, PartLoadFrac * fan1->maxAirMassFlowRate * fan1->EMSPressureValue / (fan1->totalEff * fan1->rhoAirStdInit));
     EXPECT_DOUBLE_EQ(Result2_FanPower, fan1->totalPower); // expects zero
 }

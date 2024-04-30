@@ -852,7 +852,7 @@ namespace DataPlant {
             Real64 retAir_Tdb = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).Temp;
             Real64 retAir_w = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).HumRat;
             Real64 ventLoad = outAirMdot * (Psychrometrics::PsyHFnTdbW(retAir_Tdb, retAir_w) - outAir_H); // negative is cooling
-            if (ventLoad > HVAC::SmallLoad) {                                                  // add to heating
+            if (ventLoad > HVAC::SmallLoad) {                                                             // add to heating
                 sumAirSysVentHeatingLoad += ventLoad;
             } else if (ventLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) { // add to cooling
                 sumAirSysVentCoolingLoad += ventLoad;
@@ -1018,8 +1018,7 @@ namespace DataPlant {
         // do we need to turn on heating-only if in off mode but PrimaryPlantHeatingLoad is loaded?
         if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
-            if (this->Report.PrimaryPlantHeatingLoad > HVAC::SmallLoad &&
-                state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
+            if (this->Report.PrimaryPlantHeatingLoad > HVAC::SmallLoad && state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
                 this->PlantOps.AirSourcePlantHeatingOnly = true;
             }
         }
@@ -1397,8 +1396,7 @@ namespace DataPlant {
         bool CoolLedNeed = false;
         bool HeatLedNeed = false;
 
-        if (this->PlantOps.AirSourcePlantHeatingOnly && (CW_Qdot < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) &&
-            flowInEach) {
+        if (this->PlantOps.AirSourcePlantHeatingOnly && (CW_Qdot < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) && flowInEach) {
             // polled building loads are heating only, but secondary ChW plant has some cooling load and there is mass flow in each. So turn dedicated
             // HR on in cooling lead mode
             CoolLedNeed = true;

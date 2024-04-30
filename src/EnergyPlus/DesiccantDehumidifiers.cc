@@ -390,10 +390,8 @@ namespace DesiccantDehumidifiers {
 
             if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric") ||
                 Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel")) {
-                if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric"))
-                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingElectric;
-                if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel"))
-                    desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
+                if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Electric")) desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingElectric;
+                if (Util::SameString(desicDehum.RegenCoilType, "Coil:Heating:Fuel")) desicDehum.RegenCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
                 ValidateComponent(state, desicDehum.RegenCoilType, desicDehum.RegenCoilName, ErrorsFound2, CurrentModuleObject + '=' + Alphas(1));
                 if (ErrorsFound2) ErrorsFound = true;
                 HeatingCoils::GetCoilIndex(state, desicDehum.RegenCoilName, desicDehum.RegenCoilIndex, ErrorsFound2);
@@ -1635,8 +1633,7 @@ namespace DesiccantDehumidifiers {
         }
 
         if (state.dataDesiccantDehumidifiers->MyPlantScanFlag(DesicDehumNum) && allocated(state.dataPlnt->PlantLoop)) {
-            if ((desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) ||
-                (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingSteam)) {
+            if ((desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) || (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingSteam)) {
                 if (desicDehum.RegenCoilType_Num == HVAC::Coil_HeatingWater) {
                     ErrorFlag = false;
                     PlantUtilities::ScanPlantLoopsForObject(state,

@@ -368,14 +368,10 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     // Run and Check
-    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
-                                                        fan1->Name,
-                                                        fan1->maxAirFlowRate,
-                                                        fan1->deltaPress,
-                                                        FanFaultyDeltaPressInc * fan1->deltaPress,
-                                                        1);
+    FanDesignFlowRateDec =
+        CalFaultyFanAirFlowReduction(*state, fan1->Name, fan1->maxAirFlowRate, fan1->deltaPress, FanFaultyDeltaPressInc * fan1->deltaPress, 1);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 

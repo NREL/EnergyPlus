@@ -195,14 +195,14 @@ public:                                  // data
     Real64 ratedCoilOadbRef;   // rated DX coil outside air dry bulb reference [C]
     Real64 ratedCoilOawbRef;   // rated DX coil outside air wet bulb reference [C]
 
-    std::string fanAssociatedWithCoilName;        // name of fan found to be associated with this coil
-    std::string fanTypeName;                      // type of fan found to be associated with this coil
-    HVAC::FanType supFanType; // indicates which type of fan model for supply fan, legacy or new OO
-    int supFanNum = 0;                                // index pointing to this fan in legacy fan data structure, 1-based struct array
-    Real64 fanSizeMaxAirVolumeFlow;               // the size of the fan in terms of volume flow rate [m3/s]
-    Real64 fanSizeMaxAirMassFlow;                 // the size of the fan in terms of mass flow rate [kg/s]
-    Real64 fanHeatGainIdealPeak;                  // Fan heat gain to air during Ideal loads peak sizing [W]
-    Real64 coilAndFanNetTotalCapacityIdealPeak;   // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
+    std::string fanAssociatedWithCoilName;      // name of fan found to be associated with this coil
+    std::string fanTypeName;                    // type of fan found to be associated with this coil
+    HVAC::FanType supFanType;                   // indicates which type of fan model for supply fan, legacy or new OO
+    int supFanNum = 0;                          // index pointing to this fan in legacy fan data structure, 1-based struct array
+    Real64 fanSizeMaxAirVolumeFlow;             // the size of the fan in terms of volume flow rate [m3/s]
+    Real64 fanSizeMaxAirMassFlow;               // the size of the fan in terms of mass flow rate [kg/s]
+    Real64 fanHeatGainIdealPeak;                // Fan heat gain to air during Ideal loads peak sizing [W]
+    Real64 coilAndFanNetTotalCapacityIdealPeak; // coil net total capacity including fan heat gain for ideal loads peak sizing [W]
 
     // static plant info
     Real64 plantDesMaxMassFlowRate; // this coil's plant loop overall design flow rate [kg/s]

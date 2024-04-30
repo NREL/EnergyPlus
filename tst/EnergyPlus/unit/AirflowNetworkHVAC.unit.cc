@@ -10727,7 +10727,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
 
     auto *fan1 = new FanComponent;
     fan1->Name = "SupplyFan";
-            
+
     fan1->inletNodeNum = 2;
     fan1->outletNodeNum = 3;
     fan1->type = HVAC::FanType::OnOff;
@@ -10735,7 +10735,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,
@@ -10765,7 +10765,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
 
     state->dataFans->fans.push_back(fan2);
     state->dataFans->fanMap.insert_or_assign(fan2->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   4,
@@ -10918,7 +10918,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
 
     auto *fan1 = new Fans::FanComponent;
     fan1->Name = "SupplyFan";
-    
+
     fan1->inletNodeNum = 2;
     fan1->outletNodeNum = 3;
     fan1->type = HVAC::FanType::OnOff;
@@ -10926,7 +10926,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,
@@ -10949,7 +10949,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
                                                   errFlag);
 
     auto *fan2 = new FanComponent;
-    
+
     fan2->Name = "ExhaustFan";
     fan2->inletNodeNum = 4;
     fan2->outletNodeNum = 5;
@@ -10958,7 +10958,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
 
     state->dataFans->fans.push_back(fan2);
     state->dataFans->fanMap.insert_or_assign(fan2->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   4,
@@ -11105,7 +11105,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,
@@ -11136,7 +11136,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
 
     state->dataFans->fans.push_back(fan2);
     state->dataFans->fanMap.insert_or_assign(fan2->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(4) = "SupplyExhaustInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   4,
@@ -11290,7 +11290,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportHPWH)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,
@@ -11431,7 +11431,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWH)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,
@@ -11556,7 +11556,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
 
     // Create Fan
     auto *fan1 = new Fans::FanComponent;
-    
+
     fan1->inletNodeNum = 2;
     fan1->outletNodeNum = 3;
     fan1->type = HVAC::FanType::OnOff;
@@ -11564,7 +11564,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportHPWHZoneAndOA)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->NodeID(2) = "SupplyFanInletNode";
     BranchNodeConnections::RegisterNodeConnection(*state,
                                                   2,

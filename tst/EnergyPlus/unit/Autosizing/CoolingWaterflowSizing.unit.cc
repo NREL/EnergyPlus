@@ -168,7 +168,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataSize->DataFanIndex = Fans::GetFanIndex(*state, "CONSTANT FAN 1");
     state->dataSize->DataFanType = HVAC::FanType::Constant;
     sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);

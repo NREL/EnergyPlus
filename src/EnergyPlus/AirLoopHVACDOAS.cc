@@ -880,10 +880,10 @@ namespace AirLoopHVACDOAS {
                 std::string const &CompType = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentType(CompNum);
                 std::string const &CompName = state.dataAirLoop->OutsideAirSys(this->m_OASystemNum).ComponentName(CompNum);
                 if (Util::SameString(CompType, "FAN:SYSTEMMODEL")) {
-                     state.dataFans->fans(this->m_FanIndex)->simulate(state, FirstHVACIteration);
+                    state.dataFans->fans(this->m_FanIndex)->simulate(state, FirstHVACIteration);
                 }
                 if (Util::SameString(CompType, "FAN:COMPONENTMODEL")) {
-                     state.dataFans->fans(this->m_FanIndex)->simulate(state, FirstHVACIteration);
+                    state.dataFans->fans(this->m_FanIndex)->simulate(state, FirstHVACIteration);
                 }
 
                 if (Util::SameString(CompType, "COIL:HEATING:WATER")) {

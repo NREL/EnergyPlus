@@ -196,7 +196,7 @@ namespace SystemAvailabilityManager {
         for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
 
             PreviousStatus = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus; // Save the previous status for differential thermostat
-            state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = HVAC::NoAction;       // initialize the availability to "take no action"
+            state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = HVAC::NoAction; // initialize the availability to "take no action"
 
             for (PriAirSysAvailMgrNum = 1; PriAirSysAvailMgrNum <= state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).NumAvailManagers;
                  ++PriAirSysAvailMgrNum) { // loop over the avail managers in system
@@ -213,7 +213,8 @@ namespace SystemAvailabilityManager {
                     state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = HVAC::ForceOff;
                     break; // Fans forced off takes precedence
                 } else if (AvailStatus == HVAC::CycleOnZoneFansOnly) {
-                    state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = HVAC::CycleOnZoneFansOnly; // zone fans only takes next precedence
+                    state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus =
+                        HVAC::CycleOnZoneFansOnly; // zone fans only takes next precedence
                 } else if ((AvailStatus == HVAC::CycleOn) && (state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus == HVAC::NoAction)) {
                     state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).AvailStatus = HVAC::CycleOn; // cycle on is lowest precedence
                 }
@@ -242,7 +243,7 @@ namespace SystemAvailabilityManager {
         for (PlantNum = 1; PlantNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantNum) {
 
             PreviousStatus = state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus; // Save the previous status for differential thermostat
-            state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = HVAC::NoAction;       // Initialize the availability to "take no action"
+            state.dataPlnt->PlantAvailMgr(PlantNum).AvailStatus = HVAC::NoAction; // Initialize the availability to "take no action"
 
             for (PlantAvailMgrNum = 1; PlantAvailMgrNum <= state.dataPlnt->PlantAvailMgr(PlantNum).NumAvailManagers;
                  ++PlantAvailMgrNum) { // loop over the avail managers in plant
@@ -2119,7 +2120,7 @@ namespace SystemAvailabilityManager {
                 }
                 } // end select type of night cycle control
 
-                if (AvailStatus == HVAC::CycleOn) {                                                       // reset the start and stop times
+                if (AvailStatus == HVAC::CycleOn) {                                                 // reset the start and stop times
                     if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
                         ZoneComp(ZoneEquipType).ZoneCompAvailMgrs(CompNum).StopTime = state.dataGlobal->SimTimeSteps;
@@ -2196,14 +2197,16 @@ namespace SystemAvailabilityManager {
                         default: {
                             AvailStatus = HVAC::NoAction;
                         }
-                        }                                  // end select on thermostat control
+                        }                                        // end select on thermostat control
                         if (AvailStatus == HVAC::CycleOn) break; // loop break
-                    }                                      // end loop over zones in system
+                    }                                            // end loop over zones in system
                 } break;
                 case NightCycleControlType::OnControlZone: {
                     AvailStatus = HVAC::NoAction;
-                    if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones, TempTol)) AvailStatus = HVAC::CycleOn;
-                    if (HeatingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones, TempTol)) AvailStatus = HVAC::CycleOn;
+                    if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones, TempTol))
+                        AvailStatus = HVAC::CycleOn;
+                    if (HeatingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones, TempTol))
+                        AvailStatus = HVAC::CycleOn;
                 } break;
                 case NightCycleControlType::OnAnyCoolingOrHeatingZone: {
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CoolingZonePtrs, nightCycleMgr.NumOfCoolingZones, TempTol)) {

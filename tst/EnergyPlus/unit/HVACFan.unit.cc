@@ -99,8 +99,8 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TestGetFunctions1)
 
     auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
-    fanSystem->simulate(*state, false, _, _);                       // triggers sizing call
+
+    fanSystem->simulate(*state, false, _, _);          // triggers sizing call
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate; // get function
     EXPECT_NEAR(1.0000, locFanSizeVdot, 0.00000001);
     Real64 locDesignTempRise = fanSystem->getDesignTemperatureRise(*state);
@@ -143,10 +143,10 @@ TEST_F(EnergyPlusFixture, SystemFanObj_FanSizing1)
     state->dataSize->CurOASysNum = 0;
     state->dataSize->DataNonZoneNonAirloopValue = 1.00635;
 
-    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state->dataFans->fans(1));
+    auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
-    fanSystem->simulate(*state, false, _, _);                       // triggers sizing call
+
+    fanSystem->simulate(*state, false, _, _);          // triggers sizing call
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate; // get function
     EXPECT_NEAR(1.00635, locFanSizeVdot, 0.00001);
     state->dataSize->DataNonZoneNonAirloopValue = 0.0;
@@ -197,7 +197,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc1)
 
     auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
+
     fanSystem->simulate(*state, false, _, _);
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate; // get function
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
@@ -272,7 +272,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc2)
 
     auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
+
     fanSystem->simulate(*state, false, _, _);
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate;
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
@@ -332,9 +332,9 @@ TEST_F(EnergyPlusFixture, SystemFanObj_TwoSpeedFanPowerCalc3)
     state->dataSize->CurOASysNum = 0;
     state->dataEnvrn->StdRhoAir = 1.2;
 
-    auto *fanSystem = dynamic_cast<Fans::FanSystem*>(state->dataFans->fans(1));
+    auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
+
     fanSystem->simulate(*state, false, _, _);
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate; // get function
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);
@@ -630,7 +630,7 @@ TEST_F(EnergyPlusFixture, SystemFanObj_DiscreteMode_EMSPressureRiseResetTest)
 
     auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state->dataFans->fans(1));
     assert(fanSystem != nullptr);
-    
+
     fanSystem->simulate(*state, false, _, _);
     Real64 locFanSizeVdot = fanSystem->maxAirFlowRate;
     EXPECT_NEAR(1.00, locFanSizeVdot, 0.00001);

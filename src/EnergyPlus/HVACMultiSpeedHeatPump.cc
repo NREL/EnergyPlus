@@ -224,9 +224,9 @@ namespace HVACMultiSpeedHeatPump {
         int OpMode;          // operating mode (fan cycling or continious; DX coil always cycles)
         int ZoneNum;         // Controlled zone number
         Real64 QTotUnitOut;
-        int SpeedNum;                                      // Speed number
+        int SpeedNum;                           // Speed number
         HVAC::CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
-        Real64 SaveMassFlowRate;                           // saved inlet air mass flow rate [kg/s]
+        Real64 SaveMassFlowRate;                // saved inlet air mass flow rate [kg/s]
 
         // zero the fan, DX coils, and supplemental electric heater electricity consumption
         state.dataHVACGlobal->DXElecHeatingPower = 0.0;
@@ -1542,8 +1542,7 @@ namespace HVACMultiSpeedHeatPump {
                         state, format("The {} is not equal to the number defined in {} = {}", cNumericFields(9), cAlphaFields(11), Alphas(11)));
                     ErrorsFound = true;
                 }
-            } else if (thisMSHP.HeatCoilType == HVAC::Coil_HeatingElectric_MultiStage ||
-                       thisMSHP.HeatCoilType == HVAC::Coil_HeatingGas_MultiStage) {
+            } else if (thisMSHP.HeatCoilType == HVAC::Coil_HeatingElectric_MultiStage || thisMSHP.HeatCoilType == HVAC::Coil_HeatingGas_MultiStage) {
                 i = HeatingCoils::GetHeatingCoilNumberOfStages(state, Alphas(10), Alphas(11), ErrorsFound);
                 if (thisMSHP.NumOfSpeedHeating != i) {
                     ShowSevereError(state, format("For {} \"{}\"", state.dataHVACMultiSpdHP->CurrentModuleObject, thisMSHP.Name));
@@ -1954,7 +1953,7 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         if (!state.dataGlobal->SysSizingCalc && MSHeatPump(MSHeatPumpNum).MySizeFlag) {
-                MSHeatPump(MSHeatPumpNum).FanVolFlow = state.dataFans->fans(MSHeatPump(MSHeatPumpNum).FanNum)->maxAirFlowRate;
+            MSHeatPump(MSHeatPumpNum).FanVolFlow = state.dataFans->fans(MSHeatPump(MSHeatPumpNum).FanNum)->maxAirFlowRate;
             SizeMSHeatPump(state, MSHeatPumpNum);
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
@@ -2334,8 +2333,7 @@ namespace HVACMultiSpeedHeatPump {
                                             .SequencedOutputRequiredToHeatingSP(MSHeatPump(MSHeatPumpNum).ZoneSequenceHeatingNum);
             if (ZoneLoadToHeatSPSequenced > HVAC::SmallLoad && ZoneLoadToCoolSPSequenced > HVAC::SmallLoad) {
                 QZnReq = ZoneLoadToHeatSPSequenced;
-            } else if (ZoneLoadToHeatSPSequenced < (-1.0 * HVAC::SmallLoad) &&
-                       ZoneLoadToCoolSPSequenced < (-1.0 * HVAC::SmallLoad)) {
+            } else if (ZoneLoadToHeatSPSequenced < (-1.0 * HVAC::SmallLoad) && ZoneLoadToCoolSPSequenced < (-1.0 * HVAC::SmallLoad)) {
                 QZnReq = ZoneLoadToCoolSPSequenced;
             } else if (ZoneLoadToHeatSPSequenced <= (-1.0 * HVAC::SmallLoad) && ZoneLoadToCoolSPSequenced >= HVAC::SmallLoad) {
                 QZnReq = 0.0;
@@ -2525,8 +2523,7 @@ namespace HVACMultiSpeedHeatPump {
             return;
         }
 
-        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::Invalid &&
-             MSHeatPump(MSHeatPumpNum).OpMode == HVAC::CycFanCycCoil) ||
+        if ((MSHeatPump(MSHeatPumpNum).HeatCoolMode == ModeOfOperation::Invalid && MSHeatPump(MSHeatPumpNum).OpMode == HVAC::CycFanCycCoil) ||
             state.dataHVACMultiSpdHP->CompOnMassFlow == 0.0) {
             QZnReq = 0.0;
             PartLoadFrac = 0.0;
@@ -2806,17 +2803,17 @@ namespace HVACMultiSpeedHeatPump {
     //******************************************************************************
 
     void ControlMSHPOutputEMS(EnergyPlusData &state,
-                              int const MSHeatPumpNum,                                 // Unit index of engine driven heat pump
-                              bool const FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
+                              int const MSHeatPumpNum,                      // Unit index of engine driven heat pump
+                              bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
                               HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
-                              int const OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
-                              Real64 const QZnReq,                                     // cooling or heating output needed by zone [W]
-                              Real64 const SpeedVal,                                   // continuous speed value
-                              int &SpeedNum,                                           // discrete speed level
-                              Real64 &SpeedRatio,                                      // unit speed ratio for DX coils
-                              Real64 &PartLoadFrac,                                    // unit part load fraction
-                              Real64 &OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad      // Supplemental heater load [W]
+                              int const OpMode,                             // operating mode: CycFanCycCoil | ContFanCycCoil
+                              Real64 const QZnReq,                          // cooling or heating output needed by zone [W]
+                              Real64 const SpeedVal,                        // continuous speed value
+                              int &SpeedNum,                                // discrete speed level
+                              Real64 &SpeedRatio,                           // unit speed ratio for DX coils
+                              Real64 &PartLoadFrac,                         // unit part load fraction
+                              Real64 &OnOffAirFlowRatio,                    // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SupHeaterLoad                         // Supplemental heater load [W]
 
     )
     {
@@ -2913,17 +2910,17 @@ namespace HVACMultiSpeedHeatPump {
     }
 
     void ControlMSHPSupHeater(EnergyPlusData &state,
-                              int const MSHeatPumpNum,                                 // Unit index of engine driven heat pump
-                              bool const FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
+                              int const MSHeatPumpNum,                      // Unit index of engine driven heat pump
+                              bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
                               HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
-                              int const OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
-                              Real64 const QZnReq,                                     // cooling or heating output needed by zone [W]
-                              int const EMSOutput,                                     // unit full output when compressor is operating [W]vvvv
-                              int const SpeedNum,                                      // Speed number
-                              Real64 SpeedRatio,                                       // unit speed ratio for DX coils
-                              Real64 PartLoadFrac,                                     // unit part load fraction
-                              Real64 OnOffAirFlowRatio, // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad     // Supplemental heater load [W]
+                              int const OpMode,                             // operating mode: CycFanCycCoil | ContFanCycCoil
+                              Real64 const QZnReq,                          // cooling or heating output needed by zone [W]
+                              int const EMSOutput,                          // unit full output when compressor is operating [W]vvvv
+                              int const SpeedNum,                           // Speed number
+                              Real64 SpeedRatio,                            // unit speed ratio for DX coils
+                              Real64 PartLoadFrac,                          // unit part load fraction
+                              Real64 OnOffAirFlowRatio,                     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SupHeaterLoad                         // Supplemental heater load [W]
 
     )
     {
@@ -2976,17 +2973,17 @@ namespace HVACMultiSpeedHeatPump {
     }
 
     void ControlMSHPOutput(EnergyPlusData &state,
-                           int const MSHeatPumpNum,                                 // Unit index of engine driven heat pump
-                           bool const FirstHVACIteration,                           // flag for 1st HVAC iteration in the time step
+                           int const MSHeatPumpNum,                      // Unit index of engine driven heat pump
+                           bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
                            HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
-                           int const OpMode,                                        // operating mode: CycFanCycCoil | ContFanCycCoil
-                           Real64 const QZnReq,                                     // cooling or heating output needed by zone [W]
-                           int const ZoneNum [[maybe_unused]],                      // Index to zone number
-                           int &SpeedNum,                                           // Speed number
-                           Real64 &SpeedRatio,                                      // unit speed ratio for DX coils
-                           Real64 &PartLoadFrac,                                    // unit part load fraction
-                           Real64 &OnOffAirFlowRatio,                               // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                           Real64 &SupHeaterLoad                                    // Supplemental heater load [W]
+                           int const OpMode,                             // operating mode: CycFanCycCoil | ContFanCycCoil
+                           Real64 const QZnReq,                          // cooling or heating output needed by zone [W]
+                           int const ZoneNum [[maybe_unused]],           // Index to zone number
+                           int &SpeedNum,                                // Speed number
+                           Real64 &SpeedRatio,                           // unit speed ratio for DX coils
+                           Real64 &PartLoadFrac,                         // unit part load fraction
+                           Real64 &OnOffAirFlowRatio,                    // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                           Real64 &SupHeaterLoad                         // Supplemental heater load [W]
     )
     {
 
@@ -3043,8 +3040,8 @@ namespace HVACMultiSpeedHeatPump {
 
         // If cooling and NoCompOutput < QZnReq, the coil needs to be off
         // If heating and NoCompOutput > QZnReq, the coil needs to be off
-        if ((QZnReq < (-1.0 * HVAC::SmallLoad) && NoCompOutput < QZnReq) ||
-            (QZnReq > HVAC::SmallLoad && NoCompOutput > QZnReq) || std::abs(QZnReq) <= HVAC::SmallLoad) {
+        if ((QZnReq < (-1.0 * HVAC::SmallLoad) && NoCompOutput < QZnReq) || (QZnReq > HVAC::SmallLoad && NoCompOutput > QZnReq) ||
+            std::abs(QZnReq) <= HVAC::SmallLoad) {
             return;
         }
 
@@ -3253,8 +3250,7 @@ namespace HVACMultiSpeedHeatPump {
             }
         } else {
             // Calculate the part load fraction
-            if (((QZnReq > HVAC::SmallLoad && QZnReq < FullOutput) ||
-                 (QZnReq < (-1.0 * HVAC::SmallLoad) && QZnReq > FullOutput)) &&
+            if (((QZnReq > HVAC::SmallLoad && QZnReq < FullOutput) || (QZnReq < (-1.0 * HVAC::SmallLoad) && QZnReq > FullOutput)) &&
                 (!MSHeatPump.Staged)) {
                 // Check whether the low speed coil can meet the load or not
                 CalcMSHeatPump(
@@ -3589,16 +3585,16 @@ namespace HVACMultiSpeedHeatPump {
     //******************************************************************************
 
     void CalcMSHeatPump(EnergyPlusData &state,
-                        int const MSHeatPumpNum,                                 // Engine driven heat pump number
-                        bool const FirstHVACIteration,                           // Flag for 1st HVAC iteration
+                        int const MSHeatPumpNum,                      // Engine driven heat pump number
+                        bool const FirstHVACIteration,                // Flag for 1st HVAC iteration
                         HVAC::CompressorOperation const CompressorOp, // Compressor on/off; 1=on, 0=off
-                        int const SpeedNum,                                      // Speed number
-                        Real64 const SpeedRatio,                                 // Compressor speed ratio
-                        Real64 const PartLoadFrac,                               // Compressor part load fraction
-                        Real64 &LoadMet,                                         // Load met by unit (W)
-                        Real64 const QZnReq,                                     // Zone load (W)
-                        Real64 &OnOffAirFlowRatio,                               // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                        Real64 &SupHeaterLoad                                    // supplemental heater load (W)
+                        int const SpeedNum,                           // Speed number
+                        Real64 const SpeedRatio,                      // Compressor speed ratio
+                        Real64 const PartLoadFrac,                    // Compressor part load fraction
+                        Real64 &LoadMet,                              // Load met by unit (W)
+                        Real64 const QZnReq,                          // Zone load (W)
+                        Real64 &OnOffAirFlowRatio,                    // Ratio of compressor ON airflow to AVERAGE airflow over timestep
+                        Real64 &SupHeaterLoad                         // supplemental heater load (W)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3824,7 +3820,7 @@ namespace HVACMultiSpeedHeatPump {
             } else {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, QZnReq, MSHeatPump.OpMode, QCoilActual, PartLoadFrac);
             }
-            state.dataFans->fans(MSHeatPump.FanNum)->simulate(state,  FirstHVACIteration, state.dataHVACMultiSpdHP->FanSpeedRatio);
+            state.dataFans->fans(MSHeatPump.FanNum)->simulate(state, FirstHVACIteration, state.dataHVACMultiSpdHP->FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (MSHeatPump.SuppHeatCoilNum > 0) {
                 CalcNonDXHeatingCoils(state, MSHeatPumpNum, FirstHVACIteration, SupHeaterLoad, MSHeatPump.OpMode, QCoilActual);

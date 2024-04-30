@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
 
     state->dataFans->fans.push_back(fan1);
     state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
-    
+
     state->dataLoopNodes->Node.allocate(1);
     state->dataLoopNodes->Node(1).MassFlowRate = 0.0;
 

@@ -1195,8 +1195,8 @@ void SizeController(EnergyPlusData &state, int const ControlNum)
         //   So we divide .001 by the air mass flow rate estimated from the water volumetric flow rate to come up
         //   with a temperature tolerance that won't exceed the loop energy error tolerance (10 W).
         // Finally we need to take into account the fact that somebody might change the energy tolerance.
-        controllerProps.Offset = (0.001 / (2100.0 * max(controllerProps.MaxVolFlowActuated, HVAC::SmallWaterVolFlow))) *
-                                 (DataConvergParams::HVACEnergyToler / 10.0);
+        controllerProps.Offset =
+            (0.001 / (2100.0 * max(controllerProps.MaxVolFlowActuated, HVAC::SmallWaterVolFlow))) * (DataConvergParams::HVACEnergyToler / 10.0);
         // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
         controllerProps.Offset = min(0.1 * DataConvergParams::HVACTemperatureToler, controllerProps.Offset);
         BaseSizer::reportSizerOutput(

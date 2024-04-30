@@ -389,8 +389,7 @@ namespace OutdoorAirUnit {
                 thisOutAirUnit.SFanAvailSchedPtr = fan->availSchedNum;
             }
             // A6 :Fan Place
-            thisOutAirUnit.supFanPlace =
-                static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
+            thisOutAirUnit.supFanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, state.dataIPShortCut->cAlphaArgs(6)));
 
             // A7
 
@@ -411,7 +410,7 @@ namespace OutdoorAirUnit {
                                                      state.dataOutdoorAirUnit->ExhaustFanUniqueNames,
                                                      ErrorsFound);
 
-                if ((thisOutAirUnit.ExtFan_Index = Fans::GetFanIndex(state, thisOutAirUnit.ExtFanName)) == 0) { 
+                if ((thisOutAirUnit.ExtFan_Index = Fans::GetFanIndex(state, thisOutAirUnit.ExtFanName)) == 0) {
                     ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(7), thisOutAirUnit.ExtFanName);
                     ErrorsFound = true;
                 } else {
@@ -831,8 +830,8 @@ namespace OutdoorAirUnit {
                         }
                         case CompType::UnitarySystemModel: {
                             UnitarySystems::UnitarySys thisSys;
-                            thisOutAirUnit.OAEquip(CompNum).compPointer = thisSys.factory(
-                                state, HVAC::UnitarySys_AnyCoilType, thisOutAirUnit.OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                            thisOutAirUnit.OAEquip(CompNum).compPointer =
+                                thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, thisOutAirUnit.OAEquip(CompNum).ComponentName, false, OAUnitNum);
                             UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
                                 state, thisOutAirUnit.OAEquip(CompNum).ComponentName, OAUnitNum);
 
@@ -1558,13 +1557,8 @@ namespace OutdoorAirUnit {
             }
             if (thisOAEquip.Type == CompType::WaterCoil_CoolingHXAsst) {
                 if (thisOAEquip.MaxVolWaterFlow == AutoSize) {
-                    SimHXAssistedCoolingCoil(state,
-                                             thisOAEquip.ComponentName,
-                                             true,
-                                             HVAC::CompressorOperation::On,
-                                             0.0,
-                                             thisOAEquip.ComponentIndex,
-                                             ContFanCycCoil);
+                    SimHXAssistedCoolingCoil(
+                        state, thisOAEquip.ComponentName, true, HVAC::CompressorOperation::On, 0.0, thisOAEquip.ComponentIndex, ContFanCycCoil);
                 }
             }
         }
@@ -1919,9 +1913,9 @@ namespace OutdoorAirUnit {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using HVAC::SmallLoad;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using HeatRecovery::SimHeatRecovery;
+        using HVAC::SmallLoad;
         using HVACDXHeatPumpSystem::SimDXHeatPumpSystem;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2170,8 +2164,7 @@ namespace OutdoorAirUnit {
                 if (Sim) {
                     if (thisOAEquip.compPointer == nullptr) {
                         UnitarySystems::UnitarySys thisSys;
-                        thisOAEquip.compPointer =
-                            thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, thisOAEquip.ComponentName, false, OAUnitNum);
+                        thisOAEquip.compPointer = thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, thisOAEquip.ComponentName, false, OAUnitNum);
                         UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, thisOAEquip.ComponentName, OAUnitNum);
                     }
                     if (((OpMode == Operation::NeutralMode) && (thisOutAirUnit.controlType == OAUnitCtrlType::Temperature)) ||

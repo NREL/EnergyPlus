@@ -433,7 +433,7 @@ void GetAirPathData(EnergyPlusData &state)
         primaryAirSystems.NumOAHeatCoils = 0;
         primaryAirSystems.NumOACoolCoils = 0;
         AirLoopControlInfo(AirSysNum).FanOpMode = HVAC::ContFanCycCoil; // initialize to constant fan mode for all air loops
-        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;                    // initialize to 1 for all air loops
+        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;         // initialize to 1 for all air loops
 
         CurrentModuleObject = "AirLoopHVAC";
 
@@ -1172,12 +1172,12 @@ void GetAirPathData(EnergyPlusData &state)
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_System_Object;
                         auto &comp = primaryAirSystems.Branch(BranchNum).Comp(CompNum);
                         if (comp.CompIndex == 0) {
-                                comp.CompIndex = Fans::GetFanIndex(state, comp.Name); // TODO: get rid of this
+                            comp.CompIndex = Fans::GetFanIndex(state, comp.Name); // TODO: get rid of this
                             if (comp.CompIndex == 0) {
                                 ShowSevereError(state, format("Component {} of type {} not found.", comp.Name, comp.TypeOf));
                             }
                         }
-                                
+
                         state.dataFans->fans(comp.CompIndex)->airPathFlag = true;
                     } else if (componentType == "FAN:COMPONENTMODEL") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Fan_ComponentModel;
@@ -1214,13 +1214,13 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
-                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
-                            state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer =
+                            thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
                         UnitarySystems::UnitarySys thisSys;
-                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
-                            state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer =
+                            thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -1911,19 +1911,17 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
             bool FoundCentralCoolCoil = false;
             for (int BranchNum = 1; BranchNum <= thisPrimaryAirSys.NumBranches; ++BranchNum) {
                 auto &branch = thisPrimaryAirSys.Branch(BranchNum);
-                    
+
                 for (int CompNum = 1; CompNum <= branch.TotalComponents; ++CompNum) {
                     auto &comp = branch.Comp(CompNum);
                     CompType compType = comp.CompType_Num;
                     if (compType == CompType::OAMixer_Num) {
                         FoundOASys = true;
-                    }
-                    else if (compType == CompType::WaterCoil_Cooling || compType == CompType::WaterCoil_DetailedCool ||
-                        compType == CompType::WaterCoil_CoolingHXAsst || compType == CompType::DXSystem) {
+                    } else if (compType == CompType::WaterCoil_Cooling || compType == CompType::WaterCoil_DetailedCool ||
+                               compType == CompType::WaterCoil_CoolingHXAsst || compType == CompType::DXSystem) {
                         FoundCentralCoolCoil = true;
-                    }
-                    else if (compType == CompType::Fan_Simple_CV || compType == CompType::Fan_Simple_VAV ||
-                             compType == CompType::Fan_ComponentModel || compType == CompType::Fan_System_Object) {
+                    } else if (compType == CompType::Fan_Simple_CV || compType == CompType::Fan_Simple_VAV ||
+                               compType == CompType::Fan_ComponentModel || compType == CompType::Fan_System_Object) {
                         if (thisPrimaryAirSys.OASysExists && !thisPrimaryAirSys.isAllOA) {
                             if (FoundOASys) {
                                 if (branch.DuctType != HVAC::AirDuctType::Heating) {
@@ -1946,7 +1944,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                         }
                     }
                 } // for (CompNum)
-            } // for (BranchNum)
+            }     // for (BranchNum)
         EndOfAirLoop:;
 
             thisPrimaryAirSys.supFanNum = SupFanIndex;
@@ -3436,13 +3434,13 @@ void SimAirLoopComponent(EnergyPlusData &state,
         ManageOutsideAirSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
         // Fan Types for the air sys simulation
     } break;
-    case CompType::Fan_Simple_CV:  // 'Fan:ConstantVolume'
-    case CompType::Fan_Simple_VAV: // 'Fan:VariableVolume'
+    case CompType::Fan_Simple_CV:        // 'Fan:ConstantVolume'
+    case CompType::Fan_Simple_VAV:       // 'Fan:VariableVolume'
     case CompType::Fan_ComponentModel: { // 'Fan:ComponentModel'
         state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration);
     } break;
 
-    case CompType::Fan_System_Object: {                                        // "Fan:SystemModel" new for V8.6
+    case CompType::Fan_System_Object: { // "Fan:SystemModel" new for V8.6
         // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
         // involved but the fan should really run like constant volume and not cycle with compressor
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;

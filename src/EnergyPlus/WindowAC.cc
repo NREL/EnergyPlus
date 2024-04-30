@@ -371,12 +371,11 @@ namespace WindowAC {
 
             windAC.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(7)));
 
-            if (windAC.fanType != HVAC::FanType::OnOff && windAC.fanType != HVAC::FanType::Constant &&
-                windAC.fanType != HVAC::FanType::SystemModel) {
+            if (windAC.fanType != HVAC::FanType::OnOff && windAC.fanType != HVAC::FanType::Constant && windAC.fanType != HVAC::FanType::SystemModel) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(8), Alphas(8), "Fan Type must be Fan:OnOff, Fan:ConstantVolume, or Fan:SystemModel.");
                 FanErrFlag = true;
 
-            } else if ((windAC.FanIndex = Fans::GetFanIndex(state, windAC.FanName)) == 0) { 
+            } else if ((windAC.FanIndex = Fans::GetFanIndex(state, windAC.FanName)) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(8), windAC.FanName);
                 FanErrFlag = true;
 
@@ -395,7 +394,7 @@ namespace WindowAC {
                                                 windAC.MaxAirVolFlow,
                                                 CurrentModuleObject));
                         ShowContinueError(
-                                          state, format(" The fan flow rate must be >= to the {} in the {} object.", cNumericFields(1), CurrentModuleObject));
+                            state, format(" The fan flow rate must be >= to the {} in the {} object.", cNumericFields(1), CurrentModuleObject));
                         ShowContinueError(state, format(" Occurs in {} = {}", CurrentModuleObject, state.dataWindowAC->WindAC(WindACNum).Name));
                         ErrorsFound = true;
                     }
@@ -449,8 +448,7 @@ namespace WindowAC {
                 state.dataWindowAC->WindAC(WindACNum).OpMode = CycFanCycCoil;
             }
 
-            state.dataWindowAC->WindAC(WindACNum).fanPlace =
-                static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, Alphas(12)));
+            state.dataWindowAC->WindAC(WindACNum).fanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, Alphas(12)));
             assert(state.dataWindowAC->WindAC(WindACNum).fanPlace != HVAC::FanPlace::Invalid);
 
             state.dataWindowAC->WindAC(WindACNum).ConvergenceTol = Numbers(3);

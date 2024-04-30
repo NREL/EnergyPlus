@@ -337,10 +337,9 @@ namespace UnitHeater {
             auto &unitHeat = state.dataUnitHeaters->UnitHeat(UnitHeatNum);
             // Fan information:
             unitHeat.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(5)));
-            if (unitHeat.fanType != HVAC::FanType::Constant && unitHeat.fanType != HVAC::FanType::VAV &&
-                unitHeat.fanType != HVAC::FanType::OnOff && unitHeat.fanType != HVAC::FanType::SystemModel) {
-                ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5), 
-                                     "Fan Type must be Fan:ConstantVolume, Fan:VariableVolume, or Fan:OnOff");
+            if (unitHeat.fanType != HVAC::FanType::Constant && unitHeat.fanType != HVAC::FanType::VAV && unitHeat.fanType != HVAC::FanType::OnOff &&
+                unitHeat.fanType != HVAC::FanType::SystemModel) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5), "Fan Type must be Fan:ConstantVolume, Fan:VariableVolume, or Fan:OnOff");
                 ErrorsFound = true;
             }
 
@@ -353,32 +352,27 @@ namespace UnitHeater {
 
             } else {
                 auto *fan = state.dataFans->fans(unitHeat.Fan_Index);
-                    
+
                 unitHeat.FanOutletNode = fan->outletNodeNum;
 
                 FanVolFlow = fan->maxAirFlowRate;
 
                 if (FanVolFlow != AutoSize && unitHeat.MaxAirVolFlow != AutoSize && FanVolFlow < unitHeat.MaxAirVolFlow) {
-                    ShowSevereError(state,
-                                    format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
+                    ShowSevereError(state, format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                     ShowContinueError(
-                                      state,
-                                      format(
-                                             "...air flow rate ({:.7T}) in fan object {} is less than the unit heater maximum supply air flow rate ({:.7T}).",
-                                             FanVolFlow,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
-                                             state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow));
-                    ShowContinueError(state,
-                                      "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate.");
+                        state,
+                        format("...air flow rate ({:.7T}) in fan object {} is less than the unit heater maximum supply air flow rate ({:.7T}).",
+                               FanVolFlow,
+                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).FanName,
+                               state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow));
+                    ShowContinueError(state, "...the fan flow rate must be greater than or equal to the unit heater maximum supply air flow rate.");
                     ErrorsFound = true;
                 } else if (FanVolFlow == AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow != AutoSize) {
-                    ShowWarningError(state,
-                                     format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
+                    ShowWarningError(state, format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                     ShowContinueError(state, "...the fan flow rate is autosized while the unit heater flow rate is not.");
                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                 } else if (FanVolFlow != AutoSize && state.dataUnitHeaters->UnitHeat(UnitHeatNum).MaxAirVolFlow == AutoSize) {
-                    ShowWarningError(state,
-                                     format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
+                    ShowWarningError(state, format("Specified in {} = {}", CurrentModuleObject, state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name));
                     ShowContinueError(state, "...the unit heater flow rate is autosized while the fan flow rate is not.");
                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                 }
@@ -640,12 +634,8 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
             auto &unitHeat = state.dataUnitHeaters->UnitHeat(UnitHeatNum);
-            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                     unitHeat.HCoilName,
-                                                                                     unitHeat.HCoilTypeCh,
-                                                                                     unitHeat.FanName,
-                                                                                     unitHeat.fanType,
-                                                                                     unitHeat.Fan_Index);
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                state, unitHeat.HCoilName, unitHeat.HCoilTypeCh, unitHeat.FanName, unitHeat.fanType, unitHeat.Fan_Index);
         }
     }
 
@@ -1657,7 +1647,6 @@ namespace UnitHeater {
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).HeatPower = max(0.0, QUnitOut);
         state.dataUnitHeaters->UnitHeat(UnitHeatNum).ElecPower =
             state.dataFans->fans(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Fan_Index)->totalPower;
-
 
         PowerMet = QUnitOut;
         LatOutputProvided = LatentOutput;

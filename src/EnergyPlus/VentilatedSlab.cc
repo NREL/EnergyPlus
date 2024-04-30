@@ -324,7 +324,7 @@ namespace VentilatedSlab {
                                                                      cNumericFields);
 
             ErrorObjectHeader eoh{routineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
-            
+
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames.allocate(NumNumbers);
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames = cNumericFields;
             Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
@@ -963,9 +963,11 @@ namespace VentilatedSlab {
             } else {
                 ventSlab.fanType = state.dataFans->fans(ventSlab.Fan_Index)->type;
                 if (ventSlab.fanType != HVAC::FanType::Constant && ventSlab.fanType != HVAC::FanType::SystemModel) {
-                    ShowSevereCustomMessage(state, eoh,
+                    ShowSevereCustomMessage(state,
+                                            eoh,
                                             format("Only fans of type Fan:ConstantVolume and Fan:SystemModel are supported.  {} is of type {}",
-                                                   ventSlab.FanName, HVAC::fanTypeNames[(int)ventSlab.fanType]));
+                                                   ventSlab.FanName,
+                                                   HVAC::fanTypeNames[(int)ventSlab.fanType]));
                     ErrorsFound = true;
                 }
             }
@@ -1790,11 +1792,11 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using namespace DataSizing;
+        using FluidProperties::GetDensityGlycol;
+        using FluidProperties::GetSpecificHeatGlycol;
         using HVAC::CoolingCapacitySizing;
         using HVAC::HeatingAirflowSizing;
         using HVAC::HeatingCapacitySizing;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;

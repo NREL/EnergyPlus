@@ -133,13 +133,13 @@ namespace AirflowNetwork {
     using Curve::CurveValue;
     using Curve::GetCurveIndex;
     using DataEnvironment::OutDryBulbTempAt;
-    using HVAC::ContFanCycCoil;
-    using HVAC::CycFanCycCoil;
     using DataSurfaces::cExtBoundCondition;
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::OtherSideCoefNoCalcExt;
     using DataSurfaces::SurfaceClass;
     using Fans::GetFanIndex;
+    using HVAC::ContFanCycCoil;
+    using HVAC::CycFanCycCoil;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -218,8 +218,7 @@ namespace AirflowNetwork {
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     break;
                 }
-                if (FanMassFlowRate > HVAC::VerySmallMassFlow &&
-                    m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
+                if (FanMassFlowRate > HVAC::VerySmallMassFlow && m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = CycFanCycCoil;
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
@@ -1373,7 +1372,7 @@ namespace AirflowNetwork {
                         ShowSevereError(m_state, "...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).name);
                         success = false;
                     } else {
-                        auto *fanSys = dynamic_cast<Fans::FanSystem*>(m_state.dataFans->fans(fanIndex));
+                        auto *fanSys = dynamic_cast<Fans::FanSystem *>(m_state.dataFans->fans(fanIndex));
                         assert(fanSys != nullptr);
                         flowRate = fanSys->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
                         DisSysCompCVFData(i).FanModelFlag = true;
@@ -1417,8 +1416,7 @@ namespace AirflowNetwork {
                         ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:ConstantVolume");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:OnOff");
                         success = false;
-                    }
-                    else if (fanType == HVAC::FanType::OnOff && fanType2 == HVAC::FanType::Constant) {
+                    } else if (fanType == HVAC::FanType::OnOff && fanType2 == HVAC::FanType::Constant) {
                         ShowSevereError(m_state, "The Supply Fan Object Type defined in " + CurrentModuleObject + " is Fan:SimpleOnOff");
                         ShowContinueError(m_state, "The Supply Fan Object Type defined in an AirLoopHVAC is Fan:ConstantVolume");
                         success = false;
@@ -6316,8 +6314,8 @@ namespace AirflowNetwork {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using HVAC::VerySmallMassFlow;
         using General::SolveRoot;
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int constexpr CycFanCycComp(1); // fan cycles with compressor operation
@@ -10481,11 +10479,11 @@ namespace AirflowNetwork {
                     AirflowNetworkLinkageData(i).AirLoopNum;
                 if (m_state.afn->DisSysCompCVFData(AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum).FanModelFlag) {
                     m_state.dataFans
-                            ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
+                        ->fans(m_state.afn->DisSysCompCVFData(m_state.afn->AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum)
                                    .FanIndex)
                         ->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
                 } else {
-                        m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
+                    m_state.dataFans->fans(n)->airLoopNum = AirflowNetworkLinkageData(i).AirLoopNum;
                 }
             }
             if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).EPlusTypeNum == iEPlusComponentType::COI) {
@@ -11096,7 +11094,7 @@ namespace AirflowNetwork {
                 int typeNum = AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).TypeNum;
                 if (DisSysCompCVFData(typeNum).fanType == HVAC::FanType::VAV) {
                     DisSysCompCVFData(typeNum).MaxAirMassFlowRate =
-                            m_state.dataFans->fans(DisSysCompCVFData(typeNum).FanIndex)->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
+                        m_state.dataFans->fans(DisSysCompCVFData(typeNum).FanIndex)->maxAirFlowRate * m_state.dataEnvrn->StdRhoAir;
                 }
             } break;
             case iComponentTypeNum::FAN:

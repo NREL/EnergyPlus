@@ -130,15 +130,15 @@ namespace DataAirSystems {
     struct AirLoopBranchData // a branch is a sequence of components
     {
         // Members
-        std::string Name;           // Name of the branch
-        std::string ControlType;    // Control type for the branch (not used)
-        int TotalComponents = 0;    // Total number of high level components on the branch
-        Array1D_int FirstCompIndex; // Gives the component index in AllComp that corresponds to Comp
-        Array1D_int LastCompIndex;  // Gives comp index in AllComp that corresponds to last subcomponent
-        int NodeNumIn = 0;          // Branch inlet node number
-        int NodeNumOut = 0;         // Branch outlet node number
+        std::string Name;                                        // Name of the branch
+        std::string ControlType;                                 // Control type for the branch (not used)
+        int TotalComponents = 0;                                 // Total number of high level components on the branch
+        Array1D_int FirstCompIndex;                              // Gives the component index in AllComp that corresponds to Comp
+        Array1D_int LastCompIndex;                               // Gives comp index in AllComp that corresponds to last subcomponent
+        int NodeNumIn = 0;                                       // Branch inlet node number
+        int NodeNumOut = 0;                                      // Branch outlet node number
         HVAC::AirDuctType DuctType = HVAC::AirDuctType::Invalid; // 1=main, 2=cooling, 3=heating, 4=other
-        Array1D<AirLoopCompData> Comp;                                                 // Component list--high level components
+        Array1D<AirLoopCompData> Comp;                           // Component list--high level components
         //  This list would include children, grandchildren, etc.
         int TotalNodes = 0;  // total number of nodes on branch
         Array1D_int NodeNum; // node list (numbers)
@@ -201,22 +201,22 @@ namespace DataAirSystems {
         int OASysOutletNodeNum = 0;              // node number of mixed air outlet of OA sys
         int OAMixOAInNodeNum = 0;                // node number of the OA stream inlet to the
         // OA mixer component.
-        bool RABExists = false;                               // true if there is a RAB
-        int RABMixInNode = 0;                                 // node num of RAB mixer inlet
-        int SupMixInNode = 0;                                 // node num of supply air inlet to mixer
-        int MixOutNode = 0;                                   // outlet node of mixer
-        int RABSplitOutNode = 0;                              // node num of RAB splitter outlet
-        int OtherSplitOutNode = 0;                            // node num of nonRAB splitter outlet
-        int NumOACoolCoils = 0;                               // number of cooling coils in the outside air system
-        int NumOAHeatCoils = 0;                               // number of heating coils in the outside air system
-        int NumOAHXs = 0;                                     // number of heat exchangers in the outside air system
-        bool SizeAirloopCoil = true;                          // simulates air loop coils before calling controllers
+        bool RABExists = false;                            // true if there is a RAB
+        int RABMixInNode = 0;                              // node num of RAB mixer inlet
+        int SupMixInNode = 0;                              // node num of supply air inlet to mixer
+        int MixOutNode = 0;                                // outlet node of mixer
+        int RABSplitOutNode = 0;                           // node num of RAB splitter outlet
+        int OtherSplitOutNode = 0;                         // node num of nonRAB splitter outlet
+        int NumOACoolCoils = 0;                            // number of cooling coils in the outside air system
+        int NumOAHeatCoils = 0;                            // number of heating coils in the outside air system
+        int NumOAHXs = 0;                                  // number of heat exchangers in the outside air system
+        bool SizeAirloopCoil = true;                       // simulates air loop coils before calling controllers
         HVAC::FanType supFanType = HVAC::FanType::Invalid; // indicates which type of fan model to call for supply fan, legacy or new OO
-        int supFanNum = 0;       // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
+        int supFanNum = 0; // index of the supply fan in the Fan data structure when model type is StructArrayLegacyFanModels
         HVAC::FanPlace supFanPlace = HVAC::FanPlace::Invalid; // location of fan relative to coil
-        HVAC::FanType retFanType = HVAC::FanType::Invalid; // indicates which type of fan model to call for return fan, legacy or new OO
-        int retFanNum = 0;           // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
-        Real64 FanDesCoolLoad = 0.0; // design fan heat gain for the air loop [W]
+        HVAC::FanType retFanType = HVAC::FanType::Invalid;    // indicates which type of fan model to call for return fan, legacy or new OO
+        int retFanNum = 0;                       // index of the return fan in the Fan data structure when model type is StructArrayLegacyFanModels
+        Real64 FanDesCoolLoad = 0.0;             // design fan heat gain for the air loop [W]
         bool EconomizerStagingCheckFlag = false; // flag to indicate that the applicability of the selected economizer staging operation mode is valid
     };
 

@@ -399,8 +399,8 @@ namespace UnitVentilator {
             unitVent.FanName = Alphas(12);
             unitVent.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(11)));
 
-            if (unitVent.fanType != HVAC::FanType::Constant && unitVent.fanType != HVAC::FanType::VAV && 
-                unitVent.fanType != HVAC::FanType::OnOff && unitVent.fanType != HVAC::FanType::SystemModel) {
+            if (unitVent.fanType != HVAC::FanType::Constant && unitVent.fanType != HVAC::FanType::VAV && unitVent.fanType != HVAC::FanType::OnOff &&
+                unitVent.fanType != HVAC::FanType::SystemModel) {
                 ShowSevereInvalidKey(state, eoh, cAlphaFields(11), Alphas(11));
                 ShowContinueError(state, "Fan Type must be Fan:OnOff, Fan:ConstantVolume, Fan:VariableVolume, or Fan:SystemModel");
                 ErrorsFound = true;
@@ -436,7 +436,7 @@ namespace UnitVentilator {
                     ShowContinueError(state, "...this can lead to unexpected results where the fan flow rate is less than required.");
                 }
             }
-            
+
             // For node connections, this object is both a parent and a non-parent, because the
             // OA mixing box is not called out as a separate component, its nodes must be connected
             // as ObjectIsNotParent.  But for the fan and coils, the nodes are connected as ObjectIsParent
@@ -981,20 +981,12 @@ namespace UnitVentilator {
             auto &coilReportObj = state.dataRptCoilSelection->coilSelectionReportObj;
 
             if (unitVent.HCoilPresent) {
-                coilReportObj->setCoilSupplyFanInfo(state,
-                                                    unitVent.HCoilName,
-                                                    unitVent.HCoilTypeCh,
-                                                    unitVent.FanName,
-                                                    unitVent.fanType,
-                                                    unitVent.Fan_Index);
+                coilReportObj->setCoilSupplyFanInfo(
+                    state, unitVent.HCoilName, unitVent.HCoilTypeCh, unitVent.FanName, unitVent.fanType, unitVent.Fan_Index);
             }
             if (unitVent.CCoilPresent) {
-                coilReportObj->setCoilSupplyFanInfo(state,
-                                                    unitVent.CCoilName,
-                                                    unitVent.CCoilTypeCh,
-                                                    unitVent.FanName,
-                                                    unitVent.fanType,
-                                                    unitVent.Fan_Index);
+                coilReportObj->setCoilSupplyFanInfo(
+                    state, unitVent.CCoilName, unitVent.CCoilTypeCh, unitVent.FanName, unitVent.fanType, unitVent.Fan_Index);
             }
         }
     }
@@ -2404,8 +2396,7 @@ namespace UnitVentilator {
         auto &outletNode(state.dataLoopNodes->Node(unitVent.AirOutNode));
         auto &outsideAirNode(state.dataLoopNodes->Node(unitVent.OutsideAirNode));
 
-        if ((std::abs(state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) ||
-            (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
+        if ((std::abs(state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) || (state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) ||
             (ScheduleManager::GetCurrentScheduleValue(state, unitVent.SchedPtr) <= 0) ||
             ((ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanAvailSchedPtr) <= 0 && !state.dataHVACGlobal->TurnFansOn) ||
              state.dataHVACGlobal->TurnFansOff)) {
@@ -3093,13 +3084,8 @@ namespace UnitVentilator {
                 PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
 
                 if (unitVent.CCoilType == CoolCoilType::HXAssisted) {
-                    HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                                        unitVent.CCoilName,
-                                                                        FirstHVACIteration,
-                                                                        HVAC::CompressorOperation::On,
-                                                                        PartLoadFrac,
-                                                                        unitVent.CCoil_Index,
-                                                                        OpMode);
+                    HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
+                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, PartLoadFrac, unitVent.CCoil_Index, OpMode);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(
                         state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index, QCoilReq, OpMode, PartLoadFrac);

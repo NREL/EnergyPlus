@@ -244,8 +244,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
         if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
             this->autoSizedValue = _originalValue;
         } else {
-            if (this->dataCapacityUsedForSizing >= HVAC::SmallLoad && this->dataWaterFlowUsedForSizing > 0.0 &&
-                this->dataFlowUsedForSizing > 0.0) {
+            if (this->dataCapacityUsedForSizing >= HVAC::SmallLoad && this->dataWaterFlowUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
                 Real64 UA0 = 0.001 * this->dataCapacityUsedForSizing;
                 Real64 UA1 = this->dataCapacityUsedForSizing;
                 // Invert the simple heating coil model: given the design inlet conditions and the design load,

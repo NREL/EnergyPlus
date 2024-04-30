@@ -2232,13 +2232,8 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
                 state, HPWH.Type, HPWH.Name, HPWH.DXCoilType, HPWH.DXCoilName, HPWH.CoilInletNode_str, HPWH.CoilOutletNode_str);
         }
 
-        BranchNodeConnections::SetUpCompSets(state,
-                                             HPWH.Type,
-                                             HPWH.Name,
-                                             HVAC::fanTypeNames[(int)HPWH.fanType],
-                                             HPWH.FanName,
-                                             HPWH.FanInletNode_str,
-                                             HPWH.FanOutletNode_str);
+        BranchNodeConnections::SetUpCompSets(
+            state, HPWH.Type, HPWH.Name, HVAC::fanTypeNames[(int)HPWH.fanType], HPWH.FanName, HPWH.FanInletNode_str, HPWH.FanOutletNode_str);
 
         // Control Logic Flag
         std::string CtrlLogicFlag = hpwhAlphaBlank[29 + nAlphaOffset] ? "SIMULTANEOUS" : hpwhAlpha[29 + nAlphaOffset];
@@ -9060,7 +9055,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
             int SpeedNum = 1;
             if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
                 state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
-                
+
                 this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                 if (HeatPump.bIsIHP)
                     VariableSpeedCoils::SimVariableSpeedCoils(state,
@@ -9123,7 +9118,7 @@ void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool c
                 {
                     if (HeatPump.fanPlace == HVAC::FanPlace::BlowThru) {
                         state.dataFans->fans(HeatPump.FanNum)->simulate(state, FirstHVACIteration, _, _);
-                        
+
                         this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                         VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                                   "",
@@ -10210,7 +10205,6 @@ void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state,
     if (HPWH.fanType != HVAC::FanType::SystemModel) {
         state.dataFans->fans(HPWH.FanNum)->massFlowRateMaxAvail = state.dataWaterThermalTanks->mdotAir;
     } // system fan will use the inlet node max avail.
-
 
     state.dataFans->fans(HPWH.FanNum)->simulate(state, FirstHVACIteration, _, _);
 }

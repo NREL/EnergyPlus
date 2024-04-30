@@ -1890,7 +1890,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneS
 
         // check for low delta T to avoid very high flow rates
         if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > HVAC::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
-            if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
+            if (std::abs(DeltaTemp) >= 2.0) {                                         // Vdot exceeds 3000 cfm/ton @ DT=2
                 ShowWarningError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 5C of zone temperature");
             } else {
                 ShowSevereError(state, "UpdateZoneSizing: Cooling supply air temperature (calculated) within 2C of zone temperature");
@@ -1929,7 +1929,7 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneS
         }
 
         if (std::abs(DeltaTemp) < 5.0 && std::abs(DeltaTemp) > HVAC::SmallTempDiff) { // Vdot exceeds 1200 cfm/ton @ DT=5
-            if (std::abs(DeltaTemp) >= 2.0) {                                                    // Vdot exceeds 3000 cfm/ton @ DT=2
+            if (std::abs(DeltaTemp) >= 2.0) {                                         // Vdot exceeds 3000 cfm/ton @ DT=2
                 ShowWarningError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 5C of zone temperature");
             } else {
                 ShowSevereError(state, "UpdateZoneSizing: Heating supply air temperature (calculated) within 2C of zone temperature");
@@ -3459,7 +3459,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 if (zoneEquipList.EquipIndex(EquipPtr) == 0) { // TODO: Get rid of this
                     zoneEquipList.EquipIndex(EquipPtr) = Fans::GetFanIndex(state, zoneEquipList.EquipName(EquipPtr));
                 }
-                        
+
                 state.dataFans->fans(zoneEquipList.EquipIndex(EquipPtr))->simulate(state, FirstHVACIteration);
 
             } break;

@@ -2084,7 +2084,7 @@ void GetSysInput(EnergyPlusData &state)
 
         if (airTerm.fanType != HVAC::FanType::VAV && airTerm.fanType != HVAC::FanType::SystemModel) {
             ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5), "Support fan types are Fan:VAV and Fan:SystemModel");
-            
+
             ErrorsFound = true;
         }
 
@@ -2101,7 +2101,7 @@ void GetSysInput(EnergyPlusData &state)
         if (airTerm.fanType == HVAC::FanType::SystemModel) {
             dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(airTerm.Fan_Index))->isSecondaryDriver = true;
         }
-        
+
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
         if (lAlphaBlanks(2)) {
             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -3774,8 +3774,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     // unused   USE DataHeatBalFanSys, ONLY: Mat
-    using HVAC::SmallLoad;
     using HeatingCoils::SimulateHeatingCoilComponents;
+    using HVAC::SmallLoad;
     using PlantUtilities::SetActuatedBranchFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
@@ -4699,25 +4699,25 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     int SysInletNode;     // the node number of the terminal unit inlet node
     int WaterControlNode; // This is the Actuated Reheat Control Node
     int SteamControlNode;
-    Real64 MaxFlowWater;              // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowWater;              // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MaxFlowSteam;              // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 MinFlowSteam;              // This is the value passed to the Controller depending if FirstHVACIteration or not
-    Real64 HWFlow;                    // the hot water flow rate [kg/s]
-    Real64 QCoolFanOnMax;             // max cooling - fan at max flow; note that cooling is always < 0. [W]
-    Real64 QCoolFanOnMin;             // min active cooling with fan on - fan at lowest speed. [W]
-    Real64 QHeatFanOnMax;             // max heating - fan at heat flow max, hot water flow at max [W]
-    Real64 QHeatFanOnMin;             // min heating - fan at min flow, hot water at max flow [W]
-    Real64 QHeatFanOffMax;            // max heating - fan off, hot water flow at max [W]
-    Real64 QNoHeatFanOff;             // min heating - fan off, hot water at min flow [W]
-    HeatingCoilType HCType;           // heating coil type
-    HVAC::FanType fanType; // fan type (as a number)
-    Real64 HCLoad;                    // load passed to a gas or electric heating coil [W]
-    int FanOp;                        // 1 if fan is on; 0 if off.
-    Real64 MaxCoolMassFlow;           // air flow at max cooling [kg/s]
-    Real64 MaxHeatMassFlow;           // air flow at max heating [kg/s]
-    Real64 MinMassFlow;               // minimum air flow rate [kg/s]
-    Real64 UnitFlowToler;             // flow rate tolerance
+    Real64 MaxFlowWater;    // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowWater;    // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MaxFlowSteam;    // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 MinFlowSteam;    // This is the value passed to the Controller depending if FirstHVACIteration or not
+    Real64 HWFlow;          // the hot water flow rate [kg/s]
+    Real64 QCoolFanOnMax;   // max cooling - fan at max flow; note that cooling is always < 0. [W]
+    Real64 QCoolFanOnMin;   // min active cooling with fan on - fan at lowest speed. [W]
+    Real64 QHeatFanOnMax;   // max heating - fan at heat flow max, hot water flow at max [W]
+    Real64 QHeatFanOnMin;   // min heating - fan at min flow, hot water at max flow [W]
+    Real64 QHeatFanOffMax;  // max heating - fan off, hot water flow at max [W]
+    Real64 QNoHeatFanOff;   // min heating - fan off, hot water at min flow [W]
+    HeatingCoilType HCType; // heating coil type
+    HVAC::FanType fanType;  // fan type (as a number)
+    Real64 HCLoad;          // load passed to a gas or electric heating coil [W]
+    int FanOp;              // 1 if fan is on; 0 if off.
+    Real64 MaxCoolMassFlow; // air flow at max cooling [kg/s]
+    Real64 MaxHeatMassFlow; // air flow at max heating [kg/s]
+    Real64 MinMassFlow;     // minimum air flow rate [kg/s]
+    Real64 UnitFlowToler;   // flow rate tolerance
     Real64 QDelivered;
     Real64 FracDelivered;
     int SolFlag;
@@ -5274,14 +5274,14 @@ void SingleDuctAirTerminal::SimConstVolNoReheat(EnergyPlusData &state)
 }
 
 void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
-                                      bool const FirstHVACIteration,    // flag for 1st HVAV iteration in the time step
-                                      int const ZoneNode,               // zone node number
-                                      Real64 const HWFlow,              // hot water flow (kg/s)
-                                      Real64 const HCoilReq,            // gas or elec coil demand requested
-                                      HVAC::FanType fanType, // type of fan
-                                      Real64 const AirFlow,             // air flow rate (kg/s)
-                                      int const FanOn,                  // 1 means fan is on
-                                      Real64 &LoadMet                   // load met by unit (watts)
+                                      bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
+                                      int const ZoneNode,            // zone node number
+                                      Real64 const HWFlow,           // hot water flow (kg/s)
+                                      Real64 const HCoilReq,         // gas or elec coil demand requested
+                                      HVAC::FanType fanType,         // type of fan
+                                      Real64 const AirFlow,          // air flow rate (kg/s)
+                                      int const FanOn,               // 1 means fan is on
+                                      Real64 &LoadMet                // load met by unit (watts)
 )
 {
 

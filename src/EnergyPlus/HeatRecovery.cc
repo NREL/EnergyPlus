@@ -1359,8 +1359,8 @@ namespace HeatRecovery {
                 if (this->SupOutletNode > 0 && this->ControlToTemperatureSetPoint) {
                     if (state.dataLoopNodes->Node(this->SupOutletNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                            ShowSevereError(
-                                state, format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
+                            ShowSevereError(state,
+                                            format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
                             ShowContinueError(
                                 state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                             ShowFatalError(state, " Previous condition causes program termination.");
@@ -1368,9 +1368,8 @@ namespace HeatRecovery {
                             // need call to EMS to check node
                             CheckIfNodeSetPointManagedByEMS(state, this->SupOutletNode, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                             if (FatalError) {
-                                ShowSevereError(
-                                    state,
-                                    format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
+                                ShowSevereError(state,
+                                                format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
                                 ShowContinueError(
                                     state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowContinueError(
@@ -1442,10 +1441,8 @@ namespace HeatRecovery {
                     if (!state.dataHeatRecovery->CalledFromParentObject) {
                         if (state.dataLoopNodes->Node(this->SecOutletNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
-                                ShowWarningError(state,
-                                                 format("Missing optional HumRatMax setpoint for {} \"{}\"",
-                                                        HVAC::cHXTypes(this->ExchType),
-                                                        this->Name));
+                                ShowWarningError(
+                                    state, format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::cHXTypes(this->ExchType), this->Name));
                                 ShowContinueError(state,
                                                   "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
                                                   "humidity ratio setpoint.");
@@ -1459,10 +1456,9 @@ namespace HeatRecovery {
                                     state, this->SecOutletNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, LocalWarningError);
                                 state.dataLoopNodes->NodeSetpointCheck(this->SecOutletNode).needsSetpointChecking = false;
                                 if (LocalWarningError) {
-                                    ShowWarningError(state,
-                                                     format("Missing optional HumRatMax setpoint for {} \"{}\"",
-                                                            HVAC::cHXTypes(this->ExchType),
-                                                            this->Name));
+                                    ShowWarningError(
+                                        state,
+                                        format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::cHXTypes(this->ExchType), this->Name));
                                     ShowContinueError(state,
                                                       "...the simulation will continue without control of the desiccant heat exchanger to a "
                                                       "maximum humidity ratio setpoint.");
@@ -1480,12 +1476,11 @@ namespace HeatRecovery {
                 }
             }
 
-            if ((CompanionCoilIndex > -1) && ((CompanionCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) ||
-                                              (CompanionCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) ||
-                                              (CompanionCoilType_Num == HVAC::CoilDX_Cooling))) {
+            if ((CompanionCoilIndex > -1) &&
+                ((CompanionCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) || (CompanionCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) ||
+                 (CompanionCoilType_Num == HVAC::CoilDX_Cooling))) {
 
-                if (CompanionCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
-                    CompanionCoilType_Num == HVAC::CoilDX_CoolingTwoStageWHumControl) {
+                if (CompanionCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed || CompanionCoilType_Num == HVAC::CoilDX_CoolingTwoStageWHumControl) {
                     if (state.dataDXCoils->DXCoilFullLoadOutAirTemp(CompanionCoilIndex) == 0.0 ||
                         state.dataDXCoils->DXCoilFullLoadOutAirHumRat(CompanionCoilIndex) == 0.0) {
                         //       DX Coil is OFF, read actual inlet conditions

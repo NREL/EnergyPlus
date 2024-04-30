@@ -350,11 +350,11 @@ namespace AirflowNetwork {
         int DisSysNumOfTermUnits = 0;
         int DisSysNumOfLinks = 0;
         int NumOfExtNodes = 0;
-        Real64 IncAng = 0.0;                                                        // Wind incidence angle relative to facade normal (deg)
+        Real64 IncAng = 0.0;                                  // Wind incidence angle relative to facade normal (deg)
         HVAC::FanType supplyFanType = HVAC::FanType::Invalid; // Supply air fan type
-        Real64 MaxOnOffFanRunTimeFraction = 0.0; // max Run time fraction for an On/Off fan flow rate among airloops
-        Real64 CurrentEndTimeLast = 0.0;         // last end time
-        Real64 TimeStepSysLast = 0.0;            // last system time step
+        Real64 MaxOnOffFanRunTimeFraction = 0.0;              // max Run time fraction for an On/Off fan flow rate among airloops
+        Real64 CurrentEndTimeLast = 0.0;                      // last end time
+        Real64 TimeStepSysLast = 0.0;                         // last system time step
         int AirflowNetworkNumOfOccuVentCtrls = 0;
         int IntraZoneNumOfNodes = 0;
         int IntraZoneNumOfLinks = 0;

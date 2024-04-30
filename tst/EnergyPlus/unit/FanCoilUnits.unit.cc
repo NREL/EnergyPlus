@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     state->dataLoopNodes->Node(state->dataFanCoilUnits->FanCoil(1).OutsideAirNode).MassFlowRateMax = 0.0;
 
     auto *fan1 = state->dataFans->fans(1);
-    
+
     fan1->inletAirMassFlowRate = AirMassFlow;
     fan1->maxAirMassFlowRate = MaxAirMassFlow;
 

@@ -508,16 +508,11 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {HVAC::MaxRatedVolFlowPerRatedTotCap1, HVAC::MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {HVAC::MinRatedVolFlowPerRatedTotCap1, HVAC::MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {HVAC::MaxHeatVolFlowPerRatedTotCap1, HVAC::MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {HVAC::MaxCoolVolFlowPerRatedTotCap1, HVAC::MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {HVAC::MinOperVolFlowPerRatedTotCap1, HVAC::MinOperVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxRatedVolFlowPerRatedTotCap1, HVAC::MaxRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinRatedVolFlowPerRatedTotCap1, HVAC::MinRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxHeatVolFlowPerRatedTotCap1, HVAC::MaxHeatVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxCoolVolFlowPerRatedTotCap1, HVAC::MaxCoolVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinOperVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinOperVolFlowPerRatedTotCap1, HVAC::MinOperVolFlowPerRatedTotCap2});
 
     int DXCT = 1;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step

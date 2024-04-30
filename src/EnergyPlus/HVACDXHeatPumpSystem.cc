@@ -551,8 +551,8 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using HVAC::TempControlTol;
         using DXCoils::SimDXCoil;
+        using HVAC::TempControlTol;
 
         using General::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
@@ -704,7 +704,7 @@ namespace HVACDXHeatPumpSystem {
                                 } else {
                                     int coilIndex = DXHeatPumpSystem.HeatPumpCoilIndex;
                                     auto f = [&state, coilIndex, DesOutTemp](Real64 const PartLoadFrac) {
-                                            DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, HVAC::ContFanCycCoil, 1.0);
+                                        DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, HVAC::ContFanCycCoil, 1.0);
                                         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(coilIndex);
                                         return DesOutTemp - OutletAirTemp;
                                     };

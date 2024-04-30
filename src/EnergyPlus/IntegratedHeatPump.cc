@@ -74,16 +74,16 @@ using namespace DataLoopNode;
 Real64 constexpr WaterDensity(986.0); // standard water density at 60 C
 
 void SimIHP(EnergyPlusData &state,
-            std::string_view CompName,                               // Coil Name
-            int &CompIndex,                                          // Index for Component name
-            int const CyclingScheme,                                 // Continuous fan OR cycling compressor
+            std::string_view CompName,                    // Coil Name
+            int &CompIndex,                               // Index for Component name
+            int const CyclingScheme,                      // Continuous fan OR cycling compressor
             HVAC::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
-            Real64 const PartLoadFrac,                               // part load fraction
-            int const SpeedNum,                                      // compressor speed number
-            Real64 const SpeedRatio,                                 // compressor speed ratio
-            Real64 const SensLoad,                                   // Sensible demand load [W]
-            Real64 const LatentLoad,                                 // Latent demand load [W]
-            bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
+            Real64 const PartLoadFrac,                    // part load fraction
+            int const SpeedNum,                           // compressor speed number
+            Real64 const SpeedRatio,                      // compressor speed ratio
+            Real64 const SensLoad,                        // Sensible demand load [W]
+            Real64 const LatentLoad,                      // Latent demand load [W]
+            bool const IsCallbyWH,                        // whether the call from the water heating loop or air loop, true = from water heating loop
             [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
             ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )
@@ -1630,22 +1630,14 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
 
     // clear up
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCDWHCoolCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHDWHHeatCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.DWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 }
 
 IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)

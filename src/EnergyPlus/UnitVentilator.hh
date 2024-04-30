@@ -111,7 +111,7 @@ namespace UnitVentilator {
         int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
         HVAC::FanType fanType = HVAC::FanType::Invalid; // Fan type number (see DataHVACGlobals)
-        std::string FanName;                                                  // name of fan
+        std::string FanName;                            // name of fan
         int Fan_Index = 0;
         int FanSchedPtr = 0;      // index to fan operating mode schedule
         int FanAvailSchedPtr = 0; // index to fan availability schedule
@@ -239,11 +239,11 @@ namespace UnitVentilator {
     );
 
     void CalcUnitVentilatorComponents(EnergyPlusData &state,
-                                      int const UnitVentNum,         // Unit index in unit ventilator array
-                                      bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                      Real64 &LoadMet,               // load met by unit (watts)
+                                      int const UnitVentNum,                                       // Unit index in unit ventilator array
+                                      bool const FirstHVACIteration,                               // flag for 1st HVAV iteration in the time step
+                                      Real64 &LoadMet,                                             // load met by unit (watts)
                                       ObjexxFCL::Optional_int_const OpMode = HVAC::ContFanCycCoil, // Fan Type
-                                      ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0                    // Part Load Ratio of coil and fan
+                                      ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0         // Part Load Ratio of coil and fan
     );
 
     void SimUnitVentOAMixer(EnergyPlusData &state,

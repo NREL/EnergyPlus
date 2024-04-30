@@ -274,6 +274,6 @@ namespace HVAC {
                                                                                           "AirTerminal:DualDuct:VAV:OutdoorAir",
                                                                                           "AirLoopHVACReturnAir"};
 #endif //
-} // namespace DataHVACGlobals
+} // namespace HVAC
 
 } // namespace EnergyPlus

@@ -155,10 +155,9 @@ namespace ExhaustAirSystemManager {
                 thisExhSys.ZoneMixerName = zoneMixerName;
                 thisExhSys.ZoneMixerIndex = zoneMixerIndex;
 
-                thisExhSys.centralFanType = static_cast<HVAC::FanType>(getEnumValue(
-                    HVAC::fanTypeNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type"))));
-                if (thisExhSys.centralFanType != HVAC::FanType::SystemModel &&
-                    thisExhSys.centralFanType != HVAC::FanType::ComponentModel) {
+                thisExhSys.centralFanType = static_cast<HVAC::FanType>(
+                    getEnumValue(HVAC::fanTypeNamesUC, Util::makeUPPER(ip->getAlphaFieldValue(objectFields, objectSchemaProps, "fan_object_type"))));
+                if (thisExhSys.centralFanType != HVAC::FanType::SystemModel && thisExhSys.centralFanType != HVAC::FanType::ComponentModel) {
                     ShowSevereError(state, format("{}{}={}", RoutineName, cCurrentModuleObject, thisExhSys.Name));
                     ShowContinueError(state, format("Fan Type ={} is not supported.", HVAC::fanTypeNames[(int)thisExhSys.centralFanType]));
                     ShowContinueError(state, "It needs to be either a Fan:SystemModel or a Fan:ComponentModel type.");
@@ -170,11 +169,11 @@ namespace ExhaustAirSystemManager {
                 ErrorObjectHeader eoh{routineName, cCurrentModuleObject, thisExhSys.Name};
                 int centralFanIndex = Fans::GetFanIndex(state, centralFanName);
                 if (centralFanIndex == 0) {
-                     ShowSevereItemNotFound(state, eoh, "fan_name", centralFanName);
-                     ErrorsFound = true;
+                    ShowSevereItemNotFound(state, eoh, "fan_name", centralFanName);
+                    ErrorsFound = true;
                 } else {
                     auto *fan = state.dataFans->fans(centralFanIndex);
-                    
+
                     thisExhSys.AvailScheduleNum = fan->availSchedNum;
 
                     BranchNodeConnections::SetUpCompSets(state,
@@ -200,7 +199,7 @@ namespace ExhaustAirSystemManager {
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         thisExhSys.Name);
-                    
+
                     SetupOutputVariable(state,
                                         "Central Exhaust Fan Volumetric Flow Rate Current",
                                         Constant::Units::m3_s,
@@ -208,7 +207,7 @@ namespace ExhaustAirSystemManager {
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         thisExhSys.Name);
-                    
+
                     SetupOutputVariable(state,
                                         "Central Exhaust Fan Power",
                                         Constant::Units::W,
@@ -216,7 +215,7 @@ namespace ExhaustAirSystemManager {
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         thisExhSys.Name);
-                    
+
                     SetupOutputVariable(state,
                                         "Central Exhaust Fan Energy",
                                         Constant::Units::J,
@@ -331,8 +330,7 @@ namespace ExhaustAirSystemManager {
         if (mixerFlow_Prior < HVAC::SmallMassFlow) {
             // this is the case where the fan flow should be resetted to zeros and not run the ratio
         }
-        if ((mixerFlow_Prior - mixerFlow_Posterior > HVAC::SmallMassFlow) ||
-            (mixerFlow_Prior - mixerFlow_Posterior < -HVAC::SmallMassFlow)) {
+        if ((mixerFlow_Prior - mixerFlow_Posterior > HVAC::SmallMassFlow) || (mixerFlow_Prior - mixerFlow_Posterior < -HVAC::SmallMassFlow)) {
             // calculate a ratio
             Real64 flowRatio = mixerFlow_Posterior / mixerFlow_Prior;
             if (flowRatio > 1.0) {
@@ -733,14 +731,10 @@ namespace ExhaustAirSystemManager {
             if (fan->maxAirFlowRate == DataSizing::AutoSize) {
                 fan->maxAirFlowRate = outletFlowMaxAvail / state.dataEnvrn->StdRhoAir;
             }
-            BaseSizer::reportSizerOutput(state,
-                                         "FAN:SYSTEMMODEL",
-                                         fan->Name,
-                                         "Design Fan Airflow [m3/s]",
-                                         fan->maxAirFlowRate);
+            BaseSizer::reportSizerOutput(state, "FAN:SYSTEMMODEL", fan->Name, "Design Fan Airflow [m3/s]", fan->maxAirFlowRate);
         } else if (thisExhSys.centralFanType == HVAC::FanType::ComponentModel) {
             if (fan->maxAirMassFlowRate == DataSizing::AutoSize) {
-                fan->maxAirMassFlowRate = outletFlowMaxAvail * dynamic_cast<Fans::FanComponent*>(fan)->sizingFactor;
+                fan->maxAirMassFlowRate = outletFlowMaxAvail * dynamic_cast<Fans::FanComponent *>(fan)->sizingFactor;
             }
             BaseSizer::reportSizerOutput(state,
                                          HVAC::fanTypeNames[(int)fan->type],

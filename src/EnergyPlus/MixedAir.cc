@@ -474,17 +474,17 @@ void SimOAComponent(EnergyPlusData &state,
         }
         break;
     }
-    case SimAirServingZones::CompType::Fan_Simple_CV:    // Fan:ConstantVolume
-    case SimAirServingZones::CompType::Fan_Simple_VAV:  // Fan:VariableVolume
-    case SimAirServingZones::CompType::Fan_System_Object:  // Fan:SystemModel
+    case SimAirServingZones::CompType::Fan_Simple_CV:        // Fan:ConstantVolume
+    case SimAirServingZones::CompType::Fan_Simple_VAV:       // Fan:VariableVolume
+    case SimAirServingZones::CompType::Fan_System_Object:    // Fan:SystemModel
     case SimAirServingZones::CompType::Fan_ComponentModel: { // Fan:ComponentModel
         if (Sim) {
             if (CompIndex == 0) { // TODO: get rid of this stuff
                 CompIndex = Fans::GetFanIndex(state, CompName);
                 assert(CompIndex > 0);
             }
-                
-            state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration); 
+
+            state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration);
         }
     } break;
     case SimAirServingZones::CompType::WaterCoil_Cooling: { // Coil:Cooling:Water
@@ -801,7 +801,7 @@ void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &Ct
                                 if (state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
                                         HVAC::CoilDX_MultiSpeedCooling ||
                                     state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num ==
-                                    HVAC::Coil_CoolingAirToAirVariableSpeed ||
+                                        HVAC::Coil_CoolingAirToAirVariableSpeed ||
                                     state.dataUnitarySystems->unitarySys[unitarySystemNum - 1].m_CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
                                     sensLoadCtrlUnitarySystemFound = true;
                                     break;
@@ -2402,8 +2402,7 @@ void ProcessOAControllerInputs(EnergyPlusData &state,
             if (Util::SameString(AlphArray(20), "EconomizerFirst")) {
                 state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = HVAC::EconomizerStagingType::EconomizerFirst;
             } else {
-                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType =
-                    HVAC::EconomizerStagingType::InterlockedWithMechanicalCooling;
+                state.dataMixedAir->OAController(OutAirNum).EconomizerStagingType = HVAC::EconomizerStagingType::InterlockedWithMechanicalCooling;
             }
         }
     }

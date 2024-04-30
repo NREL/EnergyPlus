@@ -96,10 +96,9 @@ CoilSelectionData::CoilSelectionData( // constructor
       ratedCoilInEnth(-999.0), ratedCoilOutDb(-999.0), ratedCoilOutWb(-999.0), ratedCoilOutHumRat(-999.0), ratedCoilOutEnth(-999.0),
       ratedCoilEff(-999.0), ratedCoilBpFactor(-999.0), ratedCoilAppDewPt(-999.0), ratedCoilOadbRef(-999.0), ratedCoilOawbRef(-999.0),
 
-      supFanType(HVAC::FanType::Invalid), supFanNum(0), fanSizeMaxAirVolumeFlow(-999.0), fanSizeMaxAirMassFlow(-999.0),
-      fanHeatGainIdealPeak(-999.0), coilAndFanNetTotalCapacityIdealPeak(-999.0), plantDesMaxMassFlowRate(-999.0), plantDesRetTemp(-999.0),
-      plantDesSupTemp(-999.0), plantDesDeltaTemp(-999.0), plantDesCapacity(-999.0), coilCapPrcntPlantCap(-999.0), coilFlowPrcntPlantFlow(-999.0),
-      coilUA(-999.0)
+      supFanType(HVAC::FanType::Invalid), supFanNum(0), fanSizeMaxAirVolumeFlow(-999.0), fanSizeMaxAirMassFlow(-999.0), fanHeatGainIdealPeak(-999.0),
+      coilAndFanNetTotalCapacityIdealPeak(-999.0), plantDesMaxMassFlowRate(-999.0), plantDesRetTemp(-999.0), plantDesSupTemp(-999.0),
+      plantDesDeltaTemp(-999.0), plantDesCapacity(-999.0), coilCapPrcntPlantCap(-999.0), coilFlowPrcntPlantFlow(-999.0), coilUA(-999.0)
 {
     coilName_ = coilName;
     coilLocation = "unknown";
@@ -622,12 +621,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         // fill out supply fan info
         auto *fan = state.dataFans->fans(state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanNum);
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                state,
-                c->coilName_,
-                c->coilObjName,
-                fan->Name,
-                fan->type,
-                state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanNum);
+            state, c->coilName_, c->coilObjName, fan->Name, fan->type, state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).supFanNum);
     }
 
     if (c->zoneEqNum > 0) {
@@ -1978,8 +1972,7 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     c->fanAssociatedWithCoilName = fanName;
     c->supFanType = fanType;
     c->supFanNum = fanIndex;
-    if (c->supFanNum == 0)
-        c->supFanNum = Fans::GetFanIndex(state, fanName);
+    if (c->supFanNum == 0) c->supFanNum = Fans::GetFanIndex(state, fanName);
 }
 
 std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const timeStepAtPeak)

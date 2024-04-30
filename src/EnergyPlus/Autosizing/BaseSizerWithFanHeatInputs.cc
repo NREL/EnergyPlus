@@ -63,7 +63,7 @@ void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state,
     this->dataDesAccountForFanHeat = state.dataSize->DataDesAccountForFanHeat;
     // water coils on main branch have no parent object to set DataFan* variables
     if (!(this->primaryAirSystem.empty()) && this->curSysNum > 0 && this->curOASysNum == 0) {
-        if (this->primaryAirSystem(this->curSysNum).supFanType != HVAC::FanType::Invalid) { 
+        if (this->primaryAirSystem(this->curSysNum).supFanType != HVAC::FanType::Invalid) {
             this->dataFanType = this->primaryAirSystem(this->curSysNum).supFanType;
             this->dataFanIndex = this->primaryAirSystem(this->curSysNum).supFanNum;
         }
@@ -82,7 +82,7 @@ void BaseSizerWithFanHeatInputs::initializeWithinEP(EnergyPlusData &state,
 Real64 BaseSizerWithFanHeatInputs::calcFanDesHeatGain(Real64 const &airVolFlow)
 {
     if (this->dataFanType == HVAC::FanType::Invalid || this->dataFanIndex == 0) {
-       return 0.0;
+        return 0.0;
     }
     if (this->fanCompModel) {
         return this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;

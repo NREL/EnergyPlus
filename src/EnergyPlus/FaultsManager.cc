@@ -426,7 +426,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(2)) {
                 faultsChillerFouling.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsChillerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+            } else if ((faultsChillerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -434,7 +434,7 @@ namespace FaultsManager {
             // Fault severity schedule
             if (lAlphaFieldBlanks(3)) {
                 faultsChillerFouling.severitySchedNum = -1; // returns schedule value of 1
-            } else if ((faultsChillerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+            } else if ((faultsChillerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -702,7 +702,7 @@ namespace FaultsManager {
             // Fault severity schedule
             if (lAlphaFieldBlanks(3)) {
                 faultsBoilerFouling.severitySchedNum = -1; // returns schedule value of 1
-            } else if ((faultsBoilerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+            } else if ((faultsBoilerFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -772,7 +772,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(2)) {
                 faultsCoilSATFouling.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsCoilSATFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+            } else if ((faultsCoilSATFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -992,7 +992,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(2)) {
                 faultsTowerFouling.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsTowerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+            } else if ((faultsTowerFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1100,7 +1100,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(2)) {
                 faultsCondSWTFouling.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsCondSWTFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+            } else if ((faultsCondSWTFouling.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1108,7 +1108,7 @@ namespace FaultsManager {
             // Fault severity schedule
             if (lAlphaFieldBlanks(3)) {
                 faultsCondSWTFouling.severitySchedNum = -1; // returns schedule value of 1
-            } else if ((faultsCondSWTFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+            } else if ((faultsCondSWTFouling.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1193,7 +1193,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(2)) {
                 faultsChillerSWT.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsChillerSWT.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+            } else if ((faultsChillerSWT.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1201,7 +1201,7 @@ namespace FaultsManager {
             // Fault severity schedule
             if (lAlphaFieldBlanks(3)) {
                 faultsChillerSWT.severitySchedNum = -1; // returns schedule value of 1
-            } else if ((faultsChillerSWT.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+            } else if ((faultsChillerSWT.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1414,7 +1414,7 @@ namespace FaultsManager {
                                                                      cAlphaFieldNames,
                                                                      cNumericFieldNames);
 
-            ErrorObjectHeader eoh {routineName, cFaultCurrentObject, cAlphaArgs(1)};
+            ErrorObjectHeader eoh{routineName, cFaultCurrentObject, cAlphaArgs(1)};
             faultsAirFilter.type = FaultType::Fouling_AirFilter;
             faultsAirFilter.Name = cAlphaArgs(1);
 
@@ -1424,7 +1424,7 @@ namespace FaultsManager {
                 ShowSevereError(state, "Fault:AirFilter cannot be applied to a Fan:SystemModel object");
                 state.dataFaultsMgr->ErrorsFound = true;
             }
-            
+
             faultsAirFilter.fanName = cAlphaArgs(3);
 
             // Check whether the specified fan exists in the fan list
@@ -1432,9 +1432,9 @@ namespace FaultsManager {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             } else {
-                auto *fanComp = dynamic_cast<Fans::FanComponent*>(state.dataFans->fans(faultsAirFilter.fanNum));
+                auto *fanComp = dynamic_cast<Fans::FanComponent *>(state.dataFans->fans(faultsAirFilter.fanNum));
                 assert(fanComp != nullptr);
-                    
+
                 fanComp->faultyFilterFlag = true;
                 fanComp->faultyFilterIndex = jFault_AirFilter;
             }
@@ -1442,7 +1442,7 @@ namespace FaultsManager {
             // Fault availability schedule
             if (lAlphaFieldBlanks(4)) {
                 faultsAirFilter.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsAirFilter.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) { 
+            } else if ((faultsAirFilter.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1457,7 +1457,7 @@ namespace FaultsManager {
 
             // Fan curve describing the relationship between fan pressure rise and air flow rate
 
-            if ((faultsAirFilter.fanCurveNum = Curve::GetCurveIndex(state, cAlphaArgs(6)))== 0) {
+            if ((faultsAirFilter.fanCurveNum = Curve::GetCurveIndex(state, cAlphaArgs(6))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(6), cAlphaArgs(6));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1513,7 +1513,7 @@ namespace FaultsManager {
                 // Availability schedule
                 if (lAlphaFieldBlanks(4)) {
                     faultsHStat.availSchedNum = -1; // returns schedule value of 1
-                } else if ((faultsHStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) { 
+                } else if ((faultsHStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
@@ -1521,7 +1521,7 @@ namespace FaultsManager {
                 // Severity schedule
                 if (lAlphaFieldBlanks(5)) {
                     faultsHStat.severitySchedNum = -1; // returns schedule value of 1
-                } else if ((faultsHStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5))) == 0) { 
+                } else if ((faultsHStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(5))) == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(5), cAlphaArgs(5));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
@@ -1566,7 +1566,7 @@ namespace FaultsManager {
             // Availability schedule
             if (lAlphaFieldBlanks(3)) {
                 faultsTStat.availSchedNum = -1; // returns schedule value of 1
-            } else if ((faultsTStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+            } else if ((faultsTStat.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1574,7 +1574,7 @@ namespace FaultsManager {
             // Severity schedule
             if (lAlphaFieldBlanks(4)) {
                 faultsTStat.severitySchedNum = -1; // returns schedule value of 1
-            } else if ((faultsTStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) { 
+            } else if ((faultsTStat.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(4))) == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(4), cAlphaArgs(4));
                 state.dataFaultsMgr->ErrorsFound = true;
             }
@@ -1776,7 +1776,7 @@ namespace FaultsManager {
                 // check availability schedule
                 if (lAlphaFieldBlanks(2)) {
                     fault.availSchedNum = -1; // returns schedule value of 1
-                } else if ((fault.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) { 
+                } else if ((fault.availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }
@@ -1784,7 +1784,7 @@ namespace FaultsManager {
                 // check severity schedule
                 if (lAlphaFieldBlanks(3)) {
                     fault.severitySchedNum = -1; // returns schedule value of 1
-                } else if ((fault.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) { 
+                } else if ((fault.severitySchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(3))) == 0) {
                     ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(3), cAlphaArgs(3));
                     state.dataFaultsMgr->ErrorsFound = true;
                 }

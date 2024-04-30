@@ -152,7 +152,7 @@ namespace FaultsManager {
         int availSchedNum = 0;
         int severitySchedNum = 0;
         Real64 Offset = 0.0; // offset, + means sensor reading is higher than actual value
-        bool Status = false;   // for future use
+        bool Status = false; // for future use
 
         // Virtual Destructor
         virtual ~FaultProperties() = default;
@@ -242,13 +242,13 @@ namespace FaultsManager {
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
     {
         // Members
-        std::string fanName;       // The name of the fan corresponding to the fouled air filter
-        int fanNum = 0; 
-        HVAC::FanType fanType = HVAC::FanType::Invalid;       // The type of the fan corresponding to the fouled air filter
-        int fanCurveNum = 0;           // The index to the curve
-        int pressFracSchedNum = 0;      // The pointer to the schedule
-        Real64 fanPressInc = 0.0;        // The increase of the fan pressure due to fouled air filter
-        Real64 fanFlowDec = 0.0;         // The decrease of the fan airflow rate due to fouled air filter
+        std::string fanName; // The name of the fan corresponding to the fouled air filter
+        int fanNum = 0;
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // The type of the fan corresponding to the fouled air filter
+        int fanCurveNum = 0;                            // The index to the curve
+        int pressFracSchedNum = 0;                      // The pointer to the schedule
+        Real64 fanPressInc = 0.0;                       // The increase of the fan pressure due to fouled air filter
+        Real64 fanFlowDec = 0.0;                        // The decrease of the fan airflow rate due to fouled air filter
 
         // Destructor
         virtual ~FaultPropertiesAirFilter() = default;

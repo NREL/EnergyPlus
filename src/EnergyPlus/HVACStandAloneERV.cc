@@ -283,7 +283,7 @@ void GetStandAloneERV(EnergyPlusData &state)
 
         errFlag = false;
 
-        if ((standAloneERV.SupplyAirFanIndex = Fans::GetFanIndex(state, standAloneERV.SupplyAirFanName)) == 0) { 
+        if ((standAloneERV.SupplyAirFanIndex = Fans::GetFanIndex(state, standAloneERV.SupplyAirFanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFields(4), standAloneERV.SupplyAirFanName);
             ErrorsFound = true;
         } else {
@@ -306,7 +306,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         } else {
             auto *fan = state.dataFans->fans(standAloneERV.ExhaustAirFanIndex);
             standAloneERV.exhaustAirFanType = fan->type;
-            
+
             standAloneERV.ExhaustAirFanSchPtr = fan->availSchedNum;
             standAloneERV.DesignEAFanVolFlowRate = fan->maxAirFlowRate;
             standAloneERV.ExhaustAirOutletNode = fan->outletNodeNum;
@@ -880,11 +880,10 @@ void GetStandAloneERV(EnergyPlusData &state)
                     ShowContinueError(state,
                                       "... This flow ratio results in a Supply Air Volume Flow Rate through the ERV which is greater than the "
                                       "Max Volume specified in the supply air fan object.");
-                    ShowContinueError(
-                        state,
-                        format("... Associated fan object = {} \"{}\"",
-                               HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).supplyAirFanType],
-                               state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirFanName));
+                    ShowContinueError(state,
+                                      format("... Associated fan object = {} \"{}\"",
+                                             HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).supplyAirFanType],
+                                             state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirFanName));
                     ShowContinueError(state,
                                       format("... Modified value                   = {:.2R}",
                                              state.dataHVACStandAloneERV->StandAloneERV(WhichERV).SupplyAirVolFlow * HighRHOARatio));
@@ -905,11 +904,10 @@ void GetStandAloneERV(EnergyPlusData &state)
                     ShowContinueError(state,
                                       "... This flow ratio results in an Exhaust Air Volume Flow Rate through the ERV which is greater than the "
                                       "Max Volume specified in the exhaust air fan object.");
-                    ShowContinueError(
-                        state,
-                        format("... Associated fan object = {} \"{}\"",
-                               HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).exhaustAirFanType],
-                               state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirFanName));
+                    ShowContinueError(state,
+                                      format("... Associated fan object = {} \"{}\"",
+                                             HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(WhichERV).exhaustAirFanType],
+                                             state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirFanName));
                     ShowContinueError(state,
                                       format("... Modified value                    = {:.2R}",
                                              state.dataHVACStandAloneERV->StandAloneERV(WhichERV).ExhaustAirVolFlow * HighRHOARatio));
@@ -1364,11 +1362,10 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
             if (state.dataGlobal->DisplayExtraWarnings) {
                 if ((std::abs(DesignSAFanVolFlowRateDes - DesignSAFanVolFlowRateUser) / DesignSAFanVolFlowRateUser) >
                     state.dataSize->AutoVsHardSizingThreshold) {
-                    ShowMessage(
-                        state,
-                        format("SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator {} {}",
-                               HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).supplyAirFanType],
-                               state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName));
+                    ShowMessage(state,
+                                format("SizeStandAloneERV: Potential issue with equipment sizing for ZoneHVAC:EnergyRecoveryVentilator {} {}",
+                                       HVAC::fanTypeNames[(int)state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).supplyAirFanType],
+                                       state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanName));
                     ShowContinueError(state, format("User-Specified Supply Fan Maximum Flow Rate of {:.5R} [m3/s]", DesignSAFanVolFlowRateUser));
                     ShowContinueError(state, format("differs from the ERV Supply Air Flow Rate of {:.5R} [m3/s]", DesignSAFanVolFlowRateDes));
                     ShowContinueError(state, "This may, or may not, indicate mismatched component sizes.");
@@ -1382,7 +1379,7 @@ void SizeStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum)
     // (i.e., ZoneEqSizing( CurZoneEqNum ).AirVolFlow = StandAloneERV( StandAloneERVNum ).SupplyAirVolFlow * StandAloneERV( StandAloneERVNum
     // ).HighRHOAFlowRatio;)
     state.dataFans->fans(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).SupplyAirFanIndex)->simulate(state, true, _, _);
-    
+
     state.dataFans->fans(state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex)->simulate(state, true, _, _);
 
     // now reset the ZoneEqSizing variable to NOT use the multiplier for HighRHOAFlowRatio for sizing HXs
@@ -1668,7 +1665,7 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
         ExhaustFanInletNodeIndex = state.dataFans->fans(StandAloneERV.ExhaustAirFanIndex)->inletNodeNum;
         ExhaustFanOutletNodeIndex = state.dataFans->fans(StandAloneERV.ExhaustAirFanIndex)->outletNodeNum;
         ExhaustFanAirFlow = state.dataFans->fans(StandAloneERV.ExhaustAirFanIndex)->maxAirFlowRate;
-            
+
         // If a standalone ERV's airflow is unbalanced it shouldn't be model along with an AFN
         if (std::abs(SupplyFanAirFlow - ExhaustFanAirFlow) >= 1E-20 ||
             std::abs(StandAloneERV.DesignSAFanVolFlowRate - StandAloneERV.DesignEAFanVolFlowRate) >= 1E-20) {

@@ -94,10 +94,10 @@ namespace HVACHXAssistedCoolingCoil {
     //   Climates, July 24-26, 2006.
 
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
-                                  std::string_view HXAssistedCoilName,                     // Name of HXAssistedCoolingCoil
-                                  bool const FirstHVACIteration,                           // FirstHVACIteration flag
+                                  std::string_view HXAssistedCoilName,          // Name of HXAssistedCoolingCoil
+                                  bool const FirstHVACIteration,                // FirstHVACIteration flag
                                   HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
-                                  Real64 const PartLoadRatio,                              // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
+                                  Real64 const PartLoadRatio,                   // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   int const FanOpMode,                         // Allows the parent object to control fan operation
                                   ObjexxFCL::Optional_bool_const HXUnitEnable, // flag to enable heat exchanger heat recovery
@@ -871,12 +871,12 @@ namespace HVACHXAssistedCoolingCoil {
     //******************************************************************************
 
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
-                                   int const HXAssistedCoilNum,                             // Index number for HXAssistedCoolingCoil
-                                   bool const FirstHVACIteration,                           // FirstHVACIteration flag
-                                   HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
-                                   Real64 const PartLoadRatio,                              // Cooling coil part load ratio
-                                   bool const HXUnitOn,                                     // Flag to enable heat exchanger
-                                   int const FanOpMode,                                     // Allows parent object to control fan operation
+                                   int const HXAssistedCoilNum,                    // Index number for HXAssistedCoolingCoil
+                                   bool const FirstHVACIteration,                  // FirstHVACIteration flag
+                                   HVAC::CompressorOperation const CompressorOp,   // compressor operation; 1=on, 0=off
+                                   Real64 const PartLoadRatio,                     // Cooling coil part load ratio
+                                   bool const HXUnitOn,                            // Flag to enable heat exchanger
+                                   int const FanOpMode,                            // Allows parent object to control fan operation
                                    ObjexxFCL::Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
                                    ObjexxFCL::Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
                                    ObjexxFCL::Optional_int_const DehumidificationMode,        // Optional dehumbidication mode
@@ -907,8 +907,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
         state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
 
-        if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling ||
-            thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
+        if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling || thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
             thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
             CompanionCoilIndexNum = thisHXCoil.CoolingCoilIndex;
         } else {
@@ -1198,8 +1197,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,
                                                             state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilName,
                                                             errFlag);
-                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num ==
-                           HVAC::Coil_CoolingAirToAirVariableSpeed) {
+                } else if (state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
                     CoilCapacity =
                         VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
                                                                          state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).CoolingCoilType,

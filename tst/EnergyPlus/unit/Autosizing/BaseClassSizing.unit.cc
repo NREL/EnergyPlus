@@ -445,20 +445,20 @@ TEST_F(EnergyPlusFixture, BaseSizer_RequestSizingSystemWithFans)
     state->dataEnvrn->StdRhoAir = 1.2;
 
     auto *fan1 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 1"));
-    fan1->simulate(*state, false, _, _);                       // triggers sizing call
+    fan1->simulate(*state, false, _, _);          // triggers sizing call
     Real64 locFanSizeVdot = fan1->maxAirFlowRate; // get function
     Real64 locDesignHeatGain1 = fan1->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
     auto *fan2 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 2"));
-    fan2->simulate(*state, false, _, _);                            // triggers sizing call
-    locFanSizeVdot = fan2->maxAirFlowRate;             // get function
+    fan2->simulate(*state, false, _, _);   // triggers sizing call
+    locFanSizeVdot = fan2->maxAirFlowRate; // get function
     Real64 locDesignHeatGain2 = fan2->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
     auto *fan3 = state->dataFans->fans(Fans::GetFanIndex(*state, "TEST FAN 3"));
     state->dataEnvrn->StdRhoAir = 1.2;
-    fan3->simulate(*state, false, _, _);                // triggers sizing call
+    fan3->simulate(*state, false, _, _);                       // triggers sizing call
     locFanSizeVdot = state->dataFans->fans(3)->maxAirFlowRate; // get function
     Real64 locDesignHeatGain3 = fan3->getDesignHeatGain(*state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);

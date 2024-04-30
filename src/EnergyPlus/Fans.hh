@@ -77,7 +77,9 @@ namespace Fans {
 
     struct FanBase
     {
-        FanBase() {}
+        FanBase()
+        {
+        }
 
         virtual ~FanBase() = default;
 
@@ -86,7 +88,7 @@ namespace Fans {
         virtual void init(EnergyPlusData &state) = 0;
         virtual void simulate(EnergyPlusData &state,
                               bool const FirstHVACIteration,
-                              ObjexxFCL::Optional<Real64 const> speedRatio = _,     // Flow fraction in operating mode 1
+                              ObjexxFCL::Optional<Real64 const> speedRatio = _,       // Flow fraction in operating mode 1
                               ObjexxFCL::Optional<Real64 const> pressureRise = _,     // Pressure difference to use for DeltaPress
                               ObjexxFCL::Optional<Real64 const> flowFraction = _,     // Flow fraction in operating mode 1
                               ObjexxFCL::Optional<Real64 const> massFlowRate1 = _,    // Mass flow rate in operating mode 1 [kg/s]
@@ -94,8 +96,8 @@ namespace Fans {
                               ObjexxFCL::Optional<Real64 const> massFlowRate2 = _,    // Mass flow rate in operating mode 2 [kg/s]
                               ObjexxFCL::Optional<Real64 const> runTimeFraction2 = _, // Run time fraction in operating mode 2
                               ObjexxFCL::Optional<Real64 const> pressureRise2 = _     // Pressure difference to use for operating mode 2
-                              );
-            
+        );
+
         virtual void update(EnergyPlusData &state) = 0;
 
         virtual void report(EnergyPlusData &state) = 0;
@@ -111,7 +113,7 @@ namespace Fans {
                                                 Real64 &motInPower,
                                                 bool &fanCompModel) = 0;
         // Members
-        std::string Name;                                                     // Name of the fan
+        std::string Name;                            // Name of the fan
         HVAC::FanType type = HVAC::FanType::Invalid; // DataHVACGlobals fan type
 
         bool envrnFlag = true;  // initialize to true
@@ -119,41 +121,39 @@ namespace Fans {
 
         std::string endUseSubcategoryName;
 
-        int availSchedNum = 0;                                             // Pointer to the availability schedule
+        int availSchedNum = 0; // Pointer to the availability schedule
         int inletNodeNum = 0;
         int outletNodeNum = 0;
         int airLoopNum = 0;
-        bool airPathFlag = false;                       // Yes, this fan is a part of airpath
+        bool airPathFlag = false; // Yes, this fan is a part of airpath
 
-        Real64 maxAirFlowRate = 0.0;            // Max Specified Volume Flow Rate of Fan [m3/sec]
-        Real64 minAirFlowRate = 0.0;            // Max Specified Volume Flow Rate of Fan [m3/sec]
+        Real64 maxAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]
+        Real64 minAirFlowRate = 0.0; // Max Specified Volume Flow Rate of Fan [m3/sec]
         bool maxAirFlowRateIsAutosized = false;
-            
-        Real64 deltaPress = 0.0;                      // Delta Pressure Across the Fan [N/m2]
-        Real64 deltaTemp = 0.0;      // Temp Rise across the Fan [C]
 
-        Real64 totalEff = 0.0;                        // Fan total system efficiency (fan*belt*motor*VFD)
+        Real64 deltaPress = 0.0; // Delta Pressure Across the Fan [N/m2]
+        Real64 deltaTemp = 0.0;  // Temp Rise across the Fan [C]
 
-        Real64 motorEff = 0.0;                       // Fan motor efficiency
-        Real64 motorInAirFrac = 0.0;                         // Fraction of motor heat entering air stream
-            
+        Real64 totalEff = 0.0; // Fan total system efficiency (fan*belt*motor*VFD)
+
+        Real64 motorEff = 0.0;       // Fan motor efficiency
+        Real64 motorInAirFrac = 0.0; // Fraction of motor heat entering air stream
+
         // report variables
-        Real64 totalPower = 0.0;       // Power of the Fan being Simulated [W]
-        Real64 totalEnergy = 0.0;      // Fan energy in [J]
-                                 //    Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
+        Real64 totalPower = 0.0;  // Power of the Fan being Simulated [W]
+        Real64 totalEnergy = 0.0; // Fan energy in [J]
+                                  //    Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
 
         Real64 powerLossToAir = 0.0; // fan heat gain into process air [W]
-            
+
         Real64 inletAirMassFlowRate = 0.0; // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 outletAirMassFlowRate = 0.0;
 
-
         Real64 maxAirMassFlowRate = 0.0; // Max flow rate of fan in kg/sec
-                                     //    Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
-                                     //    int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
-                                     //    Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
-        Real64 minAirMassFlowRate = 0.0;                    // Min flow rate of fan in kg/sec
-            
+                                         //    Real64 m_minAirMassFlowRate; // Min flow rate of fan in kg/sec
+                                         //    int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
+                                         //    Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
+        Real64 minAirMassFlowRate = 0.0; // Min flow rate of fan in kg/sec
 
         // Mass Flow Rate Control Variables
         Real64 massFlowRateMaxAvail = 0.0;
@@ -167,23 +167,23 @@ namespace Fans {
         Real64 inletAirEnthalpy = 0.0;
         Real64 outletAirEnthalpy = 0.0;
 
-            // Faults
-        bool faultyFilterFlag = false;                     // Indicate whether there is a fouling air filter corresponding to the fan
-        int faultyFilterIndex = 0;                         // Index of the fouling air filter corresponding to the fan
+        // Faults
+        bool faultyFilterFlag = false; // Indicate whether there is a fouling air filter corresponding to the fan
+        int faultyFilterIndex = 0;     // Index of the fouling air filter corresponding to the fan
 
-            // EMS
-        bool EMSMaxAirFlowRateOverrideOn = false;           // if true, EMS wants to override fan size for Max Volume Flow Rate
-        Real64 EMSMaxAirFlowRateValue = 0.0;        // EMS value to use for override of  Max Volume Flow Rate
-        bool EMSMaxMassFlowOverrideOn = false;              // if true, then EMS is calling to override mass flow
-        Real64 EMSAirMassFlowValue = 0.0;                   // value EMS is directing to use [kg/s]
-        bool EMSPressureOverrideOn = false;             // if true, then EMS is calling to override
-        Real64 EMSPressureValue = 0.0;                  // EMS value for Delta Pressure Across the Fan [Pa]
-        bool EMSTotalEffOverrideOn = false;                  // if true, then EMS is calling to override
-        Real64 EMSTotalEffValue = 0.0;                       // EMS value for total efficiency of the Fan, fraction on 0..1
+        // EMS
+        bool EMSMaxAirFlowRateOverrideOn = false; // if true, EMS wants to override fan size for Max Volume Flow Rate
+        Real64 EMSMaxAirFlowRateValue = 0.0;      // EMS value to use for override of  Max Volume Flow Rate
+        bool EMSMaxMassFlowOverrideOn = false;    // if true, then EMS is calling to override mass flow
+        Real64 EMSAirMassFlowValue = 0.0;         // value EMS is directing to use [kg/s]
+        bool EMSPressureOverrideOn = false;       // if true, then EMS is calling to override
+        Real64 EMSPressureValue = 0.0;            // EMS value for Delta Pressure Across the Fan [Pa]
+        bool EMSTotalEffOverrideOn = false;       // if true, then EMS is calling to override
+        Real64 EMSTotalEffValue = 0.0;            // EMS value for total efficiency of the Fan, fraction on 0..1
 
         std::string sizingPrefix;
     };
-        
+
     enum class VFDEffType
     {
         Invalid = -1,
@@ -193,13 +193,13 @@ namespace Fans {
     };
 
     static constexpr std::array<std::string_view, (int)VFDEffType::Num> vfdEffTypeNamesUC = {"SPEED", "POWER"};
-                
+
     struct FanComponent : public FanBase
     {
         void set_size(EnergyPlusData &state);
 
         void init(EnergyPlusData &state);
-            
+
         Real64 getDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow);
 
         void getInputsForDesignHeatGain(EnergyPlusData &state,
@@ -210,15 +210,15 @@ namespace Fans {
                                         Real64 &fanShaftPow,
                                         Real64 &motInPower,
                                         bool &fanCompModel);
-            
+
         void update(EnergyPlusData &state);
 
         void report(EnergyPlusData &state);
-            
+
         void simulateConstant(EnergyPlusData &state);
 
         void simulateVAV(EnergyPlusData &state, ObjexxFCL::Optional<Real64 const> PressureRise = _);
-            
+
         void simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real64 const> SpeedRatio = _);
 
         void simulateZoneExhaust(EnergyPlusData &state);
@@ -226,67 +226,67 @@ namespace Fans {
         void simulateComponentModel(EnergyPlusData &state);
 
         Real64 runtimeFrac = 0.0;
-            
+
         int minAirFracMethod = HVAC::MinFrac; // parameter for what method is used for min flow fraction
 
-        Real64 minFrac = 0.0;                            // Minimum fan air flow fraction
-        Real64 fixedMin = 0.0;                           // Absolute minimum fan air flow [m3/s]
+        Real64 minFrac = 0.0;                                  // Minimum fan air flow fraction
+        Real64 fixedMin = 0.0;                                 // Absolute minimum fan air flow [m3/s]
         std::array<Real64, 5> coeffs{0.0, 0.0, 0.0, 0.0, 0.0}; // Fan Part Load Coefficients to match fan type
         // Mass Flow Rate Control Variables
 
         int nightVentPerfNum = 0;
         int powerRatioAtSpeedRatioCurveNum = 0;
         int effRatioCurveNum = 0;
-        bool oneTimePowerRatioCheck = true; // one time flag used for error message
-        bool oneTimeEffRatioCheck = true;   // one time flag used for error message
-        Real64 wheelDia = 0.0;           // Fan wheel outer diameter [m]
-        Real64 outletArea = 0.0;         // Fan outlet area [m2]
-        Real64 maxEff = 0.0;             // Fan maximum static efficiency [-]
-        Real64 eulerMaxEff = 0.0;              // Euler number at fan maximum static efficiency [-]
-        Real64 maxDimFlow = 0.0;         // Fan maximum dimensionless airflow [-]
-        Real64 shaftPowerMax = 0.0;        // Fan shaft maximum input power [W]
-        Real64 sizingFactor = 0.0;       // Fan sizing factor [-]
-        Real64 pulleyDiaRatio = 0.0;        // Motor/fan pulley diameter ratio [-]
-        Real64 beltMaxTorque = 0.0;         // Belt maximum torque [N-m]
-        Real64 beltSizingFactor = 0.0;      // Belt sizing factor [-]
-        Real64 beltTorqueTrans = 0.0;       // Belt fractional torque transition Region 1-2 [-]
-        Real64 motorMaxSpeed = 0.0;           // Motor maximum speed [rpm]
-        Real64 motorMaxOutPower = 0.0;        // Motor maximum output power [W]
-        Real64 motorSizingFactor = 0.0;     // Motor sizing factor [-]
-        VFDEffType vfdEffType = VFDEffType::Invalid;             // VFD efficiency type [Speed or Power]
-        Real64 vfdMaxOutPower = 0.0;          // VFD maximum output power [W]
-        Real64 vfdSizingFactor = 0.0;       // VFD sizing factor [-]
-        int pressRiseCurveNum = 0;        // Fan pressure rise curve index
-        int pressResetCurveNum = 0;       // Duct static pressure reset curve index
-        int plTotalEffNormCurveNum = 0;     // Fan part-load efficiency (normal) curve index
-        int plTotalEffStallCurveNum = 0;    // Fan part-load efficiency (stall) curve index
-        int dimFlowNormCurveNum = 0;      // Fan dimensionless airflow (normal) curve index
-        int dimFlowStallCurveNum = 0;     // Fan dimensionless airflow (stall) curve index
-        int beltMaxEffCurveNum = 0;       // Belt maximum efficiency curve index
-        int plBeltEffReg1CurveNum = 0;    // Belt part-load efficiency (Region 1) curve index
-        int plBeltEffReg2CurveNum = 0;    // Belt part-load efficiency (Region 2) curve index
-        int plBeltEffReg3CurveNum = 0;    // Belt part-load efficiency (Region 3) curve index
-        int motorMaxEffCurveNum = 0;      // Motor maximum efficiency curve index
-        int plMotorEffCurveNum = 0;       // Motor part-load efficiency curve index
-        int vfdEffCurveNum = 0;           // VFD efficiency curve index
-        Real64 deltaPressTot = 0.0;         // Total pressure rise across fan [N/m2]
-        Real64 airPower = 0.0;           // Air power for fan being Simulated [W]
-        Real64 fanSpeed = 0.0;                // Fan shaft rotational speed [rpm]
-        Real64 fanTorque = 0.0;                // Fan shaft torque [N-m]
-        Real64 wheelEff = 0.0;           // Fan efficiency (mechanical)
-        Real64 shaftPower = 0.0;         // Shaft input power for fan being Simulated [W]
-        Real64 beltMaxEff = 0.0;            // Belt maximum efficiency (mechanical)
-        Real64 beltEff = 0.0;               // Belt efficiency (mechanical)
-        Real64 beltInputPower = 0.0;        // Belt input power for fan being Simulated [W]
-        Real64 motorMaxEff = 0.0;           // Motor maximum efficiency (electrical)
-        Real64 motorInputPower = 0.0;       // Motor input power for fan being Simulated [W]
-        Real64 vfdEff = 0.0;                // VFD efficiency (electrical)
-        Real64 vfdInputPower = 0.0;         // VFD input power for fan being Simulated [W]
+        bool oneTimePowerRatioCheck = true;          // one time flag used for error message
+        bool oneTimeEffRatioCheck = true;            // one time flag used for error message
+        Real64 wheelDia = 0.0;                       // Fan wheel outer diameter [m]
+        Real64 outletArea = 0.0;                     // Fan outlet area [m2]
+        Real64 maxEff = 0.0;                         // Fan maximum static efficiency [-]
+        Real64 eulerMaxEff = 0.0;                    // Euler number at fan maximum static efficiency [-]
+        Real64 maxDimFlow = 0.0;                     // Fan maximum dimensionless airflow [-]
+        Real64 shaftPowerMax = 0.0;                  // Fan shaft maximum input power [W]
+        Real64 sizingFactor = 0.0;                   // Fan sizing factor [-]
+        Real64 pulleyDiaRatio = 0.0;                 // Motor/fan pulley diameter ratio [-]
+        Real64 beltMaxTorque = 0.0;                  // Belt maximum torque [N-m]
+        Real64 beltSizingFactor = 0.0;               // Belt sizing factor [-]
+        Real64 beltTorqueTrans = 0.0;                // Belt fractional torque transition Region 1-2 [-]
+        Real64 motorMaxSpeed = 0.0;                  // Motor maximum speed [rpm]
+        Real64 motorMaxOutPower = 0.0;               // Motor maximum output power [W]
+        Real64 motorSizingFactor = 0.0;              // Motor sizing factor [-]
+        VFDEffType vfdEffType = VFDEffType::Invalid; // VFD efficiency type [Speed or Power]
+        Real64 vfdMaxOutPower = 0.0;                 // VFD maximum output power [W]
+        Real64 vfdSizingFactor = 0.0;                // VFD sizing factor [-]
+        int pressRiseCurveNum = 0;                   // Fan pressure rise curve index
+        int pressResetCurveNum = 0;                  // Duct static pressure reset curve index
+        int plTotalEffNormCurveNum = 0;              // Fan part-load efficiency (normal) curve index
+        int plTotalEffStallCurveNum = 0;             // Fan part-load efficiency (stall) curve index
+        int dimFlowNormCurveNum = 0;                 // Fan dimensionless airflow (normal) curve index
+        int dimFlowStallCurveNum = 0;                // Fan dimensionless airflow (stall) curve index
+        int beltMaxEffCurveNum = 0;                  // Belt maximum efficiency curve index
+        int plBeltEffReg1CurveNum = 0;               // Belt part-load efficiency (Region 1) curve index
+        int plBeltEffReg2CurveNum = 0;               // Belt part-load efficiency (Region 2) curve index
+        int plBeltEffReg3CurveNum = 0;               // Belt part-load efficiency (Region 3) curve index
+        int motorMaxEffCurveNum = 0;                 // Motor maximum efficiency curve index
+        int plMotorEffCurveNum = 0;                  // Motor part-load efficiency curve index
+        int vfdEffCurveNum = 0;                      // VFD efficiency curve index
+        Real64 deltaPressTot = 0.0;                  // Total pressure rise across fan [N/m2]
+        Real64 airPower = 0.0;                       // Air power for fan being Simulated [W]
+        Real64 fanSpeed = 0.0;                       // Fan shaft rotational speed [rpm]
+        Real64 fanTorque = 0.0;                      // Fan shaft torque [N-m]
+        Real64 wheelEff = 0.0;                       // Fan efficiency (mechanical)
+        Real64 shaftPower = 0.0;                     // Shaft input power for fan being Simulated [W]
+        Real64 beltMaxEff = 0.0;                     // Belt maximum efficiency (mechanical)
+        Real64 beltEff = 0.0;                        // Belt efficiency (mechanical)
+        Real64 beltInputPower = 0.0;                 // Belt input power for fan being Simulated [W]
+        Real64 motorMaxEff = 0.0;                    // Motor maximum efficiency (electrical)
+        Real64 motorInputPower = 0.0;                // Motor input power for fan being Simulated [W]
+        Real64 vfdEff = 0.0;                         // VFD efficiency (electrical)
+        Real64 vfdInputPower = 0.0;                  // VFD input power for fan being Simulated [W]
         // zone exhaust fan
-        int flowFracSchedNum = 0; // schedule index flow rate modifier schedule
+        int flowFracSchedNum = 0;                                      // schedule index flow rate modifier schedule
         AvailManagerMode availManagerMode = AvailManagerMode::Invalid; // mode for how exhaust fan should react to availability managers
-        int minTempLimitSchedNum = 0;             // schedule index minimum temperature limit
-        int balancedFractSchedNum = 0;            // schedule index portion recirculated
+        int minTempLimitSchedNum = 0;                                  // schedule index minimum temperature limit
+        int balancedFractSchedNum = 0;                                 // schedule index portion recirculated
         Real64 unbalancedOutletMassFlowRate = 0.0;
         Real64 balancedOutletMassFlowRate = 0.0;
         Real64 designPointFEI = 0.0; // Fan Energy Index for the fan at the design operating point
@@ -350,9 +350,13 @@ namespace Fans {
     class FanSystem : public FanBase
     {
     public: // Methods
-        FanSystem() {}
+        FanSystem()
+        {
+        }
         // Destructor
-        ~FanSystem() {}
+        ~FanSystem()
+        {
+        }
 
         // Copy Constructor
         FanSystem(FanSystem const &) = default;
@@ -370,10 +374,10 @@ namespace Fans {
                                         Real64 &motInPower,
                                         bool &fanCompModel);
 
-        SpeedControl speedControl = SpeedControl::Invalid;        // Discrete or Continuous speed control method
-        Real64 designElecPower = 0.0;                 // design electric power consumption [W]
-        int powerModFuncFlowFracCurveNum = 0; // pointer to performance curve or table
-        int numSpeeds = 0;                        // input for how many speed levels for discrete fan
+        SpeedControl speedControl = SpeedControl::Invalid; // Discrete or Continuous speed control method
+        Real64 designElecPower = 0.0;                      // design electric power consumption [W]
+        int powerModFuncFlowFracCurveNum = 0;              // pointer to performance curve or table
+        int numSpeeds = 0;                                 // input for how many speed levels for discrete fan
         std::vector<Real64> massFlowAtSpeed;
         std::vector<Real64> flowFracAtSpeed; // array of flow fractions for speed levels
 
@@ -388,7 +392,7 @@ namespace Fans {
 
         void set_size(EnergyPlusData &state);
 
-        void 
+        void
         calcSimpleSystemFan(EnergyPlusData &state,
                             ObjexxFCL::Optional<Real64 const> flowFraction, // Flow fraction for entire timestep (not used if flow ratios are present)
                             ObjexxFCL::Optional<Real64 const> pressureRise, // Pressure difference to use for DeltaPress
@@ -405,19 +409,19 @@ namespace Fans {
 
     public:
         // data
-        Real64 minPowerFlowFrac = 0.0;               // Minimum fan air flow fraction for power calculation
+        Real64 minPowerFlowFrac = 0.0; // Minimum fan air flow fraction for power calculation
         bool designElecPowerWasAutosized = false;
-        PowerSizing powerSizingMethod = PowerSizing::Invalid;          // sizing method for design electric power, three options
-        Real64 elecPowerPerFlowRate = 0.0;                  // scaling factor for PowerPerFlow method
-        Real64 elecPowerPerFlowRatePerPressure = 0.0;       // scaling factor for PowerPerFlowPerPressure
-        Real64 nightVentPressureDelta = 0.0;                // fan pressure rise during night ventilation mode
-        Real64 nightVentFlowFraction = 0.0;                 // fan's flow fraction during night ventilation mode, not used
-        int zoneNum = 0;                                  // zone index for motor heat losses as internal gains
-        Real64 zoneRadFract = 0.0;                          // thermal radiation split for motor losses
-        HeatLossDest heatLossDest = HeatLossDest::Invalid; // enum for where motor loss go
-        Real64 qdotConvZone = 0.0;                          // fan power lost to surrounding zone by convection to air (W)
-        Real64 qdotRadZone = 0.0;                           // fan power lost to surrounding zone by radiation to zone surfaces(W)
-        std::vector<Real64> powerFracAtSpeed; // array of power fractions for speed levels
+        PowerSizing powerSizingMethod = PowerSizing::Invalid; // sizing method for design electric power, three options
+        Real64 elecPowerPerFlowRate = 0.0;                    // scaling factor for PowerPerFlow method
+        Real64 elecPowerPerFlowRatePerPressure = 0.0;         // scaling factor for PowerPerFlowPerPressure
+        Real64 nightVentPressureDelta = 0.0;                  // fan pressure rise during night ventilation mode
+        Real64 nightVentFlowFraction = 0.0;                   // fan's flow fraction during night ventilation mode, not used
+        int zoneNum = 0;                                      // zone index for motor heat losses as internal gains
+        Real64 zoneRadFract = 0.0;                            // thermal radiation split for motor losses
+        HeatLossDest heatLossDest = HeatLossDest::Invalid;    // enum for where motor loss go
+        Real64 qdotConvZone = 0.0;                            // fan power lost to surrounding zone by convection to air (W)
+        Real64 qdotRadZone = 0.0;                             // fan power lost to surrounding zone by radiation to zone surfaces(W)
+        std::vector<Real64> powerFracAtSpeed;                 // array of power fractions for speed levels
         std::vector<bool> powerFracInputAtSpeed;
         // calculation variables
         std::vector<Real64> totalEffAtSpeed;
@@ -439,14 +443,14 @@ struct FansData : BaseGlobalStruct
     Array1D<Fans::NightVentPerfData> NightVentPerf;
     int ErrCount = 0;
 
-    Array1D<Fans::FanBase*> fans;
+    Array1D<Fans::FanBase *> fans;
     std::map<std::string, int> fanMap;
 
     void clear_state() override
     {
         for (int i = 1; i <= fans.size(); ++i)
             delete fans(i);
-            
+
         fans.clear();
         fanMap.clear();
 

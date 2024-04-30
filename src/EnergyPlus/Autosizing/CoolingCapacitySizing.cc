@@ -283,8 +283,15 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     CoilOutTemp = thisAirloopDOAS.PrecoolTemp;
                     if (thisAirloopDOAS.m_FanIndex > 0) {
                         // This should work for all fan types
-                        state.dataFans->fans(thisAirloopDOAS.m_FanIndex)->getInputsForDesignHeatGain(state,
-                            this->deltaP, this->motEff, this->totEff, this->motInAirFrac, this->fanShaftPow, this->motInPower, this->fanCompModel);
+                        state.dataFans->fans(thisAirloopDOAS.m_FanIndex)
+                            ->getInputsForDesignHeatGain(state,
+                                                         this->deltaP,
+                                                         this->motEff,
+                                                         this->totEff,
+                                                         this->motInAirFrac,
+                                                         this->fanShaftPow,
+                                                         this->motInPower,
+                                                         this->fanCompModel);
 
                         if (thisAirloopDOAS.m_FanTypeNum == SimAirServingZones::CompType::Fan_ComponentModel) {
                             FanCoolLoad = this->fanShaftPow + (this->motInPower - this->fanShaftPow) * this->motInAirFrac;
@@ -381,9 +388,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         if (this->curOASysNum > 0) { // coil is in the OA stream
                             // need to find fan type in OA system
                         } else {
-                            if (this->primaryAirSystem(this->curSysNum).supFanType != HVAC::FanType::Invalid) 
+                            if (this->primaryAirSystem(this->curSysNum).supFanType != HVAC::FanType::Invalid)
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
-                            if (this->primaryAirSystem(this->curSysNum).retFanType != HVAC::FanType::Invalid) 
+                            if (this->primaryAirSystem(this->curSysNum).retFanType != HVAC::FanType::Invalid)
                                 FanCoolLoad += (1.0 - OutAirFrac) * this->calcFanDesHeatGain(DesVolFlow);
                             this->primaryAirSystem(this->curSysNum).FanDesCoolLoad = FanCoolLoad;
                         }

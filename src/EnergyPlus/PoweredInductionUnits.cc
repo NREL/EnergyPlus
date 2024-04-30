@@ -406,11 +406,11 @@ void GetPIUs(EnergyPlusData &state)
 
         // find fan type
         // test if Fan:SystemModel fan of this name exists
-        if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) { 
+        if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) {
             ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
             ErrorsFound = true;
         } else {
-            auto *fan = state.dataFans->fans(thisPIU.Fan_Index);    
+            auto *fan = state.dataFans->fans(thisPIU.Fan_Index);
             thisPIU.fanType = fan->type;
             // assert(thisPIU.fanType == HVAC::FanType::Constant);
             thisPIU.FanAvailSchedPtr = fan->availSchedNum;
@@ -1683,8 +1683,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
         QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
                            (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     // check if heating coil is off
-    if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
+    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }
@@ -1956,8 +1955,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
                            (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
     // check if heating coil is off
-    if ((!UnitOn) || (QActualHeating < SmallLoad) ||
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
+    if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
         HCoilOn = false;
     }

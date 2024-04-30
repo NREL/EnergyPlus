@@ -729,7 +729,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
     state->dataDXCoils->DXCoil(1).RatedAirVolFlowRate(1) = DataSizing::AutoSize;
     state->dataDXCoils->DXCoil(1).RatedTotCap(1) = DataSizing::AutoSize;
 
-    cbvav.OpMode = HVAC::CycFanCycCoil;           // must set one type of fan operating mode to initialize CalcSetPointTempTarget
+    cbvav.OpMode = HVAC::CycFanCycCoil;                      // must set one type of fan operating mode to initialize CalcSetPointTempTarget
     state->dataLoopNodes->Node(cbvav.AirInNode).Temp = 24.0; // initialize inlet node temp used to initialize CalcSetPointTempTarget
     cbvav.AirLoopNumber = 1;
     state->dataAirLoop->AirLoopFlow.allocate(cbvav.AirLoopNumber);
@@ -1744,8 +1744,8 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_ParentElectricityRateTest)
     // simulate the ByPass VAV unit
     HVACUnitaryBypassVAV::SimCBVAV(*state, CBVAVNum, firstHVACIteration, QUnitOut, OnOffAirFlowRatio, HXUnitOn);
     // calculate expected result
-    Real64 result_BypassVAV_ElectricityRate =
-        supplyFan->totalPower + dxClgCoilMain.Power + dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower + state->dataHVACGlobal->DefrostElecPower;
+    Real64 result_BypassVAV_ElectricityRate = supplyFan->totalPower + dxClgCoilMain.Power + dxHtgCoilMain.Power + dxHtgCoilMain.CrankcaseHeaterPower +
+                                              state->dataHVACGlobal->DefrostElecPower;
     // test the components and total electricity rate results
     EXPECT_NEAR(2160.62, BypassVAV.ElecPower, 0.01);
     EXPECT_NEAR(2160.62, result_BypassVAV_ElectricityRate, 0.01);

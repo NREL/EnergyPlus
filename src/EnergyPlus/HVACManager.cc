@@ -2014,8 +2014,8 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
 
         auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex);
 
-        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
-            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Cooling) { // check for cooling duct
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) { // loop over the air loop supply outlets
+            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Cooling) {      // check for cooling duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
                 int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
@@ -2063,8 +2063,8 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                 }
             }
         }
-        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
-            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Heating) { // check for heating duct
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) { // loop over the air loop supply outlets
+            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Heating) {      // check for heating duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
                 int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
@@ -2275,8 +2275,7 @@ void ReportInfiltrations(EnergyPlusData &state)
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }

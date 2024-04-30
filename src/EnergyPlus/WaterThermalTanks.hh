@@ -333,12 +333,12 @@ namespace WaterThermalTanks {
         int DXCoilTypeNum;                                          // Type Number of DX coil
         int DXCoilAirInletNode;                                     // Inlet air node number of DX coil
         int DXCoilPLFFPLR;                                          // Index to HPWH's DX Coil PLF as a function of PLR curve
-        HVAC::FanType fanType;                           // Integer type of fan (3 = Fan:OnOff)
+        HVAC::FanType fanType;                                      // Integer type of fan (3 = Fan:OnOff)
         std::string FanName;                                        // Name of Fan
         std::string FanInletNode_str;                               // Fan inlet node name
         std::string FanOutletNode_str;                              // Fan outlet node name
         int FanNum;                                                 // Index of Fan
-        HVAC::FanPlace fanPlace;                         // Location of Fan
+        HVAC::FanPlace fanPlace;                                    // Location of Fan
         int FanOutletNode;                                          // Outlet node of heat pump water heater fan
         int WaterHeaterTankNum;                                     // Index of Water Heater Tank
         int OutletAirSplitterSchPtr;                                // Index to air-side outlet air splitter schedule
@@ -430,8 +430,8 @@ namespace WaterThermalTanks {
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), FoundTank(false), HeatPumpAirInletNode(0),
               HeatPumpAirOutletNode(0), OutsideAirNode(0), ExhaustAirNode(0), CondWaterInletNode(0), CondWaterOutletNode(0), WHUseInletNode(0),
               WHUseOutletNode(0), WHUseSidePlantLoopNum(0), DXCoilNum(0), DXCoilTypeNum(0), DXCoilAirInletNode(0), DXCoilPLFFPLR(0),
-              fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid), FanOutletNode(0),
-              WaterHeaterTankNum(0), OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0),
+              fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid), FanOutletNode(0), WaterHeaterTankNum(0),
+              OutletAirSplitterSchPtr(0), InletAirMixerSchPtr(0), Power(0.0), Energy(0.0), HeatingPLR(0.0), SetPointTemp(0.0),
               MinAirTempForHPOperation(5.0), MaxAirTempForHPOperation(48.8888888889), InletAirMixerNode(0), OutletAirSplitterNode(0),
               SourceMassFlowRate(0.0), InletAirConfiguration(WTTAmbientTemp::OutsideAir), AmbientTempSchedule(0), AmbientRHSchedule(0),
               AmbientTempZone(0), CrankcaseTempIndicator(CrankcaseHeaterControlTemp::Schedule), CrankcaseTempSchedule(0), CrankcaseTempZone(0),
@@ -445,8 +445,8 @@ namespace WaterThermalTanks {
               ControlTempFinal(0.0), AllowHeatingElementAndHeatPumpToRunAtSameTime(true), NumofSpeed(0),
               HPWHAirVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHAirMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
               HPWHWaterVolFlowRate(HVAC::MaxSpeedLevels, 0.0), HPWHWaterMassFlowRate(HVAC::MaxSpeedLevels, 0.0),
-              MSAirSpeedRatio(HVAC::MaxSpeedLevels, 0.0), MSWaterSpeedRatio(HVAC::MaxSpeedLevels, 0.0), bIsIHP(false),
-              MyOneTimeFlagHP(true), MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
+              MSAirSpeedRatio(HVAC::MaxSpeedLevels, 0.0), MSWaterSpeedRatio(HVAC::MaxSpeedLevels, 0.0), bIsIHP(false), MyOneTimeFlagHP(true),
+              MyTwoTimeFlagHP(true), CheckHPWHEquipName(true), myOneTimeInitFlag(true)
         {
         }
 

@@ -1667,7 +1667,8 @@ void ShowSevereItemNotFound(EnergyPlusData &state, ErrorObjectHeader const &eoh,
     ShowContinueError(state, format("{} = {}, item not found.", fieldName, fieldVal));
 }
 
-void ShowSevereInvalidKey(EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view msg)
+void ShowSevereInvalidKey(
+    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view msg)
 {
     ShowSevereError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, invalid key.", fieldName, fieldVal));
@@ -1698,8 +1699,12 @@ void ShowWarningCustomMessage(EnergyPlusData &state, ErrorObjectHeader const &eo
     ShowContinueError(state, format("{}", msg));
 }
 
-void ShowWarningInvalidKey(
-    EnergyPlusData &state, ErrorObjectHeader const &eoh, std::string_view fieldName, std::string_view fieldVal, std::string_view defaultVal, std::string_view msg)
+void ShowWarningInvalidKey(EnergyPlusData &state,
+                           ErrorObjectHeader const &eoh,
+                           std::string_view fieldName,
+                           std::string_view fieldVal,
+                           std::string_view defaultVal,
+                           std::string_view msg)
 {
     ShowWarningError(state, format("{}: {} = {}", eoh.routineName, eoh.objectType, eoh.objectName));
     ShowContinueError(state, format("{} = {}, invalid key, {} will be used.", fieldName, fieldVal, defaultVal));
