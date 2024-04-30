@@ -11859,11 +11859,14 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
         if (CompEvaporatingCAPSpdMin > CompEvaporatingCAPSpdMaxCurrentTsuc) {
             ShowSevereMessage(state, format("{} \"{}\":", cVRFTypes(VRF_HeatPump), this->Name));
-            ShowContinueError(state,
-                              format(" Evaporative Capacity at max speed is smaller than evaporative capacity at min speed, "
-                                     "{:.3T} < {:.3T}",
-                                     CompEvaporatingCAPSpdMaxCurrentTsuc,
-                                     CompEvaporatingCAPSpdMin));
+            ShowRecurringContinueErrorAtEnd(state,
+                                            format(" Evaporative Capacity at max speed is smaller than evaporative capacity at min speed, "
+                                                   "{:.3T} < {:.3T}",
+                                                   CompEvaporatingCAPSpdMaxCurrentTsuc,
+                                                   CompEvaporatingCAPSpdMin),
+                                            this->CondenserCapErrIdx);
+            // use the smaller value as capacity limit for later calculation
+            CompEvaporatingCAPSpdMin = CompEvaporatingCAPSpdMaxCurrentTsuc;
         }
         if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc) {
             // this branch resolves the issue of supplemental heating coil turning on when compressor speed is not at the highest
