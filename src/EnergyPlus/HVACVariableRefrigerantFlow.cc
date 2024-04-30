@@ -13034,9 +13034,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       _,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
-            // yujie: update TU air mass flow
-            state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate =
-                state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
+            AirMassFlow = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
         } else {
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
         }
@@ -13107,11 +13105,6 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
     // calculate sensible load met using delta enthalpy
-    auto const &thisDXCoil = state.dataDXCoils->DXCoil(this->HeatCoilIndex);
-    // yujie: correct mismatching in the air mass flow rate
-    if (thisDXCoil.TotalHeatingEnergyRate > 0.0) {
-        AirMassFlow = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
-    }
     LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
     LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn);                                     // latent {kgWater/s}
     if (present(LatOutputProvided)) {
