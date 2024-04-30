@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -133,10 +133,10 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test1)
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirVolFlow = AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerFloorArea = 1.0;
     state->dataHVACStandAloneERV->StandAloneERV(1).AirVolFlowPerOccupant = 0.0;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    state->dataHVACStandAloneERV->StandAloneERV(1).supplyAirFanType = DataHVACGlobals::FanType::OnOff;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = "ERV SUPPLY FAN";
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanType_Num = DataHVACGlobals::FanType_SimpleOnOff;
+    state->dataHVACStandAloneERV->StandAloneERV(1).exhaustAirFanType = DataHVACGlobals::FanType::OnOff;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = "ERV EXHAUST FAN";
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHeatBal->Zone(1).Multiplier = 1.0;
@@ -248,9 +248,9 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignSAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignEAFanVolFlowRate = DataSizing::AutoSize;
     state->dataHVACStandAloneERV->StandAloneERV(1).DesignHXVolFlowRate = DataSizing::AutoSize;
-    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanName = state->dataFans->Fan(1).Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirFanIndex = 1;
-    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).FanName;
+    state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->Fan(2).Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HX_AIRTOAIR_GENERIC;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";

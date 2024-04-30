@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -123,13 +123,13 @@ TEST_F(AutoSizingFixture, SystemAirFlowSizingGauntlet)
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataEnvrn->TotDesDays = 2;
-    state->dataWeatherManager->DesDayInput.allocate(2);
-    state->dataWeatherManager->DesDayInput(1).Month = 7;
-    state->dataWeatherManager->DesDayInput(1).DayOfMonth = 7;
-    state->dataWeatherManager->DesDayInput(2).Month = 1;
-    state->dataWeatherManager->DesDayInput(2).DayOfMonth = 1;
-    state->dataWeatherManager->DesDayInput(1).Title = "CoolingDD";
-    state->dataWeatherManager->DesDayInput(2).Title = "HeatingDD";
+    state->dataWeather->DesDayInput.allocate(2);
+    state->dataWeather->DesDayInput(1).Month = 7;
+    state->dataWeather->DesDayInput(1).DayOfMonth = 7;
+    state->dataWeather->DesDayInput(2).Month = 1;
+    state->dataWeather->DesDayInput(2).DayOfMonth = 1;
+    state->dataWeather->DesDayInput(1).Title = "CoolingDD";
+    state->dataWeather->DesDayInput(2).Title = "HeatingDD";
 
     // Test 2 - Zone Equipment, sizes to greater of zone cooling and heating flow
     // start with an auto-sized value as the user input

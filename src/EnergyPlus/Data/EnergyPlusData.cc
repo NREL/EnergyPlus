@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,10 +90,9 @@ EnergyPlusData::EnergyPlusData()
     this->dataCurveManager = std::make_unique<CurveManagerData>();
     this->dataDXCoils = std::make_unique<DXCoilsData>();
     this->dataDXFEarClipping = std::make_unique<DXFEarClippingData>();
-    this->dataDaylightingData = std::make_unique<DaylightingData>();
     this->dataDaylightingDevices = std::make_unique<DaylightingDevicesData>();
     this->dataDaylightingDevicesData = std::make_unique<DataDaylightingDevicesData>();
-    this->dataDaylightingManager = std::make_unique<DaylightingManagerData>();
+    this->dataDayltg = std::make_unique<DaylightingData>();
     this->dataDefineEquipment = std::make_unique<DefineEquipData>();
     this->dataDemandManager = std::make_unique<DemandManagerData>();
     this->dataDesiccantDehumidifiers = std::make_unique<DesiccantDehumidifiersData>();
@@ -168,6 +167,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataHybridUnitaryAC = std::make_unique<HybridUnitaryAirConditionersData>();
     this->dataHysteresisPhaseChange = std::make_unique<HysteresisPhaseChangeData>();
     this->dataICEngElectGen = std::make_unique<ICEngineElectricGeneratorData>();
+    this->dataIndoorGreen = std::make_unique<IndoorGreenData>();
     this->dataInputProcessing = std::make_unique<DataInputProcessing>();
     this->dataIPShortCut = std::make_unique<IPShortCutsData>();
     this->dataIceThermalStorage = std::make_unique<IceThermalStorageData>();
@@ -213,7 +213,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataPlantValves = std::make_unique<PlantValvesData>();
     this->dataPlnt = std::make_unique<DataPlantData>();
     this->dataPluginManager = std::make_unique<PluginManagerData>();
-    this->dataPollutionModule = std::make_unique<PollutionModuleData>();
+    this->dataPollution = std::make_unique<PollutionData>();
     this->dataPondGHE = std::make_unique<PondGroundHeatExchangerData>();
     this->dataPowerInductionUnits = std::make_unique<PoweredInductionUnitsData>();
     this->dataPsychrometrics = std::make_unique<PsychrometricsData>();
@@ -286,7 +286,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataWaterToAirHeatPump = std::make_unique<WaterToAirHeatPumpData>();
     this->dataWaterToAirHeatPumpSimple = std::make_unique<WaterToAirHeatPumpSimpleData>();
     this->dataWaterUse = std::make_unique<WaterUseData>();
-    this->dataWeatherManager = std::make_unique<WeatherManagerData>();
+    this->dataWeather = std::make_unique<WeatherManagerData>();
     this->dataWindTurbine = std::make_unique<WindTurbineData>();
     this->dataWindowAC = std::make_unique<WindowACData>();
     this->dataWindowComplexManager = std::make_unique<WindowComplexManagerData>();
@@ -346,10 +346,9 @@ void EnergyPlusData::clear_state()
     this->dataCurveManager->clear_state();
     this->dataDXCoils->clear_state();
     this->dataDXFEarClipping->clear_state();
-    this->dataDaylightingData->clear_state();
     this->dataDaylightingDevices->clear_state();
     this->dataDaylightingDevicesData->clear_state();
-    this->dataDaylightingManager->clear_state();
+    this->dataDayltg->clear_state();
     this->dataDefineEquipment->clear_state();
     this->dataDemandManager->clear_state();
     this->dataDesiccantDehumidifiers->clear_state();
@@ -426,6 +425,7 @@ void EnergyPlusData::clear_state()
     this->dataICEngElectGen->clear_state();
     this->dataIPShortCut->clear_state();
     this->dataIceThermalStorage->clear_state();
+    this->dataIndoorGreen->clear_state();
     this->dataInputProcessing->clear_state();
     this->dataIntegratedHP->clear_state();
     this->dataInternalHeatGains->clear_state();
@@ -469,7 +469,7 @@ void EnergyPlusData::clear_state()
     this->dataPlantValves->clear_state();
     this->dataPlnt->clear_state();
     this->dataPluginManager->clear_state();
-    this->dataPollutionModule->clear_state();
+    this->dataPollution->clear_state();
     this->dataPondGHE->clear_state();
     this->dataPowerInductionUnits->clear_state();
     this->dataPsychrometrics->clear_state();
@@ -542,7 +542,7 @@ void EnergyPlusData::clear_state()
     this->dataWaterToAirHeatPump->clear_state();
     this->dataWaterToAirHeatPumpSimple->clear_state();
     this->dataWaterUse->clear_state();
-    this->dataWeatherManager->clear_state();
+    this->dataWeather->clear_state();
     this->dataWindTurbine->clear_state();
     this->dataWindowAC->clear_state();
     this->dataWindowComplexManager->clear_state();

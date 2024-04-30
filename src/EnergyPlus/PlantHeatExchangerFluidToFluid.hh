@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -166,7 +166,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 MaxOperationTemp;
         PlantConnectionStruct DemandSideLoop; // plant connections and data for the side of HX connected to demand side
         PlantConnectionStruct SupplySideLoop;
-        std::string HeatTransferMeteringEndUse;
+        OutputProcessor::EndUseCat HeatTransferMeteringEndUse = OutputProcessor::EndUseCat::Invalid;
         std::string ComponentUserName; // user name for control-associated  component
         DataPlant::PlantEquipmentType ComponentType;
         PlantLocatorStruct OtherCompSupplySideLoop;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -200,6 +200,15 @@ bool EnergyPlusFixture::compare_err_stream(std::string const &expected_string, b
     bool are_equal = (expected_string == stream_str);
     if (reset_stream) this->err_stream->str(std::string());
     return are_equal;
+}
+
+bool EnergyPlusFixture::compare_err_stream_substring(std::string const &search_string, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool const found = stream_str.find(search_string) != std::string::npos;
+    EXPECT_TRUE(found);
+    if (reset_stream) this->err_stream->str(std::string());
+    return found;
 }
 
 bool EnergyPlusFixture::compare_cout_stream(std::string const &expected_string, bool reset_stream)

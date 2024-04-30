@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -143,14 +143,13 @@ ENERGYPLUSLIB_API void freeAPIData(struct APIDataEntry *data, unsigned int array
 /// \param[in] objectType The object type from the input schema, such as "Chiller:Electric", or "Zone" -- casing should match input schema!
 /// \param[out] resultingSize An integer which will be set to the size of the array upon return
 /// \return Const char * pointing to an array of const char * with the size set in the by-ref argument.  When done, pass to freeObjectNames to clear.
-ENERGYPLUSLIB_API const char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
+ENERGYPLUSLIB_API char **getObjectNames(EnergyPlusState state, const char *objectType, unsigned int *resultingSize);
 /// \brief Clears an object names array allocation
 /// \details This function frees an instance of the object names array, which is returned from getObjectNames
 /// \param[in] data An array (pointer) of const char * as returned from the getObjectNames function
 /// \param[in] arraySize The size of the object name array, which is known after the call to getObjectNames.
 /// \return Nothing, this simply frees the memory
-ENERGYPLUSLIB_API void freeObjectNames(const char **objectNames, unsigned int arraySize);
-
+ENERGYPLUSLIB_API void freeObjectNames(char **objectNames, unsigned int arraySize);
 // ----- FUNCTIONS RELATED TO VARIABLES
 
 /// \brief Gets the number of nodes for a particular CondFD surface layer

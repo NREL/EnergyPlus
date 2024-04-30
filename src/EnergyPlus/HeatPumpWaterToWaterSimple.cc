@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -377,29 +377,27 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Cooling'
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name,
-                            {},
-                            "Electricity",
-                            "Cooling",
-                            {},
-                            "Plant");
+                            Constant::eResource::Electricity,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Cooling);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportQLoadEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportQSourceEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name);
     }
 
@@ -542,29 +540,27 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         // CurrentModuleObject='HeatPump:WatertoWater:EquationFit:Heating'
         SetupOutputVariable(state,
                             "Heat Pump Electricity Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name,
-                            {},
-                            "Electricity",
-                            "Heating",
-                            {},
-                            "Plant");
+                            Constant::eResource::Electricity,
+                            OutputProcessor::Group::Plant,
+                            OutputProcessor::EndUseCat::Heating);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportQLoadEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisGSHP.reportQSourceEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisGSHP.Name);
     }
 
@@ -572,7 +568,7 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
     for (int GSHPNum = 1; GSHPNum <= state.dataHPWaterToWaterSimple->NumGSHPs; ++GSHPNum) {
         auto &thisGSHP = state.dataHPWaterToWaterSimple->GSHP(GSHPNum);
         if (!thisGSHP.companionName.empty()) {
-            thisGSHP.companionIndex = UtilityRoutines::FindItemInList(thisGSHP.companionName, state.dataHPWaterToWaterSimple->GSHP);
+            thisGSHP.companionIndex = Util::FindItemInList(thisGSHP.companionName, state.dataHPWaterToWaterSimple->GSHP);
             if (thisGSHP.companionIndex == 0) {
                 ShowSevereError(state,
                                 format("GetEquationFitWaterToWater Input: did not find companion heat pump named '{}' in heat pump called {}",
@@ -594,66 +590,66 @@ void GshpSpecs::GetWatertoWaterHPInput(EnergyPlusData &state)
         // setup output variables
         SetupOutputVariable(state,
                             "Heat Pump Electricity Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisGSHP.reportPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisGSHP.reportQLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Heat Transfer Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisGSHP.reportQSource,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisGSHP.reportLoadSideOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisGSHP.reportLoadSideInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Outlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisGSHP.reportSourceSideOutletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Inlet Temperature",
-                            OutputProcessor::Unit::C,
+                            Constant::Units::C,
                             thisGSHP.reportSourceSideInletTemp,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Load Side Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             thisGSHP.reportLoadSideMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
         SetupOutputVariable(state,
                             "Heat Pump Source Side Mass Flow Rate",
-                            OutputProcessor::Unit::kg_s,
+                            Constant::Units::kg_s,
                             thisGSHP.reportSourceSideMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisGSHP.Name);
     }
 }
@@ -1580,8 +1576,8 @@ void GshpSpecs::CalcWatertoWaterHPCooling(EnergyPlusData &state, Real64 const My
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 constexpr CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 constexpr Tref(283.15);                          // Reference Temperature for performance curves,10C [K]
+    Real64 constexpr CelsiustoKelvin(Constant::Kelvin); // Conversion from Celsius to Kelvin
+    Real64 constexpr Tref(283.15);                      // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPCooling");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1746,8 +1742,8 @@ void GshpSpecs::CalcWatertoWaterHPHeating(EnergyPlusData &state, Real64 const My
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    Real64 const CelsiustoKelvin(Constant::KelvinConv); // Conversion from Celsius to Kelvin
-    Real64 constexpr Tref(283.15);                      // Reference Temperature for performance curves,10C [K]
+    Real64 const CelsiustoKelvin(Constant::Kelvin); // Conversion from Celsius to Kelvin
+    Real64 constexpr Tref(283.15);                  // Reference Temperature for performance curves,10C [K]
     static constexpr std::string_view RoutineName("CalcWatertoWaterHPHeating");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

@@ -78,7 +78,7 @@
 #if defined(__MSL_CPP__) && (__MSL_CPP__ >= 0x8000)
     // Metrowerks compiler is acquiring intrinsic type traits support
     // post version 8.  We hook into the published interface to pick up
-    // user defined specializations as well as compiler intrinsics as 
+    // user defined specializations as well as compiler intrinsics as
     // and when they become available:
 #   include <msl_utility>
 #   define BOOST_IS_UNION(T) BOOST_STD_EXTENSION_NAMESPACE::is_union<T>::value
@@ -160,11 +160,11 @@
 #   define BOOST_HAS_TYPE_TRAITS_INTRINSICS
 #endif
 
-#if defined(BOOST_CLANG) && defined(__has_feature) && !defined(__CUDACC__)
+#if defined(BOOST_CLANG) && defined(__has_feature) && defined(__has_builtin) && (!(defined(__CUDACC__) && (__CUDACC_VER_MAJOR__ < 11)) || defined(__CUDA__))
 //
 // Note that these intrinsics are disabled for the CUDA meta-compiler as it appears
 // to not support them, even though the underlying clang compiler does so.
-// This is a rubbish fix as it basically stops type traits from working correctly, 
+// This is a rubbish fix as it basically stops type traits from working correctly,
 // but maybe the best we can do for now.  See https://svn.boost.org/trac/boost/ticket/10694
 //
 //
@@ -183,25 +183,39 @@
 #   if (!defined(__GLIBCXX__) || (__GLIBCXX__ >= 20080306 && __GLIBCXX__ != 20080519)) && __has_feature(is_empty)
 #     define BOOST_IS_EMPTY(T) __is_empty(T)
 #   endif
-#   if __has_feature(has_trivial_constructor)
+#   if __has_builtin(__is_trivially_constructible)
+#     define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) __is_trivially_constructible(T)
+#   elif __has_feature(has_trivial_constructor)
 #     define BOOST_HAS_TRIVIAL_CONSTRUCTOR(T) __has_trivial_constructor(T)
 #   endif
-#   if __has_feature(has_trivial_copy)
+#   if __has_builtin(__is_trivially_copyable)
+#     define BOOST_HAS_TRIVIAL_COPY(T) (__is_trivially_copyable(T) && !is_reference<T>::value)
+#   elif __has_feature(has_trivial_copy)
 #     define BOOST_HAS_TRIVIAL_COPY(T) (__has_trivial_copy(T) && !is_reference<T>::value)
 #   endif
-#   if __has_feature(has_trivial_assign)
+#   if __has_builtin(__is_trivially_assignable)
+#     define BOOST_HAS_TRIVIAL_ASSIGN(T) (__is_trivially_assignable(T&, const T&) && !is_volatile<T>::value && is_assignable<T&, const T&>::value)
+#   elif __has_feature(has_trivial_assign)
 #     define BOOST_HAS_TRIVIAL_ASSIGN(T) (__has_trivial_assign(T) && !is_volatile<T>::value && is_assignable<T&, const T&>::value)
 #   endif
-#   if __has_feature(has_trivial_destructor)
+#   if __has_builtin(__is_trivially_destructible)
+#     define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__is_trivially_destructible(T)  && is_destructible<T>::value)
+#   elif __has_feature(has_trivial_destructor)
 #     define BOOST_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T)  && is_destructible<T>::value)
 #   endif
-#   if __has_feature(has_nothrow_constructor)
+#   if __has_builtin(__is_nothrow_constructible)
+#     define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__is_nothrow_constructible(T) && is_default_constructible<T>::value)
+#   elif __has_feature(has_nothrow_constructor)
 #     define BOOST_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) && is_default_constructible<T>::value)
 #   endif
-#   if __has_feature(has_nothrow_copy)
+#   if __has_builtin(__is_nothrow_constructible)
+#     define BOOST_HAS_NOTHROW_COPY(T) (__is_nothrow_constructible(T, const T&) && !is_volatile<T>::value && !is_reference<T>::value && is_copy_constructible<T>::value)
+#   elif __has_feature(has_nothrow_copy)
 #     define BOOST_HAS_NOTHROW_COPY(T) (__has_nothrow_copy(T) && !is_volatile<T>::value && !is_reference<T>::value && is_copy_constructible<T>::value)
 #   endif
-#   if __has_feature(has_nothrow_assign)
+#   if __has_builtin(__is_nothrow_assignable)
+#     define BOOST_HAS_NOTHROW_ASSIGN(T) (__is_nothrow_assignable(T&, const T&) && !is_volatile<T>::value && is_assignable<T&, const T&>::value)
+#   elif __has_feature(has_nothrow_assign)
 #     define BOOST_HAS_NOTHROW_ASSIGN(T) (__has_nothrow_assign(T) && !is_volatile<T>::value && is_assignable<T&, const T&>::value)
 #   endif
 #   if __has_feature(has_virtual_destructor)
@@ -388,4 +402,3 @@
 #endif // BOOST_TT_DISABLE_INTRINSICS
 
 #endif // BOOST_TT_INTRINSICS_HPP_INCLUDED
-

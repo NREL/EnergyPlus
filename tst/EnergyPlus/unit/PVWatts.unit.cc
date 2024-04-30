@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -187,14 +187,14 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     state->dataGlobal->BeginTimeStepFlag = true;
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataGlobal->NumOfTimeStepInHour = 1;
-    WeatherManager::AllocateWeatherData(*state); // gets us the albedo array initialized
+    Weather::AllocateWeatherData(*state); // gets us the albedo array initialized
     state->dataEnvrn->Year = 1986;
     state->dataEnvrn->Month = 6;
     state->dataEnvrn->DayOfMonth = 15;
     state->dataGlobal->HourOfDay = 8; // 8th hour of day, 7-8am
-    state->dataWeatherManager->WeatherFileLatitude = 33.45;
-    state->dataWeatherManager->WeatherFileLongitude = -111.98;
-    state->dataWeatherManager->WeatherFileTimeZone = -7;
+    state->dataWeather->WeatherFileLatitude = 33.45;
+    state->dataWeather->WeatherFileLongitude = -111.98;
+    state->dataWeather->WeatherFileTimeZone = -7;
     state->dataEnvrn->BeamSolarRad = 728;
     state->dataEnvrn->DifSolarRad = 70;
     state->dataEnvrn->WindSpeed = 3.1;

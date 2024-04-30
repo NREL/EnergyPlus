@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -182,7 +182,7 @@ namespace IntegratedHeatPump {
         // IHP indoor fan name
         int IDFanID;
         // IHP indoor fan index
-        int IDFanPlace; // indoor fan placement
+        DataHVACGlobals::FanPlace fanPlace; // indoor fan placement
 
         int ODAirInletNodeNum;  // oudoor coil inlet Nod
         int ODAirOutletNodeNum; // oudoor coil outlet Nod
@@ -228,7 +228,7 @@ namespace IntegratedHeatPump {
               WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
               CurMode(IHPOperationMode::Idle), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0),
               MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0),
-              IDFanPlace(0), ODAirInletNodeNum(0),                                                                    // oudoor coil inlet Nod
+              fanPlace(DataHVACGlobals::FanPlace::Invalid), ODAirInletNodeNum(0),                                     // oudoor coil inlet Nod
               ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]

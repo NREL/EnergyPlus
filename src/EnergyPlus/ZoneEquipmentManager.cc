@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,7 +99,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
-#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/ThermalChimney.hh>
 #include <EnergyPlus/UnitHeater.hh>
@@ -762,7 +761,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
     }
 
     for (int ZoneSizIndex = 1; ZoneSizIndex <= state.dataSize->NumZoneSizingInput; ++ZoneSizIndex) {
-        int ZoneIndex = UtilityRoutines::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
+        int ZoneIndex = Util::FindItemInList(state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataHeatBal->Zone);
         if (ZoneIndex == 0) {
             ShowSevereError(
                 state,
@@ -772,7 +771,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (std::any_of(state.dataZoneEquip->ZoneEquipConfig.begin(), state.dataZoneEquip->ZoneEquipConfig.end(), [](EquipConfiguration const &e) {
                 return e.IsControlled;
             })) {
-            ZoneIndex = UtilityRoutines::FindItemInList(
+            ZoneIndex = Util::FindItemInList(
                 state.dataSize->ZoneSizingInput(ZoneSizIndex).ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
             if (ZoneIndex == 0) {
                 if (!state.dataGlobal->isPulseZoneSizing) {
@@ -835,7 +834,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (!zoneEquipConfig.IsControlled) continue;
 
         // For each Zone Sizing object, find the corresponding controlled zone
-        int ZoneSizNum = UtilityRoutines::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
+        int ZoneSizNum = Util::FindItemInList(zoneEquipConfig.ZoneName, state.dataSize->ZoneSizingInput, &ZoneSizingInputData::ZoneName);
         auto &zoneSizingInput = (ZoneSizNum > 0) ? state.dataSize->ZoneSizingInput(ZoneSizNum) : state.dataSize->ZoneSizingInput(1);
         if (ZoneSizNum == 0) { // LKL I think this is sufficient for warning -- no need for array
             if (!state.dataGlobal->isPulseZoneSizing) {
@@ -970,7 +969,7 @@ void SetUpZoneSizingArrays(EnergyPlusData &state)
         if (thisOAReq.numDSOA > 0) {
             for (int spaceCounter = 1; spaceCounter <= thisOAReq.numDSOA; ++spaceCounter) {
                 std::string thisSpaceName = thisOAReq.dsoaSpaceNames(spaceCounter);
-                int thisSpaceNum = UtilityRoutines::FindItemInList(thisSpaceName, state.dataHeatBal->space);
+                int thisSpaceNum = Util::FindItemInList(thisSpaceName, state.dataHeatBal->space);
                 if (thisSpaceNum > 0) {
                     thisOAReq.dsoaSpaceIndexes.emplace_back(thisSpaceNum);
                 } else {
@@ -2266,6 +2265,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
             zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
         }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.CoolFlowSeqNoOA = zoneSizing.CoolFlowSeq;
+            zoneSizing.DesCoolVolFlowNoOA = zoneSizing.DesCoolVolFlow;
+            zoneSizing.DesCoolMassFlowNoOA = zoneSizing.DesCoolMassFlow;
+        }
     }
     // Save a set of design cooling air flow rates greater than or equal to the specified minimums without MinOA
     {
@@ -2298,7 +2305,6 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
                 zoneSizing.DesCoolMassFlowNoOA = MaxOfMinCoolMassFlowNoOA;
             }
             for (int TimeStepIndex = 1; TimeStepIndex <= state.dataZoneEquipmentManager->NumOfTimeStepInDay; ++TimeStepIndex) {
-                zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = zoneSizing.CoolFlowSeq(TimeStepIndex);
                 if (MaxOfMinCoolMassFlowNoOA > zoneSizing.CoolFlowSeq(TimeStepIndex)) {
                     zoneSizing.CoolFlowSeqNoOA(TimeStepIndex) = MaxOfMinCoolMassFlowNoOA;
                 }
@@ -2446,6 +2452,14 @@ void updateZoneSizingEndZoneSizingCalc7(EnergyPlusData &state,
             zoneSizingDD.HeatFlowSeqNoOA = zoneSizingDD.HeatFlowSeq;
             zoneSizingDD.DesHeatVolFlowNoOA = zoneSizingDD.DesHeatVolFlow;
             zoneSizingDD.DesHeatMassFlowNoOA = zoneSizingDD.DesHeatMassFlow;
+        }
+    } else {
+        for (int DDNum = 1; DDNum <= state.dataEnvrn->TotDesDays + state.dataEnvrn->TotRunDesPersDays; ++DDNum) {
+            // initialize HeatFlowSeqNoOA before any adjustments to HeatFlowSeq
+            auto &zoneSizing = zsSizing(DDNum, zoneOrSpaceNum);
+            zoneSizing.HeatFlowSeqNoOA = zoneSizing.HeatFlowSeq;
+            zoneSizing.DesHeatVolFlowNoOA = zoneSizing.DesHeatVolFlow;
+            zoneSizing.DesHeatMassFlowNoOA = zoneSizing.DesHeatMassFlow;
         }
     }
 
@@ -3098,10 +3112,6 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
     }
 
     FirstCall = false;
-
-    // Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
-    // These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-    SwimmingPool::SimSwimmingPool(state, FirstHVACIteration);
 
     // Loop over all the primary air loop; simulate their components (equipment)
     // and controllers

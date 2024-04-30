@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -541,56 +541,55 @@ void OutsideEnergySourceSpecs::oneTimeInit_new(EnergyPlusData &state)
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, loop.MaxVolFlowRate);
 
     std::string reportVarPrefix = "District Heating Water ";
-    std::string heatingOrCooling = "Heating";
-    std::string_view meterTypeKey = "DistrictHeatingWater";
+    OutputProcessor::EndUseCat heatingOrCooling = OutputProcessor::EndUseCat::Heating;
+    Constant::eResource meterTypeKey = Constant::eResource::DistrictHeatingWater;
+
     if (this->EnergyType == DataPlant::PlantEquipmentType::PurchChilledWater) {
         reportVarPrefix = "District Cooling Water ";
-        heatingOrCooling = "Cooling";
-        meterTypeKey = "DistrictCooling";
+        heatingOrCooling = OutputProcessor::EndUseCat::Cooling;
+        meterTypeKey = Constant::eResource::DistrictCooling;
     } else if (this->EnergyType == DataPlant::PlantEquipmentType::PurchSteam) {
         reportVarPrefix = "District Heating Steam ";
-        heatingOrCooling = "Heating";
-        meterTypeKey = "DistrictHeatingSteam";
+        heatingOrCooling = OutputProcessor::EndUseCat::Heating;
+        meterTypeKey = Constant::eResource::DistrictHeatingSteam;
     }
     SetupOutputVariable(state,
                         format("{}Energy", reportVarPrefix),
-                        OutputProcessor::Unit::J,
+                        Constant::Units::J,
                         this->EnergyTransfer,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Sum,
                         this->Name,
-                        {},
                         meterTypeKey,
-                        heatingOrCooling,
-                        {},
-                        "Plant");
+                        OutputProcessor::Group::Plant,
+                        heatingOrCooling);
     SetupOutputVariable(state,
                         format("{}Rate", reportVarPrefix),
-                        OutputProcessor::Unit::W,
+                        Constant::Units::W,
                         this->EnergyRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("{}Inlet Temperature", reportVarPrefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->InletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("{}Outlet Temperature", reportVarPrefix),
-                        OutputProcessor::Unit::C,
+                        Constant::Units::C,
                         this->OutletTemp,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
     SetupOutputVariable(state,
                         format("{}Mass Flow Rate", reportVarPrefix),
-                        OutputProcessor::Unit::kg_s,
+                        Constant::Units::kg_s,
                         this->MassFlowRate,
-                        OutputProcessor::SOVTimeStepType::System,
-                        OutputProcessor::SOVStoreType::Average,
+                        OutputProcessor::TimeStepType::System,
+                        OutputProcessor::StoreType::Average,
                         this->Name);
 }
 

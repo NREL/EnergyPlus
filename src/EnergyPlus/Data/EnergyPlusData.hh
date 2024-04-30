@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -108,9 +108,8 @@ struct DataWaterData;
 struct DataZoneControlsData;
 struct DataZoneEnergyDemandsData;
 struct DataZoneEquipmentData;
-struct DaylightingData;
 struct DaylightingDevicesData;
-struct DaylightingManagerData;
+struct DaylightingData;
 struct DefineEquipData;
 struct DemandManagerData;
 struct DesiccantDehumidifiersData;
@@ -186,6 +185,7 @@ struct HysteresisPhaseChangeData;
 struct ICEngineElectricGeneratorData;
 struct IPShortCutsData;
 struct IceThermalStorageData;
+struct IndoorGreenData;
 struct IntegratedHeatPumpGlobalData;
 struct InternalHeatGainsData;
 struct LoopNodeData;
@@ -228,7 +228,7 @@ struct PlantPressureSysData;
 struct PlantUtilitiesData;
 struct PlantValvesData;
 struct PluginManagerData;
-struct PollutionModuleData;
+struct PollutionData;
 struct PondGroundHeatExchangerData;
 struct PoweredInductionUnitsData;
 struct PsychrometricsData;
@@ -365,9 +365,8 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<DataZoneControlsData> dataZoneCtrls;
     std::unique_ptr<DataZoneEnergyDemandsData> dataZoneEnergyDemand;
     std::unique_ptr<DataZoneEquipmentData> dataZoneEquip;
-    std::unique_ptr<DaylightingData> dataDaylightingData;
     std::unique_ptr<DaylightingDevicesData> dataDaylightingDevices;
-    std::unique_ptr<DaylightingManagerData> dataDaylightingManager;
+    std::unique_ptr<DaylightingData> dataDayltg;
     std::unique_ptr<DefineEquipData> dataDefineEquipment;
     std::unique_ptr<DemandManagerData> dataDemandManager;
     std::unique_ptr<DesiccantDehumidifiersData> dataDesiccantDehumidifiers;
@@ -443,6 +442,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<ICEngineElectricGeneratorData> dataICEngElectGen;
     std::unique_ptr<IPShortCutsData> dataIPShortCut;
     std::unique_ptr<IceThermalStorageData> dataIceThermalStorage;
+    std::unique_ptr<IndoorGreenData> dataIndoorGreen;
     std::unique_ptr<IntegratedHeatPumpGlobalData> dataIntegratedHP;
     std::unique_ptr<InternalHeatGainsData> dataInternalHeatGains;
     std::unique_ptr<LoopNodeData> dataLoopNodes;
@@ -485,7 +485,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<PlantUtilitiesData> dataPlantUtilities;
     std::unique_ptr<PlantValvesData> dataPlantValves;
     std::unique_ptr<PluginManagerData> dataPluginManager;
-    std::unique_ptr<PollutionModuleData> dataPollutionModule;
+    std::unique_ptr<PollutionData> dataPollution;
     std::unique_ptr<PondGroundHeatExchangerData> dataPondGHE;
     std::unique_ptr<PoweredInductionUnitsData> dataPowerInductionUnits;
     std::unique_ptr<PsychrometricsData> dataPsychrometrics;
@@ -555,7 +555,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;
     std::unique_ptr<WaterToAirHeatPumpSimpleData> dataWaterToAirHeatPumpSimple;
     std::unique_ptr<WaterUseData> dataWaterUse;
-    std::unique_ptr<WeatherManagerData> dataWeatherManager;
+    std::unique_ptr<WeatherManagerData> dataWeather;
     std::unique_ptr<WindTurbineData> dataWindTurbine;
     std::unique_ptr<WindowACData> dataWindowAC;
     std::unique_ptr<WindowComplexManagerData> dataWindowComplexManager;

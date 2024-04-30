@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -136,16 +136,16 @@ namespace HVACUnitaryBypassVAV {
         std::string OAMixName;                 // Name of OA mixer
         int OAMixIndex = 0;                    // Index to OA mixer
         std::string FanName;                   // Name of fan
-        DataHVACGlobals::FanType FanType = DataHVACGlobals::FanType::Invalid;
-        DataHVACGlobals::FanLoc FanPlace = DataHVACGlobals::FanLoc::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
-        int FanIndex = 0;                                                    // Index number to fan
-        int FanOpModeSchedPtr = 0;                                           // Fan operating mode schedule pointer
-        Real64 FanVolFlow = 0.0;                                             // Volumetric flow rate of system supply air fan [m3/s]
-        Real64 HeatingSpeedRatio = 1.0;                                      // Fan speed ratio in heating mode
-        Real64 CoolingSpeedRatio = 1.0;                                      // Fan speed ratio in cooling mode
-        Real64 NoHeatCoolSpeedRatio = 1.0;                                   // Fan speed ratio when no cooling or heating
-        bool CheckFanFlow = true;                                            // Check fan volumetric flow versus system flow in init routine.
-        std::string DXCoolCoilName;                                          // Name of DX cooling coil
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid;
+        DataHVACGlobals::FanPlace fanPlace = DataHVACGlobals::FanPlace::Invalid; // Fan placement is either blowthru (1) or drawthru (2)
+        int FanIndex = 0;                                                        // Index number to fan
+        int FanOpModeSchedPtr = 0;                                               // Fan operating mode schedule pointer
+        Real64 FanVolFlow = 0.0;                                                 // Volumetric flow rate of system supply air fan [m3/s]
+        Real64 HeatingSpeedRatio = 1.0;                                          // Fan speed ratio in heating mode
+        Real64 CoolingSpeedRatio = 1.0;                                          // Fan speed ratio in cooling mode
+        Real64 NoHeatCoolSpeedRatio = 1.0;                                       // Fan speed ratio when no cooling or heating
+        bool CheckFanFlow = true;                                                // Check fan volumetric flow versus system flow in init routine.
+        std::string DXCoolCoilName;                                              // Name of DX cooling coil
         DataHVACGlobals::CoilType CoolCoilType = DataHVACGlobals::CoilType::Invalid;
         int CoolCoilCompIndex = 0;  // cooling coil component index number
         int DXCoolCoilIndexNum = 0; // actual DX cooling coil index number

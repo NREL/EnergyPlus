@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -245,15 +245,15 @@ namespace VariableSpeedCoils {
         std::string CondensateCollectName; // name of water source e.g. water storage tank
         int CondensateTankID;
         int CondensateTankSupplyARRID;
-        Real64 CondensateVdot;         // rate of water condensation from air stream [m3/s]
-        Real64 CondensateVol;          // amount of water condensed from air stream [m3]
-        Real64 CondInletTemp;          // Evap condenser inlet temperature [C], report variable
-        int SupplyFanIndex;            // index of this fan in fan array or vector
-        int SupplyFan_TypeNum;         // type of fan, in DataHVACGlobals
-        std::string SupplyFanName;     // name of fan associated with this dx coil
-        Real64 SourceAirMassFlowRate;  // source air mass flow rate [kg/s]
-        Real64 InletSourceAirTemp;     // source air temperature entering the outdoor coil [C]
-        Real64 InletSourceAirEnthalpy; // source air enthalpy entering the outdoor coil [J/kg]
+        Real64 CondensateVdot;                  // rate of water condensation from air stream [m3/s]
+        Real64 CondensateVol;                   // amount of water condensed from air stream [m3]
+        Real64 CondInletTemp;                   // Evap condenser inlet temperature [C], report variable
+        int SupplyFanIndex;                     // index of this fan in fan array or vector
+        DataHVACGlobals::FanType supplyFanType; // type of fan, in DataHVACGlobals
+        std::string SupplyFanName;              // name of fan associated with this dx coil
+        Real64 SourceAirMassFlowRate;           // source air mass flow rate [kg/s]
+        Real64 InletSourceAirTemp;              // source air temperature entering the outdoor coil [C]
+        Real64 InletSourceAirEnthalpy;          // source air enthalpy entering the outdoor coil [J/kg]
         // end variables for water system interactions
 
         // begin varibles for HPWH
@@ -318,8 +318,8 @@ namespace VariableSpeedCoils {
               BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0), BasinHeaterSchedulePtr(0), EvapCondAirFlow(DataHVACGlobals::MaxSpeedLevels, 0.0),
               EvapCondEffect(DataHVACGlobals::MaxSpeedLevels, 0.0), MSRatedEvapCondVolFlowPerRatedTotCap(DataHVACGlobals::MaxSpeedLevels, 0.0),
               EvapWaterSupplyMode(101), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateCollectMode(1001), CondensateTankID(0),
-              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0), SupplyFan_TypeNum(0),
-              SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
+              CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CondInletTemp(0.0), SupplyFanIndex(0),
+              supplyFanType(DataHVACGlobals::FanType::Invalid), SourceAirMassFlowRate(0.0), InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
               // begin varibles for HPWH
               RatedCapWH(0.0),                  // Rated water heating Capacity [W]
               InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
@@ -517,7 +517,7 @@ namespace VariableSpeedCoils {
 
     Real64 getVarSpeedPartLoadRatio(EnergyPlusData &state, int const DXCoilNum); // the number of the DX coil to mined for current PLR
 
-    void setVarSpeedHPWHFanTypeNum(EnergyPlusData &state, int const dXCoilNum, int const fanTypeNum);
+    void setVarSpeedHPWHFanType(EnergyPlusData &state, int const dXCoilNum, DataHVACGlobals::FanType fanType);
 
     void setVarSpeedHPWHFanIndex(EnergyPlusData &state, int const dXCoilNum, int const fanIndex);
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,9 +99,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                     FanCoolLoad = state.dataSize->DataCoilSizingFanCoolLoad;
                     TotCapTempModFac = state.dataSize->DataCoilSizingCapFT;
                 } else {
-                    if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                        UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                        UtilityRoutines::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
+                    if (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
+                        Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
+                        Util::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
                         if (this->termUnitIU && (this->curTermUnitSizingNum > 0)) {
                             this->autoSizedValue = this->termUnitSizing(this->curTermUnitSizingNum).DesCoolingLoad;
                         } else if (this->zoneEqFanCoil) {
@@ -178,9 +178,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(CoilInHumRat);
                             // adjust coil inlet/outlet temp with fan temperature rise
                             if (this->dataDesAccountForFanHeat) {
-                                if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                                if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::BlowThru) {
                                     CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
-                                } else if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::DrawThru) {
+                                } else if (state.dataSize->DataFanPlacement == DataHVACGlobals::FanPlace::DrawThru) {
                                     CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 }
                             }
@@ -229,9 +229,9 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         ShowContinueError(state,
                                           format("...Capacity passed by parent object to size child component = {:.2T} [W]", this->autoSizedValue));
                     } else {
-                        if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
-                            UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
-                            UtilityRoutines::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
+                        if (Util::SameString(this->compType, "COIL:COOLING:WATER") ||
+                            Util::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY") ||
+                            Util::SameString(this->compType, "ZONEHVAC:IDEALLOADSAIRSYSTEM")) {
                             if (this->termUnitIU || this->zoneEqFanCoil) {
                                 ShowContinueError(
                                     state, format("...Capacity passed by parent object to size child component = {:.2T} [W]", this->autoSizedValue));
@@ -425,12 +425,12 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // adjust coil inlet/outlet temp with fan temperature rise
                         if (this->dataDesAccountForFanHeat) {
                             PeakCoilLoad = max(0.0, (state.dataEnvrn->StdRhoAir * DesVolFlow * (CoilInEnth - CoilOutEnth) + FanCoolLoad));
-                            if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::BlowThru) {
+                            if (this->primaryAirSystem(this->curSysNum).supFanPlace == DataHVACGlobals::FanPlace::BlowThru) {
                                 CoilInTemp += FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                                 // include change in inlet condition in TotCapTempModFac
                                 CoilInWetBulb = Psychrometrics::PsyTwbFnTdbWPb(
                                     state, CoilInTemp, CoilInHumRat, state.dataEnvrn->StdBaroPress, this->callingRoutine);
-                            } else if (this->primaryAirSystem(this->curSysNum).supFanLocation == DataAirSystems::FanPlacement::DrawThru) {
+                            } else if (this->primaryAirSystem(this->curSysNum).supFanPlace == DataHVACGlobals::FanPlace::DrawThru) {
                                 CoilOutTemp -= FanCoolLoad / (CpAir * state.dataEnvrn->StdRhoAir * DesVolFlow);
                             }
                         }
@@ -505,8 +505,8 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
             // determines capacity using physical calculations instead of emperical curves
             bool FlagCheckVolFlowPerRatedTotCap = true;
-            if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
-                UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
+            if (Util::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
+                Util::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
                 FlagCheckVolFlowPerRatedTotCap = false;
 
             if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap) {

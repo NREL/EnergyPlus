@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,7 +142,7 @@ namespace HVACDXHeatPumpSystem {
 
         // Find the correct DXSystemNumber
         if (CompIndex == 0) {
-            DXSystemNum = UtilityRoutines::FindItemInList(DXHeatPumpSystemName, DXHeatPumpSystem);
+            DXSystemNum = Util::FindItemInList(DXHeatPumpSystemName, DXHeatPumpSystem);
             if (DXSystemNum == 0) {
                 ShowFatalError(state, format("SimDXHeatPumpSystem: DXUnit not found={}", DXHeatPumpSystemName));
             }
@@ -327,13 +327,13 @@ namespace HVACDXHeatPumpSystem {
                 }
             }
 
-            if (UtilityRoutines::SameString(Alphas(3), "Coil:Heating:DX:SingleSpeed")) {
+            if (Util::SameString(Alphas(3), "Coil:Heating:DX:SingleSpeed")) {
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType = Alphas(3);
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = CoilDX_HeatingEmpirical;
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
-            } else if (UtilityRoutines::SameString(Alphas(3), "Coil:Heating:DX:VariableSpeed")) {
+            } else if (Util::SameString(Alphas(3), "Coil:Heating:DX:VariableSpeed")) {
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType = Alphas(3);
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
@@ -414,10 +414,10 @@ namespace HVACDXHeatPumpSystem {
             // Setup Report variables for the DXHeatingSystem that is not reported in the components themselves
             SetupOutputVariable(state,
                                 "Coil System Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 
@@ -1146,7 +1146,7 @@ namespace HVACDXHeatPumpSystem {
 
         int NodeNum = 0;
         if (state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems > 0) {
-            int DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+            int DXHeatSysNum = Util::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
             if (DXHeatSysNum > 0 && DXHeatSysNum <= state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems) {
                 NodeNum = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum;
             }
@@ -1171,7 +1171,7 @@ namespace HVACDXHeatPumpSystem {
 
         int NodeNum = 0;
         if (state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems > 0) {
-            int DXHeatSysNum = UtilityRoutines::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
+            int DXHeatSysNum = Util::FindItemInList(DXHeatCoilSysName, state.dataHVACDXHeatPumpSys->DXHeatPumpSystem);
             if (DXHeatSysNum > 0 && DXHeatSysNum <= state.dataHVACDXHeatPumpSys->NumDXHeatPumpSystems) {
                 NodeNum = state.dataHVACDXHeatPumpSys->DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum;
             }

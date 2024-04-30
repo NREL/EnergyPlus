@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -131,6 +131,8 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
             } else if (this->Loop(thisLoop).initPluginLocation > -1) {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
+            } else if (this->Loop(thisLoop).initCallbackIndex > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(state, this->Loop(thisLoop).initCallbackIndex);
             }
 
             PlantUtilities::InitComponentNodes(state,
@@ -201,6 +203,8 @@ namespace UserDefinedComponents {
                 EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
             } else if (this->Loop(thisLoop).simPluginLocation > -1) {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
+            } else if (this->Loop(thisLoop).simCallbackIndex > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(state, this->Loop(thisLoop).simCallbackIndex);
             }
         }
 
@@ -208,6 +212,8 @@ namespace UserDefinedComponents {
             EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::UserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
         } else if (this->simPluginLocation > -1) {
             state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
+        } else if (this->simCallbackIndex > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(state, this->simCallbackIndex);
         }
 
         this->report(state, thisLoop);
@@ -236,7 +242,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
+            CompNum = Util::FindItemInList(EquipName, state.dataUserDefinedComponents->UserCoil);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -272,6 +278,9 @@ namespace UserDefinedComponents {
             } else if (state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation > -1) {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
                     state, state.dataUserDefinedComponents->UserCoil(CompNum).initPluginLocation);
+            } else if (state.dataUserDefinedComponents->UserCoil(CompNum).initCallbackIndex > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(
+                    state, state.dataUserDefinedComponents->UserCoil(CompNum).initCallbackIndex);
             }
 
             if (state.dataUserDefinedComponents->UserCoil(CompNum).PlantIsConnected) {
@@ -298,6 +307,9 @@ namespace UserDefinedComponents {
         } else if (state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation > -1) {
             state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(state,
                                                                                state.dataUserDefinedComponents->UserCoil(CompNum).simPluginLocation);
+        } else if (state.dataUserDefinedComponents->UserCoil(CompNum).simCallbackIndex > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(state,
+                                                                                 state.dataUserDefinedComponents->UserCoil(CompNum).simCallbackIndex);
         }
 
         state.dataUserDefinedComponents->UserCoil(CompNum).report(state);
@@ -341,7 +353,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
+            CompNum = Util::FindItemInList(CompName, state.dataUserDefinedComponents->UserZoneAirHVAC);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -379,6 +391,9 @@ namespace UserDefinedComponents {
             } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
                     state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initPluginLocation);
+            } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initCallbackIndex > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(
+                    state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).initCallbackIndex);
             }
             if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
@@ -408,6 +423,9 @@ namespace UserDefinedComponents {
         } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
             state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
                 state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simPluginLocation);
+        } else if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simCallbackIndex > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(
+                state, state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).simCallbackIndex);
         }
 
         state.dataUserDefinedComponents->UserZoneAirHVAC(CompNum).report(state);
@@ -457,7 +475,7 @@ namespace UserDefinedComponents {
 
         // Find the correct Equipment
         if (CompIndex == 0) {
-            CompNum = UtilityRoutines::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
+            CompNum = Util::FindItemInList(CompName, state.dataUserDefinedComponents->UserAirTerminal);
             if (CompNum == 0) {
                 ShowFatalError(state, "SimUserDefinedPlantComponent: User Defined Coil not found");
             }
@@ -495,6 +513,9 @@ namespace UserDefinedComponents {
             } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation > -1) {
                 state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
                     state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initPluginLocation);
+            } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).initCallbackIndex > -1) {
+                state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(
+                    state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).initCallbackIndex);
             }
             if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= state.dataUserDefinedComponents->UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
@@ -524,6 +545,9 @@ namespace UserDefinedComponents {
         } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation > -1) {
             state.dataPluginManager->pluginManager->runSingleUserDefinedPlugin(
                 state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simPluginLocation);
+        } else if (state.dataUserDefinedComponents->UserAirTerminal(CompNum).simCallbackIndex > -1) {
+            state.dataPluginManager->pluginManager->runSingleUserDefinedCallback(
+                state, state.dataUserDefinedComponents->UserAirTerminal(CompNum).simCallbackIndex);
         }
 
         state.dataUserDefinedComponents->UserAirTerminal(CompNum).report(state);
@@ -570,13 +594,13 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
@@ -584,10 +608,16 @@ namespace UserDefinedComponents {
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserPlantComp(CompLoop).simCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(2));
+                            if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).simCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
@@ -627,7 +657,7 @@ namespace UserDefinedComponents {
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed =
                                 static_cast<DataPlant::HowMet>(
-                                    getEnumValue(DataPlant::HowMetTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(aArgCount + 2))));
+                                    getEnumValue(DataPlant::HowMetTypeNamesUC, Util::makeUPPER(cAlphaArgs(aArgCount + 2))));
                             if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).HowLoadServed ==
                                 DataPlant::HowMet::ByNominalCapLowOutLimit) {
                                 // actuator for low out limit
@@ -654,42 +684,49 @@ namespace UserDefinedComponents {
                         {
                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).FlowPriority =
                                 static_cast<DataPlant::LoopFlowStatus>(
-                                    getEnumValue(DataPlant::LoopFlowStatusTypeNamesUC, UtilityRoutines::makeUPPER(cAlphaArgs(aArgCount + 3))));
+                                    getEnumValue(DataPlant::LoopFlowStatusTypeNamesUC, Util::makeUPPER(cAlphaArgs(aArgCount + 3))));
                         }
 
                         // find program manager for initial setup, begin environment and sizing of this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 4)) {
-                            int StackMngrNum =
-                                UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
+                            int StackMngrNum = Util::FindItemInList(cAlphaArgs(aArgCount + 4), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlInitProgramMngr = StackMngrNum;
                             } else {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation =
                                     state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(aArgCount + 4));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation == -1) {
-                                    ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(aArgCount + 4), cAlphaArgs(aArgCount + 4)));
-                                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                                    ShowContinueError(state,
-                                                      "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                                    ErrorsFound = true;
+                                    state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initCallbackIndex =
+                                        state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(aArgCount + 4));
+                                    if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initCallbackIndex == -1) {
+                                        ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(aArgCount + 4), cAlphaArgs(aArgCount + 4)));
+                                        ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                        ShowContinueError(state,
+                                                          "Program Manager Name not found as an EMS Program Manager, API callback, or a Python "
+                                                          "Plugin Instance object.");
+                                        ErrorsFound = true;
+                                    }
                                 }
                             }
                         }
 
                         // find program to call for model simulations for just this plant connection
                         if (!lAlphaFieldBlanks(aArgCount + 5)) {
-                            int StackMngrNum =
-                                UtilityRoutines::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
+                            int StackMngrNum = Util::FindItemInList(cAlphaArgs(aArgCount + 5), state.dataRuntimeLang->EMSProgramCallManager);
                             if (StackMngrNum > 0) { // found it
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr = StackMngrNum;
                             } else {
                                 state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation =
                                     state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(aArgCount + 5));
                                 if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation == -1) {
-                                    ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(aArgCount + 4), cAlphaArgs(aArgCount + 4)));
-                                    ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                                    ShowContinueError(state, "Program Manager Name not found.");
-                                    ErrorsFound = true;
+                                    state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simCallbackIndex =
+                                        state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(aArgCount + 5));
+                                    if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simCallbackIndex == -1) {
+                                        ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(aArgCount + 4), cAlphaArgs(aArgCount + 4)));
+                                        ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                        ShowContinueError(state, "Program Manager Name not found as EMS Program, API callback, or Python Plugin.");
+                                        ErrorsFound = true;
+                                    }
                                 }
                             }
                         }
@@ -898,7 +935,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(31)) {
 
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(31), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(31), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(31)));
@@ -977,6 +1014,8 @@ namespace UserDefinedComponents {
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).ErlSimProgramMngr > 0) ++MgrCountTest;
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initPluginLocation >= 0) ++MgrCountTest;
                     if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simPluginLocation >= 0) ++MgrCountTest;
+                    if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).initCallbackIndex >= 0) ++MgrCountTest;
+                    if (state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).simCallbackIndex >= 0) ++MgrCountTest;
                 }
                 if (MgrCountTest == 0) {
                     ShowSevereError(state, format("Invalid {}={}", cCurrentModuleObject, cAlphaArgs(1)));
@@ -1016,7 +1055,7 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
                 // ErrorsFound will be set to True if problem was found, left untouched otherwise
                 GlobalNames::VerifyUniqueCoilName(state, cCurrentModuleObject, cAlphaArgs(1), ErrorsFound, cCurrentModuleObject + " Name");
@@ -1025,34 +1064,46 @@ namespace UserDefinedComponents {
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).simCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(2));
+                            if (state.dataUserDefinedComponents->UserCoil(CompLoop).simCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback, or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserCoil(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserCoil(CompLoop).initCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(3));
+                            if (state.dataUserDefinedComponents->UserCoil(CompLoop).initCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
@@ -1279,7 +1330,7 @@ namespace UserDefinedComponents {
                     if (!lAlphaFieldBlanks(13)) {
 
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum =
-                            UtilityRoutines::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
+                            Util::FindItemInList(cAlphaArgs(13), state.dataHeatBal->Zone);
                         if (state.dataUserDefinedComponents->UserCoil(CompLoop).Zone.ZoneNum == 0) {
                             ShowSevereError(
                                 state, format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(13)));
@@ -1409,39 +1460,51 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(2));
+                            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).simCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(3));
+                            if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).initCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
@@ -1754,7 +1817,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(16)) {
 
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(16), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(16), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(16)));
@@ -1858,39 +1921,51 @@ namespace UserDefinedComponents {
                                                                          lAlphaFieldBlanks,
                                                                          cAlphaFieldNames,
                                                                          _);
-                UtilityRoutines::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
+                Util::IsNameEmpty(state, cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name = cAlphaArgs(1);
 
                 // now get program manager for model simulations
                 if (!lAlphaFieldBlanks(2)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(2), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlSimProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(2));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(2));
+                            if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).simCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(2), cAlphaArgs(2)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
 
                 // now get program manager for model initializations
                 if (!lAlphaFieldBlanks(3)) {
-                    int StackMngrNum = UtilityRoutines::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
+                    int StackMngrNum = Util::FindItemInList(cAlphaArgs(3), state.dataRuntimeLang->EMSProgramCallManager);
                     if (StackMngrNum > 0) { // found it
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).ErlInitProgramMngr = StackMngrNum;
                     } else {
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation =
                             state.dataPluginManager->pluginManager->getLocationOfUserDefinedPlugin(state, cAlphaArgs(3));
                         if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initPluginLocation == -1) {
-                            ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
-                            ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
-                            ShowContinueError(state, "Program Manager Name not found as an EMS Program Manager or a Python Plugin Instance object.");
-                            ErrorsFound = true;
+                            state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initCallbackIndex =
+                                state.dataPluginManager->pluginManager->getUserDefinedCallbackIndex(state, cAlphaArgs(3));
+                            if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).initCallbackIndex == -1) {
+                                ShowSevereError(state, format("Invalid {}={}", cAlphaFieldNames(3), cAlphaArgs(3)));
+                                ShowContinueError(state, format("Entered in {}={}", cCurrentModuleObject, cAlphaArgs(1)));
+                                ShowContinueError(
+                                    state,
+                                    "Program Manager Name not found as an EMS Program Manager, API callback or a Python Plugin Instance object.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                 }
@@ -2260,7 +2335,7 @@ namespace UserDefinedComponents {
                 if (!lAlphaFieldBlanks(14)) {
 
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum =
-                        UtilityRoutines::FindItemInList(cAlphaArgs(14), state.dataHeatBal->Zone);
+                        Util::FindItemInList(cAlphaArgs(14), state.dataHeatBal->Zone);
                     if (state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Zone.ZoneNum == 0) {
                         ShowSevereError(state,
                                         format("{} = {}:  Ambient Zone Name not found = {}", cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(14)));
@@ -2862,7 +2937,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }
@@ -2896,7 +2971,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }
@@ -2933,7 +3008,7 @@ namespace UserDefinedComponents {
         }
 
         if (state.dataUserDefinedComponents->NumUserCoils > 0) {
-            CoilIndex = UtilityRoutines::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
+            CoilIndex = Util::FindItem(CoilName, state.dataUserDefinedComponents->UserCoil, state.dataUserDefinedComponents->NumUserCoils);
         } else {
             CoilIndex = 0;
         }

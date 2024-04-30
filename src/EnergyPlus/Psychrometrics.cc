@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -742,7 +742,7 @@ namespace Psychrometrics {
 #endif
 
         // Convert temperature from Centigrade to Kelvin.
-        Real64 const Tkel(T + Constant::KelvinConv); // Dry-bulb in REAL(r64) for function passing
+        Real64 const Tkel(T + Constant::Kelvin); // Dry-bulb in REAL(r64) for function passing
 
         // If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
         if (Tkel < 173.15) {

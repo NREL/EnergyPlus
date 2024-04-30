@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -150,6 +150,7 @@ namespace HVACControllers {
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
         PlantLocation ActuatedNodePlantLoc; // Location for actuated node
+        DataPlant::PlantEquipmentType WaterCoilType = DataPlant::PlantEquipmentType::Invalid;
         // --------------------
         // Sensed variable
         // --------------------

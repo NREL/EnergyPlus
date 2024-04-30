@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -379,10 +379,10 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     state->dataFans->Fan(1).MotEff = 0.9;
     state->dataFans->Fan(1).FanEff = 0.6;
     state->dataFans->Fan(1).MotInAirFrac = 0.5;
-    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
+    state->dataFans->Fan(1).fanType = DataHVACGlobals::FanType::Constant;
     state->dataAirSystemsData->PrimaryAirSystems(1).SupFanNum = 1;
     state->dataAirSystemsData->PrimaryAirSystems(1).supFanModelType = DataAirSystems::StructArrayLegacyFanModels;
-    state->dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
+    state->dataSize->DataFanPlacement = DataHVACGlobals::FanPlace::BlowThru;
 
     // Test 14 - Airloop Equipment, with OA and precooling of OA stream, add fan heat
     // start with an autosized value
@@ -404,7 +404,7 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     // Test 15 - Airloop Equipment, with OA and precooling of OA stream, add fan heat, add scalable capacity sizing
     state->dataSize->FinalSysSizing(1).CoolingCapMethod = DataSizing::FractionOfAutosizedCoolingCapacity;
     state->dataSize->FinalSysSizing(1).FractionOfAutosizedCoolingCapacity = 0.5;
-    state->dataAirSystemsData->PrimaryAirSystems(1).supFanLocation = DataAirSystems::FanPlacement::BlowThru;
+    state->dataAirSystemsData->PrimaryAirSystems(1).supFanPlace = DataHVACGlobals::FanPlace::BlowThru;
     // start with an autosized value
     inputValue = DataSizing::AutoSize;
     // do sizing

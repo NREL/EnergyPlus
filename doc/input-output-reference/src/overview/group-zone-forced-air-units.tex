@@ -2204,6 +2204,10 @@ This numeric field defines the supply air flow rate leaving the air conditioner 
 
 This numeric field defines the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required (i.e., DX coil and heater are off but the supply air fan operates). This field is only used when the air conditioner's supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the air conditioner's supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
+\paragraph{Field: No Load Supply Air Flow Rate Control Set To Low Speed}\label{field-no-load-supply-air-flow-rate-control-set-to-low-speed-001}
+
+This alpha field defines whether the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required is set to the coil high speed or low speed air flow rate. The valid choices are Yes or No. The default value is Yes. If the coil type does not have multiple air flow rates then this field is not used. If Yes is selected and the coil air flow rate is autosized the No Load Supply Air Flow Rate is proportional to the number of speeds.
+
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-001}
 
 This numeric field defines the outdoor air flow rate through the air conditioner in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the air conditioner's supply air volumetric flow rate during cooling operation. This field is set to zero flow when the PTAC is connected to an \textit{\hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}} object.
@@ -2319,6 +2323,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
   autosize,              !- Cooling Supply Air Flow Rate {m3/s}
   autosize,              !- Heating Supply Air Flow Rate operation {m3/s}
   autosize,              !- No Load Supply Air Flow Rate {m3/s}
+  ,                         !- No Load Supply Air Flow Rate Control Set To Low Speed 
   autosize,              !- Cooling Outdoor Air Flow Rate {m3/s}
   autosize,              !- Heating Outdoor Air Flow Rate {m3/s}
   autosize,              !- No Load Outdoor Air Flow Rate  {m3/s}
@@ -2551,6 +2556,10 @@ This numeric field defines the supply air flow rate leaving the heat pump in cub
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
+\paragraph{Field: No Load Supply Air Flow Rate Control Set To Low Speed}\label{field-no-load-supply-air-flow-rate-control-set-to-low-speed-002}
+
+This alpha field defines whether the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required is set to the coil high speed or low speed air flow rate. The valid choices are Yes or No. The default value is Yes. If the coil type does not have multiple air flow rates then this field is not used. If Yes is selected and the coil air flow rate is autosized the No Load Supply Air Flow Rate is proportional to the number of speeds.
+
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-1}
 
 This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the Cooling Outdoor Air Flow Rate is fixed; it cannot change during the simulation. In addition, the Cooling Outdoor Air Flow Rate cannot be greater than the heat pump's supply air volumetric flow rate during cooling operation.
@@ -2709,6 +2718,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
   autosize,                !- Cooling Supply Air Flow Rate {m3/s}
   autosize,                !- Heating Supply Air Flow Rate {m3/s}
   autosize,                !- No Load Supply Air Flow Rate {m3/s}
+  ,                           !- No Load Supply Air Flow Rate Control Set To Low Speed
   autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
   autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
   autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -3042,6 +3052,10 @@ This numeric field defines the supply air flow rate leaving the heat pump in cub
 
 This numeric field defines the supply air flow rate leaving the heat pump in cubic meters per second when neither cooling or heating is required (i.e., DX coils and supplemental heater are off but the supply air fan operates). This field is only used when the heat pump's supply air fan operating mode schedule specifies continuous fan operation. Values must be greater than or equal to zero, or this field is autosizable. If the heat pump's supply air fan operating mode schedule specifies continuous fan operation and this value is set to zero or this field is left blank, then the model assumes that the supply air flow rate when no cooling/heating is needed is equal to the supply air flow rate when the cooling or heating coil was last operating (for cooling operation or heating operation).
 
+\paragraph{Field: No Load Supply Air Flow Rate Control Set To Low Speed}\label{field-no-load-supply-air-flow-rate-control-set-to-low-speed-003}
+
+This alpha field defines whether the supply air flow rate leaving the air conditioner in cubic meters per second when neither cooling nor heating is required is set to the coil high speed or low speed air flow rate. The valid choices are Yes or No. The default value is Yes. If the coil type does not have multiple air flow rates then this field is not used. If Yes is selected and the coil air flow rate is autosized the No Load Supply Air Flow Rate is proportional to the number of speeds.
+
 \paragraph{Field: Cooling Outdoor Air Flow Rate}\label{field-cooling-outdoor-air-flow-rate-2}
 
 This numeric field defines the outdoor air flow rate through the heat pump in cubic meters per second when the DX cooling coil is operating. Values must be greater than or equal to 0, or this field is autosizable. Note that the outside air flow rate during cooling operation is fixed; it cannot change during the simulation. In addition, the outside air flow rate during cooling operation cannot be greater than the heat pump's supply air flow rate during cooling operation. This input field is set to zero flow when the WaterToAirHeatPump is connected to an \textit{\hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}} object.
@@ -3225,6 +3239,7 @@ ZoneHVAC:WaterToAirHeatPump,
   Autosize,                 !- Cooling Supply Air Flow Rate {m3/s}
   Autosize,                 !- Heating Supply Air Flow Rate {m3/s}
   ,                         !- No Load Supply Air Flow Rate {m3/s}
+  ,                         !- No Load Supply Air Flow Rate Control Set To Low Speed
   0.0,                      !- Cooling Outdoor Air Flow Rate {m3/s}
   0.0,                      !- Heating Outdoor Air Flow Rate {m3/s}
   ,                         !- No Load Outdoor Air Flow Rate {m3/s}

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #define AIRFLOWNETWORK_ELEMENTS_HPP
 
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EPVector.hh>
 
 namespace EnergyPlus {
@@ -1083,20 +1084,20 @@ namespace AirflowNetwork {
     struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
     {
         // Members
-        Real64 FlowRate;           // Air volume flow rate
-        Real64 Ctrl;               // Control ratio
-        int FanTypeNum;            // Fan type: Constant volume or ONOFF
-        int FanIndex;              // Fan index
-        int InletNode;             // Inlet node number
-        int OutletNode;            // Outlet node number
-        Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
-        int AirLoopNum;            // Air loop number
-        bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
+        Real64 FlowRate;                  // Air volume flow rate
+        Real64 Ctrl;                      // Control ratio
+        DataHVACGlobals::FanType fanType; // Fan type: Constant volume or ONOFF
+        int FanIndex;                     // Fan index
+        int InletNode;                    // Inlet node number
+        int OutletNode;                   // Outlet node number
+        Real64 MaxAirMassFlowRate;        // Max Specified MAss Flow Rate of Damper [kg/s]
+        int AirLoopNum;                   // Air loop number
+        bool FanModelFlag;                // True, this fan is FAN:SYSTEMMODEL
 
         // Default Constructor
         ConstantVolumeFan()
-            : FlowRate(0.0), Ctrl(0.0), FanTypeNum(0), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0), AirLoopNum(0),
-              FanModelFlag(false)
+            : FlowRate(0.0), Ctrl(0.0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0),
+              AirLoopNum(0), FanModelFlag(false)
         {
         }
 

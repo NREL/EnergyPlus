@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1127,24 +1127,24 @@ void SetupCommonPipes(EnergyPlusData &state)
             thisCommonPipe.CommonPipeType = DataPlant::CommonPipeType::Single;
             SetupOutputVariable(state,
                                 "Plant Common Pipe Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCommonPipe.Flow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 thisCommonPipe.Temp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Flow Direction Status",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisCommonPipe.FlowDir,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
 
             if (first_supply_component_type == DataPlant::PlantEquipmentType::PumpVariableSpeed) {
@@ -1159,31 +1159,31 @@ void SetupCommonPipes(EnergyPlusData &state)
             thisCommonPipe.CommonPipeType = DataPlant::CommonPipeType::TwoWay;
             SetupOutputVariable(state,
                                 "Plant Common Pipe Primary Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCommonPipe.PriCPLegFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Secondary Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCommonPipe.SecCPLegFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Primary to Secondary Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCommonPipe.PriToSecFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
             SetupOutputVariable(state,
                                 "Plant Common Pipe Secondary to Primary Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisCommonPipe.SecToPriFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisPlantLoop.Name);
 
             // check type of pump on supply side inlet

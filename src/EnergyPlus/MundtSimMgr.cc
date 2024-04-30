@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -262,17 +262,17 @@ namespace RoomAir {
 
                         AirNodeFoundFlag = false;
                         for (AirNodeNum = AirNodeBeginNum; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
-                            if (UtilityRoutines::SameString(state.dataRoomAir->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
+                            if (Util::SameString(state.dataRoomAir->AirNode(AirNodeNum).ZoneName, thisZone.Name)) {
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).ClassType = state.dataRoomAir->AirNode(AirNodeNum).ClassType;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName = state.dataRoomAir->AirNode(AirNodeNum).Name;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Height = state.dataRoomAir->AirNode(AirNodeNum).Height;
                                 state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).SurfMask = state.dataRoomAir->AirNode(AirNodeNum).SurfMask;
                                 SetupOutputVariable(state,
                                                     "Room Air Node Air Temperature",
-                                                    OutputProcessor::Unit::C,
+                                                    Constant::Units::C,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).Temp,
-                                                    OutputProcessor::SOVTimeStepType::HVAC,
-                                                    OutputProcessor::SOVStoreType::Average,
+                                                    OutputProcessor::TimeStepType::System,
+                                                    OutputProcessor::StoreType::Average,
                                                     state.dataMundtSimMgr->LineNode(NodeNum, MundtZoneIndex).AirNodeName);
 
                                 AirNodeBeginNum = AirNodeNum + 1;

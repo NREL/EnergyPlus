@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,12 +58,6 @@ namespace DataHVACGlobals {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
-
-    // fan types
-    Array1D_string const
-        cFanTypes(NumAllFanTypes,
-                  {"Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"});
-
     Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
                                        {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
                                         "AirLoopHVAC:Unitary:Furnace:HeatCool",

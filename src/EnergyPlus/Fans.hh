@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,12 +76,11 @@ namespace Fans {
     struct FanEquipConditions
     {
         // Members
-        std::string FanName;               // Name of the fan
-        std::string FanType;               // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-        std::string AvailSchedName;        // Fan Operation Schedule
-        int FanType_Num = 0;               // DataHVACGlobals fan type
-        int AvailSchedPtrNum = 0;          // Pointer to the availability schedule
-        Real64 InletAirMassFlowRate = 0.0; // MassFlow through the Fan being Simulated [kg/Sec]
+        std::string Name;                                                     // Name of the fan
+        std::string AvailSchedName;                                           // Fan Operation Schedule
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // DataHVACGlobals fan type
+        int AvailSchedPtrNum = 0;                                             // Pointer to the availability schedule
+        Real64 InletAirMassFlowRate = 0.0;                                    // MassFlow through the Fan being Simulated [kg/Sec]
         Real64 OutletAirMassFlowRate = 0.0;
         Real64 MaxAirFlowRate = 0.0;                        // Max Specified Volume Flow Rate of Fan [m3/sec]
         bool MaxAirFlowRateIsAutosizable = false;           // if true, then this type of fan could be autosize
@@ -233,50 +232,23 @@ namespace Fans {
 
     void ReportFan(EnergyPlusData &state, int FanNum);
 
-    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, std::string_view ThisObjectType = {});
+    int GetFanIndex(EnergyPlusData &state, std::string const &FanName);
 
-    void GetFanVolFlow(EnergyPlusData &state, int FanIndex, Real64 &FanVolFlow);
+    Real64 GetFanVolFlow(EnergyPlusData &state, int FanIndex);
 
     Real64 GetFanPower(EnergyPlusData &state, int FanIndex);
 
-    void GetFanType(EnergyPlusData &state,
-                    std::string const &FanName,           // Fan name
-                    int &FanType,                         // returned fantype number
-                    bool &ErrorsFound,                    // error indicator
-                    std::string_view ThisObjectType = {}, // parent object type (for error message)
-                    std::string_view ThisObjectName = {}  // parent object name (for error message)
-    );
+    DataHVACGlobals::FanType GetFanType(EnergyPlusData &state, int FanIndex);
 
-    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
-                                      std::string_view FanType,                  // must match fan types in this module
-                                      std::string_view FanName,                  // must match fan names for the fan type
-                                      bool &ErrorsFound,                         // set to true if problem
-                                      ObjexxFCL::Optional_int_const FanIndex = _ // index to fan
-    );
+    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state, int FanIndex);
 
-    int GetFanInletNode(EnergyPlusData &state,
-                        std::string_view FanType, // must match fan types in this module
-                        std::string_view FanName, // must match fan names for the fan type
-                        bool &ErrorsFound         // set to true if problem
-    );
+    int GetFanInletNode(EnergyPlusData &state, int FanIndex);
 
-    int GetFanOutletNode(EnergyPlusData &state,
-                         std::string const &FanType, // must match fan types in this module
-                         std::string const &FanName, // must match fan names for the fan type
-                         bool &ErrorsFound           // set to true if problem
-    );
+    int GetFanOutletNode(EnergyPlusData &state, int FanIndex);
 
-    int GetFanAvailSchPtr(EnergyPlusData &state,
-                          std::string const &FanType, // must match fan types in this module
-                          std::string const &FanName, // must match fan names for the fan type
-                          bool &ErrorsFound           // set to true if problem
-    );
+    int GetFanAvailSchPtr(EnergyPlusData &state, int FanIndex);
 
-    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
-                                   std::string &FanType,               // must match fan types in this module (set if nonzero index passed)
-                                   std::string &FanName,               // must match fan names for the fan type (set if nonzero index passed)
-                                   ObjexxFCL::Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
-    );
+    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state, int FanIndex);
 
     void SetFanData(EnergyPlusData &state,
                     int FanNum,                                          // Index of fan

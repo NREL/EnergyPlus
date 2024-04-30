@@ -119,7 +119,7 @@
 ! ZONE_TERMINAL_FAN_STATIC_PRESSURE=  298.69
 ! End WebInterface Parameters
 
-  Version,23.2;
+  Version,24.2;
 
   Timestep,4;
 
@@ -1863,7 +1863,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -2031,6 +2031,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2372,7 +2373,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -2540,6 +2541,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -2881,7 +2883,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -3049,6 +3051,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -3390,7 +3393,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -3558,6 +3561,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -3899,7 +3903,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -4067,6 +4071,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -4408,7 +4413,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -4576,6 +4581,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -4917,7 +4923,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -5085,6 +5091,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -5426,7 +5433,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -5594,6 +5601,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -5935,7 +5943,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -6103,6 +6111,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -6444,7 +6453,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -6612,6 +6621,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -6953,7 +6963,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -7121,6 +7131,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -7462,7 +7473,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -7630,6 +7641,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -7971,7 +7983,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -8139,6 +8151,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -8480,7 +8493,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -8648,6 +8661,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -8989,7 +9003,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -9157,6 +9171,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -9498,7 +9513,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -9666,6 +9681,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -10007,7 +10023,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -10175,6 +10191,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -10516,7 +10533,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -10684,6 +10701,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -11025,7 +11043,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -11193,6 +11211,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -11534,7 +11553,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -11702,6 +11721,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -12043,7 +12063,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -12211,6 +12231,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -12552,7 +12573,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -12720,6 +12741,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -13061,7 +13083,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -13229,6 +13251,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -13570,7 +13593,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -13738,6 +13761,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -14079,7 +14103,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -14247,6 +14271,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -14588,7 +14613,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -14756,6 +14781,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -15097,7 +15123,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -15265,6 +15291,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -15606,7 +15633,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -15774,6 +15801,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -16115,7 +16143,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -16283,6 +16311,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -16624,7 +16653,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -16792,6 +16821,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -17133,7 +17163,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -17301,6 +17331,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -17642,7 +17673,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -17810,6 +17841,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -18151,7 +18183,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -18319,6 +18351,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -18660,7 +18693,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -18828,6 +18861,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -19169,7 +19203,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -19337,6 +19371,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -19678,7 +19713,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -19846,6 +19881,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -20166,7 +20202,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -20334,6 +20370,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -20654,7 +20691,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -20822,6 +20859,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -21142,7 +21180,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -21310,6 +21348,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -21596,7 +21635,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -21764,6 +21803,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -22050,7 +22090,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -22218,6 +22258,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -22504,7 +22545,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -22672,6 +22713,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -22992,7 +23034,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -23160,6 +23202,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -23480,7 +23523,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -23648,6 +23691,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}
@@ -23968,7 +24012,7 @@
     ACTIVITY_SCH,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged,       !- Mean Radiant Temperature Calculation Type
     ,                        !- Surface Name/Angle Factor List Name
     WORK_EFF_SCH,            !- Work Efficiency Schedule Name
     ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method
@@ -24136,6 +24180,7 @@
     AUTOSIZE,                !- Cooling Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Supply Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Supply Air Flow Rate {m3/s}
+    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed
     AUTOSIZE,                !- Cooling Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- Heating Outdoor Air Flow Rate {m3/s}
     AUTOSIZE,                !- No Load Outdoor Air Flow Rate {m3/s}

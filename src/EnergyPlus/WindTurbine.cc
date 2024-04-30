@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -136,7 +136,7 @@ namespace WindTurbine {
         }
 
         if (GeneratorIndex == 0) {
-            WindTurbineNum = UtilityRoutines::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
+            WindTurbineNum = Util::FindItemInList(GeneratorName, state.dataWindTurbine->WindTurbineSys);
             if (WindTurbineNum == 0) {
                 ShowFatalError(state, format("SimWindTurbine: Specified Generator not one of Valid Wind Turbine Generators {}", GeneratorName));
             }
@@ -259,7 +259,7 @@ namespace WindTurbine {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
 
             auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
 
@@ -282,7 +282,7 @@ namespace WindTurbine {
             }
             // Select rotor type
             windTurbine.rotorType =
-                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
+                static_cast<RotorType>(getEnumValue(WindTurbine::RotorNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(3))));
             if (windTurbine.rotorType == RotorType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(3).empty()) {
                     windTurbine.rotorType = RotorType::HorizontalAxis;
@@ -299,7 +299,7 @@ namespace WindTurbine {
 
             // Select control type
             windTurbine.controlType =
-                static_cast<ControlType>(getEnumValue(WindTurbine::ControlNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
+                static_cast<ControlType>(getEnumValue(WindTurbine::ControlNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(4))));
             if (windTurbine.controlType == ControlType::Invalid) {
                 if (state.dataIPShortCut->cAlphaArgs(4).empty()) {
                     windTurbine.controlType = ControlType::VariableSpeedVariablePitch;
@@ -677,82 +677,80 @@ namespace WindTurbine {
             auto &windTurbine = state.dataWindTurbine->WindTurbineSys(WindTurbineNum);
             SetupOutputVariable(state,
                                 "Generator Produced AC Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 windTurbine.Power,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Produced AC Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 windTurbine.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 windTurbine.Name,
-                                {},
-                                "ElectricityProduced",
-                                "WINDTURBINE",
-                                {},
-                                "Plant");
+                                Constant::eResource::ElectricityProduced,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::WindTurbine);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Wind Speed",
-                                OutputProcessor::Unit::m_s,
+                                Constant::Units::m_s,
                                 windTurbine.LocalWindSpeed,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Local Air Density",
-                                OutputProcessor::Unit::kg_m3,
+                                Constant::Units::kg_m3,
                                 windTurbine.LocalAirDensity,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             SetupOutputVariable(state,
                                 "Generator Turbine Tip Speed Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 windTurbine.TipSpeedRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 windTurbine.Name);
             switch (windTurbine.rotorType) {
             case RotorType::HorizontalAxis: {
                 SetupOutputVariable(state,
                                     "Generator Turbine Power Coefficient",
-                                    OutputProcessor::Unit::None,
+                                    Constant::Units::None,
                                     windTurbine.PowerCoeff,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
             } break;
             case RotorType::VerticalAxis: {
                 SetupOutputVariable(state,
                                     "Generator Turbine Chordal Component Velocity",
-                                    OutputProcessor::Unit::m_s,
+                                    Constant::Units::m_s,
                                     windTurbine.ChordalVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Normal Component Velocity",
-                                    OutputProcessor::Unit::m_s,
+                                    Constant::Units::m_s,
                                     windTurbine.NormalVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Relative Flow Velocity",
-                                    OutputProcessor::Unit::m_s,
+                                    Constant::Units::m_s,
                                     windTurbine.RelFlowVel,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
                 SetupOutputVariable(state,
                                     "Generator Turbine Attack Angle",
-                                    OutputProcessor::Unit::deg,
+                                    Constant::Units::deg,
                                     windTurbine.AngOfAttack,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     windTurbine.Name);
             } break;
             default:
@@ -814,7 +812,7 @@ namespace WindTurbine {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
                                         bool error = false;
-                                        MonthWS(mon) = UtilityRoutines::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
+                                        MonthWS(mon) = Util::ProcessNumber(lineIn.data.substr(0, lnPtr), error);
 
                                         if (error) {
                                             // probably should throw some error here

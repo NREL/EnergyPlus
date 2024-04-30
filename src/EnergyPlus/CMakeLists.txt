@@ -254,6 +254,8 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
+    EnergyPlusLogger.cc 
+    EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
     EvaporativeFluidCoolers.cc
@@ -383,6 +385,8 @@ set(SRC
     ICEngineElectricGenerator.hh
     IceThermalStorage.cc
     IceThermalStorage.hh
+    IndoorGreen.cc
+    IndoorGreen.hh
     InputProcessing/CsvParser.cc
     InputProcessing/CsvParser.hh
     InputProcessing/DataStorage.hh
@@ -563,8 +567,6 @@ set(SRC
     SolarReflectionManager.hh
     SolarShading.cc
     SolarShading.hh
-    SortAndStringUtilities.cc
-    SortAndStringUtilities.hh
     SplitterComponent.cc
     SplitterComponent.hh
     StandardRatings.cc
@@ -729,7 +731,7 @@ if(LINK_WITH_PYTHON)
 endif()
 
 add_library(energyplusparser STATIC ${INPUTPARSING_SRC})
-target_link_libraries(energyplusparser PUBLIC embedded_epjson_source ModernJSON re2 fmt::fmt ${CMAKE_DL_LIBS})
+target_link_libraries(energyplusparser PUBLIC embedded_epjson_source nlohmann_json re2 fmt::fmt ${CMAKE_DL_LIBS})
 target_link_libraries(energyplusparser PRIVATE project_options project_fp_options project_warnings)
 if(WIN32)
   target_link_libraries(energyplusparser PUBLIC Shlwapi)
@@ -755,7 +757,7 @@ target_link_libraries(
   energypluslib
   PUBLIC embedded_epjson_source
          fmt::fmt
-         ModernJSON
+         nlohmann_json
          objexx
          sqlite
          bcvtb
@@ -911,6 +913,8 @@ endif()
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${Python_LIBRARIES}" REALPATH)
+  message("Python_LIBRARIES=${Python_LIBRARIES}")
+  message("RESOLVED_PYTHON_LIBRARY=${RESOLVED_PYTHON_LIBRARY}")
   if(WIN32)
 
     # In case you have both release and debug Python libraries on your system, Python_LIBRARIES might be "optimized;C:/.../python38.lib;debug;C:/.../python38_d.lib"
@@ -929,6 +933,7 @@ if(LINK_WITH_PYTHON)
       endforeach()
     # else()
       # No-op, already done above
+      message("RESOLVED_PYTHON_LIBRARY (optimized) =${RESOLVED_PYTHON_LIBRARY}")
     endif()
 
     # Windows is being ugly and linking against the Python DLL but not running
@@ -939,6 +944,7 @@ if(LINK_WITH_PYTHON)
       COMMAND ${CMAKE_COMMAND} -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY} -DEXECUTABLE_PATH=$<TARGET_FILE:energyplusapi> -P
               ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake)
   endif()
+
   install(
     CODE "execute_process(
       COMMAND ${CMAKE_COMMAND}
@@ -1111,16 +1117,17 @@ if(BUILD_TESTING)
   set(PY_FILE "${EXAMPLES_FILES_DIR}/${TEST_CASE}.py")
   configure_file(${PY_FILE} "${INPUT_TEST_DIR}/${TEST_CASE}.py" COPYONLY)
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
-  )
+  if(LINK_WITH_PYTHON)
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromWithin
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromWithin/out-${NON_ASCII_DIRNAME}" ${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}/${NON_ASCII_DIRNAME}"
+    )
 
-  add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
-    COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
-    WORKING_DIRECTORY  "${CLI_TEST_DIR}"
-  )
-
+    add_test(NAME energyplus.TestNonASCIIDirsAndFiles.PythonPlugin.FromOutside
+      COMMAND  energyplus -D -d "${CLI_TEST_DIR}/PythonPlugin.FromOutside/out-${NON_ASCII_DIRNAME}" ${NON_ASCII_DIRNAME}/${TEST_CASE}.idf
+      WORKING_DIRECTORY  "${CLI_TEST_DIR}"
+    )
+  endif()
 endif()
 
 if(UNIX AND NOT APPLE)

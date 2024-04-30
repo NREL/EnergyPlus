@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1998,6 +1998,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     Real64 OnOffAirFlowRatio = 0.5;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).AirMassFlowRate = 1.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RunFrac = 0.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(VarSpeedCoilNum).RatedCapCoolTotal = 100.0;
     // power = 26 + 2x
     VariableSpeedCoils::CalcVarSpeedCoilCooling(*state,
                                                 VarSpeedCoilNum,
@@ -2726,8 +2727,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
 
     EXPECT_FALSE(state->dataDXCoils->DXCoil(1).ReportCoolingCoilCrankcasePower);
     // These two output variables are listed in rdd for Coil:Cooling:DX:MultiSpeed used for AC only
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", state->dataOutputProcessor->DDVariableTypes(10).VarNameOnly);
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", state->dataOutputProcessor->DDVariableTypes(11).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", state->dataOutputProcessor->ddOutVars[9]->name);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", state->dataOutputProcessor->ddOutVars[10]->name);
 
     state->dataGlobal->SysSizingCalc = false;
     state->dataAirLoop->AirLoopInputsFilled = false;
@@ -5516,13 +5517,13 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     GetCurveInput(*state);
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
-    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
     auto &supplyFan = state->dataFans->Fan(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
-    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
@@ -5754,13 +5755,13 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     GetCurveInput(*state);
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
-    int dXCoilIndex = UtilityRoutines::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = UtilityRoutines::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::FanName);
+    int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
+    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
     auto &supplyFan = state->dataFans->Fan(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.FanName;
-    coolcoilTwoSpeed.SupplyFan_TypeNum = supplyFan.FanType_Num;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
@@ -6852,14 +6853,14 @@ TEST_F(EnergyPlusFixture, Test_DHW_End_Use_Cat_Removal)
     GetDXCoils(*state);
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
-    EXPECT_EQ(24, state->dataOutputProcessor->NumEnergyMeters);
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).Name, "WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).ResourceType, "Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(20).EndUse, "WaterSystems");
+    EXPECT_EQ(24, state->dataOutputProcessor->meters.size());
+    EXPECT_EQ(state->dataOutputProcessor->meters[19]->Name, "WaterSystems:Electricity");
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[19]->endUseCat, (int)OutputProcessor::EndUseCat::WaterSystem);
 
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).Name, "General:WaterSystems:Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).ResourceType, "Electricity");
-    EXPECT_EQ(state->dataOutputProcessor->EnergyMeters(21).EndUse, "WaterSystems");
+    EXPECT_EQ(state->dataOutputProcessor->meters[20]->Name, "General:WaterSystems:Electricity");
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->resource, (int)Constant::eResource::Electricity);
+    EXPECT_EQ((int)state->dataOutputProcessor->meters[20]->endUseCat, (int)OutputProcessor::EndUseCat::WaterSystem);
 }
 
 } // namespace EnergyPlus

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1622,7 +1622,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1644,7 +1644,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1666,7 +1666,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1688,7 +1688,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1710,7 +1710,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -3960,12 +3960,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    1.5,                !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    Outside Air Inlet Node 1,  !- Supply Air Inlet Node Name",
         "    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name",
         "    AirLoopDOASMixerOutlet,  !- Exhaust Air Inlet Node Name",
@@ -3977,7 +3973,57 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    1.7,                     !- Threshold Temperature {C}",
         "    0.083,                   !- Initial Defrost Time Fraction {dimensionless}",
         "    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}",
-        "    Yes;                     !- Economizer Lockout",
+        "    Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    1.0,                     !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -4033,7 +4079,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SimAirServingZones::GetAirPathData(*state);
 
     auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
-        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        const int idx = Util::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
         if (idx == 0) {
             throw;
         }
@@ -4355,56 +4401,56 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
 {
     AirLoopHVACDOAS::AirLoopDOAS thisDOAS;
 
-    state->dataWeatherManager->DesDayInput.allocate(2);
-    state->dataWeatherManager->Environment.allocate(4);
+    state->dataWeather->DesDayInput.allocate(2);
+    state->dataWeather->Environment.allocate(4);
 
-    state->dataWeatherManager->Environment(1).DesignDayNum = 1; // Environment(3) & (4) will be = 0
-    state->dataWeatherManager->Environment(2).DesignDayNum = 2;
+    state->dataWeather->Environment(1).DesignDayNum = 1; // Environment(3) & (4) will be = 0
+    state->dataWeather->Environment(2).DesignDayNum = 2;
 
-    state->dataWeatherManager->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
-    state->dataWeatherManager->Environment(3).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
-    state->dataWeatherManager->Environment(4).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+    state->dataWeather->Environment(1).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeather->Environment(2).KindOfEnvrn = Constant::KindOfSim::DesignDay;
+    state->dataWeather->Environment(3).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
+    state->dataWeather->Environment(4).KindOfEnvrn = Constant::KindOfSim::RunPeriodDesign;
 
     // set up environments such that day 2 is cooling peak and day 4 is heating peak
-    state->dataWeatherManager->Environment(1).maxCoolingOATSizing = 27.0;
-    state->dataWeatherManager->Environment(1).maxCoolingOADPSizing = 21.0;
-    state->dataWeatherManager->Environment(2).maxCoolingOATSizing = 31.0;
-    state->dataWeatherManager->Environment(2).maxCoolingOADPSizing = 22.0;
-    state->dataWeatherManager->Environment(3).maxCoolingOATSizing = 29.0;
-    state->dataWeatherManager->Environment(3).maxCoolingOADPSizing = 8.0;
-    state->dataWeatherManager->Environment(4).maxCoolingOATSizing = 26.0;
-    state->dataWeatherManager->Environment(4).maxCoolingOADPSizing = 5.0;
+    state->dataWeather->Environment(1).maxCoolingOATSizing = 27.0;
+    state->dataWeather->Environment(1).maxCoolingOADPSizing = 21.0;
+    state->dataWeather->Environment(2).maxCoolingOATSizing = 31.0;
+    state->dataWeather->Environment(2).maxCoolingOADPSizing = 22.0;
+    state->dataWeather->Environment(3).maxCoolingOATSizing = 29.0;
+    state->dataWeather->Environment(3).maxCoolingOADPSizing = 8.0;
+    state->dataWeather->Environment(4).maxCoolingOATSizing = 26.0;
+    state->dataWeather->Environment(4).maxCoolingOADPSizing = 5.0;
 
-    state->dataWeatherManager->Environment(1).minHeatingOATSizing = 17.0;
-    state->dataWeatherManager->Environment(1).minHeatingOADPSizing = 16.0;
-    state->dataWeatherManager->Environment(2).minHeatingOATSizing = 16.0;
-    state->dataWeatherManager->Environment(2).minHeatingOADPSizing = 14.0;
-    state->dataWeatherManager->Environment(3).minHeatingOATSizing = 19.0;
-    state->dataWeatherManager->Environment(3).minHeatingOADPSizing = 18.0;
-    state->dataWeatherManager->Environment(4).minHeatingOATSizing = 4.0;
-    state->dataWeatherManager->Environment(4).minHeatingOADPSizing = 3.0;
+    state->dataWeather->Environment(1).minHeatingOATSizing = 17.0;
+    state->dataWeather->Environment(1).minHeatingOADPSizing = 16.0;
+    state->dataWeather->Environment(2).minHeatingOATSizing = 16.0;
+    state->dataWeather->Environment(2).minHeatingOADPSizing = 14.0;
+    state->dataWeather->Environment(3).minHeatingOATSizing = 19.0;
+    state->dataWeather->Environment(3).minHeatingOADPSizing = 18.0;
+    state->dataWeather->Environment(4).minHeatingOATSizing = 4.0;
+    state->dataWeather->Environment(4).minHeatingOADPSizing = 3.0;
     state->dataEnvrn->StdBaroPress = DataEnvironment::StdPressureSeaLevel;
     Real64 envrnCoolingHumRat =
-        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeatherManager->Environment(2).maxCoolingOADPSizing, state->dataEnvrn->StdBaroPress);
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeather->Environment(2).maxCoolingOADPSizing, state->dataEnvrn->StdBaroPress);
     Real64 envrnHeatingHumRat =
-        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeatherManager->Environment(4).minHeatingOADPSizing, DataEnvironment::StdPressureSeaLevel);
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeather->Environment(4).minHeatingOADPSizing, DataEnvironment::StdPressureSeaLevel);
 
     // test peak conditions used for sizing
     thisDOAS.GetDesignDayConditions(*state);
 
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeather->Environment(2).maxCoolingOATSizing, 0.000001);
     EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
-    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.HeatOutTemp, state->dataWeather->Environment(4).minHeatingOATSizing, 0.000001);
     EXPECT_NEAR(thisDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     AirLoopHVACDOAS::AirLoopDOAS anotherDOAS;
     // a second DOAS system should find the same sizing conditions
     anotherDOAS.GetDesignDayConditions(*state);
 
-    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeather->Environment(2).maxCoolingOATSizing, 0.000001);
     EXPECT_NEAR(anotherDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
-    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeather->Environment(4).minHeatingOATSizing, 0.000001);
     EXPECT_NEAR(anotherDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     // reset for next test
@@ -4415,20 +4461,20 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
 
     // note in these descriptions that DOAS systems do not use time of peak to select weather data used for sizing
     // test higher summer dew point for non-peak summer day (non-peak summer design day has lower OAT than peak summer day)
-    state->dataWeatherManager->Environment(1).maxCoolingOADPSizing = 24.0;
-    state->dataWeatherManager->Environment(3).maxCoolingOADPSizing = 24.0;
-    state->dataWeatherManager->Environment(4).maxCoolingOADPSizing = 24.0;
+    state->dataWeather->Environment(1).maxCoolingOADPSizing = 24.0;
+    state->dataWeather->Environment(3).maxCoolingOADPSizing = 24.0;
+    state->dataWeather->Environment(4).maxCoolingOADPSizing = 24.0;
     // test lower winter dew point for non-peak winter day (non-peak winter design day has higher OAT then winter peak day)
-    state->dataWeatherManager->Environment(1).minHeatingOADPSizing = 2.0;
-    state->dataWeatherManager->Environment(2).minHeatingOADPSizing = 2.0;
-    state->dataWeatherManager->Environment(3).minHeatingOADPSizing = 2.0;
+    state->dataWeather->Environment(1).minHeatingOADPSizing = 2.0;
+    state->dataWeather->Environment(2).minHeatingOADPSizing = 2.0;
+    state->dataWeather->Environment(3).minHeatingOADPSizing = 2.0;
 
     thisDOAS.GetDesignDayConditions(*state);
 
     // design conditions should only be selected based on outdoor temperature so same conditions as before
-    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.SizingCoolOATemp, state->dataWeather->Environment(2).maxCoolingOATSizing, 0.000001);
     EXPECT_NEAR(anotherDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
-    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeatherManager->Environment(4).minHeatingOATSizing, 0.000001);
+    EXPECT_NEAR(anotherDOAS.HeatOutTemp, state->dataWeather->Environment(4).minHeatingOATSizing, 0.000001);
     EXPECT_NEAR(anotherDOAS.HeatOutHumRat, envrnHeatingHumRat, 0.000001);
 
     // reset for next test
@@ -4438,15 +4484,15 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestGetDesignDayConditions)
     thisDOAS.HeatOutHumRat = 999.0;
 
     // test results using user entered design day pressure
-    state->dataWeatherManager->DesDayInput(2).PressureEntered = true;
-    state->dataWeatherManager->DesDayInput(2).PressBarom = 0.9 * DataEnvironment::StdPressureSeaLevel;
-    envrnCoolingHumRat = Psychrometrics::PsyWFnTdpPb(
-        *state, state->dataWeatherManager->Environment(2).maxCoolingOADPSizing, state->dataWeatherManager->DesDayInput(2).PressBarom);
+    state->dataWeather->DesDayInput(2).PressureEntered = true;
+    state->dataWeather->DesDayInput(2).PressBarom = 0.9 * DataEnvironment::StdPressureSeaLevel;
+    envrnCoolingHumRat =
+        Psychrometrics::PsyWFnTdpPb(*state, state->dataWeather->Environment(2).maxCoolingOADPSizing, state->dataWeather->DesDayInput(2).PressBarom);
 
     thisDOAS.GetDesignDayConditions(*state);
 
     // design conditions should only be selected based on outdoor temperature so same temperature as before but different humrat
-    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeatherManager->Environment(2).maxCoolingOATSizing, 0.000001);
+    EXPECT_NEAR(thisDOAS.SizingCoolOATemp, state->dataWeather->Environment(2).maxCoolingOATSizing, 0.000001);
     EXPECT_NEAR(thisDOAS.SizingCoolOAHumRat, envrnCoolingHumRat, 0.000001);
 }
 
@@ -5975,7 +6021,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -5997,7 +6043,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -6019,7 +6065,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -6041,7 +6087,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -6063,7 +6109,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    ACTIVITY_SCH,            !- Activity Level Schedule Name",
         "    ,                        !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    No,                      !- Enable ASHRAE 55 Comfort Warnings",
-        "    ZoneAveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    WORK_EFF_SCH,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -8313,12 +8359,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    1.5,                     !- Nominal Supply Air Flow Rate {m3/s}",
         "    0.7,                     !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
         "    0.7,                     !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
         "    0.65,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
-        "    0.750000,                !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
-        "    0.700000,                !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
         "    Outside Air Inlet Node 1,  !- Supply Air Inlet Node Name",
         "    DOAS Heat Recovery Supply Outlet,  !- Supply Air Outlet Node Name",
         "    AirLoopDOASMixerOutlet,  !- Exhaust Air Inlet Node Name",
@@ -8330,7 +8372,57 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
         "    1.7,                     !- Threshold Temperature {C}",
         "    0.083,                   !- Initial Defrost Time Fraction {dimensionless}",
         "    0.012,                   !- Rate of Defrost Time Fraction Increase {1/K}",
-        "    Yes;                     !- Economizer Lockout",
+        "    Yes,                     !- Economizer Lockout",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Heating Air Flow Curve Name",
+        "    LatEffectivenessTable,   !- Latent Effectiveness of Heating Air Flow Curve Name",
+        "    SenEffectivenessTable,   !- Sensible Effectiveness of Cooling Air Flow Curve Name",
+        "    LatEffectivenessTable;   !- Latent Effectiveness of Cooling Air Flow Curve Name",
+
+        "  Table:IndependentVariable,",
+        "    airFlowRatio,  !- Name",
+        "    Linear,                  !- Interpolation Method",
+        "    Linear,                  !- Extrapolation Method",
+        "    0.0,                     !- Minimum Value",
+        "    1.0,                     !- Maximum Value",
+        "    ,                        !- Normalization Reference Value",
+        "    Dimensionless,           !- Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Value 1",
+        "    1.0;                     !- Value 2",
+
+        "  Table:IndependentVariableList,",
+        "    effectiveness_IndependentVariableList,  !- Name",
+        "    airFlowRatio;     !- Independent Variable 1 Name",
+
+        "  Table:Lookup,",
+        "    SenEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.7,                     !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.75,                    !- Output Value 1",
+        "    0.70;                    !- Output Value 2",
+
+        "  Table:Lookup,",
+        "    LatEffectivenessTable,   !- Name",
+        "    effectiveness_IndependentVariableList,  !- Independent Variable List Name",
+        "    DivisorOnly,             !- Normalization Method",
+        "    0.65,                    !- Normalization Divisor",
+        "    0.0,                     !- Minimum Output",
+        "    1.0,                     !- Maximum Output",
+        "    Dimensionless,           !- Output Unit Type",
+        "    ,                        !- External File Name",
+        "    ,                        !- External File Column Number",
+        "    ,                        !- External File Starting Row Number",
+        "    0.70,                    !- Output Value 1",
+        "    0.65;                    !- Output Value 2",
 
         "  OutdoorAir:NodeList,",
         "    OutsideAirInletNodes;    !- Node or NodeList Name 1",
@@ -8373,7 +8465,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_ReportVariableResetTest)
     SimAirServingZones::GetAirPathData(*state);
 
     auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
-        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        const int idx = Util::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
         if (idx == 0) {
             throw;
         }
@@ -8784,7 +8876,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanHeatAddeToCoolingCoilSize)
     // 9066
     std::string const idf_objects = delimited_string({
 
-        "  Version,23.2;",
+        "  Version,24.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
@@ -10344,7 +10436,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanDrawThroughPlacement)
     // 9066
     std::string const idf_objects = delimited_string({
 
-        "  Version,23.2;",
+        "  Version,24.2;",
 
         "  SimulationControl,",
         "    YES,                     !- Do Zone Sizing Calculation",
@@ -11538,7 +11630,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanDrawThroughPlacement)
     SimulationManager::ManageSimulation(*state); // run the design day over the warmup period (24 hrs, 25 days)
 
     auto getNodeByName = [this](std::string_view nodeName) -> NodeData & {
-        const int idx = UtilityRoutines::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+        const int idx = Util::FindItemInList(nodeName, state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
         if (idx == 0) {
             throw;
         }
@@ -11579,6 +11671,11 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestFanDrawThroughPlacement)
     EXPECT_NEAR(AirLoopDOAS_SplitterInletNode.MassFlowRate, 0.1, 0.0001);
     EXPECT_NEAR(DOAS_FanInletNode.MassFlowRate, 0.1, 0.0001);
     EXPECT_NEAR(DOAS_HeatingCOilOutletNode.MassFlowRate, 0.1, 0.0001);
+
+    // Issue 10204 Get AirLoopHVAC:Splitter inlet node number using NodeInputManager::GetOnlySingleNode
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopSplitter->InletNodeNum, 17);
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopSplitter->OutletNodeNum[0], 2);
+    EXPECT_EQ(thisAirLoopDOASObjec.m_CompPointerAirLoopMixer->InletNodeNum[0], 18);
 }
 
 } // namespace EnergyPlus

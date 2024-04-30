@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -807,13 +807,13 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_AdaptiveThermostat)
     int constexpr CEN15251_CENTRAL(5);
 
     state->dataEnvrn->DayOfYear = 1;
-    state->dataWeatherManager->Envrn = 1;
-    state->dataWeatherManager->Environment.allocate(1);
-    state->dataWeatherManager->DesDayInput.allocate(1);
-    state->dataWeatherManager->Environment(state->dataWeatherManager->Envrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DayType = summerDesignDayTypeIndex;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).MaxDryBulb = 30.0;
-    state->dataWeatherManager->DesDayInput(state->dataWeatherManager->Envrn).DailyDBRange = 10.0;
+    state->dataWeather->Envrn = 1;
+    state->dataWeather->Environment.allocate(1);
+    state->dataWeather->DesDayInput.allocate(1);
+    state->dataWeather->Environment(state->dataWeather->Envrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).DayType = summerDesignDayTypeIndex;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).MaxDryBulb = 30.0;
+    state->dataWeather->DesDayInput(state->dataWeather->Envrn).DailyDBRange = 10.0;
     Real64 ZoneAirSetPoint = 0.0;
 
     bool ErrorsFound(false); // If errors detected in input
@@ -1682,4 +1682,17 @@ TEST_F(EnergyPlusFixture, DownInterpolate4HistoryValues_Test)
     EXPECT_NEAR(DSHistoryValue2, 2.0, 0.000001);
     EXPECT_NEAR(DSHistoryValue3, 2.5, 0.000001);
     EXPECT_NEAR(DSHistoryValue4, 3.0, 0.000001);
+
+    std::array<Real64, 4> newValue = {0.0, 0.0, 0.0, 0.0};
+    std::array<Real64, 4> oldValue = {DSHistoryValue1, DSHistoryValue2, DSHistoryValue3, DSHistoryValue4};
+    Real64 returnValue = DownInterpolate4HistoryValues(PriorTimeStep, state->dataHVACGlobal->TimeStepSys, oldValue, newValue);
+    EXPECT_NEAR(returnValue, oldValue[0], 0.000001); // setting up history terms for shortened time step simulation
+    EXPECT_NEAR(newValue[0], 1.5, 0.000001);         // values are interpolated to provide history terms at the new time step
+    EXPECT_NEAR(newValue[1], 1.75, 0.000001);
+    EXPECT_NEAR(newValue[2], 2.0, 0.000001);
+    EXPECT_NEAR(newValue[3], 2.25, 0.000001);
+    EXPECT_NEAR(oldValue[0], DSHistoryValue1, 0.000001); // values are same as before
+    EXPECT_NEAR(oldValue[1], DSHistoryValue2, 0.000001);
+    EXPECT_NEAR(oldValue[2], DSHistoryValue3, 0.000001);
+    EXPECT_NEAR(oldValue[3], DSHistoryValue4, 0.000001);
 }

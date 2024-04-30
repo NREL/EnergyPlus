@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,9 +111,9 @@ namespace HVACMultiSpeedHeatPump {
         int NodeNumOfControlledZone;        // Controlled zone node number
         Real64 FlowFraction;                // Fraction of the total volume flow that goes through the controlling zone
         std::string FanName;                // Name of supply air fan
-        int FanType;                        // Supply fan type
+        DataHVACGlobals::FanType fanType;   // Supply fan type
         int FanNum;                         // Supply fan number
-        int FanPlaceType;                   // Supply air fan placement: 1 Blow through; 2 Draw through
+        DataHVACGlobals::FanPlace fanPlace; // Supply air fan placement: 1 Blow through; 2 Draw through
         int FanInletNode;                   // Fan Inlet node
         int FanOutletNode;                  // Fan Outlet node
         Real64 FanVolFlow;                  // Supply fan volumetric flow rate
@@ -224,12 +224,13 @@ namespace HVACMultiSpeedHeatPump {
         // Default Constructor
         MSHeatPumpData()
             : AvaiSchedPtr(0), AirInletNodeNum(0), AirOutletNodeNum(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0), ZoneSequenceHeatingNum(0),
-              NodeNumOfControlledZone(0), FlowFraction(0.0), FanType(0), FanNum(0), FanPlaceType(0), FanInletNode(0), FanOutletNode(0),
-              FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0),
-              DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0),
-              AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRPlantLoc{}, AuxElecPower(0.0),
-              IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), CheckFanFlow(true),
+              NodeNumOfControlledZone(0), FlowFraction(0.0), fanType(DataHVACGlobals::FanType::Invalid), FanNum(0),
+              fanPlace(DataHVACGlobals::FanPlace::Invalid), FanInletNode(0), FanOutletNode(0), FanVolFlow(0.0), FanSchedPtr(0), OpMode(0),
+              HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0), DXCoolCoilIndex(0), SuppHeatCoilType(0),
+              SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0), AuxOnCyclePower(0.0),
+              AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0),
+              MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRPlantLoc{}, AuxElecPower(0.0), IdleVolumeAirRate(0.0),
+              IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), CheckFanFlow(true),
               LastMode(ModeOfOperation::Invalid), HeatCoolMode(ModeOfOperation::Invalid), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
               CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0),
               SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0),

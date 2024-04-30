@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -697,9 +697,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataHVACGlobals::FanType_SimpleConstVolume;
-        using DataHVACGlobals::FanType_SimpleOnOff;
-        using DataHVACGlobals::FanType_SimpleVAV;
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -717,7 +714,7 @@ namespace AirflowNetwork {
 
         int AirLoopNum = state.afn->AirflowNetworkLinkageData(i).AirLoopNum;
 
-        if (FanTypeNum == FanType_SimpleOnOff) {
+        if (fanType == DataHVACGlobals::FanType::OnOff) {
             if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
                 state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
@@ -733,7 +730,7 @@ namespace AirflowNetwork {
                                (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
-        } else if (FanTypeNum == FanType_SimpleConstVolume) {
+        } else if (fanType == DataHVACGlobals::FanType::Constant) {
             if (state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) {
                 F[0] = FlowRate * Ctrl;
             } else if (NumPrimaryAirSys > 1 && state.dataLoopNodes->Node(InletNode).MassFlowRate <= 0.0) {
@@ -743,7 +740,7 @@ namespace AirflowNetwork {
             if (state.afn->MultiSpeedHPIndicator == 2) {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
-        } else if (FanTypeNum == FanType_SimpleVAV) {
+        } else if (fanType == DataHVACGlobals::FanType::VAV) {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
@@ -3270,7 +3267,6 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataHVACGlobals::FanType_SimpleOnOff;
         using DataHVACGlobals::VerySmallMassFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

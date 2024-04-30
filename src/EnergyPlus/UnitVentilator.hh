@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,8 +110,8 @@ namespace UnitVentilator {
         int AirOutNode = 0;    // outlet air node number
         int FanOutletNode = 0; // outlet node number for fan exit
         // (assumes fan is upstream of heating coil)
-        int FanType_Num = 0; // Fan type number (see DataHVACGlobals)
-        std::string FanName; // name of fan
+        DataHVACGlobals::FanType fanType = DataHVACGlobals::FanType::Invalid; // Fan type number (see DataHVACGlobals)
+        std::string FanName;                                                  // name of fan
         int Fan_Index = 0;
         int FanSchedPtr = 0;      // index to fan operating mode schedule
         int FanAvailSchedPtr = 0; // index to fan availability schedule

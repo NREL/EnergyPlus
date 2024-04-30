@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -313,7 +313,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         // This method allows downstream heating coils to size individually.Probably should do this for all air loop equipment
                         // ChangoverBypass model always sets AirLoopControlInfo%UnitarySys to FALSE so heating coil can individually size
                         if (this->airLoopControlInfo(this->curSysNum).UnitarySysSimulating &&
-                            !UtilityRoutines::SameString(this->compType, "COIL:HEATING:WATER")) {
+                            !Util::SameString(this->compType, "COIL:HEATING:WATER")) {
                             NominalCapacityDes = this->unitaryHeatCap;
                         } else {
                             if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
@@ -374,8 +374,8 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
             // determines capacity using physical calculations instead of emperical curves
             bool FlagCheckVolFlowPerRatedTotCap = true;
-            if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
-                UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl")) {
+            if (Util::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
+                Util::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl")) {
                 FlagCheckVolFlowPerRatedTotCap = false;
             }
 
@@ -451,7 +451,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
 
     this->selectSizerOutput(state, errorsFound);
 
-    if (this->isCoilReportObject && this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+    if (this->isCoilReportObject) {
         if (CoilInTemp > -999.0) { // set inlet air properties used during capacity sizing if available, allow for negative winter temps
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilEntAirTemp(
                 state, this->compName, this->compType, CoilInTemp, this->curSysNum, this->curZoneEqNum);
@@ -461,6 +461,7 @@ Real64 HeatingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirTemp(state, this->compName, this->compType, CoilOutTemp);
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilLvgAirHumRat(state, this->compName, this->compType, CoilOutHumRat);
         }
+        state.dataRptCoilSelection->coilSelectionReportObj->setCoilAirFlow(state, this->compName, this->compType, DesVolFlow, this->wasAutoSized);
         Real64 constexpr FanCoolLoad = 0.0;
         Real64 constexpr TotCapTempModFac = 1.0;
         state.dataRptCoilSelection->coilSelectionReportObj->setCoilHeatingCapacity(state,

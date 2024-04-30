@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,6 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Construction.hh>
-#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -61,6 +60,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -118,8 +118,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Test non-integrated option first, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 for all hours
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 999.0;
-            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 888.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour] = 999.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour] = 888.0;
         }
     }
 
@@ -128,8 +128,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+            EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
         }
     }
 
@@ -137,8 +137,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     // Re-initialize to new values
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
-            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour) = 555.0;
-            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour) = 444.0;
+            state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour] = 555.0;
+            state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour] = 444.0;
         }
     }
 
@@ -149,11 +149,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     for (int SurfNum = 1; SurfNum <= state->dataSurface->TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= HoursInDay; ++Hour) {
             if (Hour == state->dataGlobal->HourOfDay) {
-                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+                EXPECT_EQ(1.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
             } else {
-                EXPECT_EQ(555.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult(Hour));
-                EXPECT_EQ(444.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult(Hour));
+                EXPECT_EQ(555.0, state->dataSurface->SurfaceWindow(SurfNum).OutProjSLFracMult[Hour]);
+                EXPECT_EQ(444.0, state->dataSurface->SurfaceWindow(SurfNum).InOutProjSLFracMult[Hour]);
             }
         }
     }
@@ -687,7 +687,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 }
@@ -1098,11 +1098,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     EXPECT_FALSE(state->dataSolarShading->SUNCOS(3) < DataEnvironment::SunIsUpValue);
 
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(1, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
-    surfNum = UtilityRoutines::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
+    surfNum = Util::FindItemInList("ZN001:ROOF", state->dataSurface->Surface);
     EXPECT_DOUBLE_EQ(0.5432, state->dataHeatBal->SurfSunlitFrac(9, 4, surfNum));
 }
 
@@ -1877,7 +1877,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     state->dataSolarShading->CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
-    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int surfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
@@ -2662,10 +2662,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
 TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
 {
     state->dataSurface->Surface.allocate(2);
+    state->dataSurface->SurfaceWindow.allocate(2);
+
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, 2);
     state->dataConstruction->Construct.allocate(1);
     state->dataSurface->WindowShadingControl.allocate(2);
-    state->dataDaylightingData->ZoneDaylight.allocate(1);
+    state->dataDayltg->ZoneDaylight.allocate(1);
 
     auto &surf1 = state->dataSurface->Surface(1);
     auto &surf2 = state->dataSurface->Surface(2);
@@ -3156,7 +3158,7 @@ TEST_F(EnergyPlusFixture, SolarShading_TestSurfsPropertyViewFactor)
     SolarShading::InitSolarCalculations(*state);
     SolarShading::SkyDifSolarShading(*state);
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     auto &win_Surface = state->dataSurface->Surface(windowSurfNum);
     // check exterior default surfaces sky and ground view factors
     EXPECT_DOUBLE_EQ(0.5, win_Surface.ViewFactorSkyIR);
@@ -4173,10 +4175,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4220,10 +4222,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    int overhangSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
-    int treeSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int overhangSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE001", state->dataSurface->Surface);
+    int treeSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:TREE", state->dataSurface->Surface);
 
     // Get shading surface schedule indexes
     int overhangSchedNum = state->dataSurface->Surface(overhangSurfNum).SchedShadowSurfIndex;
@@ -4602,10 +4604,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -4649,10 +4651,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap2)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
-    int shade1SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE1", state->dataSurface->Surface);
-    int shade2SurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:SHADE2", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int shade1SurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE1", state->dataSurface->Surface);
+    int shade2SurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:SHADE2", state->dataSurface->Surface);
 
     // Get shading surface schedule indexes
     int shade1SchedNum = state->dataSurface->Surface(shade1SurfNum).SchedShadowSurfIndex;
@@ -4963,10 +4965,10 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     SurfaceGeometry::GetGeometryParameters(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::GetLocationInfo(*state, FoundError);
+    Weather::GetLocationInfo(*state, FoundError);
     EXPECT_FALSE(FoundError);
 
-    WeatherManager::CheckLocationValidity(*state);
+    Weather::CheckLocationValidity(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
@@ -5010,8 +5012,8 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonOverlap3)
     SolarShading::PerformSolarCalculations(*state);
 
     // Get surface nums
-    int winSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
-    int wallSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
+    int winSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int wallSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH", state->dataSurface->Surface);
 
     // Use the base transmittance schedules (no EMS override)
     // shade1 transmittance = 0.5, shade2 transmittance = 0.8
@@ -5064,4 +5066,178 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_checkScheduledSurfacePresent)
         "   **   ~~~   ** for sunlit fraction if this was not desired.  Otherwise, this surface will not be shaded at all.",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
+{
+    state->dataGlobal->NumOfTimeStepInHour = 6;
+
+    state->dataSurface->FrameDivider.allocate(2);
+    auto &frameDivider1 = state->dataSurface->FrameDivider(1);
+    frameDivider1.Name = "FrameDivider1";
+    frameDivider1.FrameWidth = 0.1;
+    frameDivider1.FrameProjectionOut = 0.0;
+    frameDivider1.FrameProjectionIn = 0.00;
+    frameDivider1.FrameConductance = 0.04;
+    frameDivider1.FrEdgeToCenterGlCondRatio = 1.0;
+    frameDivider1.FrameSolAbsorp = 0.8;
+    frameDivider1.FrameVisAbsorp = 0.5;
+    frameDivider1.FrameEmis = 0.9;
+    frameDivider1.DividerType = DataSurfaces::FrameDividerType::DividedLite;
+    frameDivider1.DividerWidth = 0.2;
+    frameDivider1.HorDividers = 2;
+    frameDivider1.VertDividers = 2;
+    frameDivider1.DividerProjectionOut = 0.00;
+    frameDivider1.DividerProjectionIn = 0.00;
+    frameDivider1.DividerConductance = 0.04;
+    frameDivider1.DivEdgeToCenterGlCondRatio = 1.0;
+    frameDivider1.DividerSolAbsorp = 0.9;
+    frameDivider1.DividerVisAbsorp = 0.5;
+    frameDivider1.DividerEmis = 0.85;
+    frameDivider1.OutsideRevealSolAbs = 0.75;
+    frameDivider1.InsideSillDepth = 0.2;
+    frameDivider1.InsideSillSolAbs = 0.9;
+    frameDivider1.InsideReveal = 0.1;
+    frameDivider1.InsideRevealSolAbs = 0.85;
+
+    auto &frameDivider2 = state->dataSurface->FrameDivider(2);
+    frameDivider2.Name = "FrameDivider2";
+    frameDivider2.FrameWidth = 0.1;
+    frameDivider2.FrameProjectionOut = 0.0; // 0.2
+    frameDivider2.FrameProjectionIn = 0.00; // 0.05
+    frameDivider2.FrameConductance = 0.04;
+    frameDivider2.FrEdgeToCenterGlCondRatio = 1.0;
+    frameDivider2.FrameSolAbsorp = 0.8;
+    frameDivider2.FrameVisAbsorp = 0.5;
+    frameDivider2.FrameEmis = 0.9;
+    frameDivider2.DividerType = DataSurfaces::FrameDividerType::DividedLite;
+    frameDivider2.DividerWidth = 0.2;
+    frameDivider2.HorDividers = 2;
+    frameDivider2.VertDividers = 2;
+    frameDivider2.DividerProjectionOut = 0.00; // 0.04
+    frameDivider2.DividerProjectionIn = 0.00;  // 0.01
+    frameDivider2.DividerConductance = 0.04;
+    frameDivider2.DivEdgeToCenterGlCondRatio = 1.0;
+    frameDivider2.DividerSolAbsorp = 0.9;
+    frameDivider2.DividerVisAbsorp = 0.5;
+    frameDivider2.DividerEmis = 0.85;
+    frameDivider2.OutsideRevealSolAbs = 0.75;
+    frameDivider2.InsideSillDepth = 0.2;
+    frameDivider2.InsideSillSolAbs = 0.9;
+    frameDivider2.InsideReveal = 0.1;
+    frameDivider2.InsideRevealSolAbs = 0.85;
+
+    int NumSurf = 2;
+    state->dataSurface->TotSurfaces = NumSurf;
+    state->dataSurface->Surface.allocate(NumSurf);
+    state->dataSurface->SurfaceWindow.allocate(NumSurf);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, NumSurf);
+    WindowManager::initWindowModel(*state);
+    SolarShading::AllocateModuleArrays(*state);
+
+    auto &surf1 = state->dataSurface->Surface(1);
+    auto &surf2 = state->dataSurface->Surface(2);
+    surf1.Name = "Surface1";
+    surf2.Name = "Surface2";
+    surf1.Zone = 1;
+    surf2.Zone = 1;
+    surf1.spaceNum = 1;
+    surf2.spaceNum = 1;
+    surf1.Class = DataSurfaces::SurfaceClass::Window;
+    surf2.Class = DataSurfaces::SurfaceClass::Window;
+    surf1.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    surf2.ExtBoundCond = DataSurfaces::ExternalEnvironment;
+    surf1.HasShadeControl = false;
+    surf2.HasShadeControl = false;
+    surf1.Construction = 1;
+    surf2.Construction = 1;
+    surf1.FrameDivider = 1;
+    surf2.FrameDivider = 2;
+    surf1.Sides = 4;
+    surf2.Sides = 4;
+    surf1.Height = 2.0;
+    surf2.Height = 2.0;
+    surf1.Width = 1.0;
+    surf2.Width = 1.0;
+    surf1.SinAzim = 0.0;
+    surf2.SinAzim = 0.0;
+    surf1.CosAzim = 1.0;
+    surf2.CosAzim = 1.0;
+    surf1.SinTilt = 1.0;
+    surf2.SinTilt = 1.0;
+    surf1.CosTilt = 0.0;
+    surf2.CosTilt = 0.0;
+
+    state->dataSurface->SurfActiveConstruction(1) = 1;
+    state->dataSurface->SurfActiveConstruction(2) = 1;
+
+    state->dataHeatBal->TotConstructs = 1;
+    state->dataConstruction->Construct.allocate(state->dataHeatBal->TotConstructs);
+    auto &construct1 = state->dataConstruction->Construct(1);
+    construct1.TotLayers = 1;
+    construct1.LayerPoint.allocate(1);
+    construct1.LayerPoint(1) = 1;
+    construct1.Name = "Construction1";
+    construct1.TotGlassLayers = 1;
+    construct1.TransSolBeamCoef(1) = 0.9;
+
+    state->dataMaterial->TotMaterials = 1;
+    for (int i = 1; i <= state->dataMaterial->TotMaterials; i++) {
+        Material::MaterialChild *p = new Material::MaterialChild;
+        state->dataMaterial->Material.push_back(p);
+    }
+    state->dataMaterial->Material(1)->Name = "GLASS";
+    state->dataMaterial->Material(1)->group = Material::Group::WindowGlass;
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes.allocate(1);
+    state->dataHeatBal->Zone(1).spaceIndexes[0] = 1;
+    state->dataHeatBal->space.allocate(1);
+    state->dataHeatBal->space(1).WindowSurfaceFirst = 1;
+    state->dataHeatBal->space(1).WindowSurfaceLast = 2;
+
+    state->dataGlobal->HourOfDay = 10;
+    state->dataGlobal->TimeStep = 1;
+    state->dataHeatBal->SurfCosIncAng(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 1) = 0.5;
+    state->dataHeatBal->SurfCosIncAng(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 2) = 0.5;
+    state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 1) = 1.0;
+    state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 2) = 1.0;
+
+    WindowManager::W5InitGlassParameters(*state);
+    construct1.TransSolBeamCoef(1) = 0.9;
+    state->dataSurface->SurfWinTanProfileAngVert(1) = 10.0;
+    state->dataSurface->SurfWinTanProfileAngVert(2) = 10.0;
+    state->dataSurface->SurfWinTanProfileAngHor(1) = 10.0;
+    state->dataSurface->SurfWinTanProfileAngHor(2) = 10.0;
+    state->dataEnvrn->SOLCOS(1) = 0.5;
+    state->dataEnvrn->SOLCOS(2) = 0.5;
+    state->dataEnvrn->SOLCOS(3) = 0.5;
+    state->dataEnvrn->SunIsUp = true;
+    state->dataEnvrn->DifSolarRad = 200.0;
+    state->dataEnvrn->BeamSolarRad = 1000.0;
+    state->dataEnvrn->GndSolarRad = 20.0;
+
+    CalcBeamSolarOnWinRevealSurface(*state);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(1), 0.0326, 0.001);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(2), 0.0326, 0.001);
+
+    // Case 2 add some projection to frame 2
+    frameDivider2.FrameProjectionOut = 0.2;
+    frameDivider2.FrameProjectionIn = 0.05;
+    frameDivider2.DividerProjectionOut = 0.04;
+    frameDivider2.DividerProjectionIn = 0.01;
+
+    CalcBeamSolarOnWinRevealSurface(*state);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(1), 0.0326, 0.001);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(2), 0.0000, 0.001);
+
+    // Case 3 less projection on frame 2
+    frameDivider2.FrameProjectionOut = 0.01;
+    frameDivider2.FrameProjectionIn = 0.01;
+    frameDivider2.DividerProjectionOut = 0.01;
+    frameDivider2.DividerProjectionIn = 0.01;
+
+    CalcBeamSolarOnWinRevealSurface(*state);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(1), 0.0326, 0.001);
+    EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(2), 0.0225, 0.001);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -663,6 +663,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -1010,6 +1011,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    0.335,                   !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -1305,6 +1307,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     EXPECT_NEAR(QUnitOut, 1000.0, 0.01);
     ASSERT_NEAR(state->dataLoopNodes->Node(thisSys.AirInNode).MassFlowRate, thisSys.MaxNoCoolHeatAirMassFlow, 0.001);
     ASSERT_GT(thisSys.DesignMaxOutletTemp, state->dataHeatingCoils->HeatingCoil(1).OutletAirTemp);
+    EXPECT_TRUE(thisSys.m_useNoLoadLowSpeedAirFlow); // because input is blank, doesn't affect no load flow rate because coils are single sped
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0; // set heating load to just below lower boundary load
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 2000.0;
@@ -3088,9 +3091,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE1-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.27003,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.27003,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.27003,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.27003,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3198,9 +3202,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE2-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.20772,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.20772,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.20772,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.20772,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3237,9 +3242,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE3-1 Supply Inlet,   !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.25034,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.25034,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.25034,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.25034,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3276,9 +3282,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE4-1 PTAC Outlet,    !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.22037,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.22037,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.22037,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.22037,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -3315,9 +3322,10 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
         "    SPACE5-1 PTAC Outlet,    !- Air Outlet Node Name",
         "    ,                        !- Outdoor Air Mixer Object Type",
         "    ,                        !- Outdoor Air Mixer Name",
-        "    0.26423,                !- Cooling Supply Air Flow Rate {m3/s}",
-        "    0.26423,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.26423,                 !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.26423,                 !- Heating Supply Air Flow Rate {m3/s}",
         "    ,                        !- No Load Supply Air Flow Rate {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0,                       !- Cooling Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- Heating Outdoor Air Flow Rate {m3/s}",
         "    0,                       !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -4104,6 +4112,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
         "    0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}",
         "    0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}",
         "    ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
+        "    ,                        !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "    0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}",
         "    0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}",
@@ -4298,9 +4307,9 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
 
-    int zoneSupplyInlet = UtilityRoutines::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode = UtilityRoutines::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneNum = UtilityRoutines::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
+    int zoneSupplyInlet = Util::FindItemInList("SPACE1-1 SUPPLY INLET", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = Util::FindItemInList("SPACE1-1 HP INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneNum = Util::FindItemInList("SPACE1-1", state->dataHeatBal->Zone);
 
     // Test 1 - PTAC Inlet node is zone exhaust node
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
@@ -4322,8 +4331,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     thisSys.processInputSpec(*state, thisSys.input_specs, sysNum, errorsFound, isZoneEquipment, zoneOAUnit);
     ASSERT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(errorsFound);
-    int plenumInducedNode =
-        UtilityRoutines::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int plenumInducedNode = Util::FindItemInList("PLENUM INDUCED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(plenumInducedNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4353,7 +4361,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
 
     ASSERT_TRUE(compare_err_stream(error_string, true));
     ASSERT_TRUE(errorsFound);
-    int someOtherNode = UtilityRoutines::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int someOtherNode = Util::FindItemInList("SOME OTHER NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     EXPECT_EQ(someOtherNode, thisSys.AirInNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.AirOutNode);
     EXPECT_EQ(zoneSupplyInlet, thisSys.m_ZoneInletNode);
@@ -4374,6 +4382,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
         "  1.00,                                   !- Cooling Supply Air Flow Rate {m3/s}",
         "  1.00,                                   !- Heating Supply Air Flow Rate {m3/s}",
         "  1.00,                                   !- No Load Supply Air Flow Rate {m3/s}",
+        "  ,                                       !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  0.50,                                   !- Cooling Outdoor Air Flow Rate {m3/s}",
         "  0.50,                                   !- Heating Outdoor Air Flow Rate {m3/s}",
         "  0.50,                                   !- No Load Outdoor Air Flow Rate {m3/s}",
@@ -4567,10 +4576,8 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     state->dataUnitarySystems->getInputOnceFlag = false;
     EXPECT_FALSE(errorsFound);
 
-    int zoneSupplyInlet =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
-    int zoneExhaustNode =
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneSupplyInlet = Util::FindItemInList("THERMAL ZONE ONE INLET NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
+    int zoneExhaustNode = Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     // test PTHP node connections
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     EXPECT_EQ("ZoneHVAC:PackagedTerminalHeatPump", thisSys.UnitType);
@@ -4586,20 +4593,20 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     state->dataEnvrn->StdRhoAir = 1.20;
 
     // set zone air conditions
-    auto &zoneAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+    auto &zoneAirNode =
+        state->dataLoopNodes->Node(Util::FindItemInList("THERMAL ZONE ONE AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneAirNode.Temp = 20.0;
     zoneAirNode.HumRat = 0.003;
     zoneAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneAirNode.Temp, zoneAirNode.HumRat);
     // set mixed air conditions
     auto &mixedAirNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("PTHP THERMAL ZONE ONE MIXED AIR NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     mixedAirNode.Temp = 10.0;
     mixedAirNode.HumRat = 0.003;
     mixedAirNode.Enthalpy = Psychrometrics::PsyHFnTdbW(mixedAirNode.Temp, mixedAirNode.HumRat);
     // set zone exhaust node
     auto &zoneExhNode = state->dataLoopNodes->Node(
-        UtilityRoutines::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
+        Util::FindItemInList("THERMAL ZONE ONE EXHAUST NODE", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes));
     zoneExhNode.Temp = 20.0;
     zoneExhNode.HumRat = 0.003;
     zoneExhNode.Enthalpy = Psychrometrics::PsyHFnTdbW(zoneExhNode.Temp, zoneExhNode.HumRat);
@@ -4730,6 +4737,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
             0.500,                   !- Supply Air Flow Rate During Cooling Operation {m3/s}
             0.500,                   !- Supply Air Flow Rate During Heating Operation {m3/s}
             ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
+            No,                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
             0.200,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
             0.200,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
             0.200,                   !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
@@ -4900,6 +4908,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_EQ("ZoneHVAC:PackagedTerminalAirConditioner", thisSys.UnitType);
     EXPECT_EQ("COIL:HEATING:FUEL", thisSys.m_HeatingCoilTypeName);
     EXPECT_EQ(state->dataHeatingCoils->HeatingCoil(1).HCoilType_Num, Coil_HeatingGasOrOtherFuel);
+    EXPECT_FALSE(thisSys.m_useNoLoadLowSpeedAirFlow);
     // set input variables
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->OutDryBulbTemp = 10.0;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,16 +111,16 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs:
     FanNum = 1;
-    state->dataFans->Fan(FanNum).FanName = "Fan_1";
-    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).Name = "Fan_1";
+    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_1";
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = 1;
 
     FanNum = 2;
-    state->dataFans->Fan(FanNum).FanName = "Fan_2";
-    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).Name = "Fan_2";
+    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     state->dataFaultsMgr->FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
@@ -359,14 +359,14 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
 
     // Inputs: fans
     FanNum = 1;
-    state->dataFans->Fan(FanNum).FanName = "Fan_1";
-    state->dataFans->Fan(FanNum).FanType = "Fan:VariableVolume";
+    state->dataFans->Fan(FanNum).Name = "Fan_1";
+    state->dataFans->Fan(FanNum).fanType = DataHVACGlobals::FanType::VAV;
     state->dataFans->Fan(FanNum).MaxAirFlowRate = 18.194;
     state->dataFans->Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
     FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(*state,
-                                                        state->dataFans->Fan(FanNum).FanName,
+                                                        state->dataFans->Fan(FanNum).Name,
                                                         state->dataFans->Fan(FanNum).MaxAirFlowRate,
                                                         state->dataFans->Fan(FanNum).DeltaPress,
                                                         FanFaultyDeltaPressInc * state->dataFans->Fan(FanNum).DeltaPress,

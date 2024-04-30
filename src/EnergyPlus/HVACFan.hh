@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -189,8 +189,7 @@ namespace HVACFan {
             Num
         };
 
-        std::string m_fanType;                   // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
-        int m_fanType_Num;                       // DataHVACGlobals fan type
+        DataHVACGlobals::FanType m_fanType;      // DataHVACGlobals fan type
         bool m_designAirVolFlowRateWasAutosized; // true if design max volume flow rate was autosize on input
         Real64 m_minPowerFlowFrac;               // Minimum fan air flow fraction for power calculation
         Real64 m_motorEff;                       // Fan motor efficiency

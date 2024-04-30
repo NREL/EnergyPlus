@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -140,7 +141,7 @@ namespace HeatRecovery {
         // Find the correct unit index
         int HeatExchNum; // index of unit being simulated
         if (CompIndex == 0) {
-            HeatExchNum = UtilityRoutines::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
+            HeatExchNum = Util::FindItemInList(CompName, state.dataHeatRecovery->ExchCond);
             if (HeatExchNum == 0) {
                 ShowFatalError(state, format("SimHeatRecovery: Unit not found={}", CompName));
             }
@@ -428,40 +429,8 @@ namespace HeatRecovery {
             thisExchanger.NomSupAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
             thisExchanger.HeatEffectSensible100 = state.dataIPShortCut->rNumericArgs(2);
             thisExchanger.HeatEffectLatent100 = state.dataIPShortCut->rNumericArgs(3);
-            thisExchanger.HeatEffectSensible75 = state.dataIPShortCut->rNumericArgs(4);
-            thisExchanger.HeatEffectLatent75 = state.dataIPShortCut->rNumericArgs(5);
-            if (thisExchanger.HeatEffectSensible75 < thisExchanger.HeatEffectSensible100) {
-                ShowWarningError(state,
-                                 format("{} \"{}\" sensible heating effectiveness at 75% rated flow is less than at 100% rated flow.",
-                                        cCurrentModuleObject,
-                                        thisExchanger.Name));
-                ShowContinueError(state, "Sensible heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
-            }
-            if (thisExchanger.HeatEffectLatent75 < thisExchanger.HeatEffectLatent100) {
-                ShowWarningError(state,
-                                 format("{} \"{}\" latent heating effectiveness at 75% rated flow is less than at 100% rated flow.",
-                                        cCurrentModuleObject,
-                                        thisExchanger.Name));
-                ShowContinueError(state, "Latent heating effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
-            }
-            thisExchanger.CoolEffectSensible100 = state.dataIPShortCut->rNumericArgs(6);
-            thisExchanger.CoolEffectLatent100 = state.dataIPShortCut->rNumericArgs(7);
-            thisExchanger.CoolEffectSensible75 = state.dataIPShortCut->rNumericArgs(8);
-            thisExchanger.CoolEffectLatent75 = state.dataIPShortCut->rNumericArgs(9);
-            if (thisExchanger.CoolEffectSensible75 < thisExchanger.CoolEffectSensible100) {
-                ShowWarningError(state,
-                                 format("{} \"{}\" sensible cooling effectiveness at 75% rated flow is less than at 100% rated flow.",
-                                        cCurrentModuleObject,
-                                        thisExchanger.Name));
-                ShowContinueError(state, "Sensible cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
-            }
-            if (thisExchanger.CoolEffectLatent75 < thisExchanger.CoolEffectLatent100) {
-                ShowWarningError(state,
-                                 format("{} \"{}\" latent cooling effectiveness at 75% rated flow is less than at 100% rated flow.",
-                                        cCurrentModuleObject,
-                                        thisExchanger.Name));
-                ShowContinueError(state, "Latent cooling effectiveness at 75% rated flow is usually greater than at 100% rated flow.");
-            }
+            thisExchanger.CoolEffectSensible100 = state.dataIPShortCut->rNumericArgs(4);
+            thisExchanger.CoolEffectLatent100 = state.dataIPShortCut->rNumericArgs(5);
             thisExchanger.SupInletNode = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(3),
                                                            ErrorsFound,
@@ -499,21 +468,21 @@ namespace HeatRecovery {
                                                             NodeInputManager::CompFluidStream::Secondary,
                                                             DataLoopNode::ObjectIsNotParent);
 
-            thisExchanger.NomElecPower = state.dataIPShortCut->rNumericArgs(10);
+            thisExchanger.NomElecPower = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "Yes")) {
                 thisExchanger.ControlToTemperatureSetPoint = true;
             } else {
-                if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
+                if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(7), "No")) {
                     ShowSevereError(state, "Rotary HX Speed Modulation or Plate Bypass for Temperature Control for ");
                     ShowContinueError(state, format("{} must be set to Yes or No", thisExchanger.Name));
                     ErrorsFound = true;
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Plate")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Plate;
-            } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
+            } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "Rotary")) {
                 thisExchanger.ExchConfig = HXConfigurationType::Rotary;
             } else {
                 ShowSevereError(state, format("{} configuration not found= {}", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(8)));
@@ -528,10 +497,10 @@ namespace HeatRecovery {
                 ErrorsFound = true;
             }
 
-            if (!UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
-                thisExchanger.ThresholdTemperature = state.dataIPShortCut->rNumericArgs(11);
-                thisExchanger.InitialDefrostTime = state.dataIPShortCut->rNumericArgs(12);
-                thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(13);
+            if (!Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "None")) {
+                thisExchanger.ThresholdTemperature = state.dataIPShortCut->rNumericArgs(7);
+                thisExchanger.InitialDefrostTime = state.dataIPShortCut->rNumericArgs(8);
+                thisExchanger.RateofDefrostTimeIncrease = state.dataIPShortCut->rNumericArgs(9);
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
@@ -543,6 +512,16 @@ namespace HeatRecovery {
                 }
                 thisExchanger.EconoLockOut = static_cast<bool>(toggle);
             }
+
+            // yujie: read new curves here
+            thisExchanger.HeatEffectSensibleCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(11)); // convert curve name to number
+            thisExchanger.HeatEffectLatentCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(12)); // convert curve name to number
+            thisExchanger.CoolEffectSensibleCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(13)); // convert curve name to number
+            thisExchanger.CoolEffectLatentCurveIndex =
+                Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14)); // convert curve name to number
 
             BranchNodeConnections::TestCompSet(state,
                                                DataHVACGlobals::cHXTypes(thisExchanger.ExchType),
@@ -1034,7 +1013,7 @@ namespace HeatRecovery {
             int const ExchNum = ExchIndex + NumAirToAirPlateExchs + NumAirToAirGenericExchs;
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             for (int PerfDataNum = 1; PerfDataNum <= NumDesBalExchsPerfDataType1; ++PerfDataNum) {
-                if (UtilityRoutines::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
+                if (Util::SameString(thisExchanger.HeatExchPerfName, state.dataHeatRecovery->BalDesDehumPerfData(PerfDataNum).Name)) {
                     thisExchanger.PerfDataIndex = PerfDataNum;
                     break;
                 }
@@ -1059,118 +1038,112 @@ namespace HeatRecovery {
             // CurrentModuleObject='HeatExchanger:AirToAir:FlatPlate/AirToAir:SensibleAndLatent/Desiccant:BalancedFlow')
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.SensHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.SensHeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.LatHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Gain Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.LatHeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.TotHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.TotHeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEAT RECOVERY FOR HEATING",
-                                {},
-                                "System");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatRecoveryForHeating);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.SensCoolingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.SensCoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.LatCoolingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.LatCoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.TotCoolingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.TotCoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name,
-                                {},
-                                "ENERGYTRANSFER",
-                                "HEAT RECOVERY FOR COOLING",
-                                {},
-                                "System");
+                                Constant::eResource::EnergyTransfer,
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatRecoveryForCooling);
 
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 thisExchanger.ElecUseRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 thisExchanger.ElecUseEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisExchanger.Name,
-                                {},
-                                "ELECTRICITY",
-                                "HEATRECOVERY",
-                                {},
-                                "System");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatRecovery);
         }
 
         // setup additional report variables for generic heat exchangers
@@ -1181,38 +1154,38 @@ namespace HeatRecovery {
             auto &thisExchanger = state.dataHeatRecovery->ExchCond(ExchNum);
             SetupOutputVariable(state,
                                 "Heat Exchanger Sensible Effectiveness",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.SensEffectiveness,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Latent Effectiveness",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.LatEffectiveness,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Supply Air Bypass Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisExchanger.SupBypassMassFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Exhaust Air Bypass Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 thisExchanger.SecBypassMassFlow,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
             SetupOutputVariable(state,
                                 "Heat Exchanger Defrost Time Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 thisExchanger.DefrostFraction,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisExchanger.Name);
         }
 
@@ -2097,16 +2070,24 @@ namespace HeatRecovery {
 
             if (this->SupInTemp < this->SecInTemp) {
                 // Use heating effectiveness values
-                this->SensEffectiveness = this->HeatEffectSensible75 +
-                                          (this->HeatEffectSensible100 - this->HeatEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                this->LatEffectiveness =
-                    this->HeatEffectLatent75 + (this->HeatEffectLatent100 - this->HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                this->SensEffectiveness = this->HeatEffectSensible100;
+                if (this->HeatEffectSensibleCurveIndex > 0) {
+                    this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                }
+                this->LatEffectiveness = this->HeatEffectLatent100;
+                if (this->HeatEffectLatentCurveIndex > 0) {
+                    this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                }
             } else {
                 // Use cooling effectiveness values
-                this->SensEffectiveness = this->CoolEffectSensible75 +
-                                          (this->CoolEffectSensible100 - this->CoolEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                this->LatEffectiveness =
-                    this->CoolEffectLatent75 + (this->CoolEffectLatent100 - this->CoolEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                this->SensEffectiveness = this->CoolEffectSensible100;
+                if (this->CoolEffectSensibleCurveIndex > 0) {
+                    this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                }
+                this->LatEffectiveness = this->CoolEffectLatent100;
+                if (this->CoolEffectLatentCurveIndex > 0) {
+                    this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                }
             }
 
             //     Keep effectiveness between 0 and 1.0 ??
@@ -2123,11 +2104,9 @@ namespace HeatRecovery {
                             this->Name));
                     if (this->SupInTemp < this->SecInTemp) {
                         ShowContinueError(state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectSensible100));
-                        ShowContinueError(state, format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     } else {
                         ShowContinueError(state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", this->CoolEffectSensible100));
-                        ShowContinueError(state, format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", this->CoolEffectSensible75));
                         ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2144,11 +2123,9 @@ namespace HeatRecovery {
                                this->Name));
                     if (this->SupInTemp < this->SecInTemp) {
                         ShowContinueError(state, format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectLatent100));
-                        ShowContinueError(state, format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     } else {
                         ShowContinueError(state, format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", this->CoolEffectLatent100));
-                        ShowContinueError(state, format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", this->CoolEffectLatent75));
                         ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                     }
                     ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2219,16 +2196,24 @@ namespace HeatRecovery {
                         CMin = min(CSup, CSec);
                         if (TempSupIn < TempSecIn) {
                             //          Use heating effectiveness values
-                            this->SensEffectiveness = this->HeatEffectSensible75 + (this->HeatEffectSensible100 - this->HeatEffectSensible75) *
-                                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                            this->LatEffectiveness = this->HeatEffectLatent75 + (this->HeatEffectLatent100 - this->HeatEffectLatent75) *
-                                                                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            this->SensEffectiveness = this->HeatEffectSensible100;
+                            if (this->HeatEffectSensibleCurveIndex > 0) {
+                                this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                            }
+                            this->LatEffectiveness = this->HeatEffectLatent100;
+                            if (this->HeatEffectLatentCurveIndex > 0) {
+                                this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                            }
                         } else {
                             //          Use cooling effectiveness values
-                            this->SensEffectiveness = this->CoolEffectSensible75 + (this->CoolEffectSensible100 - this->CoolEffectSensible75) *
-                                                                                       (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                            this->LatEffectiveness = this->CoolEffectLatent75 + (this->CoolEffectLatent100 - this->CoolEffectLatent75) *
-                                                                                    (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                            this->SensEffectiveness = this->CoolEffectSensible100;
+                            if (this->CoolEffectSensibleCurveIndex > 0) {
+                                this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                            }
+                            this->LatEffectiveness = this->CoolEffectLatent100;
+                            if (this->CoolEffectLatentCurveIndex > 0) {
+                                this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                            }
                         }
 
                         if (this->SensEffectiveness < 0.0) {
@@ -2242,14 +2227,10 @@ namespace HeatRecovery {
                                 if (this->SupInTemp < this->SecInTemp) {
                                     ShowContinueError(
                                         state, format("...Sensible Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectSensible100));
-                                    ShowContinueError(
-                                        state, format("...Sensible Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError(
                                         state, format("...Sensible Effectiveness at 100% Cooling Air Flow = {:.2R}", this->CoolEffectSensible100));
-                                    ShowContinueError(
-                                        state, format("...Sensible Effectiveness at 75% Cooling Air Flow = {:.2R}", this->CoolEffectSensible75));
                                     ShowContinueError(state, "...Sensible effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2267,14 +2248,10 @@ namespace HeatRecovery {
                                 if (this->SupInTemp < this->SecInTemp) {
                                     ShowContinueError(state,
                                                       format("...Latent Effectiveness at 100% Heating Air Flow = {:.2R}", this->HeatEffectLatent100));
-                                    ShowContinueError(state,
-                                                      format("...Latent Effectiveness at 75% Heating Air Flow = {:.2R}", this->HeatEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError(state,
                                                       format("...Latent Effectiveness at 100% Cooling Air Flow = {:.2R}", this->CoolEffectLatent100));
-                                    ShowContinueError(state,
-                                                      format("...Latent Effectiveness at 75% Cooling Air Flow = {:.2R}", this->CoolEffectLatent75));
                                     ShowContinueError(state, "...Latent effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError(state, format("...Heat Exchanger Air Volume Flow Ratio = {:.2R}", HXAirVolFlowRatio));
@@ -2803,10 +2780,14 @@ namespace HeatRecovery {
             HXSecAirVolFlowRate = this->SecOutMassFlow / RhoSec;
             HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
             HXAirVolFlowRatio = HXAvgAirVolFlowRate / this->NomSupAirVolFlow;
-            this->SensEffectiveness =
-                this->HeatEffectSensible75 + (this->HeatEffectSensible100 - this->HeatEffectSensible75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-            this->LatEffectiveness =
-                this->HeatEffectLatent75 + (this->HeatEffectLatent100 - this->HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+            this->SensEffectiveness = this->HeatEffectSensible100;
+            if (this->HeatEffectSensibleCurveIndex > 0) {
+                this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+            }
+            this->LatEffectiveness = this->HeatEffectLatent100;
+            if (this->HeatEffectLatentCurveIndex > 0) {
+                this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+            }
             this->SupOutTemp = this->SupInTemp + this->SensEffectiveness * CMin / CSup * (this->SecInTemp - this->SupInTemp);
             this->SupOutHumRat = this->SupInHumRat + this->LatEffectiveness * CMin / CSup * (this->SecInHumRat - this->SupInHumRat);
             this->SupOutEnth = Psychrometrics::PsyHFnTdbW(this->SupOutTemp, this->SupOutHumRat);
@@ -2859,16 +2840,24 @@ namespace HeatRecovery {
                     CMin = min(CSup, CSec);
                     if (TempSupIn < TempSecIn) {
                         //         Use heating effectiveness values
-                        this->SensEffectiveness = this->HeatEffectSensible75 + (this->HeatEffectSensible100 - this->HeatEffectSensible75) *
-                                                                                   (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                        this->LatEffectiveness = this->HeatEffectLatent75 +
-                                                 (this->HeatEffectLatent100 - this->HeatEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        this->SensEffectiveness = this->HeatEffectSensible100;
+                        if (this->HeatEffectSensibleCurveIndex > 0) {
+                            this->SensEffectiveness *= Curve::CurveValue(state, this->HeatEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                        }
+                        this->LatEffectiveness = this->HeatEffectLatent100;
+                        if (this->HeatEffectLatentCurveIndex > 0) {
+                            this->LatEffectiveness *= Curve::CurveValue(state, this->HeatEffectLatentCurveIndex, HXAirVolFlowRatio);
+                        }
                     } else {
                         //         Use cooling effectiveness values
-                        this->SensEffectiveness = this->CoolEffectSensible75 + (this->CoolEffectSensible100 - this->CoolEffectSensible75) *
-                                                                                   (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
-                        this->LatEffectiveness = this->CoolEffectLatent75 +
-                                                 (this->CoolEffectLatent100 - this->CoolEffectLatent75) * (HXAirVolFlowRatio - 0.75) / (1.0 - 0.75);
+                        this->SensEffectiveness = this->CoolEffectSensible100;
+                        if (this->CoolEffectSensibleCurveIndex > 0) {
+                            this->SensEffectiveness *= Curve::CurveValue(state, this->CoolEffectSensibleCurveIndex, HXAirVolFlowRatio);
+                        }
+                        this->LatEffectiveness = this->CoolEffectLatent100;
+                        if (this->CoolEffectLatentCurveIndex > 0) {
+                            this->LatEffectiveness *= Curve::CurveValue(state, this->CoolEffectLatentCurveIndex, HXAirVolFlowRatio);
+                        }
                     }
                     //         calculation of local variable Csup can be 0, gaurd against divide by 0.
                     TempSupOut = TempSupIn + this->SensEffectiveness * SafeDiv(CMin, CSup) * (TempSecIn - TempSupIn);
@@ -4819,7 +4808,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupInletNode;
         } else {
@@ -4851,7 +4840,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SupOutletNode;
         } else {
@@ -4883,7 +4872,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecInletNode;
         } else {
@@ -4915,7 +4904,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).SecOutletNode;
         } else {
@@ -4947,7 +4936,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).NomSupAirVolFlow;
         } else {
@@ -4980,7 +4969,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->GetInputFlag = false;
         }
 
-        int const WhichHX = UtilityRoutines::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
+        int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
             return state.dataHeatRecovery->ExchCond(WhichHX).ExchType;
         } else {

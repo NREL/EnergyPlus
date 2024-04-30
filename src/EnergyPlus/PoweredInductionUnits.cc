@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -152,7 +152,7 @@ void SimPIU(EnergyPlusData &state,
 
     // Get the powered induction unit index
     if (CompIndex == 0) {
-        PIUNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
+        PIUNum = Util::FindItemInList(CompName, state.dataPowerInductionUnits->PIU);
         if (PIUNum == 0) {
             ShowFatalError(state, format("SimPIU: PIU Unit not found={}", CompName));
         }
@@ -239,6 +239,8 @@ void GetPIUs(EnergyPlusData &state)
     using SteamCoils::GetCoilSteamInletNode;
     using WaterCoils::GetCoilWaterInletNode;
 
+    static constexpr std::string_view routineName = "GetPIUs";
+
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas = 0;                                          // Number of Alpha input fields for each GetObjectItem call
     int NumNumbers = 0;                                         // Number of Numeric input fields for each GetObjectItem call
@@ -285,6 +287,7 @@ void GetPIUs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
+        ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPowerInductionUnits->PiuUniqueNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -316,8 +319,7 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.MaxTotAirVolFlow = state.dataIPShortCut->rNumericArgs(1);
         thisPIU.MaxPriAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
         thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
-
-        thisPIU.HCoilType = static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+        thisPIU.HCoilType = static_cast<HtgCoilType>(getEnumValue(HCoilNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
         switch (thisPIU.HCoilType) {
         case HtgCoilType::SimpleHeating: {
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
@@ -406,21 +408,20 @@ void GetPIUs(EnergyPlusData &state)
         // find fan type
         // test if Fan:SystemModel fan of this name exists
         if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
-            thisPIU.Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+            thisPIU.fanType = DataHVACGlobals::FanType::SystemModel;
             state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
             thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
             thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
         } else {
-            bool isNotOkay(false);
-            ValidateComponent(state, "FAN:CONSTANTVOLUME", thisPIU.FanName, isNotOkay, "GetPIUs");
-            if (isNotOkay) {
-                ShowContinueError(state, format("In {} = {}", thisPIU.UnitType, thisPIU.Name));
+            thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName);
+            if (thisPIU.Fan_Index == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
                 ErrorsFound = true;
+            } else {
+                thisPIU.fanType = Fans::GetFanType(state, thisPIU.Fan_Index);
+                assert(thisPIU.fanType == DataHVACGlobals::FanType::Constant);
+                thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisPIU.Fan_Index);
             }
-            thisPIU.Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-            int FanType_Num = 0;
-            Fans::GetFanType(state, thisPIU.FanName, FanType_Num, ErrorsFound);
-            thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), thisPIU.FanName, ErrorsFound);
         }
 
         thisPIU.HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
@@ -523,6 +524,9 @@ void GetPIUs(EnergyPlusData &state)
                                                                  state.dataIPShortCut->cNumericFieldNames);
 
         auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUIndex + state.dataPowerInductionUnits->NumSeriesPIUs);
+
+        ErrorObjectHeader eoh{routineName, cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+
         GlobalNames::VerifyUniqueInterObjectName(state,
                                                  state.dataPowerInductionUnits->PiuUniqueNames,
                                                  state.dataIPShortCut->cAlphaArgs(1),
@@ -553,12 +557,12 @@ void GetPIUs(EnergyPlusData &state)
         thisPIU.MaxSecAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
         thisPIU.MinPriAirFlowFrac = state.dataIPShortCut->rNumericArgs(3);
         thisPIU.FanOnFlowFrac = state.dataIPShortCut->rNumericArgs(4);
-        if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
+        if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:WATER")) {
             thisPIU.HCoilType = HtgCoilType::SimpleHeating;
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilWaterSimpleHeating;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:FUEL")) {
             thisPIU.HCoilType = HtgCoilType::Gas;
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:STEAM")) {
             thisPIU.HCoilType = HtgCoilType::SteamAirHeating;
             thisPIU.HCoil_PlantType = DataPlant::PlantEquipmentType::CoilSteamAirHeating;
             thisPIU.HCoil_FluidIndex = FindRefrigerant(state, "Steam");
@@ -570,7 +574,7 @@ void GetPIUs(EnergyPlusData &state)
                 ErrorsFound = true;
                 SteamMessageNeeded = false;
             }
-        } else if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
+        } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(9), "COIL:HEATING:ELECTRIC")) {
             thisPIU.HCoilType = HtgCoilType::Electric;
         } else {
             ShowSevereError(state, format("Illegal {} = {}", state.dataIPShortCut->cAlphaFieldNames(9), state.dataIPShortCut->cAlphaArgs(9)));
@@ -634,22 +638,22 @@ void GetPIUs(EnergyPlusData &state)
         // find fan type
         // test if Fan:SystemModel fan of this name exists
         if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
-            thisPIU.Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
+            thisPIU.fanType = DataHVACGlobals::FanType::SystemModel;
             state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
             thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
             thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
         } else {
-            bool isNotOkay(false);
-            ValidateComponent(state, "FAN:CONSTANTVOLUME", thisPIU.FanName, isNotOkay, "GetPIUs");
-            if (isNotOkay) {
-                ShowContinueError(state, format("In {} = {}", thisPIU.UnitType, thisPIU.Name));
+            thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName);
+            if (thisPIU.Fan_Index == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
                 ErrorsFound = true;
+            } else {
+                // Assert that this is a constant volume fan?
+                thisPIU.fanType = Fans::GetFanType(state, thisPIU.Fan_Index);
+                thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, thisPIU.Fan_Index);
             }
-            thisPIU.Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-            int FanType_Num = 0;
-            Fans::GetFanType(state, thisPIU.FanName, FanType_Num, ErrorsFound);
-            thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), thisPIU.FanName, ErrorsFound);
         }
+
         thisPIU.HCoil = state.dataIPShortCut->cAlphaArgs(10); // name of heating coil object
         bool IsNotOK = false;
         ValidateComponent(state, HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], thisPIU.HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
@@ -742,45 +746,45 @@ void GetPIUs(EnergyPlusData &state)
         // Setup Report variables for the PIUs
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Damper Position",
-                            OutputProcessor::Unit::None,
+                            Constant::Units::None,
                             thisPIU.PriDamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisPIU.HeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisPIU.HeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Rate",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             thisPIU.SensCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Energy",
-                            OutputProcessor::Unit::J,
+                            Constant::Units::J,
                             thisPIU.SensCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             thisPIU.OutdoorAirFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
     }
 }
@@ -1117,7 +1121,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
         // get system sizing id if a sizing run has been done for this system
         if (SizingDesRunThisAirSys) {
-            SysSizNum = UtilityRoutines::FindItemInList(
+            SysSizNum = Util::FindItemInList(
                 state.dataSize->FinalSysSizing(AirLoopNum).AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
             if (SysSizNum == 0) {
                 SysSizNum = 1; // use first when none applicable
@@ -1322,7 +1326,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
             }
         } else {
             CheckZoneSizing(state, thisPIU.UnitType, thisPIU.Name);
-            if (UtilityRoutines::SameString(HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Water")) {
+            if (Util::SameString(HCoilNamesUC[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Water")) {
 
                 int const CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", thisPIU.HCoil, ErrorsFound);
                 int const CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", thisPIU.HCoil, ErrorsFound);
@@ -1422,7 +1426,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                     state, thisPIU.UnitType, thisPIU.Name, "User-Specified Maximum Reheat Steam Flow Rate [m3/s]", thisPIU.MaxVolHotWaterFlow);
             }
         } else {
-            if (UtilityRoutines::SameString(HCoilNames[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Steam")) {
+            if (Util::SameString(HCoilNames[static_cast<int>(thisPIU.HCoilType)], "Coil:Heating:Steam")) {
 
                 int const CoilSteamInletNode = GetCoilSteamInletNode(state, "Coil:Heating:Steam", thisPIU.HCoil, ErrorsFound);
                 int const CoilSteamOutletNode = GetCoilSteamOutletNode(state, "Coil:Heating:Steam", thisPIU.HCoil, ErrorsFound);
@@ -1647,9 +1651,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
-            if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-            } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
             }
@@ -1692,9 +1696,9 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // fire the mixer
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
     // fire the fan
-    if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+    if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-    } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+    } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // the heating load seen by the reheat coil [W]
@@ -1921,9 +1925,9 @@ void CalcParallelPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
 
-            if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+            if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
                 state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-            } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+            } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
                 Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
                                             _); // fire the fan
             }
@@ -1970,9 +1974,9 @@ void CalcParallelPIU(EnergyPlusData &state,
     // now that inlet airflows have been set, the terminal box components can be simulated.
     // fire the fan
 
-    if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+    if (thisPIU.fanType == DataHVACGlobals::FanType::SystemModel) {
         state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-    } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
+    } else if (thisPIU.fanType == DataHVACGlobals::FanType::Constant) {
         Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _); // fire the fan
     }
     // fire the mixer
@@ -2119,7 +2123,7 @@ bool PIUnitHasMixer(EnergyPlusData &state, std::string_view CompName) // compone
     }
 
     if (state.dataPowerInductionUnits->NumPIUs > 0) {
-        int const ItemNum = UtilityRoutines::FindItemInList(CompName, state.dataPowerInductionUnits->PIU, &PowIndUnitData::MixerName);
+        int const ItemNum = Util::FindItemInList(CompName, state.dataPowerInductionUnits->PIU, &PowIndUnitData::MixerName);
         if (ItemNum > 0) {
             YesNo = true;
         }

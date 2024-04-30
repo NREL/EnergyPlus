@@ -4,7 +4,13 @@ This group of EnergyPlus input objects provides methods for users to include the
 
 Some building energy performance rating systems allow analysts to option of using exceptional calculation methods when a simulation program cannot perform the function required to be modeled. These user defined component models are intended to provide a means for including such exceptional calculations within the context of a full EnergyPlus model. This allows using EnergyPlus for everything it can model and extending it yourself to include a new type of HVAC or Plant component.
 
-These objects are advanced. Making good use of them requires the user to have a detailed understanding of EnergyPlus HVAC and Plant models as well as the Energy Management System (EMS). The EnergyPlus Runtime Language (Erl) is used to program the component model. The Application Guide for EMS provides more discussion of how to use the objects in this group see the chapter called User-Defined Component Models.
+These objects are advanced. Making good use of them requires the user to have a detailed understanding of EnergyPlus HVAC and Plant models as well as the Energy Management System (EMS). There are three methods for creating the programs:
+
+\begin{description}
+  \item[Erl-Based] In this case, the EnergyPlus Runtime Language (Erl) is used to program the component model right in the IDF itself. The Application Guide for EMS provides more discussion of how to use the objects in this group see the chapter called User-Defined Component Models.
+  \item[Python Plugin] In this case, the user will create a PythonPlugin:Instance object in the IDF which lists the name of a Python file and class.  That class should override the \texttt{on\_user\_defined\_component\_model} method to create user defined behavior.
+  \item[API Callback] This approach is very similar to the Python Plugin in that the user will still create the user defined behavior in Python.  However in this case, the user will create a callback function for modeling the behavior, and register the function using the runtime API function \texttt{callback\_user\_defined\_component\_model}.  The string passed to this registration function should be entered into the user-defined object's Program Name input field to match them up.
+\end{description}
 
 \subsection{ZoneHVAC:ForcedAir:UserDefined}\label{zonehvacforcedairuserdefined}
 

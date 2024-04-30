@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -196,7 +196,7 @@ void ControlCompOutput(EnergyPlusData &state,
     if (ControlCompTypeNum != 0) {
         SimCompNum = ControlCompTypeNum;
     } else {
-        SimCompNum = UtilityRoutines::FindItemInSortedList(CompType, ListOfComponents, NumComponents);
+        SimCompNum = Util::FindItemInSortedList(CompType, ListOfComponents, NumComponents);
         ControlCompTypeNum = SimCompNum;
     }
 
@@ -968,8 +968,8 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
                   state.dataZoneEquip->SupplyAirPath(BCount).ComponentName(Count),
                   PrimaryAirLoopName);
 
-            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumValue(
-                AirLoopHVACCompTypeNamesUC, UtilityRoutines::makeUPPER(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
+            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(
+                getEnumValue(AirLoopHVACCompTypeNamesUC, Util::makeUPPER(state.dataZoneEquip->SupplyAirPath(BCount).ComponentType(Count))));
 
             switch (CompType) {
             case AirLoopHVACCompType::SupplyPlenum: {
@@ -1260,7 +1260,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
                   state.dataZoneEquip->ReturnAirPath(BCount).ComponentName(Count),
                   PrimaryAirLoopName);
 
-            if (UtilityRoutines::SameString(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count), "AirLoopHVAC:ZoneMixer")) {
+            if (Util::SameString(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count), "AirLoopHVAC:ZoneMixer")) {
                 ++MixerCount;
             }
         }
@@ -1277,8 +1277,8 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
 
         if (NumComp > 0) {
 
-            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumValue(
-                AirLoopHVACCompTypeNamesUC, UtilityRoutines::makeUPPER(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
+            AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(
+                getEnumValue(AirLoopHVACCompTypeNamesUC, Util::makeUPPER(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(NumComp))));
 
             switch (CompType) {
             case AirLoopHVACCompType::ZoneMixer: {
@@ -1364,8 +1364,8 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_i
         if (NumComp > 1) {
             for (int Count3 = 1; Count3 <= NumComp - 1; ++Count3) {
 
-                AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(getEnumValue(
-                    AirLoopHVACCompTypeNamesUC, UtilityRoutines::makeUPPER(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
+                AirLoopHVACCompType CompType = static_cast<AirLoopHVACCompType>(
+                    getEnumValue(AirLoopHVACCompTypeNamesUC, Util::makeUPPER(state.dataZoneEquip->ReturnAirPath(BCount).ComponentType(Count3))));
 
                 switch (CompType) {
                 case AirLoopHVACCompType::ZoneMixer: {

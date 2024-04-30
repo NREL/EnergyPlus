@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -457,11 +457,11 @@ protected:
         VRFTU.HeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
         VRFTU.MinOperatingPLR = 0.1;
-        VRFTU.fanType_Num = 0;
+        VRFTU.fanType = DataHVACGlobals::FanType::Invalid;
         VRFTU.FanOpModeSchedPtr = Sch2;
         VRFTU.FanAvailSchedPtr = Sch1;
         VRFTU.FanIndex = 0;
-        VRFTU.FanPlace = 0;
+        VRFTU.fanPlace = DataHVACGlobals::FanPlace::Invalid;
         VRFTU.OAMixerName = "OAMixer1";
         VRFTU.OAMixerIndex = 1;
         VRFTU.OAMixerUsed = true;
@@ -3123,8 +3123,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
     state->dataHVACVarRefFlow->VRFTU(2).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
     state->dataHVACVarRefFlow->VRFTU(2).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
-    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
-    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
     // system is on in cooling mode
     state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl(*state);
     // fan heat added to coil inlet temp, coil surface temp should also be lower to overcome additional heat tranfer
@@ -3132,8 +3132,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     // default value, coil inlet temps lower than default
     EXPECT_EQ(state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp, 42);
 
-    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::DrawThru;
-    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::DrawThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::DrawThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::DrawThru;
     // rest coil inlet temps
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(1).Temp;
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(1).HumRat;
@@ -3154,8 +3154,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     Real64 saveHeatingCondTemp = state->dataHVACVarRefFlow->VRF(IndexVRFCondenser).IUCondensingTemp;
 
     // test blow thru fan
-    state->dataHVACVarRefFlow->VRFTU(1).FanPlace = DataHVACGlobals::BlowThru;
-    state->dataHVACVarRefFlow->VRFTU(2).FanPlace = DataHVACGlobals::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(1).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
+    state->dataHVACVarRefFlow->VRFTU(2).fanPlace = DataHVACGlobals::FanPlace::BlowThru;
     // adjust coil inlet temps for fan heat
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeT = state->dataLoopNodes->Node(3).Temp;
     state->dataHVACVarRefFlow->VRFTU(1).coilInNodeW = state->dataLoopNodes->Node(3).HumRat;
@@ -4233,7 +4233,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // Test node connection function
     auto &thisTU = state->dataHVACVarRefFlow->VRFTU(VRFTUNum);
     // current configuration is draw through fan
-    EXPECT_EQ(thisTU.FanPlace, DataHVACGlobals::DrawThru);
+    EXPECT_EQ((int)thisTU.fanPlace, (int)DataHVACGlobals::FanPlace::DrawThru);
     EXPECT_FALSE(ErrorsFound);
     CheckVRFTUNodeConnections(*state, VRFTUNum, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);      // nodes are connected correctly
@@ -4263,7 +4263,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     thisTU.heatCoilAirOutNode += 1; // revert previous change
 
     // switch fan placement
-    thisTU.FanPlace = DataHVACGlobals::BlowThru;
+    thisTU.fanPlace = DataHVACGlobals::FanPlace::BlowThru;
     EXPECT_TRUE(thisTU.OAMixerUsed);
     // correct node connections
     thisTU.fanInletNode = thisTU.VRFTUOAMixerMixedNodeNum;
@@ -13896,9 +13896,8 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
     ASSERT_EQ(1, state->dataHeatingCoils->NumHeatingCoils);
     EXPECT_TRUE(thisVRFTU.OAMixerUsed);
     ASSERT_EQ("TU1 OA MIXER", thisVRFTU.OAMixerName);
-    ASSERT_EQ(thisVRFTU.fanType_Num, DataHVACGlobals::FanType_SystemModelObject);
-    ASSERT_EQ("Fan:SystemModel", DataHVACGlobals::cFanTypes(thisVRFTU.fanType_Num));
-    ASSERT_EQ(DataHVACGlobals::BlowThru, thisVRFTU.FanPlace);
+    ASSERT_EQ((int)thisVRFTU.fanType, (int)DataHVACGlobals::FanType::SystemModel);
+    ASSERT_EQ((int)DataHVACGlobals::FanPlace::BlowThru, (int)thisVRFTU.fanPlace);
     EXPECT_TRUE(thisVRFTU.CoolingCoilPresent);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     EXPECT_TRUE(thisVRFTU.HeatingCoilPresent);

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -325,7 +325,7 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     if (ExtBoundCond > 0) {
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
-        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::KelvinConv;
+        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
         value = state.dataWindowManager->sigma * pow_4(tout);
         value = ViewFactorSkyIR *
                     (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
