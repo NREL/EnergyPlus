@@ -196,8 +196,8 @@ CHECKED_AND_OKED = {
         ]
     },
     "Fans.cc": {
-        # Apparently I don't know how to use this thing.  Maybe it doesn't work with methods, only functions?
-        "FanComponent::getInputsForDesignHeatGain": [
+        # This is a method but it just uses the function name
+        "getInputsForDesignHeatGain": [
             "_fanCompModel"
         ]
     },
@@ -815,7 +815,7 @@ def get_all_errors(source_files):
                               'messagetype': 'warning',
                               'message': msg
                               }
-                    print(json.dumps(ci_msg))
+                    print(json.dumps(ci_msg), file=sys.stderr)
                 else:
                     warnings.warn(msg)
             continue
@@ -831,7 +831,7 @@ def get_all_errors(source_files):
                         'messagetype': 'warning',
                         'message': str(e)
                     }
-                    print(json.dumps(ci_msg))
+                    print(json.dumps(ci_msg), file=sys.stderr)
                 else:
                     warnings.warn(str(e))
             continue
@@ -858,9 +858,9 @@ def output_errors_to_console(all_errors):
                       'messagetype': 'error',
                       'message': error['msg']
                       }
-            print(json.dumps(ci_msg))
+            print(json.dumps(ci_msg), file=sys.stderr)
         else:
-            print(error['msg'])
+            print(error['msg'], file=sys.stderr)
 
 
 if __name__ == '__main__':
