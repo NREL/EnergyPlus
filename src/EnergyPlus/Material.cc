@@ -2939,21 +2939,19 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 IncidentAngle;  // Solar angle wrt surface outward normal to determine
     // if sun is in front of screen (rad)
 
-    NormalizePhiTheta(phi, theta);
     Real64 sinPhi = std::sin(phi);
     Real64 cosPhi = std::cos(phi);
+    Real64 tanPhi = sinPhi / cosPhi;
     Real64 sinTheta = std::sin(theta);
     Real64 cosTheta = std::cos(theta);
+    Real64 tanTheta = sinTheta / cosTheta;
     
-    Real64 NormalAltitude = phi; // + surfTilt - Constant::PiOvr2;
-    Real64 NormalAzimuth = theta;
-
-    if (NormalAltitude != 0.0 && NormalAzimuth != 0.0) {
-        IncidentAngle = std::acos(std::sin(NormalAltitude) / (std::tan(NormalAzimuth) * std::tan(NormalAltitude) / std::sin(NormalAzimuth)));
-    } else if (NormalAltitude != 0.0 && NormalAzimuth == 0.0) {
-        IncidentAngle = NormalAltitude;
-    } else if (NormalAltitude == 0.0 && NormalAzimuth != 0.0) {
-        IncidentAngle = NormalAzimuth;
+    if (phi != 0.0 && theta != 0.0) {
+        IncidentAngle = std::acos(sinPhi / (tanTheta * tanPhi / sinTheta)); // Isn't this cosPhi * cosTheta?
+    } else if (phi != 0.0) {
+        IncidentAngle = phi;
+    } else if (theta != 0.0) {
+        IncidentAngle = theta;
     } else {
         IncidentAngle = 0.0;
     }
@@ -2972,8 +2970,8 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 TransYDir;
     Real64 TransXDir;
     if (Beta > Small && std::abs(phi - Constant::PiOvr2) > Small) {
-        Real64 AlphaDblPrime = std::atan(std::tan(phi) / std::cos(theta));
-        TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * std::tan(phi) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
+        Real64 AlphaDblPrime = std::atan(tanPhi / cosTheta);
+        TransYDir = 1.0 - Gamma * (std::cos(AlphaDblPrime) + std::sin(AlphaDblPrime) * tanPhi * std::sqrt(1.0 + pow_2(1.0 / std::tan(Beta))));
         TransYDir = max(0.0, TransYDir);
     } else {
         TransYDir = 0.0;
@@ -3095,6 +3093,17 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         tar.AbsSolFront = 0.0;
     }
 } // CalcScreenTransmittance()
+        
+void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &solcos, Real64 &phi, Real64 &theta)
+{
+    Real64 phiSun = std::asin(solcos.z); // Altitude and azimuth angle of sun (radians)
+    phi = phiSun + phiWin - Constant::PiOvr2;
+                                
+    Real64 thetaSun = std::atan2(solcos.x, solcos.y);
+    if (thetaSun < 0.0) thetaSun += 2.0 * Constant::Pi;
+    theta = std::abs(thetaSun - thetaWin);
+    if (theta > Constant::PiOvr2) theta -= Constant::PiOvr2;
+} // GetSurfacePhiTheta()
         
 void NormalizePhiTheta(Real64 &Phi, Real64 &Theta) {
     Theta = std::abs(Theta);
