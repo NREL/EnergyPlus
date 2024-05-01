@@ -676,6 +676,15 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
 
+    // Defroster on, but not running (DefrostTime == 0)
+    Coil.DefrostTime = 0.0;
+    CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                   (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+    EXPECT_NEAR(COPwDefrost, COPwoDefrost, 0.0001);
+    Coil.DefrostTime = 0.058333;
+
     // Defroster off
     state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
     CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);

@@ -13711,7 +13711,7 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
             DefrostPowerLS = 0.0;
             DefrostPowerHS = 0.0;
 
-            // Check outdoor temperature to determine of defrost is active
+            // Check outdoor temperature to determine if defrost is active
             if (OutdoorDryBulb <= thisDXCoil.MaxOATDefrost) {
                 // Calculate defrost adjustment factors depending on defrost control type
                 if (thisDXCoil.DefrostControl == StandardRatings::HPdefrostControl::Timed) {

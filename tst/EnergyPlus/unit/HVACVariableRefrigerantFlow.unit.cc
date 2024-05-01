@@ -3937,6 +3937,39 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
         ASSERT_TRUE(true);
     }
 
+    // test that when resistive defrost is used and defrost time is 0 the COP is NOT degradaed due to frost built up
+    state->dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy = StandardRatings::DefrostStrat::Resistive;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    Real64 PowerWithDefrost = state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower;
+    state->dataHVACVarRefFlow->VRF(VRFCond).DefrostFraction = 0;
+    SimulateVRF(*state,
+                state->dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
+                FirstHVACIteration,
+                CurZoneNum,
+                state->dataZoneEquip->ZoneEquipList(state->dataSize->CurZoneEqNum).EquipIndex(EquipPtr),
+                HeatingActive,
+                CoolingActive,
+                OAUnitNum,
+                OAUCoilOutTemp,
+                ZoneEquipment,
+                SysOutputProvided,
+                LatOutputProvided);
+    EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostPower);
+    EXPECT_EQ(0.0, state->dataHVACVarRefFlow->VRF(VRFCond).DefrostConsumption);
+    EXPECT_GT(PowerWithDefrost, state->dataHVACVarRefFlow->VRF(VRFCond).ElecHeatingPower);
+
+    state->dataHVACVarRefFlow->VRF(VRFCond).DefrostStrategy = StandardRatings::DefrostStrat::ReverseCycle;
     // test that Hi curves are used for higher OAT
     HeatingCapacityMultiplier = 1.0; // no defrost operation
     InputPowerMultiplier = 1.0;      // no defrost operation

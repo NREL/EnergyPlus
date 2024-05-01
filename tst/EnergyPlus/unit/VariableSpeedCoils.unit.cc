@@ -6942,6 +6942,22 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 908.10992432432420, 1e-3);
 
+    // Check that when DefrostTime == 0 the performance of the coil is not degraded
+    Real64 COPwDefrost = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostTime == 0;
+    VariableSpeedCoils::SimVariableSpeedCoils(*state,
+                                              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                              DXCoilNum,
+                                              CyclingScheme,
+                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              PartLoadFrac,
+                                              SpeedCal,
+                                              SpeedRatio,
+                                              SensLoad,
+                                              LatentLoad,
+                                              OnOffAirFlowRatio);
+    EXPECT_NEAR(COPwDefrost, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP, 0.001);
+
     // Now simulate the coil with "CompressorOperation" command to be "Off":
     // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
     // Otherwise the problem reported in Issue 10108 will show up.
