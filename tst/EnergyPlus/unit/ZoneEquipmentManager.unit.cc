@@ -5268,3 +5268,74 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     EXPECT_NEAR(mixSpace2Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace2.fraction, 0.0001);
     EXPECT_NEAR(mixSpace3Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace3.fraction, 0.0001);
 }
+
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_GetZoneEquipmentTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space;                   !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " Space,                    !- Zone Name",
+        " Space Equipment,          !- Zone Conditioning Equipment List Name",
+        " Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+        " Space Exh Nodes,          !- Zone Air Exhaust Node or NodeList Name",
+        " Space Node,               !- Zone Air Node Name",
+        " Space Ret Node;           !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " SequentialLoad,           !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+        " Exhaust Fan,              !- Zone Equipment 1 Name",
+        " 1,                        !- Zone Equipment 1 Cooling Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+
+        "Fan:ZoneExhaust,",
+        "Exhaust Fan,               !- Name",
+        ",                          !- Availability Schedule Name",
+        "0.338,                     !- Fan Total Efficiency",
+        "125.0000,                  !- Pressure Rise{Pa}",
+        "0.3000,                    !- Maximum Flow Rate{m3/s}",
+        "Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+        "Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+        "Zone Exhaust Fans;         !- End - Use Subcategory",
+
+        "NodeList,",
+        "  Space Exh Nodes,  !- Name",
+        "  Space ZoneHVAC Exh Node, !- Node 1 Name",
+        "  Exhaust Fan Inlet Node; !- Node 1 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    bool ErrorsFound = false;
+
+    // Test 0: The get flag should default to true
+    EXPECT_TRUE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+
+    // Test 1: This should return no errors and the get flag should now be false.
+    //         In addition, it should have populated arrays and set the time steps correctly.
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    GetZoneData(*state, ErrorsFound);
+    AllocateHeatBalArrays(*state);
+    GetZoneEquipment(*state);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_GT(int(state->dataZoneEquip->ZoneEquipConfig.size()), 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode, 3);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
+
+    // Test 2: Call the get routine again...it should run without a crash because it does nothing.
+    //         The get flag should still be false and the number of time steps in a day should NOT change.
+    //         In essence, this tests to make sure that GetZoneEquipment doesn't do anything after the
+    //         first time it is called.
+    state->dataGlobal->NumOfTimeStepInHour = 2;
+    GetZoneEquipment(*state);
+    EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
+}

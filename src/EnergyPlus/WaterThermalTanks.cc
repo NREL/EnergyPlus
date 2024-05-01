@@ -1986,10 +1986,6 @@ bool getHPWaterHeaterInput(EnergyPlusData &state)
         // Inlet Air Configuration is Zone Air Only or Zone and Outdoor Air
         if ((HPWH.InletAirConfiguration == WTTAmbientTemp::TempZone || HPWH.InletAirConfiguration == WTTAmbientTemp::ZoneAndOA) &&
             HPWH.AmbientTempZone > 0) {
-            if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-                DataZoneEquipment::GetZoneEquipmentData(state);
-                state.dataZoneEquip->ZoneEquipInputsFilled = true;
-            }
             if (allocated(state.dataZoneEquip->ZoneEquipConfig)) {
                 bool FoundInletNode = false;
                 bool FoundOutletNode = false;

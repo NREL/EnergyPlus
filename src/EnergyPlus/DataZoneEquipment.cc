@@ -1425,11 +1425,6 @@ int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName) /
     // This function returns the index into the Controlled Zone Equipment structure
     // of the indicated zone.
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     return Util::FindItemInList(ZoneName, state.dataZoneEquip->ZoneEquipConfig, &EquipConfiguration::ZoneName);
 }
 
@@ -1446,11 +1441,6 @@ int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state,
     // zone node num.  Returns 0 if did not find zone node in any Zone
 
     int ControlledZoneIndex = 0; // Index into Controlled Zone structure
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
@@ -1477,11 +1467,6 @@ int GetSystemNodeNumberForZone(EnergyPlusData &state, int const zoneNum)
     // zone.  Returns 0 if the Zone is not a controlled zone.
 
     int SystemZoneNodeNumber = 0; // System node number for controlled zone
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     if (zoneNum > 0) {
         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) {
@@ -1512,11 +1497,6 @@ int GetReturnAirNodeForZone(EnergyPlusData &state,
 
     // Return value
     int ReturnAirNodeNumber = 0; // Return Air node number for controlled zone
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     ReturnAirNodeNumber = 0; // default is not found
     if (zoneNum > 0) {
@@ -1564,11 +1544,6 @@ int GetReturnNumForZone(EnergyPlusData &state,
     // Return value
     int ReturnIndex = 0; // Return number for the given zone (not the node number)
 
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
-
     if (zoneNum > 0) {
         if (state.dataZoneEquip->ZoneEquipConfig(zoneNum).IsControlled) {
             if (NodeName.empty()) {
@@ -1591,11 +1566,6 @@ int GetReturnNumForZone(EnergyPlusData &state,
 bool VerifyLightsExhaustNodeForZone(EnergyPlusData &state, int const ZoneNum, int const ZoneExhaustNodeNum)
 {
     bool exhaustNodeError = true;
-
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 
     for (int ExhaustNum = 1; ExhaustNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++ExhaustNum) {
         if (ZoneExhaustNodeNum == state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ExhaustNode(ExhaustNum)) {

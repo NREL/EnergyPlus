@@ -1129,7 +1129,6 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
@@ -2013,7 +2012,6 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     Material::GetMaterialData(*state, ErrorsFound);
@@ -4635,7 +4633,6 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     Material::GetMaterialData(*state, ErrorsFound);
