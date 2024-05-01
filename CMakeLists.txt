@@ -219,7 +219,7 @@ if(BUILD_TESTING)
         "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}"
         CACHE STRING "Identifier for this device configuration")
   endif()
-
+  set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)  # This avoids all the CTest Nightly, Continuous, etc. tests.
   enable_testing()
 endif()
 
@@ -349,6 +349,8 @@ if(BUILD_TESTING)
   set_target_properties(TestAPI_Runtime_C PROPERTIES FOLDER Testing)
   set_target_properties(TestAPI_Functional_C PROPERTIES FOLDER Testing)
   set_target_properties(TestEnergyPlusCallbacks PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeDeleteState_C PROPERTIES FOLDER Testing)
+  set_target_properties(TestAPI_RuntimeResetState_C PROPERTIES FOLDER Testing)
 endif()
 
 add_subdirectory(src/ConvertInputFormat)

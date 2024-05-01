@@ -124,6 +124,7 @@ namespace UnitarySystems {
         Real64 heating_supply_air_flow_rate_per_unit_of_capacity = -999.0;
         std::string no_load_supply_air_flow_rate_method;
         Real64 no_load_supply_air_flow_rate = -999.0;
+        std::string no_load_supply_air_flow_rate_low_speed;
         Real64 no_load_supply_air_flow_rate_per_floor_area = -999.0;
         Real64 no_load_fraction_of_autosized_cooling_supply_air_flow_rate = -999.0;
         Real64 no_load_fraction_of_autosized_heating_supply_air_flow_rate = -999.0;
@@ -204,15 +205,6 @@ namespace UnitarySystems {
             Num
         };
 
-        enum class FanPlace : int
-        {
-            Invalid = -1,
-            NotYetSet,
-            BlowThru,
-            DrawThru,
-            Num
-        };
-
         // Airflow control for constant fan mode
         enum class UseCompFlow
         {
@@ -248,10 +240,10 @@ namespace UnitarySystems {
         bool m_SimASHRAEModel = false; // flag denoting that ASHRAE model (SZVAV) should be used
         bool m_setFaultModelInput = true;
         int m_FanIndex = 0;
-        FanPlace m_FanPlace = FanPlace::NotYetSet;
+        DataHVACGlobals::FanPlace m_FanPlace = DataHVACGlobals::FanPlace::Invalid;
         int m_FanOpModeSchedPtr = 0;
         bool m_FanExists = false;
-        int m_FanType_Num = 0;
+        DataHVACGlobals::FanType m_FanType = DataHVACGlobals::FanType::Invalid;
         bool m_RequestAutoSize = false;
         Real64 m_ActualFanVolFlowRate = 0.0;
         Real64 m_DesignFanVolFlowRate = 0.0;
@@ -328,6 +320,7 @@ namespace UnitarySystems {
         int m_HeatRecoveryOutletNodeNum = 0;
         int m_DesignSpecMSHPIndex = -1;
         Real64 m_NoLoadAirFlowRateRatio = 1.0;
+        bool m_useNoLoadLowSpeedAirFlow = true;
         int m_SingleMode = 0;
         bool m_MultiOrVarSpeedHeatCoil = false;
         bool m_MultiOrVarSpeedCoolCoil = false;

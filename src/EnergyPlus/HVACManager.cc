@@ -78,6 +78,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IndoorGreen.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/NonZoneEquipmentManager.hh>
@@ -246,7 +247,7 @@ void ManageHVAC(EnergyPlusData &state)
             }
         }
     }
-
+    IndoorGreen::SimIndoorGreen(state);
     InternalHeatGains::UpdateInternalGainValues(state, true, true);
 
     ZoneTempPredictorCorrector::ManageZoneAirUpdates(state,
@@ -264,7 +265,6 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        PriorTimeStep);
 
     SimHVAC(state);
-
     if (state.dataGlobal->AnyIdealCondEntSetPointInModel && state.dataGlobal->MetersHaveBeenInitialized && !state.dataGlobal->WarmupFlag) {
         state.dataGlobal->RunOptCondEntTemp = true;
         while (state.dataGlobal->RunOptCondEntTemp) {
@@ -576,32 +576,55 @@ void ManageHVAC(EnergyPlusData &state)
             ReportDebug = !state.dataGlobal->WarmupFlag;
         }
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
+            // report node name list and column header each time number of nodes changes
+            static int numNodes = 0;
+            if (isize(state.dataLoopNodes->Node) > numNodes) state.dataHVACMgr->DebugNamesReported = false;
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
-                print(state.files.debug, "{}\n", "node #   Name");
+                numNodes = isize(state.dataLoopNodes->Node);
+                print(state.files.debug, "{}\n", "node #   Node Type      Name");
                 for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                    print(state.files.debug, " {:3}     {}\n", NodeNum, state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug,
+                          " {:3}        {}         {}\n",
+                          NodeNum,
+                          DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)],
+                          state.dataLoopNodes->NodeID(NodeNum));
+                }
+                print(state.files.debug, "Day of Sim, Hour of Day, TimeStep,");
+                for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+                    print(state.files.debug, "{}: Temp,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMinAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMaxAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: TempSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassFlow,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMin,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMax,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Press,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Enth,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: HumRat,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Fluid Type,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                        print(state.files.debug, "{}: CO2Conc,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                        print(state.files.debug, "{}: GenericContamConc,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
                 }
                 state.dataHVACMgr->DebugNamesReported = true;
             }
             if (size(state.dataLoopNodes->Node) > 0) {
-                print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
                 print(state.files.debug,
-                      "{:12}{:12} {:22.15N} \n",
+                      "{:12},{:12}, {:22.15N},",
                       state.dataGlobal->DayOfSim,
                       state.dataGlobal->HourOfDay,
                       state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
-                print(state.files.debug,
-                      "{}\n",
-                      "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
-                      "Enthal     HumRat Fluid Type");
             }
+            static constexpr std::string_view Format_20{
+                " {:8.2F},  {:8.3F},  {:8.3F},  {:8.2F}, {:13.2F}, {:13.2F}, {:13.2F}, {:13.2F},  {:#7.0F},  {:11.2F},  {:9.5F},  {},"};
+            static constexpr std::string_view Format_21{" {:8.2F},"};
             for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr std::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
                       Format_20,
-                      NodeNum,
                       state.dataLoopNodes->Node(NodeNum).Temp,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail,
@@ -614,6 +637,11 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataLoopNodes->Node(NodeNum).Enthalpy,
                       state.dataLoopNodes->Node(NodeNum).HumRat,
                       DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).CO2);
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).GenContam);
+                if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
             }
         }
     }
@@ -700,29 +728,29 @@ void SimHVAC(EnergyPlusData &state)
                             "HVAC System Solver Iteration Count",
                             Constant::Units::None,
                             state.dataHVACMgr->HVACManageIteration,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Solver Iteration Count",
                             Constant::Units::None,
                             state.dataHVACMgr->RepIterAir,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "Air System Relief Air Total Heat Loss Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACReliefHeatLoss,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetupOutputVariable(state,
                             "HVAC System Total Heat Rejection Energy",
                             Constant::Units::J,
                             state.dataHeatBal->SysTotalHVACRejectHeatLoss,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             "SimHVAC");
         SetPointManager::ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
         PlantManager::GetPlantLoopData(state);
@@ -739,15 +767,15 @@ void SimHVAC(EnergyPlusData &state)
                                 "Plant Solver Sub Iteration Count",
                                 Constant::Units::None,
                                 state.dataPlnt->PlantManageSubIterations,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "SimHVAC");
             SetupOutputVariable(state,
                                 "Plant Solver Half Loop Calls Count",
                                 Constant::Units::None,
                                 state.dataPlnt->PlantManageHalfLoopCalls,
-                                OutputProcessor::SOVTimeStepType::HVAC,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 "SimHVAC");
             for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
                 // init plant sizing numbers in main plant data structure
@@ -2359,7 +2387,7 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
             auto const &thisFan = state.dataFans->Fan(FanNum);
             //  Add reportable vars
-            if (thisFan.FanType_Num == DataHVACGlobals::FanType_ZoneExhaust) {
+            if (thisFan.fanType == DataHVACGlobals::FanType::Exhaust) {
                 for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
                     if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
                         znAirRpt.ExhTotalLoss +=
