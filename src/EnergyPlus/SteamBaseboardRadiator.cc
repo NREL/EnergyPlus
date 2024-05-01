@@ -103,8 +103,8 @@ namespace SteamBaseboardRadiator {
     // 1. HWBaseboardRadiator module (ZoneHVAC:Baseboard:RadiantConvective:Water)
     // 2. SteamCoils module (Coil:Heating:Steam)
 
-    using DataHVACGlobals::SmallLoad;
     using DataLoopNode::ObjectIsNotParent;
+    using HVAC::SmallLoad;
 
     using DataZoneEquipment::CheckZoneEquipmentList;
 
@@ -1069,10 +1069,10 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetSatDensityRefrig;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatSpecificHeatRefrig;
+        using HVAC::HeatingCapacitySizing;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1295,10 +1295,10 @@ namespace SteamBaseboardRadiator {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataHVACGlobals::SmallLoad;
         using FluidProperties::GetSatDensityRefrig;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSatSpecificHeatRefrig;
+        using HVAC::SmallLoad;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals

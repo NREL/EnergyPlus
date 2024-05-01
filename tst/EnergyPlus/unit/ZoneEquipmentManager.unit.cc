@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
+    // HVAC::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 2);
     zoneInlet = Util::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
@@ -1361,7 +1361,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
+    // HVAC::MinAirLoopIterationsAfterFirst should equal 2 for UniformPLR
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 2);
 
     // UniformPLR Test 2 - Heating, FirstHVACIteration = false
@@ -1575,7 +1575,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
+    // HVAC::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 2);
     zoneInlet = Util::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
@@ -1583,7 +1583,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 0);
     EXPECT_EQ(heatingPriority, 3);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
+    // HVAC::MinAirLoopIterationsAfterFirst should equal equipmnum+1 for SequentialUniformPLR
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 4);
 
     // SequentialUniformPLR Test 2 - Heating, FirstHVACIteration = false, low load requiring only 1 piece of equipment
@@ -1846,7 +1846,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -1894,7 +1894,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    // HVAC::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 1);
     zoneInlet = Util::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
@@ -1902,7 +1902,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    // HVAC::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 3);
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
@@ -2072,7 +2072,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
     state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand.allocate(1);
@@ -2125,7 +2125,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 1);
     EXPECT_EQ(heatingPriority, 1);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    // HVAC::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 1);
     zoneInlet = Util::FindItemInList("ZONE EQUIP INLET 3", state->dataLoopNodes->NodeID, state->dataLoopNodes->NumOfNodes);
     coolingPriority = 0;
@@ -2133,7 +2133,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
     state->dataZoneEquip->ZoneEquipList(1).getPrioritiesForInletNode(*state, zoneInlet, coolingPriority, heatingPriority);
     EXPECT_EQ(coolingPriority, 3);
     EXPECT_EQ(heatingPriority, 3);
-    // DataHVACGlobals::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
+    // HVAC::MinAirLoopIterationsAfterFirst should equal the highest air terminal equipment num for sequential loading
     EXPECT_EQ(state->dataHVACGlobal->MinAirLoopIterationsAfterFirst, 3);
 
     // Sequential Test 2 - Heating, FirstHVACIteration = false
@@ -4552,7 +4552,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_NoLoadTest)
     state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 24.;
@@ -4838,7 +4838,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_SizeZoneEquipment_DOASLoadTest)
     state->dataHeatBalFanSys->ZoneMassBalanceFlag.allocate(state->dataGlobal->NumOfZones);
     state->dataHeatBal->MassConservation.allocate(state->dataGlobal->NumOfZones);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 23.5;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1) = 22.5;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1) = 23.5;
@@ -5129,7 +5129,7 @@ TEST_F(EnergyPlusFixture, SpaceHVACSplitterTest)
     state->dataZoneEquip->ZoneEquipList.allocate(1);
     state->dataZoneEquip->ZoneEquipList(1).LoadDistScheme = DataZoneEquipment::LoadDist::Sequential;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
     thisSplitter.distributeOutput(*state, zone1Num, sysOutputProvided, latOutputProvided, nonAirSysOutput, equipNum);
@@ -5267,4 +5267,75 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     EXPECT_NEAR(mixSpace1Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace1.fraction, 0.0001);
     EXPECT_NEAR(mixSpace2Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace2.fraction, 0.0001);
     EXPECT_NEAR(mixSpace3Node.MassFlowRateMaxAvail, equipInletNode.MassFlowRateMaxAvail * mixSpace3.fraction, 0.0001);
+}
+
+TEST_F(EnergyPlusFixture, ZoneEquipmentManager_GetZoneEquipmentTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space;                   !- Name",
+
+        "ZoneHVAC:EquipmentConnections,",
+        " Space,                    !- Zone Name",
+        " Space Equipment,          !- Zone Conditioning Equipment List Name",
+        " Space In Node,            !- Zone Air Inlet Node or NodeList Name",
+        " Space Exh Nodes,          !- Zone Air Exhaust Node or NodeList Name",
+        " Space Node,               !- Zone Air Node Name",
+        " Space Ret Node;           !- Zone Return Air Node Name",
+
+        "ZoneHVAC:EquipmentList,",
+        " Space Equipment,          !- Name",
+        " SequentialLoad,           !- Load Distribution Scheme",
+        " Fan:ZoneExhaust,          !- Zone Equipment 1 Object Type",
+        " Exhaust Fan,              !- Zone Equipment 1 Name",
+        " 1,                        !- Zone Equipment 1 Cooling Sequence",
+        " 1,                        !- Zone Equipment 1 Heating or No - Load Sequence",
+        " ,                         !- Zone Equipment 1 Sequential Cooling Fraction",
+        " ;                         !- Zone Equipment 1 Sequential Heating or No-Load Fraction",
+
+        "Fan:ZoneExhaust,",
+        "Exhaust Fan,               !- Name",
+        ",                          !- Availability Schedule Name",
+        "0.338,                     !- Fan Total Efficiency",
+        "125.0000,                  !- Pressure Rise{Pa}",
+        "0.3000,                    !- Maximum Flow Rate{m3/s}",
+        "Exhaust Fan Inlet Node,    !- Air Inlet Node Name",
+        "Exhaust Fan Outlet Node,   !- Air Outlet Node Name",
+        "Zone Exhaust Fans;         !- End - Use Subcategory",
+
+        "NodeList,",
+        "  Space Exh Nodes,  !- Name",
+        "  Space ZoneHVAC Exh Node, !- Node 1 Name",
+        "  Exhaust Fan Inlet Node; !- Node 1 Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    EXPECT_FALSE(has_err_output());
+    bool ErrorsFound = false;
+
+    // Test 0: The get flag should default to true
+    EXPECT_TRUE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+
+    // Test 1: This should return no errors and the get flag should now be false.
+    //         In addition, it should have populated arrays and set the time steps correctly.
+    state->dataGlobal->NumOfTimeStepInHour = 1;
+    GetZoneData(*state, ErrorsFound);
+    AllocateHeatBalArrays(*state);
+    GetZoneEquipment(*state);
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_GT(int(state->dataZoneEquip->ZoneEquipConfig.size()), 0);
+    EXPECT_EQ(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode, 3);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
+
+    // Test 2: Call the get routine again...it should run without a crash because it does nothing.
+    //         The get flag should still be false and the number of time steps in a day should NOT change.
+    //         In essence, this tests to make sure that GetZoneEquipment doesn't do anything after the
+    //         first time it is called.
+    state->dataGlobal->NumOfTimeStepInHour = 2;
+    GetZoneEquipment(*state);
+    EXPECT_FALSE(state->dataZoneEquipmentManager->GetZoneEquipmentInputFlag);
+    EXPECT_EQ(state->dataZoneEquipmentManager->NumOfTimeStepInDay, 24);
 }
