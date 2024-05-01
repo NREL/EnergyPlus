@@ -5131,7 +5131,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     state->dataSurface->Surface.allocate(NumSurf);
     state->dataSurface->SurfaceWindow.allocate(NumSurf);
     EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(*state, NumSurf);
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
     SolarShading::AllocateModuleArrays(*state);
 
     auto &surf1 = state->dataSurface->Surface(1);
@@ -5203,7 +5203,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 1) = 1.0;
     state->dataHeatBal->SurfSunlitFracWithoutReveal(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, 2) = 1.0;
 
-    WindowManager::W5InitGlassParameters(*state);
+    Window::W5InitGlassParameters(*state);
     construct1.TransSolBeamCoef(1) = 0.9;
     state->dataSurface->SurfWinTanProfileAngVert(1) = 10.0;
     state->dataSurface->SurfWinTanProfileAngVert(2) = 10.0;
