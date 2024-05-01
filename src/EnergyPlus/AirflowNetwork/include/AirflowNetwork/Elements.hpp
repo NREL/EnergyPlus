@@ -1084,19 +1084,19 @@ namespace AirflowNetwork {
     struct ConstantVolumeFan : public AirflowElement // Constant volume fan component
     {
         // Members
-        Real64 FlowRate;                  // Air volume flow rate
-        Real64 Ctrl;                      // Control ratio
-        DataHVACGlobals::FanType fanType; // Fan type: Constant volume or ONOFF
-        int FanIndex;                     // Fan index
-        int InletNode;                    // Inlet node number
-        int OutletNode;                   // Outlet node number
-        Real64 MaxAirMassFlowRate;        // Max Specified MAss Flow Rate of Damper [kg/s]
-        int AirLoopNum;                   // Air loop number
-        bool FanModelFlag;                // True, this fan is FAN:SYSTEMMODEL
+        Real64 FlowRate;           // Air volume flow rate
+        Real64 Ctrl;               // Control ratio
+        HVAC::FanType fanType;     // Fan type: Constant volume or ONOFF
+        int FanIndex;              // Fan index
+        int InletNode;             // Inlet node number
+        int OutletNode;            // Outlet node number
+        Real64 MaxAirMassFlowRate; // Max Specified MAss Flow Rate of Damper [kg/s]
+        int AirLoopNum;            // Air loop number
+        bool FanModelFlag;         // True, this fan is FAN:SYSTEMMODEL
 
         // Default Constructor
         ConstantVolumeFan()
-            : FlowRate(0.0), Ctrl(0.0), fanType(DataHVACGlobals::FanType::Invalid), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0),
+            : FlowRate(0.0), Ctrl(0.0), fanType(HVAC::FanType::Invalid), FanIndex(0), InletNode(0), OutletNode(0), MaxAirMassFlowRate(0.0),
               AirLoopNum(0), FanModelFlag(false)
         {
         }

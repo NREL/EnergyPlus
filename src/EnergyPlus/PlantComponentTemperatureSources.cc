@@ -281,7 +281,7 @@ namespace PlantComponentTemperatureSources {
         int PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate; //* WaterSource(SourceNum)%SizFac
                 if (!this->DesVolFlowRateWasAutoSized) tmpVolFlowRate = this->DesVolFlowRate;
             } else {

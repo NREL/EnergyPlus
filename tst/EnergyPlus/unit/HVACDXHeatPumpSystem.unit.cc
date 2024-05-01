@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
     state->dataDXCoils->DXCoilNumericFields.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode.allocate(1);
     state->dataDXCoils->DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(4);
-    state->dataDXCoils->DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_HeatingEmpirical;
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
 
     // manually add a curve
     state->dataCurveManager->allocateCurveVector(1);

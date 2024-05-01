@@ -102,8 +102,8 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
 // Using/Aliasing
 using namespace DataPlant;
-using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
+using HVAC::SmallLoad;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
                                  PlantLocation const &plantLoc, // PlantLoop data structure Location struct

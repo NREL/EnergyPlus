@@ -313,7 +313,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     }
     thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
-    if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
+    if (fanOpMode == HVAC::CycFanCycCoil && speedNum == 1) {
         if (PLR > 0.0) {
             thisspeed.AirMassFlow = thisspeed.AirMassFlow / PLR;
         } else {
@@ -359,7 +359,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlus::EnergyPlu
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
 
-    if (fanOpMode == DataHVACGlobals::ContFanCycCoil) {
+    if (fanOpMode == HVAC::ContFanCycCoil) {
         outletNode.HumRat = outletNode.HumRat * plr1 + (1.0 - plr1) * inletNode.HumRat;
         outletNode.Enthalpy = outletNode.Enthalpy * plr1 + (1.0 - plr1) * inletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);

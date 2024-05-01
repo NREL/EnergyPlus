@@ -77,7 +77,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
@@ -126,7 +125,7 @@ protected:
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
 
         state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+        state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
@@ -1451,7 +1450,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     int ControlledZoneNum = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP = -0.0002;
-    state->dataHeatBalFanSys->TempControlType(ControlledZoneNum) = DataHVACGlobals::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(ControlledZoneNum) = HVAC::ThermostatType::SingleCooling;
 
     state->dataLoopNodes->Node(1).Temp = 30;
     state->dataLoopNodes->Node(1).HumRat = 0.012;

@@ -164,7 +164,6 @@
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDuct.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>

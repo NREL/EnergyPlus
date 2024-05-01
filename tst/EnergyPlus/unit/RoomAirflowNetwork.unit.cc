@@ -82,7 +82,6 @@ using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace RoomAir;
 using namespace DataMoistureBalanceEMPD;
 using namespace DataSurfaces;

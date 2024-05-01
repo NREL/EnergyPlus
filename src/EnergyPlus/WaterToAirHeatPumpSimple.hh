@@ -140,7 +140,7 @@ namespace WaterToAirHeatPumpSimple {
         PlantLocation plantLoc;
         int WaterCyclingMode = 0; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
-        int LastOperatingMode = DataHVACGlobals::WaterCycling; // type of coil calling for water flow, either heating or cooling,
+        int LastOperatingMode = HVAC::WaterCycling; // type of coil calling for water flow, either heating or cooling,
         // start it at 1 so there will be water flow from the start,
         // even if there is no load.
         // Gets updated only during the first iteration of each timestep
@@ -165,7 +165,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 const SensLoad,     // Sensible demand load [W]
                                Real64 const LatentLoad,   // Latent demand load [W]
                                int const CyclingScheme,   // Continuous fan OR cycling compressor
-                               DataHVACGlobals::CompressorOperation CompressorOp,
+                               HVAC::CompressorOperation CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Real64 const OnOffAirFlowRat = 1.0 // ratio of comp on to comp off air flow rate
@@ -191,22 +191,22 @@ namespace WaterToAirHeatPumpSimple {
     void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum);
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,                                   // Heat Pump Number
-                             int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
-                             Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
-                             Real64 const LatentDemand,                         // Cooling Latent Demand [W]
-                             DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
-                             Real64 const PartLoadRatio,                        // compressor part load ratio
-                             Real64 const OnOffAirFlowRatio                     // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                        // Heat Pump Number
+                             int const CyclingScheme,                // Fan/Compressor cycling scheme indicator
+                             Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
+                             Real64 const LatentDemand,              // Cooling Latent Demand [W]
+                             HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,             // compressor part load ratio
+                             Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     );
 
     void CalcHPHeatingSimple(EnergyPlusData &state,
-                             int const HPNum,                                   // Heat Pump Number
-                             int const CyclingScheme,                           // Fan/Compressor cycling scheme indicator
-                             Real64 const SensDemand,                           // Cooling Sensible Demand [W] !unused1208
-                             DataHVACGlobals::CompressorOperation CompressorOp, // compressor operation flag
-                             Real64 const PartLoadRatio,                        // compressor part load ratio
-                             Real64 const OnOffAirFlowRatio                     // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                        // Heat Pump Number
+                             int const CyclingScheme,                // Fan/Compressor cycling scheme indicator
+                             Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
+                             HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                             Real64 const PartLoadRatio,             // compressor part load ratio
+                             Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     );
 
     void UpdateSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum);
