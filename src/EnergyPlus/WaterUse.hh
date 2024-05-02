@@ -243,6 +243,8 @@ namespace WaterUse {
 
     void CalcWaterUseZoneGains(EnergyPlusData &state);
 
+    Real64 calcH2ODensity(EnergyPlusData &state);
+
 } // namespace WaterUse
 
 struct WaterUseData : BaseGlobalStruct
@@ -251,7 +253,9 @@ struct WaterUseData : BaseGlobalStruct
     int numWaterEquipment = 0;
     int numWaterConnections = 0;
     bool getWaterUseInputFlag = true;
+    bool calcRhoH2O = true;
     bool MyEnvrnFlagLocal = true;
+    Real64 rhoH2OStd;
     Array1D_bool CheckEquipName;
     EPVector<WaterUse::WaterEquipmentType> WaterEquipment;
     EPVector<WaterUse::WaterConnectionsType> WaterConnections;

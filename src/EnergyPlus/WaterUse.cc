@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -571,15 +572,15 @@ namespace WaterUse {
                 for (int WaterEquipNum = 1; WaterEquipNum <= waterConnection.NumWaterEquipment; ++WaterEquipNum) {
                     auto &thisWEq = state.dataWaterUse->WaterEquipment(waterConnection.myWaterEquipArr(WaterEquipNum));
                     if (thisWEq.Zone > 0) {
-                        waterConnection.PeakMassFlowRate += thisWEq.PeakVolFlowRate * Psychrometrics::RhoH2O(Constant::InitConvTemp) *
+                        waterConnection.PeakMassFlowRate += thisWEq.PeakVolFlowRate * calcH2ODensity(state) *
                                                             state.dataHeatBal->Zone(thisWEq.Zone).Multiplier *
                                                             state.dataHeatBal->Zone(thisWEq.Zone).ListMultiplier;
                     } else { // can't have multipliers
-                        waterConnection.PeakMassFlowRate += thisWEq.PeakVolFlowRate * Psychrometrics::RhoH2O(Constant::InitConvTemp);
+                        waterConnection.PeakMassFlowRate += thisWEq.PeakVolFlowRate * calcH2ODensity(state);
                     }
                 }
                 PlantUtilities::RegisterPlantCompDesignFlow(
-                    state, waterConnection.InletNode, waterConnection.PeakMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp));
+                    state, waterConnection.InletNode, waterConnection.PeakMassFlowRate / calcH2ODensity(state));
             }
         }
         // need a good place to set a bool to calculate WaterUse hot and cold flow rates in CalcEquipmentFlowRates
@@ -1068,7 +1069,7 @@ namespace WaterUse {
             }
         }
 
-        this->TotalMassFlowRate = this->TotalVolFlowRate * Psychrometrics::RhoH2O(Constant::InitConvTemp);
+        this->TotalMassFlowRate = this->TotalVolFlowRate * calcH2ODensity(state);
 
         // Calculate hot and cold water mixing at the tap
         if (this->TotalMassFlowRate > 0.0 && this->allowHotControl) {
@@ -1399,14 +1400,14 @@ namespace WaterUse {
 
         if (this->SupplyTankNum > 0) {
             // Set the demand request for supply water from water storage tank
-            this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
+            this->ColdVolFlowRate = this->ColdMassFlowRate / calcH2ODensity(state);
             state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotRequestDemand(this->TankDemandID) = this->ColdVolFlowRate;
 
             // Check if cold flow rate should be starved by restricted flow from tank
             // Currently, the tank flow is not really starved--water continues to flow at the tank water temperature
             // But the user can see the error by comparing report variables for TankVolFlowRate < ColdVolFlowRate
             this->TankVolFlowRate = state.dataWaterData->WaterStorage(this->SupplyTankNum).VdotAvailDemand(this->TankDemandID);
-            this->TankMassFlowRate = this->TankVolFlowRate * Psychrometrics::RhoH2O(Constant::InitConvTemp);
+            this->TankMassFlowRate = this->TankVolFlowRate * calcH2ODensity(state);
         }
     }
 
@@ -1435,7 +1436,7 @@ namespace WaterUse {
             this->DrainTemp = this->HotTemp;
         }
 
-        this->DrainVolFlowRate = this->DrainMassFlowRate * Psychrometrics::RhoH2O(Constant::InitConvTemp);
+        this->DrainVolFlowRate = this->DrainMassFlowRate * calcH2ODensity(state);
     }
 
     void WaterConnectionsType::CalcConnectionsHeatRecovery(EnergyPlusData &state)
@@ -1568,8 +1569,8 @@ namespace WaterUse {
 
         for (int WaterEquipNum = 1; WaterEquipNum <= state.dataWaterUse->numWaterEquipment; ++WaterEquipNum) {
             auto &thisWEq = state.dataWaterUse->WaterEquipment(WaterEquipNum);
-            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
-            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
+            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / calcH2ODensity(state);
+            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / calcH2ODensity(state);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
 
             thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
@@ -1602,8 +1603,8 @@ namespace WaterUse {
 
             auto &thisWEq = state.dataWaterUse->WaterEquipment(this->myWaterEquipArr(Loop));
 
-            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
-            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
+            thisWEq.ColdVolFlowRate = thisWEq.ColdMassFlowRate / calcH2ODensity(state);
+            thisWEq.HotVolFlowRate = thisWEq.HotMassFlowRate / calcH2ODensity(state);
             thisWEq.TotalVolFlowRate = thisWEq.ColdVolFlowRate + thisWEq.HotVolFlowRate;
             thisWEq.ColdVolume = thisWEq.ColdVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
             thisWEq.HotVolume = thisWEq.HotVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
@@ -1619,8 +1620,8 @@ namespace WaterUse {
             thisWEq.Energy = thisWEq.Power * state.dataHVACGlobal->TimeStepSysSec;
         }
 
-        this->ColdVolFlowRate = this->ColdMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
-        this->HotVolFlowRate = this->HotMassFlowRate / Psychrometrics::RhoH2O(Constant::InitConvTemp);
+        this->ColdVolFlowRate = this->ColdMassFlowRate / calcH2ODensity(state);
+        this->HotVolFlowRate = this->HotMassFlowRate / calcH2ODensity(state);
         this->TotalVolFlowRate = this->ColdVolFlowRate + this->HotVolFlowRate;
         this->ColdVolume = this->ColdVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
         this->HotVolume = this->HotVolFlowRate * state.dataHVACGlobal->TimeStepSysSec;
@@ -1694,5 +1695,18 @@ namespace WaterUse {
                 (state.dataHeatBal->Zone(ZoneNum).Multiplier * state.dataHeatBal->Zone(ZoneNum).ListMultiplier);
         }
     }
+
+    Real64 calcH2ODensity(EnergyPlusData &state)
+    {
+        static constexpr std::string_view RoutineName{"calcH2ODensity"};
+
+        if (state.dataWaterUse->calcRhoH2O) {
+            int DummyValue = 1;
+            state.dataWaterUse->rhoH2OStd = FluidProperties::GetDensityGlycol(state, "WATER", Constant::InitConvTemp, DummyValue, RoutineName);
+            state.dataWaterUse->calcRhoH2O = false;
+        }
+        return state.dataWaterUse->rhoH2OStd;
+    }
+
 } // namespace WaterUse
 } // namespace EnergyPlus
