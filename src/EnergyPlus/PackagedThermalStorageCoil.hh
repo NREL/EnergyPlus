@@ -65,9 +65,6 @@ namespace EnergyPlus {
 
 namespace PackagedThermalStorageCoil {
 
-    // Using/Aliasing
-    using namespace DataHVACGlobals;
-
     // control types
     enum class PTSCCtrlType
     {

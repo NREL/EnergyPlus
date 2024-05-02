@@ -1006,7 +1006,7 @@ namespace DataPlant {
                                 if (CompIndex > 0) {
                                     auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
-                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                        if (branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
                                         } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
                                             ThisBranchFlowRequestNeedIfOn = max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax);
@@ -1023,7 +1023,7 @@ namespace DataPlant {
                                 if (CompIndex > 0) {
                                     auto const &this_pump(state.dataPumps->PumpEquip(CompIndex));
                                     if (ParallelBranchIndex >= 1) { // branch pump
-                                        if (branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                                        if (branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                             ThisBranchFlowRequestNeedIfOn =
                                                 max(ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank);
                                         } else if (loop.CommonPipeType != DataPlant::CommonPipeType::No) { // common pipe and constant branch pumps
@@ -1126,7 +1126,7 @@ namespace DataPlant {
                         if (BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide) ++ParallelBranchIndex;
                         if (loop_branch.HasConstantSpeedBranchPump) {
                             Real64 const branch_mass_flow(loop_branch.ConstantSpeedBranchMassFlow);
-                            if (loop_branch.max_abs_Comp_MyLoad() > DataHVACGlobals::SmallLoad) {
+                            if (loop_branch.max_abs_Comp_MyLoad() > HVAC::SmallLoad) {
                                 LoadedConstantSpeedBranchFlowRateSteps_sum += branch_mass_flow;
                             } else {
                                 this_loop_side.noLoadConstantSpeedBranchFlowRateSteps(ParallelBranchIndex) = branch_mass_flow;

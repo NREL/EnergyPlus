@@ -60,7 +60,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
@@ -110,12 +109,12 @@ namespace FanCoilUnits {
         // Members
         // Input data
         int UnitType_Num = 0;
-        std::string Sched;       // availability schedule
-        int SchedPtr = 0;        // index to schedule
-        std::string SchedOutAir; // outside air schedule, multipliy maximum outdoor air flow rate
-        int SchedOutAirPtr = 0;  // index to outside air schedule
-        int FanType_Num = 0;     // index to fan type
-        int SpeedFanSel = 0;     // Speed fan selected
+        std::string Sched;                              // availability schedule
+        int SchedPtr = 0;                               // index to schedule
+        std::string SchedOutAir;                        // outside air schedule, multipliy maximum outdoor air flow rate
+        int SchedOutAirPtr = 0;                         // index to outside air schedule
+        HVAC::FanType fanType = HVAC::FanType::Invalid; // index to fan type
+        int SpeedFanSel = 0;                            // Speed fan selected
         CCM CapCtrlMeth_Num = CCM::Invalid;
         Real64 PLR = 0.0;             // Part Load Ratio, fraction of time step fancoil is on
         int MaxIterIndexH = 0;        // Maximum iterations exceeded for heating
@@ -139,7 +138,6 @@ namespace FanCoilUnits {
         std::string OAMixType;        // type of outside air mixer
         int OAMixIndex = 0;
         std::string FanName;     // name of fan
-        std::string FanType;     // type of fan
         int FanIndex = 0;        // index for fan
         std::string CCoilName;   // name of cooling coil
         int CCoilName_Index = 0; // Index for this Cooling Coil in SimWaterComp

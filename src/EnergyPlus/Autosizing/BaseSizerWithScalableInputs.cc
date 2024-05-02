@@ -50,7 +50,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <string>
 
 namespace EnergyPlus {
@@ -97,36 +96,19 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     // set supply air fan properties
     if (this->isCoilReportObject && this->curSysNum > 0 && int(this->primaryAirSystem.size()) > 0 &&
         this->curSysNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
-        int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
+
         // int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
-        switch (this->primaryAirSystem(this->curSysNum).supFanModelType) {
-        case DataAirSystems::StructArrayLegacyFanModels: {
-            if (SupFanNum > 0) {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                         this->compName,
-                                                                                         this->compType,
-                                                                                         state.dataFans->Fan(SupFanNum).FanName,
-                                                                                         DataAirSystems::StructArrayLegacyFanModels,
-                                                                                         this->primaryAirSystem(this->curSysNum).SupFanNum);
-            }
-            break;
+
+        // This should work for both fan types
+        if (this->primaryAirSystem(this->curSysNum).supFanNum > 0) {
+            state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
+                state,
+                this->compName,
+                this->compType,
+                state.dataFans->fans(this->primaryAirSystem(this->curSysNum).supFanNum)->Name,
+                state.dataFans->fans(this->primaryAirSystem(this->curSysNum).supFanNum)->type,
+                this->primaryAirSystem(this->curSysNum).supFanNum);
         }
-        case DataAirSystems::ObjectVectorOOFanSystemModel: {
-            if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
-                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(
-                    state,
-                    this->compName,
-                    this->compType,
-                    state.dataHVACFan->fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
-                    DataAirSystems::ObjectVectorOOFanSystemModel,
-                    this->primaryAirSystem(this->curSysNum).supFanVecIndex);
-            }
-            break;
-        }
-        default:
-            // do nothing
-            break;
-        } // end switch
     }
 
     if (this->curZoneEqNum) {

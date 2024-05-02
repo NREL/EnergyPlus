@@ -445,8 +445,8 @@ namespace HVACSingleDuctInduc {
                                 "Zone Air Terminal Outdoor Air Volume Flow Rate",
                                 Constant::Units::m3_s,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).OutdoorAirFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).Name);
         }
 
@@ -760,7 +760,7 @@ namespace HVACSingleDuctInduc {
                 } else {
                     MaxTotAirVolFlowDes = 0.0;
                 }
-                if (MaxTotAirVolFlowDes < DataHVACGlobals::SmallAirVolFlow) {
+                if (MaxTotAirVolFlowDes < HVAC::SmallAirVolFlow) {
                     MaxTotAirVolFlowDes = 0.0;
                 }
                 if (IsAutoSize) {
@@ -831,7 +831,7 @@ namespace HVACSingleDuctInduc {
                         if (PltSizHeatNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatMassFlow >=
-                                DataHVACGlobals::SmallAirVolFlow) {
+                                HVAC::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
                                 CpAir = Psychrometrics::PsyCpAirFnW(
@@ -966,7 +966,7 @@ namespace HVACSingleDuctInduc {
                         if (PltSizCoolNum > 0) {
 
                             if (state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesCoolMassFlow >=
-                                DataHVACGlobals::SmallAirVolFlow) {
+                                HVAC::SmallAirVolFlow) {
                                 DesPriVolFlow = state.dataHVACSingleDuctInduc->IndUnit(IUNum).MaxTotAirVolFlow /
                                                 (1.0 + state.dataHVACSingleDuctInduc->IndUnit(IUNum).InducRatio);
                                 CpAir = Psychrometrics::PsyCpAirFnW(
@@ -1151,7 +1151,7 @@ namespace HVACSingleDuctInduc {
             state, MinColdWaterFlow, ColdControlNode, CWOutletNode, state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc);
 
         if (ScheduleManager::GetCurrentScheduleValue(state, state.dataHVACSingleDuctInduc->IndUnit(IUNum).SchedPtr) <= 0.0) UnitOn = false;
-        if (PriAirMassFlow <= DataHVACGlobals::SmallMassFlow) UnitOn = false;
+        if (PriAirMassFlow <= HVAC::SmallMassFlow) UnitOn = false;
 
         // Set the unit's air inlet nodes mass flow rates
         state.dataLoopNodes->Node(PriNode).MassFlowRate = PriAirMassFlow;
@@ -1164,11 +1164,11 @@ namespace HVACSingleDuctInduc {
         if (UnitOn) {
 
             int SolFlag = 0;
-            if (QToHeatSetPt - QPriOnly > DataHVACGlobals::SmallLoad) {
+            if (QToHeatSetPt - QPriOnly > HVAC::SmallLoad) {
                 // heating coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
-                if (PowerMet > QToHeatSetPt + DataHVACGlobals::SmallLoad) {
+                if (PowerMet > QToHeatSetPt + HVAC::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HotControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinColdWaterFlow, QToHeatSetPt, QPriOnly, PowerMet](Real64 const HWFlow) {
@@ -1216,11 +1216,11 @@ namespace HVACSingleDuctInduc {
                                                        "[kg/s]");
                     }
                 }
-            } else if (QToCoolSetPt - QPriOnly < -DataHVACGlobals::SmallLoad) {
+            } else if (QToCoolSetPt - QPriOnly < -HVAC::SmallLoad) {
                 // cooling coil
                 // check that it can meet the load
                 CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
-                if (PowerMet < QToCoolSetPt - DataHVACGlobals::SmallLoad) {
+                if (PowerMet < QToCoolSetPt - HVAC::SmallLoad) {
                     ErrTolerance = state.dataHVACSingleDuctInduc->IndUnit(IUNum).ColdControlOffset;
                     auto f = // (AUTO_OK_LAMBDA)
                         [&state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, QToCoolSetPt, QPriOnly, PowerMet](Real64 const CWFlow) {
