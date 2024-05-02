@@ -2023,6 +2023,39 @@ namespace UnitHeater {
         }
     }
 
+    int GetUnitHeaterAirOutletNode(EnergyPlusData &state, int UnitHeaterNum)
+    {
+        // Return value
+        int GetUnitHeaterAirOutletNode = 0;
+
+        if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
+            GetUnitHeaterInput(state);
+            state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
+        }
+
+        if (UnitHeaterNum > 0 && UnitHeaterNum <= state.dataUnitHeaters->NumOfUnitHeats) {
+            GetUnitHeaterAirOutletNode = state.dataUnitHeaters->UnitHeat(UnitHeaterNum).AirOutNode;
+        }
+
+        return GetUnitHeaterAirOutletNode;
+    }
+
+    int GetUnitHeaterAirInletNode(EnergyPlusData &state, int UnitHeaterNum)
+    {
+        int GetUnitHeaterAirInletNode = 0;
+
+        if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
+            GetUnitHeaterInput(state);
+            state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
+        }
+
+        if (UnitHeaterNum > 0 && UnitHeaterNum <= state.dataUnitHeaters->NumOfUnitHeats) {
+            GetUnitHeaterAirInletNode = state.dataUnitHeaters->UnitHeat(UnitHeaterNum).AirInNode;
+        }
+
+        return GetUnitHeaterAirInletNode;
+    }
+
 } // namespace UnitHeater
 
 } // namespace EnergyPlus

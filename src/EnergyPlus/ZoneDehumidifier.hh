@@ -153,6 +153,10 @@ namespace ZoneDehumidifier {
 
     bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, int NodeNumber); // Node being tested
 
+    int GetZoneDehumidifierAirOutletNodeNum(EnergyPlusData &state, int ZoneDehumidNum);
+
+    int GetZoneDehumidifierAirInletNodeNum(EnergyPlusData &state, int ZoneDehumidNum);
+
 } // namespace ZoneDehumidifier
 
 struct ZoneDehumidifierData : BaseGlobalStruct

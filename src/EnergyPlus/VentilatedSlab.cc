@@ -4761,6 +4761,37 @@ namespace VentilatedSlab {
         }
     }
 
+    int GetVentilatedSlabReturnAirNode(EnergyPlusData &state, int const VentSlabNum)
+    {
+        int ReturnAirNode = 0;
+        if (state.dataVentilatedSlab->GetInputFlag) {
+            GetVentilatedSlabInput(state);
+            state.dataVentilatedSlab->GetInputFlag = false;
+        }
+
+        if (VentSlabNum > 0 && VentSlabNum <= state.dataVentilatedSlab->NumOfVentSlabs) {
+            ReturnAirNode = state.dataVentilatedSlab->VentSlab(VentSlabNum).ReturnAirNode;
+        }
+
+        return ReturnAirNode;
+    }
+
+    int GetVentilatedSlabZoneAirInNode(EnergyPlusData &state, int const VentSlabNum)
+    {
+        int ZoneAirInNode = 0;
+
+        if (state.dataVentilatedSlab->GetInputFlag) {
+            GetVentilatedSlabInput(state);
+            state.dataVentilatedSlab->GetInputFlag = false;
+        }
+
+        if (VentSlabNum > 0 && VentSlabNum <= state.dataVentilatedSlab->NumOfVentSlabs) {
+            ZoneAirInNode = state.dataVentilatedSlab->VentSlab(VentSlabNum).ZoneAirInNode;
+        }
+
+        return ZoneAirInNode;
+    }
+
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

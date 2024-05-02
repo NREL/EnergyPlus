@@ -989,6 +989,10 @@ namespace WaterThermalTanks {
 
     bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int NodeNumber);
 
+    int GetHeatPumpWaterHeaterAirInletNodeNum(EnergyPlusData &state, int HPNum);
+
+    int GetHeatPumpWaterHeaterAirOutletNodeNum(EnergyPlusData &state, int HPNum);
+
 } // namespace WaterThermalTanks
 
 struct WaterThermalTanksData : BaseGlobalStruct

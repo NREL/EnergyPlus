@@ -383,6 +383,10 @@ namespace VentilatedSlab {
 
     void ReportVentilatedSlab(EnergyPlusData &state, int const Item); // Index for the ventilated slab under consideration within the derived types
 
+    int GetVentilatedSlabReturnAirNode(EnergyPlusData &state, int const VentSlabNum);
+
+    int GetVentilatedSlabZoneAirInNode(EnergyPlusData &state, int const VentSlabNum);
+
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

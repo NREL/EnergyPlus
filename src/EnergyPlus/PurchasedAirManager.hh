@@ -379,6 +379,8 @@ namespace PurchasedAirManager {
 
     int GetPurchasedAirReturnAirNode(EnergyPlusData &state, int PurchAirNum);
 
+    int GetPurchasedAirZoneExhaustAirNode(EnergyPlusData &state, int PurchAirNum);
+
     Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);

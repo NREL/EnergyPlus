@@ -1181,6 +1181,36 @@ namespace ZoneDehumidifier {
         return FindZoneDehumidifierNodeNumber;
     }
 
+    int GetZoneDehumidifierAirOutletNodeNum(EnergyPlusData &state, int ZoneDehumidNum)
+    {
+        int ZoneDehumidifierAirOutletNodeNum = 0;
+        if (state.dataZoneDehumidifier->GetInputFlag) {
+            GetZoneDehumidifierInput(state);
+            state.dataZoneDehumidifier->GetInputFlag = false;
+        }
+
+        if (ZoneDehumidNum > 0 && ZoneDehumidNum <= (int)state.dataZoneDehumidifier->ZoneDehumid.size()) {
+            ZoneDehumidifierAirOutletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).AirOutletNodeNum;
+        }
+
+        return ZoneDehumidifierAirOutletNodeNum;
+    }
+
+    int GetZoneDehumidifierAirInletNodeNum(EnergyPlusData &state, int ZoneDehumidNum)
+    {
+        int ZoneDehumidifierAirInletNodeNum = 0;
+        if (state.dataZoneDehumidifier->GetInputFlag) {
+            GetZoneDehumidifierInput(state);
+            state.dataZoneDehumidifier->GetInputFlag = false;
+        }
+
+        if (ZoneDehumidNum > 0 && ZoneDehumidNum <= (int)state.dataZoneDehumidifier->ZoneDehumid.size()) {
+            ZoneDehumidifierAirInletNodeNum = state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidNum).AirInletNodeNum;
+        }
+
+        return ZoneDehumidifierAirInletNodeNum;
+    }
+
 } // namespace ZoneDehumidifier
 
 } // namespace EnergyPlus

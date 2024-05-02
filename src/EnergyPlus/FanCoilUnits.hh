@@ -322,6 +322,8 @@ namespace FanCoilUnits {
 
     int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int FanCoilNum);
 
+    int GetFanCoilAirInNode(EnergyPlusData &state, int FanCoilNum);
+
     int GetFanCoilOutAirNode(EnergyPlusData &state, int FanCoilNum);
 
     int GetFanCoilReturnAirNode(EnergyPlusData &state, int FanCoilNum);
