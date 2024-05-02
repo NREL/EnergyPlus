@@ -119,7 +119,7 @@ namespace HVACMultiSpeedHeatPump {
         Real64 FanVolFlow;                  // Supply fan volumetric flow rate
         std::string FanSchedule;            // Supply air fan operating mode schedule name
         int FanSchedPtr;                    // Pointer to the Supply air fan operating mode schedule
-        int OpMode;                         // mode of operation; 1=cycling fan, cycling compressor; 2=continuous fan, cycling compresor
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation; 1=cycling fan, cycling compressor; 2=continuous fan, cycling compresor
         std::string DXHeatCoilName;         // COIL:DX:MultiSpeed:Heating name
         int HeatCoilType;                   // Heating coil type: 1 COIL:DX:MultiSpeed:Heating only
         int HeatCoilNum;                    // Heating coil number
@@ -225,7 +225,7 @@ namespace HVACMultiSpeedHeatPump {
         MSHeatPumpData()
             : AvaiSchedPtr(0), AirInletNodeNum(0), AirOutletNodeNum(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0), ZoneSequenceHeatingNum(0),
               NodeNumOfControlledZone(0), FlowFraction(0.0), fanType(HVAC::FanType::Invalid), FanNum(0), fanPlace(HVAC::FanPlace::Invalid),
-              FanInletNode(0), FanOutletNode(0), FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0),
+              FanInletNode(0), FanOutletNode(0), FanVolFlow(0.0), FanSchedPtr(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0),
               HeatCoilIndex(0), CoolCoilType(0), DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0),
               SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0), AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false),
               HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRPlantLoc{},
@@ -307,7 +307,7 @@ namespace HVACMultiSpeedHeatPump {
                            int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                            bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
                            HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                           int const OpMode,                       // operating mode: CycFanCycCoil | ContFanCycCoil
+                           HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                            Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                            int const ZoneNum,                      // Index to zone number
                            int &SpeedNum,                          // Speed number
@@ -321,7 +321,7 @@ namespace HVACMultiSpeedHeatPump {
                               int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                               bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
                               HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                              int const OpMode,                       // operating mode: CycFanCycCoil | ContFanCycCoil
+                              HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                               Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                               int const FullOutput,                   // unit full output when compressor is operating [W]vvvv
                               int const SpeedNum,                     // Speed number
@@ -336,7 +336,7 @@ namespace HVACMultiSpeedHeatPump {
                               int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                               bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
                               HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
-                              int const OpMode,                       // operating mode: CycFanCycCoil | ContFanCycCoil
+                              HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                               Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                               Real64 const SpeedVal,                  // continuous speed value
                               int &SpeedNum,                          // discrete speed level
@@ -381,7 +381,7 @@ namespace HVACMultiSpeedHeatPump {
                                int const MSHeatPumpNum,       // multispeed heatpump index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
-                               int const FanMode,             // fan operation mode
+                               HVAC::FanOp const fanOp,       // fan operation mode
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
                                ObjexxFCL::Optional<Real64 const> PartLoadFrac = _);
 

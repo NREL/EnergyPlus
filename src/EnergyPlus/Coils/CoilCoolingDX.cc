@@ -658,7 +658,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                              Real64 PLR,
                              int speedNum,
                              Real64 speedRatio,
-                             int const fanOpMode,
+                             HVAC::FanOp const fanOp,
                              bool const singleMode,
                              Real64 LoadSHR)
 {
@@ -696,7 +696,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                PLR,
                                speedNum,
                                speedRatio,
-                               fanOpMode,
+                               fanOp,
                                condInletNode,
                                condOutletNode,
                                singleMode,
@@ -837,7 +837,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
-            int dummyFanOpMode = 1.0;
+            HVAC::FanOp dummyFanOp = HVAC::FanOp::Cycling;
             bool dummySingleMode = false;
 
             Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
@@ -879,7 +879,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                        dummyPLR,
                                        dummySpeedNum,
                                        dummySpeedRatio,
-                                       dummyFanOpMode,
+                                       dummyFanOp,
                                        dummyCondInlet,
                                        dummyCondOutlet,
                                        dummySingleMode);

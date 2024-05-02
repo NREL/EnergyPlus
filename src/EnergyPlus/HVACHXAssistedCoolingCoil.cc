@@ -99,7 +99,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,                   // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
-                                  int const FanOpMode,                         // Allows the parent object to control fan operation
+                                  HVAC::FanOp const fanOp,                         // Allows the parent object to control fan operation
                                   ObjexxFCL::Optional_bool_const HXUnitEnable, // flag to enable heat exchanger heat recovery
                                   ObjexxFCL::Optional<Real64 const> OnOffAFR,  // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                                   ObjexxFCL::Optional_bool_const EconomizerFlag,      // OA sys or air loop economizer status
@@ -185,14 +185,14 @@ namespace HVACHXAssistedCoolingCoil {
                                       CompressorOp,
                                       PartLoadRatio,
                                       HXUnitOn,
-                                      FanOpMode,
+                                      fanOp,
                                       AirFlowRatio,
                                       EconomizerFlag,
                                       DehumidificationMode,
                                       LoadSHR);
         } else {
             CalcHXAssistedCoolingCoil(
-                state, HXAssistedCoilNum, FirstHVACIteration, CompressorOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+                state, HXAssistedCoilNum, FirstHVACIteration, CompressorOp, PartLoadRatio, HXUnitOn, fanOp, AirFlowRatio, EconomizerFlag);
         }
 
         // Update the current HXAssistedCoil output
@@ -876,7 +876,7 @@ namespace HVACHXAssistedCoolingCoil {
                                    HVAC::CompressorOperation const CompressorOp,   // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,                     // Cooling coil part load ratio
                                    bool const HXUnitOn,                            // Flag to enable heat exchanger
-                                   int const FanOpMode,                            // Allows parent object to control fan operation
+                                   HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation
                                    ObjexxFCL::Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
                                    ObjexxFCL::Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
                                    ObjexxFCL::Optional_int_const DehumidificationMode,        // Optional dehumbidication mode
@@ -936,7 +936,7 @@ namespace HVACHXAssistedCoolingCoil {
                                           thisHXCoil.HeatExchangerName,
                                           FirstHVACIteration,
                                           thisHXCoil.HeatExchangerIndex,
-                                          FanOpMode,
+                                          fanOp,
                                           PartLoadRatio,
                                           HXUnitOn,
                                           CompanionCoilIndexNum,
@@ -985,7 +985,7 @@ namespace HVACHXAssistedCoolingCoil {
                     CoilPLR,       // PartLoadRatio,
                     mCoolingSpeedNum,
                     mCoolingSpeedRatio,
-                    FanOpMode,
+                    fanOp,
                     singleMode); //
 
             } else if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
@@ -994,7 +994,7 @@ namespace HVACHXAssistedCoolingCoil {
                                    CompressorOp,
                                    FirstHVACIteration,
                                    thisHXCoil.CoolingCoilIndex,
-                                   FanOpMode,
+                                   fanOp,
                                    PartLoadRatio,
                                    OnOffAirFlow);
             } else if (thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
@@ -1006,7 +1006,7 @@ namespace HVACHXAssistedCoolingCoil {
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           thisHXCoil.CoolingCoilName,
                                                           thisHXCoil.CoolingCoilIndex,
-                                                          FanOpMode,
+                                                          fanOp,
                                                           CompressorOn,
                                                           PartLoadRatio,
                                                           thisHXCoil.DXCoilNumOfSpeeds,

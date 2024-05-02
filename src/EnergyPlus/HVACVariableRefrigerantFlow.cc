@@ -3373,7 +3373,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowContinueError(state, "..." + cAlphaFieldNames(5) + " = " + cAlphaArgs(5) + " not found.");
                 ShowContinueError(state, "...Defaulting to constant fan operating mode and simulation continues.");
             }
-            thisVrfTU.OpMode = HVAC::ContFanCycCoil;
+            thisVrfTU.fanOp = HVAC::FanOp::Continuous;
         }
 
         thisVrfTU.fanPlace = static_cast<HVAC::FanPlace>(getEnumValue(HVAC::fanPlaceNamesUC, cAlphaArgs(6)));
@@ -6627,9 +6627,9 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr > 0) {
         if (GetCurrentScheduleValue(state, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr) == 0.0) {
-            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::CycFanCycCoil;
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Cycling;
         } else {
-            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::ContFanCycCoil;
+            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Continuous;
         }
     }
 
@@ -6943,7 +6943,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     // next check for overshoot when constant fan mode is used
     // check operating load to see if OA will overshoot setpoint temperature when constant fan mode is used
-    if ((state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::ContFanCycCoil || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists) &&
+    if ((state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Continuous || state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists) &&
         !state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isSetPointControlled) {
         SetCompFlowRate(state, VRFTUNum, VRFCond, true);
 
@@ -7218,7 +7218,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 state.dataHVACVarRefFlow->HeatingLoad(VRFCond) = true;
             }
         }
-    } // IF(VRFTU(VRFTUNum)%OpMode == HVAC::ContFanCycCoil)THEN
+    } // IF(VRFTU(VRFTUNum)%fanOp == HVAC::FanOp::Continuous)THEN
 
     if (state.dataHVACVarRefFlow->VRF(VRFCond).HeatRecoveryUsed) {
         if (OutsideDryBulbTemp < state.dataHVACVarRefFlow->VRF(VRFCond).MinOATHeatRecovery ||
@@ -7359,7 +7359,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         state.dataHVACVarRefFlow->OACompOffMassFlow = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
     }
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::CycFanCycCoil) {
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling) {
         state.dataHVACVarRefFlow->CompOffMassFlow = 0.0;
         state.dataHVACVarRefFlow->OACompOffMassFlow = 0.0;
         state.dataHVACVarRefFlow->CompOffFlowRatio = 0.0;
@@ -7483,7 +7483,7 @@ void SetCompFlowRate(EnergyPlusData &state, int const VRFTUNum, int const VRFCon
         }
     }
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::CycFanCycCoil) {
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling) {
         state.dataHVACVarRefFlow->CompOffMassFlow = 0.0;
         state.dataHVACVarRefFlow->OACompOffMassFlow = 0.0;
         state.dataHVACVarRefFlow->CompOffFlowRatio = 0.0;
@@ -9465,7 +9465,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     int VRFTUOutletNodeNum; // TU air outlet node
     int VRFTUInletNodeNum;  // TU air inlet node
     Real64 AirMassFlow;     // total supply air mass flow [m3/s]
-    int OpMode;             // fan operating mode, HVAC::CycFanCycCoil or HVAC::ContFanCycCoil
+    HVAC::FanOp fanOp;      // fan operating mode, HVAC::FanOp::Cycling or HVAC::FanOp::Continuous
     int VRFCond;            // index to VRF condenser
     Real64 SpecHumOut(0.0); // specific humidity ratio at outlet node
     Real64 SpecHumIn(0.0);  // specific humidity ratio at inlet node
@@ -9478,7 +9478,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     IndexToTUInTUList = this->IndexToTUInTUList;
     VRFTUOutletNodeNum = this->VRFTUOutletNodeNum;
     VRFTUInletNodeNum = this->VRFTUInletNodeNum;
-    OpMode = this->OpMode;
+    fanOp = this->fanOp;
     ZoneNode = this->ZoneAirNode;
 
     // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
@@ -9523,14 +9523,14 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       HVAC::CompressorOperation::On,
                       FirstHVACIteration,
                       this->CoolCoilIndex,
-                      OpMode,
+                      fanOp,
                       PartLoadRatio,
                       OnOffAirFlowRatio,
                       _,
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
-            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, OnOffAirFlowRatio);
+            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, fanOp, 0.0, OnOffAirFlowRatio);
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -9547,13 +9547,13 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
                       HVAC::CompressorOperation::Off,
                       FirstHVACIteration,
                       this->HeatCoilIndex,
-                      OpMode,
+                      fanOp,
                       PartLoadRatio,
                       OnOffAirFlowRatio,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
-            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, OnOffAirFlowRatio, _);
+            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, fanOp, 0.0, OnOffAirFlowRatio, _);
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -9921,7 +9921,7 @@ void SetAverageAirFlow(EnergyPlusData &state,
     OutsideAirNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum;
     AirRelNode = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerRelNodeNum;
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::CycFanCycCoil && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SpeedNum == 0) {
         Real64 partLoadRat = PartLoadRatio;
         if (partLoadRat == 0.0 && state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio > 0.0) {
             partLoadRat = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatPartLoadRatio;
@@ -10230,7 +10230,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 }
             } else if (state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::LoadPriority ||
                        state.dataHVACVarRefFlow->VRF(VRFCond).ThermostatPriority == ThermostatCtrlType::ZonePriority) {
-                if (state.dataHVACVarRefFlow->VRFTU(TUIndex).OpMode == HVAC::ContFanCycCoil) {
+                if (state.dataHVACVarRefFlow->VRFTU(TUIndex).fanOp == HVAC::FanOp::Continuous) {
                     SetCompFlowRate(state, TUIndex, VRFCond);
 
                     if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
@@ -10425,7 +10425,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
     case ThermostatCtrlType::MasterThermostatPriority: {
         ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZonePtr).RemainingOutputRequired /
                    state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).controlZoneMassFlowFrac;
-        if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).OpMode == HVAC::ContFanCycCoil) {
+        if (state.dataHVACVarRefFlow->VRFTU(state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex).fanOp == HVAC::FanOp::Continuous) {
             SetCompFlowRate(state, state.dataHVACVarRefFlow->VRF(VRFCond).MasterZoneTUIndex, VRFCond);
 
             if (state.dataHVACVarRefFlow->VRF(VRFCond).VRFAlgorithmType == AlgorithmType::FluidTCtrl) {
@@ -12719,7 +12719,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     int VRFTUOutletNodeNum; // TU air outlet node
     int VRFTUInletNodeNum;  // TU air inlet node
     Real64 AirMassFlow;     // total supply air mass flow [m3/s]
-    int OpMode;             // fan operating mode, HVAC::CycFanCycCoil or HVAC::ContFanCycCoil
+    HVAC::FanOp fanOp;      // fan operating mode, HVAC::FanOp::Cycling or HVAC::FanOp::Continuous
     int VRFCond;            // index to VRF condenser
     Real64 SpecHumOut;      // specific humidity ratio at outlet node
     Real64 SpecHumIn;       // specific humidity ratio at inlet node
@@ -12734,7 +12734,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     IndexToTUInTUList = this->IndexToTUInTUList;
     VRFTUOutletNodeNum = this->VRFTUOutletNodeNum;
     VRFTUInletNodeNum = this->VRFTUInletNodeNum;
-    OpMode = this->OpMode;
+    fanOp = this->fanOp;
     EvapTemp = state.dataHVACVarRefFlow->VRF(VRFCond).IUEvaporatingTemp;
     CondTemp = state.dataHVACVarRefFlow->VRF(VRFCond).IUCondensingTemp;
     ZoneNode = this->ZoneAirNode;
@@ -12790,14 +12790,14 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       HVAC::CompressorOperation::On,
                       FirstHVACIteration,
                       this->CoolCoilIndex,
-                      OpMode,
+                      fanOp,
                       PartLoadRatio,
                       _,
                       _,
                       state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond),
                       state.dataHVACVarRefFlow->VRF(this->VRFSysNum).VRFCondCyclingRatio);
         } else { // cooling coil is off
-            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->CoolCoilIndex, fanOp, 0.0, _);
         }
         state.dataHVACVarRefFlow->LoopDXCoolCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -12814,13 +12814,13 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       HVAC::CompressorOperation::On,
                       FirstHVACIteration,
                       this->HeatCoilIndex,
-                      OpMode,
+                      fanOp,
                       PartLoadRatio,
                       _,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
         } else {
-            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
+            SimDXCoil(state, "", HVAC::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, fanOp, 0.0, _);
         }
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = state.dataAirLoop->LoopDXCoilRTF;
     } else {
@@ -15245,7 +15245,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
     case HVAC::Coil_HeatingGasOrOtherFuel:
     case HVAC::Coil_HeatingElectric: {
         HeatingCoils::SimulateHeatingCoilComponents(
-            state, this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, QActual, true, this->OpMode, PartLoadRatio);
+            state, this->SuppHeatCoilName, FirstHVACIteration, SuppHeatCoilLoad, this->SuppHeatCoilIndex, QActual, true, this->fanOp, PartLoadRatio);
         SuppHeatCoilLoad = QActual;
     } break;
     case HVAC::Coil_HeatingWater: {
@@ -15255,7 +15255,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
             state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
             //     simulate hot water coil to find the full flow operating capacity
             WaterCoils::SimulateWaterCoilComponents(
-                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
+                state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->fanOp, PartLoadRatio);
             if (QActual > SuppHeatCoilLoad) {
                 auto f = [&state, VRFTUNum, FirstHVACIteration, SuppHeatCoilLoad](Real64 const PartLoadFrac) {
                     Real64 QActual = 0.0; // actual heating load delivered [W]
@@ -15266,7 +15266,7 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
                                                             FirstHVACIteration,
                                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilIndex,
                                                             QActual,
-                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode,
+                                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp,
                                                             PartLoadFrac);
                     if (std::abs(SuppHeatCoilLoad) == 0.0) {
                         return (QActual - SuppHeatCoilLoad) / 100.0;
@@ -15289,14 +15289,14 @@ void VRFTerminalUnitEquipment::CalcVRFSuppHeatingCoil(EnergyPlusData &state,
         }
         //     simulate water heating coil
         WaterCoils::SimulateWaterCoilComponents(
-            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->fanOp, this->SuppHeatPartLoadRatio);
     } break;
     case HVAC::Coil_HeatingSteam: {
         //     simulate steam heating coil
         Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
         state.dataLoopNodes->Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
         SteamCoils::SimulateSteamCoilComponents(
-            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
+            state, this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->fanOp, PartLoadRatio);
         SuppHeatCoilLoad = QActual;
     } break;
     default:
@@ -15340,7 +15340,7 @@ Real64 VRFTerminalUnitEquipment::HotWaterHeatingCoilResidual(EnergyPlusData &sta
                                             FirstHVACIteration,
                                             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).SuppHeatCoilIndex,
                                             QActual,
-                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode,
+                                            state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp,
                                             PartLoadFrac);
 
     if (std::abs(SuppHeatCoilLoad) == 0.0) {

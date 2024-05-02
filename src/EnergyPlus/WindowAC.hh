@@ -95,7 +95,7 @@ namespace WindowAC {
         int DXCoilIndex;       // Index to DX cooling coil
         int DXCoilNumOfSpeeds; // number of speed levels for variable speed DX coil
         int CoilOutletNodeNum; // Outlet node number of DX cooling coil
-        int OpMode;            // mode of operation; 1=cycling fan, cycling compressor,
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid;            // mode of operation; 1=cycling fan, cycling compressor,
         // 2=continuous fan, cycling compresor
         HVAC::FanPlace fanPlace; // fan placement; 1=blow through, 2=draw through
         int MaxIterIndex1;
@@ -126,7 +126,7 @@ namespace WindowAC {
         WindACData()
             : UnitType(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OutAirVolFlow(0.0),
               OutAirMassFlow(0.0), AirInNode(0), AirOutNode(0), OutsideAirNode(0), AirReliefNode(0), MixedAirNode(0), OAMixIndex(0),
-              fanType(HVAC::FanType::Invalid), FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0), OpMode(0),
+              fanType(HVAC::FanType::Invalid), FanIndex(0), DXCoilType_Num(0), DXCoilIndex(0), DXCoilNumOfSpeeds(0), CoilOutletNodeNum(0), 
               fanPlace(HVAC::FanPlace::Invalid), MaxIterIndex1(0), MaxIterIndex2(0), ConvergenceTol(0.0), PartLoadFrac(0.0),
               EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), TotCoolEnergyRate(0.0), TotCoolEnergy(0.0), SensCoolEnergyRate(0.0),
               SensCoolEnergy(0.0), LatCoolEnergyRate(0.0), LatCoolEnergy(0.0), ElecPower(0.0), ElecConsumption(0.0), FanPartLoadRatio(0.0),
@@ -182,7 +182,7 @@ namespace WindowAC {
     void CalcWindowACOutput(EnergyPlusData &state,
                             int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                            HVAC::FanOp const fanOp,              // operating mode: FanOp::Cycling | FanOp::Continuous
                             Real64 const PartLoadFrac,     // unit part load fraction
                             bool const HXUnitOn,           // Flag to toggle HX heat recovery as needed
                             Real64 &LoadMet                // load met by unit (watts)
@@ -191,7 +191,7 @@ namespace WindowAC {
     void ControlCycWindACOutput(EnergyPlusData &state,
                                 int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
+                                HVAC::FanOp const fanOp,              // operating mode: FanOp::Cycling | FanOp::Continuous
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
                                 Real64 &PartLoadFrac,          // unit part load fraction
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed

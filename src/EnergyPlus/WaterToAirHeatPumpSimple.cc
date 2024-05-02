@@ -114,7 +114,7 @@ namespace WaterToAirHeatPumpSimple {
                                int &CompIndex,            // Index for Component name
                                Real64 const SensLoad,     // Sensible demand load [W]
                                Real64 const LatentLoad,   // Latent demand load [W]
-                               int const CyclingScheme,   // Continuous fan OR cycling compressor
+                               HVAC::FanOp const fanOp,   // Continuous fan OR cycling compressor
                                HVAC::CompressorOperation const CompressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
@@ -180,13 +180,13 @@ namespace WaterToAirHeatPumpSimple {
 
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPCoolingSimple(state, HPNum, fanOp, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPHeatingSimple(state, HPNum, fanOp, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -978,7 +978,7 @@ namespace WaterToAirHeatPumpSimple {
                                 int const HPNum,                                 // Current HPNum under simulation
                                 Real64 const SensLoad,                           // Control zone sensible load[W]
                                 Real64 const LatentLoad,                         // Control zone latent load[W]
-                                [[maybe_unused]] int const CyclingScheme,        // fan operating mode
+                                [[maybe_unused]] HVAC::FanOp const fanOp,        // fan operating mode
                                 [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                 bool const FirstHVACIteration                    // Iteration flag
     )
@@ -2980,7 +2980,7 @@ namespace WaterToAirHeatPumpSimple {
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
                              int const HPNum,                                // Heat Pump Number
-                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
+                             HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
                              [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
                              HVAC::CompressorOperation const CompressorOp,   // compressor operation flag
@@ -3084,7 +3084,7 @@ namespace WaterToAirHeatPumpSimple {
         Twet_Rated = simpleWatertoAirHP.Twet_Rated;
         Gamma_Rated = simpleWatertoAirHP.Gamma_Rated;
 
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             LoadSideFullMassFlowRate = simpleWatertoAirHP.AirMassFlowRate;
         } else {
             // default to cycling fan, cycling compressor, full load air flow
@@ -3121,7 +3121,7 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWatertoAirHP.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
@@ -3203,7 +3203,7 @@ namespace WaterToAirHeatPumpSimple {
                     SHReff = CalcEffectiveSHR(state,
                                               HPNum,
                                               SHRss,
-                                              CyclingScheme,
+                                              fanOp,
                                               simpleWatertoAirHP.RunFrac,
                                               state.dataWaterToAirHeatPumpSimple->QLatRated,
                                               state.dataWaterToAirHeatPumpSimple->QLatActual,
@@ -3227,7 +3227,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat =
             Psychrometrics::PsyWFnTdbH(state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, LoadSideFullOutletEnthalpy, RoutineName);
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             simpleWatertoAirHP.OutletAirEnthalpy =
                 PartLoadRatio * LoadSideFullOutletEnthalpy + (1.0 - PartLoadRatio) * state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth;
@@ -3317,7 +3317,7 @@ namespace WaterToAirHeatPumpSimple {
 
     void CalcHPHeatingSimple(EnergyPlusData &state,
                              int const HPNum,                                // Heat Pump Number
-                             int const CyclingScheme,                        // Fan/Compressor cycling scheme indicator
+                             HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
                              HVAC::CompressorOperation const CompressorOp,   // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
@@ -3375,7 +3375,7 @@ namespace WaterToAirHeatPumpSimple {
         HeatPowerRated = simpleWatertoAirHP.RatedPowerHeat;
         AirVolFlowRateRated = simpleWatertoAirHP.RatedAirVolFlowRate;
         WaterVolFlowRateRated = simpleWatertoAirHP.RatedWaterVolFlowRate;
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             LoadSideFullMassFlowRate = simpleWatertoAirHP.AirMassFlowRate;
         } else {
             // default to cycling fan, cycling compressor, full load air flow
@@ -3423,7 +3423,7 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWatertoAirHP.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
@@ -3456,7 +3456,7 @@ namespace WaterToAirHeatPumpSimple {
             Psychrometrics::PsyWFnTdbH(state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, LoadSideFullOutletEnthalpy, RoutineName);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == HVAC::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             simpleWatertoAirHP.OutletAirEnthalpy =
                 PartLoadRatio * LoadSideFullOutletEnthalpy + (1.0 - PartLoadRatio) * state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth;
@@ -3651,7 +3651,7 @@ namespace WaterToAirHeatPumpSimple {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // Fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -3663,7 +3663,7 @@ namespace WaterToAirHeatPumpSimple {
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   September 2003
-        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating CycFanCycCoil
+        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating FanOp::Cycling
 
         // PURPOSE OF THIS FUNCTION:
         //    Adjust sensible heat ratio to account for degradation of DX coil latent
@@ -3740,12 +3740,12 @@ namespace WaterToAirHeatPumpSimple {
         //  Calculate the compressor on and off times using a converntional thermostat curve
         Ton = 3600.0 / (4.0 * MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == HVAC::CycFanCycCoil) && (FanDelayTime != 0.0)) {
-            // For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+        if ((fanOp == HVAC::FanOp::Cycling) && (FanDelayTime != 0.0)) {
+            // For FanOp::Cycling, moisture is evaporated from the cooling coil back to the air stream
             // until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = FanDelayTime;
         } else {
-            // For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+            // For FanOp::Continuous, moisture is evaporated from the cooling coil back to the air stream
             // for the entire heat pump off-cycle.
             Toff = 3600.0 / (4.0 * MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
         }

@@ -89,7 +89,7 @@ struct CoilCoolingDX
                   Real64 PLR,
                   int speedNum,
                   Real64 speedRatio,
-                  int const fanOpMode,
+                  HVAC::FanOp const fanOp,
                   bool const singleMode,
                   Real64 LoadSHR = -1.0);
     void setData(int fanIndex, HVAC::FanType fanType, std::string const &fanName, int airLoopNum);

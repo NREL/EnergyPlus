@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     thisUnit.m_FanAvailSchedPtr = 1;
     thisUnit.m_FanPlace = HVAC::FanPlace::BlowThru;
     // ensure constant fan mode is used
-    thisUnit.m_FanOpMode = HVAC::ContFanCycCoil;
+    thisUnit.m_FanOpMode = HVAC::FanOp::Continuous;
     state->dataUnitarySystems->CompOnMassFlow = thisUnit.MaxCoolAirMassFlow;
     state->dataUnitarySystems->CompOffMassFlow = thisUnit.MaxNoCoolHeatAirMassFlow;
     state->dataUnitarySystems->unitarySys.push_back(thisUnit);

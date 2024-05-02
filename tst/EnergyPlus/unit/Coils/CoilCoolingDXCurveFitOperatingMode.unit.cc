@@ -270,7 +270,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
-    int fanOpMode = 1;
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     bool singleMode = false;
     state->dataEnvrn->OutDryBulbTemp = 1.0;
     // thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -286,7 +286,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
                                   PLR,
                                   speedNum,
                                   speedRatio,
-                                  fanOpMode,
+                                  fanOp,
                                   condInletNode,
                                   condOutletNode,
                                   singleMode,

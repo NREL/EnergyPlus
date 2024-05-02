@@ -113,7 +113,7 @@ namespace HeatRecovery {
                          std::string_view CompName,                          // name of the heat exchanger unit
                          bool const FirstHVACIteration,                      // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                                     // Pointer to Component
-                         int const FanOpMode,                                // Supply air fan operating mode
+                         HVAC::FanOp const fanOp,                            // Supply air fan operating mode
                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio,  // Part load ratio requested of DX compressor
                          ObjexxFCL::Optional_bool_const HXUnitEnable,        // Flag to operate heat exchanger
                          ObjexxFCL::Optional_int_const CompanionCoilIndex,   // index of companion cooling coil
@@ -199,7 +199,7 @@ namespace HeatRecovery {
             break;
 
         case HVAC::HX_AIRTOAIR_GENERIC:
-            thisExch.CalcAirToAirGenericHeatExch(state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
+            thisExch.CalcAirToAirGenericHeatExch(state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
             break;
 
         case HVAC::HX_DESICCANT_BALANCED:
@@ -208,7 +208,7 @@ namespace HeatRecovery {
             thisExch.CalcDesiccantBalancedHeatExch(state,
                                                    HXUnitOn,
                                                    FirstHVACIteration,
-                                                   FanOpMode,
+                                                   fanOp,
                                                    PartLoadRatio,
                                                    CompanionCoilNum,
                                                    companionCoilType,
@@ -1865,7 +1865,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                              // flag to simulate heat exchanger heat recovery
         bool const FirstHVACIteration,                    // first HVAC iteration flag
-        int const FanOpMode,                              // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                              // Supply air fan operating mode (1=cycling, 2=constant)
         ObjexxFCL::Optional_bool_const EconomizerFlag,    // economizer flag pass by air loop or OA sys
         ObjexxFCL::Optional_bool_const HighHumCtrlFlag,   // high humidity control flag passed by airloop or OA sys
         ObjexxFCL::Optional<Real64 const> HXPartLoadRatio //
@@ -1981,7 +1981,7 @@ namespace HeatRecovery {
         if (UnitOn) {
             bool FrostControlFlag = false; // unit is in frost control mode when TRUE
             // Unit is on.
-            if (present(HXPartLoadRatio) && FanOpMode == HVAC::CycFanCycCoil) {
+            if (present(HXPartLoadRatio) && fanOp == HVAC::FanOp::Cycling) {
                 if (HXPartLoadRatio > 0) {
                     AirSidePLR = HXPartLoadRatio;
                 } else {
@@ -1991,7 +1991,7 @@ namespace HeatRecovery {
                 AirSidePLR = 1.0;
             }
 
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 this->SupInMassFlow /= AirSidePLR;
                 this->SupOutMassFlow /= AirSidePLR;
                 this->SecInMassFlow /= AirSidePLR;
@@ -2311,14 +2311,14 @@ namespace HeatRecovery {
 
             } // ENDIF for "IF(thisExch%ControlToTemperatureSetPoint .AND... THEN, ELSE"
 
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 this->SupInMassFlow *= AirSidePLR;
                 this->SupOutMassFlow *= AirSidePLR;
                 this->SecInMassFlow *= AirSidePLR;
                 this->SecOutMassFlow *= AirSidePLR;
                 this->SupBypassMassFlow *= AirSidePLR;
                 this->SecBypassMassFlow *= AirSidePLR;
-            } else if (FanOpMode == HVAC::ContFanCycCoil) {
+            } else if (fanOp == HVAC::FanOp::Continuous) {
                 this->SupOutTemp = this->SupOutTemp * AirSidePLR + this->SupInTemp * (1.0 - AirSidePLR);
                 this->SupOutHumRat = this->SupOutHumRat * AirSidePLR + this->SupInHumRat * (1.0 - AirSidePLR);
                 this->SupOutEnth = this->SupOutEnth * AirSidePLR + this->SupOutEnth * (1.0 - AirSidePLR);
@@ -2394,7 +2394,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
         bool const FirstHVACIteration,                 // First HVAC iteration flag
-        int const FanOpMode,                           // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                           // Supply air fan operating mode (1=cycling, 2=constant)
         Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
         int const CompanionCoilIndex,                  // index of companion cooling coil
         int const CompanionCoilType,                   // type of cooling coil
@@ -2510,11 +2510,11 @@ namespace HeatRecovery {
             // In constant fan mode, process air mass flow rate is full flow and supply (regen) air cycles based on PLR.
             // If supply (regen) inlet is OA node, regen mass flow rate is proportional to PLR.
             // If both of the above is true then boost local variable up to full flow
-            if ((FanOpMode == HVAC::ContFanCycCoil) && RegenInletIsOANode) {
+            if ((fanOp == HVAC::FanOp::Continuous) && RegenInletIsOANode) {
                 local_SupInMassFlow /= HXPartLoadRatio;
             }
             // for cycling fan case, boost both local variables up to full flow
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 local_SupInMassFlow /= HXPartLoadRatio; // supply = regen
                 local_SecInMassFlow /= HXPartLoadRatio; // secondary = process
             }
@@ -2635,7 +2635,7 @@ namespace HeatRecovery {
             }
 
             Real64 constexpr lowerLimit = 1.e-5;
-            if (FanOpMode == HVAC::CycFanCycCoil || RegenInletIsOANode) {
+            if (fanOp == HVAC::FanOp::Cycling || RegenInletIsOANode) {
                 //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
                 //       conditions
                 this->SupOutTemp = this->SupInTemp + FullLoadDeltaT;

@@ -107,7 +107,7 @@ namespace HVACHXAssistedCoolingCoil {
                              HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
                              Real64 const PartLoadRatio,             // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                              int &CompIndex,
-                             int const FanOpMode,                               // Allows the parent object to control fan operation
+                             HVAC::FanOp const fanOp,                           // Allows the parent object to control fan operation
                              ObjexxFCL::Optional_bool_const HXUnitEnable = _,   // flag to enable heat exchanger heat recovery
                              ObjexxFCL::Optional<Real64 const> OnOffAFR = _,    // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                              ObjexxFCL::Optional_bool_const EconomizerFlag = _, // OA sys or air loop economizer status
@@ -127,7 +127,7 @@ namespace HVACHXAssistedCoolingCoil {
                               HVAC::CompressorOperation CompressorOp,             // compressor operation; 1=on, 0=off
                               Real64 const PartLoadRatio,                         // Cooling coil part load ratio
                               bool const HXUnitOn,                                // Flag to enable heat exchanger
-                              int const FanOpMode,                                // Allows parent object to control fan operation
+                              HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation
                               ObjexxFCL::Optional<Real64 const> OnOffAirFlow = _, // Ratio of compressor ON air mass flow to AVERAGE over time step
                               ObjexxFCL::Optional_bool_const EconomizerFlag = _,  // OA (or airloop) econommizer status
                               ObjexxFCL::Optional_int_const DehumidificationMode = _,        // Optional dehumbidication mode

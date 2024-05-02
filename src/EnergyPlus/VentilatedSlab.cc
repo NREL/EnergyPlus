@@ -121,7 +121,6 @@ namespace VentilatedSlab {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using HVAC::ContFanCycCoil;
     using HVAC::SmallAirVolFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
@@ -3478,7 +3477,7 @@ namespace VentilatedSlab {
                                          HVAC::CompressorOperation::On,
                                          0.0,
                                          ventSlab.coolingCoil_Index,
-                                         ContFanCycCoil);
+                                         HVAC::FanOp::Continuous);
             } else {
                 SimulateWaterCoilComponents(state, ventSlab.coolingCoilName, FirstHVACIteration, ventSlab.coolingCoil_Index);
             }

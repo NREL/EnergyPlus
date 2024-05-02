@@ -104,7 +104,7 @@ namespace HeatingCoils {
                                        ObjexxFCL::Optional_int CompIndex,
                                        ObjexxFCL::Optional<Real64> QCoilActual,         // coil load actually delivered returned to calling component
                                        ObjexxFCL::Optional_bool_const SuppHeat,         // True if current heating coil is a supplemental heating coil
-                                       ObjexxFCL::Optional_int_const FanOpMode,         // fan operating mode, CycFanCycCoil or ContFanCycCoil
+                                       ObjexxFCL::Optional<HVAC::FanOp const> fanOpMode,         // fan operating mode, FanOp::Cycling or FanOp::Continuous
                                        ObjexxFCL::Optional<Real64 const> PartLoadRatio, // part-load ratio of heating coil
                                        ObjexxFCL::Optional_int StageNum,
                                        ObjexxFCL::Optional<Real64 const> SpeedRatio // Speed ratio of MultiStage heating coil
@@ -121,7 +121,7 @@ namespace HeatingCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum(0);       // The HeatingCoil that you are currently loading input into
         Real64 QCoilActual2;  // coil load actually delivered returned from specific coil
-        int OpMode;           // fan operating mode
+        HVAC::FanOp fanOp;           // fan operating mode
         Real64 PartLoadFrac;  // part-load fraction of heating coil
         Real64 QCoilRequired; // local variable for optional argument
 
@@ -172,10 +172,10 @@ namespace HeatingCoils {
             state.dataHeatingCoils->CoilIsSuppHeater = false;
         }
 
-        if (present(FanOpMode)) {
-            OpMode = FanOpMode;
+        if (present(fanOpMode)) {
+            fanOp = fanOpMode;
         } else {
-            OpMode = HVAC::ContFanCycCoil;
+            fanOp = HVAC::FanOp::Continuous;
         }
 
         if (present(PartLoadRatio)) {
@@ -196,7 +196,7 @@ namespace HeatingCoils {
         // Calculate the Correct HeatingCoil Model with the current CoilNum
         switch (state.dataHeatingCoils->HeatingCoil(CoilNum).HCoilType_Num) {
         case HVAC::Coil_HeatingElectric: {
-            CalcElectricHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
+            CalcElectricHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, fanOp, PartLoadFrac);
         } break;
         case HVAC::Coil_HeatingElectric_MultiStage: {
             CalcMultiStageElectricHeatingCoil(
@@ -205,12 +205,12 @@ namespace HeatingCoils {
                 SpeedRatio,
                 PartLoadRatio,
                 StageNum,
-                OpMode,
+                fanOp,
                 QCoilActual2,
                 state.dataHeatingCoils->CoilIsSuppHeater); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } break;
         case HVAC::Coil_HeatingGasOrOtherFuel: {
-            CalcFuelHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
+            CalcFuelHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, fanOp, PartLoadFrac);
         } break;
         case HVAC::Coil_HeatingGas_MultiStage: {
             CalcMultiStageGasHeatingCoil(state,
@@ -218,7 +218,7 @@ namespace HeatingCoils {
                                          SpeedRatio,
                                          PartLoadRatio,
                                          StageNum,
-                                         OpMode); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
+                                         fanOp); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } break;
         case HVAC::Coil_HeatingDesuperheater: {
             CalcDesuperheaterHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2);
@@ -1835,7 +1835,7 @@ namespace HeatingCoils {
                                  int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
                                  Real64 &QCoilActual,       // coil load actually delivered (W)
-                                 int const FanOpMode,       // fan operating mode
+                                 HVAC::FanOp const fanOp,       // fan operating mode
                                  Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
@@ -1871,7 +1871,7 @@ namespace HeatingCoils {
         }
 
         //  adjust mass flow rates for cycling fan cycling coil operation
-        if (FanOpMode == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             if (PartLoadRatio > 0.0) {
                 AirMassFlow = heatingCoil.InletAirMassFlowRate / PartLoadRatio;
                 QCoilReq /= PartLoadRatio;
@@ -1937,7 +1937,7 @@ namespace HeatingCoils {
             heatingCoil.ElecUseLoad = 0.0;
         }
 
-        if (FanOpMode == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             heatingCoil.ElecUseLoad *= PartLoadRatio;
             HeatingCoilLoad *= PartLoadRatio;
         }
@@ -1976,7 +1976,7 @@ namespace HeatingCoils {
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
-                                           int const FanOpMode,     // Fan operation mode
+                                           HVAC::FanOp const fanOp,     // Fan operation mode
                                            Real64 &QCoilActual,     // coil load actually delivered (W)
                                            bool const SuppHeat)
     {
@@ -2055,7 +2055,7 @@ namespace HeatingCoils {
                 OutletAirHumRat = InletAirHumRat;
 
                 // if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-                // IF (FanOpMode .EQ. CycFanCycCoil) OnOffFanPartLoadFraction = 1.0d0
+                // IF (FanOpMode .EQ. FanOp::Cycling) OnOffFanPartLoadFraction = 1.0d0
 
                 // Power calculation
                 heatingCoil.ElecUseLoad = SpeedRatio * HSElecHeatingPower + (1.0 - SpeedRatio) * LSElecHeatingPower;
@@ -2082,8 +2082,8 @@ namespace HeatingCoils {
                 PartLoadRat = min(1.0, CycRatio);
 
                 // for cycling fan, reset mass flow to full on rate
-                if (FanOpMode == HVAC::CycFanCycCoil) AirMassFlow /= PartLoadRat;
-                if (FanOpMode == HVAC::ContFanCycCoil) {
+                if (fanOp == HVAC::FanOp::Cycling) AirMassFlow /= PartLoadRat;
+                else if (fanOp == HVAC::FanOp::Continuous) {
                     if (!SuppHeat) {
                         AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow;
                     }
@@ -2106,7 +2106,7 @@ namespace HeatingCoils {
                 }
 
                 // Set outlet conditions from the full load calculation
-                if (FanOpMode == HVAC::CycFanCycCoil) {
+                if (fanOp == HVAC::FanOp::Cycling) {
                     OutletAirEnthalpy = FullLoadOutAirEnth;
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
@@ -2164,7 +2164,7 @@ namespace HeatingCoils {
                              int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
                              Real64 &QCoilActual,                        // coil load actually delivered (W)
-                             int const FanOpMode,                        // fan operating mode
+                             HVAC::FanOp const fanOp,                        // fan operating mode
                              [[maybe_unused]] Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
@@ -2319,7 +2319,7 @@ namespace HeatingCoils {
                 heatingCoil.ParasiticFuelRate = heatingCoil.ParasiticFuelCapacity * (1.0 - heatingCoil.RTF);
                 // Fan power will also be modified by the heating coil's part load fraction
                 // OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
-                if (FanOpMode == HVAC::CycFanCycCoil) {
+                if (fanOp == HVAC::FanOp::Cycling) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 }
             }
@@ -2351,7 +2351,7 @@ namespace HeatingCoils {
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                       Real64 const CycRatio,   // cycling part load ratio
                                       int const StageNum,      // Speed number
-                                      int const FanOpMode      // Fan operation mode
+                                      HVAC::FanOp const fanOp  // Fan operation mode
     )
     {
 
@@ -2440,7 +2440,7 @@ namespace HeatingCoils {
                 OutletAirHumRat = InletAirHumRat;
 
                 // if cycling fan, send coil part-load fraction to on/off fan via HVACDataGlobals
-                // IF (FanOpMode .EQ. CycFanCycCoil) OnOffFanPartLoadFraction = 1.0d0
+                // IF (FanOpMode .EQ. FanOp::Cycling) OnOffFanPartLoadFraction = 1.0d0
 
                 // Power calculation. If PartLoadRat (SpeedRatio) = 0, operate at LS the whole time step
                 heatingCoil.ElecUseLoad =
@@ -2471,9 +2471,9 @@ namespace HeatingCoils {
             } else if (CycRatio > 0.0) {
 
                 // for cycling fan, reset mass flow to full on rate
-                if (FanOpMode == HVAC::CycFanCycCoil)
+                if (fanOp == HVAC::FanOp::Cycling)
                     AirMassFlow /= CycRatio;
-                else if (FanOpMode == HVAC::ContFanCycCoil)
+                else if (fanOp == HVAC::FanOp::Continuous)
                     AirMassFlow = MSHPMassFlowRateLow;
 
                 TotCap = heatingCoil.MSNominalCapacity(StageNumLS);
@@ -2496,7 +2496,7 @@ namespace HeatingCoils {
                 }
 
                 // Set outlet conditions from the full load calculation
-                if (FanOpMode == HVAC::CycFanCycCoil) {
+                if (fanOp == HVAC::FanOp::Cycling) {
                     OutletAirEnthalpy = FullLoadOutAirEnth;
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
@@ -2595,7 +2595,7 @@ namespace HeatingCoils {
                 heatingCoil.ParasiticFuelRate = heatingCoil.ParasiticFuelCapacity * (1.0 - heatingCoil.RTF);
                 // Fan power will also be modified by the heating coil's part load fraction
                 // OnOffFanPartLoadFraction passed to fan via DataHVACGlobals (cycling fan only)
-                if (FanOpMode == HVAC::CycFanCycCoil) {
+                if (fanOp == HVAC::FanOp::Cycling) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
                 }
             }

@@ -249,7 +249,7 @@ namespace UnitarySystems {
         Real64 m_DesignFanVolFlowRate = 0.0;
         Real64 m_DesignMassFlowRate = 0.0;
         int m_FanAvailSchedPtr = 0;
-        int m_FanOpMode = 0;
+        HVAC::FanOp m_FanOpMode = HVAC::FanOp::Invalid;
         int m_ATMixerIndex = 0;
         int m_ATMixerPriNode = 0;
         int m_ATMixerSecNode = 0;
@@ -621,7 +621,7 @@ namespace UnitarySystems {
                                              int UnitarySysNum,
                                              Real64 CycRatio,
                                              int SpeedNum,
-                                             int FanOpMode,
+                                             HVAC::FanOp const fanOp,
                                              HVAC::CompressorOperation CompressorOp);
 
         static Real64 heatingCoilVarSpeedResidual(EnergyPlusData &state,
@@ -631,7 +631,7 @@ namespace UnitarySystems {
                                                   int UnitarySysNum,
                                                   Real64 CycRatio,
                                                   int SpeedNum,
-                                                  int FanOpMode,
+                                                  HVAC::FanOp const fanOp,
                                                   HVAC::CompressorOperation CompressorOp,
                                                   bool SuppHeat);
 
@@ -642,7 +642,7 @@ namespace UnitarySystems {
                                                    int UnitarySysNum,
                                                    Real64 CycRatio,
                                                    int SpeedNum,
-                                                   int FanOpMode,
+                                                   HVAC::FanOp const fanOp,
                                                    HVAC::CompressorOperation CompressorOp);
 
         static Real64 DXCoilCyclingResidual(EnergyPlusData &state,
@@ -652,7 +652,7 @@ namespace UnitarySystems {
                                             int UnitarySysNum,
                                             Real64 SpeedRatio,
                                             int SpeedNum,
-                                            int FanOpMode,
+                                            HVAC::FanOp const fanOp,
                                             HVAC::CompressorOperation CompressorOp,
                                             int AirloopNum,
                                             bool FirstHVACIteration);
@@ -664,7 +664,7 @@ namespace UnitarySystems {
                                                   int UnitarySysNum,
                                                   Real64 SpeedRatio,
                                                   int SpeedNum,
-                                                  int FanOpMode,
+                                                  HVAC::FanOp const fanOp,
                                                   HVAC::CompressorOperation CompressorOp);
 
         static Real64 heatingCoilVarSpeedCycResidual(EnergyPlusData &state,
@@ -674,7 +674,7 @@ namespace UnitarySystems {
                                                      int UnitarySysNum,
                                                      Real64 SpeedRatio,
                                                      int SpeedNum,
-                                                     int FanOpMode,
+                                                     HVAC::FanOp const fanOp,
                                                      HVAC::CompressorOperation CompressorOp,
                                                      bool SuppHeat);
 
@@ -684,7 +684,7 @@ namespace UnitarySystems {
                                                  bool FirstHVACIteration,
                                                  Real64 desTemp,
                                                  bool SuppHeatingCoilFlag,
-                                                 bool FanOpMode,
+                                                 HVAC::FanOp fanOp,
                                                  Real64 HeatingLoadArg);
 
         static Real64 coolWatertoAirHPTempResidual(EnergyPlusData &state,

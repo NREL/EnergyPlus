@@ -538,7 +538,7 @@ namespace DXCoils {
                    HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration,                // True when first HVAC iteration
                    int &CompIndex,
-                   int const FanOpMode,                                              // allows parent object to control fan mode
+                   HVAC::FanOp const fanOp,                                              // allows parent object to control fan mode
                    ObjexxFCL::Optional<Real64 const> PartLoadRatio = _,              // part load ratio (for single speed cycling unit)
                    ObjexxFCL::Optional<Real64 const> OnOffAFR = _,                   // ratio of compressor on airflow to compressor off airflow
                    ObjexxFCL::Optional<Real64 const> CoilCoolingHeatingPLRRatio = _, // used for cycling fan RH control
@@ -552,7 +552,7 @@ namespace DXCoils {
                              Real64 const CycRatio,     // cycling part load ratio for variable speed
                              int &CompIndex,
                              ObjexxFCL::Optional_int_const SpeedNum = _,  // Speed number for multispeed cooling coil onlyn
-                             ObjexxFCL::Optional_int_const FanOpMode = _, // Fan operation mode
+                             ObjexxFCL::Optional<HVAC::FanOp const> fanOp = _, // Fan operation mode
                              HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off, // Compressor on/off; 1=on, 0=off
                              ObjexxFCL::Optional_int_const SingleMode = _                             // Single mode operation Yes/No; 1=Yes, 0=No
     );
@@ -564,7 +564,7 @@ namespace DXCoils {
                             Real64 const PartLoadRatio,             // part load ratio
                             int const DehumidMode,                  // dehumidification mode (0=normal, 1=enhanced)
                             int &CompIndex,
-                            int const FanOpMode // allows parent object to control fan mode
+                            HVAC::FanOp const fanOp // allows parent object to control fan mode
     );
 
     // TODO: Add New Property for AHRI 2023 Standard & Modify Numeric Fields (increment)
@@ -584,7 +584,7 @@ namespace DXCoils {
                         HVAC::CompressorOperation CompressorOp,     // compressor operation; 1=on, 0=off
                         bool const FirstHVACIteration,              // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,                 // sensible cooling load / full load sensible cooling capacity
-                        int const FanOpMode,                        // Allows parent object to control fan operation
+                        HVAC::FanOp const fanOp,                        // Allows parent object to control fan operation
                         ObjexxFCL::Optional_int_const PerfMode = _, // Performance mode for MultiMode DX coil; Always 1 for other coil types
                         ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
                         ObjexxFCL::Optional<Real64 const> CoolingHeatingPLR = _  // used for cycling fan RH control
@@ -595,7 +595,7 @@ namespace DXCoils {
                             HVAC::CompressorOperation CompressorOp,     // compressor operation; 1=on, 0=off
                             bool const FirstHVACIteration,              // true if this is the first iteration of HVAC
                             Real64 const PartLoadRatio,                 // sensible cooling load / full load sensible cooling capacity
-                            int const FanOpMode,                        // Allows parent object to control fan operation
+                            HVAC::FanOp const fanOp,                        // Allows parent object to control fan operation
                             Real64 const CompCycRatio,                  // cycling ratio of VRF condenser
                             ObjexxFCL::Optional_int_const PerfMode = _, // Performance mode for MultiMode DX coil; Always 1 for other coil types
                             ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
@@ -605,7 +605,7 @@ namespace DXCoils {
     void CalcDXHeatingCoil(EnergyPlusData &state,
                            int const DXCoilNum,                                     // the number of the DX heating coil to be simulated
                            Real64 const PartLoadRatio,                              // sensible cooling load / full load sensible cooling capacity
-                           int const FanOpMode,                                     // Allows parent object to control fan mode
+                           HVAC::FanOp const fanOp,                                     // Allows parent object to control fan mode
                            ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio = _, // ratio of compressor on airflow to compressor off airflow
                            ObjexxFCL::Optional<Real64 const> MaxHeatCap = _         // maximum allowed heating capacity
     );
@@ -683,7 +683,7 @@ namespace DXCoils {
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
-                                     int const FanOpMode,     // Sets fan control to CycFanCycCoil or ContFanCycCoil
+                                     HVAC::FanOp const fanOp,     // Sets fan control to FanOp::Cycling or FanOp::Continuous
                                      HVAC::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
                                      int const SingleMode                    // Single mode operation Yes/No; 1=Yes, 0=No
     );
@@ -693,7 +693,7 @@ namespace DXCoils {
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
-                                     int const FanOpMode,     // Fan operation mode
+                                     HVAC::FanOp const fanOp,     // Fan operation mode
                                      int const SingleMode     // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
@@ -876,7 +876,7 @@ namespace DXCoils {
                                   HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
                                   bool const FirstHVACIteration,          // true if this is the first iteration of HVAC
                                   Real64 const PartLoadRatio,             // sensible cooling load / full load sensible cooling capacity
-                                  int const FanOpMode,                    // Allows parent object to control fan operation
+                                  HVAC::FanOp const fanOp,                    // Allows parent object to control fan operation
                                   Real64 const CompCycRatio,              // cycling ratio of VRF condenser
                                   ObjexxFCL::Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
@@ -887,7 +887,7 @@ namespace DXCoils {
                                   HVAC::CompressorOperation CompressorOp,              // compressor operation; 1=on, 0=off
                                   int const DXCoilNum,                                 // the number of the DX heating coil to be simulated
                                   Real64 const PartLoadRatio,                          // sensible cooling load / full load sensible cooling capacity
-                                  int const FanOpMode,                                 // Allows parent object to control fan mode
+                                  HVAC::FanOp const fanOp,                                 // Allows parent object to control fan mode
                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
                                   ObjexxFCL::Optional<Real64 const> MaxHeatCap         // maximum allowed heating capacity
     );
@@ -967,7 +967,7 @@ struct DXCoilsData : BaseGlobalStruct
     Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
     Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
-    Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
+    Array1D<HVAC::FanOp> DXCoilFanOp;                // supply air fan operating mode
     Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
     Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]

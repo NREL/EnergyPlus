@@ -2909,9 +2909,9 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         if (airLoopControlInfo.CycFanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
-                airLoopControlInfo.FanOpMode = HVAC::CycFanCycCoil;
+                airLoopControlInfo.fanOp = HVAC::FanOp::Cycling;
             } else {
-                airLoopControlInfo.FanOpMode = HVAC::ContFanCycCoil;
+                airLoopControlInfo.fanOp = HVAC::FanOp::Continuous;
             }
         }
     }
@@ -2926,7 +2926,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::ContFanCycCoil) {
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp == HVAC::FanOp::Continuous) {
                         thisZone.NoHeatToReturnAir = false;
                         break;
                     }

@@ -153,7 +153,7 @@ namespace HVACUnitaryBypassVAV {
         std::string HeatCoilName;   // Name of heating coil
         HVAC::CoilType HeatCoilType = HVAC::CoilType::Invalid;
         int HeatCoilIndex = 0;                  // DX heating coil index number
-        int OpMode = 0;                         // mode of operation
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid;                         // mode of operation
         int CoilControlNode = 0;                // heating coil hot water or steam inlet node
         int CoilOutletNode = 0;                 // outlet node for hot water and steam coil
         PlantLocation plantLoc;                 // plant loop component location object for water heating coil
@@ -310,7 +310,7 @@ namespace HVACUnitaryBypassVAV {
                                int CBVAVNum,            // Changeover bypass VAV unit index
                                bool FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 &HeatCoilLoad,    // heating coil load to be met (Watts)
-                               int FanMode,             // fan operation mode
+                               HVAC::FanOp const fanOp,             // fan operation mode
                                Real64 &HeatCoilLoadmet  // coil heating load met
     );
 

@@ -556,9 +556,9 @@ namespace UnitVentilator {
                 ErrorsFound = true;
             } else if (lAlphaBlanks(14)) {
                 if (unitVent.fanType == HVAC::FanType::OnOff || unitVent.fanType == HVAC::FanType::SystemModel) {
-                    unitVent.OpMode = HVAC::CycFanCycCoil;
+                    unitVent.fanOp = HVAC::FanOp::Cycling;
                 } else {
-                    unitVent.OpMode = HVAC::ContFanCycCoil;
+                    unitVent.fanOp = HVAC::FanOp::Continuous;
                 }
             }
 
@@ -1177,9 +1177,9 @@ namespace UnitVentilator {
 
         if (unitVent.FanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, unitVent.FanSchedPtr) == 0.0) {
-                unitVent.OpMode = HVAC::CycFanCycCoil;
+                unitVent.fanOp = HVAC::FanOp::Cycling;
             } else {
-                unitVent.OpMode = HVAC::ContFanCycCoil;
+                unitVent.fanOp = HVAC::FanOp::Continuous;
             }
         }
 
@@ -2389,7 +2389,7 @@ namespace UnitVentilator {
         Real64 NoOutput = 0.0;
         Real64 FullOutput = 0.0;
         int SolFlag = 0; // # of iterations IF positive, -1 means failed to converge, -2 means bounds are incorrect
-        int OpMode = unitVent.OpMode;
+        HVAC::FanOp fanOp = unitVent.fanOp;
         Real64 PartLoadFrac = 0.0;
 
         auto &inletNode(state.dataLoopNodes->Node(unitVent.AirInNode));
@@ -2414,8 +2414,8 @@ namespace UnitVentilator {
                 PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.ColdControlNode, unitVent.ColdCoilOutNodeNum, unitVent.CWPlantLoc);
             }
 
-            if (OpMode == HVAC::CycFanCycCoil) {
-                CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
+            if (fanOp == HVAC::FanOp::Cycling) {
+                CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
                 if (inletNode.MassFlowRateMax > 0.0) {
                     unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
                 }
@@ -2536,8 +2536,8 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == HVAC::CycFanCycCoil) {
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
+                    if (fanOp == HVAC::FanOp::Cycling) {
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
                         if (inletNode.MassFlowRateMax > 0.0) {
                             unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
                         }
@@ -2618,21 +2618,21 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == HVAC::CycFanCycCoil) {
+                    if (fanOp == HVAC::FanOp::Cycling) {
 
                         // Find part load ratio of unit ventilator coils
                         PartLoadFrac = 0.0;
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, OpMode, PartLoadFrac);
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, fanOp, PartLoadFrac);
                         if ((NoOutput - state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) {
                             // Unit ventilator is unable to meet the load with coil off, set PLR = 1
                             PartLoadFrac = 1.0;
-                            CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
+                            CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, fanOp, PartLoadFrac);
                             if ((FullOutput - state.dataUnitVentilators->QZnReq) > HVAC::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
+                                auto f = [&state, UnitVentNum, FirstHVACIteration, fanOp](Real64 const PartLoadRatio) {
                                     Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
-                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
+                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadRatio);
                                     if (state.dataUnitVentilators->QZnReq) {
                                         return (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
                                     } else
@@ -2642,7 +2642,7 @@ namespace UnitVentilator {
                             }
                         }
 
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
                         unitVent.PartLoadFrac = PartLoadFrac;
                         unitVent.FanPartLoadRatio = PartLoadFrac;
 
@@ -2779,8 +2779,8 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == HVAC::CycFanCycCoil) {
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
+                    if (fanOp == HVAC::FanOp::Cycling) {
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
                         if (inletNode.MassFlowRateMax > 0.0) {
                             unitVent.FanPartLoadRatio = inletNode.MassFlowRate / inletNode.MassFlowRateMax;
                         }
@@ -2859,24 +2859,24 @@ namespace UnitVentilator {
                         }
                     }
 
-                    if (OpMode == HVAC::CycFanCycCoil) {
+                    if (fanOp == HVAC::FanOp::Cycling) {
 
                         state.dataUnitVentilators->HCoilOn = false;
                         // Find part load ratio of unit ventilator coils
                         PartLoadFrac = 0.0;
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, OpMode, PartLoadFrac);
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, NoOutput, fanOp, PartLoadFrac);
                         if ((NoOutput - state.dataUnitVentilators->QZnReq) > HVAC::SmallLoad) {
                             // Unit ventilator is unable to meet the load with coil off, set PLR = 1
                             PartLoadFrac = 1.0;
-                            CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, OpMode, PartLoadFrac);
+                            CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, FullOutput, fanOp, PartLoadFrac);
                             if ((FullOutput - state.dataUnitVentilators->QZnReq) < HVAC::SmallLoad) {
                                 // Unit ventilator full load capacity is able to meet the load, Find PLR
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                auto f = [&state, UnitVentNum, FirstHVACIteration, OpMode](Real64 const PartLoadRatio) {
+                                auto f = [&state, UnitVentNum, FirstHVACIteration, fanOp](Real64 const PartLoadRatio) {
                                     Real64 QUnitOut = 0.0; // heating/Cooling provided by unit ventilator [watts]
 
                                     // Convert parameters to usable variables
-                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadRatio);
+                                    CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadRatio);
                                     if (state.dataUnitVentilators->QZnReq) {
                                         return (QUnitOut - state.dataUnitVentilators->QZnReq) / state.dataUnitVentilators->QZnReq;
                                     }
@@ -2885,7 +2885,7 @@ namespace UnitVentilator {
                                 General::SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, f, 0.0, 1.0);
                             }
                         }
-                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
+                        CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, fanOp, PartLoadFrac);
                         unitVent.PartLoadFrac = PartLoadFrac;
                         unitVent.FanPartLoadRatio = PartLoadFrac;
 
@@ -2911,7 +2911,7 @@ namespace UnitVentilator {
                                           _,
                                           unitVent.CWPlantLoc);
 
-                    } // end from IF (OpMode .EQ. HVAC::CycFanCycCoil) THEN
+                    } // end from IF (fanOp .EQ. HVAC::FanOp::Cycling) THEN
                 }
 
             } // ...end of HEATING/COOLING IF-THEN block
@@ -2938,7 +2938,7 @@ namespace UnitVentilator {
                                       int const UnitVentNum,                         // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,                 // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                               // load met by unit (watts)
-                                      ObjexxFCL::Optional_int_const OpMode,          // Fan Type
+                                      ObjexxFCL::Optional<HVAC::FanOp const> fanOp,          // Fan Type
                                       ObjexxFCL::Optional<Real64 const> PartLoadFrac // Part Load Ratio of coil and fan
     )
     {
@@ -2969,7 +2969,7 @@ namespace UnitVentilator {
         state.dataUnitVentilators->ZoneNode = state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).ZoneNode;
         Real64 QCoilReq = state.dataUnitVentilators->QZnReq;
 
-        if (OpMode != HVAC::CycFanCycCoil) {
+        if (fanOp != HVAC::FanOp::Cycling) {
 
             if (unitVent.ATMixerExists) {
                 state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
@@ -2984,7 +2984,7 @@ namespace UnitVentilator {
                     SingleDuct::SimATMixer(state, unitVent.ATMixerName, FirstHVACIteration, unitVent.ATMixerIndex);
                 }
             } else {
-                SimUnitVentOAMixer(state, UnitVentNum, OpMode);
+                SimUnitVentOAMixer(state, UnitVentNum, fanOp);
             }
             if (unitVent.fanType != HVAC::FanType::SystemModel) {
                 state.dataFans->fans(unitVent.Fan_Index)->simulate(state, FirstHVACIteration);
@@ -3001,7 +3001,7 @@ namespace UnitVentilator {
                                                                         HVAC::CompressorOperation::On,
                                                                         0.0,
                                                                         unitVent.CCoil_Index,
-                                                                        HVAC::ContFanCycCoil);
+                                                                        HVAC::FanOp::Continuous);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index);
                 }
@@ -3072,7 +3072,7 @@ namespace UnitVentilator {
                     SingleDuct::SimATMixer(state, unitVent.ATMixerName, FirstHVACIteration, unitVent.ATMixerIndex);
                 }
             } else {
-                SimUnitVentOAMixer(state, UnitVentNum, OpMode);
+                SimUnitVentOAMixer(state, UnitVentNum, fanOp);
             }
 
             state.dataFans->fans(unitVent.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
@@ -3085,10 +3085,10 @@ namespace UnitVentilator {
 
                 if (unitVent.CCoilType == CoolCoilType::HXAssisted) {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, PartLoadFrac, unitVent.CCoil_Index, OpMode);
+                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, PartLoadFrac, unitVent.CCoil_Index, fanOp);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(
-                        state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index, QCoilReq, OpMode, PartLoadFrac);
+                        state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index, QCoilReq, fanOp, PartLoadFrac);
                 }
             }
 
@@ -3112,7 +3112,7 @@ namespace UnitVentilator {
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
                         PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
                         WaterCoils::SimulateWaterCoilComponents(
-                            state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, OpMode, PartLoadFrac);
+                            state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, fanOp, PartLoadFrac);
                     } break;
                     case HeatCoilType::Steam: {
                         if (!state.dataUnitVentilators->HCoilOn) {
@@ -3130,7 +3130,7 @@ namespace UnitVentilator {
                         if (QCoilReq < 0.0) QCoilReq = 0.0;
                         PlantUtilities::SetComponentFlowRate(state, mdot, unitVent.HotControlNode, unitVent.HotCoilOutNodeNum, unitVent.HWplantLoc);
                         SteamCoils::SimulateSteamCoilComponents(
-                            state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, _, OpMode, PartLoadFrac);
+                            state, unitVent.HCoilName, FirstHVACIteration, unitVent.HCoil_Index, QCoilReq, _, fanOp, PartLoadFrac);
                     } break;
                     case HeatCoilType::Electric:
                     case HeatCoilType::Gas: {
@@ -3145,7 +3145,7 @@ namespace UnitVentilator {
                         }
                         if (QCoilReq < 0.0) QCoilReq = 0.0;
                         HeatingCoils::SimulateHeatingCoilComponents(
-                            state, unitVent.HCoilName, FirstHVACIteration, QCoilReq, unitVent.HCoil_Index, _, _, OpMode, PartLoadFrac);
+                            state, unitVent.HCoilName, FirstHVACIteration, QCoilReq, unitVent.HCoil_Index, _, _, fanOp, PartLoadFrac);
                     } break;
                     default: {
                         assert(false);
@@ -3181,7 +3181,7 @@ namespace UnitVentilator {
 
     void SimUnitVentOAMixer(EnergyPlusData &state,
                             int const UnitVentNum, // Unit index in unit ventilator array
-                            int const FanOpMode    // unit ventilator fan operating mode
+                            HVAC::FanOp const fanOp    // unit ventilator fan operating mode
     )
     {
 
@@ -3214,7 +3214,7 @@ namespace UnitVentilator {
         Real64 OutAirMassFlowRate = state.dataUnitVentilators->OAMassFlowRate;
 
         // Limit the outdoor air mass flow rate if cycling fan
-        if (FanOpMode == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             OutAirMassFlowRate = min(state.dataUnitVentilators->OAMassFlowRate, inletNode.MassFlowRate);
         }
 

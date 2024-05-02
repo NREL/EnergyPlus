@@ -115,7 +115,7 @@ namespace UnitVentilator {
         int Fan_Index = 0;
         int FanSchedPtr = 0;      // index to fan operating mode schedule
         int FanAvailSchedPtr = 0; // index to fan availability schedule
-        int OpMode = 0;           // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid;           // mode of operation; 1=cycling fan, cycling coil, 2=continuous fan, cycling coil
         int ControlCompTypeNum = 0;
         int CompErrIndex = 0;
         Real64 MaxAirVolFlow = 0.0;                     // m3/s
@@ -242,13 +242,13 @@ namespace UnitVentilator {
                                       int const UnitVentNum,                                       // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,                               // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                                             // load met by unit (watts)
-                                      ObjexxFCL::Optional_int_const OpMode = HVAC::ContFanCycCoil, // Fan Type
+                                      ObjexxFCL::Optional<HVAC::FanOp const> fanOp = HVAC::FanOp::Continuous, // Fan Type
                                       ObjexxFCL::Optional<Real64 const> PartLoadFrac = 1.0         // Part Load Ratio of coil and fan
     );
 
     void SimUnitVentOAMixer(EnergyPlusData &state,
                             int const UnitVentNum, // Unit index in unit ventilator array
-                            int const FanOpMode    // unit ventilator fan operating mode
+                            HVAC::FanOp const fanOp    // unit ventilator fan operating mode
     );
 
     void ReportUnitVentilator(EnergyPlusData &state, int const UnitVentNum); // Unit index in unit ventilator array

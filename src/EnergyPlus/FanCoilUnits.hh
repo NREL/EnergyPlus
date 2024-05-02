@@ -176,7 +176,7 @@ namespace FanCoilUnits {
         int HVACSizingIndex = 0;        // index of a HVACSizing object for a fancoil unit
         Real64 SpeedRatio = 0.0;        // speed ratio when the fan is cycling between stages
         int FanOpModeSchedPtr = 0;      // pointer to supply air fan operating mode schedule
-        int FanOpMode = 1;              // 1=cycling fan cycling coil; 2=constant fan cycling coil
+        HVAC::FanOp fanOp = HVAC::FanOp::Cycling;              // 1=cycling fan cycling coil; 2=constant fan cycling coil
         bool ASHRAETempControl = false; // ASHRAE90.1 control to temperature set point when true
         Real64 QUnitOutNoHC = 0.0;      // unit output with coils off [W]
         Real64 QUnitOutMaxH = 0.0;      // unit output at maximum heating [W]

@@ -149,8 +149,15 @@ namespace HVAC {
     int constexpr MinFrac(1);
     int constexpr FixedMin(2);
     // Fan mode
-    int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
-    int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
+
+    enum class FanOp
+    {
+        Invalid = -1,
+        Cycling,
+        Continuous,
+        Num
+    };
+        
     // Fan placement
     enum class FanPlace
     {

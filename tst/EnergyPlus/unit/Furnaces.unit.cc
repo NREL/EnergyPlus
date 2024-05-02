@@ -135,7 +135,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
 
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = HVAC::CycFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Cycling;
     // heating air flow at various speeds
 
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
@@ -236,7 +236,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     EXPECT_DOUBLE_EQ(1.2, state->dataLoopNodes->Node(state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate);
 
     // constant fan mode should drop to idle flow rate
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = HVAC::ContFanCycCoil;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Continuous;
 
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedHeating = 0;
     state->dataFurnaces->Furnace(FurnaceNum).NumOfSpeedCooling = 0;
@@ -370,7 +370,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     state->dataFurnaces->CompOnMassFlow = 2.0;
     state->dataFurnaces->CompOffMassFlow = 0.0;
-    state->dataFurnaces->Furnace(FurnaceNum).OpMode = 1;
+    state->dataFurnaces->Furnace(FurnaceNum).fanOp = HVAC::FanOp::Cycling;
     state->dataFurnaces->Furnace(FurnaceNum).MdotFurnace = 2.0;
     state->dataFurnaces->Furnace(FurnaceNum).DesignMassFlowRate = 2.2;
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 1.0;
@@ -382,7 +382,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     EXPECT_EQ(2.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
     EXPECT_EQ(0.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
-    EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
+    EXPECT_EQ((int)HVAC::FanOp::Cycling, (int)state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = HVAC::UnitarySys_HeatCool;

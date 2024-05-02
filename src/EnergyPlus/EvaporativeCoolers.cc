@@ -3488,7 +3488,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             // set evap unit to cycling mode for all fan types. Note OpMode var is not used
             // with used for ZONECOOLINGLOADVARIABLESPEEDFAN Cooler Unit Control Method
-            thisZoneEvapUnit.OpMode = HVAC::CycFanCycCoil;
+            thisZoneEvapUnit.fanOp = HVAC::FanOp::Cycling;
 
             FanVolFlow = 0.0;
             if (errFlag) {
@@ -4047,7 +4047,7 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
             if (zoneEvapUnit.IsOnThisTimestep) {
 
-                if (zoneEvapUnit.OpMode == HVAC::ContFanCycCoil) {
+                if (zoneEvapUnit.fanOp == HVAC::FanOp::Continuous) {
                     PartLoadRatio = 1.0;
                     zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
@@ -4074,7 +4074,7 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
             if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
-                if (zoneEvapUnit.OpMode == HVAC::ContFanCycCoil) {
+                if (zoneEvapUnit.fanOp == HVAC::FanOp::Continuous) {
                     PartLoadRatio = 1.0;
                     zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);

@@ -645,7 +645,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     state->dataHVACGlobal->TurnFansOff = false;
     state->dataHVACGlobal->TurnFansOn = true;
 
-    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -999,7 +999,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 0;
-    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -1438,7 +1438,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 0;
-    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -1876,7 +1876,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     state->dataHVACGlobal->TurnFansOn = true;
 
     PTUnitNum = 1;
-    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::CycFanCycCoil;
+    state->dataUnitarySystems->unitarySys[0].m_FanOpMode = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitarySystems->unitarySys[0].m_ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -2577,7 +2577,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     VRFNum = 1;
     VRFTUNum = 1;
-    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::ContFanCycCoil;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Continuous;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone = true;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
     // VRFTU( VRFTUNum ).VRFTUOutletNodeNum
@@ -3259,7 +3259,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     VRFNum = 1;
     VRFTUNum = 1;
-    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::ContFanCycCoil;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Continuous;
 
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
@@ -5015,7 +5015,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
 
     VRFNum = 1;
     VRFTUNum = 1;
-    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::CycFanCycCoil;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Cycling;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone = true;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
@@ -6772,7 +6772,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
 
     VRFNum = 1;
     VRFTUNum = 1;
-    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode = HVAC::CycFanCycCoil;
+    state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp = HVAC::FanOp::Cycling;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone = true;
     state->dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode = state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
@@ -7021,7 +7021,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow =
         state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
 
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OpMode = HVAC::CycFanCycCoil;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).fanOp = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode).MassFlowRateMax = HVACInletMassFlowRate;
@@ -7269,7 +7269,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirMassFlow =
         state->dataEnvrn->StdRhoAir * state->dataUnitVentilators->UnitVent(UnitVentNum).MinOutAirVolFlow;
 
-    state->dataUnitVentilators->UnitVent(UnitVentNum).OpMode = HVAC::CycFanCycCoil;
+    state->dataUnitVentilators->UnitVent(UnitVentNum).fanOp = HVAC::FanOp::Cycling;
     // initialize mass flow rates
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode).MassFlowRate = HVACInletMassFlowRate;
     state->dataLoopNodes->Node(state->dataUnitVentilators->UnitVent(UnitVentNum).AirInNode).MassFlowRateMax = HVACInletMassFlowRate;

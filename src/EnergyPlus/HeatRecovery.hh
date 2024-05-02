@@ -214,7 +214,7 @@ namespace HeatRecovery {
         void CalcAirToAirGenericHeatExch(EnergyPlusData &state,
                                          bool HXUnitOn,                                      // flag to simulate heat exchanger heat recovery
                                          bool FirstHVACIteration,                            // first HVAC iteration flag
-                                         int FanOpMode,                                      // Supply air fan operating mode (1=cycling, 2=constant)
+                                         HVAC::FanOp const fanOp,                            // Supply air fan operating mode (1=cycling, 2=constant)
                                          ObjexxFCL::Optional_bool_const EconomizerFlag = _,  // economizer flag pass by air loop or OA sys
                                          ObjexxFCL::Optional_bool_const HighHumCtrlFlag = _, // high humidity control flag passed by airloop or OA sys
                                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio = _ //
@@ -224,7 +224,7 @@ namespace HeatRecovery {
         CalcDesiccantBalancedHeatExch(EnergyPlusData &state,
                                       bool HXUnitOn,           // flag to simulate heat exchager heat recovery
                                       bool FirstHVACIteration, // First HVAC iteration flag
-                                      int FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
+                                      HVAC::FanOp const fanOp, // Supply air fan operating mode (1=cycling, 2=constant)
                                       Real64 PartLoadRatio,    // Part load ratio requested of DX compressor
                                       int CompanionCoilIndex,  // index of companion cooling coil
                                       int CompanionCoilType,   // type of cooling coil
@@ -394,7 +394,7 @@ namespace HeatRecovery {
                          std::string_view CompName,                             // name of the heat exchanger unit
                          bool FirstHVACIteration,                               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                                        // Pointer to Component
-                         int FanOpMode,                                         // Supply air fan operating mode
+                         HVAC::FanOp const fanOp,                               // Supply air fan operating mode
                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio = _, // Part load ratio requested of DX compressor
                          ObjexxFCL::Optional_bool_const HXUnitEnable = _,       // Flag to operate heat exchanger
                          ObjexxFCL::Optional_int_const CompanionCoilIndex = _,  // index of companion cooling coil

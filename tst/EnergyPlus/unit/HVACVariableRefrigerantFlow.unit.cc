@@ -174,7 +174,7 @@ protected:
         state->dataDXCoils->DXCoilFullLoadOutAirTemp.allocate(10);
         state->dataDXCoils->DXCoilFullLoadOutAirHumRat.allocate(10);
         state->dataDXCoils->DXCoilPartLoadRatio.allocate(10);
-        state->dataDXCoils->DXCoilFanOpMode.allocate(10);
+        state->dataDXCoils->DXCoilFanOp.allocate(10);
         state->dataDXCoils->DXCoilTotalCooling.allocate(10);
         state->dataDXCoils->DXCoilCoolInletAirWBTemp.allocate(10);
         state->dataDXCoils->DXCoilTotalHeating.allocate(10);
@@ -6678,7 +6678,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0;                                                                            // set continuous fan operating mode
     InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);  // Initialize all VRFTU related parameters
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, HVAC::ContFanCycCoil); // continuous fan cycling coil operating mode
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AverageOAMassFlow = state->dataEnvrn->StdRhoAir * state->dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
@@ -8160,7 +8160,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:ELECTRIC";
     thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingElectric;
-    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.fanOp = HVAC::FanOp::Continuous;
     thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
@@ -8225,7 +8225,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:FUEL";
     thisVRFTU.SuppHeatCoilName = "TU2 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
-    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.fanOp = HVAC::FanOp::Continuous;
     thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
@@ -8290,7 +8290,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:WATER";
     thisVRFTU.SuppHeatCoilName = "TU3 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingWater;
-    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.fanOp = HVAC::FanOp::Continuous;
     thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
@@ -8409,7 +8409,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     thisVRFTU.SuppHeatCoilType = "COIL:HEATING:STEAM";
     thisVRFTU.SuppHeatCoilName = "TU4 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingSteam;
-    thisVRFTU.OpMode = HVAC::ContFanCycCoil;
+    thisVRFTU.fanOp = HVAC::FanOp::Continuous;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -15241,7 +15241,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode, HVAC::ContFanCycCoil); // continuous fan cycling coil operating mode
+    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)

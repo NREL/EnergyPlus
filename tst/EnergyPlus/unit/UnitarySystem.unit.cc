@@ -3963,7 +3963,7 @@ Curve:Biquadratic,
     Real64 latOut = 0.0;
 
     // this setup is a continuous fan cycling coil op mode
-    thisSys->m_FanOpMode = HVAC::ContFanCycCoil;
+    thisSys->m_FanOpMode = HVAC::FanOp::Continuous;
 
     thisSys->simulate(*state,
                       thisSys->Name,
@@ -5055,7 +5055,7 @@ Schedule:Compact,
     EXPECT_EQ(0.5, state->dataHVACGlobal->MSHPMassFlowRateHigh);
 
     // constant fan mode should not drop to idle flow rate at speed = 1
-    thisSys.m_FanOpMode = HVAC::ContFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Continuous;
 
     thisSys.m_HeatingSpeedNum = 1;
     thisSys.m_CoolingSpeedNum = 0;
@@ -5103,7 +5103,7 @@ Schedule:Compact,
     thisSys.m_DehumidControlType_Num = UnitarySys::DehumCtrlType::None;
 
     // cycling fan mode should drop to 0 flow rate for cycling fan mode only below speed = 1
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     thisSys.m_HeatingSpeedNum = 1;
     thisSys.m_CoolingSpeedNum = 0;
@@ -5148,7 +5148,7 @@ Schedule:Compact,
     EXPECT_EQ(0.3, state->dataUnitarySystems->CompOnFlowRatio);
 
     // constant fan mode should not drop to idle flow rate at speed = 1
-    thisSys.m_FanOpMode = HVAC::ContFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Continuous;
 
     thisSys.m_HeatingSpeedNum = 0;
     thisSys.m_CoolingSpeedNum = 1;
@@ -5189,7 +5189,7 @@ Schedule:Compact,
 
     // test for cycling fan flow case where state->dataHVACGlobal->MSHPMassFlowRateLow variable is proportional to PLR (flow @ 0.25 * PLR @ 0.7 =
     // 0.175)
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.25, state->dataHVACGlobal->MSHPMassFlowRateHigh);
@@ -5215,7 +5215,7 @@ Schedule:Compact,
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
 
     // and flip back to constant fan and both variables should be the same
-    thisSys.m_FanOpMode = HVAC::ContFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Continuous;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(0.3, state->dataHVACGlobal->MSHPMassFlowRateHigh);
@@ -5528,7 +5528,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     state->dataUnitarySystems->CoolingLoad = false;
 
     // cycling fan mode
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     // heating load only
     state->dataUnitarySystems->MoistureLoad = 0.0;
@@ -5665,7 +5665,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     thisSys.m_MSCoolingSpeedRatio[2] = 0.6;
     thisSys.m_CoolMassFlowRate[3] = 1.0;
     thisSys.m_MSCoolingSpeedRatio[3] = 1.0;
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     // cooling load at speed 3
     thisSys.m_Humidistat = false;
@@ -19470,7 +19470,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
     thisSys.m_CoolMassFlowRate.resize(1);
     thisSys.m_LastMode = UnitarySystems::CoolingMode;
     thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     // cooling load
     thisSys.m_Humidistat = false;
@@ -19722,7 +19722,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     // cooling load
     thisSys.m_Humidistat = false;
@@ -19989,7 +19989,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     thisSys.MaxNoCoolHeatAirMassFlow = 0.2;
     thisSys.m_NoLoadAirFlowRateRatio = 0.2;
     thisSys.m_FanAvailSchedPtr = ScheduleManager::ScheduleAlwaysOn;
-    thisSys.m_FanOpMode = HVAC::CycFanCycCoil;
+    thisSys.m_FanOpMode = HVAC::FanOp::Cycling;
 
     // cooling load
     thisSys.m_Humidistat = false;

@@ -127,7 +127,7 @@ namespace DataAirLoop {
         bool CyclingFan = false;                    // TRUE if currently the air loop supply fan is cycling
         bool AnyContFan = false;                    // TRUE if at any time supply fan is continuous
         int CycFanSchedPtr = 0;                     // index of schedule indicating whether fan is cycling or continuous in a unitary system
-        int FanOpMode = 0;                          // 1=cycling fan cycling compressor; 2=constant fan cycling comptressor
+        HVAC::FanOp fanOp = HVAC::FanOp::Invalid;   // 1=cycling fan cycling compressor; 2=constant fan cycling comptressor
         bool UnitarySys = false;                    // TRUE if a unitary system
         bool UnitarySysSimulating = true;           // set FALSE for AirloopUnitarySystem after simulating to downstream coils can size independently
         bool Simple = false;                        // TRUE if system has 1 branch and 1 component
@@ -223,7 +223,7 @@ namespace DataAirLoop {
     struct AirLoopAFNData
     {
         // Members
-        int LoopFanOperationMode = 0;           // OnOff fan operation mode
+        HVAC::FanOp LoopFanOperationMode = HVAC::FanOp::Invalid;           // OnOff fan operation mode
         Real64 LoopSystemOnMassFlowrate = 0.0;  // Loop mass flow rate during on cycle using an OnOff fan
         Real64 LoopSystemOffMassFlowrate = 0.0; // Loop mass flow rate during off cycle using an OnOff fan
         Real64 LoopOnOffFanPartLoadRatio = 0.0; // OnOff fan part load ratio
