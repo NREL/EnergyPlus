@@ -86,7 +86,6 @@ using namespace EnergyPlus::HybridModel;
 using namespace EnergyPlus::ZonePlenum;
 using namespace EnergyPlus::ZoneTempPredictorCorrector;
 using namespace EnergyPlus::DataLoopNode;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;

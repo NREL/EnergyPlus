@@ -161,9 +161,9 @@ namespace VentilatedSlab {
         // (assumes fan is upstream of heating coil)
         int MSlabInNode;
         int MSlabOutNode;
-        std::string FanName;              // name of fan
-        int Fan_Index;                    // index of fan in array or vector
-        DataHVACGlobals::FanType fanType; // type of fan
+        std::string FanName;   // name of fan
+        int Fan_Index;         // index of fan in array or vector
+        HVAC::FanType fanType; // type of fan
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 MaxAirVolFlow;                        // m3/s
@@ -286,25 +286,25 @@ namespace VentilatedSlab {
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0),
               controlType(ControlType::Invalid), ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0),
-              Fan_Index(0), fanType(DataHVACGlobals::FanType::Invalid), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0),
-              MaxAirMassFlow(0.0), outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0), TempSchedPtr(0),
-              OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
-              MinOutAirMassFlow(0.0), SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false),
-              hCoilType(HeatingCoilType::Invalid), heatingCoil_Index(0), heatingCoilType(DataPlant::PlantEquipmentType::Invalid),
-              heatingCoil_FluidIndex(0), heatingCoilSchedPtr(0), heatingCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0),
-              MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0),
-              MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0), HotControlOffset(0.0), HWPlantLoc{}, HotAirHiTempSchedPtr(0),
-              HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0), HotCtrlLoTempSchedPtr(0), coolingCoilPresent(false), coolingCoil_Index(0),
-              coolingCoilType(DataPlant::PlantEquipmentType::Invalid), cCoilType(CoolingCoilType::Invalid), coolingCoilSchedPtr(0),
-              coolingCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0),
-              ColdControlNode(0), ColdCoilOutNodeNum(0), ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0),
-              ColdCtrlHiTempSchedPtr(0), ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0), MSlabIn(0), MSlabOut(0),
-              DirectHeatLossPower(0.0), DirectHeatLossEnergy(0.0), DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0), TotalVentSlabRadPower(0.0),
-              RadHeatingPower(0.0), RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0),
-              TotCoolCoilPower(0.0), TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0),
-              LateCoolCoilEnergy(0.0), ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0),
-              SlabOutTemp(0.0), ReturnAirTemp(0.0), FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true),
-              ZeroVentSlabSourceSumHATsurf(0.0), QRadSysSrcAvg(0.0), LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
+              Fan_Index(0), fanType(HVAC::FanType::Invalid), ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0),
+              outsideAirControlType(OutsideAirControlType::Invalid), MinOASchedPtr(0), MaxOASchedPtr(0), TempSchedPtr(0), OutsideAirNode(0),
+              AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0), MinOutAirMassFlow(0.0),
+              SysConfg(VentilatedSlabConfig::Invalid), coilOption(CoilType::Invalid), heatingCoilPresent(false), hCoilType(HeatingCoilType::Invalid),
+              heatingCoil_Index(0), heatingCoilType(DataPlant::PlantEquipmentType::Invalid), heatingCoil_FluidIndex(0), heatingCoilSchedPtr(0),
+              heatingCoilSchedValue(0.0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0), MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0),
+              MinHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0), HotControlNode(0), HotCoilOutNodeNum(0),
+              HotControlOffset(0.0), HWPlantLoc{}, HotAirHiTempSchedPtr(0), HotAirLoTempSchedPtr(0), HotCtrlHiTempSchedPtr(0),
+              HotCtrlLoTempSchedPtr(0), coolingCoilPresent(false), coolingCoil_Index(0), coolingCoilType(DataPlant::PlantEquipmentType::Invalid),
+              cCoilType(CoolingCoilType::Invalid), coolingCoilSchedPtr(0), coolingCoilSchedValue(0.0), MaxVolColdWaterFlow(0.0),
+              MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0), MinColdWaterFlow(0.0), ColdControlNode(0), ColdCoilOutNodeNum(0),
+              ColdControlOffset(0.0), CWPlantLoc{}, ColdAirHiTempSchedPtr(0), ColdAirLoTempSchedPtr(0), ColdCtrlHiTempSchedPtr(0),
+              ColdCtrlLoTempSchedPtr(0), CondErrIndex(0), EnrgyImbalErrIndex(0), RadSurfNum(0), MSlabIn(0), MSlabOut(0), DirectHeatLossPower(0.0),
+              DirectHeatLossEnergy(0.0), DirectHeatGainPower(0.0), DirectHeatGainEnergy(0.0), TotalVentSlabRadPower(0.0), RadHeatingPower(0.0),
+              RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0),
+              TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0),
+              ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0),
+              FanOutletTemp(0.0), ZoneInletTemp(0.0), AvailStatus(0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0),
+              QRadSysSrcAvg(0.0), LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
         {
         }
     };

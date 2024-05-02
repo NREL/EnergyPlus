@@ -499,7 +499,7 @@ namespace BoilerSteam {
         int PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum;
 
         if (PltSizNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 Real64 SizingTemp = this->TempUpLimitBoilerOut;
                 Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(state, fluidNameSteam, SizingTemp, 1.0, this->FluidIndex, RoutineName);
                 Real64 EnthSteamOutDry = FluidProperties::GetSatEnthalpyRefrig(state, fluidNameSteam, SizingTemp, 1.0, this->FluidIndex, RoutineName);

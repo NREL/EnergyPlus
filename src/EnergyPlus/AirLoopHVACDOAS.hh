@@ -123,7 +123,7 @@ namespace AirLoopHVACDOAS {
         int NumOfAirLoops = 0;
         int m_InletNodeNum = 0;
         int m_OutletNodeNum = 0;
-        int m_FanIndex = -1;
+        int m_FanIndex = 0;
         int m_FanInletNodeNum = 0;
         int m_FanOutletNodeNum = 0;
         SimAirServingZones::CompType m_FanTypeNum = SimAirServingZones::CompType::Invalid;

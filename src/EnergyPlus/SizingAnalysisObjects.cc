@@ -445,7 +445,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData &state, int 
 
     using namespace DataPlant;
     using namespace OutputReportPredefined;
-    using DataHVACGlobals::SmallWaterVolFlow;
+    using HVAC::SmallWaterVolFlow;
     bool setNewSizes;
     Real64 sizingFac;
     Real64 normalizedChange;

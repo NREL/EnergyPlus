@@ -7710,8 +7710,8 @@ namespace InternalHeatGains {
         using ScheduleManager::GetCurrentScheduleValue;
         using namespace Psychrometrics;
         using Curve::CurveValue;
-        using DataHVACGlobals::SmallAirVolFlow;
-        using DataHVACGlobals::SmallTempDiff;
+        using HVAC::SmallAirVolFlow;
+        using HVAC::SmallTempDiff;
 
         // Operating Limits for environmental class: None, A1, A2, A3, A4, B, C, H1
         // From ASHRAE 2021 Thermal Guidelines environmental classes for Air-Cooled ITE

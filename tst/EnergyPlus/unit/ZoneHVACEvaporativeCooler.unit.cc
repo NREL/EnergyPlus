@@ -228,7 +228,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
-    EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
+    EXPECT_EQ(thisZoneEvapCooler.OpMode, HVAC::CycFanCycCoil);
     EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
@@ -353,7 +353,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
-    EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
+    EXPECT_EQ(thisZoneEvapCooler.OpMode, HVAC::CycFanCycCoil);
     EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
@@ -492,7 +492,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     state->dataZoneEquip->ZoneEquipList(1).EquipName(1) = thisZoneEvapCooler.Name;
 
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
-    EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
+    EXPECT_EQ(thisZoneEvapCooler.OpMode, HVAC::CycFanCycCoil);
     EXPECT_TRUE(compare_enums(thisZoneEvapCooler.ControlSchemeType, ControlType::ZoneTemperatureDeadBandOnOffCycling));
     EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(
         *state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);

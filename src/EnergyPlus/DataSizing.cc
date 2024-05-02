@@ -457,12 +457,12 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataFractionUsedForSizing = 0.0;
     state.dataSize->DataNonZoneNonAirloopValue = 0.0;
     state.dataSize->DataZoneNumber = 0;
-    state.dataSize->DataFanEnumType = -1;
-    state.dataSize->DataFanIndex = -1;
+    state.dataSize->DataFanType = HVAC::FanType::Invalid;
+    state.dataSize->DataFanIndex = 0;
     state.dataSize->DataWaterCoilSizCoolDeltaT = 0.0;
     state.dataSize->DataWaterCoilSizHeatDeltaT = 0.0;
     state.dataSize->DataNomCapInpMeth = false;
-    state.dataSize->DataFanPlacement = DataHVACGlobals::FanPlace::Invalid;
+    state.dataSize->DataFanPlacement = HVAC::FanPlace::Invalid;
     state.dataSize->DataDXSpeedNum = 0;
     state.dataSize->DataCoilSizingAirInTemp = 0.0;
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;

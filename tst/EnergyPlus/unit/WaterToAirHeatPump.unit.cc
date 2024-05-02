@@ -66,7 +66,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
@@ -243,7 +242,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     Real64 PartLoadRatio(1.0);
     int CyclingScheme(1);
     bool FirstHVACIteration(true);
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
