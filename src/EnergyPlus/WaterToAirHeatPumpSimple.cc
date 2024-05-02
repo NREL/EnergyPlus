@@ -1196,7 +1196,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.WaterFlowMode = false;
             simpleWatertoAirHP.WaterMassFlowRate = 0.0;
             simpleWatertoAirHP.AirMassFlowRate = 0.0;
-            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).QLoadTotal > 0.0) {
@@ -3279,7 +3279,7 @@ namespace WaterToAirHeatPumpSimple {
         }
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
-        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterCycling) {
+        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Cycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
@@ -3294,7 +3294,7 @@ namespace WaterToAirHeatPumpSimple {
                     state.dataWaterToAirHeatPumpSimple->SourceSideInletEnth + simpleWatertoAirHP.QSource / simpleWatertoAirHP.WaterMassFlowRate;
             }
         } else {
-            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WaterFlowMode) {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -3496,7 +3496,7 @@ namespace WaterToAirHeatPumpSimple {
         }
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
-        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterCycling) {
+        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Cycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
@@ -3511,7 +3511,7 @@ namespace WaterToAirHeatPumpSimple {
                     state.dataWaterToAirHeatPumpSimple->SourceSideInletEnth - simpleWatertoAirHP.QSource / simpleWatertoAirHP.WaterMassFlowRate;
             }
         } else {
-            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WaterFlowMode) {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -4016,7 +4016,7 @@ namespace WaterToAirHeatPumpSimple {
     void SetSimpleWSHPData(EnergyPlusData &state,
                            int const SimpleWSHPNum,                         // Number of OA Controller
                            bool &ErrorsFound,                               // Set to true if certain errors found
-                           int const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
+                           HVAC::WaterFlow const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
                            ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
                            ObjexxFCL::Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )

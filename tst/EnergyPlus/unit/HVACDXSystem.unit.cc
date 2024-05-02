@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     std::string compName = "DX COOLING COIL SYSTEM";
     bool zoneEquipment = false;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     EXPECT_EQ(thisSys->Name, "DX COOLING COIL SYSTEM");
@@ -587,7 +587,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);
@@ -1062,7 +1062,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     int airLoopNum = 1;
 
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     // call again to get the rest of the input when sysNum > -1
     UnitarySystems::UnitarySys::getUnitarySystemInput(*state, compName, false, 0);

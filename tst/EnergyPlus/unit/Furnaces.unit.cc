@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataFurnaces->Furnace.allocate(1);
 
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = HVAC::UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatCool;
 
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceInletNodeNum = 1;
     state->dataFurnaces->Furnace(FurnaceNum).FurnaceOutletNodeNum = 2;
@@ -261,7 +261,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
     state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = 6;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir;
     state->dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number
 
     state->dataFurnaces->HeatingLoad = false;
@@ -366,7 +366,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 
     FurnaceNum = 1;
     state->dataFurnaces->Furnace.allocate(1);
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = HVAC::UnitarySys_HeatPump_AirToAir;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatPump_AirToAir;
 
     state->dataFurnaces->CompOnMassFlow = 2.0;
     state->dataFurnaces->CompOffMassFlow = 0.0;
@@ -385,7 +385,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     EXPECT_EQ((int)HVAC::FanOp::Cycling, (int)state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
     EXPECT_EQ(1.0, state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
-    state->dataFurnaces->Furnace(FurnaceNum).FurnaceType_Num = HVAC::UnitarySys_HeatCool;
+    state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatCool;
     state->dataFurnaces->Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
     state->dataFurnaces->Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
     state->dataFurnaces->Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;

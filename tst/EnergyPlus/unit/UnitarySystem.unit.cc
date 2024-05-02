@@ -777,7 +777,7 @@ TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -991,7 +991,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_TwoSpeedDXCoolCoil_Only)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -1275,7 +1275,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoolCoil_Only)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -1562,7 +1562,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageGasHeatCoil_Only)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -1799,7 +1799,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Only)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -2045,7 +2045,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiStageElecHeatCoil_Backup_Load
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -2390,7 +2390,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -2665,7 +2665,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -2924,7 +2924,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -3170,7 +3170,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -3385,7 +3385,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -3930,7 +3930,7 @@ Curve:Biquadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -4330,7 +4330,7 @@ SetpointManager:Scheduled,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -4717,7 +4717,7 @@ SetpointManager:Scheduled,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -6000,9 +6000,9 @@ Curve:Biquadratic,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -6010,7 +6010,7 @@ Curve:Biquadratic,
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = true; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
@@ -6645,7 +6645,7 @@ Curve:Biquadratic,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -7007,16 +7007,16 @@ Curve:Biquadratic,
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInput(*state, compName, zoneEquipment, 0); // get UnitarySystem input from object above
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
@@ -7503,16 +7503,16 @@ Curve:Biquadratic,
     state->dataZoneEquip->ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInput(*state, compName, zoneEquipment, 0); // get UnitarySystem input from object above
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
@@ -7837,7 +7837,7 @@ Curve:Biquadratic,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -8020,7 +8020,7 @@ Curve:Biquadratic,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -8463,16 +8463,16 @@ OutdoorAir:NodeList,
     DataZoneEquipment::GetZoneEquipmentData(*state);      // read zone equipment
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     InletNode = thisSys->AirInNode;
     OutletNode = thisSys->AirOutNode;
@@ -9234,7 +9234,7 @@ Curve:Biquadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool ErrorsFound = false;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -9721,9 +9721,9 @@ Curve:QuadLinear,
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 9;
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -9731,7 +9731,7 @@ Curve:QuadLinear,
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
@@ -10065,9 +10065,9 @@ Schedule:Compact,
     state->dataPlnt->PlantLoop(2).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 7;
 
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -10075,7 +10075,7 @@ Schedule:Compact,
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);       // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]); // compare UnitarySystem type string to valid type
 
     state->dataGlobal->SysSizingCalc = false; // DISABLE SIZING - don't call UnitarySystem::sizeSystem, much more work needed to set up sizing arrays
 
@@ -11097,7 +11097,7 @@ Schedule:Compact,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool ErrorsFound = false;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -11900,7 +11900,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = false;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -13110,7 +13110,7 @@ Curve:Biquadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool ErrorsFound = false;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -13731,7 +13731,7 @@ Coil:Heating:Electric,
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -13968,7 +13968,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
     bool ErrorsFound = false;
     bool zoneEquipment = true;
     std::string compName = "UNITARY SYSTEM MODEL";
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -14117,7 +14117,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
     bool ErrorsFound = false;
     bool zoneEquipment = true;
     std::string compName = "UNITARY SYSTEM MODEL";
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -14291,7 +14291,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
     bool ErrorsFound = false;
     bool zoneEquipment = true;
     std::string compName = "UNITARY SYSTEM MODEL";
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -14562,7 +14562,7 @@ Curve:Biquadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataGlobal->DoCoilDirectSolutions = true;
@@ -14795,16 +14795,16 @@ Curve:Biquadratic,
 
     UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool zoneEquipment(true);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum));
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]);
 
     EXPECT_TRUE(thisSys->m_FanExists);
     EXPECT_TRUE(thisSys->m_CoolCoilExists);
@@ -16230,14 +16230,14 @@ Dimensionless;	!- Output Unit Type
     std::string OASys1Name = "OA Sys Cooling Coil 1";
     std::string OASys2Name = "OA Sys Cooling Coil 2";
     bool zoneEquipment = false;
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     bool FirstHVACIteration = true;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[2];
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, OASys1Name, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, OASys1Name, zoneEquipment, 0);
     UnitarySystems::UnitarySys *OASys1 = &state->dataUnitarySystems->unitarySys[0];
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, OASys2Name, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, OASys2Name, zoneEquipment, 0);
     UnitarySystems::UnitarySys *OASys2 = &state->dataUnitarySystems->unitarySys[1];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -16725,9 +16725,9 @@ Curve:Biquadratic,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
 
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     // only 1 unitary system above so expect 1 as number of unitary system objects
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
     // Now retrieve it
@@ -16996,7 +16996,7 @@ Curve:Biquadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -17304,7 +17304,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsNoLoadFlowRateSiz
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     state->dataEnvrn->OutBaroPress = 101325.0;
 
@@ -17700,7 +17700,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultiSpeedDXCoilsDirectSolutionTes
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -18402,7 +18402,7 @@ Curve:Biquadratic,
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataGlobal->NumOfTimeStepInHour = 1;
@@ -18531,7 +18531,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -18735,7 +18735,7 @@ Curve:Quadratic,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -19038,7 +19038,7 @@ Schedule:Compact,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     thisSys->getUnitarySystemInputData(*state, compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                           // expect no errors
@@ -19182,7 +19182,7 @@ TEST_F(EnergyPlusFixture, WaterCoil_getCoilWaterSystemInputDataTest)
     int unitarySysIndex(0);
     bool ErrorsFound(false);
 
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -19268,7 +19268,7 @@ TEST_F(EnergyPlusFixture, DetailedWaterCoil_getCoilWaterSystemInputDataTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -19370,7 +19370,7 @@ TEST_F(EnergyPlusFixture, HXAssistedWaterCoil_getCoilWaterSystemInputDataTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -19449,7 +19449,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_ControlStatusTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -19696,7 +19696,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -19963,7 +19963,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
 
     int unitarySysIndex(0);
     bool ErrorsFound(false);
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "COIL SYSTEM WATER", zoneEquipment, 0);
     UnitarySystems::UnitarySys::getCoilWaterSystemInputData(*state, "Coil System Water", zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     UnitarySystems::UnitarySys *unitSys = &state->dataUnitarySystems->unitarySys[unitarySysIndex];
@@ -20575,7 +20575,7 @@ Curve:Biquadratic, EIRFT, 1, 0, 0, 0, 0, 0, 0, 100, 0, 100, , , Temperature, Tem
 
     std::string UnitarySysName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, UnitarySysName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, UnitarySysName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
     int coilIndex = CoilCoolingDX::factory(*state, "DX ClgCoil");
     auto &this_dx_clg_coil = state->dataCoilCooingDX->coilCoolingDXs[coilIndex];
@@ -20848,7 +20848,7 @@ Coil:Heating:Gas:MultiStage,
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     bool FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;                                  // indicate zone data is available
@@ -21324,9 +21324,9 @@ Schedule:Constant,
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
-    int compTypeOfNum = HVAC::UnitarySys_AnyCoilType;
+    HVAC::UnitarySysType compType = HVAC::UnitarySysType::Unitary_AnyCoilType;
     FirstHVACIteration = true;
-    UnitarySystems::UnitarySys::factory(*state, compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(*state, compType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &state->dataUnitarySystems->unitarySys[0];
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
@@ -21334,7 +21334,7 @@ Schedule:Constant,
     EXPECT_FALSE(ErrorsFound);
     // check model inputs
     ASSERT_EQ(1, state->dataUnitarySystems->numUnitarySystems);
-    EXPECT_EQ(thisSys->UnitType, HVAC::cFurnaceTypes(compTypeOfNum));
+    EXPECT_EQ(thisSys->UnitType, HVAC::unitarySysTypeNames[(int)compType]);
     EXPECT_TRUE(compare_enums(UnitarySys::UnitarySysCtrlType::Load, thisSys->m_ControlType));
     EXPECT_TRUE(compare_enums(UnitarySys::DehumCtrlType::CoolReheat, thisSys->m_DehumidControlType_Num));
     // set sizing is already done

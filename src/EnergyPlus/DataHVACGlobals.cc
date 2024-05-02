@@ -58,14 +58,43 @@ namespace HVAC {
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for HVAC variables which are considered
     // to be "global" in nature in EnergyPlus.
-    Array1D_string const cFurnaceTypes(NumUnitarySystemTypes,
-                                       {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
-                                        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-                                        "AirLoopHVAC:UnitaryHeatOnly",
-                                        "AirLoopHVAC:UnitaryHeatCool",
-                                        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-                                        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-                                        "AirLoopHVAC:UnitarySystem"});
+    constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
+        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
+
+    constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
+
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
+        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
+        "AirLoopHVAC:Unitary:Furnace:HeatCool",
+        "AirLoopHVAC:UnitaryHeatOnly",
+        "AirLoopHVAC:UnitaryHeatCool",
+        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+        "AirLoopHVAC:UnitarySystem"
+    };
+
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNamesUC = {
+        "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+        "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+        "AIRLOOPHVAC:UNITARYHEATONLY",
+        "AIRLOOPHVAC:UNITARYHEATCOOL",
+        "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
+        "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
+        "AIRLOOPHVAC:UNITARYSYSTEM"
+    };
+
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNames = {
+        "Cycling",
+        "Constant",
+        "ConstantOnDemand"
+    };
+        
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNamesUC = {
+        "CYCLING",
+        "CONSTANT",
+        "CONSTANTONDEMAND"
+    };
 
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",

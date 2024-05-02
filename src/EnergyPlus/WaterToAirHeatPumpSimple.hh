@@ -138,9 +138,9 @@ namespace WaterToAirHeatPumpSimple {
         int WaterInletNodeNum = 0;                   // Node Number of the Water Onlet
         int WaterOutletNodeNum = 0;                  // Node Number of the Water Outlet
         PlantLocation plantLoc;
-        int WaterCyclingMode = 0; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
+        HVAC::WaterFlow WaterCyclingMode = HVAC::WaterFlow::Invalid; // Heat Pump Coil water flow mode; See definitions in DataHVACGlobals,
         // 1=water cycling, 2=water constant, 3=water constant on demand (old mode)
-        int LastOperatingMode = HVAC::WaterCycling; // type of coil calling for water flow, either heating or cooling,
+        int LastOperatingMode = 0; // type of coil calling for water flow, either heating or cooling,
         // start it at 1 so there will be water flow from the start,
         // even if there is no load.
         // Gets updated only during the first iteration of each timestep
@@ -258,7 +258,7 @@ namespace WaterToAirHeatPumpSimple {
     void SetSimpleWSHPData(EnergyPlusData &state,
                            int const SimpleWSHPNum,                             // Number of OA Controller
                            bool &ErrorsFound,                                   // Set to true if certain errors found
-                           int const WaterCyclingMode,                          // the coil water flow mode (cycling, constant or constantondemand)
+                           HVAC::WaterFlow const waterCyclingMode,              // the coil water flow mode (cycling, constant or constantondemand)
                            ObjexxFCL::Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
                            ObjexxFCL::Optional_int CompanionHeatingCoilNum = _  // Index to heating coil for cooling coil = SimpleWSHPNum
     );

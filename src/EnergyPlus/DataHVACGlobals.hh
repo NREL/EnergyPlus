@@ -139,11 +139,8 @@ namespace HVAC {
         Num
     };
 
-    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
-        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
-
-    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
-        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
+    extern const std::array<std::string_view, (int)FanType::Num> fanTypeNames;
+    extern const std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC;
 
     // Fan Minimum Flow Fraction Input Method
     int constexpr MinFrac(1);
@@ -191,39 +188,21 @@ namespace HVAC {
         "InterlockedWithMechanicalCooling",
     };
 
-    //    enum class UnitarySysType
-    //    {
-    //        Invalid = -1,
-    //        Furnace_HeatOnly,
-    //        Furnace_HeatCool,
-    //        HeatOnly,
-    //        HeatCool,
-    //        HeatPump_AirToAir,
-    //        HeatPump_WaterToAir,
-    //        AnyCoilType,
-    //        Num
-    //    };
-    //
-    //    static constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
-    //        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
-    //        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-    //        "AirLoopHVAC:UnitaryHeatOnly",
-    //        "AirLoopHVAC:UnitaryHeatCool",
-    //        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-    //        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-    //        "AirLoopHVAC:UnitarySystem"
-    //    };
+    enum class UnitarySysType
+    {
+        Invalid = -1,
+        Furnace_HeatOnly,
+        Furnace_HeatCool,
+        Unitary_HeatOnly,
+        Unitary_HeatCool,
+        Unitary_HeatPump_AirToAir,
+        Unitary_HeatPump_WaterToAir,
+        Unitary_AnyCoilType,
+        Num
+    };
 
-    // parameters describing unitary systems
-    int constexpr NumUnitarySystemTypes(7);
-    // Furnace/Unitary System Types
-    int constexpr Furnace_HeatOnly(1);
-    int constexpr Furnace_HeatCool(2);
-    int constexpr UnitarySys_HeatOnly(3);
-    int constexpr UnitarySys_HeatCool(4);
-    int constexpr UnitarySys_HeatPump_AirToAir(5);
-    int constexpr UnitarySys_HeatPump_WaterToAir(6);
-    int constexpr UnitarySys_AnyCoilType(7);
+    extern const std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames;
+    extern const std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNamesUC;
 
     enum class CoilType
     {
@@ -356,11 +335,17 @@ namespace HVAC {
     int constexpr WatertoAir_VarSpeedEquationFit(3);
     int constexpr WatertoAir_VarSpeedLooUpTable(4);
 
-    // Water to Air HP Water Flow Mode
-    int constexpr WaterCycling(1);  // water flow cycles with compressor
-    int constexpr WaterConstant(2); // water flow is constant
-    int constexpr WaterConstantOnDemand(
-        3); // water flow is constant whenever the coil is operational - this is the only method used in EP V7.2 and earlier
+    enum class WaterFlow
+    {
+        Invalid = -1,
+        Cycling,
+        Constant,
+        ConstantOnDemand,
+        Num
+    };
+
+    extern const std::array<std::string_view, (int)WaterFlow::Num> waterFlowNames;
+    extern const std::array<std::string_view, (int)WaterFlow::Num> waterFlowNamesUC;
 
     // parameters describing coil performance types
     int constexpr CoilPerfDX_CoolBypassEmpirical(100);
@@ -439,8 +424,6 @@ namespace HVAC {
     extern Array1D_string const cATMixerTypes;
     extern Array1D_string const cVRFTUTypes;
     extern Array1D_string const cVRFHeatingPerformanceOATTypes;
-    extern Array1D_string const cHXTypes;
-    extern Array1D_string const cFurnaceTypes;
 
     struct ComponentSetPtData
     {

@@ -1132,7 +1132,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = UnitarySystems::UnitarySys::factory(
-                    state, HVAC::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                    state, HVAC::UnitarySysType::Unitary_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
             }
         }
     }

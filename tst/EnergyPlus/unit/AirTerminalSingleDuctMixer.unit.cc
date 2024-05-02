@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     UnitarySystems::UnitarySys thisSys;
-    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -609,7 +609,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
@@ -962,7 +962,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
@@ -1401,7 +1401,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];
@@ -1839,7 +1839,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 Heat Pump", true, 0);
     UnitarySystems::UnitarySys thisSys;
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     thisSys = state->dataUnitarySystems->unitarySys[0];

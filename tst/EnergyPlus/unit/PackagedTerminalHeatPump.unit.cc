@@ -451,7 +451,7 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "Zone WSHP", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "Zone WSHP", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "Zone WSHP", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -850,7 +850,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneAirLoopEquipment(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -1202,7 +1202,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -4299,7 +4299,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     ZonePlenum::GetZonePlenumInput(*state);
     ASSERT_TRUE(has_err_output(true)); // clear schedule warnings from err stream
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     bool isZoneEquipment = true;
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
@@ -4568,7 +4568,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     ASSERT_FALSE(has_err_output(false));
     HVACSystemData *mySys;
     std::string compName = "PTHP THERMAL ZONE ONE";
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     auto &thisSys = state->dataUnitarySystems->unitarySys[0];
     thisSys.getUnitarySystemInput(*state, "PTHP THERMAL ZONE ONE", zoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -4898,7 +4898,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     GetZoneAirLoopEquipment(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;

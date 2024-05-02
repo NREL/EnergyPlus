@@ -165,7 +165,7 @@ namespace UnitarySystems {
 
     public:
         std::string name;
-        static DesignSpecMSHP *factory(EnergyPlusData &state, int object_type_of_num, std::string const &objectName);
+        static DesignSpecMSHP *factory(EnergyPlusData &state, HVAC::UnitarySysType type, std::string const &objectName);
         int numOfSpeedHeating = 0;
         int numOfSpeedCooling = 0;
         Real64 noLoadAirFlowRateRatio = 1.0;
@@ -173,7 +173,7 @@ namespace UnitarySystems {
         std::vector<Real64> heatingVolFlowRatio; // The ratio of flow to max for this speed
 
         //    private:
-        int m_DesignSpecMSHPType_Num = 0;
+        HVAC::UnitarySysType m_type = HVAC::UnitarySysType::Invalid;
         bool m_SingleModeFlag = false;
 
         static void getDesignSpecMSHP(EnergyPlusData &state);
@@ -284,7 +284,7 @@ namespace UnitarySystems {
         bool m_DiscreteSpeedCoolingCoil = false;
         bool m_ContSpeedCoolingCoil = false;
         int CoolCtrlNode = 0;
-        int m_WaterCyclingMode = 0;
+        HVAC::WaterFlow m_WaterCyclingMode = HVAC::WaterFlow::Invalid;
         bool m_ISHundredPercentDOASDXCoil = false;
         bool m_RunOnSensibleLoad = false;
         bool m_RunOnLatentLoad = false;
@@ -870,7 +870,7 @@ namespace UnitarySystems {
         static void allocateUnitarySys(EnergyPlusData &state);
 
         static HVACSystemData *factory(
-            EnergyPlusData &state, int const object_type_of_num, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
+            EnergyPlusData &state, HVAC::UnitarySysType const type, std::string const &objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void calcUnitarySystemToLoad(EnergyPlusData &state,
                                      int const AirLoopNum,                        // index to air loop

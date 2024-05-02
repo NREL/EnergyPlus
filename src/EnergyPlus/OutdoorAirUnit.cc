@@ -830,7 +830,7 @@ namespace OutdoorAirUnit {
                         case CompType::UnitarySystemModel: {
                             UnitarySystems::UnitarySys thisSys;
                             thisOutAirUnit.OAEquip(CompNum).compPointer =
-                                thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, thisOutAirUnit.OAEquip(CompNum).ComponentName, false, OAUnitNum);
+                                thisSys.factory(state, HVAC::UnitarySysType::Unitary_AnyCoilType, thisOutAirUnit.OAEquip(CompNum).ComponentName, false, OAUnitNum);
                             UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(
                                 state, thisOutAirUnit.OAEquip(CompNum).ComponentName, OAUnitNum);
 
@@ -2163,7 +2163,7 @@ namespace OutdoorAirUnit {
                 if (Sim) {
                     if (thisOAEquip.compPointer == nullptr) {
                         UnitarySystems::UnitarySys thisSys;
-                        thisOAEquip.compPointer = thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, thisOAEquip.ComponentName, false, OAUnitNum);
+                        thisOAEquip.compPointer = thisSys.factory(state, HVAC::UnitarySysType::Unitary_AnyCoilType, thisOAEquip.ComponentName, false, OAUnitNum);
                         UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, thisOAEquip.ComponentName, OAUnitNum);
                     }
                     if (((OpMode == Operation::NeutralMode) && (thisOutAirUnit.controlType == OAUnitCtrlType::Temperature)) ||
