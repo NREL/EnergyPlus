@@ -2724,21 +2724,19 @@ namespace RoomAir {
 
         if (zoneEquipType == DataZoneEquipment::ZoneEquipType::Invalid) return EquipFind;
 
-        ErrorObjectHeader eoh{routineName, equipTypeName, EquipName};
-
         switch (zoneEquipType) {
         case DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal: { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeNum = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            SupplyNodeNum = GetFanOutletNode(state, "Fan:OnOff", EquipName, errorfound);
+            //SupplyNodeNum = GetFanOutletNode(state, "Fan:OnOff", EquipName, errorfound);
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
-            SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state,EquipIndex);
+            SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex);
             ReturnNodeNum = FanCoilUnits::GetFanCoilAirInNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
-            SupplyNodeNum = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state,EquipIndex);
+            SupplyNodeNum = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, EquipIndex);
             ReturnNodeNum = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner: { // ZoneHVAC : PackagedTerminalAirConditioner
