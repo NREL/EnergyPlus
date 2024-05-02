@@ -2729,7 +2729,7 @@ namespace RoomAir {
             SupplyNodeNum = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            //SupplyNodeNum = GetFanOutletNode(state, "Fan:OnOff", EquipName, errorfound);
+            // SupplyNodeNum = GetFanOutletNode(state, "Fan:OnOff", EquipName, errorfound);
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
             SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex);
