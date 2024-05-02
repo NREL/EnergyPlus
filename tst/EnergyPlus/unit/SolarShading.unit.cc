@@ -55,6 +55,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataShadowingCombinations.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -5251,7 +5252,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
         "    Suburbs,                 !- Terrain",
         "    3.9999999E-02,           !- Loads Convergence Tolerance Value",
         "    4.0000002E-03,           !- Temperature Convergence Tolerance Value {deltaC}",
-        "    FullExterior,            !- Solar Distribution",
+        "    FullInteriorAndExterior,    !- Solar Distribution",
         "    ,                        !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
         "  ShadowCalculation,",
@@ -5460,6 +5461,20 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
         "    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
         "    -5,-5,0;  !- X,Y,Z ==> Vertex 4 {m}",
         "  FenestrationSurface:Detailed,",
+        "    Zn001:Floor:Win001, !- Name",
+        "    Window,                  !- Surface Type",
+        "    DOUBLE PANE HW WINDOW,   !- Construction Name",
+        "    Zn001:Floor,        !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    TestFrameAndDivider,     !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    -4,4,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    4,4,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    4,-4,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -4,-4,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  FenestrationSurface:Detailed,",
         "    Zn001:Wall-South:Win001, !- Name",
         "    Window,                  !- Surface Type",
         "    DOUBLE PANE HW WINDOW,   !- Construction Name",
@@ -5580,8 +5595,25 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
     FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum2 = Util::FindItemInList("ZN001:FLOOR:WIN001", state->dataSurface->Surface);
     EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
     EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
 
+    state->dataEnvrn->BeamSolarRad = 100.0;
+    state->dataHeatBal->SurfSunlitFrac(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, windowSurfNum) = 1.0;
+    state->dataHeatBal->SurfCosIncAng(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, windowSurfNum) = 1.0;
+    state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum) = 0.8;
+    state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum2) = 0.5;
+    state->dataSurface->SurfSkySolarInc(windowSurfNum) = 50.0;
+    state->dataSurface->SurfGndSolarInc(windowSurfNum) = 25.0;
+
     CalcInteriorSolarDistribution(*state);
+    EXPECT_NEAR(1239.94, state->dataSurface->SurfWinTransSolar(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataSurface->SurfWinTransSolar(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.646, state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum), 0.01);
+    EXPECT_NEAR(1.2, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum2), 0.01);
 }
