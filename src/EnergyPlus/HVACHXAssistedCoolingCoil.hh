@@ -76,10 +76,10 @@ namespace HVACHXAssistedCoolingCoil {
         std::string CoolingCoilName; // Cooling coil name
         int CoolingCoilIndex;
         int DXCoilNumOfSpeeds;         // number of speed levels for variable speed DX coil
-        std::string HeatExchangerType; // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
+        // Heat Exchanger type must be HeatExchanger:AirToAir:FlatPlate,
         // HeatExchanger:AirToAir:SensibleAndLatent or
         // HeatExchanger:Desiccant:BalancedFlow
-        int HeatExchangerType_Num;       // Numeric Equivalent for heat exchanger
+        HVAC::HXType hxType = HVAC::HXType::Invalid;       // Numeric Equivalent for heat exchanger
         std::string HeatExchangerName;   // Heat Exchanger name
         int HeatExchangerIndex;          // Heat Exchanger index
         int HXAssistedCoilInletNodeNum;  // Inlet node to HXAssistedCoolingCoil compound object
@@ -93,7 +93,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // Default Constructor
         HXAssistedCoilParameters()
-            : HXAssistedCoilType_Num(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), DXCoilNumOfSpeeds(0), HeatExchangerType_Num(0),
+            : HXAssistedCoilType_Num(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), DXCoilNumOfSpeeds(0), 
               HeatExchangerIndex(0), HXAssistedCoilInletNodeNum(0), HXAssistedCoilOutletNodeNum(0), HXExhaustAirInletNodeNum(0), MassFlowRate(0.0),
               MaxIterCounter(0), MaxIterIndex(0), ControllerIndex(0)
         {
@@ -104,7 +104,7 @@ namespace HVACHXAssistedCoolingCoil {
     SimHXAssistedCoolingCoil(EnergyPlusData &state,
                              std::string_view HXAssistedCoilName,    // Name of HXAssistedCoolingCoil
                              bool const FirstHVACIteration,          // FirstHVACIteration flag
-                             HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
+                             HVAC::CompressorOp compressorOp, // compressor operation; 1=on, 0=off
                              Real64 const PartLoadRatio,             // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                              int &CompIndex,
                              HVAC::FanOp const fanOp,                           // Allows the parent object to control fan operation
@@ -124,7 +124,7 @@ namespace HVACHXAssistedCoolingCoil {
     CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                               int const HXAssistedCoilNum,                        // Index number for HXAssistedCoolingCoil
                               bool const FirstHVACIteration,                      // FirstHVACIteration flag
-                              HVAC::CompressorOperation CompressorOp,             // compressor operation; 1=on, 0=off
+                              HVAC::CompressorOp compressorOp,             // compressor operation; 1=on, 0=off
                               Real64 const PartLoadRatio,                         // Cooling coil part load ratio
                               bool const HXUnitOn,                                // Flag to enable heat exchanger
                               HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation

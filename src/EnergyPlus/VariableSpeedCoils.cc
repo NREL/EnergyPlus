@@ -120,7 +120,7 @@ namespace VariableSpeedCoils {
                                std::string_view CompName,                    // Coil Name
                                int &CompIndex,                               // Index for Component name
                                HVAC::FanOp const fanOp,                      // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
+                               HVAC::CompressorOp const compressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,            // compressor speed number
                                Real64 const SpeedRatio,       // compressor speed ratio
@@ -189,13 +189,13 @@ namespace VariableSpeedCoils {
             // Cooling mode
             InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             CalcVarSpeedCoilCooling(
-                state, DXCoilNum, fanOp, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+                state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if ((state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_HeatingWaterToAirHPVSEquationFit) ||
                    (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::Coil_HeatingAirToAirVariableSpeed)) {
             // Heating mode
             InitVarSpeedCoil(state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
-            CalcVarSpeedCoilHeating(state, DXCoilNum, fanOp, SensLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+            CalcVarSpeedCoilHeating(state, DXCoilNum, fanOp, SensLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
             UpdateVarSpeedCoil(state, DXCoilNum);
         } else if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).VSCoilType == HVAC::CoilDX_HeatPumpWaterHeaterVariableSpeed) {
             // Heating mode
@@ -3929,7 +3929,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->MyOneTimeFlag = false;
         }
 
-        state.dataHVACGlobal->DXCT = 1; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil member from DXcoils.cc
+        state.dataHVACGlobal->DXCT = HVAC::DXCoilType::Regular; // hard-code to non-DOAS sizing routine for cfm/ton until .ISHundredPercentDOASDXCoil member from DXcoils.cc
                                         // is added to VarSpeedCoil object
 
         // variable-speed heat pump water heating, begin
@@ -4111,7 +4111,7 @@ namespace VariableSpeedCoils {
                                         HVAC::FanOp::Continuous,
                                         SensLoad,
                                         LatentLoad,
-                                        HVAC::CompressorOperation::On,
+                                        HVAC::CompressorOp::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -4245,7 +4245,7 @@ namespace VariableSpeedCoils {
                                         DXCoilNum,
                                         HVAC::FanOp::Continuous,
                                         SensLoad,
-                                        HVAC::CompressorOperation::On,
+                                        HVAC::CompressorOp::On,
                                         1.0,
                                         1.0,
                                         1.0,
@@ -5842,7 +5842,7 @@ namespace VariableSpeedCoils {
                                  HVAC::FanOp const fanOp,                         // Fan/Compressor cycling scheme indicator
                                  [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
                                  [[maybe_unused]] Real64 const LatentDemand,      // Cooling Latent Demand [W]
-                                 HVAC::CompressorOperation const CompressorOp,    // compressor operation flag
+                                 HVAC::CompressorOp const compressorOp,    // compressor operation flag
                                  Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -6088,7 +6088,7 @@ namespace VariableSpeedCoils {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
+        if (compressorOp == HVAC::CompressorOp::Off || state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).RatedCapCoolTotal <= 0.0) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }
@@ -7210,7 +7210,7 @@ namespace VariableSpeedCoils {
                                  int const DXCoilNum,                             // Heat Pump Number
                                  HVAC::FanOp const fanOp,                         // Fan/Compressor cycling scheme indicator
                                  [[maybe_unused]] Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
-                                 HVAC::CompressorOperation const CompressorOp,    // compressor operation flag
+                                 HVAC::CompressorOp const compressorOp,    // compressor operation flag
                                  Real64 const PartLoadRatio,                      // compressor part load ratio
                                  [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -7362,7 +7362,7 @@ namespace VariableSpeedCoils {
             return;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).SimFlag = false;
             return;
         }

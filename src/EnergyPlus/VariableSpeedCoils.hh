@@ -348,7 +348,7 @@ namespace VariableSpeedCoils {
                                std::string_view CompName,              // Coil Name
                                int &CompIndex,                         // Index for Component name
                                HVAC::FanOp const fanOp,                // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
+                               HVAC::CompressorOp compressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,                  // compressor speed number
                                Real64 const SpeedRatio,             // compressor speed ratio
@@ -379,7 +379,7 @@ namespace VariableSpeedCoils {
                                  HVAC::FanOp const fanOp,                // Fan/Compressor cycling scheme indicator
                                  Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
                                  Real64 const LatentDemand,              // Cooling Latent Demand [W]
-                                 HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                                 HVAC::CompressorOp compressorOp, // compressor operation flag
                                  Real64 const PartLoadRatio,             // compressor part load ratio
                                  Real64 const OnOffAirFlowRatio,         // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio,                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
@@ -390,7 +390,7 @@ namespace VariableSpeedCoils {
                                  int const DXCoilNum,                    // Heat Pump Number
                                  HVAC::FanOp const fanOp,                // Fan/Compressor cycling scheme indicator
                                  Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
-                                 HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                                 HVAC::CompressorOp compressorOp, // compressor operation flag
                                  Real64 const PartLoadRatio,             // compressor part load ratio
                                  Real64 const OnOffAirFlowRatio,         // ratio of compressor on flow to average flow over time step
                                  Real64 const SpeedRatio,                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)

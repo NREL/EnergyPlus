@@ -285,7 +285,7 @@ TEST_F(EnergyPlusFixture, SZVAV_PTUnit_Testing)
     bool HXUnitOn = false;
     int AirLoopNum = 1;
     Real64 PLR = 0.0;
-    HVAC::CompressorOperation CompressorOnFlag = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp CompressorOnFlag = HVAC::CompressorOp::On;
     state->dataGlobal->BeginEnvrnFlag = true;
 
     auto &SZVAVModel(thisUnit);
@@ -501,7 +501,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
 
     int FanCoilNum(1);
     int ZoneNum(1);
-    HVAC::CompressorOperation CompressorOnFlag(HVAC::CompressorOperation::Off);
+    HVAC::CompressorOp CompressorOnFlag(HVAC::CompressorOp::Off);
     int AirLoopNum(0);
     bool FirstHVACIteration(false);
     bool ErrorsFound(false);
@@ -764,7 +764,7 @@ TEST_F(EnergyPlusFixture, SZVAV_FanCoilUnit_Testing)
     OnOffAirFlowRatio = 1.0;
     HXUnitOn = false;
     AirLoopNum = 0;
-    CompressorOnFlag = HVAC::CompressorOperation::Off;
+    CompressorOnFlag = HVAC::CompressorOp::Off;
     FirstHVACIteration = true;
     auto &SZVAVModel(state->dataFanCoilUnits->FanCoil(FanCoilNum));
 

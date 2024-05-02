@@ -252,7 +252,7 @@ namespace IntegratedHeatPump {
                 std::string_view CompName,              // Coil Name
                 int &CompIndex,                         // Index for Component name
                 HVAC::FanOp const fanOp,                // Continuous fan OR cycling compressor
-                HVAC::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
+                HVAC::CompressorOp compressorOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,            // compressor speed number
                 Real64 const SpeedRatio,       // compressor speed ratio

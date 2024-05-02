@@ -165,7 +165,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 const SensLoad,     // Sensible demand load [W]
                                Real64 const LatentLoad,   // Latent demand load [W]
                                HVAC::FanOp const fanOp,   // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation CompressorOp,
+                               HVAC::CompressorOp compressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Real64 const OnOffAirFlowRat = 1.0 // ratio of comp on to comp off air flow rate
@@ -195,7 +195,7 @@ namespace WaterToAirHeatPumpSimple {
                              HVAC::FanOp const fanOp,                // Fan/Compressor cycling scheme indicator
                              Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
                              Real64 const LatentDemand,              // Cooling Latent Demand [W]
-                             HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                             HVAC::CompressorOp compressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,             // compressor part load ratio
                              Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     );
@@ -204,7 +204,7 @@ namespace WaterToAirHeatPumpSimple {
                              int const HPNum,                        // Heat Pump Number
                              HVAC::FanOp const fanOp,                // Fan/Compressor cycling scheme indicator
                              Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
-                             HVAC::CompressorOperation CompressorOp, // compressor operation flag
+                             HVAC::CompressorOp compressorOp, // compressor operation flag
                              Real64 const PartLoadRatio,             // compressor part load ratio
                              Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
     );

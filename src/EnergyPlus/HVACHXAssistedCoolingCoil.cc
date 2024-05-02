@@ -96,7 +96,7 @@ namespace HVACHXAssistedCoolingCoil {
     void SimHXAssistedCoolingCoil(EnergyPlusData &state,
                                   std::string_view HXAssistedCoilName,          // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,                // FirstHVACIteration flag
-                                  HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                                  HVAC::CompressorOp const compressorOp, // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,                   // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
                                   int &CompIndex,
                                   HVAC::FanOp const fanOp,                         // Allows the parent object to control fan operation
@@ -167,7 +167,7 @@ namespace HVACHXAssistedCoolingCoil {
             HXUnitOn = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             HXUnitOn = false;
         }
 
@@ -182,7 +182,7 @@ namespace HVACHXAssistedCoolingCoil {
             CalcHXAssistedCoolingCoil(state,
                                       HXAssistedCoilNum,
                                       FirstHVACIteration,
-                                      CompressorOp,
+                                      compressorOp,
                                       PartLoadRatio,
                                       HXUnitOn,
                                       fanOp,
@@ -192,7 +192,7 @@ namespace HVACHXAssistedCoolingCoil {
                                       LoadSHR);
         } else {
             CalcHXAssistedCoolingCoil(
-                state, HXAssistedCoilNum, FirstHVACIteration, CompressorOp, PartLoadRatio, HXUnitOn, fanOp, AirFlowRatio, EconomizerFlag);
+                state, HXAssistedCoilNum, FirstHVACIteration, compressorOp, PartLoadRatio, HXUnitOn, fanOp, AirFlowRatio, EconomizerFlag);
         }
 
         // Update the current HXAssistedCoil output
@@ -227,6 +227,7 @@ namespace HVACHXAssistedCoolingCoil {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHXAssistedCoolingCoilInput: "); // include trailing blank space
+        static constexpr std::string_view routineName = "GetHXAssistedCoolingCoilInput"; 
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int HXAssistedCoilNum;            // Index number of the HXAssistedCoolingCoil for which input data is being read from the idf
@@ -302,20 +303,8 @@ namespace HVACHXAssistedCoolingCoil {
                 state, state.dataHVACAssistedCC->UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             thisHXCoil.Name = AlphArray(1);
-            thisHXCoil.HeatExchangerType = AlphArray(2);
+            thisHXCoil.hxType = static_cast<HVAC::HXType>(getEnumValue(HVAC::hxTypeNamesUC, AlphArray(2)));
             thisHXCoil.HeatExchangerName = AlphArray(3);
-
-            if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
-                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_GENERIC;
-            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
-                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_FLATPLATE;
-            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:Desiccant:BalancedFlow")) {
-                thisHXCoil.HeatExchangerType_Num = HVAC::HX_DESICCANT_BALANCED;
-            } else {
-                ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
-                ShowContinueError(state, format("Invalid {}=\"{}\"", cAlphaFields(2), thisHXCoil.HeatExchangerType));
-                ErrorsFound = true;
-            }
 
             thisHXCoil.CoolingCoilType = AlphArray(4);
             thisHXCoil.CoolingCoilName = AlphArray(5);
@@ -406,7 +395,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The supply air outlet node name in heat exchanger {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(
                         state,
@@ -423,7 +412,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The secondary air inlet node name in heat exchanger {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(state,
                                       format("must match the cooling coil air outlet node name in {}=\"{}\"",
@@ -449,7 +438,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The supply air outlet node name in heat exchanger = {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(
                         state,
@@ -470,7 +459,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The secondary air inlet node name in heat exchanger ={}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(state,
                                       format("must match the cooling coil air outlet node name in = {}=\"{}\".",
@@ -496,7 +485,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The supply air outlet node name in heat exchanger = {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(
                         state,
@@ -517,7 +506,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The secondary air inlet node name in heat exchanger ={}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(state,
                                       format("must match the cooling coil air outlet node name in = {}=\"{}\".",
@@ -592,7 +581,7 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
-                                                 thisHXCoil.HeatExchangerType,
+                                                 HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
                                                  state.dataLoopNodes->NodeID(SupplyAirInletNode),
                                                  state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -600,7 +589,7 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
-                                                 thisHXCoil.HeatExchangerType,
+                                                 HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
                                                  state.dataLoopNodes->NodeID(SecondaryAirInletNode),
                                                  state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
@@ -628,28 +617,20 @@ namespace HVACHXAssistedCoolingCoil {
                                                                      lAlphaBlanks,
                                                                      cAlphaFields,
                                                                      cNumericFields);
+
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, AlphArray(1)};
+            
             GlobalNames::VerifyUniqueInterObjectName(
                 state, state.dataHVACAssistedCC->UniqueHXAssistedCoilNames, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
             thisHXCoil.Name = AlphArray(1);
 
-            thisHXCoil.HeatExchangerType = AlphArray(2);
-            thisHXCoil.HeatExchangerName = AlphArray(3);
-
-            if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:SensibleAndLatent")) {
-                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_GENERIC;
-            } else if (Util::SameString(thisHXCoil.HeatExchangerType, "HeatExchanger:AirToAir:FlatPlate")) {
-                thisHXCoil.HeatExchangerType_Num = HVAC::HX_AIRTOAIR_FLATPLATE;
-                //       balanced desiccant HX not allowed with water coils at this time
-                //       ELSEIF(Util::SameString(HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType,'HeatExchanger:Desiccant:BalancedFlow'))
-                //       THEN
-                //         HXAssistedCoil(HXAssistedCoilNum)%HeatExchangerType_Num = HX_DESICCANT_BALANCED
-            } else {
-                ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
-                ShowContinueError(state, format("Invalid {}=\"{}\"", cAlphaFields(2), thisHXCoil.HeatExchangerType));
+            thisHXCoil.hxType = static_cast<HVAC::HXType>(getEnumValue(HVAC::hxTypeNamesUC, AlphArray(2)));
+            if (thisHXCoil.hxType == HVAC::HXType::Desiccant_Balanced) {
+                ShowSevereInvalidKey(state, eoh, cAlphaFields(2), AlphArray(2));
                 ErrorsFound = true;
             }
-
+            thisHXCoil.HeatExchangerName = AlphArray(3);
             thisHXCoil.CoolingCoilType = AlphArray(4);
             thisHXCoil.CoolingCoilName = AlphArray(5);
 
@@ -702,7 +683,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The supply air outlet node name in heat exchanger = {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(
                         state,
@@ -722,7 +703,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
                                       format("The secondary air inlet node name in heat exchanger = {}=\"{}\"",
-                                             thisHXCoil.HeatExchangerType,
+                                             HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                              thisHXCoil.HeatExchangerName));
                     ShowContinueError(state,
                                       format("must match the cooling coil air outlet node name in = {}=\"{}\".",
@@ -801,7 +782,7 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
-                                                 thisHXCoil.HeatExchangerType,
+                                                 HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
                                                  state.dataLoopNodes->NodeID(SupplyAirInletNode),
                                                  state.dataLoopNodes->NodeID(SupplyAirOutletNode),
@@ -809,7 +790,7 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
-                                                 thisHXCoil.HeatExchangerType,
+                                                 HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
                                                  state.dataLoopNodes->NodeID(SecondaryAirInletNode),
                                                  state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
@@ -873,7 +854,7 @@ namespace HVACHXAssistedCoolingCoil {
     void CalcHXAssistedCoolingCoil(EnergyPlusData &state,
                                    int const HXAssistedCoilNum,                    // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,                  // FirstHVACIteration flag
-                                   HVAC::CompressorOperation const CompressorOp,   // compressor operation; 1=on, 0=off
+                                   HVAC::CompressorOp const compressorOp,   // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,                     // Cooling coil part load ratio
                                    bool const HXUnitOn,                            // Flag to enable heat exchanger
                                    HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation
@@ -963,20 +944,20 @@ namespace HVACHXAssistedCoolingCoil {
                 }
 
                 Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
-                Real64 mCoolCompPartLoadRatio = (CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0;
+                Real64 mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
 
                 Real64 CoilPLR;
                 if (mCoolingSpeedNum > 1) {
                     if (mSingleMode == 0) {
-                        mCoolCompPartLoadRatio = (CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0;
+                        mCoolCompPartLoadRatio = (compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0;
                     } else {
-                        mCoolCompPartLoadRatio = PartLoadRatio * ((CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0);
+                        mCoolCompPartLoadRatio = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
                         mCoolingSpeedRatio = 1.0;
                     }
                     CoilPLR = 1.0;
                 } else {
                     mCoolingSpeedRatio = 1.0;
-                    CoilPLR = PartLoadRatio * ((CompressorOp == HVAC::CompressorOperation::On) ? 1.0 : 0.0);
+                    CoilPLR = PartLoadRatio * ((compressorOp == HVAC::CompressorOp::On) ? 1.0 : 0.0);
                 }
 
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(
@@ -991,7 +972,7 @@ namespace HVACHXAssistedCoolingCoil {
             } else if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
                 DXCoils::SimDXCoil(state,
                                    thisHXCoil.CoolingCoilName,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    thisHXCoil.CoolingCoilIndex,
                                    fanOp,
@@ -1001,13 +982,13 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 QZnReq(-1.0);           // Zone load (W), input to variable-speed DX coil
                 Real64 QLatReq(0.0);           // Zone latent load, input to variable-speed DX coil
                 Real64 OnOffAirFlowRatio(1.0); // ratio of compressor on flow to average flow over time step
-                HVAC::CompressorOperation CompressorOn = CompressorOp;
-                if (PartLoadRatio == 0.0) CompressorOn = HVAC::CompressorOperation::Off;
+                HVAC::CompressorOp compressorOn = compressorOp;
+                if (PartLoadRatio == 0.0) compressorOn = HVAC::CompressorOp::Off;
                 VariableSpeedCoils::SimVariableSpeedCoils(state,
                                                           thisHXCoil.CoolingCoilName,
                                                           thisHXCoil.CoolingCoilIndex,
                                                           fanOp,
-                                                          CompressorOn,
+                                                          compressorOn,
                                                           PartLoadRatio,
                                                           thisHXCoil.DXCoilNumOfSpeeds,
                                                           QZnReq,
@@ -1797,7 +1778,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (WhichCoil != 0) {
-            if (Util::SameString(state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HeatExchangerType, HXType)) {
+            if (Util::SameString(HVAC::hxTypeNames[(int)state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).hxType], HXType)) {
                 return true;
             }
         }

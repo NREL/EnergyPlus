@@ -184,10 +184,17 @@ namespace HVAC {
                                             "",
                                             ""});
 
-    Array1D_string const
-        cHXTypes(NumHXTypes,
-                 {"HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"});
 
+    constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNames = {
+        "HeatExchanger:AirToAir:FlatPlate",
+        "HeatExchanger:AirToAir:SensibleAndLatent",
+        "HeatExchanger:Desiccant:BalancedFlow"};
+
+    constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNamesUC = {
+        "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+        "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
+        "HEATEXCHANGER:DESICCANT:BALANCEDFLOW"};
+        
     Array1D_string const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
 
     Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));

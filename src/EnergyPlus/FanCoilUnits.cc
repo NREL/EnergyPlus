@@ -2795,7 +2795,7 @@ namespace FanCoilUnits {
                     Real64 OnOffAirFlowRatio = 1.0;
                     bool HXUnitOn = false;
                     int AirLoopNum = 0;
-                    HVAC::CompressorOperation CompressorOnFlag = HVAC::CompressorOperation::Off;
+                    HVAC::CompressorOp CompressorOnFlag = HVAC::CompressorOp::Off;
                     auto &SZVAVModel(fanCoil);
                     // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
                     // models
@@ -3291,7 +3291,7 @@ namespace FanCoilUnits {
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
+                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
             } else {
                 WaterCoils::SimulateWaterCoilComponents(state, fanCoil.CCoilName, FirstHVACIteration, fanCoil.CCoilName_Index, _, HVAC::FanOp::Cycling, PLR);
             }
@@ -3320,7 +3320,7 @@ namespace FanCoilUnits {
             }
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
+                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
             } else {
                 WaterCoils::SimulateWaterCoilComponents(state, fanCoil.CCoilName, FirstHVACIteration, fanCoil.CCoilName_Index, _, HVAC::FanOp::Cycling, PLR);
             }
@@ -3357,7 +3357,7 @@ namespace FanCoilUnits {
 
             if (fanCoil.CCoilType_Num == CCoil::HXAssist) {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
+                    state, fanCoil.CCoilName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, fanCoil.CCoilName_Index, HVAC::FanOp::Continuous);
             } else {
                 WaterCoils::SimulateWaterCoilComponents(state, fanCoil.CCoilName, FirstHVACIteration, fanCoil.CCoilName_Index);
             }

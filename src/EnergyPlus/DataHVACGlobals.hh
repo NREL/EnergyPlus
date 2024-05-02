@@ -379,16 +379,32 @@ namespace HVAC {
     Real64 constexpr MaxCoolVolFlowPerRatedTotCap2(0.00004026);  // m3/s per watt = 300 cfm/ton
     Real64 constexpr MinOperVolFlowPerRatedTotCap2(0.00001342);  // m3/s per watt = 100 cfm/ton
 
+    constexpr std::array<Real64, 2> MaxRatedVolFlowPerRatedTotCap = {MaxRatedVolFlowPerRatedTotCap1, MaxRatedVolFlowPerRatedTotCap2};
+    constexpr std::array<Real64, 2> MinRatedVolFlowPerRatedTotCap = {MinRatedVolFlowPerRatedTotCap1, MinRatedVolFlowPerRatedTotCap2};
+    constexpr std::array<Real64, 2> MaxHeatVolFlowPerRatedTotCap = {MaxHeatVolFlowPerRatedTotCap1, MaxHeatVolFlowPerRatedTotCap2};
+    constexpr std::array<Real64, 2> MaxCoolVolFlowPerRatedTotCap = {MaxCoolVolFlowPerRatedTotCap1, MaxCoolVolFlowPerRatedTotCap2};
+    constexpr std::array<Real64, 2> MinOperVolFlowPerRatedTotCap = {MinOperVolFlowPerRatedTotCap1, MinOperVolFlowPerRatedTotCap2};
+
     // dx coil type (DXCT)
-    int constexpr RegularDXCoil(1); // Regular DX coils or mixed air dx coils
-    int constexpr DOASDXCoil(2);    // 100% DOAS DX coils
+    enum class DXCoilType
+    {
+        Invalid = -1,
+        Regular,
+        DOAS,
+        Num
+    };
 
-    // Parameters describing Heat Exchanger types
-    int constexpr NumHXTypes(3);
+    enum class HXType
+    {
+        Invalid = -1,
+        AirToAir_FlatPlate,
+        AirToAir_Generic,
+        Desiccant_Balanced,
+        Num
+    };
 
-    int constexpr HX_AIRTOAIR_FLATPLATE(1);
-    int constexpr HX_AIRTOAIR_GENERIC(2);
-    int constexpr HX_DESICCANT_BALANCED(3);
+    extern const std::array<std::string_view, (int)HXType::Num> hxTypeNames;
+    extern const std::array<std::string_view, (int)HXType::Num> hxTypeNamesUC;
 
     // Parameters describing air terminal mixers
     int constexpr NumATMixerTypes(2);
@@ -471,7 +487,7 @@ namespace HVAC {
     };
 
     // Compressor operation
-    enum class CompressorOperation
+    enum class CompressorOp
     {
         Invalid = -1,
         Off, // signal DXCoil that compressor shouldn't run
@@ -515,13 +531,8 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxRatedVolFlowPerRatedTotCap1, HVAC::MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinRatedVolFlowPerRatedTotCap1, HVAC::MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxHeatVolFlowPerRatedTotCap1, HVAC::MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxCoolVolFlowPerRatedTotCap1, HVAC::MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinOperVolFlowPerRatedTotCap1, HVAC::MinOperVolFlowPerRatedTotCap2});
 
-    int DXCT = 1;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
+    HVAC::DXCoilType DXCT = HVAC::DXCoilType::Regular;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)

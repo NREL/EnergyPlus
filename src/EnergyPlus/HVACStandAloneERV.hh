@@ -75,7 +75,7 @@ namespace HVACStandAloneERV {
         int SchedPtr;                    // pointer to availability schedule
         std::string HeatExchangerName;   // name of the heat exchanger within the ERV unit
         int HeatExchangerIndex;          // Pointer to heat exchanger
-        int HeatExchangerTypeNum;        // Parameter equivalent of HX object type
+        HVAC::HXType hxType = HVAC::HXType::Invalid;        // Parameter equivalent of HX object type
         int SupplyAirInletNode;          // supply air inlet node for the stand alone ERV
         int SupplyAirOutletNode;         // supply air outlet node for the stand alone ERV
         std::string SupplyAirFanName;    // fan name in the supply air stream of the ERV
@@ -127,7 +127,7 @@ namespace HVACStandAloneERV {
 
         // Default Constructor
         StandAloneERVData()
-            : SchedPtr(0), HeatExchangerIndex(0), HeatExchangerTypeNum(0), SupplyAirInletNode(0), SupplyAirOutletNode(0), SupplyAirFanIndex(0),
+            : SchedPtr(0), HeatExchangerIndex(0), SupplyAirInletNode(0), SupplyAirOutletNode(0), SupplyAirFanIndex(0),
               SupplyAirFanSchPtr(0), supplyAirFanType(HVAC::FanType::Invalid), ExhaustAirInletNode(0), ExhaustAirOutletNode(0), ExhaustAirFanIndex(0),
               ExhaustAirFanSchPtr(0), exhaustAirFanType(HVAC::FanType::Invalid), SupplyAirVolFlow(0.0), ExhaustAirVolFlow(0.0),
               ControllerNameDefined(false), ControlledZoneNum(0), ControllerIndex(0), MaxSupAirMassFlow(0.0), MaxExhAirMassFlow(0.0),

@@ -107,7 +107,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         HVAC::CompressorOperation const CompressorOp,
+                         HVAC::CompressorOp const compressorOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -167,13 +167,13 @@ namespace WaterToAirHeatPump {
 
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPCoolingParamEst) {
             InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPCooling(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            CalcWatertoAirHPCooling(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPType == DataPlant::PlantEquipmentType::CoilWAHPHeatingParamEst) {
             InitWatertoAirHP(state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
-            CalcWatertoAirHPHeating(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+            CalcWatertoAirHPHeating(state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
@@ -1211,7 +1211,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 HVAC::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOp const compressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1344,7 +1344,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             heatPump.SimFlag = false;
             return;
         }
@@ -1745,7 +1745,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 HVAC::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOp const compressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1858,7 +1858,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             heatPump.SimFlag = false;
             return;
         }

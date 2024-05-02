@@ -3474,7 +3474,7 @@ namespace VentilatedSlab {
                 SimHXAssistedCoolingCoil(state,
                                          ventSlab.coolingCoilName,
                                          FirstHVACIteration,
-                                         HVAC::CompressorOperation::On,
+                                         HVAC::CompressorOp::On,
                                          0.0,
                                          ventSlab.coolingCoil_Index,
                                          HVAC::FanOp::Continuous);

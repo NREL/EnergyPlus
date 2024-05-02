@@ -10802,7 +10802,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->fans(2)->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
@@ -10995,7 +10995,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->fans(2)->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected warning
@@ -11173,7 +11173,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = fan2->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors

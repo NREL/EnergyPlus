@@ -2998,7 +2998,7 @@ namespace UnitVentilator {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         unitVent.CCoilName,
                                                                         FirstHVACIteration,
-                                                                        HVAC::CompressorOperation::On,
+                                                                        HVAC::CompressorOp::On,
                                                                         0.0,
                                                                         unitVent.CCoil_Index,
                                                                         HVAC::FanOp::Continuous);
@@ -3085,7 +3085,7 @@ namespace UnitVentilator {
 
                 if (unitVent.CCoilType == CoolCoilType::HXAssisted) {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOperation::On, PartLoadFrac, unitVent.CCoil_Index, fanOp);
+                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOp::On, PartLoadFrac, unitVent.CCoil_Index, fanOp);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(
                         state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index, QCoilReq, fanOp, PartLoadFrac);

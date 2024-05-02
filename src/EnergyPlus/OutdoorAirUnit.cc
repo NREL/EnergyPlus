@@ -1557,7 +1557,7 @@ namespace OutdoorAirUnit {
             if (thisOAEquip.Type == CompType::WaterCoil_CoolingHXAsst) {
                 if (thisOAEquip.MaxVolWaterFlow == AutoSize) {
                     SimHXAssistedCoolingCoil(
-                       state, thisOAEquip.ComponentName, true, HVAC::CompressorOperation::On, 0.0, thisOAEquip.ComponentIndex, HVAC::FanOp::Continuous);
+                       state, thisOAEquip.ComponentName, true, HVAC::CompressorOp::On, 0.0, thisOAEquip.ComponentIndex, HVAC::FanOp::Continuous);
                 }
             }
         }
@@ -2339,7 +2339,7 @@ namespace OutdoorAirUnit {
         } break;
         case CompType::WaterCoil_CoolingHXAsst: {
             SimHXAssistedCoolingCoil(
-                state, thisOAEquip.ComponentName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CoilIndex, HVAC::FanOp::Continuous);
+                state, thisOAEquip.ComponentName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, CoilIndex, HVAC::FanOp::Continuous);
             Real64 const AirMassFlow = oaInletNode.MassFlowRate;
             LoadMet = AirMassFlow * (PsyHFnTdbW(oaOutletNode.Temp, oaInletNode.HumRat) - PsyHFnTdbW(oaInletNode.Temp, oaInletNode.HumRat));
         } break;

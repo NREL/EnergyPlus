@@ -283,7 +283,7 @@ namespace Furnaces {
         state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRateMaxAvail = thisFurnace.DesignMassFlowRate;
 
         Real64 FurnaceSavMdot = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
-        HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
+        HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
         state.dataFurnaces->CoolHeatPLRRat = 1.0;
 
         // Simulate correct system type (1 of 4 choices)
@@ -323,11 +323,11 @@ namespace Furnaces {
                 if (!FirstHVACIteration && thisFurnace.fanOp == HVAC::FanOp::Cycling && state.dataFurnaces->CoolingLoad &&
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
                     // for cycling fan, cooling load, check whether furnace can meet load with compressor off
-                    CompressorOp = HVAC::CompressorOperation::Off;
+                    compressorOp = HVAC::CompressorOp::Off;
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -338,11 +338,11 @@ namespace Furnaces {
                         (thisFurnace.CoolPartLoadRatio <= 0.0 && thisFurnace.HeatPartLoadRatio <= 0.0)) {
                         // compressor on (reset inlet air mass flow rate to starting value)
                         state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = FurnaceSavMdot;
-                        CompressorOp = HVAC::CompressorOperation::On;
+                        compressorOp = HVAC::CompressorOp::On;
                         CalcNewZoneHeatCoolFlowRates(state,
                                                      FurnaceNum,
                                                      FirstHVACIteration,
-                                                     CompressorOp,
+                                                     compressorOp,
                                                      ZoneLoad,
                                                      MoistureLoad,
                                                      HeatCoilLoad,
@@ -355,7 +355,7 @@ namespace Furnaces {
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -380,7 +380,7 @@ namespace Furnaces {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
                                                                         FirstHVACIteration,
-                                                                        CompressorOp,
+                                                                        compressorOp,
                                                                         thisFurnace.CoolPartLoadRatio,
                                                                         thisFurnace.CoolingCoilIndex,
                                                                         fanOp,
@@ -390,7 +390,7 @@ namespace Furnaces {
                 } else {
                     DXCoils::SimDXCoil(state,
                                        BlankString,
-                                       CompressorOp,
+                                       compressorOp,
                                        FirstHVACIteration,
                                        thisFurnace.CoolingCoilIndex,
                                        fanOp,
@@ -436,11 +436,11 @@ namespace Furnaces {
                 if (!FirstHVACIteration && thisFurnace.fanOp == HVAC::FanOp::Cycling && state.dataFurnaces->CoolingLoad &&
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
                     // for cycling fan, cooling load, check whether furnace can meet load with compressor off
-                    CompressorOp = HVAC::CompressorOperation::Off;
+                    compressorOp = HVAC::CompressorOp::Off;
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -450,12 +450,12 @@ namespace Furnaces {
                     if (thisFurnace.CoolPartLoadRatio >= 1.0 || thisFurnace.HeatPartLoadRatio >= 1.0 ||
                         (thisFurnace.CoolPartLoadRatio <= 0.0 && thisFurnace.HeatPartLoadRatio <= 0.0)) {
                         // compressor on (reset inlet air mass flow rate to starting value)
-                        CompressorOp = HVAC::CompressorOperation::On;
+                        compressorOp = HVAC::CompressorOp::On;
                         state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = FurnaceSavMdot;
                         CalcNewZoneHeatCoolFlowRates(state,
                                                      FurnaceNum,
                                                      FirstHVACIteration,
-                                                     CompressorOp,
+                                                     compressorOp,
                                                      ZoneLoad,
                                                      MoistureLoad,
                                                      HeatCoilLoad,
@@ -468,7 +468,7 @@ namespace Furnaces {
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -485,7 +485,7 @@ namespace Furnaces {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
                                                                         FirstHVACIteration,
-                                                                        CompressorOp,
+                                                                        compressorOp,
                                                                         thisFurnace.CoolPartLoadRatio,
                                                                         thisFurnace.CoolingCoilIndex,
                                                                         fanOp,
@@ -495,7 +495,7 @@ namespace Furnaces {
                 } else {
                     DXCoils::SimDXCoil(state,
                                        BlankString,
-                                       CompressorOp,
+                                       compressorOp,
                                        FirstHVACIteration,
                                        thisFurnace.CoolingCoilIndex,
                                        fanOp,
@@ -504,7 +504,7 @@ namespace Furnaces {
                 }
                 DXCoils::SimDXCoil(state,
                                    BlankString,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    thisFurnace.HeatingCoilIndex,
                                    fanOp,
@@ -534,11 +534,11 @@ namespace Furnaces {
                 if (!FirstHVACIteration && thisFurnace.fanOp == HVAC::FanOp::Cycling && state.dataFurnaces->CoolingLoad &&
                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
                     // for cycling fan, cooling load, check whether furnace can meet load with compressor off
-                    CompressorOp = HVAC::CompressorOperation::Off;
+                    compressorOp = HVAC::CompressorOp::Off;
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -548,12 +548,12 @@ namespace Furnaces {
                     if (thisFurnace.CoolPartLoadRatio >= 1.0 || thisFurnace.HeatPartLoadRatio >= 1.0 ||
                         (thisFurnace.CoolPartLoadRatio <= 0.0 && thisFurnace.HeatPartLoadRatio <= 0.0)) {
                         // compressor on (reset inlet air mass flow rate to starting value)
-                        CompressorOp = HVAC::CompressorOperation::On;
+                        compressorOp = HVAC::CompressorOp::On;
                         state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = FurnaceSavMdot;
                         CalcNewZoneHeatCoolFlowRates(state,
                                                      FurnaceNum,
                                                      FirstHVACIteration,
-                                                     CompressorOp,
+                                                     compressorOp,
                                                      ZoneLoad,
                                                      MoistureLoad,
                                                      HeatCoilLoad,
@@ -566,7 +566,7 @@ namespace Furnaces {
                     CalcNewZoneHeatCoolFlowRates(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  ZoneLoad,
                                                  MoistureLoad,
                                                  HeatCoilLoad,
@@ -584,7 +584,7 @@ namespace Furnaces {
                                                                 thisFurnace.CoolingCoilSensDemand,
                                                                 thisFurnace.CoolingCoilLatentDemand,
                                                                 thisFurnace.fanOp,
-                                                                CompressorOp,
+                                                                compressorOp,
                                                                 thisFurnace.CoolPartLoadRatio,
                                                                 FirstHVACIteration);
                 WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
@@ -593,7 +593,7 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 Dummy,
                                                                 thisFurnace.fanOp,
-                                                                CompressorOp,
+                                                                compressorOp,
                                                                 thisFurnace.HeatPartLoadRatio,
                                                                 FirstHVACIteration);
 
@@ -611,7 +611,7 @@ namespace Furnaces {
 
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
-                CalcWaterToAirHeatPump(state, FurnaceNum, FirstHVACIteration, CompressorOp, ZoneLoad, MoistureLoad);
+                CalcWaterToAirHeatPump(state, FurnaceNum, FirstHVACIteration, compressorOp, ZoneLoad, MoistureLoad);
             } else if (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_VarSpeedEquationFit) {
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
@@ -5429,7 +5429,7 @@ namespace Furnaces {
                 CalcVarSpeedHeatPump(state,
                                      FurnaceNum,
                                      false,
-                                     HVAC::CompressorOperation::Off,
+                                     HVAC::CompressorOp::Off,
                                      1,
                                      0.0,
                                      0.0,
@@ -5444,7 +5444,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   false,
                                   HVAC::FanOp::Invalid, // Looks like Invalid is used to mean that the fan is off here?
-                                  HVAC::CompressorOperation::Off,
+                                  HVAC::CompressorOp::Off,
                                   0.0,
                                   0.0,
                                   0.0,
@@ -5495,7 +5495,7 @@ namespace Furnaces {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  false,
-                                                 HVAC::CompressorOperation::Off,
+                                                 HVAC::CompressorOp::Off,
                                                  1,
                                                  0.0,
                                                  0.0,
@@ -5510,7 +5510,7 @@ namespace Furnaces {
                                               FurnaceNum,
                                               false,
                                               HVAC::FanOp::Invalid,
-                                              HVAC::CompressorOperation::Off,
+                                              HVAC::CompressorOp::Off,
                                               0.0,
                                               0.0,
                                               0.0,
@@ -5567,7 +5567,7 @@ namespace Furnaces {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  false,
-                                                 HVAC::CompressorOperation::Off,
+                                                 HVAC::CompressorOp::Off,
                                                  1,
                                                  0.0,
                                                  0.0,
@@ -5582,7 +5582,7 @@ namespace Furnaces {
                                               FurnaceNum,
                                               false,
                                               HVAC::FanOp::Invalid,
-                                              HVAC::CompressorOperation::Off,
+                                              HVAC::CompressorOp::Off,
                                               0.0,
                                               0.0,
                                               0.0,
@@ -5869,7 +5869,7 @@ namespace Furnaces {
         state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace = thisFurnace.fanPlace;
 
         if (thisFurnace.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed) {
-            DXCoils::SimDXCoil(state, BlankString, HVAC::CompressorOperation::On, true, thisFurnace.CoolingCoilIndex, HVAC::FanOp::Cycling, 0.0);
+            DXCoils::SimDXCoil(state, BlankString, HVAC::CompressorOp::On, true, thisFurnace.CoolingCoilIndex, HVAC::FanOp::Cycling, 0.0);
         } else if (thisFurnace.CoolingCoilType_Num == HVAC::CoilDX_CoolingHXAssisted) {
             int HXCC_Index = thisFurnace.CoolingCoilIndex;
             int childCCType_Num = state.dataHVACAssistedCC->HXAssistedCoil(HXCC_Index).CoolingCoilType_Num;
@@ -5882,7 +5882,7 @@ namespace Furnaces {
                 newCoil.size(state);
             }
             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                state, BlankString, true, HVAC::CompressorOperation::On, 0.0, thisFurnace.CoolingCoilIndex, HVAC::FanOp::Cycling, false, 1.0, false);
+                state, BlankString, true, HVAC::CompressorOp::On, 0.0, thisFurnace.CoolingCoilIndex, HVAC::FanOp::Cycling, false, 1.0, false);
         } else if (thisFurnace.CoolingCoilType_Num == HVAC::Coil_CoolingWaterToAirHPSimple) {
             WaterToAirHeatPumpSimple::SimWatertoAirHPSimple(state,
                                                             BlankString,
@@ -5890,7 +5890,7 @@ namespace Furnaces {
                                                             thisFurnace.CoolingCoilSensDemand,
                                                             thisFurnace.CoolingCoilLatentDemand,
                                                             HVAC::FanOp::Invalid, // Using invalid to mean off?
-                                                            HVAC::CompressorOperation::Off,
+                                                            HVAC::CompressorOp::Off,
                                                             0.0,
                                                             FirstHVACIteration); // CoolPartLoadRatio
             if (thisFurnace.HeatingCoilType_Num == HVAC::Coil_HeatingWaterToAirHPSimple) {
@@ -5900,7 +5900,7 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 dummy,
                                                                 HVAC::FanOp::Invalid, // using Invalid to mean off?
-                                                                HVAC::CompressorOperation::Off,
+                                                                HVAC::CompressorOp::Off,
                                                                 0.0,
                                                                 FirstHVACIteration);
             }
@@ -5919,7 +5919,7 @@ namespace Furnaces {
                                                           BlankString,
                                                           thisFurnace.CoolingCoilIndex,
                                                           HVAC::FanOp::Invalid, // USing Invalid for off?
-                                                          HVAC::CompressorOperation::Off,
+                                                          HVAC::CompressorOp::Off,
                                                           0.0,
                                                           1,
                                                           0.0,
@@ -5960,7 +5960,7 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.HeatingCoilIndex,
                                                               HVAC::FanOp::Invalid, // Invalid for off?
-                                                              HVAC::CompressorOperation::Off,
+                                                              HVAC::CompressorOp::Off,
                                                               0.0,
                                                               1,
                                                               0.0,
@@ -6284,7 +6284,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  HVAC::CompressorOperation::On,
+                                  HVAC::CompressorOp::On,
                                   0.0,
                                   0.0,
                                   0.0,
@@ -6305,7 +6305,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  HVAC::CompressorOperation::On,
+                                  HVAC::CompressorOp::On,
                                   0.0,
                                   1.0,
                                   HeatCoilLoad,
@@ -6346,7 +6346,7 @@ namespace Furnaces {
                                           FurnaceNum,
                                           FirstHVACIteration,
                                           fanOp,
-                                          HVAC::CompressorOperation::On,
+                                          HVAC::CompressorOp::On,
                                           0.0,
                                           PartLoadRatio,
                                           HeatCoilLoad,
@@ -6372,7 +6372,7 @@ namespace Furnaces {
                                               FurnaceNum,
                                               FirstHVACIteration,
                                               fanOp,
-                                              HVAC::CompressorOperation::On,
+                                              HVAC::CompressorOp::On,
                                               0.0,
                                               PartLoadRatio,
                                               HeatCoilLoad,
@@ -6442,7 +6442,7 @@ namespace Furnaces {
     void CalcNewZoneHeatCoolFlowRates(EnergyPlusData &state,
                                       int const FurnaceNum,
                                       bool const FirstHVACIteration,
-                                      HVAC::CompressorOperation const CompressorOp, // compressor operation flag (1=On, 0=Off)
+                                      HVAC::CompressorOp const compressorOp, // compressor operation flag (1=On, 0=Off)
                                       Real64 const ZoneLoad,                        // the control zone load (watts)
                                       Real64 const MoistureLoad,                    // the control zone latent load (watts)
                                       Real64 &HeatCoilLoad,      // Heating load to be met by heating coil ( excluding heat pump DX coil)
@@ -6692,7 +6692,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       0.0,
                                       MinPLR,
                                       0.0,
@@ -6716,7 +6716,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       0.0,
                                       PartLoadRatio,
                                       0.0,
@@ -6735,13 +6735,13 @@ namespace Furnaces {
 
                         int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                         // HeatErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                        auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
+                        auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                             return CalcFurnaceResidual(state,
                                                        PartLoadRatio,
                                                        FurnaceNum,
                                                        FirstHVACIteration,
                                                        fanOp,
-                                                       CompressorOp,
+                                                       compressorOp,
                                                        SystemSensibleLoad,
                                                        0.0,  // par6_loadFlag,
                                                        1.0,  // par7_sensLatentFlag,
@@ -6757,7 +6757,7 @@ namespace Furnaces {
                                                   FurnaceNum,
                                                   FirstHVACIteration,
                                                   fanOp,
-                                                  CompressorOp,
+                                                  compressorOp,
                                                   0.0,
                                                   PartLoadRatio,
                                                   0.0,
@@ -6895,7 +6895,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       0.0,
                                       MinPLR,
                                       0.0,
@@ -6917,7 +6917,7 @@ namespace Furnaces {
                                           FurnaceNum,
                                           FirstHVACIteration,
                                           fanOp,
-                                          CompressorOp,
+                                          compressorOp,
                                           0.0,
                                           1.0,
                                           HeatCoilLoad,
@@ -6954,13 +6954,13 @@ namespace Furnaces {
 
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             // HeatErrorToler is in fraction load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
+                            auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                 return CalcFurnaceResidual(state,
                                                            PartLoadRatio,
                                                            FurnaceNum,
                                                            FirstHVACIteration,
                                                            fanOp,
-                                                           CompressorOp,
+                                                           compressorOp,
                                                            SystemSensibleLoad,
                                                            0.0,  // par6_loadFlag,
                                                            1.0,  // par7_sensLatentFlag,
@@ -6991,7 +6991,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       0.0,
                                                       TempMaxPLR,
                                                       HeatCoilLoad,
@@ -7014,7 +7014,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       0.0,
                                                       TempMinPLR,
                                                       HeatCoilLoad,
@@ -7026,13 +7026,13 @@ namespace Furnaces {
                                 }
                                 //           Now solve again with tighter PLR limits
                                 auto f2 = // (AUTO_OK_LAMBDA)
-                                    [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
+                                    [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, SystemSensibleLoad](Real64 const PartLoadRatio) {
                                         return CalcFurnaceResidual(state,
                                                                    PartLoadRatio,
                                                                    FurnaceNum,
                                                                    FirstHVACIteration,
                                                                    fanOp,
-                                                                   CompressorOp,
+                                                                   compressorOp,
                                                                    SystemSensibleLoad,
                                                                    0.0,  // par6_loadFlag,
                                                                    1.0,  // par7_sensLatentFlag,
@@ -7049,7 +7049,7 @@ namespace Furnaces {
                                                   FurnaceNum,
                                                   FirstHVACIteration,
                                                   fanOp,
-                                                  CompressorOp,
+                                                  compressorOp,
                                                   0.0,
                                                   PartLoadRatio,
                                                   HeatCoilLoad,
@@ -7120,7 +7120,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               0.0,
                               thisFurnace.HeatPartLoadRatio,
                               HeatCoilLoad,
@@ -7186,7 +7186,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   MinPLR,
                                   PartLoadRatio,
                                   0.0,
@@ -7213,7 +7213,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       PartLoadRatio,
                                       0.0,
                                       0.0,
@@ -7250,14 +7250,14 @@ namespace Furnaces {
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Real64 par8_HXFlag = HXUnitOn ? 1.0 : 0.0;
                             // CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, CoolCoilLoad, par8_HXFlag](
+                            auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, CoolCoilLoad, par8_HXFlag](
                                          Real64 const PartLoadRatio) {
                                 return CalcFurnaceResidual(state,
                                                            PartLoadRatio,
                                                            FurnaceNum,
                                                            FirstHVACIteration,
                                                            fanOp,
-                                                           CompressorOp,
+                                                           compressorOp,
                                                            CoolCoilLoad,
                                                            1.0,         // par6_loadFlag,
                                                            1.0,         // par7_sensLatentFlag,
@@ -7273,7 +7273,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       PartLoadRatio,
                                                       0.0,
                                                       0.0,
@@ -7339,7 +7339,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       PartLoadRatio,
                                       thisFurnace.HeatPartLoadRatio,
                                       0.0,
@@ -7375,7 +7375,7 @@ namespace Furnaces {
                                               FurnaceNum,
                                               FirstHVACIteration,
                                               fanOp,
-                                              CompressorOp,
+                                              compressorOp,
                                               1.0,
                                               0.0,
                                               0.0,
@@ -7403,7 +7403,7 @@ namespace Furnaces {
                                               FurnaceNum,
                                               FirstHVACIteration,
                                               fanOp,
-                                              CompressorOp,
+                                              compressorOp,
                                               1.0,
                                               0.0,
                                               0.0,
@@ -7450,7 +7450,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       par4_load,
                                       par6_LatentSens,
                                       par8_HXUnit,
@@ -7460,7 +7460,7 @@ namespace Furnaces {
                                                            FurnaceNum,
                                                            FirstHVACIteration,
                                                            fanOp,
-                                                           CompressorOp,
+                                                           compressorOp,
                                                            par4_load,
                                                            1.0,              // par6_loadFlag,
                                                            par6_LatentSens,  // par7_sensLatentFlag,
@@ -7497,7 +7497,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       TempMaxPLR,
                                                       0.0,
                                                       0.0,
@@ -7534,7 +7534,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       TempMinPLR2,
                                                       0.0,
                                                       0.0,
@@ -7550,7 +7550,7 @@ namespace Furnaces {
                                            FurnaceNum,
                                            FirstHVACIteration,
                                            fanOp,
-                                           CompressorOp,
+                                           compressorOp,
                                            par4_load,
                                            par6_LatentSens,
                                            par8_HXUnit,
@@ -7560,7 +7560,7 @@ namespace Furnaces {
                                                                FurnaceNum,
                                                                FirstHVACIteration,
                                                                fanOp,
-                                                               CompressorOp,
+                                                               compressorOp,
                                                                par4_load,
                                                                1.0,              // par6_loadFlag,
                                                                par6_LatentSens,  // par7_sensLatentFlag,
@@ -7586,7 +7586,7 @@ namespace Furnaces {
                                                       FurnaceNum,
                                                       FirstHVACIteration,
                                                       fanOp,
-                                                      CompressorOp,
+                                                      compressorOp,
                                                       LatentPartLoadRatio,
                                                       0.0,
                                                       0.0,
@@ -7675,7 +7675,7 @@ namespace Furnaces {
                                           FurnaceNum,
                                           FirstHVACIteration,
                                           fanOp,
-                                          CompressorOp,
+                                          compressorOp,
                                           LatentPartLoadRatio,
                                           0.0,
                                           0.0,
@@ -7709,7 +7709,7 @@ namespace Furnaces {
                     }
 
                     thisFurnace.CoolPartLoadRatio = PartLoadRatio;
-                    if (CompressorOp == HVAC::CompressorOperation::Off) {
+                    if (compressorOp == HVAC::CompressorOp::Off) {
                         thisFurnace.CompPartLoadRatio = 0.0;
                     } else {
                         thisFurnace.CompPartLoadRatio = PartLoadRatio;
@@ -7847,7 +7847,7 @@ namespace Furnaces {
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
                                 int const FurnaceNum,                         // index to Furnace
                                 bool const FirstHVACIteration,                // TRUE on first HVAC iteration
-                                HVAC::CompressorOperation const CompressorOp, // compressor operation flag (1=On, 0=Off)
+                                HVAC::CompressorOp const compressorOp, // compressor operation flag (1=On, 0=Off)
                                 Real64 const ZoneLoad,                        // the control zone load (watts)
                                 Real64 const MoistureLoad                     // the control zone latent load (watts)
     )
@@ -7948,7 +7948,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
                               Dummy2,
@@ -7968,7 +7968,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
                               Dummy2,
@@ -8012,7 +8012,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   Dummy2,
@@ -8026,14 +8026,14 @@ namespace Furnaces {
                 CoolErrorToler = thisFurnace.CoolingConvergenceTolerance;
                 SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                 // CoolErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
+                auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
                              Real64 const PartLoadRatio) {
                     return CalcWaterToAirResidual(state,
                                                   PartLoadRatio,
                                                   FurnaceNum,
                                                   FirstHVACIteration,
                                                   fanOp,
-                                                  CompressorOp,
+                                                  compressorOp,
                                                   TotalZoneSensLoad,
                                                   1.0,
                                                   1.0,
@@ -8047,7 +8047,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       CoolPartLoadRatio,
                                       0.0,
                                       0.0,
@@ -8084,7 +8084,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       CoolPartLoadRatio,
                                       0.0,
                                       0.0,
@@ -8146,7 +8146,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
                               Dummy2,
@@ -8167,7 +8167,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
                               Dummy2,
@@ -8212,7 +8212,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   Dummy2,
@@ -8226,14 +8226,14 @@ namespace Furnaces {
                 HeatErrorToler = thisFurnace.HeatingConvergenceTolerance;
                 SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                 // HeatErrorToler is in fraction of load, MaxIter = 600, SolFalg = # of iterations or error as appropriate
-                auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, CompressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
+                auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, TotalZoneSensLoad, ZoneSensLoadMetFanONCompOFF](
                              Real64 const PartLoadRatio) {
                     return CalcWaterToAirResidual(state,
                                                   PartLoadRatio,
                                                   FurnaceNum,
                                                   FirstHVACIteration,
                                                   fanOp,
-                                                  CompressorOp,
+                                                  compressorOp,
                                                   TotalZoneSensLoad,
                                                   0.0,
                                                   1.0,
@@ -8246,7 +8246,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   Dummy2,
@@ -8283,7 +8283,7 @@ namespace Furnaces {
                                       FurnaceNum,
                                       FirstHVACIteration,
                                       fanOp,
-                                      CompressorOp,
+                                      compressorOp,
                                       0.0,
                                       HeatPartLoadRatio,
                                       0.0,
@@ -8322,7 +8322,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   SuppHeatCoilLoad,
@@ -8355,7 +8355,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   Dummy2,
@@ -8370,7 +8370,7 @@ namespace Furnaces {
                                   FurnaceNum,
                                   FirstHVACIteration,
                                   fanOp,
-                                  CompressorOp,
+                                  compressorOp,
                                   CoolPartLoadRatio,
                                   HeatPartLoadRatio,
                                   Dummy2,
@@ -8395,7 +8395,7 @@ namespace Furnaces {
                               FurnaceNum,
                               FirstHVACIteration,
                               fanOp,
-                              CompressorOp,
+                              compressorOp,
                               CoolPartLoadRatio,
                               HeatPartLoadRatio,
                               Dummy2,
@@ -8416,7 +8416,7 @@ namespace Furnaces {
                            int const FurnaceNum,
                            bool const FirstHVACIteration,
                            HVAC::FanOp const fanOp,                          // Cycling fan or constant fan
-                           HVAC::CompressorOperation const CompressorOp, // Compressor on/off; 1=on, 0=off
+                           HVAC::CompressorOp const compressorOp, // Compressor on/off; 1=on, 0=off
                            Real64 const CoolPartLoadRatio,               // DX cooling coil part load ratio
                            Real64 const HeatPartLoadRatio,               // DX heating coil part load ratio (0 for other heating coil types)
                            Real64 const HeatCoilLoad,                    // Heating coil load for gas heater
@@ -8492,7 +8492,7 @@ namespace Furnaces {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
                                                                         FirstHVACIteration,
-                                                                        CompressorOp,
+                                                                        compressorOp,
                                                                         CoolPartLoadRatio,
                                                                         thisFurnace.CoolingCoilIndex,
                                                                         fanOp,
@@ -8502,7 +8502,7 @@ namespace Furnaces {
                 } else {
                     DXCoils::SimDXCoil(state,
                                        BlankString,
-                                       CompressorOp,
+                                       compressorOp,
                                        FirstHVACIteration,
                                        thisFurnace.CoolingCoilIndex,
                                        fanOp,
@@ -8511,7 +8511,7 @@ namespace Furnaces {
                 }
                 DXCoils::SimDXCoil(state,
                                    BlankString,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    thisFurnace.HeatingCoilIndex,
                                    fanOp,
@@ -8524,7 +8524,7 @@ namespace Furnaces {
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                     BlankString,
                                                                     FirstHVACIteration,
-                                                                    CompressorOp,
+                                                                    compressorOp,
                                                                     CoolPartLoadRatio,
                                                                     thisFurnace.CoolingCoilIndex,
                                                                     fanOp,
@@ -8534,7 +8534,7 @@ namespace Furnaces {
             } else {
                 DXCoils::SimDXCoil(state,
                                    BlankString,
-                                   CompressorOp,
+                                   compressorOp,
                                    FirstHVACIteration,
                                    thisFurnace.CoolingCoilIndex,
                                    fanOp,
@@ -8542,7 +8542,7 @@ namespace Furnaces {
                                    OnOffAirFlowRatio);
             }
             DXCoils::SimDXCoil(
-                state, BlankString, CompressorOp, FirstHVACIteration, thisFurnace.HeatingCoilIndex, fanOp, HeatPartLoadRatio, OnOffAirFlowRatio);
+                state, BlankString, compressorOp, FirstHVACIteration, thisFurnace.HeatingCoilIndex, fanOp, HeatPartLoadRatio, OnOffAirFlowRatio);
             //   Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
                 state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
@@ -8568,7 +8568,7 @@ namespace Furnaces {
                                                                 thisFurnace.CoolingCoilSensDemand,
                                                                 thisFurnace.CoolingCoilLatentDemand,
                                                                 fanOp,
-                                                                CompressorOp,
+                                                                compressorOp,
                                                                 CoolPartLoadRatio,
                                                                 FirstHVACIteration); // CoolPartLoadRatio
                 Real64 Dummy = 0.0;
@@ -8579,7 +8579,7 @@ namespace Furnaces {
                                                                 thisFurnace.HeatingCoilSensDemand,
                                                                 Dummy,
                                                                 fanOp,
-                                                                CompressorOp,
+                                                                compressorOp,
                                                                 HeatPartLoadRatio,
                                                                 FirstHVACIteration); // HeatPartLoadRatio
                 //      Simulate the whole thing a second time so that the correct PLF required by the coils is used by the Fan. *******
@@ -8593,7 +8593,7 @@ namespace Furnaces {
                                                             thisFurnace.CoolingCoilSensDemand,
                                                             thisFurnace.CoolingCoilLatentDemand,
                                                             fanOp,
-                                                            CompressorOp,
+                                                            compressorOp,
                                                             CoolPartLoadRatio,
                                                             FirstHVACIteration); // CoolPartLoadRatio
             Real64 Dummy = 0.0;
@@ -8604,7 +8604,7 @@ namespace Furnaces {
                                                             thisFurnace.HeatingCoilSensDemand,
                                                             Dummy,
                                                             fanOp,
-                                                            CompressorOp,
+                                                            compressorOp,
                                                             HeatPartLoadRatio,
                                                             FirstHVACIteration); // HeatPartLoadRatio
             //     Simulate the draw-thru fan
@@ -8635,7 +8635,7 @@ namespace Furnaces {
                                                 thisFurnace.InitHeatPump,
                                                 thisFurnace.CoolingCoilSensDemand,
                                                 thisFurnace.CoolingCoilLatentDemand,
-                                                CompressorOp,
+                                                compressorOp,
                                                 CoolPartLoadRatio);
             Real64 Dummy = 0.0;
             WaterToAirHeatPump::SimWatertoAirHP(state,
@@ -8647,7 +8647,7 @@ namespace Furnaces {
                                                 thisFurnace.InitHeatPump,
                                                 thisFurnace.HeatingCoilSensDemand,
                                                 Dummy,
-                                                CompressorOp,
+                                                compressorOp,
                                                 HeatPartLoadRatio);
             //    Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::DrawThru) {
@@ -8676,7 +8676,7 @@ namespace Furnaces {
                             HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                                 BlankString,
                                                                                 FirstHVACIteration,
-                                                                                CompressorOp,
+                                                                                compressorOp,
                                                                                 CoolPartLoadRatio,
                                                                                 thisFurnace.CoolingCoilIndex,
                                                                                 fanOp,
@@ -8686,7 +8686,7 @@ namespace Furnaces {
                         } else {
                             DXCoils::SimDXCoil(state,
                                                BlankString,
-                                               CompressorOp,
+                                               compressorOp,
                                                FirstHVACIteration,
                                                thisFurnace.CoolingCoilIndex,
                                                fanOp,
@@ -8717,7 +8717,7 @@ namespace Furnaces {
                     HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
                                                                         BlankString,
                                                                         FirstHVACIteration,
-                                                                        CompressorOp,
+                                                                        compressorOp,
                                                                         CoolPartLoadRatio,
                                                                         thisFurnace.CoolingCoilIndex,
                                                                         fanOp,
@@ -8727,7 +8727,7 @@ namespace Furnaces {
                 } else {
                     DXCoils::SimDXCoil(state,
                                        BlankString,
-                                       CompressorOp,
+                                       compressorOp,
                                        FirstHVACIteration,
                                        thisFurnace.CoolingCoilIndex,
                                        fanOp,
@@ -8796,7 +8796,7 @@ namespace Furnaces {
                                int FurnaceNum,
                                bool FirstHVACIteration,
                                HVAC::FanOp const fanOp,
-                               HVAC::CompressorOperation CompressorOp,
+                               HVAC::CompressorOp compressorOp,
                                Real64 LoadToBeMet,
                                Real64 par6_loadFlag,
                                Real64 par7_sensLatentFlag,
@@ -8874,7 +8874,7 @@ namespace Furnaces {
                           FurnaceNum,
                           FirstHVACIteration,
                           fanOp,
-                          CompressorOp,
+                          compressorOp,
                           CoolPartLoadRatio,
                           HeatPartLoadRatio,
                           HeatCoilLoad,
@@ -8906,7 +8906,7 @@ namespace Furnaces {
                                   int FurnaceNum,
                                   bool FirstHVACIteration,
                                   HVAC::FanOp const fanOp,
-                                  HVAC::CompressorOperation CompressorOp,
+                                  HVAC::CompressorOp compressorOp,
                                   Real64 LoadToBeMet,
                                   Real64 par6_loadTypeFlag,
                                   Real64 par7_latentOrSensible,
@@ -9009,13 +9009,13 @@ namespace Furnaces {
         }
 
         //  Subroutine arguments
-        //  CALL CalcFurnaceOutput(FurnaceNum,FirstHVACIteration,FanOp,CompressorOp,CoolPartLoadRatio,&
+        //  CALL CalcFurnaceOutput(FurnaceNum,FirstHVACIteration,FanOp,compressorOp,CoolPartLoadRatio,&
         //                         HeatPartLoadRatio, HeatCoilLoad, ReHeatCoilLoad, SensibleLoadMet, LatentLoadMet, HXUnitOn)
         CalcFurnaceOutput(state,
                           FurnaceNum,
                           FirstHVACIteration,
                           fanOp,
-                          CompressorOp,
+                          compressorOp,
                           CoolPartLoadRatio,
                           HeatPartLoadRatio,
                           Dummy,
@@ -9350,7 +9350,7 @@ namespace Furnaces {
         Real64 QTotUnitOut;  // capacity output
         auto &SpeedNum = state.dataFurnaces->SpeedNum;
         auto &SupHeaterLoad = state.dataFurnaces->SupHeaterLoad;
-        HVAC::CompressorOperation CompressorOp; // compressor operation; 1=on, 0=off
+        HVAC::CompressorOp compressorOp; // compressor operation; 1=on, 0=off
         Real64 QSensUnitOut;                    // sensible capacity output
         Real64 QLatUnitOut;                     // latent capacity output
         Real64 ActualSensibleOutput;            // Actual furnace sensible capacity
@@ -9413,11 +9413,11 @@ namespace Furnaces {
         if (!FirstHVACIteration && thisFurnace.fanOp == HVAC::FanOp::Cycling &&
             (QZnReq < (-1.0 * HVAC::SmallLoad) || TotalZoneLatentLoad < (-HVAC::SmallLoad)) && EconoActive) {
             // for cycling fan, cooling load, check whether furnace can meet load with compressor off
-            CompressorOp = HVAC::CompressorOperation::Off;
+            compressorOp = HVAC::CompressorOp::Off;
             ControlVSHPOutput(state,
                               FurnaceNum,
                               FirstHVACIteration,
-                              CompressorOp,
+                              compressorOp,
                               fanOp,
                               TotalZoneSensibleLoad,
                               TotalZoneLatentLoad,
@@ -9433,11 +9433,11 @@ namespace Furnaces {
             if (SpeedNum == thisFurnace.NumOfSpeedCooling && SpeedRatio == 1.0) {
                 // compressor on (reset inlet air mass flow rate to starting value)
                 state.dataLoopNodes->Node(InletNode).MassFlowRate = SaveMassFlowRate;
-                CompressorOp = HVAC::CompressorOperation::On;
+                compressorOp = HVAC::CompressorOp::On;
                 ControlVSHPOutput(state,
                                   FurnaceNum,
                                   FirstHVACIteration,
-                                  CompressorOp,
+                                  compressorOp,
                                   fanOp,
                                   TotalZoneSensibleLoad,
                                   TotalZoneLatentLoad,
@@ -9449,12 +9449,12 @@ namespace Furnaces {
             }
         } else {
             // compressor on
-            CompressorOp = HVAC::CompressorOperation::On;
+            compressorOp = HVAC::CompressorOp::On;
 
             ControlVSHPOutput(state,
                               FurnaceNum,
                               FirstHVACIteration,
-                              CompressorOp,
+                              compressorOp,
                               fanOp,
                               TotalZoneSensibleLoad,
                               TotalZoneLatentLoad,
@@ -9487,7 +9487,7 @@ namespace Furnaces {
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,
                                  FirstHVACIteration,
-                                 CompressorOp,
+                                 compressorOp,
                                  SpeedNum,
                                  SpeedRatio,
                                  PartLoadFrac,
@@ -9521,7 +9521,7 @@ namespace Furnaces {
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,
                                  FirstHVACIteration,
-                                 CompressorOp,
+                                 compressorOp,
                                  1,
                                  0.0,
                                  0.0,
@@ -9549,7 +9549,7 @@ namespace Furnaces {
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,
                                  FirstHVACIteration,
-                                 CompressorOp,
+                                 compressorOp,
                                  SpeedNum,
                                  SpeedRatio,
                                  PartLoadFrac,
@@ -9563,7 +9563,7 @@ namespace Furnaces {
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,
                                  FirstHVACIteration,
-                                 CompressorOp,
+                                 compressorOp,
                                  SpeedNum,
                                  SpeedRatio,
                                  PartLoadFrac,
@@ -9643,7 +9643,7 @@ namespace Furnaces {
     void ControlVSHPOutput(EnergyPlusData &state,
                            int const FurnaceNum,                         // Unit index of engine driven heat pump
                            bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
-                           HVAC::CompressorOperation const CompressorOp, // compressor operation; 1=on, 0=off
+                           HVAC::CompressorOp const compressorOp, // compressor operation; 1=on, 0=off
                            HVAC::FanOp const fanOp,                             // operating mode: FanOp::Cycling | FanOp::Continuous
                            Real64 &QZnReq,                               // cooling or heating output needed by zone [W]
                            Real64 QLatReq,                               // latent cooling output needed by zone [W]
@@ -9694,7 +9694,7 @@ namespace Furnaces {
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
                              FirstHVACIteration,
-                             CompressorOp,
+                             compressorOp,
                              SpeedNum,
                              SpeedRatio,
                              PartLoadFrac,
@@ -9744,7 +9744,7 @@ namespace Furnaces {
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
                              FirstHVACIteration,
-                             CompressorOp,
+                             compressorOp,
                              SpeedNum,
                              SpeedRatio,
                              PartLoadFrac,
@@ -9788,7 +9788,7 @@ namespace Furnaces {
                 CalcVarSpeedHeatPump(state,
                                      FurnaceNum,
                                      FirstHVACIteration,
-                                     CompressorOp,
+                                     compressorOp,
                                      1,
                                      0.0,
                                      1.0,
@@ -9803,9 +9803,9 @@ namespace Furnaces {
                     SpeedRatio = 0.0;
                     SpeedNum = 1;
                     auto f = // (AUTO_OK_LAMBDA)
-                        [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                        [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, compressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
-                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 1.0);
+                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, compressorOp, 1.0);
                         };
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                     if (SolFla == -1) {
@@ -9837,7 +9837,7 @@ namespace Furnaces {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  i,
                                                  SpeedRatio,
                                                  PartLoadFrac,
@@ -9858,7 +9858,7 @@ namespace Furnaces {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  i,
                                                  SpeedRatio,
                                                  PartLoadFrac,
@@ -9874,10 +9874,10 @@ namespace Furnaces {
                             }
                         }
                     }
-                    auto f = [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, CompressorOp](
+                    auto f = [&state, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, compressorOp](
                                  Real64 const SpeedRatio) {
                         return VSHPSpeedResidual(
-                            state, SpeedRatio, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, CompressorOp, 1.0);
+                            state, SpeedRatio, FurnaceNum, FirstHVACIteration, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, compressorOp, 1.0);
                     };
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
                     if (SolFla == -1) {
@@ -9917,7 +9917,7 @@ namespace Furnaces {
                 CalcVarSpeedHeatPump(state,
                                      FurnaceNum,
                                      FirstHVACIteration,
-                                     CompressorOp,
+                                     compressorOp,
                                      i,
                                      SpeedRatio,
                                      PartLoadFrac,
@@ -9936,13 +9936,13 @@ namespace Furnaces {
             if (QLatReq - LatOutput > HVAC::SmallLoad) {
                 if (SpeedNum < 2) {
                     auto f = // (AUTO_OK_LAMBDA)
-                        [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp](Real64 const PartLoadFrac) {
+                        [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, compressorOp](Real64 const PartLoadFrac) {
                             return VSHPCyclingResidual(
-                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, CompressorOp, 0.0);
+                                state, PartLoadFrac, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, compressorOp, 0.0);
                         };
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
                 } else {
-                    auto f = [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, CompressorOp](
+                    auto f = [&state, FurnaceNum, FirstHVACIteration, QLatReq, OnOffAirFlowRatio, SupHeaterLoad, SpeedNum, compressorOp](
                                  Real64 const SpeedRatio) {
                         return VSHPSpeedResidual(state,
                                                  SpeedRatio,
@@ -9952,7 +9952,7 @@ namespace Furnaces {
                                                  OnOffAirFlowRatio,
                                                  SupHeaterLoad,
                                                  SpeedNum,
-                                                 CompressorOp,
+                                                 compressorOp,
                                                  0.0);
                     };
                     General::SolveRoot(state, ErrorToler, MaxIte, SolFla, SpeedRatio, f, 1.0e-10, 1.0);
@@ -9998,7 +9998,7 @@ namespace Furnaces {
             CalcVarSpeedHeatPump(state,
                                  FurnaceNum,
                                  FirstHVACIteration,
-                                 CompressorOp,
+                                 compressorOp,
                                  SpeedNum,
                                  SpeedRatio,
                                  PartLoadFrac,
@@ -10047,7 +10047,7 @@ namespace Furnaces {
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
                               int const FurnaceNum,                         // Variable speed heat pump number
                               bool const FirstHVACIteration,                // Flag for 1st HVAC iteration
-                              HVAC::CompressorOperation const CompressorOp, // Compressor on/off; 1=on, 0=off
+                              HVAC::CompressorOp const compressorOp, // Compressor on/off; 1=on, 0=off
                               int const SpeedNum,                           // Speed number
                               Real64 const SpeedRatio,                      // Compressor speed ratio
                               Real64 const PartLoadFrac,                    // Compressor part load fraction
@@ -10109,7 +10109,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10123,7 +10123,7 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.fanOp,
-                                                              CompressorOp,
+                                                              compressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -10142,7 +10142,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10153,7 +10153,7 @@ namespace Furnaces {
                                                OnOffAirFlowRatio);
                 } else {
                     VariableSpeedCoils::SimVariableSpeedCoils(
-                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, compressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10164,7 +10164,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10178,7 +10178,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -10197,7 +10197,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10211,7 +10211,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   0.0,
                                                                   1,
                                                                   0.0,
@@ -10243,7 +10243,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10257,7 +10257,7 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.fanOp,
-                                                              CompressorOp,
+                                                              compressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -10276,7 +10276,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10287,7 +10287,7 @@ namespace Furnaces {
                                                OnOffAirFlowRatio);
                 } else {
                     VariableSpeedCoils::SimVariableSpeedCoils(
-                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, compressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10298,7 +10298,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10312,7 +10312,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -10330,7 +10330,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10344,7 +10344,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   0.0,
                                                                   1,
                                                                   0.0,
@@ -10380,7 +10380,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10394,7 +10394,7 @@ namespace Furnaces {
                                                               BlankString,
                                                               thisFurnace.CoolingCoilIndex,
                                                               thisFurnace.fanOp,
-                                                              CompressorOp,
+                                                              compressorOp,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -10413,7 +10413,7 @@ namespace Furnaces {
                                                BlankString,
                                                thisFurnace.CoolingCoilIndex,
                                                thisFurnace.fanOp,
-                                               CompressorOp,
+                                               compressorOp,
                                                PartLoadFrac,
                                                SpeedNum,
                                                SpeedRatio,
@@ -10424,7 +10424,7 @@ namespace Furnaces {
                                                OnOffAirFlowRatio);
                 } else {
                     VariableSpeedCoils::SimVariableSpeedCoils(
-                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, CompressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
+                        state, BlankString, thisFurnace.CoolingCoilIndex, thisFurnace.fanOp, compressorOp, 0.0, 1, 0.0, 0.0, 0.0, OnOffAirFlowRatio);
                 }
             }
 
@@ -10436,7 +10436,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.HeatingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10450,7 +10450,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   PartLoadFrac,
                                                                   SpeedNum,
                                                                   SpeedRatio,
@@ -10468,7 +10468,7 @@ namespace Furnaces {
                                                    BlankString,
                                                    thisFurnace.CoolingCoilIndex,
                                                    thisFurnace.fanOp,
-                                                   CompressorOp,
+                                                   compressorOp,
                                                    PartLoadFrac,
                                                    SpeedNum,
                                                    SpeedRatio,
@@ -10482,7 +10482,7 @@ namespace Furnaces {
                                                                   BlankString,
                                                                   thisFurnace.HeatingCoilIndex,
                                                                   thisFurnace.fanOp,
-                                                                  CompressorOp,
+                                                                  compressorOp,
                                                                   0.0,
                                                                   1,
                                                                   0.0,
@@ -10530,7 +10530,7 @@ namespace Furnaces {
                                Real64 LoadToBeMet,
                                Real64 OnOffAirFlowRatio,
                                Real64 SupHeaterLoad,
-                               HVAC::CompressorOperation CompressorOp,
+                               HVAC::CompressorOp compressorOp,
                                Real64 par9_SensLatFlag)
     {
         // FUNCTION INFORMATION:
@@ -10570,7 +10570,7 @@ namespace Furnaces {
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
                              FirstHVACIteration,
-                             CompressorOp,
+                             compressorOp,
                              1,
                              0.0,
                              PartLoadFrac,
@@ -10608,7 +10608,7 @@ namespace Furnaces {
                              Real64 OnOffAirFlowRatio,
                              Real64 SupHeaterLoad,
                              int SpeedNum,
-                             HVAC::CompressorOperation CompressorOp,
+                             HVAC::CompressorOp compressorOp,
                              Real64 par9_SensLatFlag)
     {
         // FUNCTION INFORMATION:
@@ -10636,7 +10636,7 @@ namespace Furnaces {
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
                              FirstHVACIteration,
-                             CompressorOp,
+                             compressorOp,
                              SpeedNum,
                              SpeedRatio,
                              1.0,

@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 0;
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::AirToAir_Generic;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -214,7 +214,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 2";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::AirToAir_Generic;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -3962,7 +3962,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
 
     // initialize sizing required variables
     state->dataHeatRecovery->ExchCond.allocate(ExchNum);
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_DESICCANT_BALANCED;
+    state->dataHeatRecovery->ExchCond(ExchNum).type = HVAC::HXType::Desiccant_Balanced;
     state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = AutoSize;
     state->dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
 
@@ -4185,7 +4185,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    thisHX.ExchType = HVAC::HX_AIRTOAIR_GENERIC;
+    thisHX.type = HVAC::HXType::AirToAir_Generic;
     thisHX.SupInTemp = 10.0;
     thisHX.SecInTemp = 20.0;
     thisHX.SupInHumRat = 0.01;

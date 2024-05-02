@@ -115,7 +115,7 @@ namespace WaterToAirHeatPumpSimple {
                                Real64 const SensLoad,     // Sensible demand load [W]
                                Real64 const LatentLoad,   // Latent demand load [W]
                                HVAC::FanOp const fanOp,   // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation const CompressorOp,
+                               HVAC::CompressorOp const compressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Real64 const OnOffAirFlowRatio // ratio of comp on to comp off air flow rate
@@ -181,12 +181,12 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
             InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, fanOp, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            CalcHPCoolingSimple(state, HPNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
             InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, fanOp, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            CalcHPHeatingSimple(state, HPNum, fanOp, SensLoad, compressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -2983,7 +2983,7 @@ namespace WaterToAirHeatPumpSimple {
                              HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
                              [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
-                             HVAC::CompressorOperation const CompressorOp,   // compressor operation flag
+                             HVAC::CompressorOp const compressorOp,   // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -3111,7 +3111,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }
@@ -3319,7 +3319,7 @@ namespace WaterToAirHeatPumpSimple {
                              int const HPNum,                                // Heat Pump Number
                              HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
-                             HVAC::CompressorOperation const CompressorOp,   // compressor operation flag
+                             HVAC::CompressorOp const compressorOp,   // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -3413,7 +3413,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompressorOp == HVAC::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }

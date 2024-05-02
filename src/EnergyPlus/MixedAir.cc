@@ -577,7 +577,7 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0)
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, CompName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CompIndex, HVAC::FanOp::Continuous);
+                    state, CompName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, CompIndex, HVAC::FanOp::Continuous);
             // iterate on OA sys controller and water coil at the same time
             SimAirServingZones::SolveWaterCoilController(state,
                                                          FirstHVACIteration,

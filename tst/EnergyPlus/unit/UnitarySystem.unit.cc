@@ -5481,7 +5481,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
-    HVAC::CompressorOperation CompressorOn(HVAC::CompressorOperation::On);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
     Real64 OnOffAirFlowRatio(1.0);
     Real64 HeatCoilLoad(0.0);
     Real64 HotWaterMassFlowRate(0.0);
@@ -5620,7 +5620,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
 {
 
-    HVAC::CompressorOperation CompressorOn(HVAC::CompressorOperation::On);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::On);
     int AirLoopNum(1);
     bool FirstHVACIteration(false);
     Real64 OnOffAirFlowRatio(1.0);
@@ -19842,7 +19842,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_CalcTest)
     state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     bool HXUnitOn(false);
-    HVAC::CompressorOperation CompressorOn(HVAC::CompressorOperation::Off);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::Off);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;
@@ -20122,7 +20122,7 @@ TEST_F(EnergyPlusFixture, CoilSystemCoolingWater_HeatRecoveryLoop)
     state->dataGlobal->SysSizingCalc = true;
     FirstHVACIteration = true;
     bool HXUnitOn(false);
-    HVAC::CompressorOperation CompressorOn(HVAC::CompressorOperation::Off);
+    HVAC::CompressorOp CompressorOn(HVAC::CompressorOp::Off);
     Real64 OAUCoilOutTemp(0.0);
     // initial assumptions
     thisSys.m_DesiredOutletHumRat = 0.10;

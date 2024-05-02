@@ -263,7 +263,7 @@ void GetStandAloneERV(EnergyPlusData &state)
             state, Alphas(3), CurrentModuleObject, cAlphaFields(3), state.dataHVACStandAloneERV->HeatExchangerUniqueNames, ErrorsFound);
         standAloneERV.HeatExchangerName = Alphas(3);
         bool errFlag = false;
-        standAloneERV.HeatExchangerTypeNum = HeatRecovery::GetHeatExchangerObjectTypeNum(state, standAloneERV.HeatExchangerName, errFlag);
+        standAloneERV.hxType = HeatRecovery::GetHeatExchangerObjectTypeNum(state, standAloneERV.HeatExchangerName, errFlag);
         if (errFlag) {
             ShowContinueError(state, format("... occurs in {} \"{}\"", CurrentModuleObject, standAloneERV.Name));
             ErrorsFound = true;

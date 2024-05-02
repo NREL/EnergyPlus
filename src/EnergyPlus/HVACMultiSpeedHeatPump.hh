@@ -306,7 +306,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPOutput(EnergyPlusData &state,
                            int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                            bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
-                           HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
+                           HVAC::CompressorOp compressorOp, // compressor operation; 1=on, 0=off
                            HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                            Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                            int const ZoneNum,                      // Index to zone number
@@ -320,7 +320,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPSupHeater(EnergyPlusData &state,
                               int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                               bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
-                              HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
+                              HVAC::CompressorOp compressorOp, // compressor operation; 1=on, 0=off
                               HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                               Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                               int const FullOutput,                   // unit full output when compressor is operating [W]vvvv
@@ -335,7 +335,7 @@ namespace HVACMultiSpeedHeatPump {
     void ControlMSHPOutputEMS(EnergyPlusData &state,
                               int const MSHeatPumpNum,                // Unit index of engine driven heat pump
                               bool const FirstHVACIteration,          // flag for 1st HVAC iteration in the time step
-                              HVAC::CompressorOperation CompressorOp, // compressor operation; 1=on, 0=off
+                              HVAC::CompressorOp compressorOp, // compressor operation; 1=on, 0=off
                               HVAC::FanOp const fanOp,                // operating mode: FanOp::Cycling | FanOp::Continuous
                               Real64 const QZnReq,                    // cooling or heating output needed by zone [W]
                               Real64 const SpeedVal,                  // continuous speed value
@@ -352,7 +352,7 @@ namespace HVACMultiSpeedHeatPump {
     void CalcMSHeatPump(EnergyPlusData &state,
                         int const MSHeatPumpNum,                // Engine driven heat pump number
                         bool const FirstHVACIteration,          // Flag for 1st HVAC iteration
-                        HVAC::CompressorOperation CompressorOp, // Compressor on/off; 1=on, 0=off
+                        HVAC::CompressorOp compressorOp, // Compressor on/off; 1=on, 0=off
                         int const SpeedNum,                     // Speed number
                         Real64 const SpeedRatio,                // Compressor speed ratio
                         Real64 const PartLoadFrac,              // Compressor part load fraction

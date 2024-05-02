@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     state->dataLoopNodes->Node(ControlNode).HumRatMax = RHControlHumRat;
 
     // test sensible control
-    HVAC::CompressorOperation CompressorOn = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     // system meets temperature set point
     EXPECT_NEAR(thisSys->m_DesiredOutletTemp, state->dataLoopNodes->Node(ControlNode).Temp, 0.001);
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_LatentDegradation_Test)
     state->dataLoopNodes->Node(ControlNode).TempSetPoint = thisSys->m_DesiredOutletTemp;
 
     // test sensible control
-    HVAC::CompressorOperation CompressorOn = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp CompressorOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompressorOn);
     Real64 SHR = state->dataVariableSpeedCoils->VarSpeedCoil(1).QSensible / state->dataVariableSpeedCoils->VarSpeedCoil(1).QLoadTotal;
     EXPECT_NEAR(SHR, 0.49605, 0.0001);
@@ -1101,7 +1101,7 @@ TEST_F(EnergyPlusFixture, NewDXCoilModel_RHControl)
     state->dataSize->UnitarySysEqSizing.allocate(1);
     // run init to size system
     thisSys->initUnitarySystems(*state, 1, FirstHVACIteration, 0.0);
-    HVAC::CompressorOperation CompOn = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp CompOn = HVAC::CompressorOp::On;
     thisSys->controlCoolingSystemToSP(*state, airLoopNum, FirstHVACIteration, HXUnitOn, CompOn);
     // system meets temperature set point
     Real64 outTemp1 = state->dataLoopNodes->Node(ControlNode).Temp;
