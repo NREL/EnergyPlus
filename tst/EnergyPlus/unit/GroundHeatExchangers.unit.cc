@@ -969,7 +969,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
     GetGroundHeatExchangerInput(*state);
 
     EXPECT_EQ(2u, state->dataGroundHeatExchanger->vertPropsVector.size());
-    EXPECT_EQ(4u, state->dataGroundHeatExchanger->singleBoreholesVector.size());
+    EXPECT_EQ(5u, state->dataGroundHeatExchanger->singleBoreholesVector.size());
     EXPECT_EQ(1u, state->dataGroundHeatExchanger->verticalGLHE.size());
 
     auto &thisGLHE(state->dataGroundHeatExchanger->verticalGLHE[0]);
@@ -984,6 +984,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
     EXPECT_EQ(100, thisGLHE.bhLength);
     EXPECT_EQ(0.04556, thisGLHE.bhUTubeDist);
     EXPECT_EQ(0, thisGLHE.myRespFactors->maxSimYears);
+    EXPECT_EQ(4, thisGLHE.myRespFactors->numBoreholes);
     EXPECT_EQ(400, thisGLHE.totalTubeLength);
     EXPECT_EQ(thisGLHE.soil.k / thisGLHE.soil.rhoCp, thisGLHE.soil.diffusivity);
 }
