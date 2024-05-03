@@ -941,6 +941,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_Given_Single_BHs_IDF_Ch
                           "    5.5,                !- X Location {m}",
                           "    5.5;                !- Y Location {m}",
 
+                          "GroundHeatExchanger:Vertical:Single,",
+                          "    UNUSED,             !- Name",
+                          "    GHE-1 Props,        !- GHE Properties",
+                          "    8.0,                !- X Location {m}",
+                          "    8.0;                !- Y Location {m}",
+
                           "GroundHeatExchanger:System,",
                           "    Vertical GHE 1x4 Std,  !- Name",
                           "    GHLE Inlet,         !- Inlet Node Name",
