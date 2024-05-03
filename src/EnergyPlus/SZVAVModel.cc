@@ -71,9 +71,6 @@ namespace SZVAVModel {
 
     // Module containing routines for general use
 
-    // Using/Aliasing
-    using HVAC::Bisection;
-
     // Data
     // This module should not contain variables in the module sense as it is
     // intended strictly to provide "interfaces" to routines used by other
@@ -206,7 +203,7 @@ namespace SZVAVModel {
         // Step 1: Determine boundary for region 1
         // calculate sensible load based on minimum air flow rate and specified supply air temperature limit
         if (SZVAVModel.ATMixerExists) {
-            if (SZVAVModel.ATMixerType == HVAC::ATMixer_SupplySide) {
+            if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 lowBoundaryLoad =
                     minAirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) -
@@ -671,7 +668,7 @@ namespace SZVAVModel {
         // Step 1: Determine boundary for region 1
         // calculate sensible load based on minimum air flow rate and specified supply air temperature limit
         if (SZVAVModel.ATMixerExists) {
-            if (SZVAVModel.ATMixerType == HVAC::ATMixer_SupplySide) {
+            if (SZVAVModel.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Air terminal supply side mixer
                 boundaryLoadMet =
                     minAirMassFlow * (Psychrometrics::PsyHFnTdbW(state.dataLoopNodes->Node(SZVAVModel.ATMixerOutNode).Temp, ZoneHumRat) -

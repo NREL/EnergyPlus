@@ -206,7 +206,7 @@ namespace HVACUnitaryBypassVAV {
         Real64 CoilTempSetPoint = 0.0;                                // Coil oulet node temperature setpoint (inc. fan heat) [C]
         int HeatCoolMode = 0;                                         // System operating mode (0 = floating, 1 = cooling, 2 = heating)
         Real64 BypassMassFlowRate = 0.0;                              // Bypass mass flow rate report variable [m3/s]
-        int DehumidificationMode = 0;                                 // Dehumidification mode (0=normal, 1=enhanced)
+        HVAC::CoilMode DehumidificationMode = HVAC::CoilMode::Invalid; // Dehumidification mode (0=normal, 1=enhanced)
         DehumidControl DehumidControlType = DehumidControl::None;     // Dehumidification control type (currently only for multimode coil)
         bool HumRatMaxCheck = true;                                   // Used in Init for warning messages
         int DXIterationExceeded = 0;                                  // Counter for DX coil messages

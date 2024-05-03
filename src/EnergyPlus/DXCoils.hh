@@ -242,7 +242,7 @@ namespace DXCoils {
         Real64 TimeLeftToDefrost;       // keep track of time left to defrost heat pump
         Real64 DefrostPower;            // power used during defrost
         Real64 DefrostConsumption;      // energy used during defrost
-        int HeatingPerformanceOATType;  // Heating performance curve OAT type (1-wetbulb, 2-drybulb)
+        HVAC::OATType HeatingPerformanceOATType;  // Heating performance curve OAT type (1-wetbulb, 2-drybulb)
         bool HPCoilIsInCoilSystemHeatingDX;
         bool OATempCompressorOnOffBlank;
         // end of variables used in heat pump heating coils only
@@ -285,7 +285,7 @@ namespace DXCoils {
         Array1D_int CoilPerformanceType_Num; // Coil Performance object type number
         Array1D_string CoilPerformanceName;  // Coil Performance object names
         Real64 CoolingCoilStg2RuntimeFrac;   // Run time fraction of stage 2
-        int DehumidificationMode;            // Dehumidification mode for multimode coil,
+        HVAC::CoilMode DehumidificationMode = HVAC::CoilMode::Invalid;            // Dehumidification mode for multimode coil,
         // 0=normal, 1+=enhanced dehumidification mode
         // end of variables for Multimode DX cooling coil
         // start of variables for heat pump water heater DX coil
@@ -303,7 +303,7 @@ namespace DXCoils {
         int HCapFAirFlowErrorIndex;   // Used for warning messages when output of HCapFAirFlow is negative
         int HCapFWaterFlow;           // Heating capacity as a function of water flow rate ratio curve index
         int HCapFWaterFlowErrorIndex; // Used for warning messages when output of HCapFWaterFlow is negative
-        int InletAirTemperatureType;  // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
+        HVAC::OATType InletAirTemperatureType = HVAC::OATType::Invalid;   // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
         Real64 RatedInletDBTemp;      // Rated inlet air dry-bulb temperature [C]
         Real64 RatedInletWBTemp;      // Rated inlet air wet-bulb temperature [C]
         Real64 RatedInletWaterTemp;   // Rated condenser water inlet temperature [C]
@@ -478,17 +478,17 @@ namespace DXCoils {
               DefrostStrategy(StandardRatings::DefrostStrat::Invalid), DefrostControl(StandardRatings::HPdefrostControl::Invalid), EIRFPLR(0),
               DefrostEIRFT(0), RegionNum(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATCompressor(0.0), MaxOATDefrost(0.0),
               DefrostTime(0.0), DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0),
-              DefrostPower(0.0), DefrostConsumption(0.0), HeatingPerformanceOATType(HVAC::DryBulbIndicator), HPCoilIsInCoilSystemHeatingDX(false),
+              DefrostPower(0.0), DefrostConsumption(0.0), HeatingPerformanceOATType(HVAC::OATType::DryBulb), HPCoilIsInCoilSystemHeatingDX(false),
               OATempCompressorOnOffBlank(false), Twet_Rated(MaxModes, 0.0), Gamma_Rated(MaxModes, 0.0), MaxONOFFCyclesperHour(MaxModes, 0.0),
               LatentCapacityTimeConstant(MaxModes, 0.0), CondenserType(MaxModes, DataHeatBalance::RefrigCondenserType::Air),
               ReportEvapCondVars(false), EvapCondEffect(MaxModes, 0.0), CondInletTemp(0.0), EvapCondAirFlow(MaxModes, 0.0),
               EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0),
               EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0), EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0), CoilPerformanceType(MaxModes),
-              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), DehumidificationMode(0),
+              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), 
               WaterInNode(0), WaterOutNode(0), HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0), HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0),
               HCOPFWaterFlowErrorIndex(0), HCapFTemp(0), HCapFTempErrorIndex(0), HCapFAirFlow(0), HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0),
-              HCapFWaterFlowErrorIndex(0), InletAirTemperatureType(0), RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0),
+              HCapFWaterFlowErrorIndex(0), RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0),
               HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0), RatedHPWHCondWaterFlow(0.0), ElecWaterHeatingPower(0.0),
               ElecWaterHeatingConsumption(0.0), FanPowerIncludedInCOP(true), CondPumpHeatInCapacity(false), CondPumpPowerInCOP(false),
               LowTempLast(0.0), HighTempLast(0.0), ErrIndex1(0), ErrIndex2(0), ErrIndex3(0), ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0),
@@ -562,7 +562,7 @@ namespace DXCoils {
                             HVAC::CompressorOp compressorOp, // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration,          // true if first hvac iteration
                             Real64 const PartLoadRatio,             // part load ratio
-                            int const DehumidMode,                  // dehumidification mode (0=normal, 1=enhanced)
+                            HVAC::CoilMode const DehumidMode,                  // dehumidification mode (0=normal, 1=enhanced)
                             int &CompIndex,
                             HVAC::FanOp const fanOp // allows parent object to control fan mode
     );
@@ -618,7 +618,7 @@ namespace DXCoils {
 
     void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
                                                 int const DXCoilNum,  // Index of coil being simulated
-                                                int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
+                                                HVAC::CoilMode const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
     );
 
     Real64 AdjustCBF(Real64 const CBFNom,             // nominal coil bypass factor
@@ -816,7 +816,7 @@ namespace DXCoils {
         ObjexxFCL::Optional<Real64> MaxOATCooling = _,         // Parameter equivalent of condenser Max OAT for compressor cooling operation
         ObjexxFCL::Optional<Real64> MinOATHeating = _,         // Parameter equivalent of condenser Min OAT for compressor heating operation
         ObjexxFCL::Optional<Real64> MaxOATHeating = _,         // Parameter equivalent of condenser Max OAT for compressor heating operation
-        ObjexxFCL::Optional_int HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
+        ObjexxFCL::Optional<HVAC::OATType> HeatingPerformanceOATType = _, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
         ObjexxFCL::Optional<StandardRatings::DefrostStrat> DefrostStrategy = _,
         ObjexxFCL::Optional<StandardRatings::HPdefrostControl> DefrostControl = _,
         ObjexxFCL::Optional_int DefrostEIRPtr = _,

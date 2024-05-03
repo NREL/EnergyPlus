@@ -258,7 +258,7 @@ namespace VariableSpeedCoils {
 
         // begin varibles for HPWH
         Real64 RatedCapWH;                  // Rated water heating Capacity [W]
-        int InletAirTemperatureType;        // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
+        HVAC::OATType InletAirTemperatureType = HVAC::OATType::Invalid; // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
         Real64 WHRatedInletDBTemp;          // Rated inlet air dry-bulb temperature [C]
         Real64 WHRatedInletWBTemp;          // Rated inlet air wet-bulb temperature [C]
         Real64 WHRatedInletWaterTemp;       // Rated condenser water inlet temperature [C]
@@ -319,7 +319,6 @@ namespace VariableSpeedCoils {
               InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
               // begin varibles for HPWH
               RatedCapWH(0.0),                  // Rated water heating Capacity [W]
-              InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
               WHRatedInletDBTemp(0.0),          // Rated inlet air dry-bulb temperature [C]
               WHRatedInletWBTemp(0.0),          // Rated inlet air wet-bulb temperature [C]
               WHRatedInletWaterTemp(0.0),       // Rated condenser water inlet temperature [C]

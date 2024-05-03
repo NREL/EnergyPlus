@@ -193,7 +193,7 @@ namespace HVACVariableRefrigerantFlow {
         int HeatEIRFPLR2;                      // index to heating EIR function of PLR curve >= 1
         int CoolPLFFPLR;                       // index to cooling PLF function of PLR curve
         int HeatPLFFPLR;                       // index to heating PLF function of PLR curve
-        int HeatingPerformanceOATType;         // Temperature type for heating performance curves
+        HVAC::OATType HeatingPerformanceOATType = HVAC::OATType::Invalid;         // Temperature type for heating performance curves
         Real64 MinPLR;                         // minimum PLR before cycling occurs
         int MasterZonePtr;                     // index to master thermostat zone
         int MasterZoneTUIndex;                 // index to TU in master thermostat zone
@@ -388,7 +388,7 @@ namespace HVACVariableRefrigerantFlow {
               MinOATHeating(0.0), MaxOATHeating(0.0), CoolCapFT(0), CoolEIRFT(0), HeatCapFT(0), HeatEIRFT(0), CoolBoundaryCurvePtr(0),
               HeatBoundaryCurvePtr(0), EIRCoolBoundaryCurvePtr(0), CoolEIRFPLR1(0), CoolEIRFPLR2(0), CoolCapFTHi(0), CoolEIRFTHi(0), HeatCapFTHi(0),
               HeatEIRFTHi(0), EIRHeatBoundaryCurvePtr(0), HeatEIRFPLR1(0), HeatEIRFPLR2(0), CoolPLFFPLR(0), HeatPLFFPLR(0),
-              HeatingPerformanceOATType(0), MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(ThermostatCtrlType::Invalid),
+              MinPLR(0.0), MasterZonePtr(0), MasterZoneTUIndex(0), ThermostatPriority(ThermostatCtrlType::Invalid),
               SchedPriorityPtr(0), ZoneTUListPtr(0), HeatRecoveryUsed(false), VertPipeLngth(0.0), PCFLengthCoolPtr(0), PCFHeightCool(0.0),
               EquivPipeLngthCool(0.0), PipingCorrectionCooling(1.0), PCFLengthHeatPtr(0), PCFHeightHeat(0.0), EquivPipeLngthHeat(0.0),
               PipingCorrectionHeating(1.0), CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0),
@@ -723,7 +723,7 @@ namespace HVACVariableRefrigerantFlow {
         bool ATMixerExists = false;             // True if there is an ATMixer
         std::string ATMixerName;                // name of air terminal mixer
         int ATMixerIndex = 0;                   // index to the air terminal mixer
-        int ATMixerType = 0;                    // 1 = inlet side mixer, 2 = supply side mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;                    // 1 = inlet side mixer, 2 = supply side mixer
         int ATMixerPriNode = 0;                 // primary inlet air node number for the air terminal mixer
         int ATMixerSecNode = 0;                 // secondary air inlet node number for the air terminal mixer
         int ATMixerOutNode = 0;                 // outlet air node number for the air terminal mixer

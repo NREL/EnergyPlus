@@ -88,7 +88,7 @@ struct CoilCoolingDXCurveFitPerformance
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  int useAlternateMode,
+                  HVAC::CoilMode coilMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
@@ -165,7 +165,7 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 standardRatingIEER2 = 0.0; // Integrated energy efficiency ratio of singgle speed DX cooling coil | AHRI Std.340/360-2022(IP)
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
-    int hasAlternateMode = 0;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat
+    HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;                          // 0 Normal, 1 Enhanced, 2 SubcoolReheat
     CoilCoolingDXCurveFitOperatingMode alternateMode;  // enhanced dehumidifcation or Subcool mode
     CoilCoolingDXCurveFitOperatingMode alternateMode2; // Reheat mode
 };

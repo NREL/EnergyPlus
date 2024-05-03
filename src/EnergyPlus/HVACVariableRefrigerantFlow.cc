@@ -719,11 +719,11 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         InletAirDryBulbC = SumHeatInletDB;
         InletAirWetBulbC = SumHeatInletWB;
         switch (vrf.HeatingPerformanceOATType) {
-        case HVAC::DryBulbIndicator: {
+        case HVAC::OATType::DryBulb: {
             TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFT, InletAirDryBulbC, CondInletTemp);
             TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFT, InletAirDryBulbC, CondInletTemp);
         } break;
-        case HVAC::WetBulbIndicator: {
+        case HVAC::OATType::WetBulb: {
             TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFT, InletAirDryBulbC, OutdoorWetBulb);
             TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFT, InletAirDryBulbC, OutdoorWetBulb);
         } break;
@@ -736,12 +736,12 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         if (vrf.HeatBoundaryCurvePtr > 0) {
             HeatOABoundary = CurveValue(state, vrf.HeatBoundaryCurvePtr, InletAirDryBulbC);
             switch (vrf.HeatingPerformanceOATType) {
-            case HVAC::DryBulbIndicator: {
+            case HVAC::OATType::DryBulb: {
                 if (OutdoorDryBulb > HeatOABoundary) {
                     if (vrf.HeatCapFTHi > 0) TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFTHi, InletAirDryBulbC, CondInletTemp);
                 }
             } break;
-            case HVAC::WetBulbIndicator: {
+            case HVAC::OATType::WetBulb: {
                 if (OutdoorWetBulb > HeatOABoundary) {
                     if (vrf.HeatCapFTHi > 0) TotHeatCapTempModFac = CurveValue(state, vrf.HeatCapFTHi, InletAirDryBulbC, OutdoorWetBulb);
                 }
@@ -754,12 +754,12 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
         if (vrf.EIRHeatBoundaryCurvePtr > 0) {
             HeatOABoundary = CurveValue(state, vrf.EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
             switch (vrf.HeatingPerformanceOATType) {
-            case HVAC::DryBulbIndicator: {
+            case HVAC::OATType::DryBulb: {
                 if (OutdoorDryBulb > HeatOABoundary) {
                     if (vrf.HeatEIRFTHi > 0) TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFTHi, InletAirDryBulbC, CondInletTemp);
                 }
             } break;
-            case HVAC::WetBulbIndicator: {
+            case HVAC::OATType::WetBulb: {
                 if (OutdoorWetBulb > HeatOABoundary) {
                     if (vrf.HeatEIRFTHi > 0) TotHeatEIRTempModFac = CurveValue(state, vrf.HeatEIRFTHi, InletAirDryBulbC, OutdoorWetBulb);
                 }
@@ -780,14 +780,14 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                         format(" Heating Capacity Modifier curve (function of temperature) output is negative ({:.3T}).", TotHeatCapTempModFac));
 
                     switch (vrf.HeatingPerformanceOATType) {
-                    case HVAC::DryBulbIndicator: {
+                    case HVAC::OATType::DryBulb: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air temperature of {:.1T} C and an average indoor air "
                                                  "dry-bulb temperature of {:.1T} C.",
                                                  CondInletTemp,
                                                  InletAirDryBulbC));
                     } break;
-                    case HVAC::WetBulbIndicator: {
+                    case HVAC::OATType::WetBulb: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an average "
                                                  "indoor air wet-bulb temperature of {:.1T} C.",
@@ -821,14 +821,14 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                                       format(" Heating Energy Input Ratio Modifier curve (function of temperature) output is negative ({:.3T}).",
                                              TotHeatEIRTempModFac));
                     switch (vrf.HeatingPerformanceOATType) {
-                    case HVAC::DryBulbIndicator: {
+                    case HVAC::OATType::DryBulb: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air dry-bulb temperature of {:.1T} C and an "
                                                  "average indoor air dry-bulb temperature of {:.1T} C.",
                                                  CondInletTemp,
                                                  InletAirDryBulbC));
                     } break;
-                    case HVAC::WetBulbIndicator: {
+                    case HVAC::OATType::WetBulb: {
                         ShowContinueError(state,
                                           format(" Negative value occurs using an outdoor air wet-bulb temperature of {:.1T} C and an "
                                                  "average indoor air wet-bulb temperature of {:.1T} C.",
@@ -990,10 +990,10 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     //         VRF(VRFCond)%HRCAPFTHeatConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(vrf.HRCAPFTHeat)->numDims == 2) { // Curve type for HRCAPFTCool
                         switch (vrf.HeatingPerformanceOATType) {
-                        case HVAC::DryBulbIndicator: {
+                        case HVAC::OATType::DryBulb: {
                             vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, CondInletTemp);
                         } break;
-                        case HVAC::WetBulbIndicator: {
+                        case HVAC::OATType::WetBulb: {
                             vrf.HRCAPFTHeatConst = CurveValue(state, HRCAPFT, InletAirDryBulbC, OutdoorWetBulb);
                         } break;
                         default: {
@@ -1013,10 +1013,10 @@ void CalcVRFCondenser(EnergyPlusData &state, int const VRFCond)
                     //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
                     if (state.dataCurveManager->PerfCurve(vrf.HREIRFTHeat)->numDims == 2) { // Curve type for HREIRFTHeat
                         switch (vrf.HeatingPerformanceOATType) {
-                        case HVAC::DryBulbIndicator: {
+                        case HVAC::OATType::DryBulb: {
                             vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, CondInletTemp);
                         } break;
-                        case HVAC::WetBulbIndicator: {
+                        case HVAC::OATType::WetBulb: {
                             vrf.HREIRFTHeatConst = CurveValue(state, HREIRFT, InletAirDryBulbC, OutdoorWetBulb);
                         } break;
                         default: {
@@ -1903,9 +1903,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         if (Util::SameString(cAlphaArgs(19), "WETBULBTEMPERATURE")) {
-            thisVrfSys.HeatingPerformanceOATType = HVAC::WetBulbIndicator;
+            thisVrfSys.HeatingPerformanceOATType = HVAC::OATType::WetBulb;
         } else if (Util::SameString(cAlphaArgs(19), "DRYBULBTEMPERATURE")) {
-            thisVrfSys.HeatingPerformanceOATType = HVAC::DryBulbIndicator;
+            thisVrfSys.HeatingPerformanceOATType = HVAC::OATType::DryBulb;
         } else {
             ShowSevereError(
                 state,
@@ -2177,7 +2177,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             if (Util::SameString(cAlphaArgs(34), "WaterCooled")) {
                 thisVrfSys.CondenserType = DataHeatBalance::RefrigCondenserType::Water;
                 thisVrfSys.VRFType = PlantEquipmentType::HeatPumpVRF;
-                if (thisVrfSys.HeatingPerformanceOATType == HVAC::WetBulbIndicator) {
+                if (thisVrfSys.HeatingPerformanceOATType == HVAC::OATType::WetBulb) {
                     ShowSevereError(state, format("{} = {}", cCurrentModuleObject, thisVrfSys.Name));
                     ShowContinueError(state, format("{} = {}", cAlphaFieldNames(34), cAlphaArgs(34)));
                     ShowContinueError(state, format("Illegal {} input for this object = {}", cAlphaFieldNames(19), cAlphaArgs(19)));
@@ -4099,7 +4099,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                         // biquadratic curve type.
                         if (thisVrfTU.VRFSysNum > 0 && thisVrfTU.HeatCoilIndex > 0 &&
                             state.dataCurveManager->PerfCurve(GetDXCoilCapFTCurveIndex(state, thisVrfTU.HeatCoilIndex, ErrorsFound))->numDims == 2) {
-                            if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).HeatingPerformanceOATType == HVAC::WetBulbIndicator) {
+                            if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).HeatingPerformanceOATType == HVAC::OATType::WetBulb) {
                                 checkCurveIsNormalizedToOne(
                                     state,
                                     "GetDXCoils: " + HVAC::cAllCoilTypes(thisVrfTU.DXHeatCoilType_Num),
@@ -4110,7 +4110,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                                     Curve::GetCurveName(state, GetDXCoilCapFTCurveIndex(state, thisVrfTU.HeatCoilIndex, ErrorsFound)),
                                     RatedInletAirTempHeat,
                                     RatedOutdoorWetBulbTempHeat);
-                            } else if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).HeatingPerformanceOATType == HVAC::DryBulbIndicator) {
+                            } else if (state.dataHVACVarRefFlow->VRF(thisVrfTU.VRFSysNum).HeatingPerformanceOATType == HVAC::OATType::DryBulb) {
                                 checkCurveIsNormalizedToOne(
                                     state,
                                     "GetDXCoils: " + HVAC::cAllCoilTypes(thisVrfTU.DXHeatCoilType_Num),
@@ -4578,7 +4578,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                    thisVrfTU.ATMixerSecNode,
                    thisVrfTU.ATMixerOutNode,
                    thisVrfTU.VRFTUOutletNodeNum);
-        if (thisVrfTU.ATMixerType == HVAC::ATMixer_InletSide || thisVrfTU.ATMixerType == HVAC::ATMixer_SupplySide) {
+        if (thisVrfTU.ATMixerType == HVAC::MixerType::InletSide || thisVrfTU.ATMixerType == HVAC::MixerType::SupplySide) {
             thisVrfTU.ATMixerExists = true;
         }
         // check that the VRF TU have local outside air and DOA
@@ -4589,7 +4589,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         }
 
         // for ZoneHVAC check that TU inlet node is a zone exhaust node otherwise ZoneAirNode and ZoneNum = 0
-        if (!thisVrfTU.ATMixerExists || thisVrfTU.ATMixerType == HVAC::ATMixer_SupplySide) {
+        if (!thisVrfTU.ATMixerExists || thisVrfTU.ATMixerType == HVAC::MixerType::SupplySide) {
             for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                 for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumExhaustNodes; ++NodeNum) {
@@ -4600,7 +4600,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
                 }
             }
-        } else if (thisVrfTU.ATMixerType == HVAC::ATMixer_InletSide) {
+        } else if (thisVrfTU.ATMixerType == HVAC::MixerType::InletSide) {
             for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
                 for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
@@ -6131,7 +6131,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         // check that TU inlet node is a zone exhaust node.
         if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone &&
             (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists ||
-             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::ATMixer_SupplySide)) {
+             state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::MixerType::SupplySide)) {
             bool ZoneNodeNotFound = true;
             for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -6177,7 +6177,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         // check that TU outlet node is a zone inlet node.
         if ((state.dataHVACVarRefFlow->VRFTU(VRFTUNum).isInZone &&
              (!state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists ||
-              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::ATMixer_InletSide))) {
+              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::MixerType::InletSide))) {
             bool ZoneNodeNotFound = true;
             for (int CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -6890,7 +6890,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists) {
         // There is an air terminal mixer
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::MixerType::InletSide) { // if there is an inlet side air terminal mixer
             // set the primary air inlet mass flow rate
             state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate =
                 min(state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRateMaxAvail,
@@ -9488,7 +9488,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     if (this->ATMixerExists) {
         // There is an air terminal mixer
         state.dataHVACVarRefFlow->ATMixOutNode = this->ATMixerOutNode;
-        if (this->ATMixerType == HVAC::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+        if (this->ATMixerType == HVAC::MixerType::InletSide) { // if there is an inlet side air terminal mixer
             // set the primary air inlet mass flow rate
             state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
                 min(state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate);
@@ -9593,7 +9593,7 @@ void VRFTerminalUnitEquipment::CalcVRF(EnergyPlusData &state,
     Real64 TempOut = 0.0;
     Real64 TempIn = 0.0;
     if (this->ATMixerExists) {
-        if (this->ATMixerType == HVAC::ATMixer_SupplySide) {
+        if (this->ATMixerType == HVAC::MixerType::SupplySide) {
             // Air terminal supply side mixer, calculate supply side mixer output
             SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode).Temp;
@@ -9756,7 +9756,7 @@ void ReportVRFTerminalUnit(EnergyPlusData &state, int const VRFTUNum) // index t
     Real64 TempOut = 0.0;
     Real64 TempIn = 0.0;
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerExists) {
-        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::ATMixer_SupplySide) {
+        if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerType == HVAC::MixerType::SupplySide) {
             // Air terminal supply side mixer
             TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ATMixerOutNode).Temp;
             TempIn = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneAirNode).Temp;
@@ -10124,7 +10124,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                 if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerExists) {
                     // There is an air terminal mixer
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerType ==
-                        HVAC::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+                        HVAC::MixerType::InletSide) { // if there is an inlet side air terminal mixer
                                                    // set the primary air inlet mass flow rate
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRate =
                             min(state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRateMaxAvail,
@@ -12754,7 +12754,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     if (this->ATMixerExists) {
         // There is an air terminal mixer
         state.dataHVACVarRefFlow->ATMixOutNode2 = this->ATMixerOutNode;
-        if (this->ATMixerType == HVAC::ATMixer_InletSide) { // if there is an inlet side air terminal mixer
+        if (this->ATMixerType == HVAC::MixerType::InletSide) { // if there is an inlet side air terminal mixer
             // set the primary air inlet mass flow rate
             state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRate =
                 min(state.dataLoopNodes->Node(this->ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate);
@@ -12860,7 +12860,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
     Real64 TempOut = 0.0;
     Real64 TempIn = 0.0;
     if (this->ATMixerExists) {
-        if (this->ATMixerType == HVAC::ATMixer_SupplySide) {
+        if (this->ATMixerType == HVAC::MixerType::SupplySide) {
             // Air terminal supply side mixer, calculate supply side mixer output
             SimATMixer(state, this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
             TempOut = state.dataLoopNodes->Node(state.dataHVACVarRefFlow->ATMixOutNode2).Temp;

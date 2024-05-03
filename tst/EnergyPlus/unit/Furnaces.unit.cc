@@ -260,7 +260,7 @@ TEST_F(EnergyPlusFixture, SetVSHPAirFlowTest_VSFurnaceFlowTest)
     bool hXUnitOn = false;
 
     state->dataEnvrn->OutDryBulbTemp = 35.0;
-    state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = 1; // switch to water to air heat pump
+    state->dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType = WAHPCoilType::Simple; // switch to water to air heat pump
     state->dataFurnaces->Furnace(FurnaceNum).type = HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir;
     state->dataFurnaces->Furnace(FurnaceNum).NodeNumOfControlledZone = 1; // use inlet node as surrogate for zone node number
 

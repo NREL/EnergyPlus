@@ -95,6 +95,16 @@ namespace Furnaces {
         Num
     };
 
+    enum class WAHPCoilType
+    {
+        Invalid = -1,
+        Simple,
+        ParEst,
+        VarSpeedEquationFit,
+        VarSpeedLookupTable,
+        Num
+    };
+
     struct FurnaceEquipConditions
     {
         // Members
@@ -137,7 +147,7 @@ namespace Furnaces {
         AirFlowControlConstFan AirFlowControl; // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         HVAC::FanPlace fanPlace;               // fan placement; 1=blow through, 2=draw through
         int NodeNumOfControlledZone;           // Node number of controlled zone air node
-        int WatertoAirHPType;                  // Type of water to air heat pump model used
+        WAHPCoilType WatertoAirHPType = WAHPCoilType::Invalid;                  // Type of water to air heat pump model used
         Real64 CoolingConvergenceTolerance;    // Convergence tolerance for cooling,
         //   ratio (CoolingCoilLoad - FurnaceCoolingOutput)/CoolingCoilLoad
         Real64 HeatingConvergenceTolerance; // Convergence tolerance for heating,
@@ -251,7 +261,7 @@ namespace Furnaces {
               HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
               SuppCoilControlNode(0), fanType(HVAC::FanType::Invalid), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0), 
               LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), fanPlace(HVAC::FanPlace::Invalid),
-              NodeNumOfControlledZone(0), WatertoAirHPType(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0),
+              NodeNumOfControlledZone(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0),
               DesignHeatingCapacity(0.0), DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0),
               CoolingCoilLatentDemand(0.0), DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0), DesignFanVolFlowRateEMSOverrideOn(false),
               DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0), MaxCoolAirVolFlowEMSOverrideOn(false),

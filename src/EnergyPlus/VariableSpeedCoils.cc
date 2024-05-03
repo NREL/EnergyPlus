@@ -2663,9 +2663,9 @@ namespace VariableSpeedCoils {
             }
 
             if (Util::SameString(AlphArray(10), "DryBulbTemperature")) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::DryBulbIndicator;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::OATType::DryBulb;
             } else if (Util::SameString(AlphArray(10), "WetBulbTemperature")) {
-                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::WetBulbIndicator;
+                state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType = HVAC::OATType::WetBulb;
             } else {
                 //   wrong temperature type selection
                 ShowSevereError(
@@ -2677,7 +2677,7 @@ namespace VariableSpeedCoils {
             }
 
             // set rated inlet air temperature for curve object verification
-            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::WetBulbIndicator) {
+            if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::OATType::WetBulb) {
                 WHInletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletWBTemp;
             } else {
                 WHInletAirTemp = state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WHRatedInletDBTemp;
@@ -6714,7 +6714,7 @@ namespace VariableSpeedCoils {
         state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).WaterMassFlowRate = CondInletMassFlowRate;
 
         // determine inlet air temperature type for curve objects
-        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::WetBulbIndicator) {
+        if (state.dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirTemperatureType == HVAC::OATType::WetBulb) {
             InletAirTemp = state.dataHVACGlobal->HPWHInletWBTemp;
         } else {
             InletAirTemp = state.dataHVACGlobal->HPWHInletDBTemp;

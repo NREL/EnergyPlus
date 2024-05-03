@@ -189,7 +189,7 @@ namespace UnitVentilator {
         bool ATMixerExists = false;    // True if there is an ATMixer
         std::string ATMixerName;       // name of air mixer
         int ATMixerIndex = 0;          // index to the air mixer
-        int ATMixerType = 0;           // 1 = inlet side mixer, 2 = supply side mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;           // 1 = inlet side mixer, 2 = supply side mixer
         int ATMixerPriNode = 0;        // primary inlet air node number for the mixer
         int ATMixerSecNode = 0;        // secondary air inlet node number for the mixer
         int ATMixerOutNode = 0;        // outlet air node number for the mixer

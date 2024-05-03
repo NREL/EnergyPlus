@@ -279,7 +279,7 @@ namespace SingleDuct {
         // Members
         // Input data
         std::string Name;                  // name of unit
-        int MixerType = 0;                 // type of inlet mixer, 1 = inlet side, 2 = supply side
+        HVAC::MixerType type = HVAC::MixerType::Invalid;                 // type of inlet mixer, 1 = inlet side, 2 = supply side
         int ZoneHVACUnitType = 0;          // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
         std::string ZoneHVACUnitName;      // name of Zone HVAC unit
         int SecInNode = 0;                 // secondary air inlet node number
@@ -334,7 +334,7 @@ namespace SingleDuct {
                     std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
-                    int &ATMixerType,                 // air teminal mixer type
+                    HVAC::MixerType &ATMixerType,                 // air teminal mixer type
                     int &ATMixerPriNode,              // air terminal mixer primary air node number
                     int &ATMixerSecNode,              // air terminal mixer secondary air node number
                     int &ATMixerOutNode,              // air terminal mixer outlet air node number

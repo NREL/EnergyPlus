@@ -104,7 +104,7 @@ namespace HVACHXAssistedCoolingCoil {
                                   ObjexxFCL::Optional<Real64 const> OnOffAFR,  // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                                   ObjexxFCL::Optional_bool_const EconomizerFlag,      // OA sys or air loop economizer status
                                   ObjexxFCL::Optional<Real64> QTotOut,                // the total cooling output of unit
-                                  ObjexxFCL::Optional_int_const DehumidificationMode, // Optional dehumbidication mode
+                                  ObjexxFCL::Optional<HVAC::CoilMode const> DehumidificationMode, // Optional dehumbidication mode
                                   ObjexxFCL::Optional<Real64 const> LoadSHR           // Optional CoilSHR pass over
     )
     {
@@ -860,7 +860,7 @@ namespace HVACHXAssistedCoolingCoil {
                                    HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation
                                    ObjexxFCL::Optional<Real64 const> OnOffAirFlow, // Ratio of compressor ON air mass flow to AVERAGE over time step
                                    ObjexxFCL::Optional_bool_const EconomizerFlag,  // OA (or airloop) econommizer status
-                                   ObjexxFCL::Optional_int_const DehumidificationMode,        // Optional dehumbidication mode
+                                   ObjexxFCL::Optional<HVAC::CoilMode const> DehumidificationMode,        // Optional dehumbidication mode
                                    [[maybe_unused]] ObjexxFCL::Optional<Real64 const> LoadSHR // Optional coil SHR pass over
     )
     {
@@ -936,11 +936,11 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 mCoolingSpeedNum = state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex]
                                               .performance.normalMode.speeds.size(); // used the same for the original variable speed coil
 
-                int OperationMode = HVAC::coilNormalMode;
+                HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;
                 if (state.dataCoilCooingDX->coilCoolingDXs[coolingCoilIndex].SubcoolReheatFlag) {
-                    OperationMode = HVAC::coilSubcoolReheatMode;
-                } else if (DehumidificationMode == 1) {
-                    OperationMode = HVAC::coilEnhancedMode;
+                    coilMode = HVAC::CoilMode::SubcoolReheat;
+                } else if (DehumidificationMode == HVAC::CoilMode::Enhanced) {
+                    coilMode = HVAC::CoilMode::Enhanced;
                 }
 
                 Real64 mCoolingSpeedRatio = 0.0; // used same setting as the original variable speed coil
@@ -962,7 +962,7 @@ namespace HVACHXAssistedCoolingCoil {
 
                 state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].simulate(
                     state,
-                    OperationMode, // partially implemented for HXAssistedCoil
+                    coilMode, // partially implemented for HXAssistedCoil
                     CoilPLR,       // PartLoadRatio,
                     mCoolingSpeedNum,
                     mCoolingSpeedRatio,

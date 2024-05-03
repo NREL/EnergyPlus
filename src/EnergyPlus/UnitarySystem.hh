@@ -289,7 +289,7 @@ namespace UnitarySystems {
         bool m_RunOnSensibleLoad = false;
         bool m_RunOnLatentLoad = false;
         bool m_RunOnLatentOnlyWithSensible = false;
-        int m_DehumidificationMode = 0;
+        HVAC::CoilMode m_DehumidificationMode = HVAC::CoilMode::Invalid;
         int m_SuppHeatCoilType_Num = 0;
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
@@ -510,7 +510,7 @@ namespace UnitarySystems {
         int HeatCoilInletNodeNum = 0;          // Heating coil air inlet node number
         int HeatCoilOutletNodeNum = 0;         // Heating coil air outlet node number
         bool ATMixerExists = false;            // true if AT mixer is connected to Unitary System
-        int ATMixerType = 0;                   // type of AT mixer, inlet-side or supply-side
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;                   // type of AT mixer, inlet-side or supply-side
         int ATMixerOutNode = 0;                // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac = 0.0;  // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP = nullptr;

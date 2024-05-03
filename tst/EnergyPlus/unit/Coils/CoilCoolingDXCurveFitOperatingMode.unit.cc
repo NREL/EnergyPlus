@@ -266,7 +266,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     EXPECT_EQ("COIL COOLING DX CURVE FIT PERFORMANCE 1", thisCoil.performance.name);
     EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, thisCoil.performance.crankcaseHeaterCapacityCurveIndex));
 
-    int useAlternateMode = HVAC::coilNormalMode;
+    HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
@@ -282,7 +282,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     thisCoil.performance.simulate(*state,
                                   evapInletNode,
                                   evapOutletNode,
-                                  useAlternateMode,
+                                  coilMode,
                                   PLR,
                                   speedNum,
                                   speedRatio,

@@ -527,7 +527,7 @@ namespace Furnaces {
         } break;
         // Simulate water-to-air systems:
         case HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir: {
-            if (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple) {
+                if (thisFurnace.WatertoAirHPType == WAHPCoilType::Simple) {
                 // Update the furnace flow rates
                 //   When CompressorOp logic is added to the child cooling coil (COIL:WaterToAirHP:EquationFit:Cooling), then this logic
                 //   needs to be reinstated... to align with Unitary/Furnace HeatCool and Unitary Air-to-Air Heat Pump (see above).
@@ -607,12 +607,12 @@ namespace Furnaces {
                     SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
                     CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, fanOp, QActual);
                 }
-            } else if (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_ParEst) {
+            } else if (thisFurnace.WatertoAirHPType == WAHPCoilType::ParEst) {
 
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
                 CalcWaterToAirHeatPump(state, FurnaceNum, FirstHVACIteration, compressorOp, ZoneLoad, MoistureLoad);
-            } else if (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_VarSpeedEquationFit) {
+            } else if (thisFurnace.WatertoAirHPType == WAHPCoilType::VarSpeedEquationFit) {
                 // simulate the heat pump
                 HeatCoilLoad = 0.0;
                 if (thisFurnace.bIsIHP)
@@ -620,7 +620,7 @@ namespace Furnaces {
                         state.dataLoopNodes->Node(thisFurnace.NodeNumOfControlledZone).Temp;
                 SimVariableSpeedHP(state, FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
 
-            } else if (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_VarSpeedLooUpTable) {
+            } else if (thisFurnace.WatertoAirHPType == WAHPCoilType::VarSpeedLookupTable) {
                 HeatCoilLoad = 0.0; // Added: Used below
             } else {
                 assert(false); //? If all possible states covered by if conditions change to HeatCoilLoad = 0.0;
@@ -3801,15 +3801,15 @@ namespace Furnaces {
 
             // end get water flow mode info
             if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
-                thisFurnace.WatertoAirHPType = HVAC::WatertoAir_Simple;
+                thisFurnace.WatertoAirHPType = WAHPCoilType::Simple;
                 WaterToAirHeatPumpSimple::SetSimpleWSHPData(
                     state, thisFurnace.CoolingCoilIndex, ErrorsFound, thisFurnace.WaterCyclingMode, _, thisFurnace.HeatingCoilIndex);
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" &&
                        Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") {
-                thisFurnace.WatertoAirHPType = HVAC::WatertoAir_ParEst;
+                thisFurnace.WatertoAirHPType = WAHPCoilType::ParEst;
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" &&
                        Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") {
-                thisFurnace.WatertoAirHPType = HVAC::WatertoAir_VarSpeedEquationFit;
+                thisFurnace.WatertoAirHPType = WAHPCoilType::VarSpeedEquationFit;
                 VariableSpeedCoils::SetVarSpeedCoilData(state, thisFurnace.CoolingCoilIndex, ErrorsFound, _, thisFurnace.HeatingCoilIndex);
             } else {
                 ShowContinueError(state, format("For {} = {}", CurrentModuleObject, Alphas(1)));
@@ -5174,7 +5174,7 @@ namespace Furnaces {
 
         if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
             (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-             (thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple || thisFurnace.WatertoAirHPType == HVAC::WatertoAir_VarSpeedEquationFit))) {
+             (thisFurnace.WatertoAirHPType == WAHPCoilType::Simple || thisFurnace.WatertoAirHPType == WAHPCoilType::VarSpeedEquationFit))) {
             if (MoistureLoad < 0.0 && thisFurnace.DehumidControlType_Num == DehumidificationControlMode::CoolReheat) {
                 state.dataFurnaces->HPDehumidificationLoadFlag = true;
                 state.dataFurnaces->HeatingLoad = false;
@@ -6561,7 +6561,7 @@ namespace Furnaces {
             if (state.dataFurnaces->HeatingLoad) {
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
                     (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple)) {
+                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
                     thisFurnace.HeatPartLoadRatio = 1.0;
                     HeatCoilLoad = 0.0;
                     thisFurnace.HeatingCoilSensDemand = 0.0;
@@ -6607,7 +6607,7 @@ namespace Furnaces {
                 CoolCoilLoad = 0.0;
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
                     (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple)) {
+                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
                     SystemSensibleLoad = ZoneLoad;
                     SystemMoistureLoad = 0.0;
                     HeatCoilLoad = 0.0;
@@ -6656,7 +6656,7 @@ namespace Furnaces {
                 //    Heat pumps only calculate a single PLR each time step (i.e. only cooling or heating allowed in a single time step)
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
                     (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple)) {
+                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
 
                     state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = thisFurnace.MdotFurnace;
 
@@ -7116,7 +7116,7 @@ namespace Furnaces {
                               false);
 
             if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
-                (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple &&
+                (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple &&
                  state.dataFurnaces->CoolingLoad)) {
                 HeatingSensibleOutput = 0.0;
                 HeatingLatentOutput = 0.0;
@@ -7761,7 +7761,7 @@ namespace Furnaces {
                         //         Dehumidification is not required
                         if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
                             (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                             thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple)) {
+                             thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
                             ReheatCoilLoad = max(QToHeatSetPt, QToHeatSetPt - ActualSensibleOutput);
                         }
                         thisFurnace.DehumidInducedHeatingDemandRate = max(0.0, ActualSensibleOutput * (-1.0));
@@ -7794,7 +7794,7 @@ namespace Furnaces {
             thisFurnace.MdotFurnace = state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate;
 
             if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
-                (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple)) {
+                (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
             } else {
                 // Non-HeatPump (non-DX) heating coils do not set PLR, reset to 0 here. This variable was set for non-DX
                 // coils to allow the SetAverageAirFlow CALL above to set the correct air mass flow rate. See this
@@ -8541,7 +8541,7 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, ReheatCoilLoad, fanOp, QActual);
             }
             // Simulate the parameter estimate water-to-air heat pump
-        } else if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == HVAC::WatertoAir_Simple) {
+        } else if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple) {
             //    Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
                 state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
@@ -8604,7 +8604,7 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(state, FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, fanOp, QActual);
             }
             // Simulate the detailed water-to-air heat pump
-        } else if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == HVAC::WatertoAir_ParEst) {
+        } else if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::ParEst) {
             //    Simulate the draw-thru fan
             if (thisFurnace.fanPlace == HVAC::FanPlace::BlowThru) {
                 state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
@@ -8943,15 +8943,15 @@ namespace Furnaces {
         // Get child component RuntimeFrac
         Real64 RuntimeFrac;
         switch (state.dataFurnaces->Furnace(FurnaceNum).WatertoAirHPType) {
-        case HVAC::WatertoAir_Simple: {
+        case WAHPCoilType::Simple: {
             RuntimeFrac = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(CoilIndex).RunFrac;
             break;
         }
-        case HVAC::WatertoAir_ParEst: {
+        case WAHPCoilType::ParEst: {
             RuntimeFrac = state.dataWaterToAirHeatPump->WatertoAirHP(CoilIndex).RunFrac;
             break;
         }
-        case HVAC::WatertoAir_VarSpeedEquationFit: {
+        case WAHPCoilType::VarSpeedEquationFit: {
             RuntimeFrac = state.dataVariableSpeedCoils->VarSpeedCoil(CoilIndex).RunFrac;
             break;
         }

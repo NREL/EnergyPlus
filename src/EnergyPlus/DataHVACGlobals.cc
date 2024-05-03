@@ -96,6 +96,18 @@ namespace HVAC {
         "CONSTANTONDEMAND"
     };
 
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNames = {
+        "WetBulbTemperature", "DryBulbTemperature"};
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC = {
+        "WETBULBTEMPERATURE", "DRYBULBTEMPERATURE"};
+
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames = {
+        "InletSide", "SupplySide"
+    };
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC = {
+        "INLETSIDE", "SUPPLYSIDE"
+    };
+        
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
@@ -224,11 +236,16 @@ namespace HVAC {
         "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
         "HEATEXCHANGER:DESICCANT:BALANCEDFLOW"};
         
-    Array1D_string const cATMixerTypes(NumATMixerTypes, {"AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:SupplySideMixer"});
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNames = {
+        "AirTerminal:SingleDuct:InletSideMixer",
+        "AirTerminal:SingleDuct:SupplySideMixer"};
 
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC = {
+        "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
+        "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER"};
+        
     Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
 
-    Array1D_string const cVRFHeatingPerformanceOATTypes(NumVRFHeatingPerformanceOATTypes, {"WetBulbTemperature", "DryBulbTemperature"});
 #ifdef GET_OUT
     constexpr std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC = {"DUMMY",
                                                                                             "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",

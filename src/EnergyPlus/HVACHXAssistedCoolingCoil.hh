@@ -112,7 +112,7 @@ namespace HVACHXAssistedCoolingCoil {
                              ObjexxFCL::Optional<Real64 const> OnOffAFR = _,    // Ratio of compressor ON air mass flow rate to AVERAGE over time step
                              ObjexxFCL::Optional_bool_const EconomizerFlag = _, // OA sys or air loop economizer status
                              ObjexxFCL::Optional<Real64> QTotOut = _,           // the total cooling output of unit
-                             ObjexxFCL::Optional_int_const DehumidificationMode = _, // Optional dehumbidication mode
+                             ObjexxFCL::Optional<HVAC::CoilMode const> DehumidificationMode = _, // Optional dehumbidication mode
                              ObjexxFCL::Optional<Real64 const> LoadSHR = _           // Optional coil SHR pass over
     );
 
@@ -130,7 +130,7 @@ namespace HVACHXAssistedCoolingCoil {
                               HVAC::FanOp const fanOp,                            // Allows parent object to control fan operation
                               ObjexxFCL::Optional<Real64 const> OnOffAirFlow = _, // Ratio of compressor ON air mass flow to AVERAGE over time step
                               ObjexxFCL::Optional_bool_const EconomizerFlag = _,  // OA (or airloop) econommizer status
-                              ObjexxFCL::Optional_int_const DehumidificationMode = _,        // Optional dehumbidication mode
+                              ObjexxFCL::Optional<HVAC::CoilMode const> DehumidificationMode = _,        // Optional dehumbidication mode
                               [[maybe_unused]] ObjexxFCL::Optional<Real64 const> LoadSHR = _ // Optional coil SHR pass over
     );
 

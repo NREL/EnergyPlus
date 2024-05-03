@@ -13470,7 +13470,7 @@ Coil:Heating:Electric,
     EXPECT_NE(nullptr, thisSys);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_TRUE(mySys.ATMixerExists);
-    EXPECT_EQ(HVAC::ATMixer_InletSide, mySys.ATMixerType);
+    EXPECT_EQ((int)HVAC::MixerType::InletSide, (int)mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
     EXPECT_EQ(1, mySys.ControlZoneNum);
 }
@@ -13615,7 +13615,7 @@ Coil:Heating:Electric,
     EXPECT_TRUE(thisSys);
     EXPECT_FALSE(ErrorsFound); // expect no errors
     EXPECT_TRUE(mySys.ATMixerExists);
-    EXPECT_EQ(HVAC::ATMixer_SupplySide, mySys.ATMixerType);
+    EXPECT_EQ((int)HVAC::MixerType::SupplySide, (int)mySys.ATMixerType);
     // EXPECT_FALSE(mySys.m_AirLoopEquipment);
     EXPECT_EQ(1, mySys.ControlZoneNum);
 }

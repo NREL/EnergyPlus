@@ -170,7 +170,7 @@ namespace FanCoilUnits {
         // addition for OA to Zone Units
         std::string ATMixerName;        // name of air terminal mixer
         int ATMixerIndex = 0;           // index to the air terminal mixer
-        int ATMixerType = 0;            // 1 = inlet side mixer, 2 = supply side mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;            // 1 = inlet side mixer, 2 = supply side mixer
         int ATMixerPriNode = 0;         // primary inlet air node number for the air terminal mixer
         int ATMixerSecNode = 0;         // secondary air inlet node number for the air terminal mixer
         int HVACSizingIndex = 0;        // index of a HVACSizing object for a fancoil unit
@@ -405,7 +405,7 @@ struct FanCoilUnitsData : BaseGlobalStruct
     bool ZoneExNodeNotFound = false; // used in error checking
     bool ZoneInNodeNotFound = false; // used in error checking
     int ATMixerNum = 0;              // index of air terminal mixer in the air terminal mixer data array
-    int ATMixerType = 0;             // type of air terminal mixer (1=inlet side; 2=supply side)
+    HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;             // type of air terminal mixer (1=inlet side; 2=supply side)
     int ATMixerPriNode = 0;          // node number of the air terminal mixer primary air inlet
     int ATMixerSecNode = 0;          // node number of the air terminal mixer secondary air inlet
     int ATMixerOutNode = 0;          // node number of the air terminal mixer secondary air inlet

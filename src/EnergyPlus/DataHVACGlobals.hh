@@ -325,15 +325,14 @@ namespace HVAC {
     //    int constexpr CoilDX_SubcoolReheat(36);
     int constexpr CoilDX_CurveFit_Speed(37);
 
-    int constexpr coilNormalMode = 0;        // Normal operation mode
-    int constexpr coilEnhancedMode = 1;      // Enhanced operation mode
-    int constexpr coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
-
-    // Water to air HP coil types
-    int constexpr WatertoAir_Simple(1);
-    int constexpr WatertoAir_ParEst(2);
-    int constexpr WatertoAir_VarSpeedEquationFit(3);
-    int constexpr WatertoAir_VarSpeedLooUpTable(4);
+        enum class CoilMode
+        {
+            Invalid = -1,
+            Normal,
+            Enhanced,
+            SubcoolReheat,
+            Num
+        };
 
     enum class WaterFlow
     {
@@ -391,29 +390,38 @@ namespace HVAC {
     extern const std::array<std::string_view, (int)HXType::Num> hxTypeNames;
     extern const std::array<std::string_view, (int)HXType::Num> hxTypeNamesUC;
 
-    // Parameters describing air terminal mixers
-    int constexpr NumATMixerTypes(2);
-    int constexpr No_ATMixer(0);
-    int constexpr ATMixer_InletSide(1);
-    int constexpr ATMixer_SupplySide(2);
+    enum class MixerType
+    {
+        Invalid = -1,
+        InletSide,
+        SupplySide,
+        Num
+    };
+        
+    extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeNames;
+    extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC;
 
-    bool constexpr ATMixerExists(true);
-
+    extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames;
+    extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC;
+        
     // Parameters describing variable refrigerant flow terminal unit types
     int constexpr NumVRFTUTypes(1);
     int constexpr VRFTUType_ConstVolume(1);
 
-    // VRF Heating Performance Curve Temperature Type
-    int constexpr NumVRFHeatingPerformanceOATTypes(2);
-    int constexpr WetBulbIndicator(1);
-    int constexpr DryBulbIndicator(2);
+    enum class OATType
+    {
+        Invalid = -1,
+        WetBulb,
+        DryBulb,
+        Num
+    };
+        
+    extern const std::array<std::string_view, (int)OATType::Num> oatTypeNames;
+    extern const std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC;
 
     // parameter concerning the amount of change in zone temperature is needed
     // for oscillation of zone temperature to be detected.
     Real64 constexpr OscillateMagnitude(0.15);
-
-    // Parameters for HVACSystemRootFindingAlgorithm
-    int constexpr Bisection(2);
 
     int constexpr MaxSpeedLevels = 10;
 
@@ -421,9 +429,7 @@ namespace HVAC {
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
-    extern Array1D_string const cATMixerTypes;
     extern Array1D_string const cVRFTUTypes;
-    extern Array1D_string const cVRFHeatingPerformanceOATTypes;
 
     struct ComponentSetPtData
     {

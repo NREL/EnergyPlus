@@ -375,7 +375,7 @@ namespace UnitVentilator {
                                    unitVent.ATMixerSecNode,
                                    unitVent.ATMixerOutNode,
                                    unitVent.AirOutNode);
-            if (unitVent.ATMixerType == HVAC::ATMixer_InletSide || unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
+            if (unitVent.ATMixerType == HVAC::MixerType::InletSide || unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                 unitVent.ATMixerExists = true;
             }
             unitVent.ZonePtr =
@@ -511,7 +511,7 @@ namespace UnitVentilator {
                                                      state.dataLoopNodes->NodeID(unitVent.OAMixerOutNode),
                                                      state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
             } else {
-                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // Add fan to component sets array
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -521,7 +521,7 @@ namespace UnitVentilator {
                                                          state.dataLoopNodes->NodeID(unitVent.ATMixerOutNode),
                                                          state.dataLoopNodes->NodeID(unitVent.FanOutletNode));
                 }
-                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                     // Add fan to component sets array
                     BranchNodeConnections::SetUpCompSets(state,
                                                          CurrentModuleObject,
@@ -741,7 +741,7 @@ namespace UnitVentilator {
                     ErrorsFound = true;
                 }
             } else {
-                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // check that unit ventilator air outlet node is the same as a zone inlet node.
                     ZoneNodeNotFound = true;
                     for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(unitVent.ZonePtr).NumInletNodes; ++NodeNum) {
@@ -773,7 +773,7 @@ namespace UnitVentilator {
                         ErrorsFound = true;
                     }
                 }
-                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                     // check that the mixer secondary air node is the unit ventilator air outlet node
                     if (unitVent.AirOutNode != unitVent.ATMixerSecNode) {
                         ShowSevereError(
@@ -2974,7 +2974,7 @@ namespace UnitVentilator {
             if (unitVent.ATMixerExists) {
                 state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
                 state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
-                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // set the primary air inlet mass flow rate
                     state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
                         min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
@@ -3062,7 +3062,7 @@ namespace UnitVentilator {
             if (unitVent.ATMixerExists) {
                 state.dataUnitVentilators->ATMixOutNode = unitVent.ATMixerOutNode;
                 state.dataUnitVentilators->ATMixerPriNode = unitVent.ATMixerPriNode;
-                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     // set the primary air inlet mass flow rate
                     state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRate =
                         min(min(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode).MassFlowRateMaxAvail,
@@ -3159,7 +3159,7 @@ namespace UnitVentilator {
         if (unitVent.ATMixerExists) {
             auto &ATMixOutNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixOutNode));
             auto &ATMixerPriNode(state.dataLoopNodes->Node(state.dataUnitVentilators->ATMixerPriNode));
-            if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
+            if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                 // set the primary air inlet mass flow rate
                 ATMixerPriNode.MassFlowRate = min(ATMixerPriNode.MassFlowRateMaxAvail, state.dataUnitVentilators->OAMassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
@@ -3401,11 +3401,11 @@ namespace UnitVentilator {
                 EnthDiffAcrossFan =
                     state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.OAMixerOutNode).Enthalpy;
             } else {
-                if (unitVent.ATMixerType == HVAC::ATMixer_InletSide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::InletSide) {
                     EnthDiffAcrossFan =
                         state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.ATMixerOutNode).Enthalpy;
                 }
-                if (unitVent.ATMixerType == HVAC::ATMixer_SupplySide) {
+                if (unitVent.ATMixerType == HVAC::MixerType::SupplySide) {
                     EnthDiffAcrossFan =
                         state.dataLoopNodes->Node(unitVent.FanOutletNode).Enthalpy - state.dataLoopNodes->Node(unitVent.AirInNode).Enthalpy;
                 }

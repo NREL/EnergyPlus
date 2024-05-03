@@ -375,7 +375,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
                         [[maybe_unused]] HVAC::CompressorOp const compressorOp, // compressor operation; 1=on, 0=off !unused1208
                         bool const FirstHVACIteration,                                 // true if first hvac iteration
                         Real64 const PartLoadRatio,                                    // part load ratio
-                        int const DehumidMode,                                         // dehumidification mode (0=normal, 1=enhanced)
+                        HVAC::CoilMode const DehumidMode,                                         // dehumidification mode (0=normal, 1=enhanced)
                         int &CompIndex,
                         HVAC::FanOp const fanOp // allows parent object to control fan mode
 )
@@ -502,7 +502,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
         S12EvapCondPumpElecPower = 0.0;
 
         thisDXCoil.DehumidificationMode = DehumidMode;
-        if (DehumidMode > thisDXCoil.NumDehumidModes) {
+        if ((int)DehumidMode > thisDXCoil.NumDehumidModes) {
             ShowFatalError(state,
                            format("{} \"{}\" - Requested enhanced dehumidification mode not available.", thisDXCoil.DXCoilType, thisDXCoil.Name));
         }
@@ -511,14 +511,14 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
         // run stage 1 at zero part load to set leaving conditions
         if ((thisDXCoil.NumCapacityStages == 1) || (PartLoadRatio <= 0.0)) {
             // Run stage 1 at its part load
-            PerfMode = DehumidMode * 2 + 1;
+            PerfMode = (int)DehumidMode * 2 + 1;  // This.  This is not good.  Don't do math on enums.
             CalcDoe2DXCoil(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, PartLoadRatio, fanOp, PerfMode);
             S1PLR = PartLoadRatio;
             S2PLR = 0.0;
         } else {
             // If a two-stage coil
             // Run stage 1 at full load
-            PerfMode = DehumidMode * 2 + 1;
+            PerfMode = (int)DehumidMode * 2 + 1;
             CalcDoe2DXCoil(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, 1.0, fanOp, PerfMode);
             S1SensCoolingEnergyRate = thisDXCoil.SensCoolingEnergyRate;
             if (S1SensCoolingEnergyRate > 0.0) {
@@ -528,7 +528,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             }
             // Run stage 1+2 at full load
             if (thisDXCoil.NumCapacityStages >= 2) {
-                PerfMode = DehumidMode * 2 + 2;
+                PerfMode = (int)DehumidMode * 2 + 2;
                 CalcDoe2DXCoil(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, 1.0, fanOp, PerfMode);
                 S12SensCoolingEnergyRate = thisDXCoil.SensCoolingEnergyRate;
                 S12ElecCoolFullLoadPower = thisDXCoil.ElecCoolingPower;
@@ -560,7 +560,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             S2PLR = max(0.0, S2PLR);
 
             // Run stage 1 at its part load
-            PerfMode = DehumidMode * 2 + 1;
+            PerfMode = (int)DehumidMode * 2 + 1;
             CalcDoe2DXCoil(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, S1PLR, fanOp, PerfMode);
         }
         // For stage-1 only operation, all outputs are set by CalcDoe2DXCoil.
@@ -586,7 +586,7 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             S1FullLoadOutAirHumRat = state.dataDXCoils->DXCoilFullLoadOutAirHumRat(DXCoilNum);
 
             // Run stage 1+2 at its part load
-            PerfMode = DehumidMode * 2 + 2;
+            PerfMode = (int)DehumidMode * 2 + 2;
             CalcDoe2DXCoil(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, S2PLR, fanOp, PerfMode);
             S12RuntimeFraction = thisDXCoil.CoolingCoilRuntimeFraction;
             S12OutletAirEnthalpy = thisDXCoil.OutletAirEnthalpy;
@@ -3212,20 +3212,10 @@ void GetDXCoils(EnergyPlusData &state)
                                                  cAlphaFields(9));                             // Field Name
         }
 
-        if (Util::SameString(Alphas(10), "DryBulbTemperature")) {
-            thisDXCoil.InletAirTemperatureType = HVAC::DryBulbIndicator;
-        } else if (Util::SameString(Alphas(10), "WetBulbTemperature")) {
-            thisDXCoil.InletAirTemperatureType = HVAC::WetBulbIndicator;
-        } else {
-            //   wrong temperature type selection
-            ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
-            ShowContinueError(state, format("...{} must be DryBulbTemperature or WetBulbTemperature.", cAlphaFields(10)));
-            ShowContinueError(state, format("...entered value=\"{}\".", Alphas(10)));
-            ErrorsFound = true;
-        }
+        thisDXCoil.InletAirTemperatureType = static_cast<HVAC::OATType>(getEnumValue(HVAC::oatTypeNamesUC, Alphas(10)));
 
         // set rated inlet air temperature for curve object verification
-        if (thisDXCoil.InletAirTemperatureType == HVAC::WetBulbIndicator) {
+        if (thisDXCoil.InletAirTemperatureType == HVAC::OATType::WetBulb) {
             InletAirTemp = thisDXCoil.RatedInletWBTemp;
         } else {
             InletAirTemp = thisDXCoil.RatedInletDBTemp;
@@ -3662,9 +3652,9 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         if (Util::SameString(Alphas(6), "DryBulbTemperature")) {
-            thisDXCoil.InletAirTemperatureType = HVAC::DryBulbIndicator;
+            thisDXCoil.InletAirTemperatureType = HVAC::OATType::DryBulb;
         } else if (Util::SameString(Alphas(6), "WetBulbTemperature")) {
-            thisDXCoil.InletAirTemperatureType = HVAC::WetBulbIndicator;
+            thisDXCoil.InletAirTemperatureType = HVAC::OATType::WetBulb;
         } else {
             //   wrong temperature type selection
             ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
@@ -3674,7 +3664,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // set rated inlet air temperature for curve object verification
-        if (thisDXCoil.InletAirTemperatureType == HVAC::WetBulbIndicator) {
+        if (thisDXCoil.InletAirTemperatureType == HVAC::OATType::WetBulb) {
             InletAirTemp = thisDXCoil.RatedInletWBTemp;
         } else {
             InletAirTemp = thisDXCoil.RatedInletDBTemp;
@@ -5607,7 +5597,7 @@ void GetDXCoils(EnergyPlusData &state)
                 SetupOutputVariable(state,
                                     "Cooling Coil Dehumidification Mode",
                                     Constant::Units::None,
-                                    thisDXCoil.DehumidificationMode,
+                                    (int&)thisDXCoil.DehumidificationMode,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     thisDXCoil.Name);
@@ -8789,7 +8779,7 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     }
 
     // determine inlet air temperature type for curve objects
-    if (Coil.InletAirTemperatureType == HVAC::WetBulbIndicator) {
+    if (Coil.InletAirTemperatureType == HVAC::OATType::WetBulb) {
         InletAirTemp = state.dataHVACGlobal->HPWHInletWBTemp;
     } else {
         InletAirTemp = state.dataHVACGlobal->HPWHInletDBTemp;
@@ -11006,10 +10996,10 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
         // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
         if (state.dataCurveManager->PerfCurve(thisDXCoil.CCapFTemp(Mode))->numDims == 2) {
             switch (thisDXCoil.HeatingPerformanceOATType) {
-            case HVAC::DryBulbIndicator: {
+            case HVAC::OATType::DryBulb: {
                 TotCapTempModFac = CurveValue(state, thisDXCoil.CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
             } break;
-            case HVAC::WetBulbIndicator: {
+            case HVAC::OATType::WetBulb: {
                 TotCapTempModFac = CurveValue(state, thisDXCoil.CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorWetBulb);
             } break;
             default: {
@@ -11018,14 +11008,14 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
             }
         } else {
             switch (thisDXCoil.HeatingPerformanceOATType) {
-            case HVAC::DryBulbIndicator: {
+            case HVAC::OATType::DryBulb: {
                 if (thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_Heating && thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_FluidTCtrl_Heating) {
                     TotCapTempModFac = CurveValue(state, thisDXCoil.CCapFTemp(Mode), OutdoorDryBulb);
                 } else {
                     TotCapTempModFac = CurveValue(state, thisDXCoil.CCapFTemp(Mode), InletAirDryBulbTemp);
                 }
             } break;
-            case HVAC::WetBulbIndicator: {
+            case HVAC::OATType::WetBulb: {
                 if (thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_Heating && thisDXCoil.DXCoilType_Num != HVAC::CoilVRF_FluidTCtrl_Heating) {
                     TotCapTempModFac = CurveValue(state, thisDXCoil.CCapFTemp(Mode), OutdoorWetBulb);
                 } else {
@@ -11800,7 +11790,7 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
 
 void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
                                             int const DXCoilNum,  // Index of coil being simulated
-                                            int const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
+                                            HVAC::CoilMode const DehumidMode // Dehumidification mode (0=normal, 1=enhanced)
 )
 {
 
@@ -11831,7 +11821,7 @@ void CalcBasinHeaterPowerForMultiModeDXCoil(EnergyPlusData &state,
     if (thisDXCoil.NumCapacityStages == 1) {
         thisDXCoil.BasinHeaterPower *= (1.0 - thisDXCoil.CoolingCoilRuntimeFraction);
     } else {
-        PerfMode = DehumidMode * 2 + 1;
+        PerfMode = (int)DehumidMode * 2 + 1;
         if (thisDXCoil.CondenserType(PerfMode) == DataHeatBalance::RefrigCondenserType::Evap) {
             thisDXCoil.BasinHeaterPower *= (1.0 - thisDXCoil.CoolingCoilRuntimeFraction);
         } else if (thisDXCoil.CondenserType(PerfMode + 1) == DataHeatBalance::RefrigCondenserType::Evap) {
@@ -15816,7 +15806,7 @@ void SetDXCoolingCoilData(EnergyPlusData &state,
                           ObjexxFCL::Optional<Real64> MaxOATCooling, // Parameter equivalent of condenser Max OAT for compressor cooling operation
                           ObjexxFCL::Optional<Real64> MinOATHeating, // Parameter equivalent of condenser Min OAT for compressor heating operation
                           ObjexxFCL::Optional<Real64> MaxOATHeating, // Parameter equivalent of condenser Max OAT for compressor heating operation
-                          ObjexxFCL::Optional_int HeatingPerformanceOATType, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
+                          ObjexxFCL::Optional<HVAC::OATType> HeatingPerformanceOATType, // Parameter equivalent to condenser entering air temp type (1-db, 2=wb)
                           ObjexxFCL::Optional<StandardRatings::DefrostStrat> DefrostStrategy,
                           ObjexxFCL::Optional<StandardRatings::HPdefrostControl> DefrostControl,
                           ObjexxFCL::Optional_int DefrostEIRPtr,

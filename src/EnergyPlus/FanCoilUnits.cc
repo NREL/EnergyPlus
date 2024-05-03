@@ -620,12 +620,12 @@ namespace FanCoilUnits {
             if (fanCoil.ControlZoneNum == 0) {
                 ErrorsFound = true;
             }
-            if (state.dataFanCoilUnits->ATMixerType == HVAC::ATMixer_InletSide) {
+            if (state.dataFanCoilUnits->ATMixerType == HVAC::MixerType::InletSide) {
                 // save the air terminal mixer data in the fan coil data array
                 fanCoil.ATMixerExists = true;
                 fanCoil.ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 fanCoil.ATMixerName = ATMixerName;
-                fanCoil.ATMixerType = HVAC::ATMixer_InletSide;
+                fanCoil.ATMixerType = HVAC::MixerType::InletSide;
                 fanCoil.ATMixerPriNode = state.dataFanCoilUnits->ATMixerPriNode;
                 fanCoil.ATMixerSecNode = state.dataFanCoilUnits->ATMixerSecNode;
                 fanCoil.ATMixerOutNode = state.dataFanCoilUnits->ATMixerOutNode;
@@ -647,12 +647,12 @@ namespace FanCoilUnits {
                     ErrorsFound = true;
                 }
                 // check for supply side air terminal mixer
-            } else if (state.dataFanCoilUnits->ATMixerType == HVAC::ATMixer_SupplySide) {
+            } else if (state.dataFanCoilUnits->ATMixerType == HVAC::MixerType::SupplySide) {
                 // save the air terminal mixer data in the fan coil data array
                 fanCoil.ATMixerExists = true;
                 fanCoil.ATMixerIndex = state.dataFanCoilUnits->ATMixerNum;
                 fanCoil.ATMixerName = ATMixerName;
-                fanCoil.ATMixerType = HVAC::ATMixer_SupplySide;
+                fanCoil.ATMixerType = HVAC::MixerType::SupplySide;
                 fanCoil.ATMixerPriNode = state.dataFanCoilUnits->ATMixerPriNode;
                 fanCoil.ATMixerSecNode = state.dataFanCoilUnits->ATMixerSecNode;
                 fanCoil.ATMixerOutNode = state.dataFanCoilUnits->ATMixerOutNode;
@@ -3242,7 +3242,7 @@ namespace FanCoilUnits {
 
         if (fanCoil.ATMixerExists) {
             state.dataFanCoilUnits->ATMixOutNode = fanCoil.ATMixerOutNode;
-            if (fanCoil.ATMixerType == HVAC::ATMixer_InletSide) {
+            if (fanCoil.ATMixerType == HVAC::MixerType::InletSide) {
                 // set the primary air inlet mass flow rate
                 state.dataLoopNodes->Node(fanCoil.ATMixerPriNode).MassFlowRate =
                     min(state.dataLoopNodes->Node(fanCoil.ATMixerPriNode).MassFlowRateMaxAvail, state.dataLoopNodes->Node(InletNode).MassFlowRate);
@@ -3378,7 +3378,7 @@ namespace FanCoilUnits {
         }
 
         if (fanCoil.ATMixerExists) {
-            if (fanCoil.ATMixerType == HVAC::ATMixer_SupplySide) {
+            if (fanCoil.ATMixerType == HVAC::MixerType::SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
                 SingleDuct::SimATMixer(state, fanCoil.ATMixerName, FirstHVACIteration, fanCoil.ATMixerIndex);
                 LoadMet = calcZoneSensibleOutput(state.dataLoopNodes->Node(state.dataFanCoilUnits->ATMixOutNode).MassFlowRate,

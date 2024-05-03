@@ -2622,7 +2622,7 @@ namespace HVACUnitaryBypassVAV {
                     // Determine required part load for normal mode
 
                     // Get full load result
-                    int DehumidMode = 0; // Dehumidification mode (0=normal, 1=enhanced)
+                    HVAC::CoilMode DehumidMode = HVAC::CoilMode::Normal; // Dehumidification mode (0=normal, 1=enhanced)
                     cBVAV.DehumidificationMode = DehumidMode;
                     DXCoils::SimDXCoilMultiMode(state,
                                                 cBVAV.DXCoolCoilName,
@@ -2703,7 +2703,7 @@ namespace HVACUnitaryBypassVAV {
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        DehumidMode = 1;
+                        DehumidMode = HVAC::CoilMode::Enhanced;
                         cBVAV.DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(state,
                                                     cBVAV.DXCoolCoilName,
@@ -2798,7 +2798,7 @@ namespace HVACUnitaryBypassVAV {
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        DehumidMode = 0;
+                        DehumidMode = HVAC::CoilMode::Normal;
                         cBVAV.DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(state,
                                                     cBVAV.DXCoolCoilName,
@@ -2911,7 +2911,7 @@ namespace HVACUnitaryBypassVAV {
                                                 HVAC::CompressorOp::Off,
                                                 FirstHVACIteration,
                                                 0.0,
-                                                0,
+                                                HVAC::CoilMode::Normal,
                                                 cBVAV.CoolCoilCompIndex,
                                                 HVAC::FanOp::Continuous);
                     state.dataHVACUnitaryBypassVAV->SaveCompressorPLR = state.dataDXCoils->DXCoilPartLoadRatio(cBVAV.DXCoolCoilIndexNum);
@@ -2981,7 +2981,7 @@ namespace HVACUnitaryBypassVAV {
                                             HVAC::CompressorOp::Off,
                                             FirstHVACIteration,
                                             0.0,
-                                            0,
+                                            HVAC::CoilMode::Normal,
                                             cBVAV.CoolCoilCompIndex,
                                             HVAC::FanOp::Continuous);
             }
