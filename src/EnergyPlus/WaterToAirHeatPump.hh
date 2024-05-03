@@ -174,7 +174,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         DataHVACGlobals::CompressorOperation CompressorOp,
+                         HVAC::CompressorOperation CompressorOp,
                          Real64 const PartLoadRatio);
 
     void GetWatertoAirHPInput(EnergyPlusData &state);
@@ -193,7 +193,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration, // first iteration flag
                                  bool const InitFlag,           // suppress property errors if true
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation CompressorOp,
+                                 HVAC::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
 
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
@@ -202,7 +202,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration, // first iteration flag
                                  bool const InitFlag,           // first iteration flag
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation CompressorOp,
+                                 HVAC::CompressorOperation CompressorOp,
                                  Real64 const PartLoadRatio);
 
     void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);

@@ -61,7 +61,6 @@
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -591,7 +590,7 @@ int CoilCoolingDX::getOpModeCapFTIndex(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::setData(int fanIndex, DataHVACGlobals::FanType fanType, std::string const &fanName, int _airLoopNum)
+void CoilCoolingDX::setData(int fanIndex, HVAC::FanType fanType, std::string const &fanName, int _airLoopNum)
 {
     this->supplyFanIndex = fanIndex;
     this->supplyFanName = fanName;
@@ -741,7 +740,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             Real64 waterDensity = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
-            if (useAlternateMode == DataHVACGlobals::coilNormalMode) {
+            if (useAlternateMode == HVAC::coilNormalMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             state.dataWaterData->WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -782,7 +781,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
-    if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
+    if (useAlternateMode == HVAC::coilSubcoolReheatMode) {
         this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
         this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
     }
@@ -820,24 +819,14 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                                                                                   -999.0);
 
             // report out fan information
-            if (this->supplyFanType == DataHVACGlobals::FanType::SystemModel) {
-                if (this->supplyFanIndex >= 0) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->name,
-                                                                                             state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataHVACFan->fanObjs[this->supplyFanIndex]->name,
-                                                                                             DataAirSystems::ObjectVectorOOFanSystemModel,
-                                                                                             this->supplyFanIndex);
-                }
-            } else {
-                if (this->supplyFanIndex >= 1) {
-                    state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
-                                                                                             this->name,
-                                                                                             state.dataCoilCooingDX->coilCoolingDXObjectName,
-                                                                                             state.dataFans->Fan(this->supplyFanIndex).Name,
-                                                                                             DataAirSystems::StructArrayLegacyFanModels,
-                                                                                             this->supplyFanIndex);
-                }
+            // should work for all fan types
+            if (this->supplyFanIndex > 0) {
+                state.dataRptCoilSelection->coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                                                         this->name,
+                                                                                         state.dataCoilCooingDX->coilCoolingDXObjectName,
+                                                                                         state.dataFans->fans(this->supplyFanIndex)->Name,
+                                                                                         state.dataFans->fans(this->supplyFanIndex)->type,
+                                                                                         this->supplyFanIndex);
             }
 
             // report out coil rating conditions, just create a set of dummy nodes and run calculate on them
@@ -947,13 +936,13 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
 void CoilCoolingDX::setToHundredPercentDOAS()
 {
     for (auto &speed : this->performance.normalMode.speeds) {
-        speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
-        speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+        speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
+        speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
     }
     if (this->performance.hasAlternateMode) {
         for (auto &speed : this->performance.alternateMode.speeds) {
-            speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
-            speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+            speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
+            speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
         }
     }
 }

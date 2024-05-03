@@ -90,6 +90,7 @@
 #include <EnergyPlus/Vectors.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 namespace EnergyPlus {
 
@@ -313,6 +314,8 @@ namespace SurfaceGeometry {
             state.dataSurfaceGeometry->SinZoneRelNorth.deallocate();
             return;
         }
+
+        ZoneEquipmentManager::GetZoneEquipment(state); // Necessary to get this before window air gap code
 
         GetWindowGapAirflowControlData(state, ErrorsFound);
 

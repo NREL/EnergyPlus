@@ -623,7 +623,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     int const PltSizNum = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).PlantSizNum; // Plant Sizing index corresponding to CurLoopNum
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
             Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -685,7 +685,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     }
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
             tmpBoilerVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
         } else {
             if (this->VolFlowRateWasAutoSized) tmpBoilerVolFlowRate = 0.0;

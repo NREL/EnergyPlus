@@ -139,7 +139,7 @@ namespace TranspiredCollector {
         // Setup to avoid string comparisons after first call
 
         // Using/Aliasing
-        using DataHVACGlobals::TempControlTol;
+        using HVAC::TempControlTol;
 
         using ScheduleManager::GetCurrentScheduleValue;
 

@@ -1121,7 +1121,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
             tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
         } else {
             if (this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = 0.0;
@@ -1191,7 +1191,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
             Real64 SizingEvapOutletTemp = this->TempRefEvapOut; // Plant Sizing outlet temperature for CurLoopNum [C]
             Real64 SizingCondOutletTemp = this->TempRefCondOut; // Plant Sizing outlet temperature for condenser loop [C]
             if (PltSizCondNum > 0 && PltSizNum > 0) {
@@ -1263,7 +1263,7 @@ void ReformulatedEIRChillerSpecs::size(EnergyPlusData &state)
     }
 
     if (PltSizCondNum > 0 && PltSizNum > 0 && this->CondenserType == DataPlant::CondenserType::WaterCooled) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow && tmpNomCap > 0.0) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
                                                            Constant::CWInitConvTemp,
@@ -2401,7 +2401,7 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
 
         // calculate the load due to false loading on chiller over and above water side load
         this->ChillerFalseLoadRate = (AvailChillerCap * PartLoadRat * FRAC) - this->QEvaporator;
-        if (this->ChillerFalseLoadRate < DataHVACGlobals::SmallLoad) {
+        if (this->ChillerFalseLoadRate < HVAC::SmallLoad) {
             this->ChillerFalseLoadRate = 0.0;
         }
 

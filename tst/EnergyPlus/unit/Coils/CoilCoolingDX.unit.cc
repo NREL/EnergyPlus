@@ -170,7 +170,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
 
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    int useAlternateMode = DataHVACGlobals::coilNormalMode;
+    int useAlternateMode = HVAC::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
@@ -193,7 +193,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     EXPECT_NEAR(0.0114, evapOutletNode.HumRat, 0.001);
 
     // ok so now run at alternate mode, speed 1
-    useAlternateMode = DataHVACGlobals::coilEnhancedMode;
+    useAlternateMode = HVAC::coilEnhancedMode;
     speedNum = 1;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
@@ -203,7 +203,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance)
     EXPECT_NEAR(0.0126, evapOutletNode.HumRat, 0.0001);
 
     // ok so now run at alternate mode, speed 2
-    useAlternateMode = DataHVACGlobals::coilEnhancedMode;
+    useAlternateMode = HVAC::coilEnhancedMode;
     speedNum = 2;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
@@ -308,7 +308,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
 
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    int useAlternateMode = DataHVACGlobals::coilNormalMode;
+    int useAlternateMode = HVAC::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
@@ -335,7 +335,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
     }
 
     // ok so now run at alternate mode, speed 1
-    useAlternateMode = DataHVACGlobals::coilEnhancedMode;
+    useAlternateMode = HVAC::coilEnhancedMode;
     speedNum = 1;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
@@ -348,7 +348,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation)
     }
 
     // ok so now run at alternate mode, speed 2
-    useAlternateMode = DataHVACGlobals::coilEnhancedMode;
+    useAlternateMode = HVAC::coilEnhancedMode;
     speedNum = 2;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     Real64 ratedRhoAir =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
-    Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.FuelType = Constant::eFuel::Electricity;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -487,8 +487,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
-    int FanOpMode = DataHVACGlobals::CycFanCycCoil;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int FanOpMode = HVAC::CycFanCycCoil;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
@@ -695,11 +695,11 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    int useAlternateMode = DataHVACGlobals::coilNormalMode;
+    int useAlternateMode = HVAC::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 0.0;
-    int fanOpMode = DataHVACGlobals::CycFanCycCoil;
+    int fanOpMode = HVAC::CycFanCycCoil;
     bool singleMode = false;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate1, thisCoil.totalCoolingEnergyRate, 0.1);
@@ -738,7 +738,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_CycFanCycCoil)
     evapInletNode.HumRat = 0.0100;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    useAlternateMode = DataHVACGlobals::coilNormalMode;
+    useAlternateMode = HVAC::coilNormalMode;
     PLR = 1.0;
     speedNum = 1;
     speedRatio = 1.0;
@@ -808,7 +808,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     Real64 ratedRhoAir =
         Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, routineName);
 
-    Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.FuelType = Constant::eFuel::Electricity;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -904,8 +904,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
-    int FanOpMode = DataHVACGlobals::ContFanCycCoil;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int FanOpMode = HVAC::ContFanCycCoil;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed
     Real64 SpeedRatio = 0.0;
@@ -1112,11 +1112,11 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     // set some values to run at rated conditions and call to run normal mode speed 1
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    int useAlternateMode = DataHVACGlobals::coilNormalMode;
+    int useAlternateMode = HVAC::coilNormalMode;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 0.0;
-    int fanOpMode = DataHVACGlobals::ContFanCycCoil;
+    int fanOpMode = HVAC::ContFanCycCoil;
     bool singleMode = false;
     thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     EXPECT_NEAR(MultiSpeedTotalCoolingRate1, thisCoil.totalCoolingEnergyRate, 0.1);
@@ -1156,7 +1156,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXCoolingVsMultiSpeed_ContFanCycCoil)
     evapInletNode.HumRat = 0.0100;
     evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
-    useAlternateMode = DataHVACGlobals::coilNormalMode;
+    useAlternateMode = HVAC::coilNormalMode;
     PLR = 1.0;
     speedNum = 1;
     speedRatio = 1.0;
@@ -1224,7 +1224,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     // Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat,
     // routineName);
 
-    Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.FuelType = Constant::eFuel::Electricity;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -1318,8 +1318,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_CycFanCycCoil)
     state->dataEnvrn->OutHumRat = 0.0120;
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
-    int FanOpMode = DataHVACGlobals::CycFanCycCoil;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int FanOpMode = HVAC::CycFanCycCoil;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed (speednum=2, speedratio=0)
     int SpeedNum = 2;
@@ -1455,7 +1455,7 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     // Real64 ratedRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat,
     // routineName);
 
-    Coil.DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.FuelType = Constant::eFuel::Electricity;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
@@ -1549,8 +1549,8 @@ TEST_F(EnergyPlusFixture, DISABLED_CoilDXMultiSpeed_SpeedCheck_ContFanCycCoil)
     state->dataEnvrn->OutHumRat = 0.0120;
     state->dataEnvrn->WindSpeed = 5.0;
     state->dataEnvrn->WindDir = 0.0;
-    int FanOpMode = DataHVACGlobals::ContFanCycCoil;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    int FanOpMode = HVAC::ContFanCycCoil;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     // Test 1 - dry coil - run the coil at low speed (speednum=2, speedratio=0)
     int SpeedNum = 2;
@@ -1819,7 +1819,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurOASysNum = 0;
     state->dataSize->CurSysNum = 1;
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Cooling;
     state->dataSize->FinalSysSizing.allocate(1);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupTemp = 12.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).CoolSupHumRat = 0.0085;
@@ -1830,8 +1830,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDX_LowerSpeedFlowSizingTest)
     state->dataHVACGlobal->NumPrimaryAirSys = 1;
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;

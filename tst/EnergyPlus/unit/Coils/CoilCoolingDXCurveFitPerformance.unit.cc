@@ -62,7 +62,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput)
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilNormalMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, HVAC::coilNormalMode);
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode)
@@ -72,5 +72,5 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode)
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilEnhancedMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, HVAC::coilEnhancedMode);
 }

@@ -507,7 +507,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     int OAControllerNum;
     int AirLoopNum;
 
-    state->dataHVACGlobal->NumPrimaryAirSys = 5;              // will be reset in DataHVACGlobals::clear_state(); in EnergyPlusFixture
+    state->dataHVACGlobal->NumPrimaryAirSys = 5;              // will be reset in HVAC::clear_state(); in EnergyPlusFixture
     state->dataAirLoop->AirLoopControlInfo.allocate(5);       // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     state->dataAirLoop->AirLoopFlow.allocate(5);              // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     state->dataAirSystemsData->PrimaryAirSystems.allocate(5); // will be deallocated by DataAirSystems::clear_state(); in EnergyPlusFixture
@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum = AirLoopNum;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = false;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).NightVent = false;
-        state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = DataHVACGlobals::ContFanCycCoil;
+        state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = HVAC::ContFanCycCoil;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet = false;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus = true;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
@@ -1740,7 +1740,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
 
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = false;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).NightVent = false;
-    state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = DataHVACGlobals::CycFanCycCoil;
+    state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = HVAC::CycFanCycCoil;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet = false;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus = true;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
@@ -2113,7 +2113,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
 
     // Case 2 - OA humrat < zone humrat - high humidity operation
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
-    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff;
+    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - HVAC::SmallHumRatDiff;
     state->dataMixedAir->OAController(ControllerNum)
         .CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_TRUE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
@@ -2121,7 +2121,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
 
     // Case 3 - OA humrat within tolerance of zone humrat - no high humidity operation
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
-    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff / 2.0;
+    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 - HVAC::SmallHumRatDiff / 2.0;
     state->dataMixedAir->OAController(ControllerNum)
         .CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_FALSE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
@@ -2129,7 +2129,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
 
     // Case 4 - OA humrat slightly above zone humrat - no high humidity operation
     state->dataLoopNodes->Node(state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
-    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 + DataHVACGlobals::SmallHumRatDiff / 2.0;
+    state->dataMixedAir->OAController(ControllerNum).OAHumRat = 0.006 + HVAC::SmallHumRatDiff / 2.0;
     state->dataMixedAir->OAController(ControllerNum)
         .CalcOAEconomizer(*state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
     EXPECT_FALSE(state->dataMixedAir->OAController(ControllerNum).HighHumCtrlActive);
@@ -6921,7 +6921,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -6957,7 +6957,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
 
     // check OA controller inputs
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
-    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(curOACntrl.FixedMin); // Economizer Minimum Limit Type = ProportionalMinimum
     EXPECT_EQ(curOACntrl.MinOA, 0.2);  // OA min vol flow rate
 
@@ -7111,7 +7111,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7149,7 +7149,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     EXPECT_EQ(curOACntrl.MinOA, 0.2);                                                         // user specified minimum OA vol flow rate
     EXPECT_TRUE(curOACntrl.FixedMin);                                                         // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
-    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
 
     // calc minimum OA mass flow for FixedMinimum
     OAMassFlowAMin = curOACntrl.MinOA * state->dataEnvrn->StdRhoAir;
@@ -7315,7 +7315,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7354,7 +7354,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     EXPECT_EQ(curOACntrl.MinOA, 0.2);                                                         // user specified minimum OA vol flow rate
     EXPECT_TRUE(curOACntrl.FixedMin);                                                         // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
-    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
 
     // calc minimum OA mass flow for FixedMinimum
     OAMassFlowAMin = curOACntrl.MinOA * state->dataEnvrn->StdRhoAir;
@@ -7564,7 +7564,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7603,7 +7603,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     EXPECT_EQ(curOACntrl.MinOA, 0.5);                                                         // user specified minimum OA vol flow rate
     EXPECT_TRUE(curOACntrl.FixedMin);                                                         // Economizer Minimum Limit Type = FixedMinimum
     EXPECT_TRUE(compare_enums(curOACntrl.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // NoLockout (economizer always active)
-    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
 
     // calc minimum OA mass flow for FixedMinimum
     OAMassFlowAMin = curOACntrl.MinOA * state->dataEnvrn->StdRhoAir;

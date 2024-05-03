@@ -4891,10 +4891,6 @@ void initializeForExternalHVACManager(EnergyPlusData &state)
     // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
     // to allow an external hvac manager to play nice with E+
     EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state);
-    if (!state.dataZoneEquip->ZoneEquipInputsFilled) {
-        EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
-        state.dataZoneEquip->ZoneEquipInputsFilled = true;
-    }
 }
 
 void ReportZoneMeanAirTemp(EnergyPlusData &state)
