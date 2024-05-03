@@ -17288,7 +17288,6 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         thisDXCoil.ActualSC = ActualSC;
         thisDXCoil.TotalHeatingEnergyRate = AirMassFlow * (OutletAirEnthalpy - InletAirEnthalpy) * PartLoadRatio;
         thisDXCoil.DefrostPower = thisDXCoil.DefrostPower * thisDXCoil.HeatingCoilRuntimeFraction;
-        thisDXCoil.InletAirMassFlowRate = AirMassFlow * PartLoadRatio;
 
     } else {
         // DX coil is off; just pass through conditions

@@ -12962,7 +12962,13 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->CompOffMassFlow = state.dataHVACVarRefFlow->OACompOffMassFlow;
     } else {
         // identify the air flow rate corresponding to the coil load
-        state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(state, VRFTUNum, PartLoadRatio, FirstHVACIteration);
+        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < MaxCap) {
+            // Only fix heating only mode for now
+            state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(
+                state, VRFTUNum, PartLoadRatio, FirstHVACIteration, state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
+        } else {
+            state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(state, VRFTUNum, PartLoadRatio, FirstHVACIteration, _);
+        }
     }
     SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AirMassFlow = state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate;
@@ -13034,7 +13040,6 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                       _,
                       _,
                       state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
-            AirMassFlow = state.dataDXCoils->DXCoil(this->HeatCoilIndex).InletAirMassFlowRate;
         } else {
             SimDXCoil(state, "", DataHVACGlobals::CompressorOperation::Off, FirstHVACIteration, this->HeatCoilIndex, OpMode, 0.0, _);
         }
@@ -13113,9 +13118,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 }
 
 Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                                                int const VRFTUNum,                      // Index to VRF terminal unit
-                                                                Real64 PartLoadRatio,                    // part load ratio of the coil
-                                                                [[maybe_unused]] bool FirstHVACIteration // FirstHVACIteration flag
+                                                                int const VRFTUNum,                          // Index to VRF terminal unit
+                                                                Real64 PartLoadRatio,                        // part load ratio of the coil
+                                                                [[maybe_unused]] bool FirstHVACIteration,    // FirstHVACIteration flag
+                                                                ObjexxFCL::Optional<Real64 const> MaxHeatCap // maximum allowed heating capacity
 )
 {
     // SUBROUTINE INFORMATION:
@@ -13173,7 +13179,11 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
                 state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
         // VRF terminal unit is on heating mode
         DXCoilNum = this->HeatCoilIndex;
-        QCoilReq = PartLoadRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
+        Real64 RatedCapacity = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
+        if (present(MaxHeatCap)) {
+            RatedCapacity = min(MaxHeatCap, RatedCapacity);
+        }
+        QCoilReq = PartLoadRatio * RatedCapacity;
         TeTc = state.dataHVACVarRefFlow->VRF(VRFCond).IUCondensingTemp;
 
     } else {

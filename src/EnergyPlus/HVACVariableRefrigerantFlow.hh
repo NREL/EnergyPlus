@@ -802,9 +802,10 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         Real64 CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                              int VRFTUNum,           // Index to VRF terminal unit
-                                              Real64 PartLoadRatio,   // part load ratio of the coil
-                                              bool FirstHVACIteration // FirstHVACIteration flag
+                                              int VRFTUNum,                            // Index to VRF terminal unit
+                                              Real64 PartLoadRatio,                    // part load ratio of the coil
+                                              bool FirstHVACIteration,                 // FirstHVACIteration flag
+                                              ObjexxFCL::Optional<Real64 const> MaxCap // maximum allowed heating capacity
         );
 
         // Methods for cruve based VRF Model
