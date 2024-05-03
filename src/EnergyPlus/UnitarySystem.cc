@@ -12137,7 +12137,7 @@ namespace UnitarySystems {
         Real64 SpeedRatio = 0.0;
         Real64 CycRatio = 0.0;
         Real64 PartLoadFrac = 0.0;
-        HVAC::CoilMode DehumidMode = HVAC::CoilMode::Invalid;
+        HVAC::CoilMode DehumidMode = HVAC::CoilMode::Normal;
         Real64 dummy = 0.0;
         Real64 SensLoad = 0.0;
         int SolFla = 0;

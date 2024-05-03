@@ -289,7 +289,7 @@ namespace UnitarySystems {
         bool m_RunOnSensibleLoad = false;
         bool m_RunOnLatentLoad = false;
         bool m_RunOnLatentOnlyWithSensible = false;
-        HVAC::CoilMode m_DehumidificationMode = HVAC::CoilMode::Invalid;
+        HVAC::CoilMode m_DehumidificationMode = HVAC::CoilMode::Normal; // Only explicitly initialized if something other than Normal
         int m_SuppHeatCoilType_Num = 0;
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
