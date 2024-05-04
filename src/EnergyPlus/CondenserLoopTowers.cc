@@ -5839,7 +5839,7 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 constexpr lowerTr = 0.001;
-        Real64 upperTr = max(this->MaxRangeTemp, 22.222);
+        Real64 upperTr = max(this->MaxRangeTemp, 22.2222);
 
         // determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance

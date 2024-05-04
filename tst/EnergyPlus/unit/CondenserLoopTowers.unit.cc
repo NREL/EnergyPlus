@@ -3987,7 +3987,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     VSTower.calculateVariableSpeedTower(*state);
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
-    EXPECT_NEAR(0.5213, VSTower.FanCyclingRatio, 0.0001);
+    EXPECT_NEAR(0.5424, VSTower.FanCyclingRatio, 0.0001);
     // outside air condition is favorable that fan only needs to cycle at min flow to meet the setpoint
     TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(*state, WaterFlowRateRatio, VSTower.MinimumVSAirFlowFrac, AirWetBulbTemp);
     // this is tower outlet temperature at continuous minimum fan flow
