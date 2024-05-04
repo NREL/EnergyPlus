@@ -107,7 +107,7 @@ namespace WaterToAirHeatPump {
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         DataHVACGlobals::CompressorOperation const CompressorOp,
+                         HVAC::CompressorOperation const CompressorOp,
                          Real64 const PartLoadRatio)
     {
 
@@ -1211,7 +1211,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // suppress property errors if true
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1344,7 +1344,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (CompressorOp == HVAC::CompressorOperation::Off) {
             heatPump.SimFlag = false;
             return;
         }
@@ -1367,7 +1367,7 @@ namespace WaterToAirHeatPump {
         if (heatPump.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (CyclingScheme == HVAC::CycFanCycCoil) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         heatPump.RunFrac = PartLoadRatio / PLF;
@@ -1376,8 +1376,7 @@ namespace WaterToAirHeatPump {
         QLatActual = 0.0;
         // IF((RuntimeFrac .GE. 1.0) .OR. (Twet_rated .LE. 0.0) .OR. (Gamma_rated .LE. 0.0)) THEN
         // Cycling fan does not required latent degradation model, only the constant fan case
-        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) ||
-            (CyclingScheme == DataHVACGlobals::CycFanCycCoil)) {
+        if ((heatPump.RunFrac >= 1.0) || (heatPump.Twet_Rated <= 0.0) || (heatPump.Gamma_Rated <= 0.0) || (CyclingScheme == HVAC::CycFanCycCoil)) {
             LatDegradModelSimFlag = false;
             // Set NumIteration4=1 so that latent model would quit after 1 simulation with the actual condition
             NumIteration4 = 1;
@@ -1706,7 +1705,7 @@ namespace WaterToAirHeatPump {
         SourceSideOutletTemp = heatPump.InletWaterTemp + QSource / (heatPump.InletWaterMassFlowRate * CpWater);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (CyclingScheme == HVAC::ContFanCycCoil) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * LoadSideAirInletEnth;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * LoadSideInletHumRat;
@@ -1746,7 +1745,7 @@ namespace WaterToAirHeatPump {
                                  bool const FirstHVACIteration,        // first iteration flag
                                  [[maybe_unused]] bool const InitFlag, // first iteration flag
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation const CompressorOp,
+                                 HVAC::CompressorOperation const CompressorOp,
                                  Real64 const PartLoadRatio)
     {
 
@@ -1859,7 +1858,7 @@ namespace WaterToAirHeatPump {
             heatPump.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (CompressorOp == HVAC::CompressorOperation::Off) {
             heatPump.SimFlag = false;
             return;
         }
@@ -2142,7 +2141,7 @@ namespace WaterToAirHeatPump {
 
         // Calculate actual outlet conditions for the run time fraction
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (CyclingScheme == HVAC::ContFanCycCoil) {
             // continuous fan, cycling compressor
             heatPump.OutletAirEnthalpy = PartLoadRatio * LoadSideAirOutletEnth + (1.0 - PartLoadRatio) * heatPump.InletAirEnthalpy;
             heatPump.OutletAirHumRat = PartLoadRatio * LoadSideOutletHumRat + (1.0 - PartLoadRatio) * heatPump.InletAirHumRat;
@@ -2159,7 +2158,7 @@ namespace WaterToAirHeatPump {
         if (heatPump.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, heatPump.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (CyclingScheme == HVAC::CycFanCycCoil) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         heatPump.RunFrac = PartLoadRatio / PLF;
@@ -2362,7 +2361,7 @@ namespace WaterToAirHeatPump {
         //  Calculate the compressor on and off times using a conventional thermostat curve
         Ton = 3600.0 / (4.0 * heatPump.MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == DataHVACGlobals::CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
+        if ((CyclingScheme == HVAC::CycFanCycCoil) && (heatPump.FanDelayTime != 0.0)) {
             //  For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
             //  until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = heatPump.FanDelayTime;

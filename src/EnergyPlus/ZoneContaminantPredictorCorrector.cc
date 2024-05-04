@@ -93,7 +93,6 @@ namespace EnergyPlus::ZoneContaminantPredictorCorrector {
 // Similar approach to ZoneTempPredictorCorrector
 
 // Using/Aliasing
-using namespace DataHVACGlobals;
 using namespace DataHeatBalance;
 using namespace Psychrometrics;
 using namespace HybridModel;

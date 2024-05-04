@@ -2516,7 +2516,7 @@ namespace CondenserLoopTowers {
 
         if (this->DesignWaterFlowRateWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 } else {
@@ -2591,7 +2591,7 @@ namespace CondenserLoopTowers {
                 tmpHighSpeedFanPower = this->HighSpeedFanPower;
             } else {
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                              Constant::InitConvTemp,
@@ -2691,7 +2691,7 @@ namespace CondenserLoopTowers {
 
         if (this->HighSpeedTowerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                          Constant::InitConvTemp,
@@ -2789,7 +2789,7 @@ namespace CondenserLoopTowers {
                     }
                 }
             } else {
-                if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
 
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2908,7 +2908,7 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of delivered cooling but now is
                 // a user input
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -3090,7 +3090,7 @@ namespace CondenserLoopTowers {
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity &&
             Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
 
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now is a
                 // user input
@@ -3190,7 +3190,7 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerFreeConvNomCap > 0.0) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->TowerFreeConvNomCap > 0.0) {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now user
                 // input
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -3588,7 +3588,7 @@ namespace CondenserLoopTowers {
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
 
             if (PltSizCondNum > 0) { // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             DesTowerExitWaterTemp,
@@ -3606,7 +3606,7 @@ namespace CondenserLoopTowers {
                 }
             } else {                                  // PltSizCondNum = 0
                 if (!this->TowerInletCondsAutoSize) { // can use design data entered into tower object
-                    if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 DesTowerExitWaterTemp,
@@ -3973,7 +3973,7 @@ namespace CondenserLoopTowers {
             if (this->DesignWaterFlowRateWasAutoSized) { // get from plant sizing
                 // UA input method using plant sizing for flow rate, whereas Nominal capacity method uses scalable sizing factor per cap
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
@@ -3998,7 +3998,7 @@ namespace CondenserLoopTowers {
 
                 } else {
                     if (!this->TowerInletCondsAutoSize) {
-                        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -4032,7 +4032,7 @@ namespace CondenserLoopTowers {
             if (this->HighSpeedTowerUAWasAutoSized) {
                 // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 DesTowerExitWaterTemp,
@@ -4084,7 +4084,7 @@ namespace CondenserLoopTowers {
                     }
                 } else {
                     if (!this->TowerInletCondsAutoSize) {
-                        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                     DesTowerExitWaterTemp,
@@ -4321,7 +4321,7 @@ namespace CondenserLoopTowers {
                     // need an air flow rate to find capacity from UA but flow rate is scaled off capacity
                     // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                     if (PltSizCondNum > 0) {
-                        if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                     DesTowerExitWaterTemp,
@@ -5514,14 +5514,14 @@ namespace CondenserLoopTowers {
 
         WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
         // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > DataHVACGlobals::SmallLoad)) {
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > HVAC::SmallLoad)) {
             // for multiple cells, we assume that it's a common bassin
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
-        if (std::abs(MyLoad) <= DataHVACGlobals::SmallLoad) {
+        if (std::abs(MyLoad) <= HVAC::SmallLoad) {
             // tower doesn't need to do anything
             this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
             this->FanPower = 0.0;
@@ -5567,7 +5567,7 @@ namespace CondenserLoopTowers {
         Real64 FanPowerAdjustFac = 0.0;
         if (FullSpeedFanQdot <= std::abs(MyLoad)) { // full speed is what we want.
 
-            if ((FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
+            if ((FullSpeedFanQdot + HVAC::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
                 ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin)) {
                 // If full fan and not meeting setpoint, then increase number of cells until all are used or load is satisfied
                 bool IncrNumCellFlag = true; // set value to true to enter in the loop
@@ -5579,7 +5579,7 @@ namespace CondenserLoopTowers {
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                     this->OutletWaterTemp =
                         this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-                    IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
+                    IncrNumCellFlag = (FullSpeedFanQdot + HVAC::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
                                       ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin);
                 }
                 FullSpeedFanQdot =

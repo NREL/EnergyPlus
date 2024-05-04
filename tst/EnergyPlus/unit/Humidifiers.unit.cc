@@ -65,7 +65,6 @@ using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::Psychrometrics;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::Curve;
 
 namespace EnergyPlus {

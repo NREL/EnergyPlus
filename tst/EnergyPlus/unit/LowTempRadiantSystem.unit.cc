@@ -84,7 +84,6 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::FluidProperties;
 
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSurfaces;
 using namespace EnergyPlus::DataSurfaceLists;
@@ -1130,7 +1129,6 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
 
@@ -1190,9 +1188,9 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     state->dataSize->ZoneEqSizing.allocate(state->dataSize->CurZoneEqNum);
 
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::HeatingCapacitySizing) =
         DataSizing::FractionOfAutosizedHeatingCapacity;
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::CoolingCapacitySizing) =
         DataSizing::FractionOfAutosizedCoolingCapacity;
     // heating capacity sizing calculation
     state->dataSize->FinalZoneSizing(state->dataSize->CurZoneEqNum).NonAirSysDesHeatLoad = 10000.0;
@@ -2014,7 +2012,6 @@ TEST_F(LowTempRadiantSystemTest, SimulateCapacityPerFloorAreaError)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     Material::GetMaterialData(*state, ErrorsFound);
@@ -4636,7 +4633,6 @@ TEST_F(LowTempRadiantSystemTest, VariableFlowCoolingOnlyInputTest)
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ("WEST ZONE", state->dataHeatBal->Zone(1).Name);
 
-    GetZoneEquipmentData(*state);
     ProcessScheduleInput(*state);
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     Material::GetMaterialData(*state, ErrorsFound);

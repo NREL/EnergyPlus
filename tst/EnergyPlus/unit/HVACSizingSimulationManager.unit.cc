@@ -69,7 +69,6 @@ using namespace DataSizing;
 using namespace OutputReportPredefined;
 using namespace DataLoopNode;
 using namespace OutputProcessor;
-using namespace DataHVACGlobals;
 
 class HVACSizingSimulationManagerTest : public EnergyPlusFixture
 {
