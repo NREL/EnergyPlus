@@ -2349,6 +2349,20 @@ namespace CondenserLoopTowers {
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Sum,
                             this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Approach",
+                            Constant::Units::C,
+                            this->coolingTowerApproach,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Range",
+                            Constant::Units::C,
+                            this->coolingTowerRange,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
     }
 
     void CoolingTower::SizeTower(EnergyPlusData &state)
@@ -5196,7 +5210,7 @@ namespace CondenserLoopTowers {
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
+        if (this->WaterMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
@@ -5248,7 +5262,7 @@ namespace CondenserLoopTowers {
         }
 
         // find the correct air ratio only if full flow is  too much
-        if (OutletWaterTempON <= TempSetPoint) {
+        if (OutletWaterTempON < TempSetPoint) {
             //   outlet water temperature is calculated in the free convection regime
             OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp -
                                  FreeConvectionCapFrac * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempON);
@@ -5268,7 +5282,7 @@ namespace CondenserLoopTowers {
                 Real64 OutletWaterTempMIN; // Outlet water temperature with fan at minimum speed (C)
                 OutletWaterTempMIN = this->calculateVariableTowerOutletTemp(state, WaterFlowRateRatioCapped, this->airFlowRateRatio, TwbCapped);
 
-                if (OutletWaterTempMIN <= TempSetPoint) {
+                if (OutletWaterTempMIN < TempSetPoint) {
                     //         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->airFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
@@ -5825,51 +5839,21 @@ namespace CondenserLoopTowers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 constexpr lowerTr = 0.001;
-        Real64 upperTr = this->MaxRangeTemp;
+        Real64 upperTr = max(this->MaxRangeTemp, 22.222);
 
-        //   determine tower outlet water temperature
+        // determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance
         auto f = [&state, this, WaterFlowRateRatio, airFlowRateRatioLocal, Twb](Real64 Trange) {
             // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
             Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, airFlowRateRatioLocal, Twb, Trange);
-            // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
-            return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            // calculate residual based on a balance where Twb + Ta + Tr = Inlet Water Temp
+            return (Twb + Tapproach + Trange) - this->WaterTemp;
         };
-
-        // select bounds so range calculation through regula falsi can be determined
-        Real64 fLowerTr = f(lowerTr);
-        for (int upperTrIncr = 0; upperTrIncr <= 100; ++upperTrIncr) {
-            if (fLowerTr * f(upperTr + upperTrIncr) < 0) {
-                upperTr += upperTrIncr;
-                break;
-            }
-        }
         int SolFla = 0;
         General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, lowerTr, upperTr);
 
-        // get cooling tower setpoint
-        Real64 TempSetPoint(0.0);
-        switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
-        case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
-        } break;
-        case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
-        } break;
-        default: {
-            assert(false);
-        } break;
-        }
-
-        Real64 outletWaterTempLocal = 0;
-        Real64 calculatedOutletTemp = this->WaterTemp - min(Tr, this->MaxRangeTemp);
-
-        // cap the outlet water temperature to the setpoint
-        if (calculatedOutletTemp < TempSetPoint) {
-            outletWaterTempLocal = TempSetPoint;
-        } else {
-            outletWaterTempLocal = calculatedOutletTemp;
-        }
+        // calculate outlet temperature
+        Real64 outletWaterTempLocal = this->WaterTemp - min(Tr, this->MaxRangeTemp);
 
         if (SolFla == -1) {
             ShowSevereError(state, "Iteration limit exceeded in calculating tower nominal capacity at minimum air flow ratio");
@@ -5878,29 +5862,24 @@ namespace CondenserLoopTowers {
                 "Design inlet air wet-bulb or approach temperature must be modified to achieve an acceptable range at the minimum air flow rate");
             ShowContinueError(state, format("Cooling tower simulation failed to converge for tower {}", this->Name));
         } else if (SolFla == -2) {
-            if (this->WaterTemp - this->MaxRangeTemp > TempSetPoint) { // run flat out
-                outletWaterTempLocal = this->WaterTemp - this->MaxRangeTemp;
+            // bad starting value means that solution corresponds to a range that is beyond
+            // the bounds of the model; The maximum range is used here
+            outletWaterTempLocal = this->WaterTemp - this->MaxRangeTemp;
+            ++this->VSErrorCountTRCalc;
+            if (this->VSErrorCountTRCalc < 2) {
+                ShowWarningError(
+                    state,
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}",
+                           this->Name,
+                           this->MaxRangeTemp));
+                ShowContinueError(state,
+                                  format(" ... Occurrence info = {}, {} {}",
+                                         state.dataEnvrn->EnvironmentName,
+                                         state.dataEnvrn->CurMnDy,
+                                         General::CreateSysTimeIntervalString(state)));
             } else {
-                if (this->WaterTemp > TempSetPoint) {
-                    ++this->VSErrorCountTRCalc;
-                    if (this->VSErrorCountTRCalc < 2) {
-                        ShowWarningError(
-                            state,
-                            format("The outlet water temperature for cooling tower {} could not be correctly calculated. The outlet water "
-                                   "temperature was set to the inlet water temperature minus 0.001 deg. C.",
-                                   this->Name));
-                        ShowContinueError(state,
-                                          format(" ... Occurrence info = {}, {} {}",
-                                                 state.dataEnvrn->EnvironmentName,
-                                                 state.dataEnvrn->CurMnDy,
-                                                 General::CreateSysTimeIntervalString(state)));
-                    } else {
-                        ShowRecurringWarningErrorAtEnd(
-                            state,
-                            format("The outlet water temperature for cooling tower {} could not be calculated.", this->Name),
-                            this->ErrIndexTRCalc);
-                    }
-                }
+                ShowRecurringWarningErrorAtEnd(
+                    state, format("The outlet water temperature for cooling tower {} could not be calculated.", this->Name), this->ErrIndexTRCalc);
             }
         }
         return outletWaterTempLocal;
@@ -6359,6 +6338,8 @@ namespace CondenserLoopTowers {
         this->TankSupplyVol = tankSupplyVdot * (state.dataHVACGlobal->TimeStepSysSec);
         this->StarvedMakeUpVdot = StarvedVdot;
         this->StarvedMakeUpVol = StarvedVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->coolingTowerApproach = this->OutletWaterTemp - this->AirWetBulb;
+        this->coolingTowerRange = this->InletWaterTemp - this->OutletWaterTemp;
     }
 
     void CoolingTower::update(EnergyPlusData &state)

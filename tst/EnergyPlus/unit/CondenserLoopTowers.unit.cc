@@ -4293,7 +4293,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CalculateVariableTowerOutletTemp)
     // cooling tower get input
     CondenserLoopTowers::GetTowerInput(*state);
     int index;
-    index = UtilityRoutines::FindItemInList("COOLINGTOWER-PLANT_LOOPS-170", state->dataCondenserLoopTowers->towers);
+    index = Util::FindItemInList("COOLINGTOWER-PLANT_LOOPS-170", state->dataCondenserLoopTowers->towers);
     auto &tower = state->dataCondenserLoopTowers->towers(index);
 
     // set node temperature
@@ -4302,7 +4302,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_CalculateVariableTowerOutletTemp)
 
     // calculate outlet temperature
     Real64 tOutlet = tower.calculateVariableTowerOutletTemp(*state, 0.25, 1.0, 14.1);
-    EXPECT_NEAR(16.63, tOutlet, 0.01);
+    EXPECT_NEAR(tower.WaterTemp - 22.2222, tOutlet, 0.01);
 }
 
 } // namespace EnergyPlus

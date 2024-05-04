@@ -301,6 +301,8 @@ namespace CondenserLoopTowers {
         Real64 TankSupplyVol = 0.0;
         Real64 StarvedMakeUpVdot = 0.0;
         Real64 StarvedMakeUpVol = 0.0;
+        Real64 coolingTowerApproach = 0.0;
+        Real64 coolingTowerRange = 0.0;
 
         // From VSTower struct - for Variable speed towers only
         std::array<Real64, 35> Coeff = {0.0}; // - model coefficients
