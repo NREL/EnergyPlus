@@ -58,8 +58,6 @@
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <EnergyPlus/Plant/PlantAvailManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 namespace EnergyPlus {
@@ -101,13 +99,11 @@ namespace DataAirLoop {
     {
         // Members
         int NumAvailManagers = 0;                                    // number of availability managers for this system
-        int AvailStatus = 0;                                         // system availability status
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;                                         // system availability status
         int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
         int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
         Real64 ReqSupplyFrac = 0.0;                                  // required system flow rate (as a fraction)
-        Array1D_string AvailManagerName;                             // name of each availability manager
-        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
-        Array1D_int AvailManagerNum;                                 // index for availability manager
+        Array1D<Avail::AvailManagerNTN> availManagers; // type of availability manager
     };
 
     struct AirLooptoZoneData // Derived type for air loop connection to zones on air loop

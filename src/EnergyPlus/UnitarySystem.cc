@@ -372,7 +372,7 @@ namespace UnitarySystems {
         // only access for zone equipment, UnitaySystem does not yet have input for Availability Manager List Name
         if (this->m_IsZoneEquipment &&
             (this->m_sysType == SysType::PackagedAC || this->m_sysType == SysType::PackagedHP || this->m_sysType == SysType::PackagedWSHP) &&
-            !state.dataHVACGlobal->ZoneComp.empty()) {
+            !state.dataAvail->ZoneComp.empty()) {
             // need to move to better location and save thisObjectIndex and thisObjectType in struct
             // this->m_EquipCompNum is by parent type, not total UnitarySystems
             // e.g., PTAC = 1,2,3; PTHP = 1,2; PTWSHP = 1,2,3,4; UnitarySystems = 9 total
@@ -391,12 +391,12 @@ namespace UnitarySystems {
                 break;
             }
             if (this->m_ZoneCompFlag) {
-                state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).AvailManagerListName =
+                state.dataAvail->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).AvailManagerListName =
                     this->m_AvailManagerListName;
-                state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).ZoneNum = this->ControlZoneNum;
+                state.dataAvail->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).ZoneNum = this->ControlZoneNum;
                 this->m_ZoneCompFlag = false;
             }
-            this->m_AvailStatus = state.dataHVACGlobal->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).AvailStatus;
+            this->m_AvailStatus = state.dataAvail->ZoneComp(thisObjectType).ZoneCompAvailMgrs(this->m_EquipCompNum).availStatus;
         }
 
         // sizing does not execute until SysSizing is complete. This means we may not know plant connections for zone equipment.
@@ -17362,7 +17362,7 @@ namespace UnitarySystems {
                     SetupOutputVariable(state,
                                         "Zone Packaged Terminal Air Conditioner Fan Availability Status",
                                         Constant::Units::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
+                                        (int&)state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
@@ -17484,7 +17484,7 @@ namespace UnitarySystems {
                     SetupOutputVariable(state,
                                         "Zone Packaged Terminal Heat Pump Fan Availability Status",
                                         Constant::Units::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
+                                        (int&)state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);
@@ -17606,7 +17606,7 @@ namespace UnitarySystems {
                     SetupOutputVariable(state,
                                         "Zone Water to Air Heat Pump Fan Availability Status",
                                         Constant::Units::None,
-                                        state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
+                                        (int&)state.dataUnitarySystems->unitarySys[sysNum].m_AvailStatus,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         state.dataUnitarySystems->unitarySys[sysNum].Name);

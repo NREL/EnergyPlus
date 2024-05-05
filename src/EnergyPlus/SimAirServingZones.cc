@@ -268,7 +268,6 @@ void GetAirPathData(EnergyPlusData &state)
     using MixedAir::GetOASystemNumber;
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
-    using SystemAvailabilityManager::GetAirLoopAvailabilityManager;
     using WaterCoils::GetCoilWaterInletNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1133,7 +1132,7 @@ void GetAirPathData(EnergyPlusData &state)
         }
 
         errFlag = false;
-        GetAirLoopAvailabilityManager(state, AvailManagerListName, AirSysNum, NumPrimaryAirSys, errFlag);
+        Avail::GetAirLoopAvailabilityManager(state, AvailManagerListName, AirSysNum, NumPrimaryAirSys, errFlag);
 
         if (errFlag) {
             ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, primaryAirSystems.Name));
@@ -1371,7 +1370,7 @@ void GetAirPathData(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Air System Simulation Cycle On Off Status",
                             Constant::Units::None,
-                            state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
+                            (int&)state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name);
@@ -2085,7 +2084,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
         if (numPrimaryAirSys > 0) {
             for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
-                e.AvailStatus = HVAC::NoAction;
+                e.availStatus = Avail::AvailStatus::NoAction;
                 e.StartTime = 0;
                 e.StopTime = 0;
             }
@@ -2461,10 +2460,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         state.dataHVACGlobal->TurnFansOn = false;
         state.dataHVACGlobal->TurnFansOff = false;
         state.dataHVACGlobal->NightVentOn = false;
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::CycleOn) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::CycleOn) {
             state.dataHVACGlobal->TurnFansOn = true;
         }
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::ForceOff) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::ForceOff) {
             state.dataHVACGlobal->TurnFansOff = true;
         }
         if (AirLoopControlInfo(AirLoopNum).NightVent) {
@@ -2536,10 +2535,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 state.dataHVACGlobal->TurnFansOn = false;
                 state.dataHVACGlobal->TurnFansOff = false;
                 state.dataHVACGlobal->NightVentOn = false;
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::CycleOn) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::CycleOn) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::ForceOff) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
                 if (AirLoopControlInfo(AirLoopNum).NightVent) {

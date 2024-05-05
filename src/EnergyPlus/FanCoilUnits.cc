@@ -960,7 +960,7 @@ namespace FanCoilUnits {
             SetupOutputVariable(state,
                                 "Fan Coil Availability Status",
                                 Constant::Units::None,
-                                fanCoil.AvailStatus,
+                                (int&)fanCoil.availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 fanCoil.Name);
@@ -1008,14 +1008,14 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->InitFanCoilUnitsOneTimeFlag = false;
         }
 
-        if (allocated(state.dataHVACGlobal->ZoneComp)) {
-            auto &availMgr = state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::FourPipeFanCoil).ZoneCompAvailMgrs(FanCoilNum);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::FourPipeFanCoil).ZoneCompAvailMgrs(FanCoilNum);
             if (state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = fanCoil.AvailManagerListName;
                 availMgr.ZoneNum = ControlledZoneNum;
                 state.dataFanCoilUnits->MyZoneEqFlag(FanCoilNum) = false;
             }
-            fanCoil.AvailStatus = availMgr.AvailStatus;
+            fanCoil.availStatus = availMgr.availStatus;
         }
 
         if (state.dataFanCoilUnits->MyPlantScanFlag(FanCoilNum) && allocated(state.dataPlnt->PlantLoop)) {

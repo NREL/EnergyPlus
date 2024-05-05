@@ -102,8 +102,6 @@ namespace EnergyPlus::Pumps {
 
 // Using/Aliasing
 using DataLoopNode::ObjectIsNotParent;
-using HVAC::CycleOn;
-using HVAC::ForceOff;
 using HVAC::SmallWaterVolFlow;
 
 static constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {
@@ -1718,8 +1716,8 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     }
 
     // Override pump operation based on System Availability Managers, should be done elsewhere?  I suppose this should be OK though
-    if (allocated(state.dataPlnt->PlantAvailMgr)) {
-        if (state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus == ForceOff) {
+    if (allocated(state.dataAvail->PlantAvailMgr)) {
+        if (state.dataAvail->PlantAvailMgr(LoopNum).availStatus == Avail::AvailStatus::ForceOff) {
             PumpMassFlowRateMax = 0.0;
             PumpMassFlowRateMin = 0.0;
         }

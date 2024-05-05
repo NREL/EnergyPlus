@@ -615,7 +615,7 @@ namespace UnitHeater {
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
                                 Constant::Units::None,
-                                state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus,
+                                (int&)state.dataUnitHeaters->UnitHeat(UnitHeatNum).availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);
@@ -658,8 +658,6 @@ namespace UnitHeater {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
@@ -696,14 +694,14 @@ namespace UnitHeater {
             state.dataUnitHeaters->InitUnitHeaterOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::UnitHeater).ZoneCompAvailMgrs(UnitHeatNum);
             if (state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailManagerListName;
                 availMgr.ZoneNum = ZoneNum;
                 state.dataUnitHeaters->MyZoneEqFlag(UnitHeatNum) = false;
             }
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AvailStatus = availMgr.AvailStatus;
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).availStatus = availMgr.availStatus;
         }
 
         if (state.dataUnitHeaters->MyPlantScanFlag(UnitHeatNum) && allocated(state.dataPlnt->PlantLoop)) {

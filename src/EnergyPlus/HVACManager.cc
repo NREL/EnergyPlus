@@ -226,7 +226,7 @@ void ManageHVAC(EnergyPlusData &state)
                                                                        state.dataHVACGlobal->UseZoneTimeStepHistory,
                                                                        PriorTimeStep);
 
-    SystemAvailabilityManager::ManageHybridVentilation(state);
+    Avail::ManageHybridVentilation(state);
 
     ZoneEquipmentManager::CalcAirFlowSimple(state);
     if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
@@ -319,7 +319,7 @@ void ManageHVAC(EnergyPlusData &state)
 
         if (state.dataHVACGlobal->TimeStepSys < state.dataGlobal->TimeStepZone) {
 
-            SystemAvailabilityManager::ManageHybridVentilation(state);
+            Avail::ManageHybridVentilation(state);
             ZoneEquipmentManager::CalcAirFlowSimple(state, SysTimestepLoop);
             if (state.afn->simulation_control.type != AirflowNetwork::ControlType::NoMultizoneOrDistribution) {
                 state.afn->RollBackFlag = false;
@@ -811,7 +811,7 @@ void SimHVAC(EnergyPlusData &state)
     PlantManager::ReInitPlantLoopsAtFirstHVACIteration(state);
 
     // Before the HVAC simulation, call ManageSystemAvailability to set the system on/off flags
-    SystemAvailabilityManager::ManageSystemAvailability(state);
+    Avail::ManageSystemAvailability(state);
 
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::AfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
     EMSManager::ManageEMS(state, EMSManager::EMSCallFrom::HVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
@@ -2275,7 +2275,8 @@ void ReportInfiltrations(EnergyPlusData &state)
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == Avail::AvailStatus::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(NZ) == Avail::AvailStatus::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2373,8 +2374,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::AvailStatus::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::AvailStatus::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
@@ -2429,8 +2430,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::AvailStatus::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == Avail::AvailStatus::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }

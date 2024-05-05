@@ -128,7 +128,7 @@ namespace UnitHeater {
         Real64 ElecPower;
         Real64 ElecEnergy;
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction; 
         bool FanOffNoHeating;    // True when fan is on during no heating load
         Real64 FanPartLoadRatio; // fan part-load ratio for time step
         int ZonePtr;             // pointer to a zone served by a unit heater
@@ -142,7 +142,7 @@ namespace UnitHeater {
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), HCoil_FluidIndex(0), MaxVolHotWaterFlow(0.0), MaxVolHotSteamFlow(0.0),
               MaxHotWaterFlow(0.0), MaxHotSteamFlow(0.0), MinVolHotWaterFlow(0.0), MinVolHotSteamFlow(0.0), MinHotWaterFlow(0.0),
               MinHotSteamFlow(0.0), HotControlNode(0), HotControlOffset(0.0), HotCoilOutNodeNum(0), HWplantLoc{}, PartLoadFrac(0.0), HeatPower(0.0),
-              HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), AvailStatus(0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0),
+              HeatEnergy(0.0), ElecPower(0.0), ElecEnergy(0.0), FanOffNoHeating(false), FanPartLoadRatio(0.0), ZonePtr(0),
               HVACSizingIndex(0), FirstPass(true)
         {
         }

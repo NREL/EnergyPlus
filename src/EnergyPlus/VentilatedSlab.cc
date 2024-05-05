@@ -1459,7 +1459,7 @@ namespace VentilatedSlab {
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Availability Status",
                                 Constant::Units::None,
-                                ventSlab.AvailStatus,
+                                (int&)ventSlab.availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
@@ -1490,7 +1490,6 @@ namespace VentilatedSlab {
         // na
 
         // Using/Aliasing
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -1556,14 +1555,14 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
             if (state.dataVentilatedSlab->MyZoneEqFlag(Item)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = ventSlab.AvailManagerListName;
                 availMgr.ZoneNum = VentSlabZoneNum;
                 state.dataVentilatedSlab->MyZoneEqFlag(Item) = false;
             }
-            ventSlab.AvailStatus = availMgr.AvailStatus;
+            ventSlab.availStatus = availMgr.availStatus;
         }
 
         if (state.dataVentilatedSlab->MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {

@@ -960,7 +960,7 @@ namespace UnitVentilator {
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Availability Status",
                                 Constant::Units::None,
-                                unitVent.AvailStatus,
+                                (int&)unitVent.availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 unitVent.Name);
@@ -1010,7 +1010,6 @@ namespace UnitVentilator {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &unitVent = state.dataUnitVentilators->UnitVent(UnitVentNum);
 
         static constexpr std::string_view RoutineName("InitUnitVentilator");
@@ -1031,14 +1030,14 @@ namespace UnitVentilator {
             state.dataUnitVentilators->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::UnitVentilator).ZoneCompAvailMgrs(UnitVentNum);
             if (state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = unitVent.AvailManagerListName;
                 availMgr.ZoneNum = ZoneNum;
                 state.dataUnitVentilators->MyZoneEqFlag(UnitVentNum) = false;
             }
-            unitVent.AvailStatus = availMgr.AvailStatus;
+            unitVent.availStatus = availMgr.availStatus;
         }
 
         if (state.dataUnitVentilators->MyPlantScanFlag(UnitVentNum) && allocated(state.dataPlnt->PlantLoop)) {

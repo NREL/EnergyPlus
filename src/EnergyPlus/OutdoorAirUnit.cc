@@ -1083,7 +1083,7 @@ namespace OutdoorAirUnit {
             SetupOutputVariable(state,
                                 "Zone Outdoor Air Unit Fan Availability Status",
                                 Constant::Units::None,
-                                thisOutAirUnit.AvailStatus,
+                                (int&)thisOutAirUnit.availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 thisOutAirUnit.Name);
@@ -1115,8 +1115,6 @@ namespace OutdoorAirUnit {
         // na
 
         // Using/Aliasing
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
         using DataZoneEquipment::CheckZoneEquipmentList;
         using FluidProperties::GetDensityGlycol;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
@@ -1150,14 +1148,14 @@ namespace OutdoorAirUnit {
             state.dataOutdoorAirUnit->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::OutdoorAirUnit).ZoneCompAvailMgrs(OAUnitNum);
             if (state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = thisOutAirUnit.AvailManagerListName;
                 availMgr.ZoneNum = ZoneNum;
                 state.dataOutdoorAirUnit->MyZoneEqFlag(OAUnitNum) = false;
             }
-            thisOutAirUnit.AvailStatus = availMgr.AvailStatus;
+            thisOutAirUnit.availStatus = availMgr.availStatus;
         }
 
         if (state.dataOutdoorAirUnit->MyPlantScanFlag(OAUnitNum) && allocated(state.dataPlnt->PlantLoop)) {

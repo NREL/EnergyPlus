@@ -8110,11 +8110,11 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     ProcessScheduleInput(*state);
     state->dataScheduleMgr->ScheduleInputProcessed = true;
     GetFanCoilUnits(*state);
-    SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
+    Avail::GetSysAvailManagerInputs(*state);
 
     auto &thisFanCoil(state->dataFanCoilUnits->FanCoil(1));
     auto &thisATMixer(state->dataSingleDuct->SysATMixer(1));
-    auto &thisAvaiManager(state->dataSystemAvailabilityManager->NightCycleData(1));
+    auto &thisAvaiManager(state->dataAvail->NightCycleData(1));
 
     // get input test for terminal air single duct mixer on inlet side of PTAC
     ASSERT_EQ(1, state->dataSingleDuct->NumATMixers);
@@ -8127,7 +8127,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
-    EXPECT_EQ(DataPlant::SystemAvailabilityType::NightCycle, thisAvaiManager.MgrType);
+    EXPECT_EQ((int)Avail::AvailManagerType::NightCycle, (int)thisAvaiManager.type);
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -8269,9 +8269,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     state->dataSize->ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
-    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime,
-                              state->dataSystemAvailabilityManager->NightCycleData(1).cyclingRunTimeControl));
-    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ((int)Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, (int)state->dataAvail->NightCycleData(1).cyclingRunTimeControl);
+    EXPECT_EQ((int)Avail::AvailStatus::NoAction, (int)state->dataAvail->NightCycleData(1).availStatus);
 
     // set predicted heating load
     zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 4000.0;
@@ -8289,21 +8288,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
 
     int SysAvailNum = 1;
     int PriAirSysNum = 0;
-    int AvailStatus;
     int constexpr ZoneEquipType = 1;
     int constexpr CompNum = 1;
     // current time is within the run time period, starting time is less than stopping time
     state->dataGlobal->SimTimeSteps = 0;
-    state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
-    state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
+    state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
+    state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    state->dataAvail->NightCycleData(1).availStatus = Avail::AvailStatus::NoAction;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    Avail::AvailStatus availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, ZoneEquipType, CompNum);
     // check that the NightCycle has turned on the equipment
-    EXPECT_EQ(HVAC::CycleOn, AvailStatus);
-    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ((int)Avail::AvailStatus::CycleOn, (int)availStatus);
+    EXPECT_EQ((int)Avail::AvailStatus::CycleOn, (int)state->dataAvail->NightCycleData(1).availStatus);
     // set zone equipment is CyclOn based on night cycle manager status
-    if (state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus == HVAC::CycleOn) {
+    if (state->dataAvail->NightCycleData(1).availStatus == Avail::AvailStatus::CycleOn) {
         state->dataHVACGlobal->TurnFansOn = true;
         state->dataHVACGlobal->TurnFansOff = false;
     }

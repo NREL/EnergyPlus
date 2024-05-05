@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -181,7 +182,7 @@ namespace UnitVentilator {
         Real64 ElecPower = 0.0;
         Real64 ElecEnergy = 0.0;
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus = 0;
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction; 
         Real64 FanPartLoadRatio = 0.0; // fan part-load ratio for time step
         Real64 PartLoadFrac = 0.0;     // unit ventilator part-load ratio for time step
         int ZonePtr = 0;               // pointer to a zone served by a unit ventilator

@@ -155,7 +155,7 @@ protected:
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
-        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, HVAC::NoAction);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, Avail::AvailStatus::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         state->dataSize->FinalZoneSizing.allocate(numZones);
         state->dataSize->FinalSysSizing.allocate(numAirloops);

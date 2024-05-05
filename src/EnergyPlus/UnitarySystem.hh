@@ -471,7 +471,7 @@ namespace UnitarySystems {
         Real64 m_HeatConvTol = 0.001;
         Real64 m_CoolConvTol = 0.001;
         int m_HVACSizingIndex = -1;
-        int m_AvailStatus = 0;
+        Avail::AvailStatus m_AvailStatus = Avail::AvailStatus::NoAction;
         bool m_IsZoneEquipment = false;
         bool m_ZoneCompFlag = true;
         std::string m_AvailManagerListName;

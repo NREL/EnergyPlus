@@ -238,11 +238,11 @@ namespace AirflowNetwork {
                 }
             }
         }
-        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0 &&
+        if (allocated(m_state.dataZoneEquip->ZoneEquipConfig) && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0 &&
             allocated(m_state.dataAirSystemsData->PrimaryAirSystems)) {
             hybrid_ventilation_control();
         }
-        if (VentilationCtrl == 1 && m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs > 0) {
+        if (ventCtrlStatus == Avail::VentCtrlStatus::Open && m_state.dataAvail->NumHybridVentSysAvailMgrs > 0) {
             AirflowNetworkFanActivated = false;
         }
 
@@ -11241,16 +11241,7 @@ namespace AirflowNetwork {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine performs hybrid ventilation control
 
-        auto &HybridVentSysAvailActualZoneNum = m_state.dataHVACGlobal->HybridVentSysAvailActualZoneNum;
-        auto &HybridVentSysAvailAirLoopNum = m_state.dataHVACGlobal->HybridVentSysAvailAirLoopNum;
-        auto &HybridVentSysAvailANCtrlStatus = m_state.dataHVACGlobal->HybridVentSysAvailANCtrlStatus;
-        auto &HybridVentSysAvailMaster = m_state.dataHVACGlobal->HybridVentSysAvailMaster;
-        auto &HybridVentSysAvailVentCtrl = m_state.dataHVACGlobal->HybridVentSysAvailVentCtrl;
-        auto &HybridVentSysAvailWindModifier = m_state.dataHVACGlobal->HybridVentSysAvailWindModifier;
-        auto &NumHybridVentSysAvailMgrs = m_state.dataHVACGlobal->NumHybridVentSysAvailMgrs;
-
         // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr HybridVentCtrl_Close(2);                                                                 // Open windows or doors
         int constexpr IndividualCtrlType(0);                                                                   // Individual window or door control
         int constexpr GlobalCtrlType(1);                                                                       // Global window or door control
         static constexpr std::string_view RoutineName("AirflowNetwork::Solver::hybrid_ventilation_control: "); // include trailing blank space
@@ -11270,11 +11261,12 @@ namespace AirflowNetwork {
         }
         ControlType = IndividualCtrlType;
 
-        for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
-            int AirLoopNum = HybridVentSysAvailAirLoopNum(SysAvailNum);
-            VentilationCtrl = HybridVentSysAvailVentCtrl(SysAvailNum);
-            if (HybridVentSysAvailANCtrlStatus(SysAvailNum) > 0) {
-                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, HybridVentSysAvailANCtrlStatus(SysAvailNum)));
+        for (SysAvailNum = 1; SysAvailNum <= m_state.dataAvail->NumHybridVentSysAvailMgrs; ++SysAvailNum) {
+            auto &hybridVentMgr = m_state.dataAvail->HybridVentData(SysAvailNum);
+            int AirLoopNum = hybridVentMgr.AirLoopNum;
+            ventCtrlStatus = hybridVentMgr.ctrlStatus;
+            if (hybridVentMgr.ANCtrlStatus > 0) {
+                ControlType = static_cast<int>(GetCurrentScheduleValue(m_state, hybridVentMgr.ANCtrlStatus));
             }
             bool Found = false; // Logical to indicate whether a master surface is found or not
             int ActualZoneNum = 0;
@@ -11288,8 +11280,8 @@ namespace AirflowNetwork {
                             break;
                         }
                     } else {
-                        if (HybridVentSysAvailActualZoneNum(SysAvailNum) == ControlledZoneNum) {
-                            ActualZoneNum = HybridVentSysAvailActualZoneNum(SysAvailNum);
+                        if (hybridVentMgr.ControlledZoneNum == ControlledZoneNum) {
+                            ActualZoneNum = hybridVentMgr.ControlledZoneNum;
                         }
                     }
                 }
@@ -11299,15 +11291,15 @@ namespace AirflowNetwork {
                         auto const &surf = m_state.dataSurface->Surface(SurfNum);
 
                         if (surf.Zone == ActualZoneNum) {
-                            if (VentilationCtrl == HybridVentCtrl_Close) {
+                            if (ventCtrlStatus == Avail::VentCtrlStatus::Close) {
                                 MultizoneSurfaceData(ANSurfaceNum).HybridVentClose = true;
                             } else {
-                                if (HybridVentSysAvailWindModifier(SysAvailNum) >= 0) {
-                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = HybridVentSysAvailWindModifier(SysAvailNum);
+                                if (hybridVentMgr.WindModifier >= 0) {
+                                    MultizoneSurfaceData(ANSurfaceNum).WindModifier = hybridVentMgr.WindModifier;
                                 }
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
-                                    if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
+                                    if (hybridVentMgr.Master == ActualZoneNum) {
                                         if ((surf.OriginalClass == SurfaceClass::Window || surf.OriginalClass == SurfaceClass::Door ||
                                              surf.OriginalClass == SurfaceClass::GlassDoor) &&
                                             surf.ExtBoundCond == ExternalEnvironment) {
@@ -11321,13 +11313,13 @@ namespace AirflowNetwork {
                     }
                 }
             }
-            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && VentilationCtrl != HybridVentCtrl_Close) {
+            if (ControlType == GlobalCtrlType && !Found && !m_state.dataGlobal->WarmupFlag && ventCtrlStatus != Avail::VentCtrlStatus::Close) {
                 ++HybridGlobalErrCount;
                 if (HybridGlobalErrCount < 2) {
                     ShowWarningError(m_state,
                                      format("{}The hybrid ventilation control schedule value indicates global control in the controlled zone = {}",
                                             RoutineName,
-                                            m_state.dataHeatBal->Zone(HybridVentSysAvailMaster(SysAvailNum)).Name));
+                                            m_state.dataHeatBal->Zone(hybridVentMgr.Master).Name));
                     ShowContinueError(m_state,
                                       "The exterior surface containing an opening component in the controlled zone is not found.  No global control "
                                       "will not be modeled.");

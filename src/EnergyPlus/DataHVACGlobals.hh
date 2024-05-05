@@ -55,7 +55,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Plant/PlantAvailManager.hh>
 
 namespace EnergyPlus {
 
@@ -93,12 +92,6 @@ namespace HVAC {
     int constexpr HeatingCapacitySizing(18);              // request sizing for heating capacity
     int constexpr SystemCapacitySizing(21);               // request sizing for system capacity
     int constexpr AutoCalculateSizing(25);                // identifies an autocalulate input
-
-    // The following parameters are used for system availability status
-    int constexpr NoAction(0);
-    int constexpr ForceOff(1);
-    int constexpr CycleOn(2);
-    int constexpr CycleOnZoneFansOnly(3);
 
     // The following parameters describe the setpoint types in TempControlType(ActualZoneNum)
     enum class ThermostatType
@@ -142,9 +135,6 @@ namespace HVAC {
     extern const std::array<std::string_view, (int)FanType::Num> fanTypeNames;
     extern const std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC;
 
-    // Fan Minimum Flow Fraction Input Method
-    int constexpr MinFrac(1);
-    int constexpr FixedMin(2);
     // Fan mode
 
     enum class FanOp
@@ -444,37 +434,6 @@ namespace HVAC {
         int OpType = 0;
     };
 
-    struct DefineZoneCompAvailMgrs
-    {
-        // Members
-        int NumAvailManagers = 0;                                    // number of availability managers for this system
-        int AvailStatus = 0;                                         // system availability status
-        int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
-        int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
-        std::string AvailManagerListName;                            // name of each availability manager
-        Array1D_string AvailManagerName;                             // name of each availability manager
-        Array1D<DataPlant::SystemAvailabilityType> AvailManagerType; // type of availability manager
-        Array1D_int AvailManagerNum;                                 // index for availability manager
-        int ZoneNum = 0;                                             // cycle off time (in SimTimeSteps)
-        bool Input = true;                                           // starts off as true to initialize zone equipment availability manager data
-        int Count = 0; // initialize twice to ensure zone equipment availability manager list name has been read in
-    };
-
-    struct ZoneCompTypeData
-    {
-        // Members
-        Array1D<DefineZoneCompAvailMgrs> ZoneCompAvailMgrs;
-        int TotalNumComp = 0; // total number of components of a zone equip type
-    };
-
-    struct OptStartDataType
-    {
-        // Members
-        Array1D_int ActualZoneNum;
-        Array1D<Real64> OccStartTime;
-        Array1D_bool OptStartFlag;
-    };
-
     // Compressor operation
     enum class CompressorOp
     {
@@ -488,18 +447,8 @@ namespace HVAC {
 struct HVACGlobalsData : BaseGlobalStruct
 {
     // Object Data
-    Array1D<HVAC::ZoneCompTypeData> ZoneComp;
-    HVAC::OptStartDataType OptStartData; // For optimum start
     Array1D<HVAC::ComponentSetPtData> CompSetPtEquip;
 
-    // Hybrid ventilation control part
-    int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control
-    Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
-    Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
     // For multispeed heat pump only
     Real64 MSHPMassFlowRateLow = 0.0;       // Mass flow rate at low speed
     Real64 MSHPMassFlowRateHigh = 0.0;      // Mass flow rate at high speed

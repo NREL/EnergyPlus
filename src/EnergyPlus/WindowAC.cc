@@ -684,7 +684,7 @@ namespace WindowAC {
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Fan Availability Status",
                                 Constant::Units::None,
-                                state.dataWindowAC->WindAC(WindACNum).AvailStatus,
+                                (int&)state.dataWindowAC->WindAC(WindACNum).availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
@@ -729,7 +729,6 @@ namespace WindowAC {
         // Uses the status flags to trigger initializations.
 
         using HVAC::SmallLoad;
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         using DataZoneEquipment::CheckZoneEquipmentList;
 
         int InNode;          // inlet node number in window AC loop
@@ -754,14 +753,14 @@ namespace WindowAC {
             state.dataWindowAC->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::WindowAirConditioner).ZoneCompAvailMgrs(WindACNum);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::WindowAirConditioner).ZoneCompAvailMgrs(WindACNum);
             if (state.dataWindowAC->MyZoneEqFlag(WindACNum)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = state.dataWindowAC->WindAC(WindACNum).AvailManagerListName;
                 availMgr.ZoneNum = ZoneNum;
                 state.dataWindowAC->MyZoneEqFlag(WindACNum) = false;
             }
-            state.dataWindowAC->WindAC(WindACNum).AvailStatus = availMgr.AvailStatus;
+            state.dataWindowAC->WindAC(WindACNum).availStatus = availMgr.availStatus;
         }
 
         // need to check all Window AC units to see if they are on Zone Equipment List or issue warning

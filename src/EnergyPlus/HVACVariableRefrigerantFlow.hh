@@ -700,7 +700,7 @@ namespace HVACVariableRefrigerantFlow {
         bool HeatingCoilPresent = true;                    // FALSE if coil not present
         bool SuppHeatingCoilPresent = false;               // FALSE if coil not present
         std::string AvailManagerListName;                  // Name of an availability manager list object
-        int AvailStatus = 0;
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
         Real64 TerminalUnitSensibleRate = 0.0;  // sensible cooling/heating rate of VRF terminal unit (W)
         Real64 TerminalUnitLatentRate = 0.0;    // latent dehumidification/humidification rate of VRF terminal unit (W)
         Real64 TotalCoolingRate = 0.0;          // report variable for total cooling rate (W)

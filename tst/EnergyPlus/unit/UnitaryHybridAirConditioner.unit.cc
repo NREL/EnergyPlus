@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     thisUnitary.InitializeModelParams();
     thisUnitary.SecInletTemp = Tosa;
     thisUnitary.SecInletHumRat = Wosa;
-    thisUnitary.AvailStatus = 1;
+    thisUnitary.availStatus = Avail::AvailStatus::ForceOff;
     thisUnitary.doStep(*state, RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results

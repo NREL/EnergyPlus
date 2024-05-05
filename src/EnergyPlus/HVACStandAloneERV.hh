@@ -106,7 +106,7 @@ namespace HVACStandAloneERV {
         Real64 AirVolFlowPerOccupant;    // Air flow rate per occupant, used for autosizing
         int EconomizerOASchedPtr;        // schedule to modify outdoor air
         bool FlowError;                  // used for one-time warning message for flow imbalance (Init)
-        int AvailStatus;
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // report variables
         Real64 ElecUseRate;       // total electric use rate (power) for supply/exhaust fans & generic HX parasitics [W]
@@ -133,7 +133,7 @@ namespace HVACStandAloneERV {
               ControllerNameDefined(false), ControlledZoneNum(0), ControllerIndex(0), MaxSupAirMassFlow(0.0), MaxExhAirMassFlow(0.0),
               HighRHOAFlowRatio(1.0), DesignSAFanVolFlowRate(0.0), DesignEAFanVolFlowRate(0.0), DesignHXVolFlowRate(0.0),
               DesignSAFanMassFlowRate(0.0), DesignEAFanMassFlowRate(0.0), AirVolFlowPerFloorArea(0.0), AirVolFlowPerOccupant(0.0),
-              EconomizerOASchedPtr(0), FlowError(true), AvailStatus(0), ElecUseRate(0.0), ElecUseEnergy(0.0), SensCoolingEnergy(0.0),
+              EconomizerOASchedPtr(0), FlowError(true), ElecUseRate(0.0), ElecUseEnergy(0.0), SensCoolingEnergy(0.0),
               SensCoolingRate(0.0), LatCoolingEnergy(0.0), LatCoolingRate(0.0), TotCoolingEnergy(0.0), TotCoolingRate(0.0), SensHeatingEnergy(0.0),
               SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
         {

@@ -64,6 +64,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EPVector.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -324,7 +325,7 @@ namespace AirflowNetwork {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
-        int VentilationCtrl = 0;  // Hybrid ventilation control type
+        Avail::VentCtrlStatus ventCtrlStatus = Avail::VentCtrlStatus::NoAction;  // Hybrid ventilation control type
         int NumOfExhaustFans = 0; // Number of exhaust fans
         int NumAirflowNetwork = 0;
         int AirflowNetworkNumOfDetOpenings = 0;
@@ -548,7 +549,7 @@ namespace AirflowNetwork {
             MA.deallocate();
             MV.deallocate();
             IVEC.deallocate();
-            VentilationCtrl = 0;
+            ventCtrlStatus = Avail::VentCtrlStatus::NoAction;
             NumOfExhaustFans = 0;
             NumAirflowNetwork = 0;
             AirflowNetworkNumOfDetOpenings = 0;

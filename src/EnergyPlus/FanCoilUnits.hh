@@ -62,6 +62,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -165,7 +166,7 @@ namespace FanCoilUnits {
         Real64 MinHotWaterFlow = 0.0;       // kg/s
         Real64 HotControlOffset = 0.0;      // control tolerance
         Real64 DesignHeatingCapacity = 0.0; // size of electric heating coil [W]
-        int AvailStatus = 0;
+        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // addition for OA to Zone Units
         std::string ATMixerName;        // name of air terminal mixer

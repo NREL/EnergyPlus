@@ -4797,7 +4797,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         SetupOutputVariable(state,
                             "Zone VRF Air Terminal Fan Availability Status",
                             Constant::Units::None,
-                            thisVrfTU.AvailStatus,
+                            (int&)thisVrfTU.availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             thisVrfTU.Name);
@@ -5622,15 +5622,15 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
         }
     }
 
-    if (allocated(state.dataHVACGlobal->ZoneComp)) {
+    if (allocated(state.dataAvail->ZoneComp)) {
         auto &availMgr =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
+            state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
         if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
             state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum) = false;
         }
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailStatus = availMgr.AvailStatus;
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).availStatus = availMgr.availStatus;
     }
 
     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MySuppCoilPlantScanFlag && allocated(state.dataPlnt->PlantLoop)) {
