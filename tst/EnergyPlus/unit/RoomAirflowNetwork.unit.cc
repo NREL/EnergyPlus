@@ -72,6 +72,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
@@ -633,10 +634,10 @@ TEST_F(EnergyPlusFixture, RoomAirflowNetwork_CheckEquipName_Test)
     state->dataLoopNodes->NodeID(1) = "SupplyNode1";
     state->dataLoopNodes->NodeID(2) = "ReturnNode1";
     zoneEquipType = DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator;
-    state->dataFans->GetFanInputFlag = false;
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->Fan(1).FanName = EquipName;
-    state->dataFans->Fan(1).OutletNodeNum = 1;
+    state->dataHVACStandAloneERV->GetERVInputFlag = false;
+    state->dataHVACStandAloneERV->StandAloneERV.allocate(1);
+    state->dataHVACStandAloneERV->NumStandAloneERVs = 1;
+    state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 1;
     check = CheckEquipName(*state, EquipName, SupplyNodeName, ReturnNodeName, EquipIndex, zoneEquipType);
     if (check) {
         EXPECT_EQ("SupplyNode1", SupplyNodeName);

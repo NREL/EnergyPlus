@@ -75,6 +75,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -2729,7 +2730,7 @@ namespace RoomAir {
             SupplyNodeNum = HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator: { // ZoneHVAC : EnergyRecoveryVentilator
-            // SupplyNodeNum = GetFanOutletNode(state, "Fan:OnOff", EquipName, errorfound);
+            SupplyNodeNum = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
             SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex);
