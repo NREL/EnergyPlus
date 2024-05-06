@@ -5210,7 +5210,7 @@ namespace CondenserLoopTowers {
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked)
             return; // TODO: WTF
         // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= HVAC::VerySmallMassFlow) {
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
@@ -5880,7 +5880,7 @@ namespace CondenserLoopTowers {
             } else {
                 ShowRecurringWarningErrorAtEnd(
                     state,
-                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}.",
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}",
                            this->Name,
                            this->MaxRangeTemp),
                     this->ErrIndexTRCalc);
