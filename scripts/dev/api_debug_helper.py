@@ -77,13 +77,21 @@ from subprocess import check_call
 from sys import exit, path
 from tempfile import mkdtemp
 
+DO_BUILD = False
+
 repo_root = Path(__file__).resolve().parent.parent.parent
-build_dir = repo_root / 'builds' / 'r'
-products_dir = build_dir / 'Products'
 file_to_run = repo_root / 'testfiles' / 'PythonPluginCustomOutputVariable.idf'
 
-# this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
-check_call(['make', '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
+if DO_BUILD:
+    build_dir = repo_root / 'cmake-build-debug'
+    products_dir = build_dir / 'Products'
+    make_tool = '/snap/clion/current/bin/ninja/linux/x64/ninja'  # 'make'
+
+    # this will automatically build E+ each run, so you can quickly make changes and re-execute inside the debugger
+    check_call([make_tool, '-j', str(cpu_count() - 2), 'energyplus'], cwd=str(build_dir))
+else:
+    products_dir = '/tmp/EnergyPlus-24.1.0-241fc81186-Linux-Ubuntu22.04-x86_64'
+
 
 path.insert(0, str(products_dir))
 from pyenergyplus.api import EnergyPlusAPI

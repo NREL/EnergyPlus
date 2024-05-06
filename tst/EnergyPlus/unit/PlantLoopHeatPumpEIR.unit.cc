@@ -3166,11 +3166,11 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
 
     EXPECT_EQ(2, NumFound);
     EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::Invalid));
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::Plant));
+    EXPECT_TRUE(compare_enums(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid));
+    EXPECT_TRUE(compare_enums(meteredVars(1).group, OutputProcessor::Group::Plant));
     EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::Plant));
+    EXPECT_TRUE(compare_enums(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Cooling));
+    EXPECT_TRUE(compare_enums(meteredVars(2).group, OutputProcessor::Group::Plant));
 }
 
 TEST_F(EnergyPlusFixture, HeatingMetering)
@@ -3257,11 +3257,11 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
 
     EXPECT_EQ(2, NumFound);
     EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovEndUseCat, OutputProcessor::SOVEndUseCat::Invalid));
-    EXPECT_TRUE(compare_enums(meteredVars(1).sovGroup, OutputProcessor::SOVGroup::Plant));
+    EXPECT_TRUE(compare_enums(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid));
+    EXPECT_TRUE(compare_enums(meteredVars(1).group, OutputProcessor::Group::Plant));
     EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovEndUseCat, OutputProcessor::SOVEndUseCat::Heating));
-    EXPECT_TRUE(compare_enums(meteredVars(2).sovGroup, OutputProcessor::SOVGroup::Plant));
+    EXPECT_TRUE(compare_enums(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Heating));
+    EXPECT_TRUE(compare_enums(meteredVars(2).group, OutputProcessor::Group::Plant));
 }
 
 TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
@@ -3499,6 +3499,7 @@ TEST_F(EnergyPlusFixture, Test_Curve_Negative_Energy)
     thisCoolingPLHP->loadSideInletTemp = 20;
     thisCoolingPLHP->sourceSideInletTemp = 20;
     thisCoolingPLHP->doPhysics(*state, curLoad);
+    thisCoolingPLHP->report(*state);
 
     // Power and energy are now zero since the curve is reset with zero values
     EXPECT_NEAR(thisCoolingPLHP->powerUsage, 0.000, 1e-3);
@@ -4306,6 +4307,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
 
     // for now we know the order is maintained, so get each heat pump object
     EIRFuelFiredHeatPump *thisHeatingPLHP = &state->dataEIRFuelFiredHeatPump->heatPumps[0];
+    auto thisEIRPlantLoopHP = &(*(EIRPlantLoopHeatPump *)thisHeatingPLHP);
 
     // do a bit of extra wiring up to the plant
     PLHPPlantLoadSideComp.Name = thisHeatingPLHP->name;
@@ -4363,6 +4365,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         // expect it to meet setpoint and have some pre-evaluated conditions
         // EXPECT_NEAR(specifiedLoadSetpoint, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(curLoad, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
+        EXPECT_NEAR(18020.0, thisEIRPlantLoopHP->powerUsage, 0.001);
     }
 
     // now we can call it again from the load side, but this time there is load (still firsthvac, unit cannot meet load)
@@ -4381,6 +4384,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         thisHeatingPLHP->simulate(*state, myLoadLocation, firstHVAC, curLoad, runFlag);
         EXPECT_NEAR(28800.0, thisHeatingPLHP->fuelRate, 0.001);
         EXPECT_NEAR(25920000.0, thisHeatingPLHP->fuelEnergy, 0.001);
+        EXPECT_NEAR(18020.0, thisEIRPlantLoopHP->powerUsage, 0.001);
         // expect it to miss setpoint and be at max capacity
         // EXPECT_NEAR(44.402, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         // EXPECT_NEAR(availableCapacity, thisHeatingPLHP->loadSideHeatTransfer, 0.001);
@@ -4402,6 +4406,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingSimulate_AirSource_with_Defrost)
         // expect it to miss setpoint and be at max capacity
         EXPECT_NEAR(45.0, thisHeatingPLHP->loadSideOutletTemp, 0.001);
         EXPECT_NEAR(30.0, thisHeatingPLHP->sourceSideOutletTemp, 0.001);
+        EXPECT_NEAR(0.0, thisEIRPlantLoopHP->powerUsage, 0.001);
     }
 }
 
