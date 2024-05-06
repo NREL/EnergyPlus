@@ -1031,11 +1031,11 @@ namespace StandardRatings {
         // Using/Aliasing
         using Curve::CurveValue;
         using Curve::GetCurveMinMaxValues;
-        using DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::Coil_CoolingAirToAirVariableSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Argument array dimensioning
         RatedTotalCapacity.dim(ns);
@@ -5313,12 +5313,12 @@ namespace StandardRatings {
         // Using/Aliasing
 
         using namespace OutputReportPredefined;
-        using DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_CoolingTwoSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::Coil_CoolingAirToAirVariableSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_CoolingTwoSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5576,7 +5576,7 @@ namespace StandardRatings {
         // Using/Aliasing
 
         using namespace OutputReportPredefined;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5683,10 +5683,10 @@ namespace StandardRatings {
         using Curve::GetCurveIndex;
         using Curve::GetCurveMinMaxValues;
         using Curve::GetCurveName;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

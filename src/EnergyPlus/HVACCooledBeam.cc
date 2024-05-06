@@ -102,10 +102,10 @@ namespace HVACCooledBeam {
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace ScheduleManager;
-    using DataHVACGlobals::SmallAirVolFlow;
-    using DataHVACGlobals::SmallLoad;
-    using DataHVACGlobals::SmallMassFlow;
-    using DataHVACGlobals::SmallWaterVolFlow;
+    using HVAC::SmallAirVolFlow;
+    using HVAC::SmallLoad;
+    using HVAC::SmallMassFlow;
+    using HVAC::SmallWaterVolFlow;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;

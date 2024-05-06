@@ -91,7 +91,7 @@ namespace BaseboardRadiator {
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
+    using HVAC::SmallLoad;
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
@@ -641,7 +641,7 @@ namespace BaseboardRadiator {
                     std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
-                    int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                    int SizingMethod = HVAC::HeatingCapacitySizing;
                     int FieldNum = 1;
                     std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
@@ -763,7 +763,7 @@ namespace BaseboardRadiator {
                     std::string_view const CompName = this->EquipID;
                     state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
                     state.dataSize->DataZoneNumber = this->ZonePtr;
-                    int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+                    int SizingMethod = HVAC::HeatingCapacitySizing;
                     int FieldNum = 1;
                     std::string const SizingString = format("{} [W]", this->FieldNames(FieldNum));
                     int CapSizingMethod = this->HeatingCapMethod;
@@ -962,7 +962,7 @@ namespace BaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::SmallLoad;
+        using HVAC::SmallLoad;
         using PlantUtilities::SetActuatedBranchFlowRate;
 
         // SUBROUTINE PARAMETER DEFINITIONS:

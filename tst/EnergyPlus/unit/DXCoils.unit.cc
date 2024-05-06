@@ -79,7 +79,6 @@ using namespace EnergyPlus;
 using namespace DXCoils;
 using namespace DataAirLoop;
 using namespace DataAirSystems;
-using namespace DataHVACGlobals;
 using namespace DataSizing;
 using namespace Curve;
 using namespace OutputReportPredefined;
@@ -98,9 +97,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     state->dataDXCoils->DXCoil(1).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+    state->dataDXCoils->DXCoil(2).DXCoilType_Num = HVAC::CoilDX_MultiSpeedHeating;
     state->dataDXCoils->DXCoil(2).DXCoilType = "Coil:Heating:DX:MultiSpeed";
     state->dataDXCoils->DXCoil(1).MSRatedTotCap.allocate(2);
     state->dataDXCoils->DXCoil(2).MSRatedTotCap.allocate(2);
@@ -259,7 +258,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     CalcMultiSpeedDXCoilCooling(*state, CoilIndex, SpeedRatio, CycRatio, SpeedNum, FanOpMode, CompressorOp, SingleMode);
 
@@ -294,8 +293,8 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     DXCoilNum = 2;
     state->dataSize->UnitarySysEqSizing.allocate(1);
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
-    state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilDX_HeatingEmpirical;
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
+    state->dataDXCoils->DXCoil(2).DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     state->dataDXCoils->DXCoil(DXCoilNum).DXCoilType = "Coil:Heating:DX:SingleSpeed";
     state->dataDXCoils->DXCoil(2).CompanionUpstreamDXCoil = 1;
 
@@ -404,7 +403,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     DXCoilData &Coil = state->dataDXCoils->DXCoil(DXCoilNum);
 
     Coil.DXCoilType = "Coil:Heating:DX:MultiSpeed";
-    Coil.DXCoilType_Num = CoilDX_MultiSpeedHeating;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedHeating;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
 
     state->dataDXCoils->DXCoilNumericFields.allocate(state->dataDXCoils->NumDXCoils);
@@ -667,7 +666,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Real64 SpeedRatio = 1.0;
     Real64 CycRatio = 1.0;
     int SpeedNum = 2;
-    int const FanOpMode = ContFanCycCoil;
+    int const FanOpMode = HVAC::ContFanCycCoil;
 
     // Defroster on
     state->dataEnvrn->OutDryBulbTemp = -5.0; // cold
@@ -676,6 +675,15 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
                           (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
     Real64 COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
     EXPECT_LT(COPwDefrost, COPwoDefrost);
+
+    // Defroster on, but not running (DefrostTime == 0)
+    Coil.DefrostTime = 0.0;
+    CalcMultiSpeedDXCoilHeating(*state, DXCoilNum, SpeedRatio, CycRatio, SpeedNum, FanOpMode, 0);
+    COPwoDefrost = Coil.MSRatedCOP(SpeedNum) /
+                   (CurveValue(*state, nEIRfT2, Coil.InletAirTemp, state->dataEnvrn->OutDryBulbTemp) * CurveValue(*state, nEIRfFF2, 1));
+    COPwDefrost = Coil.TotalHeatingEnergyRate / Coil.ElecHeatingPower;
+    EXPECT_NEAR(COPwDefrost, COPwoDefrost, 0.0001);
+    Coil.DefrostTime = 0.058333;
 
     // Defroster off
     state->dataEnvrn->OutDryBulbTemp = 5.0; // not cold enough for defroster
@@ -783,7 +791,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     state->dataLoopNodes->Node.allocate(1);
     Coil.AirOutNode = 1;
@@ -905,7 +913,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.InletAirHumRat = 0.008;
     Coil.InletAirEnthalpy = PsyHFnTdbW(Coil.InletAirTemp, Coil.InletAirHumRat);
 
-    int const FanOpMode = ContFanCycCoil;
+    int const FanOpMode = HVAC::ContFanCycCoil;
     Real64 constexpr PLR = 1.0;
 
     // Defrost Off
@@ -1934,47 +1942,47 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     GetDXCoils(*state);
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
     // Coil:Cooling:DX:SingleSpeed
-    EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, CoilDX_CoolingSingleSpeed);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(1).DXCoilType_Num, HVAC::CoilDX_CoolingSingleSpeed);
     EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(1).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Cooling:DX:TwoStageWithHumidityControlMode
-    EXPECT_EQ(state->dataDXCoils->DXCoil(2).DXCoilType_Num, CoilDX_CoolingTwoStageWHumControl);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(2).DXCoilType_Num, HVAC::CoilDX_CoolingTwoStageWHumControl);
     EXPECT_EQ("HEATERCAPCURVE7", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(2).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Heating:DX:SingleSpeed
-    EXPECT_EQ(state->dataDXCoils->DXCoil(3).DXCoilType_Num, CoilDX_HeatingEmpirical);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(3).DXCoilType_Num, HVAC::CoilDX_HeatingEmpirical);
     EXPECT_EQ("HEATERCAPCURVE2", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(3).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:WaterHeating:AirToWaterHeatPump:Pumped
-    EXPECT_EQ(state->dataDXCoils->DXCoil(4).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterPumped);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(4).DXCoilType_Num, HVAC::CoilDX_HeatPumpWaterHeaterPumped);
     EXPECT_EQ("HEATERCAPCURVE9", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(4).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:WaterHeating:AirToWaterHeatPump:Wrapped
-    EXPECT_EQ(state->dataDXCoils->DXCoil(5).DXCoilType_Num, CoilDX_HeatPumpWaterHeaterWrapped);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(5).DXCoilType_Num, HVAC::CoilDX_HeatPumpWaterHeaterWrapped);
     EXPECT_EQ("HEATERCAPCURVE8", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(5).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Cooling:DX:MultiSpeed
-    EXPECT_EQ(state->dataDXCoils->DXCoil(6).DXCoilType_Num, CoilDX_MultiSpeedCooling);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(6).DXCoilType_Num, HVAC::CoilDX_MultiSpeedCooling);
     EXPECT_EQ("HEATERCAPCURVE3", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(6).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Heating:DX:MultiSpeed
-    EXPECT_EQ(state->dataDXCoils->DXCoil(7).DXCoilType_Num, CoilDX_MultiSpeedHeating);
+    EXPECT_EQ(state->dataDXCoils->DXCoil(7).DXCoilType_Num, HVAC::CoilDX_MultiSpeedHeating);
     EXPECT_EQ("HEATERCAPCURVE4", Curve::GetCurveName(*state, state->dataDXCoils->DXCoil(7).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Cooling:DX:VariableSpeed
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).VSCoilType, Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(1).VSCoilType, HVAC::Coil_CoolingAirToAirVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE5", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(1).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:Heating:DX:VariableSpeed
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).VSCoilType, Coil_HeatingAirToAirVariableSpeed);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(2).VSCoilType, HVAC::Coil_HeatingAirToAirVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE6", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(2).CrankcaseHeaterCapacityCurveIndex));
 
     // Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed
-    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(3).VSCoilType, CoilDX_HeatPumpWaterHeaterVariableSpeed);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(3).VSCoilType, HVAC::CoilDX_HeatPumpWaterHeaterVariableSpeed);
     EXPECT_EQ("HEATERCAPCURVE10", Curve::GetCurveName(*state, state->dataVariableSpeedCoils->VarSpeedCoil(3).CrankcaseHeaterCapacityCurveIndex));
 
     state->dataEnvrn->OutDryBulbTemp = -5.0;
-    int const FanOpMode = ContFanCycCoil;
+    int const FanOpMode = HVAC::ContFanCycCoil;
     Real64 PLR = 0.0;
     int DXCoilNum = 1;
     CalcDXHeatingCoil(*state, DXCoilNum, PLR, FanOpMode);
@@ -1988,7 +1996,7 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
 
     Real64 SpeedRatio = 0.0;
     Real64 CycRatio = 1.0;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
 
     int VarSpeedCoilNum = 1;
@@ -2072,21 +2080,21 @@ TEST_F(EnergyPlusFixture, TestReadingCoilCoolingHeatingDX)
     DXCoilNum = 2;
     bool FirstHVACIteration = true;
     Real64 AirFlowRatio = 1.0;
-    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, HVAC::CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
     EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
 
     // Coil:WaterHeating:AirToWaterHeatPump:Pumped,
     // for water heaters, the following temperature is used in heater capacity curve calculation
     state->dataHVACGlobal->HPWHCrankcaseDBTemp = -6.0;
     DXCoilNum = 4;
-    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, HVAC::CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
     // heaterCapCurve9, power = 31 + 2x
     EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 190.0);
 
     // Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
     DXCoilNum = 5;
     state->dataHVACGlobal->HPWHCrankcaseDBTemp = -7.0;
-    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
+    DXCoils::CalcDoe2DXCoil(*state, DXCoilNum, HVAC::CompressorOperation::On, FirstHVACIteration, PLR, FanOpMode, _, AirFlowRatio);
     // heaterCapCurve8, power = 30 + 2x
     EXPECT_EQ(state->dataDXCoils->DXCoil(DXCoilNum).CrankcaseHeaterPower, 160.0);
 }
@@ -2349,7 +2357,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSRatedCBF(1) = 0.1262;
     state->dataDXCoils->DXCoil(1).MSRatedCBF(2) = 0.0408;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, HVAC::CompressorOperation::On, 0);
     EXPECT_EQ(0, state->dataHVACGlobal->MSHPWasteHeat);
 
     // Case 3 heat recovery is true and no waste heat function cuvre
@@ -2357,7 +2365,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     state->dataDXCoils->DXCoil(1).MSWasteHeat(2) = 0;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = true;
 
-    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, DataHVACGlobals::CompressorOperation::On, 0);
+    CalcMultiSpeedDXCoilCooling(*state, 1, 1, 1, 2, 1, HVAC::CompressorOperation::On, 0);
 
     EXPECT_NEAR(1302.748, state->dataHVACGlobal->MSHPWasteHeat, 0.001);
 }
@@ -2480,7 +2488,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesCoolingLoad = state->dataDXCoils->DXCoil(1).RatedTotCap(1);
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
     state->dataSize->NumZoneSizingInput = 1;
@@ -3232,8 +3240,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -3249,7 +3257,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     // Fake having a parent coil setting the size
     // UnitarySysEqSizing(DXCoilNum).CoolingCapacity = true;
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -3457,8 +3465,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->SysSizInput.allocate(1);
@@ -3473,7 +3481,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     state->dataSize->OASysEqSizing.allocate(1);
 
     // Get into a block so that it sets the RatedTotCap
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Cooling;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
     // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
@@ -4591,8 +4599,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
@@ -4876,8 +4884,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).NumOACoolCoils = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).SupFanNum = 0;
-    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).RetFanNum = 0;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).supFanNum = -1;
+    state->dataAirSystemsData->PrimaryAirSystems(state->dataSize->CurSysNum).retFanNum = -1;
 
     state->dataSize->SysSizInput.allocate(1);
     state->dataSize->SysSizInput(1).AirLoopNum = state->dataSize->CurSysNum;
@@ -4922,9 +4930,9 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
 
     state->dataDXCoils->NumDXCoils = 2;
     state->dataDXCoils->DXCoil.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoil(1).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+    state->dataDXCoils->DXCoil(1).DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     state->dataDXCoils->DXCoil(1).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
-    state->dataDXCoils->DXCoil(2).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+    state->dataDXCoils->DXCoil(2).DXCoilType_Num = HVAC::CoilDX_MultiSpeedHeating;
     state->dataDXCoils->DXCoil(2).DXCoilType = "Coil:Heating:DX:MultiSpeed";
 
     for (DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
@@ -5073,7 +5081,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     auto &AirInletNode = state->dataLoopNodes->Node(1);
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
     // set coil parameters
-    Coil.DXCoilType_Num = CoilDX_CoolingSingleSpeed;
+    Coil.DXCoilType_Num = HVAC::CoilDX_CoolingSingleSpeed;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedTotCap(1) = 17580.0;
     Coil.RatedCOP(1) = 3.0;
@@ -5137,7 +5145,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedDXCoolingCoilOutputTest)
     Real64 PartLoadRatio(1.0);
     Real64 AirFlowRatio(1.0);
     int FanOpMode(2);
-    CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     CalcDoe2DXCoil(*state, DXCoilNum, CompressorOp, true, PartLoadRatio, FanOpMode, _, AirFlowRatio);
     EXPECT_NEAR(17580.0, Coil.TotalCoolingEnergyRate, 0.0001);   // equals fully capacity
     EXPECT_NEAR(17580.0, Coil.SensCoolingEnergyRate, 0.0001);    // sensible cooling only
@@ -5224,7 +5232,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     auto &AirInletNode = state->dataLoopNodes->Node(1);
     auto &AirOutletNode = state->dataLoopNodes->Node(2);
 
-    Coil.DXCoilType_Num = CoilDX_MultiSpeedCooling;
+    Coil.DXCoilType_Num = HVAC::CoilDX_MultiSpeedCooling;
     Coil.DXCoilType = "Coil:Cooling:DX:MultiSpeed";
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.NumOfSpeeds = 2;
@@ -5319,7 +5327,7 @@ TEST_F(EnergyPlusFixture, MultiSpeedDXCoolingCoilOutputTest)
     state->dataEnvrn->WindDir = 0.0;
     int SpeedNum = 2;
     int FanOpMode = 1;
-    CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     int SingleMode = 0;
     // run the coil at low speed
     Real64 SpeedRatio = 0.0;
@@ -5518,19 +5526,19 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
     int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
+    int fanIndex = Fans::GetFanIndex(*state, "FAN VARIABLE VOLUME");
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
-    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    auto *supplyFan = state->dataFans->fans(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
-    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan->Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan->type;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
-    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
-    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
-    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    supplyFan->maxAirMassFlowRate = supplyFan->maxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan->inletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan->outletNodeNum);
     InletNode.MassFlowRate = 1.0;
     InletNode.MassFlowRateMax = 1.0;
     InletNode.MassFlowRateMaxAvail = 1.0;
@@ -5544,7 +5552,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatingsTest)
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
     EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
-    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, HVAC::CoilDX_CoolingTwoSpeed);
     EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
     EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
     EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));
@@ -5756,19 +5764,19 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     Fans::GetFanInput(*state);
     GetDXCoils(*state);
     int dXCoilIndex = Util::FindItemInList("CCOOLING DX TWO SPEED", state->dataDXCoils->DXCoil);
-    int fanIndex = Util::FindItemInList("FAN VARIABLE VOLUME", state->dataFans->Fan, &Fans::FanEquipConditions::Name);
+    int fanIndex = Fans::GetFanIndex(*state, "FAN VARIABLE VOLUME");
     auto &coolcoilTwoSpeed = state->dataDXCoils->DXCoil(dXCoilIndex);
-    auto &supplyFan = state->dataFans->Fan(fanIndex);
+    auto *supplyFan = state->dataFans->fans(fanIndex);
     coolcoilTwoSpeed.SupplyFanIndex = fanIndex;
-    coolcoilTwoSpeed.SupplyFanName = supplyFan.Name;
-    coolcoilTwoSpeed.supplyFanType = supplyFan.fanType;
+    coolcoilTwoSpeed.SupplyFanName = supplyFan->Name;
+    coolcoilTwoSpeed.supplyFanType = supplyFan->type;
     state->dataGlobal->SysSizingCalc = true;
     coolcoilTwoSpeed.RatedAirMassFlowRate(1) = coolcoilTwoSpeed.RatedAirVolFlowRate(1) * state->dataEnvrn->StdRhoAir;
     coolcoilTwoSpeed.RatedAirMassFlowRate2 = coolcoilTwoSpeed.RatedAirVolFlowRate2 * state->dataEnvrn->StdRhoAir;
-    supplyFan.MaxAirMassFlowRate = supplyFan.MaxAirFlowRate * state->dataEnvrn->StdRhoAir;
-    supplyFan.RhoAirStdInit = state->dataEnvrn->StdRhoAir;
-    auto &InletNode = state->dataLoopNodes->Node(supplyFan.InletNodeNum);
-    auto &OutletNode = state->dataLoopNodes->Node(supplyFan.OutletNodeNum);
+    supplyFan->maxAirMassFlowRate = supplyFan->maxAirFlowRate * state->dataEnvrn->StdRhoAir;
+    supplyFan->rhoAirStdInit = state->dataEnvrn->StdRhoAir;
+    auto &InletNode = state->dataLoopNodes->Node(supplyFan->inletNodeNum);
+    auto &OutletNode = state->dataLoopNodes->Node(supplyFan->outletNodeNum);
     InletNode.MassFlowRate = 1.0;
     InletNode.MassFlowRateMax = 1.0;
     InletNode.MassFlowRateMaxAvail = 1.0;
@@ -5784,7 +5792,7 @@ TEST_F(EnergyPlusFixture, TwoSpeedDXCoilStandardRatings_Curve_Fix_Test)
     CalcTwoSpeedDXCoilStandardRating(*state, dXCoilIndex);
     EXPECT_EQ(coolcoilTwoSpeed.Name, "CCOOLING DX TWO SPEED");
     EXPECT_EQ(coolcoilTwoSpeed.DXCoilType, "Coil:Cooling:DX:TwoSpeed");
-    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, CoilDX_CoolingTwoSpeed);
+    EXPECT_EQ(coolcoilTwoSpeed.DXCoilType_Num, HVAC::CoilDX_CoolingTwoSpeed);
     EXPECT_EQ(coolcoilTwoSpeed.InternalStaticPressureDrop, 400.0);
     EXPECT_TRUE(coolcoilTwoSpeed.RateWithInternalStaticAndFanObject);
     EXPECT_EQ("8.77", RetrievePreDefTableEntry(*state, state->dataOutRptPredefined->pdchDXCoolCoilEERIP, coolcoilTwoSpeed.Name));

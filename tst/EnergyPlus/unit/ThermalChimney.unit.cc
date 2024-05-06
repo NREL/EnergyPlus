@@ -76,7 +76,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::InternalHeatGains;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::OutputProcessor;

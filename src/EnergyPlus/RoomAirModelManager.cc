@@ -2689,9 +2689,6 @@ namespace RoomAir {
         // number.If incorrect name is given, errorsfound is returned as true and value is returned
         // as zero.
 
-        // Using/Aliasing
-        using Fans::GetFanOutletNode;
-
         static constexpr std::string_view routineName = "CheckEquipName";
 
         // Return value
@@ -2758,7 +2755,7 @@ namespace RoomAir {
                 errorfound = true;
             }
 
-            int nodeNum = GetFanOutletNode(state, fanIndex);
+            int nodeNum = state.dataFans->fans(fanIndex)->outletNodeNum;
             if (errorfound) {
             }
             SupplyNodeName = state.dataLoopNodes->NodeID(nodeNum); // ?????

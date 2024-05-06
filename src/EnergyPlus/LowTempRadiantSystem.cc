@@ -136,7 +136,7 @@ namespace LowTempRadiantSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
+    using HVAC::SmallLoad;
     using Psychrometrics::PsyTdpFnWPb;
 
     // Data
@@ -2633,11 +2633,11 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::AutoCalculateSizing;
-        using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using HVAC::AutoCalculateSizing;
+        using HVAC::CoolingCapacitySizing;
+        using HVAC::HeatingCapacitySizing;
 
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
@@ -3531,7 +3531,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataHVACGlobals::SmallLoad;
+        using HVAC::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -4181,8 +4181,8 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataHVACGlobals::SmallLoad;
         using FluidProperties::GetSpecificHeatGlycol;
+        using HVAC::SmallLoad;
         using PlantUtilities::SetComponentFlowRate;
         using ScheduleManager::GetCurrentScheduleValue;
 
@@ -5224,7 +5224,7 @@ namespace LowTempRadiantSystem {
 
         // Using/Aliasing
         using DataHeatBalance::ZoneData;
-        using DataHVACGlobals::SmallLoad;
+        using HVAC::SmallLoad;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

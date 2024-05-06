@@ -69,7 +69,7 @@ namespace ExhaustAirSystemManager {
         int AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
         std::string ZoneMixerName = "";
         int ZoneMixerIndex = 0;
-        DataHVACGlobals::FanType centralFanType = DataHVACGlobals::FanType::Invalid;
+        HVAC::FanType centralFanType = HVAC::FanType::Invalid;
         std::string CentralFanName = "";
         int CentralFanIndex = 0;
 
