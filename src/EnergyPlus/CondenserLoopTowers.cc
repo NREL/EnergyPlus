@@ -5869,7 +5869,7 @@ namespace CondenserLoopTowers {
             if (this->VSErrorCountTRCalc < 2) {
                 ShowWarningError(
                     state,
-                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}",
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}.",
                            this->Name,
                            this->MaxRangeTemp));
                 ShowContinueError(state,
@@ -5879,7 +5879,11 @@ namespace CondenserLoopTowers {
                                          General::CreateSysTimeIntervalString(state)));
             } else {
                 ShowRecurringWarningErrorAtEnd(
-                    state, format("The outlet water temperature for cooling tower {} could not be calculated.", this->Name), this->ErrIndexTRCalc);
+                    state,
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}.",
+                           this->Name,
+                           this->MaxRangeTemp),
+                    this->ErrIndexTRCalc);
             }
         }
         return outletWaterTempLocal;
