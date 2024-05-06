@@ -376,7 +376,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 SCHigh;                    // VRF outdoor unit subcooling degrees uppler limit [C]
         Real64 VRFOperationSimPath;       // simulation path indicating the VRF operation mode [--]
         bool checkPlantCondTypeOneTime;
-        int CondenserCapErrIdx;           // recurring condenser capacity error index
+        int CondenserCapErrIdx; // recurring condenser capacity error index
 
         // Default Constructor
         VRFCondenserEquipment()
