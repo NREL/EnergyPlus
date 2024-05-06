@@ -409,7 +409,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
             DisplayString(state, "Computing Interior Diffuse Solar Exchange through Interzone Windows");
         }
-        ComputeDifSolExcZonesWIZWindows(state, state.dataGlobal->NumOfZones);
+        ComputeDifSolExcZonesWIZWindows(state, state.dataViewFactor->NumOfSolarEnclosures);
     }
 
     Dayltg::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
