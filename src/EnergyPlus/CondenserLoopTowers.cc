@@ -5838,8 +5838,7 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(0.0001); // Accuracy of result
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 constexpr lowerTr = 0.001;
-        Real64 upperTr = max(this->MaxRangeTemp, 22.2222);
+        Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
         // determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance
@@ -5850,7 +5849,7 @@ namespace CondenserLoopTowers {
             return (Twb + Tapproach + Trange) - this->WaterTemp;
         };
         int SolFla = 0;
-        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, lowerTr, upperTr);
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, max(this->MaxRangeTemp, VSTowerMaxRangeTemp));
 
         // calculate outlet temperature
         Real64 outletWaterTempLocal = this->WaterTemp - min(Tr, this->MaxRangeTemp);
