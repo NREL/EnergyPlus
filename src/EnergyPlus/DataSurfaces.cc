@@ -74,7 +74,6 @@ namespace EnergyPlus::DataSurfaces {
 //                      Dec 2006, DJS (PSU) added logical ecoroof variable
 //                      Dec 2008, TH added new properties to SurfaceWindowCalc for thermochromic windows
 //                      Jul 2011, M.J. Witte and C.O. Pedersen, add new fields to OSC for last T, max and min
-//       RE-ENGINEERED  na
 
 // Using/Aliasing
 using namespace DataVectorTypes;
@@ -88,15 +87,6 @@ using namespace WindowManager;
 
 Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
-// Parameters to indicate surface classes
-// Surface Class (FLOOR, WALL, ROOF (incl's CEILING), WINDOW, DOOR, GLASSDOOR,
-// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
-// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
-// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
-// why aren't these sequential (LKL - 13 Aug 2007)
-
-// Constructor
 Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
     : axis(axis), vertices(v), vl(vl), vu(vu)
 {
@@ -180,7 +170,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
                 xt = xte;
             }
 #endif
-            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2));
+            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() >= 2u));
             for (auto const &edge : crossEdges) {
                 size_type const iEdge(std::get<2>(edge));
                 slab.edges.push_back(iEdge); // Add edge to slab
