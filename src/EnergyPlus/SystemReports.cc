@@ -107,7 +107,6 @@ namespace EnergyPlus::SystemReports {
 // Using/Aliasing
 using namespace DataLoopNode;
 using namespace DataAirLoop;
-using namespace DataHVACGlobals;
 using namespace DataPlant;
 using namespace DataZoneEquipment;
 using namespace DataAirSystems;
@@ -4180,7 +4179,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         } else if (totMechNatVentVolStdRho > (1.01 * targetVoz)) {
             thisZoneVentRepVars.TimeAboveVozDyn = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeAboveVozDyn = TimeStepSys;
-        } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
+        } else if (totMechNatVentVolStdRho > HVAC::SmallAirVolFlow) {
             thisZoneVentRepVars.TimeAtVozDyn = TimeStepSys;
             state.dataSysRpts->AllZonesTimeAtVozDyn = TimeStepSys;
         }
@@ -4227,7 +4226,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
             thisZonePredefRep.VozTargetTimeBelowOcc += thisZoneVentRepVars.TimeBelowVozDyn;
             thisZonePredefRep.VozTargetTimeAtOcc += thisZoneVentRepVars.TimeAtVozDyn;
             thisZonePredefRep.VozTargetTimeAboveOcc += thisZoneVentRepVars.TimeAboveVozDyn;
-        } else if (totMechNatVentVolStdRho > SmallAirVolFlow) {
+        } else if (totMechNatVentVolStdRho > HVAC::SmallAirVolFlow) {
             thisZoneVentRepVars.TimeVentUnocc = TimeStepSys;
             state.dataSysRpts->AnyZoneTimeVentUnocc = TimeStepSys;
             thisZonePredefRep.TotVentTimeNonZeroUnocc += thisZoneVentRepVars.TimeVentUnocc;
@@ -4308,7 +4307,7 @@ void ReportVentilationLoads(EnergyPlusData &state)
         } else if (totMechNatVentVolFlowStdRho > (1.01 * targetFlowVoz)) {
             thisSysVentRepVars.TimeAboveVozDyn = TimeStepSys;
             thisSysPreDefRep.TimeAboveVozDynTotal += TimeStepSys;
-        } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
+        } else if (totMechNatVentVolFlowStdRho > HVAC::SmallAirVolFlow) {
             thisSysVentRepVars.TimeAtVozDyn = TimeStepSys;
             thisSysPreDefRep.TimeAtVozDynTotal += TimeStepSys;
         }
@@ -4321,13 +4320,13 @@ void ReportVentilationLoads(EnergyPlusData &state)
             thisSysPreDefRep.TimeBelowVozDynTotalOcc += thisSysVentRepVars.TimeBelowVozDyn;
             thisSysPreDefRep.TimeAboveVozDynTotalOcc += thisSysVentRepVars.TimeAboveVozDyn;
             thisSysPreDefRep.TimeAtVozDynTotalOcc += thisSysVentRepVars.TimeAtVozDyn;
-        } else if (totMechNatVentVolFlowStdRho > SmallAirVolFlow) {
+        } else if (totMechNatVentVolFlowStdRho > HVAC::SmallAirVolFlow) {
             thisSysVentRepVars.TimeVentUnocc = TimeStepSys;
             thisSysPreDefRep.TimeVentUnoccTotal += TimeStepSys;
         }
 
         // set time at OA limiting factors
-        if (mechVentFlow > SmallAirVolFlow) {
+        if (mechVentFlow > HVAC::SmallAirVolFlow) {
             int thisOAControlNum = state.dataAirLoop->AirLoopControlInfo(sysNum).OACtrlNum;
             if (thisOAControlNum > 0) {
                 int limitFactorIndex = static_cast<int>(state.dataMixedAir->OAController(thisOAControlNum).OALimitingFactor);

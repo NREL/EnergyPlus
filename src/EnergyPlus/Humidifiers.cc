@@ -102,7 +102,7 @@ namespace Humidifiers {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::SmallMassFlow;
+    using HVAC::SmallMassFlow;
     using namespace ScheduleManager;
 
     void SimHumidifier(EnergyPlusData &state,
@@ -823,10 +823,10 @@ namespace Humidifiers {
                         OutletHumRatDes = std::max(thisFinalSysSizing.CoolSupHumRat, thisFinalSysSizing.HeatSupHumRat);
                     } else { // ELSE size to supply air duct flow rate
                         switch (state.dataSize->CurDuctType) {
-                        case DataHVACGlobals::AirDuctType::Cooling: {
+                        case HVAC::AirDuctType::Cooling: {
                             AirVolFlow = thisFinalSysSizing.DesCoolVolFlow;
                         } break;
-                        case DataHVACGlobals::AirDuctType::Heating: {
+                        case HVAC::AirDuctType::Heating: {
                             AirVolFlow = thisFinalSysSizing.DesHeatVolFlow;
                         } break;
                         default: {

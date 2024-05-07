@@ -1061,7 +1061,7 @@ namespace DualDuct {
                     this->MaxAirMassFlowRate = this->MaxAirVolFlowRate * state.dataEnvrn->StdRhoAir;
                 }
 
-                if (this->MaxAirVolFlowRate < DataHVACGlobals::SmallAirVolFlow) {
+                if (this->MaxAirVolFlowRate < HVAC::SmallAirVolFlow) {
                     this->MaxAirVolFlowRate = 0.0;
                     this->MaxAirMassFlowRate = 0.0;
                     this->DesignOAFlowRate = 0.0;
@@ -1097,7 +1097,7 @@ namespace DualDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using DataHVACGlobals::SmallTempDiff;
+        using HVAC::SmallTempDiff;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
 
@@ -1122,7 +1122,7 @@ namespace DualDuct {
         }
         // If there is massflow then need to provide the correct amount of total
         //  required zone energy
-        if (MassFlow > DataHVACGlobals::SmallMassFlow) {
+        if (MassFlow > HVAC::SmallMassFlow) {
             CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
             QZnReq = QTotLoad + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
             // If the enthalpy is the same for the hot and cold duct then there would be a
@@ -1160,7 +1160,7 @@ namespace DualDuct {
             // System is Off set massflow to 0.0
             MassFlow = 0.0;
         }
-        if (MassFlow > DataHVACGlobals::SmallMassFlow) {
+        if (MassFlow > HVAC::SmallMassFlow) {
             // After flows are calculated then calculate the mixed air flow properties.
             HumRat = (this->dd_airterminalHotAirInlet.AirHumRat * this->dd_airterminalHotAirInlet.AirMassFlowRate +
                       this->dd_airterminalColdAirInlet.AirHumRat * this->dd_airterminalColdAirInlet.AirMassFlowRate) /
@@ -1252,7 +1252,7 @@ namespace DualDuct {
             // Next check for the denominator equal to zero
             if (std::abs((CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
                     CpAirZn >
-                DataHVACGlobals::SmallTempDiff) {
+                HVAC::SmallTempDiff) {
                 MassFlow = QTotLoad / (CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             } else {
                 // If denominator tends to zero then mass flow would go to infinity thus set to the max for this iteration
@@ -1279,7 +1279,7 @@ namespace DualDuct {
             // Next check for the denominator equal to zero
             if (std::abs((CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
                     CpAirZn >
-                DataHVACGlobals::SmallTempDiff) {
+                HVAC::SmallTempDiff) {
                 MassFlow =
                     QTotLoad / (CpAirSysCold * this->dd_airterminalColdAirInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
             } else {
@@ -1329,12 +1329,12 @@ namespace DualDuct {
         // Min or Max we will need to mix the hot and cold deck to meet the zone load.  Knowing the enthalpy
         // of the zone and the hot and cold air flows we can determine exactly by using the Energy and Continuity
         // Eqns.  Of course we have to make sure that we are within the Min and Max flow conditions.
-        if (MassFlow > DataHVACGlobals::SmallMassFlow) {
+        if (MassFlow > HVAC::SmallMassFlow) {
             // Determine the enthalpy required from Zone enthalpy and the zone load.
             QZnReq = QTotLoad + MassFlow * CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp;
             // Using the known enthalpies the cold air inlet mass flow is determined.  If the enthalpy of the hot and cold
             // air streams are equal the IF-Then block handles that condition.
-            if (std::abs(this->dd_airterminalColdAirInlet.AirTemp - this->dd_airterminalHotAirInlet.AirTemp) > DataHVACGlobals::SmallTempDiff) {
+            if (std::abs(this->dd_airterminalColdAirInlet.AirTemp - this->dd_airterminalHotAirInlet.AirTemp) > HVAC::SmallTempDiff) {
                 // Calculate the Cold air mass flow rate
                 this->dd_airterminalColdAirInlet.AirMassFlowRate =
                     (QZnReq - MassFlow * CpAirSysHot * this->dd_airterminalHotAirInlet.AirTemp) /
@@ -1472,7 +1472,7 @@ namespace DualDuct {
 
         //..Find the amount of load that the OAMassFlow accounted for
         if (std::abs((CpAirSysOA * this->dd_airterminalOAInlet.AirTemp) - (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) / CpAirZn >
-            DataHVACGlobals::SmallTempDiff) {
+            HVAC::SmallTempDiff) {
             QOALoad = this->dd_airterminalOAInlet.AirMassFlowRate *
                       (CpAirSysOA * this->dd_airterminalOAInlet.AirTemp - CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
 
@@ -1508,7 +1508,7 @@ namespace DualDuct {
                     if (std::abs((CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp) -
                                  (CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp)) /
                             CpAirZn >
-                        DataHVACGlobals::SmallTempDiff) {
+                        HVAC::SmallTempDiff) {
                         this->dd_airterminalRecircAirInlet.AirMassFlowRate = QRALoad / (CpAirSysRA * this->dd_airterminalRecircAirInlet.AirTemp -
                                                                                         CpAirZn * state.dataLoopNodes->Node(ZoneNodeNum).Temp);
                     }
@@ -1554,7 +1554,7 @@ namespace DualDuct {
             TotMassFlow = 0.0;
         }
 
-        if (TotMassFlow > DataHVACGlobals::SmallMassFlow) {
+        if (TotMassFlow > HVAC::SmallMassFlow) {
 
             // If the sum of the two air streams' flow is greater than the Max Box Flow Rate then reset the RA Stream
             if (TotMassFlow > MassFlowMax) {
@@ -1562,7 +1562,7 @@ namespace DualDuct {
             }
             // After the flow rates are determined the properties are calculated.
             TotMassFlow = this->dd_airterminalOAInlet.AirMassFlowRate + this->dd_airterminalRecircAirInlet.AirMassFlowRate;
-            if (TotMassFlow > DataHVACGlobals::SmallMassFlow) {
+            if (TotMassFlow > HVAC::SmallMassFlow) {
                 HumRat = (this->dd_airterminalOAInlet.AirHumRat * this->dd_airterminalOAInlet.AirMassFlowRate +
                           this->dd_airterminalRecircAirInlet.AirHumRat * this->dd_airterminalRecircAirInlet.AirMassFlowRate) /
                          TotMassFlow;

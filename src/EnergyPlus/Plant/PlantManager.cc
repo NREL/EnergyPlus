@@ -140,7 +140,6 @@ namespace EnergyPlus::PlantManager {
 // connections are performed in this module.
 
 // Using/Aliasing
-using namespace DataHVACGlobals;
 using namespace DataPlant;
 using namespace DataBranchAirLoopPlant;
 using namespace DataLoopNode;
@@ -2882,11 +2881,11 @@ void UpdateNodeThermalHistory(EnergyPlusData &state)
     if (state.dataPlnt->TotNumLoops > 0 && !state.dataGlobal->WarmupFlag) {
         for (auto &loop : state.dataPlnt->PlantLoop) {
             for (auto &side : loop.LoopSide) {
-                if (loop.OutletNodeFlowrate > DataHVACGlobals::SmallMassFlow) {
+                if (loop.OutletNodeFlowrate > HVAC::SmallMassFlow) {
                     // Accumulate total time loop is active
                     side.LoopSideInlet_TotalTime += state.dataHVACGlobal->TimeStepSys;
                     // Determine excessive storage - if both are moving in the same direction and McpDTdt is larger than MdotCpDeltaT
-                    if ((std::abs(side.LoopSideInlet_MdotCpDeltaT) > DataHVACGlobals::SmallLoad) &&
+                    if ((std::abs(side.LoopSideInlet_MdotCpDeltaT) > HVAC::SmallLoad) &&
                         ((side.LoopSideInlet_McpDTdt / side.LoopSideInlet_MdotCpDeltaT) > 1.1)) {
                         side.LoopSideInlet_CapExcessStorageTimeReport = state.dataHVACGlobal->TimeStepSys;
                         side.LoopSideInlet_CapExcessStorageTime += state.dataHVACGlobal->TimeStepSys;
@@ -3212,7 +3211,7 @@ void SizePlantLoop(EnergyPlusData &state,
 
         if ((PlantSizNum > 0)) {
 
-            if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate =
                     state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * state.dataSize->PlantSizData(PlantSizNum).PlantSizFac;
             } else {
@@ -3488,7 +3487,7 @@ void ResizePlantLoopLevelSizes(EnergyPlusData &state, int const LoopNum // Suppl
 
         if ((PlantSizNum > 0)) {
 
-            if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = state.dataSize->PlantSizData(PlantSizNum).DesVolFlowRate * PlantSizeFac;
             } else {
                 state.dataPlnt->PlantLoop(LoopNum).MaxVolFlowRate = 0.0;

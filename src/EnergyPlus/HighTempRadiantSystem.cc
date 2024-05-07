@@ -713,7 +713,7 @@ namespace HighTempRadiantSystem {
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = thisHTR.ZonePtr;
             // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingCapacitySizing, etc.)
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            int SizingMethod = HVAC::HeatingCapacitySizing;
             int FieldNum = 1;
             std::string const SizingString = format("{} [W]", state.dataHighTempRadSys->HighTempRadSysNumericFields(RadSysNum).FieldNames(FieldNum));
             // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and

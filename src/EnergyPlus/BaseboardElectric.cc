@@ -446,7 +446,7 @@ namespace BaseboardElectric {
             std::string_view const CompName = baseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = baseboard.ZonePtr;
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing;
+            int SizingMethod = HVAC::HeatingCapacitySizing;
             int FieldNum = 1;
             std::string const SizingString = format("{} [W]", baseboard.FieldNames(FieldNum));
             int CapSizingMethod = baseboard.HeatingCapMethod;
@@ -515,7 +515,7 @@ namespace BaseboardElectric {
         //  thermal loss that could be accounted for with this efficiency input.
         Real64 Effic = baseboard.BaseboardEfficiency;
 
-        if (GetCurrentScheduleValue(state, baseboard.SchedPtr) > 0.0 && LoadMet >= DataHVACGlobals::SmallLoad) {
+        if (GetCurrentScheduleValue(state, baseboard.SchedPtr) > 0.0 && LoadMet >= HVAC::SmallLoad) {
 
             // if the load exceeds the capacity than the capacity is set to the BB limit.
             if (LoadMet > baseboard.NominalCapacity) {

@@ -956,7 +956,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
     if (this->DesignWaterFlowRateWasAutoSized) {
         if (PltSizCondNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpDesignWaterFlowRate = state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
             } else {
@@ -1035,7 +1035,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 tmpHighSpeedFanPower = 0.0105 * DesFluidCoolerLoad;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedFanPower = tmpHighSpeedFanPower;
             } else if (PltSizCondNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                     // temperature is less than design inlet air dry bulb temperature
                     if (state.dataSize->PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
@@ -1124,7 +1124,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                 tmpHighSpeedAirFlowRate = DesFluidCoolerLoad / (this->DesignEnteringWaterTemp - this->DesignEnteringAirTemp) * 4.0;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
             } else if (PltSizCondNum > 0) {
-                if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                     // temperature is less than design inlet air dry bulb temperature
                     if (state.dataSize->PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
@@ -1206,7 +1206,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
 
     if (this->HighSpeedFluidCoolerUAWasAutoSized && state.dataPlnt->PlantFirstSizesOkayToFinalize) {
         if (PltSizCondNum > 0) {
-            if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 // This conditional statement is to trap when the user specified Condenser/Fluid Cooler water design setpoint
                 // temperature is less than design inlet air dry bulb temperature
                 if (state.dataSize->PlantSizData(PltSizCondNum).ExitTemp <= this->DesignEnteringAirTemp &&
@@ -1338,7 +1338,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
     }
 
     if (this->PerformanceInputMethod_Num == PerfInputMethod::NOMINAL_CAPACITY) {
-        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     Constant::InitConvTemp,
@@ -1522,7 +1522,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
             }
         }
 
-        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
+        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->FluidCoolerLowSpeedNomCap > 0.0) {
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     Constant::InitConvTemp,

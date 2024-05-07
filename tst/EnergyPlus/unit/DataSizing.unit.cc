@@ -114,8 +114,8 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     state->dataSize->DataFractionUsedForSizing = 1.0;
     state->dataSize->DataNonZoneNonAirloopValue = 1.0;
     state->dataSize->DataZoneNumber = 1;
-    state->dataSize->DataFanEnumType = 1;
-    state->dataSize->DataFanIndex = 1;
+    state->dataSize->DataFanType = HVAC::FanType::Constant;
+    state->dataSize->DataFanIndex = 0;
     state->dataSize->DataWaterCoilSizCoolDeltaT = 1.0;
     state->dataSize->DataWaterCoilSizHeatDeltaT = 1.0;
     state->dataSize->DataNomCapInpMeth = true;
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     EXPECT_NE(state->dataSize->DataTotCapCurveIndex, 0);
     EXPECT_NE(state->dataSize->DataDesInletWaterTemp, 0.0);
     EXPECT_NE(state->dataSize->DataHeatSizeRatio, 1.0);
-    EXPECT_NE(state->dataSize->DataFanEnumType, -1);
+    EXPECT_NE((int)state->dataSize->DataFanType, (int)HVAC::FanType::Invalid);
     EXPECT_TRUE(state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).AirFlow);
     EXPECT_FALSE(state->dataSize->DataAutosizable);
 
@@ -195,8 +195,8 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     EXPECT_EQ(state->dataSize->DataFractionUsedForSizing, 0.0);
     EXPECT_EQ(state->dataSize->DataNonZoneNonAirloopValue, 0.0);
     EXPECT_EQ(state->dataSize->DataZoneNumber, 0);
-    EXPECT_EQ(state->dataSize->DataFanEnumType, -1);
-    EXPECT_EQ(state->dataSize->DataFanIndex, -1);
+    EXPECT_EQ((int)state->dataSize->DataFanType, (int)HVAC::FanType::Invalid);
+    EXPECT_EQ(state->dataSize->DataFanIndex, 0);
     EXPECT_EQ(state->dataSize->DataWaterCoilSizCoolDeltaT, 0.0);
     EXPECT_EQ(state->dataSize->DataWaterCoilSizHeatDeltaT, 0.0);
     EXPECT_FALSE(state->dataSize->DataNomCapInpMeth);

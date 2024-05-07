@@ -873,7 +873,7 @@ void GshpSpecs::sizeCoolingWaterToWaterHP(EnergyPlusData &state)
 
     int pltLoadSizNum = state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).PlantSizNum;
     if (pltLoadSizNum > 0) {
-        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > HVAC::SmallWaterVolFlow) {
             tmpLoadSideVolFlowRate = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
             // now compare to companion coil and take higher
             if (this->companionIdentified) {
@@ -1228,7 +1228,7 @@ void GshpSpecs::sizeHeatingWaterToWaterHP(EnergyPlusData &state)
 
     int pltLoadSizNum = state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).PlantSizNum;
     if (pltLoadSizNum > 0) {
-        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > HVAC::SmallWaterVolFlow) {
             tmpLoadSideVolFlowRate = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizFac;
             // now compare to companion coil and take higher
             if (this->companionIdentified) {
