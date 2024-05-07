@@ -3053,7 +3053,7 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     sdat(1).MaxAirVolFlowRateDuringReheat = 0.25;
     sdat(1).OARequirementsPtr = 0;
     sdat(1).ReheatComp = "watercoil";
-    sdat(1).fanType = DataHVACGlobals::FanType::VAV;
+    sdat(1).fanType = HVAC::FanType::VAV;
     sdat(1).FanName = "FanA";
 
     sdat(1).reportTerminalUnit(*state);
@@ -3092,7 +3092,7 @@ TEST_F(EnergyPlusFixture, SingleDuctAirTerminal_reportTerminalUnit)
     sdat(2).MaxAirVolFlowRateDuringReheat = 0.26;
     sdat(2).OARequirementsPtr = 1;
     sdat(2).ReheatComp = "furncoil";
-    sdat(2).fanType = DataHVACGlobals::FanType::OnOff;
+    sdat(2).fanType = HVAC::FanType::OnOff;
     sdat(2).FanName = "FanB";
 
     auto &oa = state->dataSize->OARequirements;

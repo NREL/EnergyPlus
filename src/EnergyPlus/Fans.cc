@@ -132,19 +132,19 @@ void FanBase::simulate(EnergyPlusData &state,
 
         case HVAC::FanType::Constant: {
             _thisFan->simulateConstant(state);
-    } break;
+        } break;
         case HVAC::FanType::VAV: {
             _thisFan->simulateVAV(state, _pressureRise);
-    } break;
+        } break;
         case HVAC::FanType::OnOff: {
             _thisFan->simulateOnOff(state, _speedRatio);
-    } break;
+        } break;
         case HVAC::FanType::Exhaust: {
             _thisFan->simulateZoneExhaust(state);
-    } break;
+        } break;
         case HVAC::FanType::ComponentModel: {
             _thisFan->simulateComponentModel(state);
-    } break;
+        } break;
         default: {
         } break;
         } // switch (type)
@@ -174,7 +174,7 @@ void FanBase::simulate(EnergyPlusData &state,
             _thisFan->calcSimpleSystemFan(state, _flowFraction, _, _, _, _, _, _);
         } else {
             _thisFan->calcSimpleSystemFan(state, _, _, _, _, _, _, _);
-    }
+        }
     }
 
     update(state);
@@ -200,7 +200,7 @@ void GetFanInput(EnergyPlusData &state)
     int NumAlphas;
     int NumNums;
     int IOStat;
-    bool ErrorsFound(false);                                        // If errors detected in input
+    bool ErrorsFound(false); // If errors detected in input
     Array1D_string cAlphaFieldNames;
     Array1D_string cNumericFieldNames;
     Array1D_bool lNumericFieldBlanks;
@@ -272,17 +272,17 @@ void GetFanInput(EnergyPlusData &state)
     for (int SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum) {
         cCurrentModuleObject = "Fan:ConstantVolume";
         ip->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 SimpFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                          cCurrentModuleObject,
+                          SimpFanNum,
+                          cAlphaArgs,
+                          NumAlphas,
+                          rNumericArgs,
+                          NumNums,
+                          IOStat,
+                          lNumericFieldBlanks,
+                          lAlphaFieldBlanks,
+                          cAlphaFieldNames,
+                          cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
 
@@ -304,8 +304,8 @@ void GetFanInput(EnergyPlusData &state)
             fan->availSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else if ((fan->availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
 
         fan->totalEff = rNumericArgs(1);
         fan->deltaPress = rNumericArgs(2);
@@ -321,23 +321,23 @@ void GetFanInput(EnergyPlusData &state)
         fan->minAirFlowRate = 0.0;
 
         fan->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                   cAlphaArgs(3),
-                                                                   ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::FanConstantVolume,
-                                                                   cAlphaArgs(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                cAlphaArgs(3),
+                                                                ErrorsFound,
+                                                                DataLoopNode::ConnectionObjectType::FanConstantVolume,
+                                                                cAlphaArgs(1),
+                                                                DataLoopNode::NodeFluidType::Air,
+                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                DataLoopNode::ObjectIsNotParent);
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                    cAlphaArgs(4),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::FanConstantVolume,
-                                                                    cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
+                                                                 cAlphaArgs(4),
+                                                                 ErrorsFound,
+                                                                 DataLoopNode::ConnectionObjectType::FanConstantVolume,
+                                                                 cAlphaArgs(1),
+                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                 DataLoopNode::ConnectionType::Outlet,
+                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                 DataLoopNode::ObjectIsNotParent);
 
         fan->endUseSubcategoryName = (NumAlphas > 4) ? cAlphaArgs(5) : "General";
 
@@ -383,8 +383,8 @@ void GetFanInput(EnergyPlusData &state)
             fan->availSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else if ((fan->availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
 
         fan->totalEff = rNumericArgs(1);
         fan->deltaPress = rNumericArgs(2);
@@ -414,23 +414,23 @@ void GetFanInput(EnergyPlusData &state)
             ShowContinueError(state, format("For {}, Fan={}", cCurrentModuleObject, cAlphaArgs(1)));
         }
         fan->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                   cAlphaArgs(4),
-                                                                   ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::FanVariableVolume,
-                                                                   cAlphaArgs(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                cAlphaArgs(4),
+                                                                ErrorsFound,
+                                                                DataLoopNode::ConnectionObjectType::FanVariableVolume,
+                                                                cAlphaArgs(1),
+                                                                DataLoopNode::NodeFluidType::Air,
+                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                DataLoopNode::ObjectIsNotParent);
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                    cAlphaArgs(5),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::FanVariableVolume,
-                                                                    cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
+                                                                 cAlphaArgs(5),
+                                                                 ErrorsFound,
+                                                                 DataLoopNode::ConnectionObjectType::FanVariableVolume,
+                                                                 cAlphaArgs(1),
+                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                 DataLoopNode::ConnectionType::Outlet,
+                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                 DataLoopNode::ObjectIsNotParent);
 
         fan->endUseSubcategoryName = (NumAlphas > 5) ? cAlphaArgs(6) : "General";
 
@@ -444,17 +444,17 @@ void GetFanInput(EnergyPlusData &state)
     for (int ExhFanNum = 1; ExhFanNum <= NumZoneExhFan; ++ExhFanNum) {
         cCurrentModuleObject = "Fan:ZoneExhaust";
         ip->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 ExhFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                          cCurrentModuleObject,
+                          ExhFanNum,
+                          cAlphaArgs,
+                          NumAlphas,
+                          rNumericArgs,
+                          NumNums,
+                          IOStat,
+                          lNumericFieldBlanks,
+                          lAlphaFieldBlanks,
+                          cAlphaFieldNames,
+                          cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
 
@@ -476,14 +476,14 @@ void GetFanInput(EnergyPlusData &state)
             fan->availSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else if ((fan->availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
-                ErrorsFound = true;
+            ErrorsFound = true;
         } else if (ScheduleManager::HasFractionalScheduleValue(state, fan->availSchedNum)) {
-                    ShowWarningError(state,
-                                     format("{}=\"{}\" has fractional values in Schedule={}. Only 0.0 in the schedule value turns the fan off.",
-                                            cCurrentModuleObject,
+            ShowWarningError(state,
+                             format("{}=\"{}\" has fractional values in Schedule={}. Only 0.0 in the schedule value turns the fan off.",
+                                    cCurrentModuleObject,
                                     fan->Name,
-                                            cAlphaArgs(2)));
-                }
+                                    cAlphaArgs(2)));
+        }
 
         fan->totalEff = rNumericArgs(1);
         fan->deltaPress = rNumericArgs(2);
@@ -502,23 +502,23 @@ void GetFanInput(EnergyPlusData &state)
         }
 
         fan->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                   cAlphaArgs(3),
-                                                                   ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::FanZoneExhaust,
-                                                                   cAlphaArgs(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                cAlphaArgs(3),
+                                                                ErrorsFound,
+                                                                DataLoopNode::ConnectionObjectType::FanZoneExhaust,
+                                                                cAlphaArgs(1),
+                                                                DataLoopNode::NodeFluidType::Air,
+                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                DataLoopNode::ObjectIsNotParent);
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                    cAlphaArgs(4),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::FanZoneExhaust,
-                                                                    cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
+                                                                 cAlphaArgs(4),
+                                                                 ErrorsFound,
+                                                                 DataLoopNode::ConnectionObjectType::FanZoneExhaust,
+                                                                 cAlphaArgs(1),
+                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                 DataLoopNode::ConnectionType::Outlet,
+                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                 DataLoopNode::ObjectIsNotParent);
 
         fan->endUseSubcategoryName = (NumAlphas > 4 && !lAlphaFieldBlanks(5)) ? cAlphaArgs(5) : "General";
 
@@ -526,78 +526,78 @@ void GetFanInput(EnergyPlusData &state)
             fan->flowFracSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else if ((fan->flowFracSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(6))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(6), cAlphaArgs(6));
-                ErrorsFound = true;
+            ErrorsFound = true;
         } else if (!ScheduleManager::CheckScheduleValueMinMax(
                        state, fan->flowFracSchedNum, ScheduleManager::Clusivity::Inclusive, 0.0, ScheduleManager::Clusivity::Inclusive, 1.0)) {
             ShowSevereError(
                 state,
                 format("{}: {}: invalid {} for {}={}", routineName, cCurrentModuleObject, cAlphaFieldNames(6), cAlphaFieldNames(1), cAlphaArgs(1)));
-                    ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(6), cAlphaArgs(6)));
-                    ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
-                    ErrorsFound = true;
-                }
+            ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(6), cAlphaArgs(6)));
+            ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+            ErrorsFound = true;
+        }
 
         if (NumAlphas <= 6 || lAlphaFieldBlanks(7)) {
             fan->availManagerMode = AvailManagerMode::Coupled;
         } else if ((fan->availManagerMode = static_cast<AvailManagerMode>(getEnumValue(availManagerModeNamesUC, cAlphaArgs(7)))) ==
                    AvailManagerMode::Invalid) {
             ShowSevereInvalidKey(state, eoh, cAlphaFieldNames(7), cAlphaArgs(7));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
 
         if (NumAlphas <= 7 || lAlphaFieldBlanks(8)) {
             fan->minTempLimitSchedNum = 0;
         } else if ((fan->minTempLimitSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(8))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(8), cAlphaArgs(8));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
 
         if (NumAlphas <= 8 || lAlphaFieldBlanks(9)) {
             fan->balancedFractSchedNum = 0;
         } else if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment != DataHeatBalance::AdjustmentType::NoAdjustReturnAndMixing) {
-                // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
-                ShowWarningError(state,
+            // do not include adjusted for "balanced" exhaust flow in the zone total return calculation
+            ShowWarningError(state,
                              format("{}: {}: invalid {} = {} for {}={}",
                                     routineName,
-                                        cCurrentModuleObject,
-                                        cAlphaFieldNames(9),
-                                        cAlphaArgs(9),
-                                        cAlphaFieldNames(1),
-                                        cAlphaArgs(1)));
-                ShowContinueError(state, "When zone air mass flow balance is enforced, this input field should be left blank.");
-                ShowContinueError(state, "This schedule will be ignored in the simulation.");
+                                    cCurrentModuleObject,
+                                    cAlphaFieldNames(9),
+                                    cAlphaArgs(9),
+                                    cAlphaFieldNames(1),
+                                    cAlphaArgs(1)));
+            ShowContinueError(state, "When zone air mass flow balance is enforced, this input field should be left blank.");
+            ShowContinueError(state, "This schedule will be ignored in the simulation.");
             fan->balancedFractSchedNum = 0;
         } else if ((fan->balancedFractSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(9))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(9), cAlphaArgs(9));
-                    ErrorsFound = true;
+            ErrorsFound = true;
         } else if (!ScheduleManager::CheckScheduleValueMinMax(
                        state, fan->balancedFractSchedNum, ScheduleManager::Clusivity::Inclusive, 0.0, ScheduleManager::Clusivity::Inclusive, 1.0)) {
             ShowSevereError(
                 state,
                 format("{}: {}: invalid {} for {}={}", routineName, cCurrentModuleObject, cAlphaFieldNames(9), cAlphaFieldNames(1), cAlphaArgs(1)));
-                        ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(9), cAlphaArgs(9)));
-                        ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
-                        ErrorsFound = true;
-                    }
+            ShowContinueError(state, format("Error found in {} = {}", cAlphaFieldNames(9), cAlphaArgs(9)));
+            ShowContinueError(state, "Schedule values must be (>=0., <=1.)");
+            ErrorsFound = true;
+        }
         if (ErrorsFound) {
             ShowFatalError(state, format("{}: Errors found in input for fan name = {}.  Program terminates.", routineName, fan->Name));
-                }
+        }
     } // for (iFanExhaust)
 
     for (int OnOffFanNum = 1; OnOffFanNum <= NumOnOff; ++OnOffFanNum) {
         cCurrentModuleObject = "Fan:OnOff";
         ip->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 OnOffFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                          cCurrentModuleObject,
+                          OnOffFanNum,
+                          cAlphaArgs,
+                          NumAlphas,
+                          rNumericArgs,
+                          NumNums,
+                          IOStat,
+                          lNumericFieldBlanks,
+                          lAlphaFieldBlanks,
+                          cAlphaFieldNames,
+                          cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
 
@@ -619,8 +619,8 @@ void GetFanInput(EnergyPlusData &state)
             fan->availSchedNum = ScheduleManager::ScheduleAlwaysOn;
         } else if ((fan->availSchedNum = ScheduleManager::GetScheduleIndex(state, cAlphaArgs(2))) == 0) {
             ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(2), cAlphaArgs(2));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
 
         fan->totalEff = rNumericArgs(1);
         fan->deltaPress = rNumericArgs(2);
@@ -641,23 +641,23 @@ void GetFanInput(EnergyPlusData &state)
         fan->minAirFlowRate = 0.0;
 
         fan->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                   cAlphaArgs(3),
-                                                                   ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::FanOnOff,
-                                                                   cAlphaArgs(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                cAlphaArgs(3),
+                                                                ErrorsFound,
+                                                                DataLoopNode::ConnectionObjectType::FanOnOff,
+                                                                cAlphaArgs(1),
+                                                                DataLoopNode::NodeFluidType::Air,
+                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                DataLoopNode::ObjectIsNotParent);
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                    cAlphaArgs(4),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::FanOnOff,
-                                                                    cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
+                                                                 cAlphaArgs(4),
+                                                                 ErrorsFound,
+                                                                 DataLoopNode::ConnectionObjectType::FanOnOff,
+                                                                 cAlphaArgs(1),
+                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                 DataLoopNode::ConnectionType::Outlet,
+                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                 DataLoopNode::ObjectIsNotParent);
 
         if (NumAlphas > 4 && !lAlphaFieldBlanks(5)) {
             fan->powerRatioAtSpeedRatioCurveNum = Curve::GetCurveIndex(state, cAlphaArgs(5));
@@ -688,21 +688,21 @@ void GetFanInput(EnergyPlusData &state)
             e.MaxAirMassFlowRate = 0.0;
         }
 
-    // input the night ventilation performance objects
-    for (int NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
+        // input the night ventilation performance objects
+        for (int NVPerfNum = 1; NVPerfNum <= state.dataFans->NumNightVentPerf; ++NVPerfNum) {
             cCurrentModuleObject = "FanPerformance:NightVentilation";
             ip->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 NVPerfNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                              cCurrentModuleObject,
+                              NVPerfNum,
+                              cAlphaArgs,
+                              NumAlphas,
+                              rNumericArgs,
+                              NumNums,
+                              IOStat,
+                              lNumericFieldBlanks,
+                              lAlphaFieldBlanks,
+                              cAlphaFieldNames,
+                              cNumericFieldNames);
 
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
 
@@ -718,29 +718,29 @@ void GetFanInput(EnergyPlusData &state)
             auto found = df->fanMap.find(nvp.FanName);
             if (found == df->fanMap.end()) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFieldNames(1), cAlphaArgs(1));
-            ErrorsFound = true;
+                ErrorsFound = true;
             } else {
                 auto *fan = dynamic_cast<FanComponent *>(df->fans(found->second));
                 assert(fan != nullptr);
                 fan->nightVentPerfNum = NVPerfNum;
-        }
+            }
         } // for (iNightVent)
     }
 
     for (int CompModelFanNum = 1; CompModelFanNum <= NumCompModelFan; ++CompModelFanNum) {
         cCurrentModuleObject = "Fan:ComponentModel";
         ip->getObjectItem(state,
-                                                                 cCurrentModuleObject,
-                                                                 CompModelFanNum,
-                                                                 cAlphaArgs,
-                                                                 NumAlphas,
-                                                                 rNumericArgs,
-                                                                 NumNums,
-                                                                 IOStat,
-                                                                 lNumericFieldBlanks,
-                                                                 lAlphaFieldBlanks,
-                                                                 cAlphaFieldNames,
-                                                                 cNumericFieldNames);
+                          cCurrentModuleObject,
+                          CompModelFanNum,
+                          cAlphaArgs,
+                          NumAlphas,
+                          rNumericArgs,
+                          NumNums,
+                          IOStat,
+                          lNumericFieldBlanks,
+                          lAlphaFieldBlanks,
+                          cAlphaFieldNames,
+                          cNumericFieldNames);
 
         ErrorObjectHeader eoh{routineName, cCurrentModuleObject, cAlphaArgs(1)};
 
@@ -759,23 +759,23 @@ void GetFanInput(EnergyPlusData &state)
         fan->sizingPrefix = cNumericFieldNames(1);
 
         fan->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                   cAlphaArgs(2),
-                                                                   ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::FanComponentModel,
-                                                                   cAlphaArgs(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent); // Air inlet node name
+                                                                cAlphaArgs(2),
+                                                                ErrorsFound,
+                                                                DataLoopNode::ConnectionObjectType::FanComponentModel,
+                                                                cAlphaArgs(1),
+                                                                DataLoopNode::NodeFluidType::Air,
+                                                                DataLoopNode::ConnectionType::Inlet,
+                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                DataLoopNode::ObjectIsNotParent); // Air inlet node name
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                                                    cAlphaArgs(3),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::FanComponentModel,
-                                                                    cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent); // Air outlet node name
+                                                                 cAlphaArgs(3),
+                                                                 ErrorsFound,
+                                                                 DataLoopNode::ConnectionObjectType::FanComponentModel,
+                                                                 cAlphaArgs(1),
+                                                                 DataLoopNode::NodeFluidType::Air,
+                                                                 DataLoopNode::ConnectionType::Outlet,
+                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                 DataLoopNode::ObjectIsNotParent); // Air outlet node name
 
         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(2), cAlphaArgs(3), "Air Nodes");
 
@@ -847,7 +847,7 @@ void GetFanInput(EnergyPlusData &state)
         constexpr std::string_view cCurrentModuleObject = "Fan:SystemModel";
 
         ip->getObjectItem(state,
-                                       cCurrentModuleObject,
+                          cCurrentModuleObject,
                           SystemFanNum,
                           cAlphaArgs,
                           NumAlphas,
@@ -891,7 +891,7 @@ void GetFanInput(EnergyPlusData &state)
                                                                 NodeInputManager::CompFluidStream::Primary,
                                                                 DataLoopNode::ObjectIsNotParent);
         fan->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
-                                       cAlphaArgs(4),
+                                                                 cAlphaArgs(4),
                                                                  ErrorsFound,
                                                                  DataLoopNode::ConnectionObjectType::FanSystemModel,
                                                                  cAlphaArgs(1),
@@ -917,8 +917,8 @@ void GetFanInput(EnergyPlusData &state)
         fan->deltaPress = rNumericArgs(3);
         if (fan->deltaPress <= 0.0) {
             ShowSevereError(state, format("{}: {} zero or negative, invalid entry in {}", routineName, cCurrentModuleObject, cNumericFieldNames(3)));
-                ErrorsFound = true;
-            }
+            ErrorsFound = true;
+        }
         fan->motorEff = rNumericArgs(4);
         fan->motorInAirFrac = rNumericArgs(5);
         fan->designElecPower = rNumericArgs(6);
@@ -1026,10 +1026,10 @@ void GetFanInput(EnergyPlusData &state)
                 // field set input does not match number of speeds, throw warning
                 ShowSevereError(state, format("{}: {}=\"{}\", invalid entry.", routineName, cCurrentModuleObject, cAlphaArgs(1)));
                 ShowContinueError(
-                state,
+                    state,
                     "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
                 ErrorsFound = true;
-        }
+            }
         }
 
         if (fan->heatLossDest == HeatLossDest::Zone) {
@@ -1125,21 +1125,21 @@ void GetFanInput(EnergyPlusData &state)
             auto *fanExhaust = dynamic_cast<FanComponent *>(fan);
             assert(fanExhaust != nullptr);
             if (fanExhaust->balancedFractSchedNum > 0) {
-            SetupOutputVariable(state,
-                                "Fan Unbalanced Air Mass Flow Rate",
-                                Constant::Units::kg_s,
+                SetupOutputVariable(state,
+                                    "Fan Unbalanced Air Mass Flow Rate",
+                                    Constant::Units::kg_s,
                                     fanExhaust->unbalancedOutletMassFlowRate,
-                                OutputProcessor::TimeStepType::System,
-                                OutputProcessor::StoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanExhaust->Name);
-            SetupOutputVariable(state,
-                                "Fan Balanced Air Mass Flow Rate",
-                                Constant::Units::kg_s,
+                SetupOutputVariable(state,
+                                    "Fan Balanced Air Mass Flow Rate",
+                                    Constant::Units::kg_s,
                                     fanExhaust->balancedOutletMassFlowRate,
-                                OutputProcessor::TimeStepType::System,
-                                OutputProcessor::StoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanExhaust->Name);
-        }
+            }
         }
 
         if (fan->type == HVAC::FanType::OnOff) {
@@ -1161,12 +1161,12 @@ void GetFanInput(EnergyPlusData &state)
             if (fanSystem->speedControl != SpeedControl::Discrete) continue;
 
             if (fanSystem->numSpeeds == 1) {
-        SetupOutputVariable(state,
-                            "Fan Runtime Fraction",
-                            Constant::Units::None,
+                SetupOutputVariable(state,
+                                    "Fan Runtime Fraction",
+                                    Constant::Units::None,
                                     fanSystem->runtimeFracAtSpeed[0],
-                            OutputProcessor::TimeStepType::System,
-                            OutputProcessor::StoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     fanSystem->Name);
             } else {
                 for (int speedLoop = 0; speedLoop < fanSystem->numSpeeds; ++speedLoop) {
@@ -1177,7 +1177,7 @@ void GetFanInput(EnergyPlusData &state)
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
                                         fan->Name);
-    }
+                }
             }
         }
 
@@ -1458,7 +1458,7 @@ void FanComponent::set_size(EnergyPlusData &state)
             _plBeltEff = Curve::CurveValue(state, plBeltEffReg3CurveNum, _torqueRatio); //[-]
         } else {
             _plBeltEff = 1.0; // Direct drive or no curve specified - use constant efficiency
-                }
+        }
         beltEff = beltMaxEff * _plBeltEff;     //[-]
         beltEff = max(beltEff, 0.01);          // Minimum efficiency is 1% to avoid numerical errors
         beltInputPower = shaftPower / beltEff; //[W]
@@ -1497,26 +1497,26 @@ void FanComponent::set_size(EnergyPlusData &state)
             vfdEff = Curve::CurveValue(state, vfdEffCurveNum, _vfdSpeedRatio);
         } else if ((vfdEffType == VFDEffType::Power) && (vfdEffCurveNum != 0)) {
             if (vfdMaxOutPower == DataSizing::AutoSize) {
-                    // WRITE(*,*) 'Autosizing fan VFD'
+                // WRITE(*,*) 'Autosizing fan VFD'
                 vfdMaxOutPower = motorInputPower;
-                }
-                // Adjust max VFD output power using VFD sizing factor
+            }
+            // Adjust max VFD output power using VFD sizing factor
             vfdMaxOutPower *= vfdSizingFactor; //[W]
 
-                // Check for undersized VFD and report design size with warning
+            // Check for undersized VFD and report design size with warning
             if (motorInputPower > (vfdMaxOutPower + 1.e-5)) {
                 ShowWarningError(
                     state, format("VFD for {}: {} is undersized at design conditions -- check VFD inputs", HVAC::fanTypeNames[(int)type], Name));
                 ShowContinueError(state, format("...Design VFD output power (without oversizing) [W]: {:.2R}", motorInputPower));
-                }
+            }
 
             Real64 _vfdOutPowerRatio = motorInputPower / vfdMaxOutPower; // Ratio of VFD output power to max VFD output power [-]
             vfdEff = Curve::CurveValue(state, vfdEffCurveNum, _vfdOutPowerRatio);
-            } else {
-                // No curve specified - use constant efficiency
+        } else {
+            // No curve specified - use constant efficiency
             vfdMaxOutPower = 0.0;
             vfdEff = 0.97;
-            }
+        }
 
         vfdEff = max(vfdEff, 0.01); // Minimum efficiency is 1% to avoid numerical errors
 
@@ -1571,8 +1571,8 @@ void FanComponent::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAutosized,
                                              Name,
-                                             maxAirFlowRateIsAutosizable ? "Yes" : "No"); // autosizable vs. autosized equivalent?
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motEff);
+                                             maxAirFlowRateIsAutosized ? "Yes" : "No"); // autosizable vs. autosized equivalent?
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 0.0);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, "n/a");
     OutputReportPredefined::PreDefTableEntry(state,
@@ -2074,24 +2074,24 @@ void FanComponent::simulateZoneExhaust(EnergyPlusData &state)
             !state.dataHVACGlobal->TurnFansOff && _massFlow > 0.0) { // available
             if (minTempLimitSchedNum > 0) {
                 _fanIsRunning = (_Tin >= ScheduleManager::GetCurrentScheduleValue(state, minTempLimitSchedNum));
-                } else {
-                _fanIsRunning = true;
-                }
             } else {
-            _fanIsRunning = false;
+                _fanIsRunning = true;
             }
+        } else {
+            _fanIsRunning = false;
+        }
 
     } else if (availManagerMode == AvailManagerMode::Decoupled) {
         if (ScheduleManager::GetCurrentScheduleValue(state, availSchedNum) > 0.0 && _massFlow > 0.0) {
             if (minTempLimitSchedNum > 0) {
                 _fanIsRunning = (_Tin >= ScheduleManager::GetCurrentScheduleValue(state, minTempLimitSchedNum));
-                } else {
-                _fanIsRunning = true;
-                }
             } else {
-            _fanIsRunning = false;
+                _fanIsRunning = true;
             }
+        } else {
+            _fanIsRunning = false;
         }
+    }
 
     if (_fanIsRunning) {
         // Fan is operating
@@ -2234,7 +2234,7 @@ void FanComponent::simulateComponentModel(EnergyPlusData &state)
             _beltPLEff = Curve::CurveValue(state, plBeltEffReg3CurveNum, _torqueRatio); //[-]
         } else {
             _beltPLEff = 1.0; // Direct drive or no curve specified - use constant efficiency
-                }
+        }
         beltEff = beltMaxEff * _beltPLEff; //[-]
         beltEff = max(beltEff, 0.01);      // Minimum efficiency is 1% to avoid numerical errors
 
@@ -2262,10 +2262,10 @@ void FanComponent::simulateComponentModel(EnergyPlusData &state)
             _vfdOutPowerRatio = motorInputPower / vfdMaxOutPower;                 //[-]
             vfdEff = Curve::CurveValue(state, vfdEffCurveNum, _vfdOutPowerRatio); //[-]
         } else {
-                // No curve specified - use constant efficiency
+            // No curve specified - use constant efficiency
             vfdMaxOutPower = 0.0;
             vfdEff = 0.97;
-            }
+        }
         vfdEff = max(vfdEff, 0.01); // Minimum efficiency is 1% to avoid numerical errors
 
         // Calculate VFD input power using motor input power and VFD efficiency
@@ -2487,7 +2487,7 @@ Real64 FanComponent::getDesignHeatGain(EnergyPlusData &state,
         if (!state.dataGlobal->SysSizingCalc && sizingFlag) {
             set_size(state);
             sizingFlag = false;
-    }
+        }
         return shaftPower + (motorInputPower - shaftPower) * motorInAirFrac;
     }
 } // FanComponent::getDesignHeatGain()
@@ -2666,7 +2666,11 @@ void FanSystem::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanPurpose, Name, "N/A"); // m_fanType); // purpose? not the same
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAutosized, Name, maxAirFlowRateIsAutosized ? "Yes" : "No");
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, motorInAirFrac);
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 1 - motorInAirFrac);
+    if (heatLossDest == HeatLossDest::Zone) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, state.dataHeatBal->Zone(zoneNum).Name);
+    }
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAirLoopName,
                                              Name,
@@ -2750,12 +2754,12 @@ void FanSystem::calcSimpleSystemFan(
         if (present(_flowFraction)) {
             _localFlowFrac = _flowFraction;
             _localAirMassFlow[0] = _localFlowFrac * maxAirMassFlowRate;
-    } else {
+        } else {
             if (maxAirMassFlowRate > 0.0) { // protect div by 0
                 _localFlowFrac = inletAirMassFlowRate / maxAirMassFlowRate;
             } else {
                 _localFlowFrac = 1.0;
-    }
+            }
             _localAirMassFlow[0] = inletAirMassFlowRate;
         }
         if (present(_flowRatio1) && present(_flowRatio2) && present(_runTimeFrac1) && present(_runTimeFrac2)) {
@@ -2786,7 +2790,7 @@ void FanSystem::calcSimpleSystemFan(
 
             _localFaultMaxAirMassFlow = maxAirMassFlowRate - _designFlowRateDec * rhoAirStdInit;
             _localFaultPressureRise = _pressFrac * deltaPress;
-    }
+        }
     }
 
     for (int mode = 0; mode < _numModes; ++mode) {
@@ -2799,13 +2803,13 @@ void FanSystem::calcSimpleSystemFan(
         if (_faultActive) {
             _localAirMassFlow[mode] = min(_localAirMassFlow[mode], _localFaultMaxAirMassFlow);
             _localPressureRise[mode] = _localFaultPressureRise;
-    }
+        }
         _localFlowFrac = _localAirMassFlow[0] / maxAirMassFlowRate;
         _localFlowFrac = min(1.0, _localFlowFrac);
 
         if (_localRuntimeFrac[mode] > 0.0) {
             _localFlowRatio[mode] = _localAirMassFlow[mode] / (maxAirMassFlowRate * _localRuntimeFrac[mode]);
-    }
+        }
         _localFlowRatio[mode] = min(1.0, _localFlowRatio[mode]);
     }
 
@@ -2834,7 +2838,7 @@ void FanSystem::calcSimpleSystemFan(
                 //
                 if (state.dataHVACGlobal->OnOffFanPartLoadFraction <= 0.0) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;
-    }
+                }
                 if (state.dataHVACGlobal->OnOffFanPartLoadFraction < 0.7) {
                     state.dataHVACGlobal->OnOffFanPartLoadFraction = 0.7; // a warning message is already issued from the DX coils or gas heating coil
                 }
@@ -2923,8 +2927,8 @@ void FanSystem::calcSimpleSystemFan(
                                 if ((flowFracAtSpeed[loop] <= _locRuntimeFrac) && (_locRuntimeFrac <= flowFracAtSpeed[loop + 1])) {
                                     _lowSideSpeed = loop;
                                     _hiSideSpeed = loop + 1;
-            break;
-        }
+                                    break;
+                                }
                             }
                             _locLowSpeedRuntimeFrac =
                                 (flowFracAtSpeed[_hiSideSpeed] - _locRuntimeFrac) / (flowFracAtSpeed[_hiSideSpeed] - flowFracAtSpeed[_lowSideSpeed]);
@@ -2959,7 +2963,7 @@ void FanSystem::calcSimpleSystemFan(
                 } else {
                     _locFlowRatio = _localFlowFrac;
                     _locRuntimeFrac = 1.0;
-    }
+                }
 
                 Real64 _localFlowFracForPower = max(minPowerFlowFrac, _locFlowRatio);
                 Real64 _localPowerFrac = (state.dataHVACGlobal->NightVentOn) ? 1.0 : // not sure why, but legacy fan had this for night ventilation
@@ -3084,8 +3088,8 @@ void FanSystem::update(EnergyPlusData &state) // does not change state of object
                 state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = outletAirMassFlowRate / massFlowAtSpeed[0];
             } else {
                 state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = 1.0;
+            }
         }
-    }
     }
 } // FanSystem::update()
 
@@ -3112,7 +3116,7 @@ Real64 FanSystem::getDesignHeatGain(EnergyPlusData &state, Real64 const _volFlow
 {
     if (sizingFlag) {
         set_size(state);
-        }
+    }
 
     Real64 _fanPowerTot = (_volFlow * deltaPress) / totalEff;
     return motorEff * _fanPowerTot + (_fanPowerTot - motorEff * _fanPowerTot) * motorInAirFrac;

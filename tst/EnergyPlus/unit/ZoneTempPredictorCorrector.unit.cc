@@ -1718,7 +1718,7 @@ TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
     dzc.TempControlledZone(1).NumControlTypes = 1;
     dzc.TempControlledZone(1).ControlTypeEnum.allocate(dzc.TempControlledZone(1).NumControlTypes);
     dzc.TempControlledZone(1).ControlTypeName.allocate(dzc.TempControlledZone(1).NumControlTypes);
-    dzc.TempControlledZone(1).ControlTypeEnum(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+    dzc.TempControlledZone(1).ControlTypeEnum(1) = HVAC::ThermostatType::SingleHeating;
     dzc.TempControlledZone(1).ControlTypeName(1) = "control A";
     dzc.TempControlledZone(1).SchIndx_SingleHeatSetPoint = 1;
     state->dataScheduleMgr->Schedule(1).Name = "schA";
@@ -1729,7 +1729,7 @@ TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
     dzc.TempControlledZone(2).NumControlTypes = 1;
     dzc.TempControlledZone(2).ControlTypeEnum.allocate(dzc.TempControlledZone(1).NumControlTypes);
     dzc.TempControlledZone(2).ControlTypeName.allocate(dzc.TempControlledZone(1).NumControlTypes);
-    dzc.TempControlledZone(2).ControlTypeEnum(1) = DataHVACGlobals::ThermostatType::SingleCooling;
+    dzc.TempControlledZone(2).ControlTypeEnum(1) = HVAC::ThermostatType::SingleCooling;
     dzc.TempControlledZone(2).ControlTypeName(1) = "control B";
     dzc.TempControlledZone(2).SchIndx_SingleCoolSetPoint = 2;
     state->dataScheduleMgr->Schedule(2).Name = "schB";
@@ -1740,7 +1740,7 @@ TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
     dzc.TempControlledZone(3).NumControlTypes = 1;
     dzc.TempControlledZone(3).ControlTypeEnum.allocate(dzc.TempControlledZone(1).NumControlTypes);
     dzc.TempControlledZone(3).ControlTypeName.allocate(dzc.TempControlledZone(1).NumControlTypes);
-    dzc.TempControlledZone(3).ControlTypeEnum(1) = DataHVACGlobals::ThermostatType::SingleHeatCool;
+    dzc.TempControlledZone(3).ControlTypeEnum(1) = HVAC::ThermostatType::SingleHeatCool;
     dzc.TempControlledZone(3).ControlTypeName(1) = "control C";
     dzc.TempControlledZone(3).SchIndx_SingleHeatCoolSetPoint = 3;
     state->dataScheduleMgr->Schedule(3).Name = "schC";
@@ -1751,7 +1751,7 @@ TEST_F(EnergyPlusFixture, FillPredefinedTableOnThermostatSchedules_Test)
     dzc.TempControlledZone(4).NumControlTypes = 1;
     dzc.TempControlledZone(4).ControlTypeEnum.allocate(dzc.TempControlledZone(1).NumControlTypes);
     dzc.TempControlledZone(4).ControlTypeName.allocate(dzc.TempControlledZone(1).NumControlTypes);
-    dzc.TempControlledZone(4).ControlTypeEnum(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    dzc.TempControlledZone(4).ControlTypeEnum(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     dzc.TempControlledZone(4).ControlTypeName(1) = "control D";
     dzc.TempControlledZone(4).SchIndx_DualSetPointWDeadBandHeat = 4;
     dzc.TempControlledZone(4).SchIndx_DualSetPointWDeadBandCool = 5;

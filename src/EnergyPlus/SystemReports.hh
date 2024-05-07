@@ -337,7 +337,7 @@ namespace SystemReports {
     void fillAirloopToplogyComponentRow(EnergyPlusData &state,
                                         const std::string_view &loopName,
                                         const std::string_view &branchName,
-                                        const DataHVACGlobals::AirDuctType ductType,
+                                        const HVAC::AirDuctType ductType,
                                         const std::string_view &compType,
                                         const std::string_view &compName,
                                         int &rowCounter);

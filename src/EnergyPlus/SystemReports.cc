@@ -4861,14 +4861,14 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                     OutputReportPredefined::PreDefTableEntry(
                         state, orp->pdchTopAirSupplyPCompType, format("{}", rowCounter), thisSupplyPath.ComponentType(compNum));
                     OutputReportPredefined::PreDefTableEntry(
                         state, orp->pdchTopAirSupplyPCompName, format("{}", rowCounter), thisSupplyPath.ComponentName(compNum));
                     ++rowCounter;
                 }
-                if (thisBranch.DuctType == DataHVACGlobals::AirDuctType::Cooling || thisBranch.DuctType == DataHVACGlobals::AirDuctType::Main) {
+                if (thisBranch.DuctType == HVAC::AirDuctType::Cooling || thisBranch.DuctType == HVAC::AirDuctType::Main) {
                     for (int zoneNum : thisAtoZInfo.CoolCtrlZoneNums) {
                         auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
@@ -4888,7 +4888,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      orp->pdchTopAirSupplyDuctType,
                                                                      format("{}", rowCounter),
-                                                                     DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                                                                     HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
                             auto &aduIndex = zel.EquipIndex(thisCoolADU.AirDistUnitIndex);
@@ -4922,7 +4922,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                             ++rowCounter;
                         }
                     }
-                } else if (thisBranch.DuctType == DataHVACGlobals::AirDuctType::Heating) {
+                } else if (thisBranch.DuctType == HVAC::AirDuctType::Heating) {
                     for (int zoneNum : thisAtoZInfo.HeatCtrlZoneNums) {
                         auto &thisZoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(zoneNum);
                         auto &zel = state.dataZoneEquip->ZoneEquipList(zoneNum);
@@ -4942,7 +4942,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                             OutputReportPredefined::PreDefTableEntry(state,
                                                                      orp->pdchTopAirSupplyDuctType,
                                                                      format("{}", rowCounter),
-                                                                     DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                                                                     HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
                             auto &aduIndex = zel.EquipIndex(thisHeatADU.AirDistUnitIndex);
@@ -4979,7 +4979,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                 OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                 OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
                 OutputReportPredefined::PreDefTableEntry(
-                    state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                    state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                 ++rowCounter;
             }
         }
@@ -4991,7 +4991,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                     auto &thisBranch = pas.Branch(pas.InletBranchNum[0]);
                     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
                     OutputReportPredefined::PreDefTableEntry(
-                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)thisBranch.DuctType]);
+                        state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                 }
                 OutputReportPredefined::PreDefTableEntry(
                     state, orp->pdchTopAirReturnPCompType, format("{}", rowCounter), thisReturnPath.ComponentType(compNum));
@@ -5006,7 +5006,7 @@ void reportAirLoopToplogy(EnergyPlusData &state)
 void fillAirloopToplogyComponentRow(EnergyPlusData &state,
                                     const std::string_view &loopName,
                                     const std::string_view &branchName,
-                                    const DataHVACGlobals::AirDuctType ductType,
+                                    const HVAC::AirDuctType ductType,
                                     const std::string_view &compType,
                                     const std::string_view &compName,
                                     int &rowCounter)
@@ -5019,7 +5019,7 @@ void fillAirloopToplogyComponentRow(EnergyPlusData &state,
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirLoopName, format("{}", rowCounter), loopName);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirBranchName, format("{}", rowCounter), branchName);
     OutputReportPredefined::PreDefTableEntry(
-        state, orp->pdchTopAirSupplyBranchType, format("{}", rowCounter), DataHVACGlobals::airDuctTypeNames[(int)ductType]);
+        state, orp->pdchTopAirSupplyBranchType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)ductType]);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompType, format("{}", rowCounter), compType);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompName, format("{}", rowCounter), compName);
     ++rowCounter;
