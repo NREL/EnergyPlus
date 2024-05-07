@@ -180,40 +180,40 @@ namespace OutdoorAirUnit {
         int ZoneNodeNum;             // index of zone air node in node structure
         std::string UnitControlType; // Control type for the system
         // (Neutral and setpoint temperatrue)
-        OAUnitCtrlType controlType;            // Unit Control type indicator
-        int AirInletNode;                      // inlet air node number
-        int AirOutletNode;                     // outlet air node number
-        std::string SFanName;                  // name of supply fan
-        int SFan_Index;                        // index in fan structure
+        OAUnitCtrlType controlType;  // Unit Control type indicator
+        int AirInletNode;            // inlet air node number
+        int AirOutletNode;           // outlet air node number
+        std::string SFanName;        // name of supply fan
+        int SFan_Index;              // index in fan structure
         HVAC::FanType supFanType;    // type of fan in cFanTypes
-        int SFanAvailSchedPtr;                 // supply fan availability sched from fan object
+        int SFanAvailSchedPtr;       // supply fan availability sched from fan object
         HVAC::FanPlace supFanPlace;  // fan placement; blow through and draw through
-        Real64 FanCorTemp;                     // correction temperature
-        bool FanEffect;                        // .TRUE. if unit has a fan type of draw through
-        int SFanOutletNode;                    // supply fan outlet node number
-        std::string ExtFanName;                // name of exhaust fan
-        int ExtFan_Index;                      // index in fan structure
+        Real64 FanCorTemp;           // correction temperature
+        bool FanEffect;              // .TRUE. if unit has a fan type of draw through
+        int SFanOutletNode;          // supply fan outlet node number
+        std::string ExtFanName;      // name of exhaust fan
+        int ExtFan_Index;            // index in fan structure
         HVAC::FanType extFanType;    // type of fan in cFanTypes
-        int ExtFanAvailSchedPtr;               // exhaust fan availability sched from fan object
-        bool ExtFan;                           // true if there is an exhaust fan
-        std::string OutAirSchedName;           // schedule of fraction for outside air (all controls)
-        int OutAirSchedPtr;                    // index to schedule
-        int OutsideAirNode;                    // outside air node number
-        Real64 OutAirVolFlow;                  // m3/s
-        Real64 OutAirMassFlow;                 // kg/s
-        Real64 ExtAirVolFlow;                  // m3/s
-        Real64 ExtAirMassFlow;                 // kg/s
-        std::string ExtAirSchedName;           // schedule of fraction for exhaust air
-        int ExtOutAirSchedPtr;                 // index to schedule
-        Real64 SMaxAirMassFlow;                // kg/s
-        Real64 EMaxAirMassFlow;                // kg/s
-        Real64 SFanMaxAirVolFlow;              // m3/s
-        Real64 EFanMaxAirVolFlow;              // m3/s
-        std::string HiCtrlTempSched;           // Schedule name for the High Control Air temperature
-        int HiCtrlTempSchedPtr;                // Schedule index for the High Control Air temperature
-        std::string LoCtrlTempSched;           // Schedule name for the Low Control Air temperature
-        int LoCtrlTempSchedPtr;                // Schedule index for the Low Control Air temperature
-        Operation OperatingMode;               // operating condition( NeutralMode, HeatingMode, CoolingMode)
+        int ExtFanAvailSchedPtr;     // exhaust fan availability sched from fan object
+        bool ExtFan;                 // true if there is an exhaust fan
+        std::string OutAirSchedName; // schedule of fraction for outside air (all controls)
+        int OutAirSchedPtr;          // index to schedule
+        int OutsideAirNode;          // outside air node number
+        Real64 OutAirVolFlow;        // m3/s
+        Real64 OutAirMassFlow;       // kg/s
+        Real64 ExtAirVolFlow;        // m3/s
+        Real64 ExtAirMassFlow;       // kg/s
+        std::string ExtAirSchedName; // schedule of fraction for exhaust air
+        int ExtOutAirSchedPtr;       // index to schedule
+        Real64 SMaxAirMassFlow;      // kg/s
+        Real64 EMaxAirMassFlow;      // kg/s
+        Real64 SFanMaxAirVolFlow;    // m3/s
+        Real64 EFanMaxAirVolFlow;    // m3/s
+        std::string HiCtrlTempSched; // Schedule name for the High Control Air temperature
+        int HiCtrlTempSchedPtr;      // Schedule index for the High Control Air temperature
+        std::string LoCtrlTempSched; // Schedule name for the Low Control Air temperature
+        int LoCtrlTempSchedPtr;      // Schedule index for the Low Control Air temperature
+        Operation OperatingMode;     // operating condition( NeutralMode, HeatingMode, CoolingMode)
         int ControlCompTypeNum;
         int CompErrIndex;
         Real64 AirMassFlow; // kg/s

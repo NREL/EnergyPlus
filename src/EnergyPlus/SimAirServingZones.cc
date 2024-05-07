@@ -433,7 +433,7 @@ void GetAirPathData(EnergyPlusData &state)
         primaryAirSystems.NumOAHeatCoils = 0;
         primaryAirSystems.NumOACoolCoils = 0;
         AirLoopControlInfo(AirSysNum).FanOpMode = HVAC::ContFanCycCoil; // initialize to constant fan mode for all air loops
-        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;                    // initialize to 1 for all air loops
+        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;         // initialize to 1 for all air loops
 
         CurrentModuleObject = "AirLoopHVAC";
 
@@ -1182,7 +1182,7 @@ void GetAirPathData(EnergyPlusData &state)
                             comp.CompIndex = Fans::GetFanIndex(state, comp.Name); // TODO: get rid of this
                             if (comp.CompIndex == 0) {
                                 ShowSevereError(state, format("Component {} of type {} not found.", comp.Name, comp.TypeOf));
-                        }
+                            }
                         }
 
                         state.dataFans->fans(comp.CompIndex)->airPathFlag = true;
@@ -1937,7 +1937,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                     if (compType == CompType::OAMixer_Num) {
                         FoundOASys = true;
                     } else if (compType == CompType::WaterCoil_Cooling || compType == CompType::WaterCoil_DetailedCool ||
-                        compType == CompType::WaterCoil_CoolingHXAsst || compType == CompType::DXSystem) {
+                               compType == CompType::WaterCoil_CoolingHXAsst || compType == CompType::DXSystem) {
                         FoundCentralCoolCoil = true;
                     } else if (compType == CompType::Fan_Simple_CV || compType == CompType::Fan_Simple_VAV ||
                                compType == CompType::Fan_ComponentModel || compType == CompType::Fan_System_Object) {
@@ -1947,16 +1947,16 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
                                     SupFanIndex = comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
                                     supFanType = state.dataFans->fans(SupFanIndex)->type;
                                     goto EndOfAirLoop;
-                            } else {
+                                } else {
                                     // Grab CompIndex but don't set airLoop.supFanType or retFanType?
                                     comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
-                            }
-                        } else {
+                                }
+                            } else {
                                 RetFanIndex = comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
                                 retFanType = state.dataFans->fans(RetFanIndex)->type;
                                 // no goto here?
-                        }
-                            } else {
+                            }
+                        } else {
                             SupFanIndex = comp.CompIndex = Fans::GetFanIndex(state, comp.Name);
                             supFanType = state.dataFans->fans(SupFanIndex)->type;
                             goto EndOfAirLoop;
@@ -1977,7 +1977,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
             thisPrimaryAirSys.retFanType = retFanType;
             thisPrimaryAirSys.retFanNum = RetFanIndex;
-            }
+        }
         // Check whether there are Central Heating Coils in the Primary Air System
         for (int AirLoopNum = 1; AirLoopNum <= numPrimaryAirSys; ++AirLoopNum) {
             auto &thisPrimaryAirSys = state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum);
@@ -3464,7 +3464,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
         state.dataFans->fans(CompIndex)->simulate(state, FirstHVACIteration);
     } break;
 
-    case CompType::Fan_System_Object: {                                        // "Fan:SystemModel" new for V8.6
+    case CompType::Fan_System_Object: { // "Fan:SystemModel" new for V8.6
         // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
         // involved but the fan should really run like constant volume and not cycle with compressor
         state.dataHVACGlobal->OnOffFanPartLoadFraction = 1.0;

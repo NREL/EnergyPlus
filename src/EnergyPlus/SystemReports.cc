@@ -4885,10 +4885,8 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                                 state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
-                            OutputReportPredefined::PreDefTableEntry(state,
-                                                                     orp->pdchTopAirSupplyDuctType,
-                                                                     format("{}", rowCounter),
-                                                                     HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
                             auto &aduIndex = zel.EquipIndex(thisCoolADU.AirDistUnitIndex);
@@ -4939,10 +4937,8 @@ void reportAirLoopToplogy(EnergyPlusData &state)
                                 state, orp->pdchTopAirDemandName, format("{}", rowCounter), thisAtoZInfo.AirLoopName);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirSupplyBranchName, format("{}", rowCounter), thisBranch.Name);
-                            OutputReportPredefined::PreDefTableEntry(state,
-                                                                     orp->pdchTopAirSupplyDuctType,
-                                                                     format("{}", rowCounter),
-                                                                     HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
+                            OutputReportPredefined::PreDefTableEntry(
+                                state, orp->pdchTopAirSupplyDuctType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)thisBranch.DuctType]);
                             OutputReportPredefined::PreDefTableEntry(
                                 state, orp->pdchTopAirZoneName, format("{}", rowCounter), thisZoneEquipConfig.ZoneName);
                             auto &aduIndex = zel.EquipIndex(thisHeatADU.AirDistUnitIndex);
@@ -5018,8 +5014,7 @@ void fillAirloopToplogyComponentRow(EnergyPlusData &state,
     // s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirLoopName, format("{}", rowCounter), loopName);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirBranchName, format("{}", rowCounter), branchName);
-    OutputReportPredefined::PreDefTableEntry(
-        state, orp->pdchTopAirSupplyBranchType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)ductType]);
+    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSupplyBranchType, format("{}", rowCounter), HVAC::airDuctTypeNames[(int)ductType]);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompType, format("{}", rowCounter), compType);
     OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirCompName, format("{}", rowCounter), compName);
     ++rowCounter;
