@@ -14611,9 +14611,9 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                     NumIteCcap = NumIteCcap + 1;
                     goto Label19;
                 }
-                if (CapDiff > (Tolerance * Cap_Eva0)) {
+                if (CapDiff > (Tolerance * Cap_Eva0) && (Cap_Eva1 - Cap_Eva0) >= 0.0) {
                     NumIteCcap = 999;
-                    CyclingRatio = min(1.0, (TU_load + Pipe_Q) * C_cap_operation / Cap_Eva1);
+                    CyclingRatio = Cap_Eva0 / Cap_Eva1;
                 } else {
                     CyclingRatio = 1.0;
                 }
