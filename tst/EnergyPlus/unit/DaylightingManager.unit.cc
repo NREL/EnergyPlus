@@ -78,6 +78,7 @@
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::Construction;
@@ -870,6 +871,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(2);
     state->dataSurfaceGeometry->SinZoneRelNorth.allocate(2);
@@ -1767,6 +1769,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
 
     SurfaceGeometry::SetupZoneGeometry(*state, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                               // expect no errors
@@ -2567,6 +2570,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_OutputFormats)
 
     HeatBalanceManager::GetZoneData(*state, foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                            // expect no errors
+    ZoneEquipmentManager::GetZoneEquipment(*state);
+
     state->dataViewFactor->NumOfSolarEnclosures = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataViewFactor->NumOfSolarEnclosures);
     dl->enclDaylight.allocate(state->dataViewFactor->NumOfSolarEnclosures);

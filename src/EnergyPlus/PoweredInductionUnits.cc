@@ -58,7 +58,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/HVAC.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -71,7 +71,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -109,10 +108,10 @@ namespace EnergyPlus::PoweredInductionUnits {
 
 // Using/Aliasing
 using namespace DataLoopNode;
-using DataHVACGlobals::SmallAirVolFlow;
-using DataHVACGlobals::SmallLoad;
-using DataHVACGlobals::SmallMassFlow;
-using DataHVACGlobals::SmallTempDiff;
+using HVAC::SmallAirVolFlow;
+using HVAC::SmallLoad;
+using HVAC::SmallMassFlow;
+using HVAC::SmallTempDiff;
 using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
@@ -238,6 +237,8 @@ void GetPIUs(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilSteamInletNode;
     using WaterCoils::GetCoilWaterInletNode;
+
+    static constexpr std::string_view routineName = "GetPIUs";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumAlphas = 0;                                          // Number of Alpha input fields for each GetObjectItem call
@@ -411,22 +412,14 @@ void GetPIUs(EnergyPlusData &state)
 
                 // find fan type
                 // test if Fan:SystemModel fan of this name exists
-                if (HVACFan::checkIfFanNameIsAFanSystem(state, thisPIU.FanName)) {
-                    thisPIU.Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, thisPIU.FanName)); // call constructor
-                    thisPIU.Fan_Index = HVACFan::getFanObjectVectorIndex(state, thisPIU.FanName);
-                    thisPIU.FanAvailSchedPtr = state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->availSchedIndex;
+                if ((thisPIU.Fan_Index = Fans::GetFanIndex(state, thisPIU.FanName)) == 0) {
+                    ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(8), thisPIU.FanName);
+                    ErrorsFound = true;
                 } else {
-                    bool isNotOkay(false);
-                    ValidateComponent(state, "FAN:CONSTANTVOLUME", thisPIU.FanName, isNotOkay, "GetPIUs");
-                    if (isNotOkay) {
-                        ShowContinueError(state, format("In {} = {}", thisPIU.UnitType, thisPIU.Name));
-                        ErrorsFound = true;
-                    }
-                    thisPIU.Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-                    int FanType_Num = 0;
-                    Fans::GetFanType(state, thisPIU.FanName, FanType_Num, ErrorsFound);
-                    thisPIU.FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), thisPIU.FanName, ErrorsFound);
+                    // Assert that this is a constant volume fan?
+                    auto *fan = state.dataFans->fans(thisPIU.Fan_Index);
+                    thisPIU.fanType = fan->type;
+                    thisPIU.FanAvailSchedPtr = fan->availSchedNum;
                 }
 
                 thisPIU.HCoil = ip->getAlphaFieldValue(fields, objectSchemaProps, "reheat_coil_name");
@@ -451,7 +444,7 @@ void GetPIUs(EnergyPlusData &state)
                 thisPIU.fanControlType = FanCntrlType::ConstantSpeedFan;
                 if (Util::SameString(fan_control_type, "VariableSpeed")) {
                     thisPIU.fanControlType = FanCntrlType::VariableSpeedFan;
-                    if (thisPIU.Fan_Num != DataHVACGlobals::FanType_SystemModelObject) {
+                    if (thisPIU.Fan_Num != HVAC::FanType_SystemModelObject) {
                         ErrorsFound = true;
                         ShowSevereError(state, format("Fan type must be Fan:SystemModel when Fan Control Type = {}", fan_control_type));
                         ShowContinueError(state, format("Occurs in {} = {}", cCurrentModuleObject, thisPIU.Name));
@@ -575,43 +568,43 @@ void GetPIUs(EnergyPlusData &state)
                             "Zone Air Terminal Primary Damper Position",
                             Constant::Units::None,
                             thisPIU.PriDamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Rate",
                             Constant::Units::W,
                             thisPIU.HeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Heating Energy",
                             Constant::Units::J,
                             thisPIU.HeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Rate",
                             Constant::Units::W,
                             thisPIU.SensCoolRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Sensible Cooling Energy",
                             Constant::Units::J,
                             thisPIU.SensCoolEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             Constant::Units::m3_s,
                             thisPIU.OutdoorAirFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisPIU.Name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Total Air Mass Flow Rate",
@@ -1549,12 +1542,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
                 state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
                 state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
                 SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
-                if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-                } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                    Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
-                                                _); // fire the fan
-                }
+                state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
                 // fan temperature rise [C]
                 Real64 const FanDeltaTemp =
@@ -1605,19 +1593,19 @@ void CalcSeriesPIU(EnergyPlusData &state,
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
 
     // fire the fan
-    if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+    if (thisPIU.Fan_Num == HVAC::FanType_SystemModelObject) {
         if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
             // calculate fan speed ratio
             Real64 fanFlowRatio(1.0);
             if (thisPIU.MaxTotAirMassFlow > 0.0) {
                 fanFlowRatio = (thisPIU.PriAirMassFlow + thisPIU.SecAirMassFlow) / thisPIU.MaxTotAirMassFlow;
             }
-            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, fanFlowRatio, _);
         } else {
-            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         }
-    } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _);
+    } else if (thisPIU.Fan_Num == HVAC::FanType_SimpleConstVolume) {
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
     }
 
     // the heating load seen by the reheat coil [W]
@@ -1626,7 +1614,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
     // check if heating coil is off
     if (((!UnitOn) || (QActualHeating < SmallLoad) ||
-         (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+         (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
          (thisPIU.PriAirMassFlow > PriAirMassFlowMin)) &&
         (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
         thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;
@@ -1900,12 +1888,8 @@ void CalcParallelPIU(EnergyPlusData &state,
             state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
             state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
 
-            if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
-            } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index,
-                                            _); // fire the fan
-            }
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             // fan temperature rise [C]
             Real64 const FanDeltaTemp = state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp;
@@ -1957,19 +1941,19 @@ void CalcParallelPIU(EnergyPlusData &state,
 
     // now that inlet airflows have been set, the terminal box components can be simulated.
     // fire the fan
-    if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
+    if (thisPIU.Fan_Num == HVAC::FanType_SystemModelObject) {
         if (thisPIU.fanControlType == FanCntrlType::VariableSpeedFan) {
             // calculate fan speed ratio
             Real64 fanFlowRatio(1.0);
             if (thisPIU.MaxSecAirMassFlow > 0.0) {
                 fanFlowRatio = thisPIU.SecAirMassFlow / thisPIU.MaxSecAirMassFlow;
             }
-            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, fanFlowRatio, _);
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, fanFlowRatio, _);
         } else {
-            state.dataHVACFan->fanObjs[thisPIU.Fan_Index]->simulate(state, _, _);
+            state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         }
-    } else if (thisPIU.Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-        Fans::SimulateFanComponents(state, thisPIU.FanName, FirstHVACIteration, thisPIU.Fan_Index, _);
+    } else if (thisPIU.Fan_Num == HVAC::FanType_SimpleConstVolume) {
+        state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
     }
 
     // fire the mixer
@@ -1981,7 +1965,7 @@ void CalcParallelPIU(EnergyPlusData &state,
 
     // check if heating coil is off
     if (((!UnitOn) || (QActualHeating < SmallLoad) ||
-         (state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleCooling) ||
+         (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
          (thisPIU.PriAirMassFlow > PriAirMassFlowMin)) &&
         (thisPIU.heatingOperatingMode != HeatOpModeType::StagedHeatFirstStage)) { // reheat is off during the first stage of heating
         thisPIU.heatingOperatingMode = HeatOpModeType::HeaterOff;

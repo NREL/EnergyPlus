@@ -3326,7 +3326,7 @@ namespace WindowComplexManager {
             // IF(ShadeFlag <= 0) THEN
             // TransDiff = Construct(ConstrNum).TransDiff;
             int IState = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.NumStates;
-            Real64 TransDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinDiffTrans;
+            Real64 ReflDiff = state.dataSurface->SurfaceWindow(SurfNum).ComplexFen.State(IState).WinBkHemRefl;
             // ELSE IF(ShadeFlag==WinShadingType::IntShade .OR. ShadeFlag==WinShadingType::ExtShade) THEN
             //  TransDiff = Construct(ConstrNum)%TransDiff
             // ELSE IF(ShadeFlag==WinShadingType::IntBlind .OR. ShadeFlag==WinShadingType::ExtBlind .OR.ShadeFlag==WinShadingType::BGBlind) THEN
@@ -3338,8 +3338,11 @@ namespace WindowComplexManager {
             // END IF
             state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
                 state.dataHeatBal->EnclSolQSWRad(state.dataSurface->Surface(SurfNum).SolarEnclIndex) * state.dataSurface->Surface(SurfNum).Area *
-                TransDiff;
-            state.dataSurface->SurfWinHeatGain(SurfNum) -= state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum);
+                    (1 - ReflDiff) +
+                state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
+            state.dataSurface->SurfWinHeatGain(SurfNum) -=
+                (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
+                 state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);
 
             if (ShadeFlag == WinShadingType::IntShade || ShadeFlag == WinShadingType::ExtShade) {
                 state.dataSurface->SurfWinShadingAbsorbedSolar(SurfNum) =

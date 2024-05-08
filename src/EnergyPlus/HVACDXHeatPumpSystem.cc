@@ -94,7 +94,6 @@ namespace HVACDXHeatPumpSystem {
     // Use statements for data only modules
     // Using/Aliasing
     using namespace DataLoopNode;
-    using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
     void SimDXHeatPumpSystem(EnergyPlusData &state,
@@ -182,21 +181,21 @@ namespace HVACDXHeatPumpSystem {
         CompName = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilName;
 
         switch (DXHeatPumpSystem(DXSystemNum).HeatPumpCoilType_Num) {
-        case CoilDX_HeatingEmpirical: { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
+        case HVAC::CoilDX_HeatingEmpirical: { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
             SimDXCoil(state,
                       CompName,
-                      CompressorOperation::On,
+                      HVAC::CompressorOperation::On,
                       FirstHVACIteration,
                       DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                       DXHeatPumpSystem(DXSystemNum).FanOpMode,
                       DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
         } break;
-        case Coil_HeatingAirToAirVariableSpeed: { // Coil:Heating:DX:VariableSpeed
+        case HVAC::Coil_HeatingAirToAirVariableSpeed: { // Coil:Heating:DX:VariableSpeed
             SimVariableSpeedCoils(state,
                                   CompName,
                                   DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                   DXHeatPumpSystem(DXSystemNum).FanOpMode,
-                                  CompressorOperation::On,
+                                  HVAC::CompressorOperation::On,
                                   DXHeatPumpSystem(DXSystemNum).PartLoadFrac,
                                   DXHeatPumpSystem(DXSystemNum).SpeedNum,
                                   DXHeatPumpSystem(DXSystemNum).SpeedRatio,
@@ -330,13 +329,13 @@ namespace HVACDXHeatPumpSystem {
             if (Util::SameString(Alphas(3), "Coil:Heating:DX:SingleSpeed")) {
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType = Alphas(3);
-                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = CoilDX_HeatingEmpirical;
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
             } else if (Util::SameString(Alphas(3), "Coil:Heating:DX:VariableSpeed")) {
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType = Alphas(3);
-                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = Coil_HeatingAirToAirVariableSpeed;
+                DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num = HVAC::Coil_HeatingAirToAirVariableSpeed;
 
                 DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName = Alphas(4);
 
@@ -346,7 +345,7 @@ namespace HVACDXHeatPumpSystem {
                 state.dataHVACDXHeatPumpSys->ErrorsFound = true;
             }
 
-            if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
+            if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num == HVAC::Coil_HeatingAirToAirVariableSpeed) {
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum =
                     GetCoilInletNodeVariableSpeed(state,
                                                   DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType,
@@ -398,9 +397,9 @@ namespace HVACDXHeatPumpSystem {
                           state.dataLoopNodes->NodeID(DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum));
 
             // Supply air fan operating mode defaulted to constant fan cycling coil/compressor
-            DXHeatPumpSystem(DXHeatSysNum).FanOpMode = ContFanCycCoil;
+            DXHeatPumpSystem(DXHeatSysNum).FanOpMode = HVAC::ContFanCycCoil;
 
-            if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num != Coil_HeatingAirToAirVariableSpeed) {
+            if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num != HVAC::Coil_HeatingAirToAirVariableSpeed) {
                 SetCoilSystemHeatingDXFlag(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName);
             }
 
@@ -416,8 +415,8 @@ namespace HVACDXHeatPumpSystem {
                                 "Coil System Part Load Ratio",
                                 Constant::Units::None,
                                 DXHeatPumpSystem(DXHeatSysNum).PartLoadFrac,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 DXHeatPumpSystem(DXHeatSysNum).Name);
         }
 
@@ -552,8 +551,8 @@ namespace HVACDXHeatPumpSystem {
 
         // Using/Aliasing
         using namespace ScheduleManager;
-        using DataHVACGlobals::TempControlTol;
         using DXCoils::SimDXCoil;
+        using HVAC::TempControlTol;
 
         using General::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
@@ -643,13 +642,13 @@ namespace HVACDXHeatPumpSystem {
                     Real64 TempOut1;
 
                     switch (DXHeatPumpSystem.HeatPumpCoilType_Num) {
-                    case CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
+                    case HVAC::CoilDX_HeatingEmpirical: { // Coil:Heating:DX:SingleSpeed
 
                         // Get no load result
                         PartLoadFrac = 0.0;
                         SimDXCoil(state,
                                   CompName,
-                                  CompressorOperation::On,
+                                  HVAC::CompressorOperation::On,
                                   FirstHVACIteration,
                                   DXHeatPumpSystem.HeatPumpCoilIndex,
                                   FanOpMode,
@@ -662,7 +661,7 @@ namespace HVACDXHeatPumpSystem {
                         PartLoadFrac = 1.0;
                         SimDXCoil(state,
                                   CompName,
-                                  CompressorOperation::On,
+                                  HVAC::CompressorOperation::On,
                                   FirstHVACIteration,
                                   DXHeatPumpSystem.HeatPumpCoilIndex,
                                   FanOpMode,
@@ -697,7 +696,7 @@ namespace HVACDXHeatPumpSystem {
                                                    (TempOut1 - state.dataLoopNodes->Node(InletNode).Temp);
                                     SimDXCoil(state,
                                               CompName,
-                                              CompressorOperation::On,
+                                              HVAC::CompressorOperation::On,
                                               FirstHVACIteration,
                                               DXHeatPumpSystem.HeatPumpCoilIndex,
                                               FanOpMode,
@@ -705,7 +704,7 @@ namespace HVACDXHeatPumpSystem {
                                 } else {
                                     int coilIndex = DXHeatPumpSystem.HeatPumpCoilIndex;
                                     auto f = [&state, coilIndex, DesOutTemp](Real64 const PartLoadFrac) {
-                                        DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, ContFanCycCoil, 1.0);
+                                        DXCoils::CalcDXHeatingCoil(state, coilIndex, PartLoadFrac, HVAC::ContFanCycCoil, 1.0);
                                         Real64 OutletAirTemp = state.dataDXCoils->DXCoilOutletTemp(coilIndex);
                                         return DesOutTemp - OutletAirTemp;
                                     };
@@ -772,7 +771,7 @@ namespace HVACDXHeatPumpSystem {
                             PartLoadFrac = 0.0;
                         }
                     } break;
-                    case Coil_HeatingAirToAirVariableSpeed: {
+                    case HVAC::Coil_HeatingAirToAirVariableSpeed: {
                         // variable-speed air-to-air heating coil, begin -------------------------
                         // Get no load result
                         PartLoadFrac = 0.0;
@@ -786,7 +785,7 @@ namespace HVACDXHeatPumpSystem {
                                               CompName,
                                               DXHeatPumpSystem.HeatPumpCoilIndex,
                                               FanOpMode,
-                                              CompressorOperation::On,
+                                              HVAC::CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
                                               SpeedRatio,
@@ -811,7 +810,7 @@ namespace HVACDXHeatPumpSystem {
                                               CompName,
                                               VSCoilIndex,
                                               FanOpMode,
-                                              CompressorOperation::On,
+                                              HVAC::CompressorOperation::On,
                                               PartLoadFrac,
                                               SpeedNum,
                                               SpeedRatio,
@@ -856,7 +855,7 @@ namespace HVACDXHeatPumpSystem {
                                                       CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
-                                                      CompressorOperation::On,
+                                                      HVAC::CompressorOperation::On,
                                                       PartLoadFrac,
                                                       SpeedNum,
                                                       SpeedRatio,
@@ -877,7 +876,7 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              CompressorOperation::On,
+                                                              HVAC::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -899,7 +898,7 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              CompressorOperation::On,
+                                                              HVAC::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -973,7 +972,7 @@ namespace HVACDXHeatPumpSystem {
                                                               CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
-                                                              CompressorOperation::On,
+                                                              HVAC::CompressorOperation::On,
                                                               PartLoadFrac,
                                                               SpeedNum,
                                                               SpeedRatio,
@@ -1085,7 +1084,7 @@ namespace HVACDXHeatPumpSystem {
                                                   "",
                                                   CoilIndex,
                                                   FanOpMode,
-                                                  CompressorOperation::On,
+                                                  HVAC::CompressorOperation::On,
                                                   PartLoadRatio,
                                                   state.dataHVACDXHeatPumpSys->SpeedNum,
                                                   state.dataHVACDXHeatPumpSys->SpeedRatio,
@@ -1120,7 +1119,7 @@ namespace HVACDXHeatPumpSystem {
                                                   "",
                                                   CoilIndex,
                                                   FanOpMode,
-                                                  CompressorOperation::On,
+                                                  HVAC::CompressorOperation::On,
                                                   state.dataHVACDXHeatPumpSys->SpeedPartLoadRatio,
                                                   state.dataHVACDXHeatPumpSys->SpeedNumber,
                                                   SpeedRatio,

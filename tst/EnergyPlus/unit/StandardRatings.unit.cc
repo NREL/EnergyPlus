@@ -70,7 +70,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
 using namespace EnergyPlus::Curve;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::ChillerReformulatedEIR;
@@ -101,7 +100,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
@@ -297,7 +296,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
@@ -484,7 +483,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
 
     Coil.Name = "HeatingCoilDXSingleSpeedAutosize";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;

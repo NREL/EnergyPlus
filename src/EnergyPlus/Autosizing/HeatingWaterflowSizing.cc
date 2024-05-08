@@ -90,7 +90,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
                     Real64 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                     Real64 DesCoilLoad = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
-                    if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                    if (DesCoilLoad >= HVAC::SmallLoad) {
                         if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                             this->dataWaterCoilSizHeatDeltaT > 0.0) {
                             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -120,7 +120,7 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
             } else {
-                if (this->dataCapacityUsedForSizing >= DataHVACGlobals::SmallLoad) {
+                if (this->dataCapacityUsedForSizing >= HVAC::SmallLoad) {
                     if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                         this->dataWaterCoilSizHeatDeltaT > 0.0) {
                         Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,

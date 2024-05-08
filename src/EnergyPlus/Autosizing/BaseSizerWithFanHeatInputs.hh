@@ -72,7 +72,6 @@ struct BaseSizerWithFanHeatInputs : BaseSizer
     Real64 motInPower = 0.0;
 
     void getFanInputsForDesHeatGain(EnergyPlusData &state,
-                                    int fanEnumType,
                                     int fanIndex,
                                     Real64 &deltaP,
                                     Real64 &motEff,

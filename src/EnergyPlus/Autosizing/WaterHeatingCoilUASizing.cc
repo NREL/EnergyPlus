@@ -244,8 +244,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
         if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
             this->autoSizedValue = _originalValue;
         } else {
-            if (this->dataCapacityUsedForSizing >= DataHVACGlobals::SmallLoad && this->dataWaterFlowUsedForSizing > 0.0 &&
-                this->dataFlowUsedForSizing > 0.0) {
+            if (this->dataCapacityUsedForSizing >= HVAC::SmallLoad && this->dataWaterFlowUsedForSizing > 0.0 && this->dataFlowUsedForSizing > 0.0) {
                 Real64 UA0 = 0.001 * this->dataCapacityUsedForSizing;
                 Real64 UA1 = this->dataCapacityUsedForSizing;
                 // Invert the simple heating coil model: given the design inlet conditions and the design load,
@@ -366,7 +365,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                 }
             } else {
                 this->autoSizedValue = 1.0;
-                if (this->dataWaterFlowUsedForSizing > 0.0 && this->dataCapacityUsedForSizing < DataHVACGlobals::SmallLoad) {
+                if (this->dataWaterFlowUsedForSizing > 0.0 && this->dataCapacityUsedForSizing < HVAC::SmallLoad) {
                     std::string msg = "The design coil load used for UA sizing is zero for Coil:Heating:Water " + this->compName;
                     this->addErrorMessage(msg);
                     ShowWarningError(state, msg);

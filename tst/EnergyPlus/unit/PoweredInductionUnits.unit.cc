@@ -198,7 +198,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -224,7 +224,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
@@ -424,7 +424,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     // node number table
     //  1   SPACE2-1 Air Node
@@ -449,7 +449,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
 
@@ -699,7 +699,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(1) = false;
@@ -717,7 +717,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     state->dataGlobal->BeginEnvrnFlag = true;
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, PIUNum, FirstHVACIteration);
-    Fans::InitFan(*state, 1, FirstHVACIteration);
+    state->dataFans->fans(1)->init(*state);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
     state->dataHVACGlobal->TurnFansOn = true;
@@ -1949,8 +1949,8 @@ TEST_F(EnergyPlusFixture, PIU_InducedAir_Plenums)
     HeatBalanceManager::SetPreConstructionInputParameters(*state); // establish array bounds for constructions early
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers(
-        *state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
-    OutputProcessor::SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+        *state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone); // Set up Time pointer for HB/Zone Simulation
+    OutputProcessor::SetupTimePointers(*state, OutputProcessor::TimeStepType::System, state->dataHVACGlobal->TimeStepSys);
     PlantManager::CheckIfAnyPlant(*state);
     EnergyPlus::createFacilityElectricPowerServiceObject(*state);
     BranchInputManager::ManageBranchInput(*state); // just gets input and returns.
