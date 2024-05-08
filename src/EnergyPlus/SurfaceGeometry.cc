@@ -9799,6 +9799,7 @@ namespace SurfaceGeometry {
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Multiplier = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Multiplier;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).NetAreaShadowCalc = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).NetAreaShadowCalc;
         state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Perimeter = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Perimeter;
+        state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).IsConvex = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).IsConvex;
 
         for (Vert = 1; Vert <= state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Sides; ++Vert) {
             state.dataSurfaceGeometry->SurfaceTmp(SurfNum + 1).Vertex(Vert) = state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Vertex(NVert);
