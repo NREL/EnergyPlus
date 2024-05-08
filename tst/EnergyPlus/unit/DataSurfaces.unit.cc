@@ -247,44 +247,53 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D)
 TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D_bigVertices)
 {
     using Vector2D = Surface2D::Vector2D;
-    SurfaceData s;
-    s.Vertex.dimension(22);
+    state->dataSurface->TotSurfaces = 1;
+    constexpr int surfNum = 1;
+    int nVertices = 22;
+    state->dataSurface->MaxVerticesPerSurface = nVertices;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &s = state->dataSurfaceGeometry->SurfaceTmp(surfNum);
+    s.Vertex.dimension(nVertices);
+    s.Sides = nVertices;
+
     // convex, >nVerticesBig, simple shape
-    s.Vertex = {Vector(0, 0, 0),     Vector(0.1, 0.2, 0), Vector(0.2, 0.4, 0), Vector(0.3, 0.6, 0), Vector(0.4, 0.8, 0), Vector(0.5, 1.0, 0),
-                Vector(0.6, 1.2, 0), Vector(0.7, 1.4, 0), Vector(0.8, 1.6, 0), Vector(0.9, 1.8, 0), Vector(1.0, 1.9, 0), Vector(1.1, 1.8, 0),
-                Vector(1.2, 1.6, 0), Vector(1.3, 1.4, 0), Vector(1.4, 1.2, 0), Vector(1.5, 1.0, 0), Vector(1.6, 0.8, 0), Vector(1.7, 0.6, 0),
-                Vector(1.8, 0.4, 0), Vector(1.9, 0.2, 0), Vector(2.0, 0.1, 0), Vector(2.0, 0, 0)};
+    s.Vertex = {Vector(0, 0, 0),     Vector(0.1, 1.0, 0), Vector(0.2, 1.9, 0), Vector(0.3, 2.7, 0), Vector(0.4, 3.4, 0), Vector(0.5, 4.0, 0),
+                Vector(0.6, 4.5, 0), Vector(0.7, 4.9, 0), Vector(0.8, 5.2, 0), Vector(0.9, 5.4, 0), Vector(1.0, 5.5, 0), Vector(1.1, 5.4, 0),
+                Vector(1.2, 5.2, 0), Vector(1.3, 4.9, 0), Vector(1.4, 4.5, 0), Vector(1.5, 4.0, 0), Vector(1.6, 3.4, 0), Vector(1.7, 2.7, 0),
+                Vector(1.8, 1.9, 0), Vector(1.9, 1.0, 0), Vector(2.0, 0.0, 0), Vector(2.0, -1, 0)};
     s.Shape = SurfaceShape::Polygonal;
+    CheckConvexity(*state, 1, s.Sides);
+    EXPECT_TRUE(s.IsConvex);
     s.set_computed_geometry();
 
     Surface2D const &s2d(s.surface2d);
     EXPECT_EQ(2, s2d.axis); // Projection along z axis
     EXPECT_EQ(Vector2D(0.0, 0.0), s2d.vertices[0]);
-    EXPECT_EQ(Vector2D(2.0, 0.0), s2d.vertices[1]);
-    EXPECT_EQ(Vector2D(2.0, 0.1), s2d.vertices[2]);
-    EXPECT_EQ(Vector2D(1.9, 0.2), s2d.vertices[3]);
-    EXPECT_EQ(Vector2D(1.8, 0.4), s2d.vertices[4]);
-    EXPECT_EQ(Vector2D(1.7, 0.6), s2d.vertices[5]);
-    EXPECT_EQ(Vector2D(1.6, 0.8), s2d.vertices[6]);
-    EXPECT_EQ(Vector2D(1.5, 1.0), s2d.vertices[7]);
-    EXPECT_EQ(Vector2D(1.4, 1.2), s2d.vertices[8]);
-    EXPECT_EQ(Vector2D(1.3, 1.4), s2d.vertices[9]);
-    EXPECT_EQ(Vector2D(1.2, 1.6), s2d.vertices[10]);
-    EXPECT_EQ(Vector2D(1.1, 1.8), s2d.vertices[11]);
-    EXPECT_EQ(Vector2D(1.0, 1.9), s2d.vertices[12]);
-    EXPECT_EQ(Vector2D(0.9, 1.8), s2d.vertices[13]);
-    EXPECT_EQ(Vector2D(0.8, 1.6), s2d.vertices[14]);
-    EXPECT_EQ(Vector2D(0.7, 1.4), s2d.vertices[15]);
-    EXPECT_EQ(Vector2D(0.6, 1.2), s2d.vertices[16]);
-    EXPECT_EQ(Vector2D(0.5, 1.0), s2d.vertices[17]);
-    EXPECT_EQ(Vector2D(0.4, 0.8), s2d.vertices[18]);
-    EXPECT_EQ(Vector2D(0.3, 0.6), s2d.vertices[19]);
-    EXPECT_EQ(Vector2D(0.2, 0.4), s2d.vertices[20]);
-    EXPECT_EQ(Vector2D(0.1, 0.2), s2d.vertices[21]);
+    EXPECT_EQ(Vector2D(2.0, -1.0), s2d.vertices[1]);
+    EXPECT_EQ(Vector2D(2.0, 0.0), s2d.vertices[2]);
+    EXPECT_EQ(Vector2D(1.9, 1.0), s2d.vertices[3]);
+    EXPECT_EQ(Vector2D(1.8, 1.9), s2d.vertices[4]);
+    EXPECT_EQ(Vector2D(1.7, 2.7), s2d.vertices[5]);
+    EXPECT_EQ(Vector2D(1.6, 3.4), s2d.vertices[6]);
+    EXPECT_EQ(Vector2D(1.5, 4.0), s2d.vertices[7]);
+    EXPECT_EQ(Vector2D(1.4, 4.5), s2d.vertices[8]);
+    EXPECT_EQ(Vector2D(1.3, 4.9), s2d.vertices[9]);
+    EXPECT_EQ(Vector2D(1.2, 5.2), s2d.vertices[10]);
+    EXPECT_EQ(Vector2D(1.1, 5.4), s2d.vertices[11]);
+    EXPECT_EQ(Vector2D(1.0, 5.5), s2d.vertices[12]);
+    EXPECT_EQ(Vector2D(0.9, 5.4), s2d.vertices[13]);
+    EXPECT_EQ(Vector2D(0.8, 5.2), s2d.vertices[14]);
+    EXPECT_EQ(Vector2D(0.7, 4.9), s2d.vertices[15]);
+    EXPECT_EQ(Vector2D(0.6, 4.5), s2d.vertices[16]);
+    EXPECT_EQ(Vector2D(0.5, 4.0), s2d.vertices[17]);
+    EXPECT_EQ(Vector2D(0.4, 3.4), s2d.vertices[18]);
+    EXPECT_EQ(Vector2D(0.3, 2.7), s2d.vertices[19]);
+    EXPECT_EQ(Vector2D(0.2, 1.9), s2d.vertices[20]);
+    EXPECT_EQ(Vector2D(0.1, 1.0), s2d.vertices[21]);
     EXPECT_DOUBLE_EQ(0.0, s2d.vl.x);
-    EXPECT_DOUBLE_EQ(0.0, s2d.vl.y);
+    EXPECT_DOUBLE_EQ(-1.0, s2d.vl.y);
     EXPECT_DOUBLE_EQ(2.0, s2d.vu.x);
-    EXPECT_DOUBLE_EQ(1.9, s2d.vu.y);
+    EXPECT_DOUBLE_EQ(5.5, s2d.vu.y);
     EXPECT_EQ(11u, s2d.slabs.size());
     // Slabs here all have 2 edges
     EXPECT_EQ(2u, s2d.slabs[0].edges.size());
@@ -303,9 +312,16 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D_bigVertices)
 TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D_bigVertices2)
 {
     using Vector2D = Surface2D::Vector2D;
-    SurfaceData s;
-    s.Vertex.dimension(24);
-    // convex, >nVerticesBig, Issue 10490 defect file failed surface
+    state->dataSurface->TotSurfaces = 1;
+    constexpr int surfNum = 1;
+    int nVertices = 24;
+    state->dataSurface->MaxVerticesPerSurface = nVertices;
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(state->dataSurface->TotSurfaces);
+    auto &s = state->dataSurfaceGeometry->SurfaceTmp(surfNum);
+    s.Vertex.dimension(nVertices);
+    s.Sides = nVertices;
+
+    // nonconvex, >nVerticesBig, Issue 10490 defect file failed surface
     s.Vertex = {Vector(4.5047023, 14.8653133, 35.35), Vector(6.5689151, 13.4862441, 35.35), Vector(6.1242243, 12.8206238, 35.35),
                 Vector(7.8836902, 11.6451513, 35.35), Vector(8.2156112, 12.1419759, 35.35), Vector(8.7993282, 11.7520035, 35.35),
                 Vector(8.9659831, 12.0014552, 35.35), Vector(9.2241656, 11.8289674, 35.35), Vector(9.4352618, 12.1449395, 35.35),
@@ -315,6 +331,8 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D_bigVertices2)
                 Vector(6.6740828, 13.5392534, 35.35), Vector(4.646872, 14.8936022, 35.35),  Vector(5.8684524, 16.7220831, 35.35),
                 Vector(7.8474358, 15.3999543, 35.35), Vector(7.8796558, 15.4481816, 35.35), Vector(5.815443, 16.8272508, 35.35)};
     s.Shape = SurfaceShape::Polygonal;
+    CheckConvexity(*state, 1, s.Sides);
+    EXPECT_FALSE(s.IsConvex);
     s.set_computed_geometry();
 
     Surface2D const &s2d(s.surface2d);
@@ -348,7 +366,7 @@ TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D_bigVertices2)
     EXPECT_DOUBLE_EQ(9.6032909, s2d.vu.x);
     EXPECT_DOUBLE_EQ(16.8272508, s2d.vu.y);
     EXPECT_EQ(23u, s2d.slabs.size());
-    // Slabs here have anywhere from 2 to 10 edges??
+    // Slabs here have anywhere from 2 to 10 edges
     EXPECT_EQ(2u, s2d.slabs[0].edges.size());
     EXPECT_EQ(4u, s2d.slabs[1].edges.size());
     EXPECT_EQ(6u, s2d.slabs[2].edges.size());
