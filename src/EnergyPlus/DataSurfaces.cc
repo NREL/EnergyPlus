@@ -170,7 +170,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
                 xt = xte;
             }
 #endif
-            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() >= 2u));
+            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2u));
             for (auto const &edge : crossEdges) {
                 size_type const iEdge(std::get<2>(edge));
                 slab.edges.push_back(iEdge); // Add edge to slab
