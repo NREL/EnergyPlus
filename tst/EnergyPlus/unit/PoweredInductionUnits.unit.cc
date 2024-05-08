@@ -59,7 +59,6 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -69,7 +68,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/MixerComponent.hh>
@@ -2095,11 +2093,12 @@ TEST_F(EnergyPlusFixture, VSParallelPIUStagedHeat)
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+    Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -2111,10 +2110,10 @@ TEST_F(EnergyPlusFixture, VSParallelPIUStagedHeat)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
+    state->dataFans->fans(thisPIU.Fan_Index)->simulate(*state, FirstHVACIteration, _, _);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
     int SecNodeNum = thisPIU.SecAirInNode;
     int PriNodeNum = thisPIU.PriAirInNode;
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
@@ -2293,11 +2292,12 @@ TEST_F(EnergyPlusFixture, VSParallelPIUModulatedHeat)
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+    Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -2309,10 +2309,10 @@ TEST_F(EnergyPlusFixture, VSParallelPIUModulatedHeat)
     state->dataGlobal->BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
+    state->dataFans->fans(thisPIU.Fan_Index)->simulate(*state, false, _, _);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
     int SecNodeNum = thisPIU.SecAirInNode;
     int PriNodeNum = thisPIU.PriAirInNode;
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
@@ -2532,10 +2532,11 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUStagedHeat)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
     state->dataFans->GetFanInputFlag = false;
+    Fans::GetFanInput(*state);
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -2549,10 +2550,10 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUStagedHeat)
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     MixerComponent::GetMixerInput(*state);
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
+    state->dataFans->fans(thisPIU.Fan_Index)->simulate(*state, false, _, _);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
     int SecNodeNum = thisPIU.SecAirInNode;
     int PriNodeNum = thisPIU.PriAirInNode;
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
@@ -2733,11 +2734,12 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUModulatedHeat)
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+    Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -2751,10 +2753,10 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUModulatedHeat)
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     MixerComponent::GetMixerInput(*state);
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
+    state->dataFans->fans(thisPIU.Fan_Index)->simulate(*state, false, _, _);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
     int SecNodeNum = thisPIU.SecAirInNode;
     int PriNodeNum = thisPIU.PriAirInNode;
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
@@ -2969,11 +2971,12 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUCool)
     DataZoneEquipment::GetZoneEquipmentData(*state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     state->dataZoneAirLoopEquipmentManager->GetAirDistUnitsFlag = false;
+    Fans::GetFanInput(*state);
     state->dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(*state);
     EXPECT_TRUE(compare_err_stream(""));
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
 
@@ -2987,10 +2990,10 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUCool)
     FirstHVACIteration = true;
     PoweredInductionUnits::InitPIU(*state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     MixerComponent::GetMixerInput(*state);
-    state->dataHVACFan->fanObjs[0]->simulate(*state, _, _);
+    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
+    state->dataFans->fans(thisPIU.Fan_Index)->simulate(*state, false, _, _);
     state->dataGlobal->BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    auto &thisPIU = state->dataPowerInductionUnits->PIU(1);
     int SecNodeNum = thisPIU.SecAirInNode;
     int PriNodeNum = thisPIU.PriAirInNode;
     Real64 PriMaxMassFlow = thisPIU.MaxPriAirMassFlow;
