@@ -1717,7 +1717,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
 
     // Override pump operation based on System Availability Managers, should be done elsewhere?  I suppose this should be OK though
     if (allocated(state.dataAvail->PlantAvailMgr)) {
-        if (state.dataAvail->PlantAvailMgr(LoopNum).availStatus == Avail::AvailStatus::ForceOff) {
+        if (state.dataAvail->PlantAvailMgr(LoopNum).availStatus == Avail::Status::ForceOff) {
             PumpMassFlowRateMax = 0.0;
             PumpMassFlowRateMin = 0.0;
         }

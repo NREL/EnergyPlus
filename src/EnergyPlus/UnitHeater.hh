@@ -128,7 +128,7 @@ namespace UnitHeater {
         Real64 ElecPower;
         Real64 ElecEnergy;
         std::string AvailManagerListName; // Name of an availability manager list object
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction; 
+        Avail::Status availStatus = Avail::Status::NoAction; 
         bool FanOffNoHeating;    // True when fan is on during no heating load
         Real64 FanPartLoadRatio; // fan part-load ratio for time step
         int ZonePtr;             // pointer to a zone served by a unit heater

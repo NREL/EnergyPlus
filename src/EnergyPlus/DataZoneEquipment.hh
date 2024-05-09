@@ -612,7 +612,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     bool ZoneEquipInputsFilled = false;
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
-    Array1D<Avail::AvailStatus> ZoneEquipAvail;
+    Array1D<Avail::Status> ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
     EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;

@@ -8127,7 +8127,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     EXPECT_EQ("COIL:HEATING:WATER", thisFanCoil.HCoilType);
     EXPECT_EQ("FCU HEATING COIL", thisFanCoil.HCoilName);
     EXPECT_EQ("NIGHTCYCLE AVAILMGR", thisAvaiManager.Name);
-    EXPECT_EQ((int)Avail::AvailManagerType::NightCycle, (int)thisAvaiManager.type);
+    EXPECT_EQ((int)Avail::ManagerType::NightCycle, (int)thisAvaiManager.type);
 
     state->dataPlnt->TotNumLoops = 2;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -8270,7 +8270,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataSize->ZoneEqFanCoil = true;
     // check availability manager Night Cycle parameters
     EXPECT_EQ((int)Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, (int)state->dataAvail->NightCycleData(1).cyclingRunTimeControl);
-    EXPECT_EQ((int)Avail::AvailStatus::NoAction, (int)state->dataAvail->NightCycleData(1).availStatus);
+    EXPECT_EQ((int)Avail::Status::NoAction, (int)state->dataAvail->NightCycleData(1).availStatus);
 
     // set predicted heating load
     zoneSysEnergyDemand.RemainingOutputReqToCoolSP = 4000.0;
@@ -8294,14 +8294,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     state->dataGlobal->SimTimeSteps = 0;
     state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 0.0;
     state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataAvail->NightCycleData(1).availStatus = Avail::AvailStatus::NoAction;
+    state->dataAvail->NightCycleData(1).availStatus = Avail::Status::NoAction;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
-    Avail::AvailStatus availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, ZoneEquipType, CompNum);
+    Avail::Status availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, ZoneEquipType, CompNum);
     // check that the NightCycle has turned on the equipment
-    EXPECT_EQ((int)Avail::AvailStatus::CycleOn, (int)availStatus);
-    EXPECT_EQ((int)Avail::AvailStatus::CycleOn, (int)state->dataAvail->NightCycleData(1).availStatus);
+    EXPECT_EQ((int)Avail::Status::CycleOn, (int)availStatus);
+    EXPECT_EQ((int)Avail::Status::CycleOn, (int)state->dataAvail->NightCycleData(1).availStatus);
     // set zone equipment is CyclOn based on night cycle manager status
-    if (state->dataAvail->NightCycleData(1).availStatus == Avail::AvailStatus::CycleOn) {
+    if (state->dataAvail->NightCycleData(1).availStatus == Avail::Status::CycleOn) {
         state->dataHVACGlobal->TurnFansOn = true;
         state->dataHVACGlobal->TurnFansOff = false;
     }

@@ -155,7 +155,7 @@ protected:
         state->dataHeatBal->Zone.allocate(numZones);
         state->dataZoneEquip->ZoneEquipConfig.allocate(numZones);
         state->dataZoneEquip->ZoneEquipList.allocate(numZones);
-        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, Avail::AvailStatus::NoAction);
+        state->dataZoneEquip->ZoneEquipAvail.dimension(numZones, Avail::Status::NoAction);
         state->dataZoneEquip->NumOfZoneEquipLists = numZones;
         state->dataSize->FinalZoneSizing.allocate(numZones);
         state->dataSize->FinalSysSizing.allocate(numAirloops);
@@ -431,7 +431,7 @@ protected:
         state->dataMixedAir->OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
 
         VRFTU.Name = "VRFTU1";
-        VRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
+        VRFTU.type = TUType::ConstantVolume;
         VRFTU.SchedPtr = Sch1;
         VRFTU.VRFSysNum = numVRFCond;
         VRFTU.TUListIndex = TUNum;
@@ -8161,7 +8161,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilElectric)
     thisVRFTU.SuppHeatCoilName = "TU1 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingElectric;
     thisVRFTU.fanOp = HVAC::FanOp::Continuous;
-    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
+    thisVRFTU.type = TUType::ConstantVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -8226,7 +8226,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilFuel)
     thisVRFTU.SuppHeatCoilName = "TU2 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingGasOrOtherFuel;
     thisVRFTU.fanOp = HVAC::FanOp::Continuous;
-    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
+    thisVRFTU.type = TUType::ConstantVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;
@@ -8291,7 +8291,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
     thisVRFTU.SuppHeatCoilName = "TU3 SUPP HEATING COIL";
     thisVRFTU.SuppHeatCoilType_Num = HVAC::Coil_HeatingWater;
     thisVRFTU.fanOp = HVAC::FanOp::Continuous;
-    thisVRFTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
+    thisVRFTU.type = TUType::ConstantVolume;
     thisVRFTU.SuppHeatCoilAirInletNode = 1;
     thisVRFTU.SuppHeatCoilAirOutletNode = 2;
     thisVRFTU.SuppHeatCoilIndex = 1;

@@ -166,7 +166,7 @@ namespace FanCoilUnits {
         Real64 MinHotWaterFlow = 0.0;       // kg/s
         Real64 HotControlOffset = 0.0;      // control tolerance
         Real64 DesignHeatingCapacity = 0.0; // size of electric heating coil [W]
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // addition for OA to Zone Units
         std::string ATMixerName;        // name of air terminal mixer

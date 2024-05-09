@@ -117,7 +117,7 @@ namespace WindowAC {
         Real64 FanPartLoadRatio;          // fan part-load ratio for time step
         Real64 CompPartLoadRatio;         // compressor part-load ratio for time step
         std::string AvailManagerListName; // Name of an availability manager list object
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         int ZonePtr;         // pointer to a zone served by a Window AC unit
         int HVACSizingIndex; // index of a HVACSizing object for a Window AC unit
         bool FirstPass;      // detects first time through for resetting sizing data

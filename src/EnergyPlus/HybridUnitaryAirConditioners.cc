@@ -215,7 +215,7 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = Avail::AvailStatus::NoAction;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = Avail::Status::NoAction;
 
     // set the availability status based on the availability manager list name
     if (allocated(state.dataAvail->ZoneComp)) {

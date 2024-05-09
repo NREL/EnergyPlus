@@ -272,7 +272,7 @@ namespace VentilatedSlab {
         Real64 FanOutletTemp;             // FanOutlet temp in degree C
         Real64 ZoneInletTemp;             // supply air temp
         std::string AvailManagerListName; // Name of an availability manager list object
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction; 
+        Avail::Status availStatus = Avail::Status::NoAction; 
         int HVACSizingIndex;                 // index of a HVACSizing object for a ventilator slab
         bool FirstPass;                      // detects first time through for resetting sizing data
         Real64 ZeroVentSlabSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source

@@ -122,6 +122,9 @@ using namespace DataZoneEnergyDemands;
 using namespace Psychrometrics;
 using namespace DataPlant;
 
+constexpr std::array<std::string_view, (int)TUType::Num> tuTypeNames = {
+    "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"};
+
 void SimulateVRF(EnergyPlusData &state,
                  std::string_view CompName,
                  bool const FirstHVACIteration,
@@ -3325,7 +3328,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             thisVrfTU.VRFSysNum = NumCond;
             break;
         }
-        thisVrfTU.VRFTUType_Num = HVAC::VRFTUType_ConstVolume;
+        thisVrfTU.type = TUType::ConstantVolume;
         if (lAlphaFieldBlanks(2)) {
             thisVrfTU.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
         } else {
@@ -5732,7 +5735,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     if (state.dataZoneEquip->ZoneEquipList(ELLoop).Name == "") continue;    // dimensioned by NumOfZones.  Only valid ones have names.
                     for (ListLoop = 1; ListLoop <= state.dataZoneEquip->ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
                         if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipTypeName(ListLoop),
-                                              HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num)))
+                                              tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type]))
                             continue;
                         if (!Util::SameString(state.dataZoneEquip->ZoneEquipList(ELLoop).EquipName(ListLoop),
                                               state.dataHVACVarRefFlow->VRFTU(TUIndex).Name))
@@ -5977,7 +5980,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 state.dataHVACVarRefFlow->VRFTU(TUIndex).controlZoneMassFlowFrac =
                                     initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
                                 BaseSizer::reportSizerOutput(state,
-                                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num),
+                                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type],
                                                              state.dataHVACVarRefFlow->VRFTU(TUIndex).Name,
                                                              "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                              state.dataHVACVarRefFlow->VRFTU(TUIndex).controlZoneMassFlowFrac);
@@ -5992,7 +5995,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                             0.0) {
                                             ShowSevereError(state,
                                                             format("{} = {}",
-                                                                   HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num),
+                                                                   tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type],
                                                                    state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
                                             ShowContinueError(state,
                                                               "When using set point control, fan operating mode must be continuous (fan "
@@ -6009,12 +6012,12 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                                 } else {
                                     ShowSevereError(state,
                                                     format("{} = {}",
-                                                           HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num),
+                                                           tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type],
                                                            state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
                                     ShowContinueError(state, " The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                                     state.dataHVACVarRefFlow->VRFTU(TUIndex).controlZoneMassFlowFrac = 1.0;
                                     BaseSizer::reportSizerOutput(state,
-                                                                 HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num),
+                                                                 tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type],
                                                                  state.dataHVACVarRefFlow->VRFTU(TUIndex).Name,
                                                                  "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                                  state.dataHVACVarRefFlow->VRFTU(TUIndex).controlZoneMassFlowFrac);
@@ -6121,7 +6124,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                 ShowSevereError(state,
                                 format("InitVRF: VRF Terminal Unit = [{},{}] is not on any ZoneHVAC:EquipmentList, AirloopHVAC or "
                                        "AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not be simulated.",
-                                       HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUType_Num),
+                                       tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(TUIndex).type],
                                        state.dataHVACVarRefFlow->VRFTU(TUIndex).Name));
                 ShowContinueError(state, "...The VRF AC System associated with this terminal unit may also not be simulated.");
             }
@@ -6451,7 +6454,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(state, "... has Supply Air Flow Rate During Cooling Operation > Max Fan Volume Flow Rate, should be <=");
                         ShowContinueError(state,
@@ -6469,7 +6472,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(state, "... has Supply Air Flow Rate When No Cooling is Needed > Max Fan Volume Flow Rate, should be <=");
                         ShowContinueError(state,
@@ -6487,7 +6490,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(
                             state,
@@ -6506,7 +6509,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(state, "... has Supply Air Flow Rate During Heating Operation > Max Fan Volume Flow Rate, should be <=");
                         ShowContinueError(state,
@@ -6524,7 +6527,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(state, "... has Supply Air Flow Rate When No Heating is Needed > Max Fan Volume Flow Rate, should be <=");
                         ShowContinueError(state,
@@ -6542,7 +6545,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                     if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow > state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(
                             state,
@@ -6561,7 +6564,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ActualFanVolFlowRate) {
                         ShowWarningError(state,
                                          format("InitVRF: VRF Terminal Unit = [{}, \"{}\"]",
-                                                HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                         ShowContinueError(
                             state, "... has a Outdoor Air Flow Rate When No Cooling or Heating is Needed > Max Fan Volume Flow Rate, should be <=");
@@ -7642,7 +7645,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         state.dataHVACVarRefFlow->MyOneTimeSizeFlag = false;
     }
 
-    CompType = HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num);
+    CompType = tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type];
     CompName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name;
     state.dataSize->DataZoneNumber = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).ZoneNum;
 
@@ -8120,14 +8123,14 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "User-Specified Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
             }
         } else {
             CheckZoneSizing(
-                state, HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             CoolOutAirVolFlowDes =
                 min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
             if (CoolOutAirVolFlowDes < HVAC::SmallAirVolFlow) {
@@ -8137,7 +8140,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (IsAutoSize) {
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow = CoolOutAirVolFlowDes;
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                              CoolOutAirVolFlowDes);
@@ -8145,7 +8148,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0 && CoolOutAirVolFlowDes > 0.0) {
                     CoolOutAirVolFlowUser = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow;
                     BaseSizer::reportSizerOutput(state,
-                                                 HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                 tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                                  CoolOutAirVolFlowDes,
@@ -8156,7 +8159,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
                                         format("SizeVRF: Potential issue with equipment sizing for {} {}",
-                                               HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                               tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                             ShowContinueError(
                                 state,
@@ -8181,7 +8184,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
             }
             BaseSizer::reportSizerOutput(state,
-                                         HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                         tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                          "Design Size Outdoor Air Flow Rate During Cooling Operation [m3/s]",
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -8196,14 +8199,14 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow > 0.0) {
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
             }
         } else {
             CheckZoneSizing(
-                state, HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             HeatOutAirVolFlowDes =
                 min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
             if (HeatOutAirVolFlowDes < HVAC::SmallAirVolFlow) {
@@ -8213,7 +8216,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (IsAutoSize) {
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow = HeatOutAirVolFlowDes;
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                              HeatOutAirVolFlowDes);
@@ -8221,7 +8224,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow > 0.0 && HeatOutAirVolFlowDes > 0.0) {
                     HeatOutAirVolFlowUser = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow;
                     BaseSizer::reportSizerOutput(state,
-                                                 HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                 tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                                  HeatOutAirVolFlowDes,
@@ -8232,7 +8235,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
                                         format("SizeVRF: Potential issue with equipment sizing for {} {}",
-                                               HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                               tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                             ShowContinueError(
                                 state,
@@ -8257,7 +8260,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
             }
             BaseSizer::reportSizerOutput(state,
-                                         HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                         tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                          "Design Size Outdoor Air Flow Rate During Heating Operation [m3/s]",
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow);
@@ -8283,14 +8286,14 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
         if (!IsAutoSize && !state.dataSize->ZoneSizingRunDone) { // Simulation continue
             if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow > 0.0) {
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow);
             }
         } else {
             CheckZoneSizing(
-                state, HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num), state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             NoCoolHeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -8301,7 +8304,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
             if (IsAutoSize) {
                 state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow = NoCoolHeatOutAirVolFlowDes;
                 BaseSizer::reportSizerOutput(state,
-                                             HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                             tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                              "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                              NoCoolHeatOutAirVolFlowDes);
@@ -8309,7 +8312,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow > 0.0 && NoCoolHeatOutAirVolFlowDes > 0.0) {
                     NoCoolHeatOutAirVolFlowUser = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
                     BaseSizer::reportSizerOutput(state,
-                                                 HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                                 tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                  state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                                  "Design Size Outdoor Air Flow Rate When No Cooling or Heating is Needed [m3/s]",
                                                  NoCoolHeatOutAirVolFlowDes,
@@ -8320,7 +8323,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                             state.dataSize->AutoVsHardSizingThreshold) {
                             ShowMessage(state,
                                         format("SizeVRF: Potential issue with equipment sizing for {} {}",
-                                               HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                               tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                                state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name));
                             ShowContinueError(state,
                                               format("User-Specified Outdoor Air Flow Rate When No Cooling or Heating is Needed of {:.5R} [m3/s]",
@@ -8354,7 +8357,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                 }
             }
             BaseSizer::reportSizerOutput(state,
-                                         HVAC::cVRFTUTypes(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUType_Num),
+                                         tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type],
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name,
                                          "Design Size Outdoor Air Flow Rate When No Cooling or Heating Heating is Needed [m3/s]",
                                          state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow);
@@ -9357,7 +9360,7 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                 if (SolFla == -1) {
                     if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                         if (this->IterLimitExceeded == 0) {
-                            ShowWarningMessage(state, format("{} \"{}\"", HVAC::cVRFTUTypes(this->VRFTUType_Num), this->Name));
+                            ShowWarningMessage(state, format("{} \"{}\"", tuTypeNames[(int)this->type], this->Name));
                             ShowContinueError(
                                 state,
                                 format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
@@ -9374,31 +9377,31 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
 
                             ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                               "\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                           format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                                  tuTypeNames[(int)this->type], this->Name),
                                                            this->IterLimitExceeded);
                         } else {
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                               "\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                           format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                                  tuTypeNames[(int)this->type], this->Name),
                                                            this->IterLimitExceeded);
                         }
                     }
                 } else if (SolFla == -2) {
                     if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                         if (thisVRFTU.FirstIterfailed == 0) {
-                            ShowWarningMessage(state, format("{} \"{}\"", HVAC::cVRFTUTypes(this->VRFTUType_Num), this->Name));
+                            ShowWarningMessage(state, format("{} \"{}\"", tuTypeNames[(int)this->type], this->Name));
                             ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp(state, "");
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                               "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                           format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                                  tuTypeNames[(int)this->type], this->Name),
                                                            this->FirstIterfailed);
                         } else {
                             ShowRecurringWarningErrorAtEnd(state,
-                                                           HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                               "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                           format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                                  tuTypeNames[(int)this->type], this->Name),
                                                            thisVRFTU.FirstIterfailed);
                         }
                     }
@@ -9407,19 +9410,19 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
             } else if (SolFla == -2) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                     if (thisVRFTU.FirstIterfailed == 0) {
-                        ShowWarningMessage(state, format("{} \"{}\"", HVAC::cVRFTUTypes(this->VRFTUType_Num), this->Name));
+                        ShowWarningMessage(state, format("{} \"{}\"", tuTypeNames[(int)this->type], this->Name));
 
                         ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
                         ShowRecurringWarningErrorAtEnd(state,
-                                                       HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                           "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                       format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                              tuTypeNames[(int)this->type], " \"" + this->Name),
                                                        this->FirstIterfailed);
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
-                                                       HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                           "\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                       format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                                              tuTypeNames[(int)this->type], this->Name),
                                                        this->FirstIterfailed);
                     }
                 }
@@ -12655,7 +12658,7 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
             if (SolFla == -1) {
                 if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
                     if (this->IterLimitExceeded == 0) {
-                        ShowWarningMessage(state, format("{} \"{}\"", HVAC::cVRFTUTypes(this->VRFTUType_Num), this->Name));
+                        ShowWarningMessage(state, format("{} \"{}\"", tuTypeNames[(int)this->type], this->Name));
                         ShowContinueError(
                             state, format(" Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = {}", MaxIte));
                         ShowContinueErrorTimeStamp(state, format(" Part-load ratio returned = {:.3R}", PartLoadRatio));
@@ -12664,13 +12667,13 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
 
                         ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                         ShowRecurringWarningErrorAtEnd(state,
-                                                       HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                           "\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                       format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                              tuTypeNames[(int)this->type], this->Name),
                                                        this->IterLimitExceeded);
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
-                                                       HVAC::cVRFTUTypes(this->VRFTUType_Num) + " \"" + this->Name +
-                                                           "\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                       format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
+                                                              tuTypeNames[(int)this->type], this->Name),
                                                        this->IterLimitExceeded);
                     }
                 }

@@ -4998,7 +4998,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     int NumZones(1);
     int SysAvailNum = 1;
     int PriAirSysNum = 0;
-    int AvailStatus = 0;
+    Avail::Status availStatus = Avail::Status::NoAction;
     constexpr DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
     int constexpr CompNum = 1;
     bool SimAir = false;
@@ -5030,11 +5030,11 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataHVACGlobal->TurnFansOff = true;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
-    sysAvailMgr.availStatus = Avail::AvailStatus::NoAction;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
     // run calc system availability requirement
-    Avail::AvailStatus availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
+    availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
     // check that the fan is off
-    EXPECT_EQ((int)Avail::AvailStatus::NoAction, (int)sysAvailMgr.availStatus);
+    EXPECT_EQ((int)Avail::Status::NoAction, (int)sysAvailMgr.availStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_TRUE(state->dataHVACGlobal->TurnFansOff);
     // run to set zone night cycle manager
@@ -5051,16 +5051,16 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.5;
-    sysAvailMgr.availStatus = Avail::AvailStatus::NoAction;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
     // run calc system availability requirement
     availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
     // check that the availability manager is cycling On
-    EXPECT_EQ((int)Avail::AvailStatus::CycleOn, (int)sysAvailMgr.availStatus);
+    EXPECT_EQ((int)Avail::Status::CycleOn, (int)sysAvailMgr.availStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).availStatus = Avail::AvailStatus::CycleOn;
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).availStatus = Avail::Status::CycleOn;
     // run to set zone night cycle manager
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
     // test global zone fan control variables are turned on

@@ -3839,7 +3839,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
         zoneEvapUnit.UnitLatentHeatingEnergy = 0.0;
         zoneEvapUnit.UnitLatentCoolingRate = 0.0;
         zoneEvapUnit.UnitLatentCoolingEnergy = 0.0;
-        zoneEvapUnit.FanAvailStatus = Avail::AvailStatus::NoAction;
+        zoneEvapUnit.FanAvailStatus = Avail::Status::NoAction;
 
         // place default cold setpoints on control nodes of select evap coolers
         if ((zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||

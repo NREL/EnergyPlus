@@ -99,7 +99,7 @@ namespace DataAirLoop {
     {
         // Members
         int NumAvailManagers = 0;                                    // number of availability managers for this system
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;                                         // system availability status
+        Avail::Status availStatus = Avail::Status::NoAction;         // system availability status
         int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
         int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
         Real64 ReqSupplyFrac = 0.0;                                  // required system flow rate (as a fraction)

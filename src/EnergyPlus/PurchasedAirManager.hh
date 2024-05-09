@@ -218,7 +218,7 @@ namespace PurchasedAirManager {
         int OAFlowMaxCoolOutputIndex; // Recurring warning index for OAFlow > Max Cooling Flow error
         int OAFlowMaxHeatOutputIndex; // Recurring warning index for OAFlow > Max Heating Flow error
         int SaturationOutputIndex;    // Recurring warning index for OAFlow > Max Heating Flow error
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         int CoolErrIndex; // Cooling setpoint error index (recurring errors)
         int HeatErrIndex; // Heating setpoint error index (recurring errors)
         // Output variables

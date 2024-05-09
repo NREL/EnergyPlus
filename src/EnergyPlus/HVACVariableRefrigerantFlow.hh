@@ -72,6 +72,14 @@ struct EnergyPlusData;
 
 namespace HVACVariableRefrigerantFlow {
 
+    // Parameters describing variable refrigerant flow terminal unit types
+    enum class TUType
+    {
+        Invalid = -1,
+        ConstantVolume,
+        Num
+    };
+
     // Thermostat Priority Control Type
     enum class ThermostatCtrlType
     {
@@ -632,7 +640,7 @@ namespace HVACVariableRefrigerantFlow {
     {
         // Members
         std::string Name;                                  // Name of the VRF Terminal Unit
-        int VRFTUType_Num = 0;                             // DataHVACGlobals VRF Terminal Unit type
+        TUType type = TUType::Invalid;                 // DataHVACGlobals VRF Terminal Unit type
         int SchedPtr = -1;                                 // Pointer to the correct schedule
         int VRFSysNum = 0;                                 // index to VRF Condenser
         int TUListIndex = 0;                               // index to VRF Terminal Unit List
@@ -700,7 +708,7 @@ namespace HVACVariableRefrigerantFlow {
         bool HeatingCoilPresent = true;                    // FALSE if coil not present
         bool SuppHeatingCoilPresent = false;               // FALSE if coil not present
         std::string AvailManagerListName;                  // Name of an availability manager list object
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         Real64 TerminalUnitSensibleRate = 0.0;  // sensible cooling/heating rate of VRF terminal unit (W)
         Real64 TerminalUnitLatentRate = 0.0;    // latent dehumidification/humidification rate of VRF terminal unit (W)
         Real64 TotalCoolingRate = 0.0;          // report variable for total cooling rate (W)

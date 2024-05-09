@@ -106,7 +106,7 @@ namespace HVACStandAloneERV {
         Real64 AirVolFlowPerOccupant;    // Air flow rate per occupant, used for autosizing
         int EconomizerOASchedPtr;        // schedule to modify outdoor air
         bool FlowError;                  // used for one-time warning message for flow imbalance (Init)
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // report variables
         Real64 ElecUseRate;       // total electric use rate (power) for supply/exhaust fans & generic HX parasitics [W]

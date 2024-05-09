@@ -244,8 +244,6 @@ namespace HVAC {
         "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
         "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER"};
         
-    Array1D_string const cVRFTUTypes(NumVRFTUTypes, std::string("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"));
-
 #ifdef GET_OUT
     constexpr std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC = {"DUMMY",
                                                                                             "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",

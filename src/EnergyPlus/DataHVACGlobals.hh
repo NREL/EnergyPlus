@@ -394,10 +394,6 @@ namespace HVAC {
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames;
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC;
         
-    // Parameters describing variable refrigerant flow terminal unit types
-    int constexpr NumVRFTUTypes(1);
-    int constexpr VRFTUType_ConstVolume(1);
-
     enum class OATType
     {
         Invalid = -1,
@@ -419,7 +415,6 @@ namespace HVAC {
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
-    extern Array1D_string const cVRFTUTypes;
 
     struct ComponentSetPtData
     {

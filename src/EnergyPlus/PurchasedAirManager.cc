@@ -2148,7 +2148,7 @@ void CalcPurchAirLoads(EnergyPlusData &state,
         availMgr.ZoneNum = ControlledZoneNum;
         PurchAir(PurchAirNum).availStatus = availMgr.availStatus;
         // Check if the hybrid ventilation availability manager is turning the unit off
-        if (PurchAir(PurchAirNum).availStatus == Avail::AvailStatus::ForceOff) {
+        if (PurchAir(PurchAirNum).availStatus == Avail::Status::ForceOff) {
             UnitOn = false;
         }
     }

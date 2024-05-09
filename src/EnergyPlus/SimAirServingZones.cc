@@ -2084,7 +2084,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
         if (numPrimaryAirSys > 0) {
             for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
-                e.availStatus = Avail::AvailStatus::NoAction;
+                e.availStatus = Avail::Status::NoAction;
                 e.StartTime = 0;
                 e.StopTime = 0;
             }
@@ -2460,10 +2460,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         state.dataHVACGlobal->TurnFansOn = false;
         state.dataHVACGlobal->TurnFansOff = false;
         state.dataHVACGlobal->NightVentOn = false;
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::CycleOn) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::CycleOn) {
             state.dataHVACGlobal->TurnFansOn = true;
         }
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::ForceOff) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::ForceOff) {
             state.dataHVACGlobal->TurnFansOff = true;
         }
         if (AirLoopControlInfo(AirLoopNum).NightVent) {
@@ -2535,10 +2535,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 state.dataHVACGlobal->TurnFansOn = false;
                 state.dataHVACGlobal->TurnFansOff = false;
                 state.dataHVACGlobal->NightVentOn = false;
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::CycleOn) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::CycleOn) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::AvailStatus::ForceOff) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
                 if (AirLoopControlInfo(AirLoopNum).NightVent) {

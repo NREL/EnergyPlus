@@ -221,7 +221,7 @@ namespace OutdoorAirUnit {
         int NumComponents;
         std::string ComponentListName;
         Real64 CompOutSetTemp; // component outlet setpoint temperature
-        Avail::AvailStatus availStatus = Avail::AvailStatus::NoAction;
+        Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         Array1D<OAEquipList> OAEquip;
         // Report data

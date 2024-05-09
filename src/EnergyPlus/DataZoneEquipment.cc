@@ -271,7 +271,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // found in the input file.  This may or may not
     // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
-    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::AvailStatus::NoAction);
+    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
     if (state.dataZoneEquip->NumOfZoneEquipLists != numControlledZones) {

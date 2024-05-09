@@ -69,7 +69,7 @@ namespace Avail {
     // belongs) creates a circular dependecy between
     // SystemAvailabilityManager and PlantAvailablityManager which
     // needs to be resolved by unifying those two.
-    enum class AvailStatus
+    enum class Status
     {
         Invalid = -1,
         NoAction,
@@ -123,7 +123,7 @@ namespace Avail {
         Num
     };
 
-    enum class AvailManagerType
+    enum class ManagerType
     {
         Invalid = -1,
         Scheduled,
@@ -145,9 +145,9 @@ namespace Avail {
     {
         // Members
         std::string Name;                                  // Name of the manager object
-        AvailManagerType type = AvailManagerType::Invalid; // Integer equivalent of availability manager type
+        ManagerType type = ManagerType::Invalid; // Integer equivalent of availability manager type
         int SchedPtr = 0;                                  // Schedule pointer
-        AvailStatus availStatus = AvailStatus::NoAction;   // reports status of availability manager
+        Status availStatus = Status::NoAction;   // reports status of availability manager
     };
 
     struct SysAvailManagerScheduled : SysAvailManager // Derived type for Scheduled Sys Avail Managers
@@ -170,7 +170,7 @@ namespace Avail {
         //   Cycle On Control Zone, or Cycle On Any - Zone Fans Only
         Real64 TempTolRange;                                                          // range in degrees C of thermostat tolerance
         int CyclingTimeSteps;                                                         // period (in Loads time steps) system will cycle on.
-        AvailStatus priorAvailStatus = AvailStatus::NoAction;                         // prior status of availability manager
+        Status priorAvailStatus = Status::NoAction;                                   // prior status of availability manager
         std::string CtrlZoneListName;                                                 // controlled zone or zonelist name
         int NumOfCtrlZones;                                                           // number of controlled zones
         Array1D_int CtrlZonePtrs;                                                     // pointers to controlled zone(s)
@@ -403,7 +403,7 @@ namespace Avail {
     struct AvailManagerNTN
     {
         std::string Name;
-        AvailManagerType type;
+        ManagerType type;
         int Num;
     };
         
@@ -419,7 +419,7 @@ namespace Avail {
     {
         // Members
         int NumAvailManagers = 0;                                    // number of availability managers for this system
-        AvailStatus availStatus = AvailStatus::NoAction;             // system availability status
+        Status availStatus = Status::NoAction;                       // system availability status
         int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
         int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
         std::string AvailManagerListName;                            // name of each availability manager
@@ -464,34 +464,34 @@ namespace Avail {
 
     void InitSysAvailManagers(EnergyPlusData &state);
 
-    AvailStatus SimSysAvailManager(EnergyPlusData &state,
-                                   AvailManagerType const type,
-                                   std::string const &SysAvailName,
-                                   int &SysAvailNum,
-                                   int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
-                                   AvailStatus const previousStatus,
-                                   ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC:* equipment component
-                                   ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC:* equipment component
+    Status SimSysAvailManager(EnergyPlusData &state,
+                              ManagerType const type,
+                              std::string const &SysAvailName,
+                              int &SysAvailNum,
+                              int const PriAirSysNum, // Primary Air System index. If being called for a ZoneHVAC:* component
+                              Status const previousStatus,
+                              ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC:* equipment component
+                              ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC:* equipment component
     );
 
-    AvailStatus CalcSchedSysAvailMgr(EnergyPlusData &state,
-                              int const SysAvailNum // number of the current scheduled system availability manager
+    Status CalcSchedSysAvailMgr(EnergyPlusData &state,
+                                int const SysAvailNum // number of the current scheduled system availability manager
     );
 
-    AvailStatus CalcSchedOnSysAvailMgr(EnergyPlusData &state,
-                                int const SysAvailNum // number of the current scheduled on system availability manager
+    Status CalcSchedOnSysAvailMgr(EnergyPlusData &state,
+                                  int const SysAvailNum // number of the current scheduled on system availability manager
     );
 
-    AvailStatus CalcSchedOffSysAvailMgr(EnergyPlusData &state,
-                                        int const SysAvailNum // number of the current scheduled off system availability manager
+    Status CalcSchedOffSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum // number of the current scheduled off system availability manager
     );
 
-    AvailStatus CalcNCycSysAvailMgr(EnergyPlusData &state,
-                                    int const SysAvailNum,                           // number of the current scheduled system availability manager
-                                    int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
-                                    ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
-                                    ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
-    );
+    Status CalcNCycSysAvailMgr(EnergyPlusData &state,
+                               int const SysAvailNum,                           // number of the current scheduled system availability manager
+                               int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
+                               ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
+                               ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
+                               );
 
     bool CoolingZoneOutOfTolerance(EnergyPlusData &state,
                                    Array1D_int const ZonePtrList, // list of controlled zone pointers
@@ -505,38 +505,38 @@ namespace Avail {
                                    Real64 const TempTolerance     // temperature tolerance
     );
 
-    AvailStatus CalcOptStartSysAvailMgr(EnergyPlusData &state,
-                                       int const SysAvailNum,                           // number of the current scheduled system availability manager
-                                       int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
-                                       ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
-                                       ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
+    Status CalcOptStartSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum,                           // number of the current scheduled system availability manager
+                                   int const PriAirSysNum,                          // number of the primary air system affected by this Avail. Manager
+                                   ObjexxFCL::Optional_int_const ZoneEquipType = _, // Type of ZoneHVAC equipment component
+                                   ObjexxFCL::Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
-    AvailStatus CalcNVentSysAvailMgr(EnergyPlusData &state,
-                                     int const SysAvailNum,             // number of the current scheduled system availability manager
-                                     int const PriAirSysNum,            // number of the primary air system affected by this Avail. Manager
-                                     bool const isZoneEquipType = false // Type of zone equipment component
+    Status CalcNVentSysAvailMgr(EnergyPlusData &state,
+                                int const SysAvailNum,             // number of the current scheduled system availability manager
+                                int const PriAirSysNum,            // number of the primary air system affected by this Avail. Manager
+                                bool const isZoneEquipType = false // Type of zone equipment component
     );
 
-    AvailStatus CalcDiffTSysAvailMgr(EnergyPlusData &state,
-                                     int const SysAvailNum,    // Number of the current scheduled system availability manager
-                                     AvailStatus const PreviousStatus // System status for the previous timestep
+    Status CalcDiffTSysAvailMgr(EnergyPlusData &state,
+                                int const SysAvailNum,    // Number of the current scheduled system availability manager
+                                Status const PreviousStatus // System status for the previous timestep
     );
 
-    AvailStatus CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
-                                         int const SysAvailNum // Number of the current scheduled system availability manager
+    Status CalcHiTurnOffSysAvailMgr(EnergyPlusData &state,
+                                    int const SysAvailNum // Number of the current scheduled system availability manager
     );
 
-    AvailStatus CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
-                                        int const SysAvailNum // Number of the current scheduled system availability manager
+    Status CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum // Number of the current scheduled system availability manager
     );
 
-    AvailStatus CalcLoTurnOffSysAvailMgr(EnergyPlusData &state,
-                                         int const SysAvailNum // Number of the current scheduled system availability manager
+    Status CalcLoTurnOffSysAvailMgr(EnergyPlusData &state,
+                                    int const SysAvailNum // Number of the current scheduled system availability manager
     );
 
-    AvailStatus CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
-                                        int const SysAvailNum // Number of the current scheduled system availability manager
+    Status CalcLoTurnOnSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum // Number of the current scheduled system availability manager
     );
 
     void ManageHybridVentilation(EnergyPlusData &state);
@@ -556,7 +556,7 @@ namespace Avail {
     {
         // Members
         int NumAvailManagers = 0;                         // number of availability managers for this plant loop
-        AvailStatus availStatus = AvailStatus::NoAction;                                  // system availability status
+        Status availStatus = Status::NoAction;            // system availability status
         int StartTime = 0;                                // cycle on time (in SimTimeSteps)
         int StopTime = 0;                                 // cycle off time (in SimTimeSteps)
         Array1D<AvailManagerNTN> availManagers; // type of availability manager

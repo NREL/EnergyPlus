@@ -239,7 +239,7 @@ namespace EvaporativeCoolers {
         int AvailSchedIndex;              // pointer to local availability schedule
         std::string AvailManagerListName; // Name of an availability manager list object
         bool UnitIsAvailable;
-        Avail::AvailStatus FanAvailStatus = Avail::AvailStatus::NoAction;
+        Avail::Status FanAvailStatus = Avail::Status::NoAction;
         int OAInletNodeNum;    // outdoor air inlet node index
         int UnitOutletNodeNum; // Unit air outlet (to zone) node index
         int UnitReliefNodeNum; // Unit relief air (from zone) node index (optional)
