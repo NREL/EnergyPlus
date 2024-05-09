@@ -6678,7 +6678,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
         1.0;                                                                            // set continuous fan operating mode
     InitVRF(*state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);  // Initialize all VRFTU related parameters
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
+    ASSERT_EQ((int)state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, (int)HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
     // Set average OA flow rate when there in no load for cont. fan cyc. coil operating mode
     SetAverageAirFlow(*state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AverageOAMassFlow = state->dataEnvrn->StdRhoAir * state->dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
@@ -15241,7 +15241,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    ASSERT_EQ(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
+    ASSERT_EQ((int)state->dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp, (int)HVAC::FanOp::Continuous); // continuous fan cycling coil operating mode
 }
 
 TEST_F(EnergyPlusFixture, VRFTU_FanOnOff_Power)
