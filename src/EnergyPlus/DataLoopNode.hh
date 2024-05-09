@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -432,31 +433,31 @@ namespace DataLoopNode {
     struct NodeData
     {
         // Members
-        NodeFluidType FluidType = NodeFluidType::Blank; // must be one of the valid parameters
-        int FluidIndex = 0;                             // For Fluid Properties
-        Real64 Temp = 0.0;                              // {C}
-        Real64 TempMin = 0.0;                           // {C}
-        Real64 TempMax = 0.0;                           // {C}
-        Real64 TempSetPoint = SensedNodeFlagValue;      // {C}
-        Real64 TempLastTimestep = 0.0;                  // [C}
-        Real64 MassFlowRateRequest = 0.0;               // {kg/s}
-        Real64 MassFlowRate = 0.0;                      // {kg/s}
-        Real64 MassFlowRateMin = 0.0;                   // {kg/s}
-        Real64 MassFlowRateMax = SensedNodeFlagValue;   // {kg/s}
-        Real64 MassFlowRateMinAvail = 0.0;              // {kg/s}
-        Real64 MassFlowRateMaxAvail = 0.0;              // {kg/s}
-        Real64 MassFlowRateSetPoint = 0.0;              // {kg/s}
-        Real64 Quality = 0.0;                           // {0.0-1.0 vapor fraction/percent}
-        Real64 Press = 101325.0;                        // {Pa}
-        Real64 Enthalpy = 0.0;                          // {J/kg}
-        Real64 EnthalpyLastTimestep = 0.0;              // {J/kg}
-        Real64 HumRat = 0.0;                            // {}
-        Real64 HumRatMin = SensedNodeFlagValue;         // {}
-        Real64 HumRatMax = SensedNodeFlagValue;         // {}
-        Real64 HumRatSetPoint = SensedNodeFlagValue;    // {}
-        Real64 TempSetPointHi = SensedNodeFlagValue;    // {C}
-        Real64 TempSetPointLo = SensedNodeFlagValue;    // {C}
-        Real64 Height = -1.0;                           // {m}
+        NodeFluidType FluidType = NodeFluidType::Blank;      // must be one of the valid parameters
+        int FluidIndex = 0;                                  // For Fluid Properties
+        Real64 Temp = 0.0;                                   // {C}
+        Real64 TempMin = 0.0;                                // {C}
+        Real64 TempMax = 0.0;                                // {C}
+        Real64 TempSetPoint = SensedNodeFlagValue;           // {C}
+        Real64 TempLastTimestep = 0.0;                       // [C}
+        Real64 MassFlowRateRequest = 0.0;                    // {kg/s}
+        Real64 MassFlowRate = 0.0;                           // {kg/s}
+        Real64 MassFlowRateMin = 0.0;                        // {kg/s}
+        Real64 MassFlowRateMax = SensedNodeFlagValue;        // {kg/s}
+        Real64 MassFlowRateMinAvail = 0.0;                   // {kg/s}
+        Real64 MassFlowRateMaxAvail = 0.0;                   // {kg/s}
+        Real64 MassFlowRateSetPoint = 0.0;                   // {kg/s}
+        Real64 Quality = 0.0;                                // {0.0-1.0 vapor fraction/percent}
+        Real64 Press = DataEnvironment::StdPressureSeaLevel; // {Pa}
+        Real64 Enthalpy = 0.0;                               // {J/kg}
+        Real64 EnthalpyLastTimestep = 0.0;                   // {J/kg}
+        Real64 HumRat = 0.0;                                 // {}
+        Real64 HumRatMin = SensedNodeFlagValue;              // {}
+        Real64 HumRatMax = SensedNodeFlagValue;              // {}
+        Real64 HumRatSetPoint = SensedNodeFlagValue;         // {}
+        Real64 TempSetPointHi = SensedNodeFlagValue;         // {C}
+        Real64 TempSetPointLo = SensedNodeFlagValue;         // {C}
+        Real64 Height = -1.0;                                // {m}
 
         //  Following are for Outdoor Air Nodes Scheduled Properties
         bool IsLocalNode = false;
@@ -490,73 +491,6 @@ namespace DataLoopNode {
 
         // Default Constructor
         NodeData() = default;
-
-        // Member Constructor
-        NodeData(NodeFluidType const FluidType,     // must be one of the valid parameters
-                 int const FluidIndex,              // For Fluid Properties
-                 Real64 const Temp,                 // {C}
-                 Real64 const TempMin,              // {C}
-                 Real64 const TempMax,              // {C}
-                 Real64 const TempSetPoint,         // {C}
-                 Real64 const TempLastTimestep,     // [C}
-                 Real64 const MassFlowRateRequest,  // {kg/s}
-                 Real64 const MassFlowRate,         // {kg/s}
-                 Real64 const MassFlowRateMin,      // {kg/s}
-                 Real64 const MassFlowRateMax,      // {kg/s}
-                 Real64 const MassFlowRateMinAvail, // {kg/s}
-                 Real64 const MassFlowRateMaxAvail, // {kg/s}
-                 Real64 const MassFlowRateSetPoint, // {kg/s}
-                 Real64 const Quality,              // {0.0-1.0 vapor fraction/percent}
-                 Real64 const Press,                // {Pa}
-                 Real64 const Enthalpy,             // {J/kg}
-                 Real64 const EnthalpyLastTimestep, // {J/kg}
-                 Real64 const HumRat,               // {}
-                 Real64 const HumRatMin,            // {}
-                 Real64 const HumRatMax,            // {}
-                 Real64 const HumRatSetPoint,       // {}
-                 Real64 const TempSetPointHi,       // {C}
-                 Real64 const TempSetPointLo,       // {C}
-                 Real64 const Height,               // {m}
-                 bool const IsLocalNode,
-                 int const OutAirDryBulbSchedNum,         // schedule value in {C}
-                 int const OutAirWetBulbSchedNum,         // schedule value in {C}
-                 int const OutAirWindSpeedSchedNum,       // schedule value in {m/s}
-                 int const OutAirWindDirSchedNum,         // schedule value in {degree}
-                 Real64 const OutAirDryBulb,              // {C}
-                 bool const EMSOverrideOutAirDryBulb,     // if true, the EMS is calling to override outdoor air node drybulb setting
-                 Real64 const EMSValueForOutAirDryBulb,   // value EMS is directing to use for outdoor air node's drybulb {C}
-                 Real64 const OutAirWetBulb,              // {C}
-                 bool const EMSOverrideOutAirWetBulb,     // if true, the EMS is calling to override outdoor air node wetbulb setting
-                 Real64 const EMSValueForOutAirWetBulb,   // value EMS is directing to use for outdoor air node's wetbulb {C}
-                 Real64 const OutAirWindSpeed,            // {m/s}
-                 bool const EMSOverrideOutAirWindSpeed,   // if true, the EMS is calling to override outdoor air node wind speed setting
-                 Real64 const EMSValueForOutAirWindSpeed, // value EMS is directing to use for outdoor air node's drybulb {m/s}
-                 Real64 const OutAirWindDir,              // {degree}
-                 bool const EMSOverrideOutAirWindDir,     // if true, the EMS is calling to override outdoor air node wind direction setting
-                 Real64 const EMSValueForOutAirWindDir,   // value EMS is directing to use for outdoor air node's wind directio {degree}
-                 Real64 const CO2,                        // {ppm}
-                 Real64 const CO2SetPoint,                // {ppm}
-                 Real64 const GenContam,                  // {ppm}
-                 Real64 const GenContamSetPoint,          // {ppm}
-                 bool const SPMNodeWetBulbRepReq,         // Set to true when node has SPM which follows wetbulb
-                 bool const plantNodeErrorMsgIssued)
-            : FluidType(FluidType), FluidIndex(FluidIndex), Temp(Temp), TempMin(TempMin), TempMax(TempMax), TempSetPoint(TempSetPoint),
-              TempLastTimestep(TempLastTimestep), MassFlowRateRequest(MassFlowRateRequest), MassFlowRate(MassFlowRate),
-              MassFlowRateMin(MassFlowRateMin), MassFlowRateMax(MassFlowRateMax), MassFlowRateMinAvail(MassFlowRateMinAvail),
-              MassFlowRateMaxAvail(MassFlowRateMaxAvail), MassFlowRateSetPoint(MassFlowRateSetPoint), Quality(Quality), Press(Press),
-              Enthalpy(Enthalpy), EnthalpyLastTimestep(EnthalpyLastTimestep), HumRat(HumRat), HumRatMin(HumRatMin), HumRatMax(HumRatMax),
-              HumRatSetPoint(HumRatSetPoint), TempSetPointHi(TempSetPointHi), TempSetPointLo(TempSetPointLo), Height(Height),
-              IsLocalNode(IsLocalNode), OutAirDryBulbSchedNum(OutAirDryBulbSchedNum), OutAirWetBulbSchedNum(OutAirWetBulbSchedNum),
-              OutAirWindSpeedSchedNum(OutAirWindSpeedSchedNum), OutAirWindDirSchedNum(OutAirWindDirSchedNum), OutAirDryBulb(OutAirDryBulb),
-              EMSOverrideOutAirDryBulb(EMSOverrideOutAirDryBulb), EMSValueForOutAirDryBulb(EMSValueForOutAirDryBulb), OutAirWetBulb(OutAirWetBulb),
-              EMSOverrideOutAirWetBulb(EMSOverrideOutAirWetBulb), EMSValueForOutAirWetBulb(EMSValueForOutAirWetBulb),
-              OutAirWindSpeed(OutAirWindSpeed), EMSOverrideOutAirWindSpeed(EMSOverrideOutAirWindSpeed),
-              EMSValueForOutAirWindSpeed(EMSValueForOutAirWindSpeed), OutAirWindDir(OutAirWindDir),
-              EMSOverrideOutAirWindDir(EMSOverrideOutAirWindDir), EMSValueForOutAirWindDir(EMSValueForOutAirWindDir), CO2(CO2),
-              CO2SetPoint(CO2SetPoint), GenContam(GenContam), GenContamSetPoint(GenContamSetPoint), SPMNodeWetBulbRepReq(SPMNodeWetBulbRepReq),
-              plantNodeErrorMsgIssued(plantNodeErrorMsgIssued)
-        {
-        }
     };
 
     struct MoreNodeData
