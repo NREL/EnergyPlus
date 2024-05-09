@@ -5243,8 +5243,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcBeamSolarOnWinRevealSurface)
     EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(1), 0.0326, 0.001);
     EXPECT_NEAR(state->dataSurface->SurfWinBmSolAbsdInsReveal(2), 0.0225, 0.001);
 }
-TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
+TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution_Detailed)
 {
+    // Test for detailed window model
     std::string const idf_objects = delimited_string({
         "  Building,",
         "    DemoFDT,                 !- Name",
@@ -5263,24 +5264,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
         "    ,                        !- Polygon Clipping Algorithm",
         "    ,                        !- Pixel Counting Resolution",
         "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
-        "  SurfaceConvectionAlgorithm:Inside,TARP;",
-        "  SurfaceConvectionAlgorithm:Outside,TARP;",
-        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
         "  Timestep,6;",
-        "  RunPeriod,",
-        "    RP1,                     !- Name",
-        "    1,                       !- Begin Month",
-        "    1,                       !- Begin Day of Month",
-        "    ,                        !- Begin Year",
-        "    12,                      !- End Month",
-        "    31,                      !- End Day of Month",
-        "    ,                        !- End Year",
-        "    ,                        !- Day of Week for Start Day",
-        "    ,                        !- Use Weather File Holidays and Special Days",
-        "    ,                        !- Use Weather File Daylight Saving Period",
-        "    ,                        !- Apply Weekend Holiday Rule",
-        "    ,                        !- Use Weather File Rain Indicators",
-        "    ;                        !- Use Weather File Snow Indicators",
         "  ScheduleTypeLimits,",
         "    Fraction,                !- Name",
         "    0.0,                     !- Lower Limit Value",
@@ -5355,15 +5339,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
         "    Counterclockwise,        !- Vertex Entry Direction",
         "    Relative;                !- Coordinate System",
         "  Zone,",
-        "    ZONE ONE,                !- Name",
-        "    0,                       !- Direction of Relative North {deg}",
-        "    0,                       !- X Origin {m}",
-        "    0,                       !- Y Origin {m}",
-        "    0,                       !- Z Origin {m}",
-        "    1,                       !- Type",
-        "    1,                       !- Multiplier",
-        "    0,                       !- Ceiling Height {m}",
-        "    0;                       !- Volume {m3}",
+        "    ZONE ONE;                !- Name",
         "  BuildingSurface:Detailed,",
         "    Zn001:Wall-North,        !- Name",
         "    Wall,                    !- Surface Type",
@@ -5534,21 +5510,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
 
     HeatBalanceManager::SetPreConstructionInputParameters(*state);
     ScheduleManager::ProcessScheduleInput(*state); // read schedules
-
-    // Material::GetMaterialData(*state, FoundError);
-    // EXPECT_FALSE(FoundError);
-
-    // HeatBalanceManager::GetFrameAndDividerData(*state);
-
-    // HeatBalanceManager::GetConstructData(*state, FoundError);
-    // EXPECT_FALSE(FoundError);
-
-    // HeatBalanceManager::GetZoneData(*state, FoundError); // Read Zone data from input file
-    // EXPECT_FALSE(FoundError);
-
-    // SurfaceGeometry::GetGeometryParameters(*state, FoundError);
-    // EXPECT_FALSE(FoundError);
-
     HeatBalanceManager::GetHeatBalanceInput(*state);
 
     state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
@@ -5558,14 +5519,6 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
     state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
     state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
     state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
-
-    // SurfaceGeometry::GetSurfaceData(*state, FoundError); // setup zone geometry and get zone data
-    // EXPECT_FALSE(FoundError);                            // expect no errors
-
-    //	compare_err_stream( "" ); // just for debugging
-
-    // SurfaceGeometry::SetupZoneGeometry(*state, FoundError); // this calls GetSurfaceData()
-    // EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays(*state);
     SolarShading::DetermineShadowingCombinations(*state);
@@ -5583,16 +5536,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
     state->dataSolarShading->CalcSkyDifShading = true;
     state->dataGlobal->BeginSimFlag = true;
     HeatBalanceManager::InitHeatBalance(*state);
-    createFacilityElectricPowerServiceObject(*state);
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state);
     HeatBalanceSurfaceManager::InitSurfaceHeatBalance(*state);
     SolarShading::InitSolarCalculations(*state);
-    // SolarShading::SkyDifSolarShading(*state);
-    // state->dataSolarShading->CalcSkyDifShading = false;
 
     state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
     state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
     state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
-    FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
+    SolarShading::FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
 
     int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     int windowSurfNum2 = Util::FindItemInList("ZN001:FLOOR:WIN001", state->dataSurface->Surface);
@@ -5607,7 +5558,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
     state->dataSurface->SurfSkySolarInc(windowSurfNum) = 50.0;
     state->dataSurface->SurfGndSolarInc(windowSurfNum) = 25.0;
 
-    CalcInteriorSolarDistribution(*state);
+    SolarShading::CalcInteriorSolarDistribution(*state);
     EXPECT_NEAR(1239.94, state->dataSurface->SurfWinTransSolar(windowSurfNum), 0.01);
     EXPECT_NEAR(0.0, state->dataSurface->SurfWinTransSolar(windowSurfNum2), 0.01);
     EXPECT_NEAR(0.646, state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum), 0.01);
@@ -5616,4 +5567,376 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution)
     EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum2), 0.01);
     EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum), 0.01);
     EXPECT_NEAR(1.2, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum2), 0.01);
+}
+TEST_F(EnergyPlusFixture, SolarShadingTest_CalcInteriorSolarDistribution_EQL)
+{
+    // Test for equivalent layer window model
+    std::string const idf_objects = delimited_string({
+        "  Building,",
+        "    DemoFDT,                 !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    3.9999999E-02,           !- Loads Convergence Tolerance Value",
+        "    4.0000002E-03,           !- Temperature Convergence Tolerance Value {deltaC}",
+        "    FullInteriorAndExterior,    !- Solar Distribution",
+        "    ,                        !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+        "  ShadowCalculation,",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Timestep,                !- Shading Calculation Update Frequency Method",
+        "    ,                        !- Shading Calculation Update Frequency",
+        "    ,                        !- Maximum Figures in Shadow Overlap Calculations",
+        "    ,                        !- Polygon Clipping Algorithm",
+        "    ,                        !- Pixel Counting Resolution",
+        "    DetailedSkyDiffuseModeling;  !- Sky Diffuse Modeling Algorithm",
+        "  Timestep,6;",
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    Continuous;              !- Numeric Type",
+        "  ScheduleTypeLimits,",
+        "    ON/OFF,                  !- Name",
+        "    0,                       !- Lower Limit Value",
+        "    1,                       !- Upper Limit Value",
+        "    Discrete;                !- Numeric Type",
+        "  Schedule:Compact,",
+        "    SunShading,              !- Name",
+        "    ON/OFF,                  !- Schedule Type Limits Name",
+        "    Through: 4/30,           !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    until: 24:00,1,          !- Field 3",
+        "    Through: 10/31,          !- Field 5",
+        "    For: AllDays,            !- Field 6",
+        "    until: 24:00,0,          !- Field 7",
+        "    Through: 12/31,          !- Field 9",
+        "    For: AllDays,            !- Field 10",
+        "    until: 24:00,1;          !- Field 11",
+        "  Material,",
+        "    C12 - 2 IN HW CONCRETE,  !- Name",
+        "    MediumRough,             !- Roughness",
+        "    5.0901599E-02,           !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+        "  Material:NoMass,",
+        "    R13LAYER,                !- Name",
+        "    Rough,                   !- Roughness",
+        "    2.290965,                !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+        "  Construction:WindowEquivalentLayer,",
+        "  CLR CLR VB,                !- Name",
+        "  GLZCLR,                    !- Outside Layer",
+        "  Air GAP SealedOut 20mm,    !- Layer 2",
+        "  GLZCLR;                    !- Layer 3",
+        "  ! Air GAP SealedIndoor 20mm, !- Layer 4",
+        "  ! VBU8D6+45SW1;              !- Layer 5",
+        "WindowMaterial:Glazing:EquivalentLayer,",
+        "  GLZCLR,                    !-  Name",
+        "  SpectralAverage,           !-  Optical Data Type",
+        "  ,                          !-  Window Glass Spectral Data Set Name",
+        "  0.83,                      !-  Front Side Beam-Beam Solar Transmittance",
+        "  0.83,                      !-  Back Side Beam-Beam Solar Transmittance",
+        "  0.08,                      !-  Front Side Beam-Beam Solar Reflectance",
+        "  0.08,                      !-  Back Side Beam-Beam Solar Reflectance",
+        "  0.0,                       !-  Front Side Beam-Beam Visible Transmittance",
+        "  0.0,                       !-  Back Side Beam-Beam Visible Transmittance",
+        "  0.0,                       !-  Front Side Beam-Beam Visible Reflectance",
+        "  0.0,                       !-  Back Side Beam-Beam Visible Reflectance",
+        "  0.0,                       !-  Front Side Beam-Diffuse Solar Transmittance",
+        "  0.0,                       !-  Back Side Beam-Diffuse Solar Transmittance",
+        "  0.0,                       !-  Front Side Beam-Diffuse Solar Reflectance",
+        "  0.0,                       !-  Back Side Beam-Diffuse Solar Reflectance",
+        "  0.0,                       !-  Front Side Beam-Diffuse Visible Transmittance",
+        "  0.0,                       !-  Back Side Beam-Diffuse Visible Transmittance",
+        "  0.0,                       !-  Front Side Beam-Diffuse Visible Reflectance",
+        "  0.0,                       !-  Back Side Beam-Diffuse Visible Reflectance",
+        "  0.76,                      !-  Diffuse-Diffuse Solar Transmittance",
+        "  0.14,                      !-  Front Side Diffuse-Diffuse Solar Reflectance",
+        "  0.14,                      !-  Back Side Diffuse-Diffuse Solar Reflectance",
+        "  0.0,                       !-  Diffuse-Diffuse Visible Transmittance",
+        "  0.0,                       !-  Front Side Diffuse-Diffuse Visible Reflectance",
+        "  0.0,                       !-  Back Side Diffuse-Diffuse Visible Reflectance",
+        "  0.0,                       !-  Infrared Transmittance (front and back)",
+        "  0.84,                      !-  Front Side Infrared Emissivity",
+        "  0.84;                      !-  Back Side Infrared Emissivity",
+        "WindowMaterial:Blind:EquivalentLayer,",
+        "  VBU8D6+45SW1,           ! - Name",
+        "  Horizontal,             ! - Slat Orientation",
+        "  0.025,                  ! - Slat Width",
+        "  0.025,                  ! - Slat Separation",
+        "  0.0,                    ! - Slat Crown",
+        "  45.0,                   ! - Slat Angle",
+        "  0.0,                    ! - Front Side Slat Beam-Diffuse Solar Transmittance",
+        "  0.0,                    ! - Back Side Slat Beam-Diffuse Solar Transmittance",
+        "  0.0,                    ! - Front Side Slat Beam-Diffuse Solar Reflectance",
+        "  0.0,                    ! - Back Side Slat Beam-Diffuse Solar Reflectance",
+        "  0.0,                    ! - Front Side Slat Beam-Diffuse Visible Solar Transmittance",
+        "  0.0,                    ! - Back Side Slat Beam-Diffuse Visible Solar Transmittance",
+        "  0.0,                    ! - Front Side Slat Beam-Diffuse Visible Solar Reflectance",
+        "  0.0,                    ! - Back Side Slat Beam-Diffuse Visible Solar Reflectance",
+        "  0.0,                    ! - Slat Diffuse-Diffuse Solar Transmittance",
+        "  0.80,                   ! - Front Side Slat Diffuse-Diffuse Solar Reflectance",
+        "  0.60,                   ! - Back Side Slat Diffuse-Diffuse Solar Reflectance",
+        "  0.0,                    ! - Slat Diffuse-Diffuse Visible Transmittance",
+        "  0.0,                    ! - Front Side Slat Diffuse-Diffuse Visible Reflectance",
+        "  0.0,                    ! - Back Side Slat Diffuse-Diffuse Visible Reflectance",
+        "  0.0,                    ! - Slat Infrared Transmittance",
+        "  0.90,                   ! - Front Side Slat Infrared Emissivity",
+        "  0.90,                   ! - Back Side Slat Infrared Emissivity",
+        "  BlockBeamSolar;         ! - Slat Angle Control",
+        " WindowMaterial:Gap:EquivalentLayer,",
+        "  Air GAP SealedOut 20mm,    !- Name",
+        "  Air,                       !- Gas Type",
+        "  0.0200,                    !- Thickness",
+        "  Sealed;                    !- Gap Vent Type",
+        " WindowMaterial:Gap:EquivalentLayer,",
+        "  Air GAP SealedIndoor 20mm, !- Name",
+        "  Air,                       !- Gas Type",
+        "  0.020,                     !- Thickness",
+        "  Sealed;                    !- Gap Vent Type ",
+        "  Construction,",
+        "    R13WALL,                 !- Name",
+        "    R13LAYER;                !- Outside Layer",
+        "  Construction,",
+        "    SLAB FLOOR,              !- Name",
+        "    C12 - 2 IN HW CONCRETE;  !- Layer 4",
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    Counterclockwise,        !- Vertex Entry Direction",
+        "    Relative;                !- Coordinate System",
+        "  Zone,",
+        "    ZONE ONE;                !- Name",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall-North,        !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,             !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5,5,3,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    -5,5,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall-East,         !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,               !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,5,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall-South,        !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -5,-5,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall-West,         !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,               !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    -5,5,3,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    -5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,-5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:roof,              !- Name",
+        "    Roof,                    !- Surface Type",
+        "    R13WALL,                  !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.0000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    -5,-5,3,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,-5,3,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,5,3,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,5,3;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  BuildingSurface:Detailed,",
+        "    Zn001:floor,             !- Name",
+        "    Floor,                   !- Surface Type",
+        "    SLAB FLOOR,              !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    ,                        !- Space Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.0000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    -5,5,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    5,5,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    5,-5,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -5,-5,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Floor:Win001, !- Name",
+        "    Window,                  !- Surface Type",
+        "    CLR CLR VB,   !- Construction Name",
+        "    Zn001:Floor,        !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    TestFrameAndDivider,     !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    -4,4,0,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    4,4,0,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    4,-4,0,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    -4,-4,0;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Wall-South:Win001, !- Name",
+        "    Window,                  !- Surface Type",
+        "    CLR CLR VB,   !- Construction Name",
+        "    Zn001:Wall-South,        !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    TestFrameAndDivider,     !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-5,0.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-5,0.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  WindowProperty:FrameAndDivider,",
+        "    TestFrameAndDivider,     !- Name",
+        "    0.05,                    !- Frame Width {m}",
+        "    0.05,                    !- Frame Outside Projection {m}",
+        "    0.05,                    !- Frame Inside Projection {m}",
+        "    5.0,                     !- Frame Conductance {W/m2-K}",
+        "    1.2,                     !- Ratio of Frame-Edge Glass Conductance to Center-Of-Gl",
+        "    0.8,                     !- Frame Solar Absorptance",
+        "    0.8,                     !- Frame Visible Absorptance",
+        "    0.9,                     !- Frame Thermal Hemispherical Emissivity",
+        "    DividedLite,             !- Divider Type",
+        "    0.02,                    !- Divider Width {m}",
+        "    2,                       !- Number of Horizontal Dividers",
+        "    2,                       !- Number of Vertical Dividers",
+        "    0.02,                    !- Divider Outside Projection {m}",
+        "    0.02,                    !- Divider Inside Projection {m}",
+        "    5.0,                     !- Divider Conductance {W/m2-K}",
+        "    1.2,                     !- Ratio of Divider-Edge Glass Conductance to Center-Of-",
+        "    0.8,                     !- Divider Solar Absorptance",
+        "    0.8,                     !- Divider Visible Absorptance",
+        "    0.9;                     !- Divider Thermal Hemispherical Emissivity",
+        "  Shading:Zone:Detailed,",
+        "    Zn001:Wall-South:Shade001,  !- Name",
+        "    Zn001:Wall-South,        !- Base Surface Name",
+        "    SunShading,              !- Transmittance Schedule Name",
+        "    4,                       !- Number of Vertices",
+        "    -3,-5,2.5,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    -3,-6,2.5,  !- X,Y,Z ==> Vertex 2 {m}",
+        "    3,-6,2.5,  !- X,Y,Z ==> Vertex 3 {m}",
+        "    3,-5,2.5;  !- X,Y,Z ==> Vertex 4 {m}",
+        "  ShadingProperty:Reflectance,",
+        "    Zn001:Wall-South:Shade001,  !- Shading Surface Name",
+        "    0.2,                     !- Diffuse Solar Reflectance of Unglazed Part of Shading",
+        "    0.2;                     !- Diffuse Visible Reflectance of Unglazed Part of Shading",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(*state);
+    bool FoundError = false;
+
+    HeatBalanceManager::GetProjectControlData(*state, FoundError); // read project control data
+    EXPECT_FALSE(FoundError);                                      // expect no errors
+
+    HeatBalanceManager::SetPreConstructionInputParameters(*state);
+    ScheduleManager::ProcessScheduleInput(*state); // read schedules
+    HeatBalanceManager::GetHeatBalanceInput(*state);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth.allocate(1);
+    state->dataSurfaceGeometry->SinZoneRelNorth.allocate(1);
+
+    state->dataSurfaceGeometry->CosZoneRelNorth(1) = std::cos(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->SinZoneRelNorth(1) = std::sin(-state->dataHeatBal->Zone(1).RelNorth * Constant::DegToRadians);
+    state->dataSurfaceGeometry->CosBldgRelNorth = 1.0;
+    state->dataSurfaceGeometry->SinBldgRelNorth = 0.0;
+
+    SolarShading::AllocateModuleArrays(*state);
+    SolarShading::DetermineShadowingCombinations(*state);
+    state->dataEnvrn->DayOfYear_Schedule = 168;
+    state->dataEnvrn->DayOfWeek = 6;
+    state->dataGlobal->TimeStep = 4;
+    state->dataGlobal->HourOfDay = 9;
+
+    //	compare_err_stream( "" ); // just for debugging
+
+    state->dataSurface->ShadingTransmittanceVaries = true;
+    state->dataSysVars->DetailedSkyDiffuseAlgorithm = true;
+    state->dataHeatBal->SolarDistribution = DataHeatBalance::Shadowing::FullExterior;
+
+    state->dataSolarShading->CalcSkyDifShading = true;
+    state->dataGlobal->BeginSimFlag = true;
+    HeatBalanceManager::InitHeatBalance(*state);
+    EnergyPlus::createFacilityElectricPowerServiceObject(*state);
+    HeatBalanceSurfaceManager::InitSurfaceHeatBalance(*state);
+    SolarShading::InitSolarCalculations(*state);
+
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(1) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(2) = 0.1;
+    state->dataBSDFWindow->SUNCOSTS(4, 9)(3) = 0.1;
+    SolarShading::FigureSolarBeamAtTimestep(*state, state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep);
+
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum2 = Util::FindItemInList("ZN001:FLOOR:WIN001", state->dataSurface->Surface);
+    EXPECT_NEAR(0.6504, state->dataSolarShading->SurfDifShdgRatioIsoSkyHRTS(4, 9, windowSurfNum), 0.0001);
+    EXPECT_NEAR(0.9152, state->dataSolarShading->SurfDifShdgRatioHorizHRTS(4, 9, windowSurfNum), 0.0001);
+
+    state->dataEnvrn->BeamSolarRad = 100.0;
+    state->dataHeatBal->SurfSunlitFrac(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, windowSurfNum) = 1.0;
+    state->dataHeatBal->SurfCosIncAng(state->dataGlobal->HourOfDay, state->dataGlobal->TimeStep, windowSurfNum) = 1.0;
+    state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum) = 0.8;
+    state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum2) = 0.5;
+    state->dataSurface->SurfSkySolarInc(windowSurfNum) = 50.0;
+    state->dataSurface->SurfGndSolarInc(windowSurfNum) = 25.0;
+
+    SolarShading::CalcInteriorSolarDistribution(*state);
+    EXPECT_NEAR(1362.24, state->dataSurface->SurfWinTransSolar(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataSurface->SurfWinTransSolar(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.6933, state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataSurface->SurfWinGlTsolBmBm(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans(windowSurfNum2), 0.01);
+    EXPECT_NEAR(0.0, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum), 0.01);
+    EXPECT_NEAR(1.4736, state->dataHeatBalSurf->SurfWinInitialDifSolInTrans(windowSurfNum2), 0.01);
 }
