@@ -2630,19 +2630,27 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         // Test if we can write to the database
         // If we can't then there are probably locks on the database
         if (ok) {
-            sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            // sqlite3_open_v2 could return SQLITE_BUSY at this point. If so, do not proceed to sqlite3_exec.
+            rc = sqlite3_open_v2(dbName.string().c_str(), &m_connection, SQLITE_OPEN_READWRITE, nullptr);
+            if (rc) {
+                *m_errorStream << "SQLite3 message, can't get exclusive lock to open database: " << sqlite3_errmsg(m_connection) << std::endl;
+                ok = false;
+            }
+        }
+        if (ok) {
             char *zErrMsg = nullptr;
             rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
             sqlite3_close(m_connection);
             if (rc) {
-                *m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_connection) << std::endl;
+                *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << sqlite3_errmsg(m_connection) << std::endl;
                 ok = false;
             } else {
                 if (dbName != ":memory:") {
                     // Remove test db
                     rc = remove(dbName.string().c_str());
                     if (rc) {
-                        *m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_connection) << std::endl;
+                        // File operation failed. SQLite connection is not in an error state.
+                        *m_errorStream << "SQLite3 message, can't remove old database." << std::endl;
                         ok = false;
                     }
                 }

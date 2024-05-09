@@ -550,6 +550,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.011;
 
     state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
+    state->dataHeatBalSurf->SurfWinInitialDifSolInTrans.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -588,6 +589,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
     state->dataHeatBalSurf->SurfQAirExtReport.allocate(3);
     state->dataHeatBalSurf->SurfQHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(3, 0.0);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
