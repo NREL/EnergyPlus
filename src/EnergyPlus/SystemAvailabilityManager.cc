@@ -256,32 +256,32 @@ namespace Avail {
             for (CompNum = 1; CompNum <= zoneComp.TotalNumComp; ++CompNum) {
 
                 auto &zcam = zoneComp.ZoneCompAvailMgrs(CompNum);
-                if (zcam.NumAvailManagers == 0) {
-                    zcam.availStatus = AvailStatus::NoAction;
-                    continue;
-                }
+                if (zcam.NumAvailManagers > 0) {
                 
-                // Save the previous status for differential thermostat
-                previousStatus = zcam.availStatus;
-                // initialize the availability to "take no action"
-                zcam.availStatus = AvailStatus::NoAction;
-                for (ZoneCompAvailMgrNum = 1; ZoneCompAvailMgrNum <= zcam.NumAvailManagers; ++ZoneCompAvailMgrNum) {
-                    // loop over the avail managers in ZoneHVAC:* components
-                    availStatus = SimSysAvailManager(state,
-                                                     zcam.availManagers(ZoneCompAvailMgrNum).type,
-                                                     zcam.availManagers(ZoneCompAvailMgrNum).Name,
-                                                     zcam.availManagers(ZoneCompAvailMgrNum).Num,
-                                                     DummyArgument,
-                                                     previousStatus,
-                                                     ZoneEquipType,
-                                                     CompNum);
-                    if (availStatus == AvailStatus::ForceOff) {
-                        zcam.availStatus = AvailStatus::ForceOff;
-                        break; // Fans forced off takes precedence
-                    } else if ((availStatus == AvailStatus::CycleOn) && (zcam.availStatus == AvailStatus::NoAction)) {
-                        // cycle on is next precedence
-                        zcam.availStatus = AvailStatus::CycleOn;
+                    // Save the previous status for differential thermostat
+                    previousStatus = zcam.availStatus;
+                    // initialize the availability to "take no action"
+                    zcam.availStatus = AvailStatus::NoAction;
+                    for (ZoneCompAvailMgrNum = 1; ZoneCompAvailMgrNum <= zcam.NumAvailManagers; ++ZoneCompAvailMgrNum) {
+                        // loop over the avail managers in ZoneHVAC:* components
+                        availStatus = SimSysAvailManager(state,
+                                                         zcam.availManagers(ZoneCompAvailMgrNum).type,
+                                                         zcam.availManagers(ZoneCompAvailMgrNum).Name,
+                                                         zcam.availManagers(ZoneCompAvailMgrNum).Num,
+                                                         DummyArgument,
+                                                         previousStatus,
+                                                         ZoneEquipType,
+                                                         CompNum);
+                        if (availStatus == AvailStatus::ForceOff) {
+                            zcam.availStatus = AvailStatus::ForceOff;
+                            break; // Fans forced off takes precedence
+                        } else if ((availStatus == AvailStatus::CycleOn) && (zcam.availStatus == AvailStatus::NoAction)) {
+                            // cycle on is next precedence
+                            zcam.availStatus = AvailStatus::CycleOn;
+                        }
                     }
+                } else {
+                    zcam.availStatus = AvailStatus::NoAction;
                 }
                 
                 if (zcam.ZoneNum == 0) continue;
@@ -4393,7 +4393,7 @@ namespace Avail {
             hybridVentMgr.ctrlType = static_cast<VentCtrlType>(GetCurrentScheduleValue(state, hybridVentMgr.ControlModeSchedPtr));
             // -1 means that the value will be determined inside CalcHybridVentSysAvailMgr.
             // IF the value is still -1, the program will stop.
-            hybridVentMgr.ctrlStatus = VentCtrlStatus::Invalid;
+            // hybridVentMgr.ctrlStatus = VentCtrlStatus::Invalid; // Not sure what this is for
             hybridVentMgr.WindModifier = -1.0;
         }
 
@@ -4401,8 +4401,8 @@ namespace Avail {
             for (auto &e : state.dataAvail->HybridVentData)
                 e.availStatus = AvailStatus::NoAction;
 
-        for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
-            if (allocated(state.dataAvail->ZoneComp)) {
+        if (allocated(state.dataAvail->ZoneComp)) {
+            for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) { // loop over the zone equipment types
                 if (state.dataAvail->ZoneComp(ZoneEquipType).TotalNumComp > 0)
                     for (auto &e : state.dataAvail->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)
                         e.availStatus = AvailStatus::NoAction;
