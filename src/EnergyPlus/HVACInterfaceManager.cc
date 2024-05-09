@@ -153,6 +153,12 @@ void UpdateHVACInterface(EnergyPlusData &state,
         airLoopConv.HVACHumRatNotConverged[0] = false;
         airLoopConv.HVACTempNotConverged[0] = false;
         airLoopConv.HVACEnergyNotConverged[0] = false;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            airLoopConv.HVACCO2NotConverged[0] = false;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            airLoopConv.HVACGenContamNotConverged[0] = false;
+        }
 
         TmpRealARR = airLoopConv.HVACFlowDemandToSupplyTolValue;
         airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
@@ -212,12 +218,42 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            TmpRealARR = airLoopConv.HVACCO2DemandToSupplyTolValue;
+            airLoopConv.HVACCO2DemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).CO2 - thisInletNode.CO2);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACCO2DemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACCO2DemandToSupplyTolValue[0] > DataConvergParams::HVACCO2Toler) {
+                airLoopConv.HVACCO2NotConverged[0] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
+        }
+
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            TmpRealARR = airLoopConv.HVACGenContamDemandToSupplyTolValue;
+            airLoopConv.HVACGenContamDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).GenContam - thisInletNode.GenContam);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACGenContamDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACGenContamDemandToSupplyTolValue[0] > DataConvergParams::HVACGenContamToler) {
+                airLoopConv.HVACGenContamNotConverged[0] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
+        }
+
     } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck1) {
 
         airLoopConv.HVACMassFlowNotConverged[1] = false;
         airLoopConv.HVACHumRatNotConverged[1] = false;
         airLoopConv.HVACTempNotConverged[1] = false;
         airLoopConv.HVACEnergyNotConverged[1] = false;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            airLoopConv.HVACCO2NotConverged[1] = false;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            airLoopConv.HVACGenContamNotConverged[1] = false;
+        }
 
         TmpRealARR = airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue;
         airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[0] =
@@ -277,6 +313,31 @@ void UpdateHVACInterface(EnergyPlusData &state,
         if (airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
+        // CO2 check
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            TmpRealARR = airLoopConv.HVACCO2SupplyDeck1ToDemandTolValue;
+            airLoopConv.HVACCO2SupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).CO2 - thisInletNode.CO2);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACCO2SupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACCO2SupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACCO2Toler) {
+                airLoopConv.HVACCO2NotConverged[1] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
+        }
+
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            TmpRealARR = airLoopConv.HVACGenContamSupplyDeck1ToDemandTolValue;
+            airLoopConv.HVACGenContamSupplyDeck1ToDemandTolValue[0] =
+                std::abs(state.dataLoopNodes->Node(OutletNode).GenContam - thisInletNode.GenContam);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACGenContamSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACGenContamSupplyDeck1ToDemandTolValue[0] > DataConvergParams::HVACGenContamToler) {
+                airLoopConv.HVACGenContamNotConverged[1] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
+        }
 
     } else if (CalledFrom == DataConvergParams::CalledFrom::AirSystemSupplySideDeck2) {
 
@@ -284,6 +345,12 @@ void UpdateHVACInterface(EnergyPlusData &state,
         airLoopConv.HVACHumRatNotConverged[2] = false;
         airLoopConv.HVACTempNotConverged[2] = false;
         airLoopConv.HVACEnergyNotConverged[2] = false;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            airLoopConv.HVACCO2NotConverged[2] = false;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            airLoopConv.HVACGenContamNotConverged[2] = false;
+        }
 
         TmpRealARR = airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue;
         airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[0] =
@@ -342,6 +409,30 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
         if (airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACPressToler) {
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+        }
+
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            TmpRealARR = airLoopConv.HVACCO2SupplyDeck2ToDemandTolValue;
+            airLoopConv.HVACCO2SupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).CO2 - thisInletNode.CO2);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACCO2SupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACCO2SupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACCO2Toler) {
+                airLoopConv.HVACCO2NotConverged[2] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            TmpRealARR = airLoopConv.HVACGenContamSupplyDeck2ToDemandTolValue;
+            airLoopConv.HVACGenContamSupplyDeck2ToDemandTolValue[0] =
+                std::abs(state.dataLoopNodes->Node(OutletNode).GenContam - thisInletNode.GenContam);
+            for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
+                airLoopConv.HVACGenContamSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
+            }
+            if (airLoopConv.HVACGenContamSupplyDeck2ToDemandTolValue[0] > DataConvergParams::HVACGenContamToler) {
+                airLoopConv.HVACGenContamNotConverged[2] = true;
+                OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
+            }
         }
     }
 

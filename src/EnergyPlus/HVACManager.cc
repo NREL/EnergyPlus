@@ -1117,7 +1117,74 @@ void SimHVAC(EnergyPlusData &state)
                         }
                     } // energy not converged
 
-                } // loop over air loop systems
+                    auto &arrayRef5 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACCO2NotConverged;
+                    if (std::any_of(std::begin(arrayRef5), std::end(arrayRef5), [](bool i) { return i; })) {
+
+                        ShowContinueError(state,
+                                          format("Air System Named = {} did not converge for CO2",
+                                                 state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
+                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            HistoryTrace +=
+                                format("{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACCO2DemandToSupplyTolValue[StackDepth]);
+                        }
+                        ShowContinueError(state,
+                                          format("Demand-to-Supply interface CO2 check value iteration history trace: {}", HistoryTrace));
+                        HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            HistoryTrace += format(
+                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACCO2SupplyDeck1ToDemandTolValue[StackDepth]);
+                        }
+                        ShowContinueError(
+                            state, format("Supply-to-demand interface deck 1 CO2 check value iteration history trace: {}", HistoryTrace));
+
+                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            HistoryTrace = "";
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace +=
+                                    format("{:.6R},",
+                                           state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACCO2SupplyDeck1ToDemandTolValue[StackDepth]);
+                            }
+                            ShowContinueError(
+                                state, format("Supply-to-demand interface deck 2 CO2 check value iteration history trace: {}", HistoryTrace));
+                        }
+                    } // CO2 not converged
+
+                    auto &arrayRef6 = state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACGenContamNotConverged;
+                    if (std::any_of(std::begin(arrayRef6), std::end(arrayRef6), [](bool i) { return i; })) {
+
+                        ShowContinueError(
+                            state,
+                            format("Air System Named = {} did not converge for generic contaminant", state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName));
+                        ShowContinueError(state, "Check values should be zero. Most Recent values listed first.");
+                        std::string HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            HistoryTrace += format(
+                                "{:.6R},", state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACGenContamDemandToSupplyTolValue[StackDepth]);
+                        }
+                        ShowContinueError(state, format("Demand-to-Supply interface generic contaminant check value iteration history trace: {}", HistoryTrace));
+                        HistoryTrace = "";
+                        for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                            HistoryTrace += format("{:.6R},",
+                                       state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACGenContamSupplyDeck1ToDemandTolValue[StackDepth]);
+                        }
+                        ShowContinueError(
+                            state, format("Supply-to-demand interface deck 1 generic contaminant check value iteration history trace: {}", HistoryTrace));
+
+                        if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            HistoryTrace = "";
+                            for (int StackDepth = 0; StackDepth < DataConvergParams::ConvergLogStackDepth; ++StackDepth) {
+                                HistoryTrace +=
+                                    format("{:.6R},",
+                                    state.dataConvergeParams->AirLoopConvergence(AirSysNum).HVACGenContamSupplyDeck1ToDemandTolValue[StackDepth]);
+                            }
+                            ShowContinueError(state,
+                                              format("Supply-to-demand interface deck 2 generic contaminant check value iteration history trace: {}", HistoryTrace));
+                        }
+                    } // Generic contaminant not converged
+
+                }     // loop over air loop systems
 
                 // loop over zones and check for issues with zone inlet nodes
                 for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
