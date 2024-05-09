@@ -3096,27 +3096,18 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         
 void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &solcos, Real64 &phi, Real64 &theta)
 {
-    Real64 phiSun = std::asin(solcos.z); // Altitude and azimuth angle of sun (radians)
-    phi = phiSun + phiWin - Constant::PiOvr2;
-                                
-    Real64 thetaSun = std::atan2(solcos.x, solcos.y);
-    if (thetaSun < 0.0) thetaSun += 2.0 * Constant::Pi;
-    theta = std::abs(thetaSun - thetaWin);
-    if (theta > Constant::PiOvr2) theta -= Constant::PiOvr2;
-} // GetSurfacePhiTheta()
+    phi = std::abs(std::acos(solcos.z) - phiWin);
+    theta = std::abs(std::atan2(solcos.x, solcos.y) - thetaWin);
+
+    NormalizePhiTheta(phi, theta);
+} // GetRelativePhiTheta()
         
-void NormalizePhiTheta(Real64 &Phi, Real64 &Theta) {
-    Theta = std::abs(Theta);
-    if (Theta > Constant::Pi) {
-        Theta = 0.0;
-    } else if (Theta > Constant::PiOvr2) {
-        Theta = Constant::Pi - Theta;
-    }
+void NormalizePhiTheta(Real64 &phi, Real64 &theta) {
+    if (phi > Constant::Pi) phi = 2 * Constant::Pi - phi;
+    if (phi > Constant::PiOvr2) phi = Constant::Pi - phi;
     
-    Phi = std::abs(Phi);
-    if (Phi > Constant::PiOvr2) {
-        Phi = Constant::Pi - Phi;
-    }
+    if (theta > Constant::Pi) theta = 2 * Constant::Pi - theta;
+    if (theta > Constant::PiOvr2) theta = Constant::Pi - theta;
 } // NormalizePhiTheta()
 
 void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2)

@@ -3220,8 +3220,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                         auto const *screen = dynamic_cast<Material::MaterialScreen*>(state.dataMaterial->Material(surfWin.screenNum));
                         assert(screen != nullptr);
 
-                        Real64 phi = dl->sunAngles.phi - surfWin.phi;
-                        Real64 theta = dl->sunAngles.theta - surfWin.theta;
+                        Real64 phi = std::abs(dl->sunAngles.phi - surfWin.phi);
+                        Real64 theta = std::abs(dl->sunAngles.theta - surfWin.theta);
                         int ip1, ip2, it1, it2;
                         General::BilinearInterpCoeffs coeffs;
                         Material::NormalizePhiTheta(phi, theta);
@@ -3408,8 +3408,8 @@ void FigureDayltgCoeffsAtPointsForSunPosition(
                                 auto const *screen = dynamic_cast<Material::MaterialScreen const*>(state.dataMaterial->Material(surfWin.screenNum));
                                 assert(screen != nullptr);
 
-                                Real64 phi = dl->sunAngles.phi - surfWin.phi;
-                                Real64 theta = dl->sunAngles.theta - surfWin.theta;
+                                Real64 phi = std::abs(dl->sunAngles.phi - surfWin.phi);
+                                Real64 theta = std::abs(dl->sunAngles.theta - surfWin.theta);
                                 int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
                                 General::BilinearInterpCoeffs coeffs;
                                 Material::NormalizePhiTheta(phi, theta);
@@ -7488,8 +7488,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                     auto const *screen = dynamic_cast<Material::MaterialScreen*>(state.dataMaterial->Material(surfWin.screenNum));
                     assert(screen != nullptr);
                     
-                    Real64 phi = PH - surfWin.phi;
-                    Real64 theta = TH - surfWin.theta;
+                    Real64 phi = std::abs(PH - surfWin.phi);
+                    Real64 theta = std::abs(TH - surfWin.theta);
                     int ip1, ip2, it1, it2; // lo/hi phi/theta interpolation map indices
                     General::BilinearInterpCoeffs coeffs;
 
@@ -7736,8 +7736,8 @@ void DayltgInterReflectedIllum(EnergyPlusData &state,
                             if (ScreenOn) {
                                 auto const *screen = dynamic_cast<Material::MaterialScreen const *>(state.dataMaterial->Material(surfWin.screenNum));
                                 assert(screen != nullptr);
-                                Real64 phi = dl->sunAngles.phi - surfWin.phi;
-                                Real64 theta = dl->sunAngles.theta - surfWin.theta;
+                                Real64 phi = std::abs(dl->sunAngles.phi - surfWin.phi);
+                                Real64 theta = std::abs(dl->sunAngles.theta - surfWin.theta);
                                 int ip1, ip2, it1, it2;
                                 General::BilinearInterpCoeffs coeffs;
                                 Material::NormalizePhiTheta(phi, theta);
