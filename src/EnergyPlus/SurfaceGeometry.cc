@@ -3421,7 +3421,7 @@ namespace SurfaceGeometry {
                                                state.dataIPShortCut->cAlphaArgs(2)));
                         ShowContinueError(state, "...Schedule values > 1 have no meaning for shading elements.");
                     }
-                    if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
+                    if (std::abs(SchedMinValue - SchedMaxValue) > Constant::OneMillionth) {
                         state.dataSurface->ShadingTransmittanceVaries = true;
                     }
                 }
@@ -6584,7 +6584,7 @@ namespace SurfaceGeometry {
                                            state.dataIPShortCut->cAlphaArgs(2)));
                     ShowContinueError(state, "...Schedule values > 1 have no meaning for shading elements.");
                 }
-                if (std::abs(SchedMinValue - SchedMaxValue) > 1.0e-6) {
+                if (std::abs(SchedMinValue - SchedMaxValue) > Constant::OneMillionth) {
                     state.dataSurface->ShadingTransmittanceVaries = true;
                 }
             }
@@ -13711,7 +13711,7 @@ namespace SurfaceGeometry {
 
         DotSelfX23 = magnitude_squared(x23);
 
-        if (DotSelfX23 <= .1e-6) {
+        if (DotSelfX23 <= Constant::OneMillionth) {
             ShowSevereError(state, format("CalcCoordinateTransformation: Invalid dot product, surface=\"{}\":", surf.Name));
             for (I = 1; I <= surf.Sides; ++I) {
                 auto const &point = surf.Vertex(I);
@@ -15605,7 +15605,7 @@ namespace SurfaceGeometry {
         for (int n = 1; n <= NSides; ++n) {
             Det += X(n) * Y(n + 1) - X(n + 1) * Y(n);
         }
-        if (std::abs(Det) > 1.e-4) {
+        if (std::abs(Det) > Constant::DistTooSmall) {
             A = X;
             B = Y;
         } else {
@@ -15613,7 +15613,7 @@ namespace SurfaceGeometry {
             for (int n = 1; n <= NSides; ++n) {
                 Det += X(n) * Z(n + 1) - X(n + 1) * Z(n);
             }
-            if (std::abs(Det) > 1.e-4) {
+            if (std::abs(Det) > Constant::DistTooSmall) {
                 A = X;
                 B = Z;
             } else {
@@ -15621,7 +15621,7 @@ namespace SurfaceGeometry {
                 for (int n = 1; n <= NSides; ++n) {
                     Det += Y(n) * Z(n + 1) - Y(n + 1) * Z(n);
                 }
-                if (std::abs(Det) > 1.e-4) {
+                if (std::abs(Det) > Constant::DistTooSmall) {
                     A = Y;
                     B = Z;
                 } else {

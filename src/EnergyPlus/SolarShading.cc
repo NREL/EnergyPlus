@@ -5746,7 +5746,7 @@ void SHADOW(EnergyPlusData &state,
                      state.dataSurface->Surface(NGRS).lcsz.y * state.dataSolarShading->SUNCOS(2) +
                      state.dataSurface->Surface(NGRS).lcsz.z * state.dataSolarShading->SUNCOS(3);
 
-                if (std::abs(ZS) > 1.e-4) {
+                if (std::abs(ZS) > Constant::DistTooSmall) {
                     state.dataSolarShading->XShadowProjection = XS / ZS;
                     state.dataSolarShading->YShadowProjection = YS / ZS;
                     if (std::abs(state.dataSolarShading->XShadowProjection) < 1.e-8) state.dataSolarShading->XShadowProjection = 0.0;
@@ -11231,7 +11231,7 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
                     if (A2ill < 0.0) A2ill = 0.0;
 
                     // Quantities related to outside reveal
-                    if (A1ill > 1.0e-6) {
+                    if (A1ill > Constant::OneMillionth) {
 
                         state.dataSurface->SurfWinBmSolAbsdOutsReveal(SurfNum) +=
                             A1ill * state.dataSurface->SurfWinOutsideRevealSolAbs(SurfNum) * CosBeta * tmp_SunlitFracWithoutReveal;
@@ -11259,7 +11259,7 @@ void CalcBeamSolarOnWinRevealSurface(EnergyPlusData &state)
 
                     if (NOT_SHADED(ShadeFlag) || ShadeFlag == WinShadingType::SwitchableGlazing) {
 
-                        if (A2ill > 1.0e-6) {
+                        if (A2ill > Constant::OneMillionth) {
 
                             DiffReflGlass = state.dataConstruction->Construct(ConstrNum).ReflectSolDiffBack;
                             if (ShadeFlag == WinShadingType::SwitchableGlazing) {
@@ -12751,7 +12751,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
         ZSp = -SdotZ;
 
         // Projection of shadows for current basis direciton
-        if (std::abs(ZSp) > 1.e-4) {
+        if (std::abs(ZSp) > Constant::DistTooSmall) {
             XShadowProjection = XSp / ZSp;
             YShadowProjection = YSp / ZSp;
             if (std::abs(XShadowProjection) < 1.e-8) XShadowProjection = 0.0;
