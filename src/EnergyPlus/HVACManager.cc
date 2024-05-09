@@ -1187,7 +1187,7 @@ void SimHVAC(EnergyPlusData &state)
                         }
                     } // Generic contaminant not converged
 
-                }     // loop over air loop systems
+                } // loop over air loop systems
 
                 // loop over zones and check for issues with zone inlet nodes
                 for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
