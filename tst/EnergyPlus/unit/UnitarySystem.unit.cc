@@ -5085,16 +5085,16 @@ Schedule:Compact,
     state->dataUnitarySystems->HeatingLoad = true;
     state->dataUnitarySystems->CoolingLoad = false;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
-    EXPECT_EQ(0.6, state->dataUnitarySystems->CompOffMassFlow);
+    EXPECT_EQ(1.2, state->dataUnitarySystems->CompOffMassFlow);
     EXPECT_EQ(1.2, state->dataUnitarySystems->CompOnMassFlow);
-    EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
 
     PartLoadRatio = 0.5;
     thisSys.setOnOffMassFlowRate(*state, OnOffAirFlowRatio, PartLoadRatio);
-    EXPECT_EQ(0.6, state->dataUnitarySystems->CompOffMassFlow);
+    EXPECT_EQ(1.2, state->dataUnitarySystems->CompOffMassFlow);
     EXPECT_EQ(1.2, state->dataUnitarySystems->CompOnMassFlow);
-    EXPECT_EQ(0.6, state->dataHVACGlobal->MSHPMassFlowRateLow);
+    EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateLow);
     EXPECT_EQ(1.2, state->dataHVACGlobal->MSHPMassFlowRateHigh);
 
     PartLoadRatio = 1.0;

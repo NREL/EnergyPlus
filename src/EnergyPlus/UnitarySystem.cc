@@ -10529,10 +10529,7 @@ namespace UnitarySystems {
                 if (HeatSpeedNum == 0) {
                     state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
-                } else if (HeatSpeedNum == 1) {
-                    state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[1];
-                    state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[1];
-                } else if (HeatSpeedNum > 1) {
+                } else {
                     state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum];
                     state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum];
                 }
@@ -10547,14 +10544,10 @@ namespace UnitarySystems {
                                 state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                                 state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
                                 state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
-                            } else if (CoolSpeedNum == 1) {
-                                state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[1];
-                                state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[1];
-                                state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[1];
                             } else {
                                 state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
-                                state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
-                                state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
+                                state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
+                                state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
                             }
                         } else {
                             state.dataUnitarySystems->CompOffMassFlow = this->MaxCoolAirMassFlow;
@@ -10565,12 +10558,9 @@ namespace UnitarySystems {
                         if (HeatSpeedNum == 0) {
                             state.dataUnitarySystems->CompOffMassFlow = this->MaxNoCoolHeatAirMassFlow;
                             state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
-                        } else if (HeatSpeedNum == 1) {
+                        } else {
                             state.dataUnitarySystems->CompOffMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum];
                             state.dataUnitarySystems->CompOffFlowRatio = this->m_HeatMassFlowRate[HeatSpeedNum];
-                        } else {
-                            state.dataUnitarySystems->CompOffMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum - 1];
-                            state.dataUnitarySystems->CompOffFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum - 1];
                         }
                         state.dataUnitarySystems->OACompOnMassFlow = this->m_HeatOutAirMassFlow;
                         // only used for PTUnit to UnitarySystem conversion, should use all the time
@@ -10606,9 +10596,6 @@ namespace UnitarySystems {
                         if (CoolSpeedNum < 1) {
                             state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                             state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
-                        } else if (CoolSpeedNum == 1) {
-                            state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[1];
-                            state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[1];
                         } else {
                             state.dataUnitarySystems->CompOnMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
                             state.dataUnitarySystems->CompOnFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
@@ -10630,10 +10617,7 @@ namespace UnitarySystems {
                             if (HeatSpeedNum == 0) {
                                 state.dataUnitarySystems->CompOnMassFlow = this->MaxNoCoolHeatAirMassFlow;
                                 state.dataUnitarySystems->CompOnFlowRatio = this->m_NoLoadAirFlowRateRatio;
-                            } else if (HeatSpeedNum == 1) {
-                                state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[1];
-                                state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[1];
-                            } else if (HeatSpeedNum > 1) {
+                            } else {
                                 state.dataUnitarySystems->CompOnMassFlow = this->m_HeatMassFlowRate[HeatSpeedNum];
                                 state.dataUnitarySystems->CompOnFlowRatio = this->m_MSHeatingSpeedRatio[HeatSpeedNum];
                             }
@@ -10699,13 +10683,9 @@ namespace UnitarySystems {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[this->m_EconoSpeedNum];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[this->m_EconoSpeedNum];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
-                    } else if (CoolSpeedNum == 1) {
+                    } else {
                         state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
                         state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
-                        state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
-                    } else {
-                        state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
-                        state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
                         state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                     }
                 } else {                                                   // cycling fan mode
@@ -10771,8 +10751,8 @@ namespace UnitarySystems {
                                 state.dataUnitarySystems->CompOffFlowRatio = this->m_NoLoadAirFlowRateRatio;
                                 state.dataUnitarySystems->OACompOffMassFlow = this->m_NoCoolHeatOutAirMassFlow;
                             } else {
-                                state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum - 1];
-                                state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum - 1];
+                                state.dataUnitarySystems->CompOffMassFlow = this->m_CoolMassFlowRate[CoolSpeedNum];
+                                state.dataUnitarySystems->CompOffFlowRatio = this->m_MSCoolingSpeedRatio[CoolSpeedNum];
                                 state.dataUnitarySystems->OACompOffMassFlow = this->m_CoolOutAirMassFlow;
                             }
                         } else {
