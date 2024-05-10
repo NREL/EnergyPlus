@@ -73,7 +73,6 @@
 using namespace EnergyPlus;
 using namespace DataEnvironment;
 using namespace EnergyPlus::DataSizing;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::Fans;
@@ -129,7 +128,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     state->dataHeatRecovery->ExchCond(ExchNum).CoolEffectLatentCurveIndex = 0;
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 1";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_AIRTOAIR_GENERIC;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -215,7 +214,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
     EXPECT_DOUBLE_EQ(Toutlet, Tnode);
 
     state->dataHeatRecovery->ExchCond(ExchNum).Name = "Test Heat Recovery 2";
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_AIRTOAIR_GENERIC;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_AIRTOAIR_GENERIC;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInTemp = 15.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SecInTemp = 24.0;
     state->dataHeatRecovery->ExchCond(ExchNum).SupInHumRat = 0.01;
@@ -292,7 +291,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HRTest)
                      state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupOutletNode).Temp);
 
     // test cycling fan case
-    FanOpMode = DataHVACGlobals::CycFanCycCoil;
+    FanOpMode = HVAC::CycFanCycCoil;
     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SupInletNode).MassFlowRate =
         state->dataHeatRecovery->ExchCond(ExchNum).SupInMassFlow / 4.0;
     state->dataLoopNodes->Node(state->dataHeatRecovery->ExchCond(ExchNum).SecInletNode).MassFlowRate =
@@ -3963,7 +3962,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
 
     // initialize sizing required variables
     state->dataHeatRecovery->ExchCond.allocate(ExchNum);
-    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HX_DESICCANT_BALANCED;
+    state->dataHeatRecovery->ExchCond(ExchNum).ExchType = HVAC::HX_DESICCANT_BALANCED;
     state->dataHeatRecovery->ExchCond(ExchNum).NomSupAirVolFlow = AutoSize;
     state->dataHeatRecovery->ExchCond(ExchNum).PerfDataIndex = BalDesDehumPerfDataIndex;
 
@@ -3978,7 +3977,7 @@ TEST_F(EnergyPlusFixture, SizeHeatRecovery)
     state->dataHeatRecovery->BalDesDehumPerfData(BalDesDehumPerfDataIndex).NomProcAirFaceVel = AutoSize;
 
     // initialize sizing variables
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Main;
     state->dataSize->FinalSysSizing.allocate(state->dataSize->CurSysNum);
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
 
@@ -4173,7 +4172,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     // check user-inputs
     EXPECT_TRUE(compare_enums(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer));
     EXPECT_TRUE(compare_enums(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // no lockout
-    EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+    EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
 
     int CompanionCoilNum = 0;
@@ -4186,7 +4185,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataEnvrn->OutBaroPress = 101325.0;
     state->dataEnvrn->StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
-    thisHX.ExchType = HX_AIRTOAIR_GENERIC;
+    thisHX.ExchType = HVAC::HX_AIRTOAIR_GENERIC;
     thisHX.SupInTemp = 10.0;
     thisHX.SecInTemp = 20.0;
     thisHX.SupInHumRat = 0.01;
@@ -4290,12 +4289,12 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     state->dataSize->CurOASysNum = 1;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesMainVolFlow = 1.0;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).DesOutAirVolFlow = 0.20;
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Main;
 
     // test 1: the HX is in OA System, no economizer, no-bypass
     thisOAController.Econo = MixedAir::EconoOp::NoEconomizer;
     thisOAController.Lockout = MixedAir::LockoutType::NoLockoutPossible; // no lockout
-    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum;
+    thisOAController.HeatRecoveryBypassControlType = HVAC::BypassWhenOAFlowGreaterThanMinimum;
     thisOAController.EconBypass = false; // economizer control action type, no bypass
     // run HX sizing calculation
     thisHX.size(*state);
@@ -4312,7 +4311,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
 
     // test 3: the HX is on OA system but with economizer, and no-bypass
     thisOAController.Econo = MixedAir::EconoOp::DifferentialDryBulb; // with economizer
-    thisOAController.HeatRecoveryBypassControlType = DataHVACGlobals::BypassWhenWithinEconomizerLimits;
+    thisOAController.HeatRecoveryBypassControlType = HVAC::BypassWhenWithinEconomizerLimits;
     thisHX.NomSupAirVolFlow = DataSizing::AutoSize;
     // run HX sizing calculation
     thisHX.size(*state);

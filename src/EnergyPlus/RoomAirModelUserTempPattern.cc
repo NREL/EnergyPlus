@@ -369,8 +369,8 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
                             "Room Air Zone Vertical Temperature Gradient",
                             Constant::Units::K_m,
                             patternZoneInfo.Gradient,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             patternZoneInfo.ZoneName);
 
         state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
@@ -620,8 +620,8 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // sets values in Heat balance variables
 
     // Using/Aliasing
-    using DataHVACGlobals::RetTempMax;
-    using DataHVACGlobals::RetTempMin;
+    using HVAC::RetTempMax;
+    using HVAC::RetTempMin;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
