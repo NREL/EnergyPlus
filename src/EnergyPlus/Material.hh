@@ -620,6 +620,8 @@ namespace Material {
 
     };
 
+#define PRECALC_INTERP_SCREEN
+        
     constexpr int minDegResolution = 5;
         
     constexpr int maxIPhi = (Constant::Pi * Constant::RadToDeg / minDegResolution) + 1;

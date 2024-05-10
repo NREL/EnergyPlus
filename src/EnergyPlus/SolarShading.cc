@@ -6738,7 +6738,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 phi, theta;
                                 Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
                                                               phi, theta);
-#ifdef GET_OUT                                
+#ifdef PRECALC_INTERP_SCREEN
                                 int ip1, ip2, it1, it2;
                                 General::BilinearInterpCoeffs coeffs;
                                 Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
@@ -6773,7 +6773,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                    (AbsScDiffBack * TScBmBm * RGlFront * RGlDiffFront * RScBack /
                                                     (1.0 - RScDifBack * RGlDiffFront)); // Exterior screen beam solar absorptance
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
-#else // GET_OUT
+#else // !PRECALC_INTERP_SCREEN
                                 Material::ScreenBmTransAbsRef btar;
                                 CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
@@ -6801,7 +6801,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                                    (AbsScDiffBack * TScBmBm * RGlFront * RGlDiffFront * RScBack /
                                                     (1.0 - RScDifBack * RGlDiffFront)); // Exterior screen beam solar absorptance
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
-#endif // GET_OUT
+#endif // PRECALC_INTERP_SCREEN
                             } else if (ShadeFlag == WinShadingType::BGBlind) {
                                 // Between-glass blind o
                                 // Isolated glass and blind properties at current incidence angle, profile angle and slat angle
@@ -7192,7 +7192,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 Real64 phi, theta;
                                 Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
                                                               phi, theta); 
-#ifdef GET_OUT                                
+#ifdef PRECALC_INTERP_SCREEN                               
                                 int ip1, ip2, it1, it2;
                                 General::BilinearInterpCoeffs coeffs;
                                 Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
@@ -7221,7 +7221,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 state.dataSurface->SurfWinScGlSysTsolBmBm(SurfNum) = TBmBmSc;
                                 state.dataSurface->SurfWinScTsolBmBm(SurfNum) = TScBmBm;
                                 state.dataSurface->SurfWinScTsolBmDif(SurfNum) = TScBmDif;
-#else // GET_OUT
+#else // !PRECALC_INTERP_SCREEN
                                 Material::ScreenBmTransAbsRef btar;
                                 CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
@@ -7243,7 +7243,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 state.dataSurface->SurfWinScGlSysTsolBmBm(SurfNum) = TBmBmSc;
                                 state.dataSurface->SurfWinScTsolBmBm(SurfNum) = TScBmBm;
                                 state.dataSurface->SurfWinScTsolBmDif(SurfNum) = TScBmDif;
-#endif // GET_OUT
+#endif // PRECALC_INTERP_SCREEN
                             } else {
                                 TBlBmBm = state.dataSurface->SurfWinBlindBmBmTrans(SurfNum);
                                 TBlBmDif = FrontBeamDiffTrans;
@@ -8001,7 +8001,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     Real64 phi, theta;
                                     Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
                                                         phi, theta);
-#ifdef GET_OUT
+#ifdef PRECALC_INTERP_SCREEN
                                     int ip1, ip2, it1, it2;
                                     General::BilinearInterpCoeffs coeffs;
                                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
@@ -8043,7 +8043,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AScBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
-#else // GET_OUT
+#else // !PRECALC_INTERP_SCREEN
                                     Material::ScreenBmTransAbsRef btar;
                                     Material::CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
@@ -8077,7 +8077,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     state.dataSolarShading->SurfWinIntBeamAbsByShadFac(BackSurfNum) =
                                         BOverlap * AScBack /
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
-#endif // GET_OUT
+#endif // PRECALC_INTERP_SCREEN
 
                                 } // End of check if exterior screen on back window
 

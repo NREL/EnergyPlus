@@ -3550,7 +3550,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                     Real64 phi, theta;
                                     Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
                                                                   phi, theta);
-#ifdef GET_OUT
+#ifdef PRECALC_INTERP_SCREEN
                                     int ip1, ip2, it1, it2; // hi/lo phi and theta map indices
                                     General::BilinearInterpCoeffs coeffs;
                                     Material::GetPhiThetaIndices(phi, theta, screen->dPhi, screen->dTheta, ip1, ip2, it1, it2);
@@ -3567,7 +3567,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarInBm + DivIncSolarInDif);
-#else // GET_OUT
+#else // !PRECALC_INTERP_SCREEN
                                     Material::ScreenBmTransAbsRef btar;
 
                                     Material::CalcScreenTransmittance(state, screen, phi, theta, btar);
@@ -3578,7 +3578,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarOutBm + DivIncSolarOutDif);
                                     state.dataSurface->SurfWinDividerQRadInAbs(SurfNum) =
                                         DividerAbs * (BmBmTrans + BmDfTrans) * (DivIncSolarInBm + DivIncSolarInDif);
-#endif // GET_OUT
+#endif // PRECALC_INTERP_SCREEN
                                 }
                             }
                         }
