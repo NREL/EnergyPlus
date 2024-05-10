@@ -240,6 +240,7 @@ namespace Material {
         Real64 VaporDiffus = 0.0;   // Layer vapor diffusivity
 
         virtual bool dummy() { return true; }   // Need at least one virtual function (vtable) for dynamic casting to work (duh)
+        virtual ~MaterialBase() = default;
     };
 
     struct MaterialChild : public MaterialBase
@@ -390,6 +391,7 @@ namespace Material {
         // material
 
         virtual bool dummy() { return true; }
+        virtual ~MaterialChild() = default;
     };
 
     struct WindowBlindProperties
@@ -620,8 +622,8 @@ namespace Material {
 
     constexpr int minDegResolution = 5;
         
-    constexpr int maxIPhi = (Constant::PiOvr2 * Constant::RadToDeg / minDegResolution) + 1;
-    constexpr int maxITheta = (Constant::PiOvr2 * Constant::RadToDeg / minDegResolution) + 1;
+    constexpr int maxIPhi = (Constant::Pi * Constant::RadToDeg / minDegResolution) + 1;
+    constexpr int maxITheta = (Constant::Pi * Constant::RadToDeg / minDegResolution) + 1;
         
     struct MaterialScreen : public MaterialBase
     {
@@ -673,7 +675,6 @@ namespace Material {
     void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2);
 
     void CalcScreenTransmittance(EnergyPlusData &state,
-                                 Real64 surfTilt, 
                                  MaterialScreen const *screen,
                                  Real64 phi,     // Sun altitude relative to surface outward normal (rad)
                                  Real64 theta,   // Sun azimuth relative to surface outward normal (rad)
