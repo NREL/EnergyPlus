@@ -2900,7 +2900,6 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 }
 
 void CalcScreenTransmittance(EnergyPlusData &state,
-                             Real64 surfTilt, 
                              MaterialScreen const *screen,
                              Real64 phi,     // Optional sun altitude relative to surface outward normal (radians)
                              Real64 theta,   // Optional sun azimuth relative to surface outward normal (radians)
@@ -2936,8 +2935,6 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // when Delta < DeltaMax (0,0 to peak)
     Real64 ExponentExterior; // Exponent used in scattered transmittance calculation
     // when Delta > DeltaMax (peak to max)
-    Real64 IncidentAngle;  // Solar angle wrt surface outward normal to determine
-    // if sun is in front of screen (rad)
 
     Real64 sinPhi = std::sin(phi);
     Real64 cosPhi = std::cos(phi);
@@ -2946,15 +2943,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 cosTheta = std::cos(theta);
     Real64 tanTheta = sinTheta / cosTheta;
     
-    if (phi != 0.0 && theta != 0.0) {
-        IncidentAngle = std::acos(sinPhi / (tanTheta * tanPhi / sinTheta)); // Isn't this cosPhi * cosTheta?
-    } else if (phi != 0.0) {
-        IncidentAngle = phi;
-    } else if (theta != 0.0) {
-        IncidentAngle = theta;
-    } else {
-        IncidentAngle = 0.0;
-    }
+    bool sunInFront = (phi < Constant::PiOvr2) && (theta < Constant::PiOvr2); // Sun is in front of screen
 
     // ratio of screen material diameter to screen material spacing
     Real64 Gamma = screen->diameterToSpacingRatio;
@@ -3006,7 +2995,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     } else {
         //   DeltaMax and Delta are in degrees
         Real64 DeltaMax = 89.7 - (10.0 * Gamma / 0.16);
-        Real64 Delta = std::sqrt(pow_2(theta / Constant::DegToRadians) + pow_2(phi / Constant::DegToRadians));
+        Real64 Delta = std::sqrt(pow_2(theta / Constant::DegToRad) + pow_2(phi / Constant::DegToRad));
 
         //   Use empirical model to determine maximum (peak) scattering
         Real64 Tscattermax = 0.0229 * Gamma + 0.2971 * ReflCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCyl) - 0.44416 * Gamma * ReflCyl;
@@ -3032,11 +3021,9 @@ void CalcScreenTransmittance(EnergyPlusData &state,
             TscatteredVis = 0.2 * (1.0 - Gamma) * ReflCylVis * TscattermaxVis * (1.0 + (PeakToPlateauRatioVis - 1.0) * std::exp(ExponentInterior));
         }
     }
-    Tscattered = max(0.0, Tscattered);
-    TscatteredVis = max(0.0, TscatteredVis);
 
     if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::DoNotModel) {
-        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+        if (sunInFront) {
             tar.BmTrans = Tdirect;
             tar.BmTransVis = Tdirect;
             tar.BmTransBack = 0.0;
@@ -3048,7 +3035,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::DirectBeam) {
-        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+        if (sunInFront) {
             tar.BmTrans = Tdirect + Tscattered;
             tar.BmTransVis = Tdirect + TscatteredVis;
             tar.BmTransBack = 0.0;
@@ -3060,7 +3047,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else if (screen->bmRefModel == Material::ScreenBeamReflectanceModel::Diffuse) {
-        if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+        if (sunInFront) {
             tar.BmTrans = Tdirect;
             tar.BmTransVis = Tdirect;
             tar.BmTransBack = 0.0;
@@ -3069,9 +3056,11 @@ void CalcScreenTransmittance(EnergyPlusData &state,
             tar.BmTransVis = 0.0;
             tar.BmTransBack = Tdirect;
         }
+        Tscattered = max(0.0, Tscattered);
+        TscatteredVis = max(0.0, TscatteredVis);
     }
 
-    if (std::abs(IncidentAngle) <= Constant::PiOvr2) {
+    if (sunInFront) {
         tar.DfTrans = Tscattered;
         tar.DfTransVis = TscatteredVis;
         tar.DfTransBack = 0.0;
@@ -3085,12 +3074,12 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         tar.DfTrans = 0.0;
         tar.DfTransVis = 0.0;
         tar.DfTransBack = Tscattered;
-        tar.RefSolBack = max(0.0, ReflCyl * (1.0 - Tdirect) - Tscattered);
-        tar.RefVisBack = max(0.0, ReflCylVis * (1.0 - Tdirect) - TscatteredVis);
-        tar.AbsSolBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflCyl));
         tar.RefSolFront = 0.0;
         tar.RefVisFront = 0.0;
         tar.AbsSolFront = 0.0;
+        tar.RefSolBack = max(0.0, ReflCyl * (1.0 - Tdirect) - Tscattered);
+        tar.RefVisBack = max(0.0, ReflCylVis * (1.0 - Tdirect) - TscatteredVis);
+        tar.AbsSolBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflCyl));
     }
 } // CalcScreenTransmittance()
         
@@ -3101,13 +3090,11 @@ void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &
 
     NormalizePhiTheta(phi, theta);
 } // GetRelativePhiTheta()
-        
+
+// Use reflection around Pi to normalize to the range 0 to Pi        
 void NormalizePhiTheta(Real64 &phi, Real64 &theta) {
     if (phi > Constant::Pi) phi = 2 * Constant::Pi - phi;
-    if (phi > Constant::PiOvr2) phi = Constant::Pi - phi;
-    
     if (theta > Constant::Pi) theta = 2 * Constant::Pi - theta;
-    if (theta > Constant::PiOvr2) theta = Constant::Pi - theta;
 } // NormalizePhiTheta()
 
 void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, int &iPhi1, int &iPhi2, int &iTheta1, int &iTheta2)

@@ -6775,7 +6775,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 state.dataSolarShading->SurfWinExtBeamAbsByShadFac(SurfNum) = AbsScreen * CosInc * SunLitFract * InOutProjSLFracMult;
 #else // GET_OUT
                                 Material::ScreenBmTransAbsRef btar;
-                                CalcScreenTransmittance(state, 0.0, screen, phi, theta, btar);
+                                CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
                                 Real64 TScDifDif = screen->DfTrans;
                                 Real64 TScBmDif = btar.DfTrans;
@@ -7223,7 +7223,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 state.dataSurface->SurfWinScTsolBmDif(SurfNum) = TScBmDif;
 #else // GET_OUT
                                 Material::ScreenBmTransAbsRef btar;
-                                CalcScreenTransmittance(state, 0.0, screen, phi, theta, btar);
+                                CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
                                 Real64 RScBack = btar.RefSolFront;
                                 Real64 RScDifBack = screen->DfRef;
@@ -8045,7 +8045,7 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                         (state.dataSurface->Surface(BackSurfNum).Area + state.dataSurface->SurfWinDividerArea(BackSurfNum));
 #else // GET_OUT
                                     Material::ScreenBmTransAbsRef btar;
-                                    Material::CalcScreenTransmittance(state, 0.0, screen, phi, theta, btar);
+                                    Material::CalcScreenTransmittance(state, screen, phi, theta, btar);
                                 
                                     Real64 TScBmBmBack = btar.BmTransBack;
                                     Real64 TScBmDiffBack = btar.DfTransBack;

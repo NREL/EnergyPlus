@@ -7825,7 +7825,7 @@ namespace Window {
                 for (int i = M; i >= 1; --i) {
                     // Integrate transmittance using coordinate transform
                     // TODO: switch to interpolation?
-                    CalcScreenTransmittance(state, 0.0, matScreen, relativeAltitude(i, j), relativeAzimuth(i, j), btar);
+                    CalcScreenTransmittance(state, matScreen, relativeAltitude(i, j), relativeAzimuth(i, j), btar);
                     SumTrans += (btar.BmTrans + btar.DfTrans) * skyArea[i - 1];
                     SumTransVis += (btar.BmTransVis + btar.DfTransVis) * skyArea[i - 1];
                     SumReflect += btar.RefSolFront * skyArea[i - 1];
@@ -7856,7 +7856,7 @@ namespace Window {
                 Real64 Phi = ip * matScreen->dPhi;
                 for (int it = 0; it < Material::maxITheta; ++it) {
                     Real64 Theta = it * matScreen->dTheta;
-                    CalcScreenTransmittance(state, 0.0, matScreen, Phi, Theta, matScreen->btars[ip][it]);
+                    CalcScreenTransmittance(state, matScreen, Phi, Theta, matScreen->btars[ip][it]);
                 }
             }
 

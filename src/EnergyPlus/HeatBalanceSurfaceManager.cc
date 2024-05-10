@@ -3570,7 +3570,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
 #else // GET_OUT
                                     Material::ScreenBmTransAbsRef btar;
 
-                                    Material::CalcScreenTransmittance(state, 0.0, screen, phi, theta, btar);
+                                    Material::CalcScreenTransmittance(state, screen, phi, theta, btar);
                                     Real64 BmDfTrans = btar.DfTrans;
                                     Real64 BmBmTrans = btar.BmTrans;
                         
