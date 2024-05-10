@@ -6735,9 +6735,14 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 assert(screen != nullptr);
                                 
                                 auto &surf = state.dataSurface->Surface(SurfNum);
-                                Real64 phi, theta;
-                                Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
-                                                              phi, theta);
+
+                                Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                Real64 phi = std::abs(solPhi - winPhi);
+                                Real64 theta = std::abs(solTheta - winTheta); 
+                                Material::NormalizePhiTheta(phi, theta);
 #ifdef PRECALC_INTERP_SCREEN
                                 int ip1, ip2, it1, it2;
                                 General::BilinearInterpCoeffs coeffs;
@@ -7189,9 +7194,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                 assert(screen != nullptr);
                                 
                                 auto &surf = state.dataSurface->Surface(SurfNum);
-                                Real64 phi, theta;
-                                Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
-                                                              phi, theta); 
+                                Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                Real64 phi = std::abs(solPhi - winPhi);
+                                Real64 theta = std::abs(solTheta - winTheta);
+                                Material::NormalizePhiTheta(phi, theta);
 #ifdef PRECALC_INTERP_SCREEN                               
                                 int ip1, ip2, it1, it2;
                                 General::BilinearInterpCoeffs coeffs;
@@ -7998,9 +8007,13 @@ void CalcInteriorSolarDistribution(EnergyPlusData &state)
                                     assert(screen != nullptr);
                                     
                                     auto &surf = state.dataSurface->Surface(SurfNum);
-                                    Real64 phi, theta;
-                                    Material::GetRelativePhiTheta(surf.Tilt * Constant::DegToRad, surf.Azimuth * Constant::DegToRad, state.dataEnvrn->SOLCOS,
-                                                        phi, theta);
+                                    Real64 solPhi = std::acos(state.dataEnvrn->SOLCOS.z);
+                                    Real64 solTheta = std::atan2(state.dataEnvrn->SOLCOS.x, state.dataEnvrn->SOLCOS.y);
+                                    Real64 winPhi = surf.Tilt * Constant::DegToRad;
+                                    Real64 winTheta = surf.Azimuth * Constant::DegToRad;
+                                    Real64 phi = std::abs(solPhi - winPhi);
+                                    Real64 theta = std::abs(solTheta - winTheta);
+                                    Material::NormalizePhiTheta(phi, theta);
 #ifdef PRECALC_INTERP_SCREEN
                                     int ip1, ip2, it1, it2;
                                     General::BilinearInterpCoeffs coeffs;

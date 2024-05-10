@@ -2873,8 +2873,8 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 
 void CalcScreenTransmittance(EnergyPlusData &state,
                              MaterialScreen const *screen,
-                             Real64 phi,     // Optional sun altitude relative to surface outward normal (radians)
-                             Real64 theta,   // Optional sun azimuth relative to surface outward normal (radians)
+                             Real64 phi,     // Sun altitude relative to surface outward normal (radians, 0 to Pi)
+                             Real64 theta,   // Optional sun azimuth relative to surface outward normal (radians, 0 to Pi)
                              ScreenBmTransAbsRef &tar
 )
 {
@@ -2908,6 +2908,9 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 ExponentExterior; // Exponent used in scattered transmittance calculation
     // when Delta > DeltaMax (peak to max)
 
+    assert(phi >= 0.0 && phi <= Constant::Pi);
+    assert(theta >= 0.0 && theta <= Constant::Pi);
+    
     Real64 sinPhi = std::sin(phi);
     Real64 cosPhi = std::cos(phi);
     Real64 tanPhi = sinPhi / cosPhi;
@@ -2924,6 +2927,10 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // * calculate transmittance of totally absorbing screen material (beam passing through open area)*
     // ************************************************************************************************
 
+    // Now we need to normalize phi and theta to the 0 to Pi/2 range using reflection.
+    if (phi > Constant::PiOvr2) phi = Constant::Pi - phi;
+    if (theta > Constant::PiOvr2) theta = Constant::Pi - phi;
+    
     // calculate compliment of relative solar azimuth
     Real64 Beta = Constant::PiOvr2 - theta;
 
@@ -2961,7 +2968,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 ReflCyl = screen->CylinderRef;
     Real64 ReflCylVis = screen->CylinderRefVis;
 
-    if (std::abs(theta - Constant::PiOvr2) < Small || std::abs(phi - Constant::PiOvr2) < Small) {
+    if ((Constant::PiOvr2 - theta) < Small || (Constant::PiOvr2 - phi) < Small) {
         Tscattered = 0.0;
         TscatteredVis = 0.0;
     } else {
@@ -3065,7 +3072,11 @@ void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &
 
 // Use reflection around Pi to normalize to the range 0 to Pi        
 void NormalizePhiTheta(Real64 &phi, Real64 &theta) {
+
+    while (phi > 2 * Constant::Pi) phi -= 2 * Constant::Pi;
     if (phi > Constant::Pi) phi = 2 * Constant::Pi - phi;
+    
+    while (theta > 2 * Constant::Pi) theta -= 2 * Constant::Pi;
     if (theta > Constant::Pi) theta = 2 * Constant::Pi - theta;
 } // NormalizePhiTheta()
 
