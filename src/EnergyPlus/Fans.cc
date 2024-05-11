@@ -1773,6 +1773,7 @@ void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Op
         fan.MassFlowRateMaxAvail = 0.0;
         fan.MassFlowRateMinAvail = 0.0;
     }
+    fan.FanPower *= state.dataHVACGlobal->OnOffFanPartLoadFraction;
 }
 
 void SimOnOffFan(EnergyPlusData &state, int const FanNum, ObjexxFCL::Optional<Real64 const> SpeedRatio)
