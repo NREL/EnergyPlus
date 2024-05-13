@@ -4774,11 +4774,11 @@ void reportAirLoopToplogy(EnergyPlusData &state)
     // s->pdchTopAirSupplyBranchType = newPreDefColumn(state, s->pdstTopAirLoop, "Supply Branch Type");
     // s->pdchTopAirCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Component Type");
     // s->pdchTopAirCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Component Name");
+    // s->pdchTopAirSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Type");
+    // s->pdchTopAirSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Component Name");
+    // s->pdchTopAirSubSubCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Type");
+    // s->pdchTopAirSubSubCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Sub-Sub-Component Name");
     // s->pdchTopAirMixName = newPreDefColumn(state, s->pdstTopAirLoop, "Mixer Name");
-    // s->pdchTopAirParentCompType = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type");
-    // s->pdchTopAirParentCompName = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name");
-    // s->pdchTopAirParentCompType2 = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Type 2");
-    // s->pdchTopAirParentCompName2 = newPreDefColumn(state, s->pdstTopAirLoop, "Parent Component Name 2");
 
     auto &orp = state.dataOutRptPredefined;
     int rowCounter = 1;
@@ -4798,30 +4798,25 @@ void reportAirLoopToplogy(EnergyPlusData &state)
             }
             for (int CompNum = 1; CompNum <= pasBranch.TotalComponents; ++CompNum) {
                 auto &pasBranchComp = pasBranch.Comp(CompNum);
-                if (pasBranchComp.NumSubComps == 0) {
-                    fillAirloopToplogyComponentRow(
-                        state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
-                }
+                fillAirloopToplogyComponentRow(
+                    state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
                 for (int SubCompNum = 1; SubCompNum <= pasBranchComp.NumSubComps; ++SubCompNum) {
                     auto &pasBranchSubComp = pasBranchComp.SubComp(SubCompNum);
-                    if (pasBranchSubComp.NumSubSubComps == 0) {
-                        OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchComp.TypeOf);
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchComp.Name);
-                        fillAirloopToplogyComponentRow(
-                            state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchSubComp.TypeOf, pasBranchSubComp.Name, rowCounter);
-                    }
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
+                    OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
+                    fillAirloopToplogyComponentRow(
+                        state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
                     for (int SubSubCompNum = 1; SubSubCompNum <= pasBranchSubComp.NumSubSubComps; ++SubSubCompNum) {
                         auto &pasBranchSubSubComp = pasBranchSubComp.SubSubComp(SubSubCompNum);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirParentCompType, format("{}", rowCounter), pasBranchComp.TypeOf);
-                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirParentCompName, format("{}", rowCounter), pasBranchComp.Name);
+                            state, orp->pdchTopAirSubCompType, format("{}", rowCounter), pasBranchSubComp.TypeOf);
+                        OutputReportPredefined::PreDefTableEntry(state, orp->pdchTopAirSubCompName, format("{}", rowCounter), pasBranchSubComp.Name);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirParentCompType2, format("{}", rowCounter), pasBranchSubComp.TypeOf);
+                            state, orp->pdchTopAirSubSubCompType, format("{}", rowCounter), pasBranchSubSubComp.TypeOf);
                         OutputReportPredefined::PreDefTableEntry(
-                            state, orp->pdchTopAirParentCompName2, format("{}", rowCounter), pasBranchSubComp.Name);
+                            state, orp->pdchTopAirSubSubCompName, format("{}", rowCounter), pasBranchSubSubComp.Name);
                         fillAirloopToplogyComponentRow(
-                            state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchSubSubComp.TypeOf, pasBranchSubSubComp.Name, rowCounter);
+                            state, pas.Name, pasBranch.Name, pasBranch.DuctType, pasBranchComp.TypeOf, pasBranchComp.Name, rowCounter);
                     }
                 }
             }
