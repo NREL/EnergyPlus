@@ -88,7 +88,7 @@ struct CoilCoolingDXCurveFitPerformance
     void simulate(EnergyPlusData &state,
                   const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
-                  HVAC::CoilMode coilMode,
+                  HVAC::CoilMode maxAvailCoilMode,
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
