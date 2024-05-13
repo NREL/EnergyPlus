@@ -317,7 +317,7 @@ namespace StandardRatings {
     std::tuple<Real64, Real64, Real64> IEERCalculationMultiSpeed(
         EnergyPlusData &state,
         std::string const &DXCoilType, // Type of DX coil
-        int const nsp,                // Number of Speeds
+        int const nsp,                 // Number of Speeds
         Array1A_int const &CapFTempCurveIndex,
         Array1A<Real64> const &RatedTotalCapacity, // Rated gross total cooling capacity
         Array1A_int const &CapFFlowCurveIndex,
@@ -352,7 +352,7 @@ namespace StandardRatings {
     // Real64 EER -> Energy efficiency ratio for Single Speed DX cooling coil
     std::tuple<Real64, Real64, Real64> IEERCalculationSingleSpeed(
         EnergyPlus::EnergyPlusData &state,
-        std::string const &DXCoilType,            // Type of DX coil
+        std::string const &DXCoilType,           // Type of DX coil
         const int CapFTempCurveIndex,            // Index for the capacity as a function of temperature modifier curve
         const Real64 RatedTotalCapacity,         // Rated gross total cooling capacity
         const Real64 TotCapFlowModFac,           // Total capacity modifier f(actual flow vs rated flow) for each speed [-]

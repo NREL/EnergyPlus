@@ -144,7 +144,7 @@ namespace HVAC {
         Continuous,
         Num
     };
-        
+
     // Fan placement
     enum class FanPlace
     {
@@ -315,14 +315,14 @@ namespace HVAC {
     //    int constexpr CoilDX_SubcoolReheat(36);
     int constexpr CoilDX_CurveFit_Speed(37);
 
-        enum class CoilMode
-        {
-            Invalid = -1,
-            Normal,
-            Enhanced,
-            SubcoolReheat,
-            Num
-        };
+    enum class CoilMode
+    {
+        Invalid = -1,
+        Normal,
+        Enhanced,
+        SubcoolReheat,
+        Num
+    };
 
     enum class WaterFlow
     {
@@ -387,13 +387,13 @@ namespace HVAC {
         SupplySide,
         Num
     };
-        
+
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeNames;
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC;
 
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames;
     extern const std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC;
-        
+
     enum class OATType
     {
         Invalid = -1,
@@ -401,7 +401,7 @@ namespace HVAC {
         DryBulb,
         Num
     };
-        
+
     extern const std::array<std::string_view, (int)OATType::Num> oatTypeNames;
     extern const std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC;
 
@@ -464,9 +464,8 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
-
-    HVAC::DXCoilType DXCT = HVAC::DXCoilType::Regular;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
-    bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step
+    HVAC::DXCoilType DXCT = HVAC::DXCoilType::Regular; // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
+    bool FirstTimeStepSysFlag = false;                 // Set to true at the start of each sub-time step
 
     Real64 TimeStepSys = 0.0;                  // System Time Increment - the adaptive time step used by the HVAC simulation (hours)
     Real64 TimeStepSysSec = 0.0;               // System Time Increment in seconds

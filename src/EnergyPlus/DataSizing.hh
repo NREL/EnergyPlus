@@ -1181,7 +1181,7 @@ struct SizingData : BaseGlobalStruct
     int DataPltSizHeatNum = 0;                                  // index to heating plant sizing data
     int DataWaterLoopNum = 0;                                   // index to plant water loop
     int DataCoilNum = 0;                                        // index to coil object
-    HVAC::FanOp DataFanOp = HVAC::FanOp::Invalid;                                      // fan operating mode (FanOp::Continuous or FanOp::Cycling)
+    HVAC::FanOp DataFanOp = HVAC::FanOp::Invalid;               // fan operating mode (FanOp::Continuous or FanOp::Cycling)
     bool DataCoilIsSuppHeater = false;                          // TRUE if heating coil used as supplemental heater
     bool DataIsDXCoil = false;                                  // TRUE if direct-expansion coil
     bool DataAutosizable = true;                                // TRUE if component is autosizable

@@ -2647,8 +2647,14 @@ namespace HVACUnitaryBypassVAV {
                     } else {
                         auto f = [&state, CBVAVNum, DehumidMode](Real64 const PartLoadRatio) {
                             auto &thisCBVAV = state.dataHVACUnitaryBypassVAV->CBVAV(CBVAVNum);
-                            DXCoils::SimDXCoilMultiMode(
-                                 state, "", HVAC::CompressorOp::On, false, PartLoadRatio, DehumidMode, thisCBVAV.CoolCoilCompIndex, HVAC::FanOp::Continuous);
+                            DXCoils::SimDXCoilMultiMode(state,
+                                                        "",
+                                                        HVAC::CompressorOp::On,
+                                                        false,
+                                                        PartLoadRatio,
+                                                        DehumidMode,
+                                                        thisCBVAV.CoolCoilCompIndex,
+                                                        HVAC::FanOp::Continuous);
                             return thisCBVAV.CoilTempSetPoint - state.dataDXCoils->DXCoilOutletTemp(thisCBVAV.CoolCoilCompIndex);
                         };
                         General::SolveRoot(state, HVAC::SmallTempDiff, MaxIte, SolFla, PartLoadFrac, f, 0.0, 1.0);
@@ -3809,7 +3815,7 @@ namespace HVACUnitaryBypassVAV {
                                int const CBVAVNum,            // Changeover bypass VAV unit index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 &HeatCoilLoad,          // heating coil load to be met (Watts)
-                               HVAC::FanOp const fanOp,             // fan operation mode
+                               HVAC::FanOp const fanOp,       // fan operation mode
                                Real64 &HeatCoilLoadmet        // coil heating load met
     )
     {

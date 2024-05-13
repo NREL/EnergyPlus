@@ -74,16 +74,16 @@ using namespace DataLoopNode;
 Real64 constexpr WaterDensity(986.0); // standard water density at 60 C
 
 void SimIHP(EnergyPlusData &state,
-            std::string_view CompName,                    // Coil Name
-            int &CompIndex,                               // Index for Component name
-            HVAC::FanOp const fanOp,                      // Continuous fan OR cycling compressor
+            std::string_view CompName,             // Coil Name
+            int &CompIndex,                        // Index for Component name
+            HVAC::FanOp const fanOp,               // Continuous fan OR cycling compressor
             HVAC::CompressorOp const compressorOp, // compressor on/off. 0 = off; 1= on
-            Real64 const PartLoadFrac,                    // part load fraction
-            int const SpeedNum,                           // compressor speed number
-            Real64 const SpeedRatio,                      // compressor speed ratio
-            Real64 const SensLoad,                        // Sensible demand load [W]
-            Real64 const LatentLoad,                      // Latent demand load [W]
-            bool const IsCallbyWH,                        // whether the call from the water heating loop or air loop, true = from water heating loop
+            Real64 const PartLoadFrac,             // part load fraction
+            int const SpeedNum,                    // compressor speed number
+            Real64 const SpeedRatio,               // compressor speed ratio
+            Real64 const SensLoad,                 // Sensible demand load [W]
+            Real64 const LatentLoad,               // Latent demand load [W]
+            bool const IsCallbyWH,                 // whether the call from the water heating loop or air loop, true = from water heating loop
             [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
             ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )

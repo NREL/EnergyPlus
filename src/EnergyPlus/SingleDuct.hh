@@ -278,25 +278,25 @@ namespace SingleDuct {
     {
         // Members
         // Input data
-        std::string Name;                  // name of unit
-        HVAC::MixerType type = HVAC::MixerType::Invalid;                 // type of inlet mixer, 1 = inlet side, 2 = supply side
-        int ZoneHVACUnitType = 0;          // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
-        std::string ZoneHVACUnitName;      // name of Zone HVAC unit
-        int SecInNode = 0;                 // secondary air inlet node number
-        int PriInNode = 0;                 // primary air inlet node number
-        int MixedAirOutNode = 0;           // mixed air outlet node number
-        int ZoneInletNode = 0;             // zone inlet node that ultimately receives air from this mixer
-        Real64 MixedAirTemp = 0.0;         // mixed air in temp
-        Real64 MixedAirHumRat = 0.0;       // mixed air in hum rat
-        Real64 MixedAirEnthalpy = 0.0;     // mixed air in enthalpy
-        Real64 MixedAirPressure = 0.0;     // mixed air in pressure
-        Real64 MixedAirMassFlowRate = 0.0; // mixed air in mass flow rate
-        Real64 MassFlowRateMaxAvail = 0.0; // maximum air mass flow rate allowed through component
-        int ADUNum = 0;                    // index of Air Distribution Unit
-        int TermUnitSizingIndex = 0;       // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
-        bool OneTimeInitFlag = true;       // true if one-time inits should be done
-        bool OneTimeInitFlag2 = true;      // true if more one-time inits should be done
-        int CtrlZoneInNodeIndex = 0;       // which controlled zone inlet node number corresponds with this unit
+        std::string Name;                                // name of unit
+        HVAC::MixerType type = HVAC::MixerType::Invalid; // type of inlet mixer, 1 = inlet side, 2 = supply side
+        int ZoneHVACUnitType = 0;                        // type of Zone HVAC unit. ZoneHVAC:WaterToAirHeatPump =1, ZoneHVAC:FourPipeFanCoil = 2
+        std::string ZoneHVACUnitName;                    // name of Zone HVAC unit
+        int SecInNode = 0;                               // secondary air inlet node number
+        int PriInNode = 0;                               // primary air inlet node number
+        int MixedAirOutNode = 0;                         // mixed air outlet node number
+        int ZoneInletNode = 0;                           // zone inlet node that ultimately receives air from this mixer
+        Real64 MixedAirTemp = 0.0;                       // mixed air in temp
+        Real64 MixedAirHumRat = 0.0;                     // mixed air in hum rat
+        Real64 MixedAirEnthalpy = 0.0;                   // mixed air in enthalpy
+        Real64 MixedAirPressure = 0.0;                   // mixed air in pressure
+        Real64 MixedAirMassFlowRate = 0.0;               // mixed air in mass flow rate
+        Real64 MassFlowRateMaxAvail = 0.0;               // maximum air mass flow rate allowed through component
+        int ADUNum = 0;                                  // index of Air Distribution Unit
+        int TermUnitSizingIndex = 0;                     // Pointer to TermUnitSizing and TermUnitFinalZoneSizing data for this terminal unit
+        bool OneTimeInitFlag = true;                     // true if one-time inits should be done
+        bool OneTimeInitFlag2 = true;                    // true if more one-time inits should be done
+        int CtrlZoneInNodeIndex = 0;                     // which controlled zone inlet node number corresponds with this unit
         int ZoneNum = 0;
         bool NoOAFlowInputFromUser = true;    // avoids OA calculation if no input specified by user
         int OARequirementsPtr = 0;            // - Index to DesignSpecification:OutdoorAir object
@@ -334,7 +334,7 @@ namespace SingleDuct {
                     std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
-                    HVAC::MixerType &ATMixerType,                 // air teminal mixer type
+                    HVAC::MixerType &ATMixerType,     // air teminal mixer type
                     int &ATMixerPriNode,              // air terminal mixer primary air node number
                     int &ATMixerSecNode,              // air terminal mixer secondary air node number
                     int &ATMixerOutNode,              // air terminal mixer outlet air node number

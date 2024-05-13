@@ -684,7 +684,7 @@ namespace WindowAC {
             SetupOutputVariable(state,
                                 "Zone Window Air Conditioner Fan Availability Status",
                                 Constant::Units::None,
-                                (int&)state.dataWindowAC->WindAC(WindACNum).availStatus,
+                                (int &)state.dataWindowAC->WindAC(WindACNum).availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 state.dataWindowAC->WindAC(WindACNum).Name);
@@ -728,8 +728,8 @@ namespace WindowAC {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger initializations.
 
-        using HVAC::SmallLoad;
         using DataZoneEquipment::CheckZoneEquipmentList;
+        using HVAC::SmallLoad;
 
         int InNode;          // inlet node number in window AC loop
         int OutNode;         // outlet node number in window AC loop
@@ -1231,7 +1231,7 @@ namespace WindowAC {
     void CalcWindowACOutput(EnergyPlusData &state,
                             int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                            HVAC::FanOp const fanOp,              // operating mode: FanOp::Cycling | FanOp::Continuous
+                            HVAC::FanOp const fanOp,       // operating mode: FanOp::Cycling | FanOp::Continuous
                             Real64 const PartLoadFrac,     // unit part load fraction
                             bool const HXUnitOn,           // Flag to toggle HX heat recovery as needed
                             Real64 &LoadMet                // load met by unit (watts)
@@ -1328,7 +1328,7 @@ namespace WindowAC {
     void ControlCycWindACOutput(EnergyPlusData &state,
                                 int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-                                HVAC::FanOp const fanOp,              // operating mode: FanOp::Cycling | FanOp::Continuous
+                                HVAC::FanOp const fanOp,       // operating mode: FanOp::Cycling | FanOp::Continuous
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
                                 Real64 &PartLoadFrac,          // unit part load fraction
                                 bool &HXUnitOn                 // Used to control HX heat recovery as needed

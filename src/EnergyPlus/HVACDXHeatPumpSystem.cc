@@ -577,7 +577,7 @@ namespace HVACDXHeatPumpSystem {
         Real64 OutletTempDXCoil; // Actual outlet temperature of the DX cooling coil
 
         bool SensibleLoad; // True if there is a sensible cooling load on this system
-        HVAC::FanOp fanOp;     // Supply air fan operating mode
+        HVAC::FanOp fanOp; // Supply air fan operating mode
         // added variables to call variable speed DX coils
         int SpeedNum;             // speed number of variable speed DX cooling coil
         Real64 QZnReq;            // Zone load (W), input to variable-speed DX coil
@@ -646,26 +646,16 @@ namespace HVACDXHeatPumpSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(state,
-                                  CompName,
-                                  HVAC::CompressorOp::On,
-                                  FirstHVACIteration,
-                                  DXHeatPumpSystem.HeatPumpCoilIndex,
-                                  fanOp,
-                                  PartLoadFrac);
+                        SimDXCoil(
+                            state, CompName, HVAC::CompressorOp::On, FirstHVACIteration, DXHeatPumpSystem.HeatPumpCoilIndex, fanOp, PartLoadFrac);
                         NoOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                    (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat) -
                                     PsyHFnTdbW(state.dataLoopNodes->Node(InletNode).Temp, state.dataLoopNodes->Node(OutletNode).HumRat));
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(state,
-                                  CompName,
-                                  HVAC::CompressorOp::On,
-                                  FirstHVACIteration,
-                                  DXHeatPumpSystem.HeatPumpCoilIndex,
-                                  fanOp,
-                                  PartLoadFrac);
+                        SimDXCoil(
+                            state, CompName, HVAC::CompressorOp::On, FirstHVACIteration, DXHeatPumpSystem.HeatPumpCoilIndex, fanOp, PartLoadFrac);
 
                         FullOutput = state.dataLoopNodes->Node(InletNode).MassFlowRate *
                                      (PsyHFnTdbW(state.dataLoopNodes->Node(OutletNode).Temp, state.dataLoopNodes->Node(InletNode).HumRat) -

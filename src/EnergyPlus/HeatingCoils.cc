@@ -102,10 +102,10 @@ namespace HeatingCoils {
                                        bool const FirstHVACIteration,
                                        ObjexxFCL::Optional<Real64 const> QCoilReq, // coil load to be met
                                        ObjexxFCL::Optional_int CompIndex,
-                                       ObjexxFCL::Optional<Real64> QCoilActual,         // coil load actually delivered returned to calling component
-                                       ObjexxFCL::Optional_bool_const SuppHeat,         // True if current heating coil is a supplemental heating coil
-                                       ObjexxFCL::Optional<HVAC::FanOp const> fanOpMode,         // fan operating mode, FanOp::Cycling or FanOp::Continuous
-                                       ObjexxFCL::Optional<Real64 const> PartLoadRatio, // part-load ratio of heating coil
+                                       ObjexxFCL::Optional<Real64> QCoilActual, // coil load actually delivered returned to calling component
+                                       ObjexxFCL::Optional_bool_const SuppHeat, // True if current heating coil is a supplemental heating coil
+                                       ObjexxFCL::Optional<HVAC::FanOp const> fanOpMode, // fan operating mode, FanOp::Cycling or FanOp::Continuous
+                                       ObjexxFCL::Optional<Real64 const> PartLoadRatio,  // part-load ratio of heating coil
                                        ObjexxFCL::Optional_int StageNum,
                                        ObjexxFCL::Optional<Real64 const> SpeedRatio // Speed ratio of MultiStage heating coil
     )
@@ -121,7 +121,7 @@ namespace HeatingCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int CoilNum(0);       // The HeatingCoil that you are currently loading input into
         Real64 QCoilActual2;  // coil load actually delivered returned from specific coil
-        HVAC::FanOp fanOp;           // fan operating mode
+        HVAC::FanOp fanOp;    // fan operating mode
         Real64 PartLoadFrac;  // part-load fraction of heating coil
         Real64 QCoilRequired; // local variable for optional argument
 
@@ -1835,7 +1835,7 @@ namespace HeatingCoils {
                                  int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
                                  Real64 &QCoilActual,       // coil load actually delivered (W)
-                                 HVAC::FanOp const fanOp,       // fan operating mode
+                                 HVAC::FanOp const fanOp,   // fan operating mode
                                  Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {
@@ -1976,7 +1976,7 @@ namespace HeatingCoils {
                                            Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                            Real64 const CycRatio,   // cycling part load ratio
                                            int const StageNum,      // Stage number
-                                           HVAC::FanOp const fanOp,     // Fan operation mode
+                                           HVAC::FanOp const fanOp, // Fan operation mode
                                            Real64 &QCoilActual,     // coil load actually delivered (W)
                                            bool const SuppHeat)
     {
@@ -2082,7 +2082,8 @@ namespace HeatingCoils {
                 PartLoadRat = min(1.0, CycRatio);
 
                 // for cycling fan, reset mass flow to full on rate
-                if (fanOp == HVAC::FanOp::Cycling) AirMassFlow /= PartLoadRat;
+                if (fanOp == HVAC::FanOp::Cycling)
+                    AirMassFlow /= PartLoadRat;
                 else if (fanOp == HVAC::FanOp::Continuous) {
                     if (!SuppHeat) {
                         AirMassFlow = state.dataHVACGlobal->MSHPMassFlowRateLow;
@@ -2164,7 +2165,7 @@ namespace HeatingCoils {
                              int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
                              Real64 &QCoilActual,                        // coil load actually delivered (W)
-                             HVAC::FanOp const fanOp,                        // fan operating mode
+                             HVAC::FanOp const fanOp,                    // fan operating mode
                              [[maybe_unused]] Real64 const PartLoadRatio // part-load ratio of heating coil
     )
     {

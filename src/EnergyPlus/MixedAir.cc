@@ -642,7 +642,7 @@ void SimOAComponent(EnergyPlusData &state,
                 } else {
                     fanOp = HVAC::FanOp::Continuous;
                 }
-                
+
                 if (fanOp == HVAC::FanOp::Cycling) {
                     // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                     // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be

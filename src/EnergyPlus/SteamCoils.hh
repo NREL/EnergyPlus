@@ -168,10 +168,10 @@ namespace SteamCoils {
 
     void CalcSteamAirCoil(EnergyPlusData &state,
                           int CoilNum,
-                          Real64 QCoilRequested, // requested coil load
-                          Real64 &QCoilActual,   // coil load actually delivered
-                          HVAC::FanOp const fanOp,         // fan operating mode
-                          Real64 PartLoadRatio   // part-load ratio of heating coil
+                          Real64 QCoilRequested,   // requested coil load
+                          Real64 &QCoilActual,     // coil load actually delivered
+                          HVAC::FanOp const fanOp, // fan operating mode
+                          Real64 PartLoadRatio     // part-load ratio of heating coil
     );
 
     void UpdateSteamCoil(EnergyPlusData &state, int CoilNum);

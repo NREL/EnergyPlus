@@ -233,8 +233,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         Real64 EnthalpyNorOut;
         Real64 modeRatio;
 
-        this->calculate(
-            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
 
         // this->OperatingMode = 1;
         CalcComponentSensibleLatentOutput(
@@ -260,17 +259,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
 
             if (LoadSHR < SysNorSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(state,
-                                this->alternateMode,
-                                inletNode,
-                                outletNode,
-                                PLR,
-                                speedNum,
-                                speedRatio,
-                                fanOp,
-                                condInletNode,
-                                condOutletNode,
-                                singleMode);
+                this->calculate(
+                    state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
                 CalcComponentSensibleLatentOutput(outletNode.MassFlowRate,
                                                   inletNode.Temp,
                                                   inletNode.HumRat,
@@ -353,8 +343,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
         this->RTF = this->alternateMode.OpModeRTF;
         this->wasteHeatRate = this->alternateMode.OpModeWasteHeat;
     } else {
-        this->calculate(
-            state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 1;
         this->powerUse = this->normalMode.OpModePower;
         this->RTF = this->normalMode.OpModeRTF;

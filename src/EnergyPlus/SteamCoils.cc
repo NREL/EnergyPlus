@@ -128,7 +128,7 @@ namespace SteamCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QCoilActualTemp; // coil load actually delivered returned to calling component
         int CoilNum;            // The SteamCoil that you are currently loading input into
-        HVAC::FanOp fanOp;             // fan operating mode
+        HVAC::FanOp fanOp;      // fan operating mode
         Real64 PartLoadFrac;    // part-load fraction of heating coil
         Real64 QCoilReqLocal;   // local required heating load optional
 
@@ -1008,7 +1008,7 @@ namespace SteamCoils {
                           int const CoilNum,
                           Real64 const QCoilRequested, // requested coil load
                           Real64 &QCoilActual,         // coil load actually delivered
-                          HVAC::FanOp const fanOp,         // fan operating mode
+                          HVAC::FanOp const fanOp,     // fan operating mode
                           Real64 const PartLoadRatio   // part-load ratio of heating coil
     )
     {

@@ -163,9 +163,9 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800655, sizedValue, 0.000001); // includes impact of ValidateADP
     initialSHR = 0.431 + 6086.0 * HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT];
-                                                                    // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue);                              // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0;                                     // reset for next test
+    // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue); // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;        // reset for next test
 
     // Test #6 - Zone Equipment, flow to capacity ratio low
     state->dataSize->DataFlowUsedForSizing = 0.1;
@@ -177,11 +177,13 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * HVAC::MinRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
-    EXPECT_GT(initialSHR, sizedValue);                              // compares impact of ValidateADP
-    EXPECT_NEAR(0.676083, initialSHR, 0.000001);                    // does not include impact of ValidateADP
-    EXPECT_NEAR(0.675083, sizedValue, 0.000001);                    // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0;                                     // reset for next test
+    initialSHR =
+        0.431 +
+        6086.0 * HVAC::MinRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
+    EXPECT_GT(initialSHR, sizedValue);                                                  // compares impact of ValidateADP
+    EXPECT_NEAR(0.676083, initialSHR, 0.000001);                                        // does not include impact of ValidateADP
+    EXPECT_NEAR(0.675083, sizedValue, 0.000001);                                        // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                                         // reset for next test
 
     // reset eio stream
     has_eio_output(true);
@@ -215,10 +217,11 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType)); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.800798, sizedValue, 0.000001); // includes impact of ValidateADP
-    initialSHR = 0.431 + 6086.0 * HVAC::MaxRatedVolFlowPerRatedTotCap[
-                                                                      (int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue);                              // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0;                                     // reset for next test
+    initialSHR =
+        0.431 +
+        6086.0 * HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue);                                                  // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                                         // reset for next test
 
     // Test #9 - Zone Equipment, flow to capacity ratio low
     state->dataSize->DataFlowUsedForSizing = 0.1;
@@ -230,11 +233,13 @@ TEST_F(AutoSizingFixture, CoolingSHRSizingGauntlet)
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
     EXPECT_TRUE(sizer.wasAutoSized);
-    initialSHR = 0.431 + 6086.0 * HVAC::MinRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
-    EXPECT_LT(initialSHR, sizedValue);                              // compares impact of ValidateADP
-    EXPECT_NEAR(0.533062, initialSHR, 0.000001);                    // does not include impact of ValidateADP
-    EXPECT_NEAR(0.675861, sizedValue, 0.000001);                    // includes impact of ValidateADP
-    sizer.autoSizedValue = 0.0;                                     // reset for next test
+    initialSHR =
+        0.431 +
+        6086.0 * HVAC::MinRatedVolFlowPerRatedTotCap[(int)state->dataHVACGlobal->DXCT]; // does not include impact of ValidateADP, which increases SHR
+    EXPECT_LT(initialSHR, sizedValue);                                                  // compares impact of ValidateADP
+    EXPECT_NEAR(0.533062, initialSHR, 0.000001);                                        // does not include impact of ValidateADP
+    EXPECT_NEAR(0.675861, sizedValue, 0.000001);                                        // includes impact of ValidateADP
+    sizer.autoSizedValue = 0.0;                                                         // reset for next test
 
     // reset eio stream
     has_eio_output(true);

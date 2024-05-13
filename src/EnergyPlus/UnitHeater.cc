@@ -615,7 +615,7 @@ namespace UnitHeater {
             SetupOutputVariable(state,
                                 "Zone Unit Heater Fan Availability Status",
                                 Constant::Units::None,
-                                (int&)state.dataUnitHeaters->UnitHeat(UnitHeatNum).availStatus,
+                                (int &)state.dataUnitHeaters->UnitHeat(UnitHeatNum).availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name);

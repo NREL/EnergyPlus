@@ -5602,7 +5602,7 @@ void GetATMixers(EnergyPlusData &state)
     state.dataSingleDuct->GetATMixerFlag = false;
 
     auto &ipsc = state.dataIPShortCut;
-    
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
     state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -6165,7 +6165,7 @@ void GetATMixer(EnergyPlusData &state,
                 std::string const &ZoneEquipName, // zone unit name name
                 std::string &ATMixerName,         // air terminal mixer name
                 int &ATMixerNum,                  // air terminal mixer index
-                HVAC::MixerType &ATMixerType,                 // air teminal mixer type
+                HVAC::MixerType &ATMixerType,     // air teminal mixer type
                 int &ATMixerPriNode,              // air terminal mixer primary air node number
                 int &ATMixerSecNode,              // air terminal mixer secondary air node number
                 int &ATMixerOutNode,              // air terminal mixer outlet air node number
