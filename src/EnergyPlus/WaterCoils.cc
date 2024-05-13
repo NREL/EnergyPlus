@@ -154,7 +154,7 @@ void SimulateWaterCoilComponents(EnergyPlusData &state,
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CoilNum;         // The WaterCoil that you are currently loading input into
-    HVAC::FanOp fanOp;          // fan operating mode
+    HVAC::FanOp fanOp;   // fan operating mode
     Real64 PartLoadFrac; // part-load fraction of heating coil
 
     // Obtains and Allocates WaterCoil related parameters from input file
@@ -2900,7 +2900,7 @@ void CalcSimpleHeatingCoil(EnergyPlusData &state,
 void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state,
                                   int const CoilNum,
                                   int const CalcMode,
-                                  HVAC::FanOp const fanOp,       // fan operating mode
+                                  HVAC::FanOp const fanOp,   // fan operating mode
                                   Real64 const PartLoadRatio // part-load ratio of heating coil
 )
 {
@@ -3547,7 +3547,7 @@ void CoolingCoil(EnergyPlusData &state,
                  int const CoilNum,
                  bool const FirstHVACIteration,
                  int const CalcMode,
-                 HVAC::FanOp const fanOp,       // fan operating mode
+                 HVAC::FanOp const fanOp,   // fan operating mode
                  Real64 const PartLoadRatio // part-load ratio of heating coil
 )
 {
@@ -3765,7 +3765,7 @@ void CoilCompletelyDry(EnergyPlusData &state,
                        Real64 &OutletAirTemp,     // Leaving air dry bulb temperature
                        Real64 &OutletAirHumRat,   // Leaving air humidity ratio
                        Real64 &Q,                 // Heat transfer rate
-                       HVAC::FanOp const fanOp,       // fan operating mode
+                       HVAC::FanOp const fanOp,   // fan operating mode
                        Real64 const PartLoadRatio // part-load ratio of heating coil
 )
 {
@@ -3848,7 +3848,7 @@ void CoilCompletelyWet(EnergyPlusData &state,
                        Real64 &SenWaterCoilLoad,     // Sensible heat transfer rate(W)
                        Real64 &SurfAreaWetFraction,  // Fraction of surface area wet
                        Real64 &AirInletCoilSurfTemp, // Surface temperature at air entrance(C)
-                       HVAC::FanOp const fanOp,          // fan operating mode
+                       HVAC::FanOp const fanOp,      // fan operating mode
                        Real64 const PartLoadRatio    // part-load ratio of heating coil
 )
 {
@@ -3999,7 +3999,7 @@ void CoilPartWetPartDry(EnergyPlusData &state,
                         Real64 &TotWaterCoilLoad,      // Total heat transfer rate (W)
                         Real64 &SenWaterCoilLoad,      // Sensible heat transfer rate (W)
                         Real64 &SurfAreaWetFraction,   // Fraction of surface area wet
-                        HVAC::FanOp const fanOp,           // fan operating mode
+                        HVAC::FanOp const fanOp,       // fan operating mode
                         Real64 const PartLoadRatio     // part-load ratio of heating coil
 )
 {

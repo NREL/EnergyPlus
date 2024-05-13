@@ -108,8 +108,8 @@ namespace HeatRecovery {
 
     struct HeatExchCond
     {
-        std::string Name;                                   // name of component
-        HVAC::HXType type = HVAC::HXType::Invalid; 
+        std::string Name; // name of component
+        HVAC::HXType type = HVAC::HXType::Invalid;
         std::string HeatExchPerfName;                       // Desiccant balanced heat exchanger performance data name
         int SchedPtr = 0;                                   // index of schedule
         HXConfiguration FlowArr = HXConfiguration::Invalid; // flow Arrangement:

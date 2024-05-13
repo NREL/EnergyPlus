@@ -249,9 +249,9 @@ namespace IntegratedHeatPump {
     };
 
     void SimIHP(EnergyPlusData &state,
-                std::string_view CompName,              // Coil Name
-                int &CompIndex,                         // Index for Component name
-                HVAC::FanOp const fanOp,                // Continuous fan OR cycling compressor
+                std::string_view CompName,       // Coil Name
+                int &CompIndex,                  // Index for Component name
+                HVAC::FanOp const fanOp,         // Continuous fan OR cycling compressor
                 HVAC::CompressorOp compressorOp, // compressor on/off. 0 = off; 1= on
                 Real64 const PartLoadFrac,
                 int const SpeedNum,            // compressor speed number

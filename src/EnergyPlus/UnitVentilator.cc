@@ -960,7 +960,7 @@ namespace UnitVentilator {
             SetupOutputVariable(state,
                                 "Zone Unit Ventilator Fan Availability Status",
                                 Constant::Units::None,
-                                (int&)unitVent.availStatus,
+                                (int &)unitVent.availStatus,
                                 OutputProcessor::TimeStepType::System,
                                 OutputProcessor::StoreType::Average,
                                 unitVent.Name);
@@ -2937,7 +2937,7 @@ namespace UnitVentilator {
                                       int const UnitVentNum,                         // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,                 // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                               // load met by unit (watts)
-                                      ObjexxFCL::Optional<HVAC::FanOp const> fanOp,          // Fan Type
+                                      ObjexxFCL::Optional<HVAC::FanOp const> fanOp,  // Fan Type
                                       ObjexxFCL::Optional<Real64 const> PartLoadFrac // Part Load Ratio of coil and fan
     )
     {
@@ -2994,13 +2994,8 @@ namespace UnitVentilator {
 
             if (unitVent.CCoilPresent) {
                 if (unitVent.CCoilType == CoolCoilType::HXAssisted) {
-                    HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state,
-                                                                        unitVent.CCoilName,
-                                                                        FirstHVACIteration,
-                                                                        HVAC::CompressorOp::On,
-                                                                        0.0,
-                                                                        unitVent.CCoil_Index,
-                                                                        HVAC::FanOp::Continuous);
+                    HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
+                        state, unitVent.CCoilName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, unitVent.CCoil_Index, HVAC::FanOp::Continuous);
                 } else {
                     WaterCoils::SimulateWaterCoilComponents(state, unitVent.CCoilName, FirstHVACIteration, unitVent.CCoil_Index);
                 }
@@ -3179,8 +3174,8 @@ namespace UnitVentilator {
     }
 
     void SimUnitVentOAMixer(EnergyPlusData &state,
-                            int const UnitVentNum, // Unit index in unit ventilator array
-                            HVAC::FanOp const fanOp    // unit ventilator fan operating mode
+                            int const UnitVentNum,  // Unit index in unit ventilator array
+                            HVAC::FanOp const fanOp // unit ventilator fan operating mode
     )
     {
 

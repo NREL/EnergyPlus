@@ -316,9 +316,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataGlobal->CurrentTime = 1.0;   // set the current time to 1 AM
     Avail::ManageSystemAvailability(*state);
     EXPECT_EQ(3, state->dataAvail->OptimumStartData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
-    EXPECT_EQ(
-        1,
-        state->dataAvail->OptimumStartData(1).ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
+    EXPECT_EQ(1,
+              state->dataAvail->OptimumStartData(1).ATGWCZoneNumHi);   // zone 1 is default for cooling set point when heating load exists
     EXPECT_EQ(-3.0, state->dataAvail->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
     EXPECT_EQ(0.0, state->dataAvail->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
     EXPECT_EQ((int)Avail::Status::NoAction, (int)state->dataAvail->OptimumStartData(1).availStatus); // avail manager should not yet be set
@@ -330,9 +329,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     Avail::ManageSystemAvailability(*state);
     // same data as before since zone temps are unchanged
     EXPECT_EQ(3, state->dataAvail->OptimumStartData(1).ATGWCZoneNumLo); // zone 3 is farthest from heating set point
-    EXPECT_EQ(
-        1,
-        state->dataAvail->OptimumStartData(1).ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
+    EXPECT_EQ(1,
+              state->dataAvail->OptimumStartData(1).ATGWCZoneNumHi);   // zone 1 is default for cooling set point when heating load exists
     EXPECT_EQ(-3.0, state->dataAvail->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
     EXPECT_EQ(0.0, state->dataAvail->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
     EXPECT_EQ((int)Avail::Status::NoAction, (int)state->dataAvail->OptimumStartData(1).availStatus); // avail manager should not yet be set
@@ -342,7 +340,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     Avail::ManageSystemAvailability(*state);
 
     EXPECT_EQ((int)Avail::Status::CycleOn, (int)state->dataAvail->OptimumStartData(1).availStatus); // avail manager should be set to cycle on
-    EXPECT_EQ(1.5, state->dataAvail->OptimumStartData(1).NumHoursBeforeOccupancy); // 1.5 hours = 3C from SP divided by 2C/hour
+    EXPECT_EQ(1.5, state->dataAvail->OptimumStartData(1).NumHoursBeforeOccupancy);                  // 1.5 hours = 3C from SP divided by 2C/hour
 
     EXPECT_EQ((int)Avail::Status::CycleOn, (int)state->dataAvail->OptimumStartData(2).availStatus); // avail manager should be set at 6 AM
 
@@ -350,7 +348,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     state->dataGlobal->CurrentTime = 5.00; // set the current time to 5:00 AM, before max optimum start time
     Avail::ManageSystemAvailability(*state);
     EXPECT_FALSE(state->dataAvail->OptStart(6).OptStartFlag); // avail manager should be set to no action for Zone 6
-    state->dataGlobal->CurrentTime = 6.50;                             // set the current time to 6:30 AM when occupancy begins
+    state->dataGlobal->CurrentTime = 6.50;                    // set the current time to 6:30 AM when occupancy begins
     Avail::ManageSystemAvailability(*state);
     EXPECT_TRUE(state->dataAvail->OptStart(6).OptStartFlag); // avail manager should be set to cycle on for Zone 6
 
@@ -365,8 +363,8 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(*state);
 
     EXPECT_EQ((int)Avail::Status::NoAction, (int)state->dataAvail->OptimumStartData(1).availStatus); // avail manager should be set to no action
-    EXPECT_EQ(15.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));           // 15.0C is the unoccupied heating setpoint
-    EXPECT_EQ(29.4, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));           // 29.4C is the unoccupied cooling setpoint
+    EXPECT_EQ(15.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));                          // 15.0C is the unoccupied heating setpoint
+    EXPECT_EQ(29.4, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));                          // 29.4C is the unoccupied cooling setpoint
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
@@ -606,12 +604,9 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleGetInput)
     Avail::GetSysAvailManagerInputs(*state);
     // check the three cycling run time control types
     EXPECT_EQ(3, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::FixedRunTime,
-                              state->dataAvail->NightCycleData(1).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::Thermostat,
-                              state->dataAvail->NightCycleData(2).cyclingRunTimeControl));
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime,
-                              state->dataAvail->NightCycleData(3).cyclingRunTimeControl));
+    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::FixedRunTime, state->dataAvail->NightCycleData(1).cyclingRunTimeControl));
+    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::Thermostat, state->dataAvail->NightCycleData(2).cyclingRunTimeControl));
+    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, state->dataAvail->NightCycleData(3).cyclingRunTimeControl));
 }
 
 TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
@@ -714,8 +709,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
     state->dataAvail->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
-    state->dataAvail->NightCycleData(1).cyclingRunTimeControl =
-        Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
+    state->dataAvail->NightCycleData(1).cyclingRunTimeControl = Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
     state->dataAvail->NightCycleData(1).availStatus = Avail::Status::NoAction;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, ZoneEquipType, CompNum);
@@ -849,8 +843,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
-    state->dataAvail->NightCycleData(1).cyclingRunTimeControl =
-        Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
+    state->dataAvail->NightCycleData(1).cyclingRunTimeControl = Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime;
     state->dataAvail->NightCycleData(1).availStatus = Avail::Status::NoAction;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum);

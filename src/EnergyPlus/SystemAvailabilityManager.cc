@@ -109,33 +109,31 @@ namespace Avail {
     // Use statements for data only modules
     using namespace ScheduleManager;
 
-    static constexpr std::array<std::string_view, (int)ManagerType::Num> managerTypeNamesUC = {
-        "AVAILABILITYMANAGER:SCHEDULED",
-        "AVAILABILITYMANAGER:SCHEDULEDON",
-        "AVAILABILITYMANAGER:SCHEDULEDOFF",
-        "AVAILABILITYMANAGER:NIGHTCYCLE",
-        "AVAILABILITYMANAGER:DIFFERENTIALTHERMOSTAT",
-        "AVAILABILITYMANAGER:HIGHTEMPERATURETURNOFF",
-        "AVAILABILITYMANAGER:HIGHTEMPERATURETURNON",
-        "AVAILABILITYMANAGER:LOWTEMPERATURETURNOFF",
-        "AVAILABILITYMANAGER:LOWTEMPERATURETURNON",
-        "AVAILABILITYMANAGER:NIGHTVENTILATION",
-        "AVAILABILITYMANAGER:HYBRIDVENTILATION",
-        "AVAILABILITYMANAGER:OPTIMUMSTART"};
+    static constexpr std::array<std::string_view, (int)ManagerType::Num> managerTypeNamesUC = {"AVAILABILITYMANAGER:SCHEDULED",
+                                                                                               "AVAILABILITYMANAGER:SCHEDULEDON",
+                                                                                               "AVAILABILITYMANAGER:SCHEDULEDOFF",
+                                                                                               "AVAILABILITYMANAGER:NIGHTCYCLE",
+                                                                                               "AVAILABILITYMANAGER:DIFFERENTIALTHERMOSTAT",
+                                                                                               "AVAILABILITYMANAGER:HIGHTEMPERATURETURNOFF",
+                                                                                               "AVAILABILITYMANAGER:HIGHTEMPERATURETURNON",
+                                                                                               "AVAILABILITYMANAGER:LOWTEMPERATURETURNOFF",
+                                                                                               "AVAILABILITYMANAGER:LOWTEMPERATURETURNON",
+                                                                                               "AVAILABILITYMANAGER:NIGHTVENTILATION",
+                                                                                               "AVAILABILITYMANAGER:HYBRIDVENTILATION",
+                                                                                               "AVAILABILITYMANAGER:OPTIMUMSTART"};
 
-    static constexpr std::array<std::string_view, (int)ManagerType::Num> managerTypeNames = {
-        "AvailabilityManager:Scheduled",
-        "AvailabilityManager:ScheduledOn",
-        "AvailabilityManager:ScheduledOff",
-        "AvailabilityManager:NightCycle",
-        "AvailabilityManager:DifferentialThermostat",
-        "AvailabilityManager:HighTemperatureTurnOff",
-        "AvailabilityManager:HighTemperatureTurnOn",
-        "AvailabilityManager:LowTemperatureTurnOff",
-        "AvailabilityManager:LowTemperatureTurnOn",
-        "AvailabilityManager:NightVentilation",
-        "AvailabilityManager:HybridVentilation",
-        "AvailabilityManager:OptimumStart"};
+    static constexpr std::array<std::string_view, (int)ManagerType::Num> managerTypeNames = {"AvailabilityManager:Scheduled",
+                                                                                             "AvailabilityManager:ScheduledOn",
+                                                                                             "AvailabilityManager:ScheduledOff",
+                                                                                             "AvailabilityManager:NightCycle",
+                                                                                             "AvailabilityManager:DifferentialThermostat",
+                                                                                             "AvailabilityManager:HighTemperatureTurnOff",
+                                                                                             "AvailabilityManager:HighTemperatureTurnOn",
+                                                                                             "AvailabilityManager:LowTemperatureTurnOff",
+                                                                                             "AvailabilityManager:LowTemperatureTurnOn",
+                                                                                             "AvailabilityManager:NightVentilation",
+                                                                                             "AvailabilityManager:HybridVentilation",
+                                                                                             "AvailabilityManager:OptimumStart"};
 
     void ManageSystemAvailability(EnergyPlusData &state)
     {
@@ -180,9 +178,9 @@ namespace Avail {
         for (PriAirSysNum = 1; PriAirSysNum <= state.dataHVACGlobal->NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
             auto &availMgr = state.dataAirLoop->PriAirSysAvailMgr(PriAirSysNum);
             previousAvailStatus = availMgr.availStatus; // Save the previous status for differential thermostat
-            availMgr.availStatus = Status::NoAction; // initialize the availability to "take no action"
+            availMgr.availStatus = Status::NoAction;    // initialize the availability to "take no action"
 
-            for (PriAirSysAvailMgrNum = 1; PriAirSysAvailMgrNum <= availMgr.NumAvailManagers; ++PriAirSysAvailMgrNum) { 
+            for (PriAirSysAvailMgrNum = 1; PriAirSysAvailMgrNum <= availMgr.NumAvailManagers; ++PriAirSysAvailMgrNum) {
 
                 availStatus = SimSysAvailManager(state,
                                                  availMgr.availManagers(PriAirSysAvailMgrNum).type,
@@ -224,10 +222,9 @@ namespace Avail {
         for (PlantNum = 1; PlantNum <= state.dataHVACGlobal->NumPlantLoops; ++PlantNum) {
             auto &availMgr = state.dataAvail->PlantAvailMgr(PlantNum);
             previousAvailStatus = availMgr.availStatus; // Save the previous status for differential thermostat
-            availMgr.availStatus = Status::NoAction; // Initialize the availability to "take no action"
+            availMgr.availStatus = Status::NoAction;    // Initialize the availability to "take no action"
 
-            for (PlantAvailMgrNum = 1; PlantAvailMgrNum <= availMgr.NumAvailManagers;
-                 ++PlantAvailMgrNum) { // loop over the avail managers in plant
+            for (PlantAvailMgrNum = 1; PlantAvailMgrNum <= availMgr.NumAvailManagers; ++PlantAvailMgrNum) { // loop over the avail managers in plant
 
                 availStatus = SimSysAvailManager(state,
                                                  availMgr.availManagers(PlantAvailMgrNum).type,
@@ -246,7 +243,7 @@ namespace Avail {
         } // end of plant loop
 
         if (!allocated(state.dataAvail->ZoneComp)) return;
-        
+
         // loop over the zone equipment types which allow system avail managers
         for (ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
             auto &zoneComp = state.dataAvail->ZoneComp(ZoneEquipType);
@@ -257,7 +254,7 @@ namespace Avail {
 
                 auto &zcam = zoneComp.ZoneCompAvailMgrs(CompNum);
                 if (zcam.NumAvailManagers > 0) {
-                
+
                     // Save the previous status for differential thermostat
                     previousAvailStatus = zcam.availStatus;
                     // initialize the availability to "take no action"
@@ -283,10 +280,10 @@ namespace Avail {
                 } else {
                     zcam.availStatus = Status::NoAction;
                 }
-                
+
                 if (zcam.ZoneNum == 0) continue;
                 if (state.dataAvail->NumHybridVentSysAvailMgrs == 0) continue;
-                
+
                 for (HybridVentNum = 1; HybridVentNum <= state.dataAvail->NumHybridVentSysAvailMgrs; ++HybridVentNum) {
                     if (!state.dataAvail->HybridVentData(HybridVentNum).HybridVentMgrConnectedToAirLoop) {
                         if (state.dataAvail->HybridVentData(HybridVentNum).ControlledZoneNum == zcam.ZoneNum) {
@@ -298,7 +295,7 @@ namespace Avail {
                 }
             }
         } // for (ZoneEquipType)
-    } // ManageSystemAvailability()
+    }     // ManageSystemAvailability()
 
     void GetSysAvailManagerInputs(EnergyPlusData &state)
     {
@@ -402,8 +399,7 @@ namespace Avail {
         }
 
         std::string_view cCurrentModuleObject = managerTypeNames[(int)ManagerType::Scheduled];
-        state.dataAvail->NumSchedSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumSchedSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumSchedSysAvailMgrs > 0) {
 
@@ -438,7 +434,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled Control Status",
                                     Constant::Units::None,
-                                    (int&)schedMgr.availStatus,
+                                    (int &)schedMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     schedMgr.Name);
@@ -447,8 +443,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::ScheduledOn];
-        state.dataAvail->NumSchedOnSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumSchedOnSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumSchedOnSysAvailMgrs > 0) {
 
@@ -483,7 +478,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled On Control Status",
                                     Constant::Units::None,
-                                    (int&)schedOnMgr.availStatus,
+                                    (int &)schedOnMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     schedOnMgr.Name);
@@ -492,8 +487,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::ScheduledOff];
-        state.dataAvail->NumSchedOffSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumSchedOffSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumSchedOffSysAvailMgrs > 0) {
 
@@ -528,7 +522,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Scheduled Off Control Status",
                                     Constant::Units::None,
-                                    (int&)schedOffMgr.availStatus,
+                                    (int &)schedOffMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     schedOffMgr.Name);
@@ -537,8 +531,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::NightCycle];
-        state.dataAvail->NumNCycSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumNCycSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
 
         if (state.dataAvail->NumNCycSysAvailMgrs > 0) {
@@ -580,12 +573,10 @@ namespace Avail {
                     ErrorsFound = true;
                 }
 
-                nightCycleMgr.nightCycleControlType =
-                    static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, cAlphaArgs(4)));
+                nightCycleMgr.nightCycleControlType = static_cast<NightCycleControlType>(getEnumValue(NightCycleControlTypeNamesUC, cAlphaArgs(4)));
 
                 // Cycling Run Time Control Type
-                nightCycleMgr.cyclingRunTimeControl =
-                    static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, cAlphaArgs(5)));
+                nightCycleMgr.cyclingRunTimeControl = static_cast<CyclingRunTimeControl>(getEnumValue(CyclingRunTimeControlNamesUC, cAlphaArgs(5)));
 
                 // Control zone or zonelist
                 if (!lAlphaFieldBlanks(6)) {
@@ -693,7 +684,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Night Cycle Control Status",
                                     Constant::Units::None,
-                                    (int&)nightCycleMgr.availStatus,
+                                    (int &)nightCycleMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     nightCycleMgr.Name);
@@ -702,8 +693,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::OptimumStart];
-        state.dataAvail->NumOptStartSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumOptStartSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         CyclingTimeSteps = 0;
 
         if (state.dataAvail->NumOptStartSysAvailMgrs > 0) {
@@ -803,7 +793,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Optimum Start Control Status",
                                     Constant::Units::None,
-                                    (int&)optimumStartMgr.availStatus,
+                                    (int &)optimumStartMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     optimumStartMgr.Name);
@@ -831,8 +821,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::DiffThermo];
-        state.dataAvail->NumDiffTSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumDiffTSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumDiffTSysAvailMgrs > 0) {
 
@@ -904,7 +893,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Differential Thermostat Control Status",
                                     Constant::Units::None,
-                                    (int&)diffThermoMgr.availStatus,
+                                    (int &)diffThermoMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     diffThermoMgr.Name);
@@ -913,8 +902,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::HiTempTOff];
-        state.dataAvail->NumHiTurnOffSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumHiTurnOffSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumHiTurnOffSysAvailMgrs > 0) {
             state.dataAvail->HiTurnOffData.allocate(state.dataAvail->NumHiTurnOffSysAvailMgrs);
@@ -959,7 +947,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager High Temperature Turn Off Control Status",
                                     Constant::Units::None,
-                                    (int&)hiTurnOffMgr.availStatus,
+                                    (int &)hiTurnOffMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     hiTurnOffMgr.Name);
@@ -968,8 +956,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::HiTempTOn];
-        state.dataAvail->NumHiTurnOnSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumHiTurnOnSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumHiTurnOnSysAvailMgrs > 0) {
 
@@ -1014,7 +1001,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager High Temperature Turn On Control Status",
                                     Constant::Units::None,
-                                    (int&)hiTurnOnMgr.availStatus,
+                                    (int &)hiTurnOnMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     hiTurnOnMgr.Name);
@@ -1023,8 +1010,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::LoTempTOff];
-        state.dataAvail->NumLoTurnOffSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumLoTurnOffSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumLoTurnOffSysAvailMgrs > 0) {
 
@@ -1079,7 +1065,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn Off Control Status",
                                     Constant::Units::None,
-                                    (int&)loTurnOffMgr.availStatus,
+                                    (int &)loTurnOffMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     loTurnOffMgr.Name);
@@ -1088,8 +1074,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::LoTempTOn];
-        state.dataAvail->NumLoTurnOnSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumLoTurnOnSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumLoTurnOnSysAvailMgrs > 0) {
 
@@ -1135,7 +1120,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Low Temperature Turn On Control Status",
                                     Constant::Units::None,
-                                    (int&)loTurnOnMgr.availStatus,
+                                    (int &)loTurnOnMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     loTurnOnMgr.Name);
@@ -1144,8 +1129,7 @@ namespace Avail {
         }
 
         cCurrentModuleObject = managerTypeNames[(int)ManagerType::NightVent];
-        state.dataAvail->NumNVentSysAvailMgrs =
-            state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
+        state.dataAvail->NumNVentSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
 
         if (state.dataAvail->NumNVentSysAvailMgrs > 0) {
 
@@ -1201,7 +1185,7 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Night Ventilation Control Status",
                                     Constant::Units::None,
-                                    (int&)nightVentMgr.availStatus,
+                                    (int &)nightVentMgr.availStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     nightVentMgr.Name);
@@ -1280,8 +1264,8 @@ namespace Avail {
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_name");
                         std::string availManagerObjType =
                             ip->getAlphaFieldValue(extensibleInstance, extensionSchemaProps, "availability_manager_object_type");
-                        mgrList.availManagers(listItem).type = static_cast<ManagerType>(
-                            getEnumValue(managerTypeNamesUC, Util::makeUPPER(availManagerObjType)));
+                        mgrList.availManagers(listItem).type =
+                            static_cast<ManagerType>(getEnumValue(managerTypeNamesUC, Util::makeUPPER(availManagerObjType)));
                         if (mgrList.availManagers(listItem).type == ManagerType::HybridVent)
                             mgrList.availManagers(listItem).type = ManagerType::Invalid;
                         // these are validated individually in the GetPlant, GetSystem and GetZoneEq lists
@@ -1325,8 +1309,7 @@ namespace Avail {
         }
 
         int Found = 0;
-        if (state.dataAvail->NumAvailManagerLists > 0)
-            Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
+        if (state.dataAvail->NumAvailManagerLists > 0) Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
 
         if (Found != 0) {
             availMgr.NumAvailManagers = state.dataAvail->ListData(Found).NumItems;
@@ -1339,12 +1322,11 @@ namespace Avail {
                 am.Name = state.dataAvail->ListData(Found).availManagers(Num).Name;
                 am.Num = 0;
                 am.type = state.dataAvail->ListData(Found).availManagers(Num).type;
-                assert (am.type != ManagerType::Invalid);
+                assert(am.type != ManagerType::Invalid);
 
                 if (am.type == ManagerType::DiffThermo && Num != availMgr.NumAvailManagers) {
-                    ShowWarningError(state,
-                                     format("GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".",
-                                            am.Name));
+                    ShowWarningError(
+                        state, format("GetPlantLoopData/GetPlantAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".", am.Name));
                     ShowContinueError(
                         state, "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
                     ShowContinueError(state, format("Occurs in AvailabilityManagerAssignmentList =\"{}\".", AvailabilityListName));
@@ -1401,10 +1383,9 @@ namespace Avail {
         }
 
         auto &availMgr = state.dataAirLoop->PriAirSysAvailMgr(Loop);
-        
+
         int Found = 0;
-        if (state.dataAvail->NumAvailManagerLists > 0)
-            Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
+        if (state.dataAvail->NumAvailManagerLists > 0) Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
 
         if (Found != 0) {
             availMgr.NumAvailManagers = state.dataAvail->ListData(Found).NumItems;
@@ -1418,17 +1399,14 @@ namespace Avail {
                 am.Name = state.dataAvail->ListData(Found).availManagers(Num).Name;
                 am.Num = 0;
                 am.type = state.dataAvail->ListData(Found).availManagers(Num).type;
-                assert (am.type != ManagerType::Invalid);
+                assert(am.type != ManagerType::Invalid);
 
                 if (am.type == ManagerType::DiffThermo && Num != availMgr.NumAvailManagers) {
-                    ShowWarningError(state,
-                                     format("GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".",
-                                            am.Name));
+                    ShowWarningError(
+                        state, format("GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".", am.Name));
                     ShowContinueError(
                         state, "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
-                    ShowContinueError(state,
-                                      format("Occurs in AvailabilityManagerAssignmentList=\"{}\".",
-                                             am.Name));
+                    ShowContinueError(state, format("Occurs in AvailabilityManagerAssignmentList=\"{}\".", am.Name));
                 }
             } // End of Num Loop
 
@@ -1478,12 +1456,11 @@ namespace Avail {
         auto &zoneComp = state.dataAvail->ZoneComp(ZoneEquipType);
         auto &availMgr = zoneComp.ZoneCompAvailMgrs(CompNum);
         if (availMgr.Input) { // when both air loop and zone eq avail managers are present, zone
-                                                                        // avail mngrs list name has not been read in first time through here
-                                                                        // (see end of if block)
+                              // avail mngrs list name has not been read in first time through here
+                              // (see end of if block)
             AvailabilityListName = availMgr.AvailManagerListName;
             int Found = 0;
-            if (state.dataAvail->NumAvailManagerLists > 0)
-                Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
+            if (state.dataAvail->NumAvailManagerLists > 0) Found = Util::FindItemInList(AvailabilityListName, state.dataAvail->ListData);
             if (Found != 0) {
                 availMgr.NumAvailManagers = state.dataAvail->ListData(Found).NumItems;
                 CompNumAvailManagers = availMgr.NumAvailManagers;
@@ -1497,23 +1474,18 @@ namespace Avail {
                     auto &am = availMgr.availManagers(Num);
                     am.Name = state.dataAvail->ListData(Found).availManagers(Num).Name;
                     am.Num = 0;
-                    am.type =  state.dataAvail->ListData(Found).availManagers(Num).type;
+                    am.type = state.dataAvail->ListData(Found).availManagers(Num).type;
                     assert(am.type != ManagerType::Invalid);
 
                     if (am.type == ManagerType::DiffThermo && Num != availMgr.NumAvailManagers) {
-                        ShowWarningError(state,
-                                         format("GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".",
-                                                am.Name));
+                        ShowWarningError(state, format("GetZoneEqAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"{}\".", am.Name));
                         ShowContinueError(
                             state, "...is not the last manager on the AvailabilityManagerAssignmentList.  Any remaining managers will not be used.");
-                        ShowContinueError(state,
-                                          format("Occurs in AvailabilityManagerAssignmentList=\"{}\".",
-                                                 am.Name));
+                        ShowContinueError(state, format("Occurs in AvailabilityManagerAssignmentList=\"{}\".", am.Name));
                     }
                 } // End of Num Loop
             }
-            if (availMgr.Count > 0 || Found > 0)
-                availMgr.Input = false;
+            if (availMgr.Count > 0 || Found > 0) availMgr.Input = false;
             availMgr.Count += 1;
         }
     }
@@ -1633,7 +1605,7 @@ namespace Avail {
         // System Availability Manager algorithm.
 
         Status availStatus;
-        
+
         switch (type) {
         case ManagerType::Scheduled: { // 'AvailabilityManager:Scheduled'
             if (SysAvailNum == 0) {
@@ -1897,7 +1869,7 @@ namespace Avail {
         TempTol = (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime) ? (0.5 * nightCycleMgr.TempTolRange) : 0.05;
 
         Status availStatus;
-        
+
         if (present(ZoneEquipType)) {
             if (state.dataGlobal->SimTimeSteps >= StartTime && state.dataGlobal->SimTimeSteps < StopTime &&
                 (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::FixedRunTime ||
@@ -1977,7 +1949,7 @@ namespace Avail {
                 }
                 } // end select type of night cycle control
 
-                if (availStatus == Status::CycleOn) {                                                 // reset the start and stop times
+                if (availStatus == Status::CycleOn) { // reset the start and stop times
                     auto &zoneComp = state.dataAvail->ZoneComp(ZoneEquipType);
                     if (nightCycleMgr.cyclingRunTimeControl == CyclingRunTimeControl::Thermostat) { // Cycling Run Time is ignored
                         zoneComp.ZoneCompAvailMgrs(CompNum).StartTime = state.dataGlobal->SimTimeSteps;
@@ -2055,9 +2027,9 @@ namespace Avail {
                         default: {
                             availStatus = Status::NoAction;
                         }
-                        }                                        // end select on thermostat control
+                        }                                          // end select on thermostat control
                         if (availStatus == Status::CycleOn) break; // loop break
-                    }                                            // end loop over zones in system
+                    }                                              // end loop over zones in system
                 } break;
 
                 case NightCycleControlType::OnControlZone: {
@@ -2067,7 +2039,7 @@ namespace Avail {
                     if (HeatingZoneOutOfTolerance(state, nightCycleMgr.CtrlZonePtrs, nightCycleMgr.NumOfCtrlZones, TempTol))
                         availStatus = Status::CycleOn;
                 } break;
-                        
+
                 case NightCycleControlType::OnAnyCoolingOrHeatingZone: {
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CoolingZonePtrs, nightCycleMgr.NumOfCoolingZones, TempTol)) {
                         availStatus = Status::CycleOn;
@@ -2079,7 +2051,7 @@ namespace Avail {
                         availStatus = Status::NoAction;
                     }
                 } break;
-                        
+
                 case NightCycleControlType::OnAnyCoolingZone: {
                     if (CoolingZoneOutOfTolerance(state, nightCycleMgr.CoolingZonePtrs, nightCycleMgr.NumOfCoolingZones, TempTol)) {
                         availStatus = Status::CycleOn;
@@ -2096,7 +2068,7 @@ namespace Avail {
                         availStatus = Status::NoAction;
                     }
                 } break;
-                        
+
                 case NightCycleControlType::OnAnyHeatingZoneFansOnly: {
                     if (HeatingZoneOutOfTolerance(state, nightCycleMgr.HeatZnFanZonePtrs, nightCycleMgr.NumOfHeatZnFanZones, TempTol)) {
                         availStatus = Status::CycleOnZoneFansOnly;
@@ -2104,7 +2076,7 @@ namespace Avail {
                         availStatus = Status::NoAction;
                     }
                 } break;
-                        
+
                 default:
                     availStatus = Status::NoAction;
                 } // end select type of night cycle control
@@ -2246,7 +2218,7 @@ namespace Avail {
         bool exitLoop;                  // exit loop on found data
 
         Status availStatus;
-        
+
         auto &OptStartMgr = state.dataAvail->OptimumStartData(SysAvailNum);
 
         // some avail managers may be used in air loop and plant availability manager lists, if so they only need be simulated once
@@ -2306,13 +2278,15 @@ namespace Avail {
             }
 
             // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
-            for (auto &optStart : state.dataAvail->OptStart) optStart.OptStartFlag = false;
+            for (auto &optStart : state.dataAvail->OptStart)
+                optStart.OptStartFlag = false;
 
             // reset OptStartData once per beginning of day
             if (state.dataGlobal->BeginDayFlag) {
                 NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
                 if (state.dataAvail->BeginOfDayResetFlag) {
-                    for (auto &optStart : state.dataAvail->OptStart) optStart.OccStartTime = 22.99; // initialize the zone occupancy start time
+                    for (auto &optStart : state.dataAvail->OptStart)
+                        optStart.OccStartTime = 22.99; // initialize the zone occupancy start time
                     state.dataAvail->BeginOfDayResetFlag = false;
                 }
             }
@@ -2417,7 +2391,7 @@ namespace Avail {
                     }
                 }
             } break;
-                    
+
             case ControlAlgorithm::ConstantTemperatureGradient: {
                 if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
                     ZoneNum = OptStartMgr.ZoneNum;
@@ -2726,7 +2700,7 @@ namespace Avail {
                     availStatus = Status::NoAction;
                 }
             } break;
-                    
+
             case ControlAlgorithm::AdaptiveTemperatureGradient: {
 
                 if (OptStartMgr.optimumStartControlType == OptimumStartControlType::ControlZone) {
@@ -3346,7 +3320,7 @@ namespace Avail {
             state.dataAvail->OptStart(thisAirToZoneNodeInfo.HeatCtrlZoneNums(counter)).OptStartFlag = true;
         }
     }
-        
+
     Status CalcNVentSysAvailMgr(EnergyPlusData &state,
                                 int const SysAvailNum,     // number of the current scheduled system availability manager
                                 int const PriAirSysNum,    // number of the primary air system affected by this Avail. Manager
@@ -3380,7 +3354,7 @@ namespace Avail {
         Real64 VentTemp;  // value of the ventilation temperature schedule
 
         Status availStatus;
-        
+
         TempCheck = false;
         DelTCheck = false;
         LowLimCheck = false;
@@ -3444,7 +3418,7 @@ namespace Avail {
     }
 
     Status CalcDiffTSysAvailMgr(EnergyPlusData &state,
-                                int const SysAvailNum,    // Number of the current scheduled system availability manager
+                                int const SysAvailNum,      // Number of the current scheduled system availability manager
                                 Status const previousStatus // System status for the previous timestep
     )
     {
@@ -3460,7 +3434,7 @@ namespace Avail {
 
         // METHODOLOGY EMPLOYED:
 
-        Status availStatus; 
+        Status availStatus;
 
         auto &diffThermoMgr = state.dataAvail->DiffThermoData(SysAvailNum);
         Real64 DeltaTemp = state.dataLoopNodes->Node(diffThermoMgr.HotNode).Temp - state.dataLoopNodes->Node(diffThermoMgr.ColdNode).Temp;
@@ -3493,8 +3467,7 @@ namespace Avail {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOffData(SysAvailNum).Node).Temp >=
-            state.dataAvail->HiTurnOffData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOffData(SysAvailNum).Node).Temp >= state.dataAvail->HiTurnOffData(SysAvailNum).Temp) {
             availStatus = Status::ForceOff;
         } else {
             availStatus = Status::NoAction;
@@ -3505,7 +3478,7 @@ namespace Avail {
     }
 
     Status CalcHiTurnOnSysAvailMgr(EnergyPlusData &state,
-                                        int const SysAvailNum // Number of the current scheduled system availability manager
+                                   int const SysAvailNum // Number of the current scheduled system availability manager
     )
     {
 
@@ -3519,8 +3492,7 @@ namespace Avail {
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
 
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOnData(SysAvailNum).Node).Temp >=
-            state.dataAvail->HiTurnOnData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataAvail->HiTurnOnData(SysAvailNum).Node).Temp >= state.dataAvail->HiTurnOnData(SysAvailNum).Temp) {
             availStatus = Status::CycleOn;
         } else {
             availStatus = Status::NoAction;
@@ -3580,8 +3552,7 @@ namespace Avail {
         // PURPOSE OF THIS SUBROUTINE:
         // Set AvailStatus indicator for a plant loop, primary air loop or ZoneHVAC component.
         Status availStatus;
-        if (state.dataLoopNodes->Node(state.dataAvail->LoTurnOnData(SysAvailNum).Node).Temp <=
-            state.dataAvail->LoTurnOnData(SysAvailNum).Temp) {
+        if (state.dataLoopNodes->Node(state.dataAvail->LoTurnOnData(SysAvailNum).Node).Temp <= state.dataAvail->LoTurnOnData(SysAvailNum).Temp) {
             availStatus = Status::CycleOn;
         } else {
             availStatus = Status::NoAction;
@@ -3658,7 +3629,7 @@ namespace Avail {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetHybridVentilationInputs: "); // include trailing blank
-        static constexpr std::string_view routineName = "GetHybridVentilationInputs"; 
+        static constexpr std::string_view routineName = "GetHybridVentilationInputs";
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;           // Number of Alphas for each GetObjectItem call
@@ -3672,7 +3643,7 @@ namespace Avail {
         Real64 CurveVal;         // Curve value
 
         auto &ipsc = state.dataIPShortCut;
-        
+
         // Get the number of occurrences of each type of System Availability Manager
         std::string_view cCurrentModuleObject = managerTypeNames[(int)ManagerType::HybridVent];
         state.dataAvail->NumHybridVentSysAvailMgrs = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -3727,27 +3698,20 @@ namespace Avail {
             if (SchedMin == 0 && SchedMax == 0) {
                 ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  format("{}=\"{}\" specifies control mode 0 for all entries.",
-                                         ipsc->cAlphaFieldNames(4),
-                                         ipsc->cAlphaArgs(4)));
-                ShowContinueError(state,
-                                  format("All zones using this {} have no hybrid ventilation control.", ipsc->cAlphaFieldNames(4)));
+                                  format("{}=\"{}\" specifies control mode 0 for all entries.", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
+                ShowContinueError(state, format("All zones using this {} have no hybrid ventilation control.", ipsc->cAlphaFieldNames(4)));
             }
             if (SchedMax > 7.0) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                ShowContinueError(state,
-                                  format("{}=\"{}\", the maximum schedule value should be 7. However, ",
-                                         ipsc->cAlphaFieldNames(4),
-                                         ipsc->cAlphaArgs(4)));
+                ShowContinueError(
+                    state, format("{}=\"{}\", the maximum schedule value should be 7. However, ", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
                 ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                 ErrorsFound = true;
             }
             if (SchedMin < 0.0) {
                 ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  format("{}=\"{}the minimum schedule value should be 0. However, ",
-                                         ipsc->cAlphaFieldNames(4),
-                                         ipsc->cAlphaArgs(4)));
+                                  format("{}=\"{}the minimum schedule value should be 0. However, ", ipsc->cAlphaFieldNames(4), ipsc->cAlphaArgs(4)));
                 ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                 ErrorsFound = true;
             }
@@ -3768,16 +3732,15 @@ namespace Avail {
             } else {
                 hybridVentMgr.UseRainIndicator = static_cast<bool>(b);
             }
-                                                         
+
             // Check max wind speed
             if (NumNumbers > 0) {
                 hybridVentMgr.MaxWindSpeed = ipsc->rNumericArgs(1);
                 if (ipsc->rNumericArgs(1) > 40.0 || ipsc->rNumericArgs(1) < 0.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(1)));
-                    ShowContinueError(
-                        state,
-                        format("The input value is {:.0T}. The allowed value must be >= 0 and <= 40 m/s", ipsc->rNumericArgs(1)));
+                    ShowContinueError(state,
+                                      format("The input value is {:.0T}. The allowed value must be >= 0 and <= 40 m/s", ipsc->rNumericArgs(1)));
                     ErrorsFound = true;
                 }
             }
@@ -3788,9 +3751,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(2) > 100.0 || ipsc->rNumericArgs(2) < -100.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(2)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
-                                             ipsc->rNumericArgs(2)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", ipsc->rNumericArgs(2)));
                     ErrorsFound = true;
                 }
             }
@@ -3799,9 +3761,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(3) > 100.0 || ipsc->rNumericArgs(3) < -100.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(3)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
-                                             ipsc->rNumericArgs(3)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", ipsc->rNumericArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -3829,9 +3790,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(4) > 300000.0 || ipsc->rNumericArgs(4) < 0.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(4)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg",
-                                             ipsc->rNumericArgs(4)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", ipsc->rNumericArgs(4)));
                     ErrorsFound = true;
                 }
             }
@@ -3840,9 +3800,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(5) > 300000.0 || ipsc->rNumericArgs(5) < 0.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(5)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg",
-                                             ipsc->rNumericArgs(5)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between 0 and 300000 J/kg", ipsc->rNumericArgs(5)));
                     ErrorsFound = true;
                 }
             }
@@ -3870,9 +3829,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(6) > 100.0 || ipsc->rNumericArgs(6) < -100.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(6)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
-                                             ipsc->rNumericArgs(6)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", ipsc->rNumericArgs(6)));
                     ErrorsFound = true;
                 }
             }
@@ -3881,9 +3839,8 @@ namespace Avail {
                 if (ipsc->rNumericArgs(7) > 100.0 || ipsc->rNumericArgs(7) < -100.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("{} is beyond the range.", ipsc->cNumericFieldNames(7)));
-                    ShowContinueError(state,
-                                      format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C",
-                                             ipsc->rNumericArgs(7)));
+                    ShowContinueError(
+                        state, format("The input value is {:.0T}. The allowed value must be between -100 C and +100 C", ipsc->rNumericArgs(7)));
                     ErrorsFound = true;
                 }
             }
@@ -3946,8 +3903,7 @@ namespace Avail {
                         ShowContinueError(state,
                                           format("The minimum value of {} must be greater than or equal to 0.0 at the minimum value of wind speed.",
                                                  ipsc->cAlphaFieldNames(7)));
-                        ShowContinueError(state,
-                                          format("{}=\"{}\".", ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7)));
+                        ShowContinueError(state, format("{}=\"{}\".", ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7)));
                         ShowContinueError(state, format("Curve output at the minimum wind speed = {:.3T}", CurveVal));
                         ErrorsFound = true;
                     }
@@ -3957,19 +3913,18 @@ namespace Avail {
                         ShowContinueError(state,
                                           format("The maximum value of {} must be less than or equal to 1.0 at the maximum value of wind speed.",
                                                  ipsc->cAlphaFieldNames(7)));
-                        ShowContinueError(state,
-                                          format("{}=\"{}\".", ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7)));
+                        ShowContinueError(state, format("{}=\"{}\".", ipsc->cAlphaFieldNames(7), ipsc->cAlphaArgs(7)));
                         ShowContinueError(state, format("Curve output at the maximum wind speed = {:.3T}", CurveVal));
                         ErrorsFound = true;
                     }
                     // Check curve type
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         hybridVentMgr.OpeningFactorFWS,             // Curve index
-                                                         {1},                                        // Valid dimensions
-                                                         RoutineName,                                // Routine name
-                                                         cCurrentModuleObject,                       // Object Type
-                                                         hybridVentMgr.Name,                         // Object Name
-                                                         ipsc->cAlphaFieldNames(7)); // Field Name
+                                                         hybridVentMgr.OpeningFactorFWS, // Curve index
+                                                         {1},                            // Valid dimensions
+                                                         RoutineName,                    // Routine name
+                                                         cCurrentModuleObject,           // Object Type
+                                                         hybridVentMgr.Name,             // Object Name
+                                                         ipsc->cAlphaFieldNames(7));     // Field Name
                 }
             }
 
@@ -3982,16 +3937,14 @@ namespace Avail {
                 hybridVentMgr.ANCtrlStatus = hybridVentMgr.ANControlTypeSchedPtr;
                 if (SchedMax > 1.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state,
-                                      format(" For {}=\"{}\",", ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8)));
+                    ShowContinueError(state, format(" For {}=\"{}\",", ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8)));
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
                     ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state,
-                                      format("For {}=\"{}\",", ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8)));
+                    ShowContinueError(state, format("For {}=\"{}\",", ipsc->cAlphaFieldNames(8), ipsc->cAlphaArgs(8)));
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
                     ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                     ErrorsFound = true;
@@ -4001,10 +3954,7 @@ namespace Avail {
             hybridVentMgr.SimpleControlTypeSchedPtr = GetScheduleIndex(state, ipsc->cAlphaArgs(9));
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0 && hybridVentMgr.ANControlTypeSchedPtr > 0) {
                 ShowWarningError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                ShowContinueError(state,
-                                  format("The inputs for{} and {} are valid.",
-                                         ipsc->cAlphaFieldNames(8),
-                                         ipsc->cAlphaFieldNames(9)));
+                ShowContinueError(state, format("The inputs for{} and {} are valid.", ipsc->cAlphaFieldNames(8), ipsc->cAlphaFieldNames(9)));
                 ShowContinueError(state, "But both objects cannot work at the same time. The Simple Airflow Control is disabled");
                 hybridVentMgr.SimpleControlTypeSchedPtr = 0;
             } else if (hybridVentMgr.SimpleControlTypeSchedPtr > 0) {
@@ -4013,16 +3963,14 @@ namespace Avail {
                 SchedMax = GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
                 if (SchedMax > 1.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state,
-                                      format("For {}=\"{}\",", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
+                    ShowContinueError(state, format("For {}=\"{}\",", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
                     ShowContinueError(state, "the maximum schedule value should be 1. However, ");
                     ShowContinueError(state, format("the maximum entered value in the schedule is {:.1T}", SchedMax));
                     ErrorsFound = true;
                 }
                 if (SchedMin < 0.0) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state,
-                                      format("For {}=\"{}\",", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
+                    ShowContinueError(state, format("For {}=\"{}\",", ipsc->cAlphaFieldNames(9), ipsc->cAlphaArgs(9)));
                     ShowContinueError(state, "the minimum schedule value should be 0. However, ");
                     ShowContinueError(state, format("the minimum entered value in the schedule is {:.1T}", SchedMin));
                     ErrorsFound = true;
@@ -4032,7 +3980,7 @@ namespace Avail {
             if (hybridVentMgr.SimpleControlTypeSchedPtr > 0) {
                 hybridVentMgr.VentilationName = ipsc->cAlphaArgs(10);
                 if (state.dataHeatBal->TotVentilation > 0) {
-                        
+
                     hybridVentMgr.VentilationPtr = Util::FindItemInList(ipsc->cAlphaArgs(10), state.dataHeatBal->Ventilation);
                     hybridVentMgr.Master = hybridVentMgr.VentilationPtr;
                     SchedMax = GetScheduleMaxValue(state, hybridVentMgr.SimpleControlTypeSchedPtr);
@@ -4050,9 +3998,7 @@ namespace Avail {
                     ShowContinueError(state,
                                       format("The Zone name specified in the Ventilation object {}",
                                              state.dataHeatBal->Zone(state.dataHeatBal->Ventilation(hybridVentMgr.VentilationPtr).ZonePtr).Name));
-                    ShowContinueError(
-                        state,
-                        format("is not equal to the {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
+                    ShowContinueError(state, format("is not equal to the {}=\"{}\".", ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3)));
                     ErrorsFound = true;
                 }
             }
@@ -4140,14 +4086,14 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Status",
                                     Constant::Units::None,
-                                    (int&)state.dataAvail->HybridVentData(SysAvailNum).ctrlStatus,
+                                    (int &)state.dataAvail->HybridVentData(SysAvailNum).ctrlStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     state.dataAvail->HybridVentData(SysAvailNum).AirLoopName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
                                     Constant::Units::None,
-                                    (int&)state.dataAvail->HybridVentData(SysAvailNum).ctrlType,
+                                    (int &)state.dataAvail->HybridVentData(SysAvailNum).ctrlType,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     state.dataAvail->HybridVentData(SysAvailNum).AirLoopName);
@@ -4155,14 +4101,14 @@ namespace Avail {
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Status",
                                     Constant::Units::None,
-                                    (int&)state.dataAvail->HybridVentData(SysAvailNum).ctrlStatus,
+                                    (int &)state.dataAvail->HybridVentData(SysAvailNum).ctrlStatus,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     state.dataAvail->HybridVentData(SysAvailNum).ControlZoneName);
                 SetupOutputVariable(state,
                                     "Availability Manager Hybrid Ventilation Control Mode",
                                     Constant::Units::None,
-                                    (int&)state.dataAvail->HybridVentData(SysAvailNum).ctrlType,
+                                    (int &)state.dataAvail->HybridVentData(SysAvailNum).ctrlType,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     state.dataAvail->HybridVentData(SysAvailNum).ControlZoneName);
@@ -4428,15 +4374,13 @@ namespace Avail {
                 }
                 if (hybridVentMgr.MinVentTime > 0.0) {
                     if (hybridVentMgr.ctrlStatus == VentCtrlStatus::Open) {
-                        hybridVentMgr.TimeVentDuration +=
-                            (state.dataAvail->CurrentEndTime - state.dataAvail->CurrentEndTimeLast) * 60.0;
+                        hybridVentMgr.TimeVentDuration += (state.dataAvail->CurrentEndTime - state.dataAvail->CurrentEndTimeLast) * 60.0;
                         hybridVentMgr.TimeOperDuration = 0.0;
                     }
                 }
                 if (hybridVentMgr.MinOperTime > 0.0) {
                     if (hybridVentMgr.ctrlStatus == VentCtrlStatus::Close) {
-                        hybridVentMgr.TimeOperDuration +=
-                            (state.dataAvail->CurrentEndTime - state.dataAvail->CurrentEndTimeLast) * 60.0;
+                        hybridVentMgr.TimeOperDuration += (state.dataAvail->CurrentEndTime - state.dataAvail->CurrentEndTimeLast) * 60.0;
                         hybridVentMgr.TimeVentDuration = 0.0;
                     }
                 }
@@ -4525,7 +4469,7 @@ namespace Avail {
 
                 // Temperature control
             } break;
-                    
+
             case VentCtrlType::Temp: {
                 if (TempExt >= hybridVentMgr.MinOutdoorTemp && TempExt <= hybridVentMgr.MaxOutdoorTemp) {
                     hybridVentMgr.ctrlStatus = VentCtrlStatus::Open;
@@ -4535,7 +4479,7 @@ namespace Avail {
 
                 // Enthalpy control
             } break;
-                    
+
             case VentCtrlType::Enth: {
                 ZoneAirEnthalpy = PsyHFnTdbW(thisZoneHB.MAT, thisZoneHB.airHumRat);
                 if (state.dataEnvrn->OutEnthalpy >= hybridVentMgr.MinOutdoorEnth && state.dataEnvrn->OutEnthalpy <= hybridVentMgr.MaxOutdoorEnth) {
@@ -4546,7 +4490,7 @@ namespace Avail {
 
                 // Dew point control
             } break;
-                    
+
             case VentCtrlType::DewPoint: {
                 if (state.dataEnvrn->OutDewPointTemp >= hybridVentMgr.MinOutdoorDewPoint &&
                     state.dataEnvrn->OutDewPointTemp <= hybridVentMgr.MaxOutdoorDewPoint) {
@@ -4556,7 +4500,7 @@ namespace Avail {
                 }
 
             } break;
-                    
+
             case VentCtrlType::OA: {
                 OASetPoint = GetCurrentScheduleValue(state, hybridVentMgr.MinOASchedPtr);
                 ACH = 0.0;
@@ -4578,7 +4522,7 @@ namespace Avail {
                 }
 
             } break;
-                    
+
             case VentCtrlType::OperT80: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                     hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
@@ -4596,7 +4540,7 @@ namespace Avail {
                 }
 
             } break;
-                    
+
             case VentCtrlType::OperT90: {
                 if (state.dataThermalComforts->runningAverageASH >= 10.0 && state.dataThermalComforts->runningAverageASH <= 33.5) {
                     hybridVentMgr.OperativeTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
@@ -4648,7 +4592,8 @@ namespace Avail {
                 }
             } break;
             default: {
-                ShowSevereError(state, format("{}: incorrect Control Type: {}", managerTypeNames[(int)hybridVentMgr.type], hybridVentMgr.AirLoopName));
+                ShowSevereError(state,
+                                format("{}: incorrect Control Type: {}", managerTypeNames[(int)hybridVentMgr.type], hybridVentMgr.AirLoopName));
                 ShowFatalError(state, format("Errors found in getting {} Control mode value", managerTypeNames[(int)hybridVentMgr.type]));
             }
             }
@@ -4906,6 +4851,6 @@ namespace Avail {
         return VentControl;
     }
 
-} // namespace SystemAvailabilityManager
+} // namespace Avail
 
 } // namespace EnergyPlus

@@ -216,7 +216,8 @@ namespace AirflowNetwork {
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;
                     break;
                 }
-                if (FanMassFlowRate > HVAC::VerySmallMassFlow && m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == HVAC::FanOp::Cycling &&
+                if (FanMassFlowRate > HVAC::VerySmallMassFlow &&
+                    m_state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                     m_state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = HVAC::FanOp::Cycling;
                     AFNSupplyFanType = DisSysCompCVFData(i).fanType;

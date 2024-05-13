@@ -122,8 +122,7 @@ using namespace DataZoneEnergyDemands;
 using namespace Psychrometrics;
 using namespace DataPlant;
 
-constexpr std::array<std::string_view, (int)TUType::Num> tuTypeNames = {
-    "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"};
+constexpr std::array<std::string_view, (int)TUType::Num> tuTypeNames = {"ZoneHVAC:TerminalUnit:VariableRefrigerantFlow"};
 
 void SimulateVRF(EnergyPlusData &state,
                  std::string_view CompName,
@@ -4800,7 +4799,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
         SetupOutputVariable(state,
                             "Zone VRF Air Terminal Fan Availability Status",
                             Constant::Units::None,
-                            (int&)thisVrfTU.availStatus,
+                            (int &)thisVrfTU.availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             thisVrfTU.Name);
@@ -5626,8 +5625,7 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     }
 
     if (allocated(state.dataAvail->ZoneComp)) {
-        auto &availMgr =
-            state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal).ZoneCompAvailMgrs(VRFTUNum);
         if (state.dataHVACVarRefFlow->MyZoneEqFlag(VRFTUNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHVACVarRefFlow->VRFTU(VRFTUNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
@@ -8129,8 +8127,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
             }
         } else {
-            CheckZoneSizing(
-                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+            CheckZoneSizing(state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             CoolOutAirVolFlowDes =
                 min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxCoolAirVolFlow);
             if (CoolOutAirVolFlowDes < HVAC::SmallAirVolFlow) {
@@ -8205,8 +8202,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
             }
         } else {
-            CheckZoneSizing(
-                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+            CheckZoneSizing(state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             HeatOutAirVolFlowDes =
                 min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).MaxHeatAirVolFlow);
             if (HeatOutAirVolFlowDes < HVAC::SmallAirVolFlow) {
@@ -8292,8 +8288,7 @@ void SizeVRF(EnergyPlusData &state, int const VRFTUNum)
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow);
             }
         } else {
-            CheckZoneSizing(
-                state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
+            CheckZoneSizing(state, tuTypeNames[(int)state.dataHVACVarRefFlow->VRFTU(VRFTUNum).type], state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name);
             NoCoolHeatOutAirVolFlowDes = min(state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).MinOA,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).HeatOutAirVolFlow,
                                              state.dataHVACVarRefFlow->VRFTU(VRFTUNum).CoolOutAirVolFlow);
@@ -9378,12 +9373,14 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                             ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                             ShowRecurringWarningErrorAtEnd(state,
                                                            format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                                  tuTypeNames[(int)this->type], this->Name),
+                                                                  tuTypeNames[(int)this->type],
+                                                                  this->Name),
                                                            this->IterLimitExceeded);
                         } else {
                             ShowRecurringWarningErrorAtEnd(state,
                                                            format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                                  tuTypeNames[(int)this->type], this->Name),
+                                                                  tuTypeNames[(int)this->type],
+                                                                  this->Name),
                                                            this->IterLimitExceeded);
                         }
                     }
@@ -9394,15 +9391,19 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                             ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                             ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                             ShowContinueErrorTimeStamp(state, "");
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                                  tuTypeNames[(int)this->type], this->Name),
-                                                           this->FirstIterfailed);
+                            ShowRecurringWarningErrorAtEnd(
+                                state,
+                                format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                       tuTypeNames[(int)this->type],
+                                       this->Name),
+                                this->FirstIterfailed);
                         } else {
-                            ShowRecurringWarningErrorAtEnd(state,
-                                                           format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                                  tuTypeNames[(int)this->type], this->Name),
-                                                           thisVRFTU.FirstIterfailed);
+                            ShowRecurringWarningErrorAtEnd(
+                                state,
+                                format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                       tuTypeNames[(int)this->type],
+                                       this->Name),
+                                thisVRFTU.FirstIterfailed);
                         }
                     }
                     PartLoadRatio = max(MinPLF, std::abs(QZnReq - NoCompOutput) / std::abs(FullOutput - NoCompOutput));
@@ -9415,15 +9416,19 @@ void VRFTerminalUnitEquipment::ControlVRFToLoad(EnergyPlusData &state,
                         ShowContinueError(state, "Terminal unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded");
                         ShowContinueError(state, "Please fill out a bug report and forward to the EnergyPlus support group.");
                         ShowContinueErrorTimeStamp(state, "");
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                              tuTypeNames[(int)this->type], " \"" + this->Name),
-                                                       this->FirstIterfailed);
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                   tuTypeNames[(int)this->type],
+                                   " \"" + this->Name),
+                            this->FirstIterfailed);
                     } else {
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
-                                                              tuTypeNames[(int)this->type], this->Name),
-                                                       this->FirstIterfailed);
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("{} \"{}\" -- Terminal unit part-load ratio limits of 0 to 1 exceeded error continues...",
+                                   tuTypeNames[(int)this->type],
+                                   this->Name),
+                            this->FirstIterfailed);
                     }
                 }
                 if (FullOutput - NoCompOutput == 0.0) {
@@ -10128,7 +10133,7 @@ void InitializeOperatingMode(EnergyPlusData &state,
                     // There is an air terminal mixer
                     if (state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerType ==
                         HVAC::MixerType::InletSide) { // if there is an inlet side air terminal mixer
-                                                   // set the primary air inlet mass flow rate
+                                                      // set the primary air inlet mass flow rate
                         state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRate =
                             min(state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).ATMixerPriNode).MassFlowRateMaxAvail,
                                 state.dataLoopNodes->Node(state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUInletNodeNum).MassFlowRate);
@@ -12668,12 +12673,14 @@ void VRFTerminalUnitEquipment::ControlVRF_FluidTCtrl(EnergyPlusData &state,
                         ShowContinueError(state, format(" Load requested = {:.5T}, Load delivered = {:.5T}", QZnReq, TempOutput));
                         ShowRecurringWarningErrorAtEnd(state,
                                                        format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                              tuTypeNames[(int)this->type], this->Name),
+                                                              tuTypeNames[(int)this->type],
+                                                              this->Name),
                                                        this->IterLimitExceeded);
                     } else {
                         ShowRecurringWarningErrorAtEnd(state,
                                                        format("{} \"{}\" -- Terminal unit Iteration limit exceeded error continues...",
-                                                              tuTypeNames[(int)this->type], this->Name),
+                                                              tuTypeNames[(int)this->type],
+                                                              this->Name),
                                                        this->IterLimitExceeded);
                     }
                 }

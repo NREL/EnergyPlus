@@ -325,8 +325,8 @@ namespace AirflowNetwork {
         Array1D<Real64> MA;
         Array1D<Real64> MV;
         Array1D_int IVEC;
-        Avail::VentCtrlStatus ventCtrlStatus = Avail::VentCtrlStatus::NoAction;  // Hybrid ventilation control type
-        int NumOfExhaustFans = 0; // Number of exhaust fans
+        Avail::VentCtrlStatus ventCtrlStatus = Avail::VentCtrlStatus::NoAction; // Hybrid ventilation control type
+        int NumOfExhaustFans = 0;                                               // Number of exhaust fans
         int NumAirflowNetwork = 0;
         int AirflowNetworkNumOfDetOpenings = 0;
         int AirflowNetworkNumOfSimOpenings = 0;

@@ -689,18 +689,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(state,
-                               evapInletNode,
-                               evapOutletNode,
-                               coilMode,
-                               PLR,
-                               speedNum,
-                               speedRatio,
-                               fanOp,
-                               condInletNode,
-                               condOutletNode,
-                               singleMode,
-                               LoadSHR);
+    this->performance.simulate(
+        state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor

@@ -272,7 +272,7 @@ namespace VentilatedSlab {
         Real64 FanOutletTemp;             // FanOutlet temp in degree C
         Real64 ZoneInletTemp;             // supply air temp
         std::string AvailManagerListName; // Name of an availability manager list object
-        Avail::Status availStatus = Avail::Status::NoAction; 
+        Avail::Status availStatus = Avail::Status::NoAction;
         int HVACSizingIndex;                 // index of a HVACSizing object for a ventilator slab
         bool FirstPass;                      // detects first time through for resetting sizing data
         Real64 ZeroVentSlabSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
@@ -303,8 +303,8 @@ namespace VentilatedSlab {
               RadHeatingEnergy(0.0), RadCoolingPower(0.0), RadCoolingEnergy(0.0), HeatCoilPower(0.0), HeatCoilEnergy(0.0), TotCoolCoilPower(0.0),
               TotCoolCoilEnergy(0.0), SensCoolCoilPower(0.0), SensCoolCoilEnergy(0.0), LateCoolCoilPower(0.0), LateCoolCoilEnergy(0.0),
               ElecFanPower(0.0), ElecFanEnergy(0.0), AirMassFlowRate(0.0), AirVolFlow(0.0), SlabInTemp(0.0), SlabOutTemp(0.0), ReturnAirTemp(0.0),
-              FanOutletTemp(0.0), ZoneInletTemp(0.0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0),
-              QRadSysSrcAvg(0.0), LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
+              FanOutletTemp(0.0), ZoneInletTemp(0.0), HVACSizingIndex(0), FirstPass(true), ZeroVentSlabSourceSumHATsurf(0.0), QRadSysSrcAvg(0.0),
+              LastQRadSysSrc(0.0), LastSysTimeElapsed(0.0), LastTimeStepSys(0.0)
         {
         }
     };

@@ -2983,7 +2983,7 @@ namespace WaterToAirHeatPumpSimple {
                              HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
                              [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
-                             HVAC::CompressorOp const compressorOp,   // compressor operation flag
+                             HVAC::CompressorOp const compressorOp,          // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -3319,7 +3319,7 @@ namespace WaterToAirHeatPumpSimple {
                              int const HPNum,                                // Heat Pump Number
                              HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
                              [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
-                             HVAC::CompressorOp const compressorOp,   // compressor operation flag
+                             HVAC::CompressorOp const compressorOp,          // compressor operation flag
                              Real64 const PartLoadRatio,                     // compressor part load ratio
                              [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
@@ -4016,7 +4016,7 @@ namespace WaterToAirHeatPumpSimple {
     void SetSimpleWSHPData(EnergyPlusData &state,
                            int const SimpleWSHPNum,                         // Number of OA Controller
                            bool &ErrorsFound,                               // Set to true if certain errors found
-                           HVAC::WaterFlow const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
+                           HVAC::WaterFlow const WaterCyclingMode,          // the coil water flow mode (cycling, constant or constantondemand)
                            ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
                            ObjexxFCL::Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )

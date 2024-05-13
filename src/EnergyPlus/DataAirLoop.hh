@@ -98,12 +98,12 @@ namespace DataAirLoop {
     struct DefinePriAirSysAvailMgrs
     {
         // Members
-        int NumAvailManagers = 0;                                    // number of availability managers for this system
-        Avail::Status availStatus = Avail::Status::NoAction;         // system availability status
-        int StartTime = 0;                                           // cycle on time (in SimTimeSteps)
-        int StopTime = 0;                                            // cycle off time (in SimTimeSteps)
-        Real64 ReqSupplyFrac = 0.0;                                  // required system flow rate (as a fraction)
-        Array1D<Avail::AvailManagerNTN> availManagers; // type of availability manager
+        int NumAvailManagers = 0;                            // number of availability managers for this system
+        Avail::Status availStatus = Avail::Status::NoAction; // system availability status
+        int StartTime = 0;                                   // cycle on time (in SimTimeSteps)
+        int StopTime = 0;                                    // cycle off time (in SimTimeSteps)
+        Real64 ReqSupplyFrac = 0.0;                          // required system flow rate (as a fraction)
+        Array1D<Avail::AvailManagerNTN> availManagers;       // type of availability manager
     };
 
     struct AirLooptoZoneData // Derived type for air loop connection to zones on air loop
@@ -219,14 +219,14 @@ namespace DataAirLoop {
     struct AirLoopAFNData
     {
         // Members
-        HVAC::FanOp LoopFanOperationMode = HVAC::FanOp::Invalid;           // OnOff fan operation mode
-        Real64 LoopSystemOnMassFlowrate = 0.0;  // Loop mass flow rate during on cycle using an OnOff fan
-        Real64 LoopSystemOffMassFlowrate = 0.0; // Loop mass flow rate during off cycle using an OnOff fan
-        Real64 LoopOnOffFanPartLoadRatio = 0.0; // OnOff fan part load ratio
-        Real64 LoopCompCycRatio = 0.0;          // Loop compressor cycling ratio for multispeed heat pump
-        Real64 AFNLoopHeatingCoilMaxRTF = 0.0;  // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
-        Real64 AFNLoopOnOffFanRTF = 0.0;        // OnOff fan run time fraction in an HVAC Air Loop
-        Real64 AFNLoopDXCoilRTF = 0.0;          // OnOff fan run time fraction in an HVAC Air Loop
+        HVAC::FanOp LoopFanOperationMode = HVAC::FanOp::Invalid; // OnOff fan operation mode
+        Real64 LoopSystemOnMassFlowrate = 0.0;                   // Loop mass flow rate during on cycle using an OnOff fan
+        Real64 LoopSystemOffMassFlowrate = 0.0;                  // Loop mass flow rate during off cycle using an OnOff fan
+        Real64 LoopOnOffFanPartLoadRatio = 0.0;                  // OnOff fan part load ratio
+        Real64 LoopCompCycRatio = 0.0;                           // Loop compressor cycling ratio for multispeed heat pump
+        Real64 AFNLoopHeatingCoilMaxRTF = 0.0;                   // Maximum run time fraction for electric or gas heating coil in an HVAC Air Loop
+        Real64 AFNLoopOnOffFanRTF = 0.0;                         // OnOff fan run time fraction in an HVAC Air Loop
+        Real64 AFNLoopDXCoilRTF = 0.0;                           // OnOff fan run time fraction in an HVAC Air Loop
     };
 
 } // namespace DataAirLoop

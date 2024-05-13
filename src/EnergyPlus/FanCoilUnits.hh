@@ -169,23 +169,23 @@ namespace FanCoilUnits {
         Avail::Status availStatus = Avail::Status::NoAction;
         std::string AvailManagerListName; // Name of an availability manager list object
         // addition for OA to Zone Units
-        std::string ATMixerName;        // name of air terminal mixer
-        int ATMixerIndex = 0;           // index to the air terminal mixer
-        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;            // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;         // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode = 0;         // secondary air inlet node number for the air terminal mixer
-        int HVACSizingIndex = 0;        // index of a HVACSizing object for a fancoil unit
-        Real64 SpeedRatio = 0.0;        // speed ratio when the fan is cycling between stages
-        int FanOpModeSchedPtr = 0;      // pointer to supply air fan operating mode schedule
-        HVAC::FanOp fanOp = HVAC::FanOp::Cycling;              // 1=cycling fan cycling coil; 2=constant fan cycling coil
-        bool ASHRAETempControl = false; // ASHRAE90.1 control to temperature set point when true
-        Real64 QUnitOutNoHC = 0.0;      // unit output with coils off [W]
-        Real64 QUnitOutMaxH = 0.0;      // unit output at maximum heating [W]
-        Real64 QUnitOutMaxC = 0.0;      // unit output at maximum cooling [W]
-        int LimitErrCountH = 0;         // count of SolveRoot limit errors
-        int LimitErrCountC = 0;         // count of SolveRoot limit errors
-        int ConvgErrCountH = 0;         // count of SolveRoot iteration limit errors
-        int ConvgErrCountC = 0;         // count of SolveRoot iteration limit errors
+        std::string ATMixerName;                                // name of air terminal mixer
+        int ATMixerIndex = 0;                                   // index to the air terminal mixer
+        HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
+        int ATMixerPriNode = 0;                                 // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the air terminal mixer
+        int HVACSizingIndex = 0;                                // index of a HVACSizing object for a fancoil unit
+        Real64 SpeedRatio = 0.0;                                // speed ratio when the fan is cycling between stages
+        int FanOpModeSchedPtr = 0;                              // pointer to supply air fan operating mode schedule
+        HVAC::FanOp fanOp = HVAC::FanOp::Cycling;               // 1=cycling fan cycling coil; 2=constant fan cycling coil
+        bool ASHRAETempControl = false;                         // ASHRAE90.1 control to temperature set point when true
+        Real64 QUnitOutNoHC = 0.0;                              // unit output with coils off [W]
+        Real64 QUnitOutMaxH = 0.0;                              // unit output at maximum heating [W]
+        Real64 QUnitOutMaxC = 0.0;                              // unit output at maximum cooling [W]
+        int LimitErrCountH = 0;                                 // count of SolveRoot limit errors
+        int LimitErrCountC = 0;                                 // count of SolveRoot limit errors
+        int ConvgErrCountH = 0;                                 // count of SolveRoot iteration limit errors
+        int ConvgErrCountC = 0;                                 // count of SolveRoot iteration limit errors
         // Report data
         Real64 HeatPower = 0.0;          // unit heating output in watts
         Real64 HeatEnergy = 0.0;         // unit heating output in J
@@ -400,16 +400,16 @@ struct FanCoilUnitsData : BaseGlobalStruct
     bool InitFanCoilUnitsCheckInZoneEquipmentListFlag = false; // True after the Zone Equipment List has been checked for items
 
     // static variables extracted from functions
-    bool ErrorsFound = false;        // Set to true if errors in input, fatal at end of routine
-    bool errFlag = false;            // Local error flag for GetOAMixerNodeNums
-    int TotalArgs = 0;               // Total number of alpha and numeric arguments (max) for a
-    bool ZoneExNodeNotFound = false; // used in error checking
-    bool ZoneInNodeNotFound = false; // used in error checking
-    int ATMixerNum = 0;              // index of air terminal mixer in the air terminal mixer data array
-    HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid;             // type of air terminal mixer (1=inlet side; 2=supply side)
-    int ATMixerPriNode = 0;          // node number of the air terminal mixer primary air inlet
-    int ATMixerSecNode = 0;          // node number of the air terminal mixer secondary air inlet
-    int ATMixerOutNode = 0;          // node number of the air terminal mixer secondary air inlet
+    bool ErrorsFound = false;                               // Set to true if errors in input, fatal at end of routine
+    bool errFlag = false;                                   // Local error flag for GetOAMixerNodeNums
+    int TotalArgs = 0;                                      // Total number of alpha and numeric arguments (max) for a
+    bool ZoneExNodeNotFound = false;                        // used in error checking
+    bool ZoneInNodeNotFound = false;                        // used in error checking
+    int ATMixerNum = 0;                                     // index of air terminal mixer in the air terminal mixer data array
+    HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // type of air terminal mixer (1=inlet side; 2=supply side)
+    int ATMixerPriNode = 0;                                 // node number of the air terminal mixer primary air inlet
+    int ATMixerSecNode = 0;                                 // node number of the air terminal mixer secondary air inlet
+    int ATMixerOutNode = 0;                                 // node number of the air terminal mixer secondary air inlet
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag;
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers

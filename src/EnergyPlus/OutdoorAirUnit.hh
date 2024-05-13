@@ -249,9 +249,9 @@ namespace OutdoorAirUnit {
               OutsideAirNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), ExtAirVolFlow(0.0), ExtAirMassFlow(0.0), ExtOutAirSchedPtr(0),
               SMaxAirMassFlow(0.0), EMaxAirMassFlow(0.0), SFanMaxAirVolFlow(0.0), EFanMaxAirVolFlow(0.0), HiCtrlTempSchedPtr(0),
               LoCtrlTempSchedPtr(0), OperatingMode(Operation::Invalid), ControlCompTypeNum(0), CompErrIndex(0), AirMassFlow(0.0), FlowError(false),
-              NumComponents(0), CompOutSetTemp(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), SensCoolingRate(0.0),
-              SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0), SensHeatingEnergy(0.0),
-              SensHeatingRate(0.0), LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
+              NumComponents(0), CompOutSetTemp(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), SensCoolingRate(0.0), SensCoolingEnergy(0.0),
+              LatCoolingRate(0.0), LatCoolingEnergy(0.0), ElecFanRate(0.0), ElecFanEnergy(0.0), SensHeatingEnergy(0.0), SensHeatingRate(0.0),
+              LatHeatingEnergy(0.0), LatHeatingRate(0.0), TotHeatingEnergy(0.0), TotHeatingRate(0.0), FirstPass(true)
         {
         }
     };

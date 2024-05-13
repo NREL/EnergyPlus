@@ -64,50 +64,32 @@ namespace HVAC {
     constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
         "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
-    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
-        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
-        "AirLoopHVAC:Unitary:Furnace:HeatCool",
-        "AirLoopHVAC:UnitaryHeatOnly",
-        "AirLoopHVAC:UnitaryHeatCool",
-        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
-        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
-        "AirLoopHVAC:UnitarySystem"
-    };
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {"AirLoopHVAC:Unitary:Furnace:HeatOnly",
+                                                                                            "AirLoopHVAC:Unitary:Furnace:HeatCool",
+                                                                                            "AirLoopHVAC:UnitaryHeatOnly",
+                                                                                            "AirLoopHVAC:UnitaryHeatCool",
+                                                                                            "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+                                                                                            "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+                                                                                            "AirLoopHVAC:UnitarySystem"};
 
-    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNamesUC = {
-        "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
-        "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
-        "AIRLOOPHVAC:UNITARYHEATONLY",
-        "AIRLOOPHVAC:UNITARYHEATCOOL",
-        "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
-        "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
-        "AIRLOOPHVAC:UNITARYSYSTEM"
-    };
+    constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNamesUC = {"AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+                                                                                              "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATONLY",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATCOOL",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
+                                                                                              "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
+                                                                                              "AIRLOOPHVAC:UNITARYSYSTEM"};
 
-    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNames = {
-        "Cycling",
-        "Constant",
-        "ConstantOnDemand"
-    };
-        
-    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNamesUC = {
-        "CYCLING",
-        "CONSTANT",
-        "CONSTANTONDEMAND"
-    };
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNames = {"Cycling", "Constant", "ConstantOnDemand"};
 
-    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNames = {
-        "WetBulbTemperature", "DryBulbTemperature"};
-    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC = {
-        "WETBULBTEMPERATURE", "DRYBULBTEMPERATURE"};
+    constexpr std::array<std::string_view, (int)WaterFlow::Num> waterFlowNamesUC = {"CYCLING", "CONSTANT", "CONSTANTONDEMAND"};
 
-    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames = {
-        "InletSide", "SupplySide"
-    };
-    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC = {
-        "INLETSIDE", "SUPPLYSIDE"
-    };
-        
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNames = {"WetBulbTemperature", "DryBulbTemperature"};
+    constexpr std::array<std::string_view, (int)OATType::Num> oatTypeNamesUC = {"WETBULBTEMPERATURE", "DRYBULBTEMPERATURE"};
+
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNames = {"InletSide", "SupplySide"};
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeLocNamesUC = {"INLETSIDE", "SUPPLYSIDE"};
+
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
@@ -225,25 +207,18 @@ namespace HVAC {
                                             "",
                                             ""});
 
-
     constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNames = {
-        "HeatExchanger:AirToAir:FlatPlate",
-        "HeatExchanger:AirToAir:SensibleAndLatent",
-        "HeatExchanger:Desiccant:BalancedFlow"};
+        "HeatExchanger:AirToAir:FlatPlate", "HeatExchanger:AirToAir:SensibleAndLatent", "HeatExchanger:Desiccant:BalancedFlow"};
 
     constexpr std::array<std::string_view, (int)HXType::Num> hxTypeNamesUC = {
-        "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
-        "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
-        "HEATEXCHANGER:DESICCANT:BALANCEDFLOW"};
-        
-    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNames = {
-        "AirTerminal:SingleDuct:InletSideMixer",
-        "AirTerminal:SingleDuct:SupplySideMixer"};
+        "HEATEXCHANGER:AIRTOAIR:FLATPLATE", "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT", "HEATEXCHANGER:DESICCANT:BALANCEDFLOW"};
 
-    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC = {
-        "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
-        "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER"};
-        
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNames = {"AirTerminal:SingleDuct:InletSideMixer",
+                                                                                  "AirTerminal:SingleDuct:SupplySideMixer"};
+
+    constexpr std::array<std::string_view, (int)MixerType::Num> mixerTypeNamesUC = {"AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
+                                                                                    "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER"};
+
 #ifdef GET_OUT
     constexpr std::array<std::string_view, (int)ZoneEquipType::Num> zoneEquipTypeNamesUC = {"DUMMY",
                                                                                             "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",

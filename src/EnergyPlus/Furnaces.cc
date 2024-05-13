@@ -527,7 +527,7 @@ namespace Furnaces {
         } break;
         // Simulate water-to-air systems:
         case HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir: {
-                if (thisFurnace.WatertoAirHPType == WAHPCoilType::Simple) {
+            if (thisFurnace.WatertoAirHPType == WAHPCoilType::Simple) {
                 // Update the furnace flow rates
                 //   When CompressorOp logic is added to the child cooling coil (COIL:WaterToAirHP:EquationFit:Cooling), then this logic
                 //   needs to be reinstated... to align with Unitary/Furnace HeatCool and Unitary Air-to-Air Heat Pump (see above).
@@ -3796,8 +3796,9 @@ namespace Furnaces {
                 ErrorsFound = true;
             }
 
-            thisFurnace.WaterCyclingMode = (NumAlphas < 18 || lAlphaBlanks(18)) ? HVAC::WaterFlow::Cycling :
-                static_cast<HVAC::WaterFlow>(getEnumValue(HVAC::waterFlowNamesUC, Alphas(18)));
+            thisFurnace.WaterCyclingMode = (NumAlphas < 18 || lAlphaBlanks(18))
+                                               ? HVAC::WaterFlow::Cycling
+                                               : static_cast<HVAC::WaterFlow>(getEnumValue(HVAC::waterFlowNamesUC, Alphas(18)));
 
             // end get water flow mode info
             if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
@@ -5679,7 +5680,7 @@ namespace Furnaces {
                               int const FurnaceNum,                   // index to furnace
                               [[maybe_unused]] int const AirLoopNum,  // index to air loop !unused1208
                               Real64 &OnOffAirFlowRatio,              // ratio of coil on to coil off air flow rate
-                              HVAC::FanOp const fanOp,                       // fan operating mode
+                              HVAC::FanOp const fanOp,                // fan operating mode
                               [[maybe_unused]] Real64 const ZoneLoad, // sensible load to be met (W) !unused1208
                               Real64 const MoistureLoad,              // moisture load to be met (W)
                               Real64 const PartLoadRatio              // coil part-load ratio
@@ -6394,7 +6395,8 @@ namespace Furnaces {
                         }
                         ShowRecurringWarningErrorAtEnd(state,
                                                        format("{} \"{}\" -- Exceeded max heating iterations error continues...",
-                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                              thisFurnace.Name),
                                                        thisFurnace.HeatingMaxIterIndex2);
                     }
 
@@ -6428,9 +6430,9 @@ namespace Furnaces {
                                       int const FurnaceNum,
                                       bool const FirstHVACIteration,
                                       HVAC::CompressorOp const compressorOp, // compressor operation flag (1=On, 0=Off)
-                                      Real64 const ZoneLoad,                        // the control zone load (watts)
-                                      Real64 const MoistureLoad,                    // the control zone latent load (watts)
-                                      Real64 &HeatCoilLoad,      // Heating load to be met by heating coil ( excluding heat pump DX coil)
+                                      Real64 const ZoneLoad,                 // the control zone load (watts)
+                                      Real64 const MoistureLoad,             // the control zone latent load (watts)
+                                      Real64 &HeatCoilLoad,                  // Heating load to be met by heating coil ( excluding heat pump DX coil)
                                       Real64 &ReheatCoilLoad,    // Heating load to be met by reheat coil using hstat (excluding HP DX coil)
                                       Real64 &OnOffAirFlowRatio, // Ratio of compressor ON air flow to AVERAGE air flow over time step
                                       bool &HXUnitOn             // flag to control HX based on zone moisture load
@@ -6560,8 +6562,7 @@ namespace Furnaces {
             // Init for heating
             if (state.dataFurnaces->HeatingLoad) {
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
-                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
+                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
                     thisFurnace.HeatPartLoadRatio = 1.0;
                     HeatCoilLoad = 0.0;
                     thisFurnace.HeatingCoilSensDemand = 0.0;
@@ -6606,8 +6607,7 @@ namespace Furnaces {
             if (state.dataFurnaces->HeatingLoad) {
                 CoolCoilLoad = 0.0;
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
-                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
+                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
                     SystemSensibleLoad = ZoneLoad;
                     SystemMoistureLoad = 0.0;
                     HeatCoilLoad = 0.0;
@@ -6655,8 +6655,7 @@ namespace Furnaces {
 
                 //    Heat pumps only calculate a single PLR each time step (i.e. only cooling or heating allowed in a single time step)
                 if (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_AirToAir ||
-                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir &&
-                     thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
+                    (thisFurnace.type == HVAC::UnitarySysType::Unitary_HeatPump_WaterToAir && thisFurnace.WatertoAirHPType == WAHPCoilType::Simple)) {
 
                     state.dataLoopNodes->Node(FurnaceInletNode).MassFlowRate = thisFurnace.MdotFurnace;
 
@@ -6766,14 +6765,15 @@ namespace Furnaces {
                                                    SystemSensibleLoad,
                                                    TempHeatOutput));
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        format("{} \"{}\" - Iteration limit exceeded in calculating DX sensible heating part-load ratio error continues. "
-                                               "Sensible load statistics:",
-                                               HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
-                                        thisFurnace.DXHeatingMaxIterIndex,
-                                        SystemSensibleLoad,
-                                        SystemSensibleLoad);
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   format("{} \"{}\" - Iteration limit exceeded in calculating DX sensible heating "
+                                                                          "part-load ratio error continues. "
+                                                                          "Sensible load statistics:",
+                                                                          HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                                          thisFurnace.Name),
+                                                                   thisFurnace.DXHeatingMaxIterIndex,
+                                                                   SystemSensibleLoad,
+                                                                   SystemSensibleLoad);
                                 }
                             } else if (SolFlag == -2) {
                                 if (thisFurnace.DXHeatingRegulaFalsiFailedIndex == 0) {
@@ -6790,7 +6790,8 @@ namespace Furnaces {
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
                                     format("{} \"{}\" -  DX sensible heating part-load ratio out of range error continues. Sensible load statistics:",
-                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                           thisFurnace.Name),
                                     thisFurnace.DXHeatingRegulaFalsiFailedIndex,
                                     SystemSensibleLoad,
                                     SystemSensibleLoad);
@@ -7058,13 +7059,15 @@ namespace Furnaces {
                                                                           SystemSensibleLoad,
                                                                           TempHeatOutput));
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   format("{} \"{}\" - Iteration limit exceeded in calculating sensible heating part-load "
-                                                                          "ratio error continues. Sensible load statistics:",
-                                                                          HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
-                                                                   thisFurnace.HeatingMaxIterIndex,
-                                                                   SystemSensibleLoad,
-                                                                   SystemSensibleLoad);
+                                    ShowRecurringWarningErrorAtEnd(
+                                        state,
+                                        format("{} \"{}\" - Iteration limit exceeded in calculating sensible heating part-load "
+                                               "ratio error continues. Sensible load statistics:",
+                                               HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                               thisFurnace.Name),
+                                        thisFurnace.HeatingMaxIterIndex,
+                                        SystemSensibleLoad,
+                                        SystemSensibleLoad);
                                 }
                             } else if (SolFlag == -2) {
                                 if (thisFurnace.HeatingRegulaFalsiFailedIndex == 0) {
@@ -7081,7 +7084,8 @@ namespace Furnaces {
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
                                     format("{} \"{}\" -  Sensible heating part-load ratio out of range error continues. Sensible load statistics:",
-                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                           thisFurnace.Name),
                                     thisFurnace.HeatingRegulaFalsiFailedIndex,
                                     SystemSensibleLoad,
                                     SystemSensibleLoad);
@@ -7235,20 +7239,20 @@ namespace Furnaces {
                             int SolFlag = 0; // # of iterations if positive, -1 means failed to converge, -2 means bounds are incorrect
                             Real64 par8_HXFlag = HXUnitOn ? 1.0 : 0.0;
                             // CoolErrorToler is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                            auto f = [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, CoolCoilLoad, par8_HXFlag](
-                                         Real64 const PartLoadRatio) {
-                                return CalcFurnaceResidual(state,
-                                                           PartLoadRatio,
-                                                           FurnaceNum,
-                                                           FirstHVACIteration,
-                                                           fanOp,
-                                                           compressorOp,
-                                                           CoolCoilLoad,
-                                                           1.0,         // par6_loadFlag,
-                                                           1.0,         // par7_sensLatentFlag,
-                                                           par8_HXFlag, // par9_HXOnFlag,
-                                                           0.0);        // par10_HeatingCoilPLR);
-                            };
+                            auto f =
+                                [&state, FurnaceNum, FirstHVACIteration, fanOp, compressorOp, CoolCoilLoad, par8_HXFlag](Real64 const PartLoadRatio) {
+                                    return CalcFurnaceResidual(state,
+                                                               PartLoadRatio,
+                                                               FurnaceNum,
+                                                               FirstHVACIteration,
+                                                               fanOp,
+                                                               compressorOp,
+                                                               CoolCoilLoad,
+                                                               1.0,         // par6_loadFlag,
+                                                               1.0,         // par7_sensLatentFlag,
+                                                               par8_HXFlag, // par9_HXOnFlag,
+                                                               0.0);        // par10_HeatingCoilPLR);
+                                };
                             General::SolveRoot(state, CoolErrorToler, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
                             //             OnOffAirFlowRatio is updated during the above iteration. Reset to correct value based on PLR.
                             OnOffAirFlowRatio = state.dataFurnaces->OnOffAirFlowRatioSave;
@@ -7282,13 +7286,15 @@ namespace Furnaces {
                                                                                   CoolCoilLoad,
                                                                                   TempCoolOutput));
                                             }
-                                            ShowRecurringWarningErrorAtEnd(state,
-                                                                           format("{} \"{}\" - Iteration limit exceeded in calculating sensible cooling "
-                                                                                  "part-load ratio error continues. Sensible load statistics:",
-                                                                                  HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
-                                                                           thisFurnace.SensibleMaxIterIndex,
-                                                                           CoolCoilLoad,
-                                                                           CoolCoilLoad);
+                                            ShowRecurringWarningErrorAtEnd(
+                                                state,
+                                                format("{} \"{}\" - Iteration limit exceeded in calculating sensible cooling "
+                                                       "part-load ratio error continues. Sensible load statistics:",
+                                                       HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                       thisFurnace.Name),
+                                                thisFurnace.SensibleMaxIterIndex,
+                                                CoolCoilLoad,
+                                                CoolCoilLoad);
                                         }
                                     }
                                 } else if (SolFlag == -2) {
@@ -7305,7 +7311,8 @@ namespace Furnaces {
                                             state,
                                             format("{} \"{}\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load "
                                                    "statistics:",
-                                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                   thisFurnace.Name),
                                             thisFurnace.SensibleRegulaFalsiFailedIndex,
                                             CoolCoilLoad,
                                             CoolCoilLoad);
@@ -7602,9 +7609,11 @@ namespace Furnaces {
                                             }
                                             ShowRecurringWarningErrorAtEnd(
                                                 state,
-                                                format("{} \"{}\" - Iteration limit exceeded in calculating latent part-load ratio error continues. Latent "
+                                                format("{} \"{}\" - Iteration limit exceeded in calculating latent part-load ratio error continues. "
+                                                       "Latent "
                                                        "load convergence error (percent) statistics follow.",
-                                                       HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                                       HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                       thisFurnace.Name),
                                                 thisFurnace.LatentMaxIterIndex,
                                                 100.0 * std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad),
                                                 100.0 * std::abs((SystemMoistureLoad - TempLatentOutput) / SystemMoistureLoad));
@@ -7623,13 +7632,14 @@ namespace Furnaces {
                                         ShowContinueErrorTimeStamp(state,
                                                                    format("A PLR of {:.3T} will be used and the simulation continues.", TempMinPLR));
                                     }
-                                    ShowRecurringWarningErrorAtEnd(
-                                        state,
-                                        format("{} \"{}\" - Cooling sensible part-load ratio out of range error continues. System moisture load statistics:",
-                                               HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
-                                        thisFurnace.LatentRegulaFalsiFailedIndex2,
-                                        SystemMoistureLoad,
-                                        SystemMoistureLoad);
+                                    ShowRecurringWarningErrorAtEnd(state,
+                                                                   format("{} \"{}\" - Cooling sensible part-load ratio out of range error "
+                                                                          "continues. System moisture load statistics:",
+                                                                          HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                                          thisFurnace.Name),
+                                                                   thisFurnace.LatentRegulaFalsiFailedIndex2,
+                                                                   SystemMoistureLoad,
+                                                                   SystemMoistureLoad);
                                     LatentPartLoadRatio = TempMinPLR;
                                 }
                             } else if (SolFlag == -2) {
@@ -7644,7 +7654,8 @@ namespace Furnaces {
                                 ShowRecurringWarningErrorAtEnd(
                                     state,
                                     format("{} \"{}\" - Latent part-load ratio out of range or 0-1 error continues. System moisture load statistics:",
-                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                           HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                           thisFurnace.Name),
                                     thisFurnace.LatentRegulaFalsiFailedIndex,
                                     SystemMoistureLoad,
                                     SystemMoistureLoad);
@@ -7829,11 +7840,11 @@ namespace Furnaces {
     }
 
     void CalcWaterToAirHeatPump(EnergyPlusData &state,
-                                int const FurnaceNum,                         // index to Furnace
-                                bool const FirstHVACIteration,                // TRUE on first HVAC iteration
+                                int const FurnaceNum,                  // index to Furnace
+                                bool const FirstHVACIteration,         // TRUE on first HVAC iteration
                                 HVAC::CompressorOp const compressorOp, // compressor operation flag (1=On, 0=Off)
-                                Real64 const ZoneLoad,                        // the control zone load (watts)
-                                Real64 const MoistureLoad                     // the control zone latent load (watts)
+                                Real64 const ZoneLoad,                 // the control zone load (watts)
+                                Real64 const MoistureLoad              // the control zone latent load (watts)
     )
     {
 
@@ -8053,13 +8064,15 @@ namespace Furnaces {
                                                               TotalZoneSensLoad,
                                                               ZoneSensLoadMet));
                         }
-                        ShowRecurringWarningErrorAtEnd(state,
-                                                       format("{} \"{}\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error "
-                                                              "continues. Sensible load statistics:",
-                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
-                                                       thisFurnace.SensibleMaxIterIndex,
-                                                       TotalZoneSensLoad,
-                                                       TotalZoneSensLoad);
+                        ShowRecurringWarningErrorAtEnd(
+                            state,
+                            format("{} \"{}\" - Iteration limit exceeded in calculating sensible cooling part-load ratio error "
+                                   "continues. Sensible load statistics:",
+                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                   thisFurnace.Name),
+                            thisFurnace.SensibleMaxIterIndex,
+                            TotalZoneSensLoad,
+                            TotalZoneSensLoad);
                     }
                 } else if (SolFlag == -2 && !state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     CoolPartLoadRatio = max(MinPLR, min(1.0, std::abs(HPCoilSensDemand) / std::abs(HPCoilSensCapacity)));
@@ -8093,7 +8106,8 @@ namespace Furnaces {
                         ShowRecurringWarningErrorAtEnd(
                             state,
                             format("{} \"{}\" - Cooling sensible part-load ratio out of range error continues. Sensible cooling load statistics:",
-                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                   thisFurnace.Name),
                             thisFurnace.SensibleRegulaFalsiFailedIndex,
                             TotalZoneSensLoad,
                             TotalZoneSensLoad);
@@ -8256,7 +8270,8 @@ namespace Furnaces {
                         ShowRecurringWarningErrorAtEnd(
                             state,
                             format("{} \"{}\" - Iteration limit exceeded in calculating sensible heating part-load ratio error continues.",
-                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                   HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                   thisFurnace.Name),
                             thisFurnace.WSHPHeatMaxIterIndex,
                             TotalZoneSensLoad,
                             TotalZoneSensLoad);
@@ -8291,7 +8306,8 @@ namespace Furnaces {
                         }
                         ShowRecurringWarningErrorAtEnd(state,
                                                        format("{} \"{}\" - Heating sensible part-load ratio out of range error continues.",
-                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                              thisFurnace.Name),
                                                        thisFurnace.WSHPHeatRegulaFalsiFailedIndex,
                                                        TotalZoneSensLoad,
                                                        TotalZoneSensLoad);
@@ -8399,13 +8415,13 @@ namespace Furnaces {
     void CalcFurnaceOutput(EnergyPlusData &state,
                            int const FurnaceNum,
                            bool const FirstHVACIteration,
-                           HVAC::FanOp const fanOp,                          // Cycling fan or constant fan
+                           HVAC::FanOp const fanOp,               // Cycling fan or constant fan
                            HVAC::CompressorOp const compressorOp, // Compressor on/off; 1=on, 0=off
-                           Real64 const CoolPartLoadRatio,               // DX cooling coil part load ratio
-                           Real64 const HeatPartLoadRatio,               // DX heating coil part load ratio (0 for other heating coil types)
-                           Real64 const HeatCoilLoad,                    // Heating coil load for gas heater
-                           Real64 const ReheatCoilLoad,                  // Reheating coil load for gas heater
-                           Real64 &SensibleLoadMet,            // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                           Real64 const CoolPartLoadRatio,        // DX cooling coil part load ratio
+                           Real64 const HeatPartLoadRatio,        // DX heating coil part load ratio (0 for other heating coil types)
+                           Real64 const HeatCoilLoad,             // Heating coil load for gas heater
+                           Real64 const ReheatCoilLoad,           // Reheating coil load for gas heater
+                           Real64 &SensibleLoadMet,               // Sensible cooling load met (furnace outlet with respect to control zone temp)
                            Real64 &LatentLoadMet,              // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                            Real64 &OnOffAirFlowRatio,          // Ratio of compressor ON mass flow rate to AVERAGE
                            bool const HXUnitOn,                // flag to enable HX based on zone moisture load
@@ -8493,14 +8509,8 @@ namespace Furnaces {
                                        CoolPartLoadRatio,
                                        OnOffAirFlowRatio);
                 }
-                DXCoils::SimDXCoil(state,
-                                   BlankString,
-                                   compressorOp,
-                                   FirstHVACIteration,
-                                   thisFurnace.HeatingCoilIndex,
-                                   fanOp,
-                                   HeatPartLoadRatio,
-                                   OnOffAirFlowRatio);
+                DXCoils::SimDXCoil(
+                    state, BlankString, compressorOp, FirstHVACIteration, thisFurnace.HeatingCoilIndex, fanOp, HeatPartLoadRatio, OnOffAirFlowRatio);
                 state.dataFans->fans(thisFurnace.FanIndex)->simulate(state, FirstHVACIteration, state.dataFurnaces->FanSpeedRatio);
             }
             //   Simulate cooling and heating coils
@@ -8516,14 +8526,8 @@ namespace Furnaces {
                                                                     OnOffAirFlowRatio,
                                                                     state.dataFurnaces->EconomizerFlag);
             } else {
-                DXCoils::SimDXCoil(state,
-                                   BlankString,
-                                   compressorOp,
-                                   FirstHVACIteration,
-                                   thisFurnace.CoolingCoilIndex,
-                                   fanOp,
-                                   CoolPartLoadRatio,
-                                   OnOffAirFlowRatio);
+                DXCoils::SimDXCoil(
+                    state, BlankString, compressorOp, FirstHVACIteration, thisFurnace.CoolingCoilIndex, fanOp, CoolPartLoadRatio, OnOffAirFlowRatio);
             }
             DXCoils::SimDXCoil(
                 state, BlankString, compressorOp, FirstHVACIteration, thisFurnace.HeatingCoilIndex, fanOp, HeatPartLoadRatio, OnOffAirFlowRatio);
@@ -9135,7 +9139,7 @@ namespace Furnaces {
                                bool const SuppHeatingCoilFlag, // .TRUE. if supplemental heating coil
                                bool const FirstHVACIteration,  // flag for first HVAC iteration in the time step
                                Real64 const QCoilLoad,         // load met by unit (watts)
-                               HVAC::FanOp const fanOp,              // fan operation mode
+                               HVAC::FanOp const fanOp,        // fan operation mode
                                Real64 &HeatCoilLoadmet         // Heating Load Met
     )
     {
@@ -9269,7 +9273,8 @@ namespace Furnaces {
                         }
                         ShowRecurringWarningErrorAtEnd(state,
                                                        format("CalcNonDXHeatingCoils: Hot water coil control failed (flow limits) for {}=\"{}\"",
-                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type], thisFurnace.Name),
+                                                              HVAC::unitarySysTypeNames[(int)thisFurnace.type],
+                                                              thisFurnace.Name),
                                                        thisFurnace.HotWaterCoilMaxIterIndex2,
                                                        MaxHotWaterFlow,
                                                        MinWaterFlow,
@@ -9335,12 +9340,12 @@ namespace Furnaces {
         auto &SpeedNum = state.dataFurnaces->SpeedNum;
         auto &SupHeaterLoad = state.dataFurnaces->SupHeaterLoad;
         HVAC::CompressorOp compressorOp; // compressor operation; 1=on, 0=off
-        Real64 QSensUnitOut;                    // sensible capacity output
-        Real64 QLatUnitOut;                     // latent capacity output
-        Real64 ActualSensibleOutput;            // Actual furnace sensible capacity
-        Real64 QToHeatSetPt;                    // Load required to meet heating setpoint temp (>0 is a heating load)
-        Real64 NoCompOutput;                    // output when no active compressor [W]
-        bool EconoActive;                       // TRUE if Economizer is active
+        Real64 QSensUnitOut;             // sensible capacity output
+        Real64 QLatUnitOut;              // latent capacity output
+        Real64 ActualSensibleOutput;     // Actual furnace sensible capacity
+        Real64 QToHeatSetPt;             // Load required to meet heating setpoint temp (>0 is a heating load)
+        Real64 NoCompOutput;             // output when no active compressor [W]
+        bool EconoActive;                // TRUE if Economizer is active
 
         // zero DX coils, and supplemental electric heater electricity consumption
         state.dataHVACGlobal->DXElecHeatingPower = 0.0;
@@ -9625,17 +9630,17 @@ namespace Furnaces {
     //******************************************************************************
 
     void ControlVSHPOutput(EnergyPlusData &state,
-                           int const FurnaceNum,                         // Unit index of engine driven heat pump
-                           bool const FirstHVACIteration,                // flag for 1st HVAC iteration in the time step
+                           int const FurnaceNum,                  // Unit index of engine driven heat pump
+                           bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
                            HVAC::CompressorOp const compressorOp, // compressor operation; 1=on, 0=off
-                           HVAC::FanOp const fanOp,                             // operating mode: FanOp::Cycling | FanOp::Continuous
-                           Real64 &QZnReq,                               // cooling or heating output needed by zone [W]
-                           Real64 QLatReq,                               // latent cooling output needed by zone [W]
-                           int &SpeedNum,                                // Speed number
-                           Real64 &SpeedRatio,                           // unit speed ratio for DX coils
-                           Real64 &PartLoadFrac,                         // unit part load fraction
-                           Real64 &OnOffAirFlowRatio,                    // ratio of compressor ON airflow to AVERAGE airflow over timestep
-                           Real64 &SupHeaterLoad                         // Supplemental heater load [W]
+                           HVAC::FanOp const fanOp,               // operating mode: FanOp::Cycling | FanOp::Continuous
+                           Real64 &QZnReq,                        // cooling or heating output needed by zone [W]
+                           Real64 QLatReq,                        // latent cooling output needed by zone [W]
+                           int &SpeedNum,                         // Speed number
+                           Real64 &SpeedRatio,                    // unit speed ratio for DX coils
+                           Real64 &PartLoadFrac,                  // unit part load fraction
+                           Real64 &OnOffAirFlowRatio,             // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                           Real64 &SupHeaterLoad                  // Supplemental heater load [W]
     )
     {
 
@@ -10029,13 +10034,13 @@ namespace Furnaces {
     //******************************************************************************
 
     void CalcVarSpeedHeatPump(EnergyPlusData &state,
-                              int const FurnaceNum,                         // Variable speed heat pump number
-                              bool const FirstHVACIteration,                // Flag for 1st HVAC iteration
+                              int const FurnaceNum,                  // Variable speed heat pump number
+                              bool const FirstHVACIteration,         // Flag for 1st HVAC iteration
                               HVAC::CompressorOp const compressorOp, // Compressor on/off; 1=on, 0=off
-                              int const SpeedNum,                           // Speed number
-                              Real64 const SpeedRatio,                      // Compressor speed ratio
-                              Real64 const PartLoadFrac,                    // Compressor part load fraction
-                              Real64 &SensibleLoadMet,   // Sensible cooling load met (furnace outlet with respect to control zone temp)
+                              int const SpeedNum,                    // Speed number
+                              Real64 const SpeedRatio,               // Compressor speed ratio
+                              Real64 const PartLoadFrac,             // Compressor part load fraction
+                              Real64 &SensibleLoadMet,               // Sensible cooling load met (furnace outlet with respect to control zone temp)
                               Real64 &LatentLoadMet,     // Latent cooling load met (furnace outlet with respect to control zone humidity ratio)
                               Real64 const QZnReq,       // Zone load (W)
                               Real64 const QLatReq,      // Zone latent load []

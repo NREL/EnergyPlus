@@ -1019,7 +1019,7 @@ namespace HeatRecovery {
                 }
             }
             if (thisExchanger.PerfDataIndex == 0) {
-                    ShowSevereError(state, format("{} \"{}\"", HVAC::hxTypeNames[(int)thisExchanger.type], thisExchanger.Name));
+                ShowSevereError(state, format("{} \"{}\"", HVAC::hxTypeNames[(int)thisExchanger.type], thisExchanger.Name));
                 ShowContinueError(state, format("... Performance data set not found = {}", thisExchanger.HeatExchPerfName));
                 ErrorsFound = true;
             } else {
@@ -1368,8 +1368,8 @@ namespace HeatRecovery {
                             // need call to EMS to check node
                             CheckIfNodeSetPointManagedByEMS(state, this->SupOutletNode, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
                             if (FatalError) {
-                                ShowSevereError(state,
-                                                format("Missing temperature setpoint for {} \"{}\" :", HVAC::hxTypeNames[(int)this->type], this->Name));
+                                ShowSevereError(
+                                    state, format("Missing temperature setpoint for {} \"{}\" :", HVAC::hxTypeNames[(int)this->type], this->Name));
                                 ShowContinueError(
                                     state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowContinueError(
@@ -1442,7 +1442,8 @@ namespace HeatRecovery {
                         if (state.dataLoopNodes->Node(this->SecOutletNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowWarningError(
-                                    state, format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::hxTypeNames[(int)this->type], this->Name));
+                                    state,
+                                    format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::hxTypeNames[(int)this->type], this->Name));
                                 ShowContinueError(state,
                                                   "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
                                                   "humidity ratio setpoint.");
@@ -1661,7 +1662,7 @@ namespace HeatRecovery {
                                                  this->Name,
                                                  this->type == HVAC::HXType::AirToAir_FlatPlate
                                                      ? "Flat Plate"
-                                                 : (this->type == HVAC::HXType::Desiccant_Balanced ? "Dessicant Balanced" : "Generic"));
+                                                     : (this->type == HVAC::HXType::Desiccant_Balanced ? "Dessicant Balanced" : "Generic"));
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirHRPlateOrRotary,
                                                  this->Name,
@@ -1865,7 +1866,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                              // flag to simulate heat exchanger heat recovery
         bool const FirstHVACIteration,                    // first HVAC iteration flag
-        HVAC::FanOp const fanOp,                              // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                          // Supply air fan operating mode (1=cycling, 2=constant)
         ObjexxFCL::Optional_bool_const EconomizerFlag,    // economizer flag pass by air loop or OA sys
         ObjexxFCL::Optional_bool_const HighHumCtrlFlag,   // high humidity control flag passed by airloop or OA sys
         ObjexxFCL::Optional<Real64 const> HXPartLoadRatio //
@@ -2394,7 +2395,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
         bool const FirstHVACIteration,                 // First HVAC iteration flag
-        HVAC::FanOp const fanOp,                           // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                       // Supply air fan operating mode (1=cycling, 2=constant)
         Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
         int const CompanionCoilIndex,                  // index of companion cooling coil
         int const CompanionCoilType,                   // type of cooling coil
@@ -4943,8 +4944,8 @@ namespace HeatRecovery {
     }
 
     HVAC::HXType GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
-                                      std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
-                                      bool &ErrorsFound          // set to true if problem
+                                               std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
+                                               bool &ErrorsFound          // set to true if problem
     )
     {
 

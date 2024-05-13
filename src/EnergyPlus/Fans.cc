@@ -91,16 +91,10 @@ namespace EnergyPlus::Fans {
 // To encapsulate the data and algorithms required to
 // manage the Fan System Component
 
-constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNames = {
-    "Fraction",
-    "FixedFlowRate"
-};
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNames = {"Fraction", "FixedFlowRate"};
 
-constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNamesUC = {
-    "FRACTION",
-    "FIXEDFLOWRATE"
-};
-        
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNamesUC = {"FRACTION", "FIXEDFLOWRATE"};
+
 void FanBase::simulate(EnergyPlusData &state,
                        bool const _FirstHVACIteration,
                        ObjexxFCL::Optional<Real64 const> _speedRatio, // SpeedRatio for Fan:SystemModel

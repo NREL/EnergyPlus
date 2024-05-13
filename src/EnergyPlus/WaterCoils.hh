@@ -298,7 +298,7 @@ namespace WaterCoils {
                      int const CoilNum,
                      bool const FirstHVACIteration,
                      int const CalcMode,
-                     HVAC::FanOp const fanOp,       // fan operating mode
+                     HVAC::FanOp const fanOp,   // fan operating mode
                      Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
@@ -349,7 +349,7 @@ namespace WaterCoils {
                             Real64 &TotWaterCoilLoad,      // Total heat transfer rate (W)
                             Real64 &SenWaterCoilLoad,      // Sensible heat transfer rate (W)
                             Real64 &SurfAreaWetFraction,   // Fraction of surface area wet
-                            HVAC::FanOp const fanOp,           // fan operating mode
+                            HVAC::FanOp const fanOp,       // fan operating mode
                             Real64 const PartLoadRatio     // part-load ratio of heating coil
     );
 
@@ -523,7 +523,7 @@ namespace WaterCoils {
     // estimate heating coil design inlet water temperature for autosizing UA-value
     void EstimateCoilInletWaterTemp(EnergyPlusData &state,
                                     int const CoilNum,                // index to heating coil
-                                    HVAC::FanOp const fanOp,              // fan operating mode
+                                    HVAC::FanOp const fanOp,          // fan operating mode
                                     Real64 const PartLoadRatio,       // part-load ratio of heating coil
                                     Real64 const UAMax,               // maximum UA-Value
                                     Real64 &DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
