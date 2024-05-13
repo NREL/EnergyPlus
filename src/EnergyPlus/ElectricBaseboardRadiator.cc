@@ -441,68 +441,66 @@ namespace ElectricBaseboardRadiator {
                                 "Baseboard Total Heating Rate",
                                 Constant::Units::W,
                                 elecBaseboard.TotPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 elecBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Rate",
                                 Constant::Units::W,
                                 elecBaseboard.ConvPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Rate",
                                 Constant::Units::W,
                                 elecBaseboard.RadPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 elecBaseboard.EquipName);
 
             SetupOutputVariable(state,
                                 "Baseboard Electricity Energy",
                                 Constant::Units::J,
                                 elecBaseboard.ElecUseLoad,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 elecBaseboard.EquipName,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Baseboard Electricity Rate",
                                 Constant::Units::W,
                                 elecBaseboard.ElecUseRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Total Heating Energy",
                                 Constant::Units::J,
                                 elecBaseboard.TotEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 elecBaseboard.EquipName,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::Baseboard,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Baseboard);
 
             SetupOutputVariable(state,
                                 "Baseboard Convective Heating Energy",
                                 Constant::Units::J,
                                 elecBaseboard.ConvEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 elecBaseboard.EquipName);
             SetupOutputVariable(state,
                                 "Baseboard Radiant Heating Energy",
                                 Constant::Units::J,
                                 elecBaseboard.RadEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 elecBaseboard.EquipName);
         }
     }
@@ -601,8 +599,8 @@ namespace ElectricBaseboardRadiator {
             std::string_view const CompName = elecBaseboard.EquipName;
             state.dataSize->DataFracOfAutosizedHeatingCapacity = 1.0;
             state.dataSize->DataZoneNumber = elecBaseboard.ZonePtr;
-            int SizingMethod = DataHVACGlobals::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
-            int FieldNum = 1;                                          // IDD numeric field number where input field description is found
+            int SizingMethod = HVAC::HeatingCapacitySizing; // Integer representation of sizing method name (e.g., CoolingAirflowSizing)
+            int FieldNum = 1;                               // IDD numeric field number where input field description is found
             std::string const SizingString =
                 format("{} [W]", state.dataElectBaseboardRad->ElecBaseboardNumericFields(BaseboardNum).FieldNames(FieldNum));
             // capacity sizing methods (e.g., HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity)
@@ -692,7 +690,7 @@ namespace ElectricBaseboardRadiator {
         // thermal loss that could be accounted for with this efficiency input.
         Real64 Effic = elecBaseboard.BaseboardEfficiency;
 
-        if (QZnReq > DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
+        if (QZnReq > HVAC::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
             ScheduleManager::GetCurrentScheduleValue(state, elecBaseboard.SchedPtr) > 0.0) {
 
             // If the load exceeds the capacity than the capacity is set to the BB limit.

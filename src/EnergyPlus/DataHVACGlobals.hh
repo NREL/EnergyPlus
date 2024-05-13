@@ -59,7 +59,7 @@
 
 namespace EnergyPlus {
 
-namespace DataHVACGlobals {
+namespace HVAC {
 
     // Using/Aliasing
 
@@ -127,9 +127,6 @@ namespace DataHVACGlobals {
     int constexpr Cooling(2);
     int constexpr Heating(3);
 
-    // parameters describing fan types
-    int constexpr NumAllFanTypes(6);
-
     enum class FanType
     {
         Invalid = -1,
@@ -137,19 +134,16 @@ namespace DataHVACGlobals {
         VAV,
         OnOff,
         Exhaust,
-        Component,
-        System,
+        ComponentModel,
+        SystemModel,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanType::Num)> fanTypeNamesUC = {
-        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
-    int constexpr FanType_SimpleConstVolume(1);
-    int constexpr FanType_SimpleVAV(2);
-    int constexpr FanType_SimpleOnOff(3);
-    int constexpr FanType_ZoneExhaust(4);
-    int constexpr FanType_ComponentModel(5);
-    int constexpr FanType_SystemModelObject(6);
+    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNames = {
+        "Fan:ConstantVolume", "Fan:VariableVolume", "Fan:OnOff", "Fan:ZoneExhaust", "Fan:ComponentModel", "Fan:SystemModel"};
+
+    static constexpr std::array<std::string_view, (int)FanType::Num> fanTypeNamesUC = {
+        "FAN:CONSTANTVOLUME", "FAN:VARIABLEVOLUME", "FAN:ONOFF", "FAN:ZONEEXHAUST", "FAN:COMPONENTMODEL", "FAN:SYSTEMMODEL"};
 
     // Fan Minimum Flow Fraction Input Method
     int constexpr MinFrac(1);
@@ -158,17 +152,16 @@ namespace DataHVACGlobals {
     int constexpr CycFanCycCoil(1);  // Cycling fan, cycling coil = 1
     int constexpr ContFanCycCoil(2); // Continuous fan, cycling coil = 2
     // Fan placement
-    enum class FanLoc
+    enum class FanPlace
     {
         Invalid = -1,
-        BlowThrough,
-        DrawThrough,
+        BlowThru,
+        DrawThru,
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(FanLoc::Num)> fanLocNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
 
-    int constexpr BlowThru(1); // fan before coil
-    int constexpr DrawThru(2); // fan after coil
+    static constexpr std::array<std::string_view, (int)FanPlace::Num> fanPlaceNamesUC = {"BLOWTHROUGH", "DRAWTHROUGH"};
+
     // OA Controller Heat Recovery Bypass Control Types
     int constexpr BypassWhenWithinEconomizerLimits(0);   // heat recovery controlled by economizer limits
     int constexpr BypassWhenOAFlowGreaterThanMinimum(1); // heat recovery ON at minimum OA in economizer mode
@@ -181,14 +174,38 @@ namespace DataHVACGlobals {
         InterlockedWithMechanicalCooling, // economizer operation (flow rate) depends on the cooling speed chosen by the system
         Num
     };
-    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeUC = {
+
+    static constexpr std::array<std::string_view, (int)EconomizerStagingType::Num> economizerStagingTypeNamesUC = {
         "ECONOMIZERFIRST",
         "INTERLOCKEDWITHMECHANICALCOOLING",
     };
-    static constexpr std::array<std::string_view, static_cast<int>(DataHVACGlobals::EconomizerStagingType::Num)> EconomizerStagingTypeCC = {
+    static constexpr std::array<std::string_view, (int)EconomizerStagingType::Num> economizerStagingTypeNames = {
         "EconomizerFirst",
         "InterlockedWithMechanicalCooling",
     };
+
+    //    enum class UnitarySysType
+    //    {
+    //        Invalid = -1,
+    //        Furnace_HeatOnly,
+    //        Furnace_HeatCool,
+    //        HeatOnly,
+    //        HeatCool,
+    //        HeatPump_AirToAir,
+    //        HeatPump_WaterToAir,
+    //        AnyCoilType,
+    //        Num
+    //    };
+    //
+    //    static constexpr std::array<std::string_view, (int)UnitarySysType::Num> unitarySysTypeNames = {
+    //        "AirLoopHVAC:Unitary:Furnace:HeatOnly",
+    //        "AirLoopHVAC:Unitary:Furnace:HeatCool",
+    //        "AirLoopHVAC:UnitaryHeatOnly",
+    //        "AirLoopHVAC:UnitaryHeatCool",
+    //        "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+    //        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+    //        "AirLoopHVAC:UnitarySystem"
+    //    };
 
     // parameters describing unitary systems
     int constexpr NumUnitarySystemTypes(7);
@@ -392,7 +409,7 @@ namespace DataHVACGlobals {
 
     int constexpr MaxSpeedLevels = 10;
 
-    extern Array1D_string const cFanTypes;
+    // extern Array1D_string const cFanTypes;
     extern Array1D_string const cAllCoilTypes;
     extern Array1D_string const cCoolingCoilTypes;
     extern Array1D_string const cHeatingCoilTypes;
@@ -454,14 +471,14 @@ namespace DataHVACGlobals {
         On,  // normal compressor operation
         Num
     };
-} // namespace DataHVACGlobals
+} // namespace HVAC
 
 struct HVACGlobalsData : BaseGlobalStruct
 {
     // Object Data
-    Array1D<DataHVACGlobals::ZoneCompTypeData> ZoneComp;
-    DataHVACGlobals::OptStartDataType OptStartData; // For optimum start
-    Array1D<DataHVACGlobals::ComponentSetPtData> CompSetPtEquip;
+    Array1D<HVAC::ZoneCompTypeData> ZoneComp;
+    HVAC::OptStartDataType OptStartData; // For optimum start
+    Array1D<HVAC::ComponentSetPtData> CompSetPtEquip;
 
     // Hybrid ventilation control part
     int NumHybridVentSysAvailMgrs = 0;              // Number of hybrid ventilation control
@@ -491,16 +508,11 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool ZoneMassBalanceHVACReSim = false;  // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst = 1; // minimum number of HVAC iterations after FirstHVACIteration
 
-    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinRatedVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1, DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap1, DataHVACGlobals::MaxHeatVolFlowPerRatedTotCap2});
-    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap1, DataHVACGlobals::MaxCoolVolFlowPerRatedTotCap2});
-    Array1D<Real64> MinOperVolFlowPerRatedTotCap =
-        Array1D<Real64>(2, {DataHVACGlobals::MinOperVolFlowPerRatedTotCap1, DataHVACGlobals::MinOperVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxRatedVolFlowPerRatedTotCap1, HVAC::MaxRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinRatedVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinRatedVolFlowPerRatedTotCap1, HVAC::MinRatedVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxHeatVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxHeatVolFlowPerRatedTotCap1, HVAC::MaxHeatVolFlowPerRatedTotCap2});
+    Array1D<Real64> MaxCoolVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MaxCoolVolFlowPerRatedTotCap1, HVAC::MaxCoolVolFlowPerRatedTotCap2});
+    Array1D<Real64> MinOperVolFlowPerRatedTotCap = Array1D<Real64>(2, {HVAC::MinOperVolFlowPerRatedTotCap1, HVAC::MinOperVolFlowPerRatedTotCap2});
 
     int DXCT = 1;                      // dx coil type: regular DX coil ==1, 100% DOAS DX coil = 2
     bool FirstTimeStepSysFlag = false; // Set to true at the start of each sub-time step

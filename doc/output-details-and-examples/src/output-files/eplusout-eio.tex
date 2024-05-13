@@ -1019,17 +1019,17 @@ This field is ``yes'' if there is outdoor controlled baseboard heat in a Zone.
 
 \subsection{People Gains}\label{people-gains}
 
-! \textless{}People Internal Gains - Nominal\textgreater{},Name,Schedule Name,Zone Name,Zone Floor Area \{m2\},\# Zone Occupants,Number of People \{\},People/Floor Area \{person/m2\},Floor Area per person \{m2/person\},Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People
+! \textless{}People Internal Gains Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Number of People \{\}, People/Floor Area \{person/m2\}, Floor Area per person \{m2/person\}, Fraction Radiant, Fraction Convected, Sensible Fraction Calculation, Activity level, ASHRAE 55 Warnings, Carbon Dioxide Generation Rate, Minimum Number of People for All Day Types, Maximum Number of People for All Day Types, Minimum Number of People for Weekdays,  Maximum Number of People for Weekdays,  Minimum Number of People for Weekends/Holidays,  Maximum Number of People for Weekends /Holidays, Minimum Number of People for Summer Design Days,  Maximum Number of People for Summer Design Days, Minimum Number of People for Winter Design Days,  Maximum Number of People for WinterDesign Days
 
-People Internal Gains,~ SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 99.16, 11.0, 11.0, 0.111, 9.015, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+ People Internal Gains Nominal,  SPACE1-1 PEOPLE 1, OCCUPY-1, SPACE1-1, 90.00, 10.0, 10.0, 0.111, 9.009, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 10.0, 0.8, 4.0, 0.6, 2.5, 9.5, 10.0, 0.0, 0.5, 
 
-~People Internal Gains,~ SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+~People Internal Gains Nominal,  SPACE2-1 PEOPLE 1, OCCUPY-1, SPACE2-1, 42.37, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 5.0, 0.4, 2.0, 0.3, 1.2, 4.7, 5.0, 0.0, 0.2, 
 
-~People Internal Gains,~ SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 11
+~People Internal Gains Nominal,  SPACE3-1 PEOPLE 1, OCCUPY-1, SPACE3-1, 96.48, 11.0, 11.0, 0.114, 8.771, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 11.0, 0.9, 4.4, 0.7, 2.8, 10.5, 11.0, 0.0, 0.6, 
 
-~People Internal Gains,~ SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 5
+~People Internal Gains Nominal,  SPACE4-1 PEOPLE 1, OCCUPY-1, SPACE4-1, 42.74, 5.0, 5.0, 0.117, 8.547, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 5.0, 0.4, 2.0, 0.3, 1.3, 4.8, 5.0, 0.0, 0.3, 
 
-~People Internal Gains,~ SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, AutoCalculate, ACTSCHD, No, 3.8200E-008, 0, 20
+~People Internal Gains Nominal,  SPACE5-1 PEOPLE 1, OCCUPY-1, SPACE5-1, 182.49, 20.0, 20.0, 0.110, 9.125, 0.300, 0.700, 0.550, ACTSCHD, No, 3.8200E-008, 0.0, 20.0, 1.6, 8.0, 1.2, 5.0, 19.0, 20.0, 0.0, 1.0, 
 
 \subsubsection{Field: \textless{}People Internal Gains - Nominal\textgreater{}}\label{field-people-internal-gains---nominal}
 
@@ -1123,27 +1123,70 @@ This numeric input field specifies carbon dioxide generation rate per person wit
 
 Number of People * People Schedule * People Activity * Carbon Dioxide Generation Rate. The default value is 3.82E-8 m3/s-W (obtained from ASHRAE Standard 62.1-2007 value at 0.0084 cfm/met/person over the general adult population). The maximum value can be 10 times the default value.
 
-\subsubsection{Field: Nominal Minimum Number of People}\label{field-nominal-minimum-number-of-people}
+\subsubsection{Field: Minimum Number of People for All Day Types}\label{field-minimum-number-of-people-for-all-day-types}
 
-This numeric field is the calculated minimum number of people based on the number of people field * the minimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
 
-\subsubsection{Field: Nominal Maximum Number of People}\label{field-nominal-maximum-number-of-people}
+\subsubsection{Field: Maximum Number of People for All Day Types}\label{field-maximum-number-of-people-for-all-day-types}
 
-This numeric field is the calculated maximum number of people based on the number of people field * the maxnimum value (annual) for the people schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Minimum Number of People for Weekdays}\label{field-minimum-number-of-people-for-weekdays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for weekday day types (Monday through Friday).
+
+\subsubsection{Field: Maximum Number of People for Weekdays}\label{field-maximum-number-of-people-for-weekdays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for weekday day types (Monday through Friday).
+
+\subsubsection{Field: Minimum Number of People for Weekends/Holidays}\label{field-minimum-number-of-people-for-weekends-holidays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Maximum Number of People for Weekends/Holidays}\label{field-maximum-number-of-people-for-weekends-holidays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for weekend (Saturday and Sunday) or holiday day types
+
+\subsubsection{Field: Minimum Number of People for Summer Design Days}\label{field-minimum-number-of-people-for-summer-designdays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for the summer design day type.
+
+\subsubsection{Field: Maximum Number of People for Summer Design Days}\label{field-maximum-number-of-people-for-summer-designdays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for the summer design day type.
+
+\subsubsection{Field: Minimum Number of People for Winter Design Days}\label{field-minimum-number-of-people-for-winter-designdays}
+
+This numeric field is the calculated minimum number of people based on the number of people field * the minimum value for the people schedule for the winter design day type.
+
+\subsubsection{Field: Maximum Number of People for Winter Design Days}\label{field-maximum-number-of-people-for-winter-designdays}
+
+This numeric field is the calculated maximum number of people based on the number of people field * the maximum value for the people schedule for the winter design day type.
 
 \subsection{Lights Gains}\label{lights-gains}
 
-! \textless{}Lights Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Lighting Level \{W\}, Lights/Floor Area \{W/m2\}, Lights per person \{W/person\}, Fraction Return Air, Fraction Radiant, Fraction Short Wave, Fraction Convected, Fraction Replaceable, End-Use Category, Nominal Minimum Lighting Level \{W\}, Nominal Maximum Lighting Level \{W\}
+! \textless{}Lights Internal Gains Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Lighting Level \{W\}, Lights/Floor Area \{W/m2\}, Lights per person \{W/person\}, Fraction Return Air, Fraction Radiant, Fraction Short Wave, Fraction Convected, Fraction Replaceable, End-Use,  Minimum Lighting Level for All Day Types \{W\}, Maximum Lighting Level for All Day Types \{W\}, Minimum Lighting Level for Weekdays \{W\},  Maximum Lighting Level for Weekdays \{W\}, Minimum Lighting Level for Weekends/Holidays \{W\}, Maximum Lighting Level for Weekends /Holidays \{W\}, Minimum Lighting Level for Summer Design Days \{W\}, Maximum Lighting Level for Summer Design Days \{W\}, Minimum Lighting Level for Winter Design Days \{W\}, Maximum Lighting Level for WinterDesign Days \{W\}
 
-Lights Internal Gains,~ SPACE1-1 LIGHTS 1, LIGHTS-1, SPACE1-1, 99.16, 11.0, 1584.000, 15.974, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+Lights Internal Gains Nominal, SPACE1-1 LIGHTS 1, LIGHTS-1, SPACE1-1, 90.00, 10.0, 1437.660, 15.974, 143.910, 0.200, 0.590, 0.200, 1.000E-002, 1.000, General, 71.883, 1437.660, 71.883, 1437.7, 71.883, 71.883, 71.883, 1437.660, 71.883, 71.883
 
-~Lights Internal Gains,~ SPACE2-1 LIGHTS 1, LIGHTS-1, SPACE2-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+~Lights Internal Gains Nominal, SPACE1-1 LIGHTS 2, LIGHTS-1, SPACE1-1, 90.00, 10.0, 480.000, 5.333, 48.048, 0.200, 0.590, 0.200, 1.000E-002, 0.000, Task Lights, 24.000, 480.000, 24.000, 480.0, 24.000, 24.000, 24.000, 480.000, 24.000, 24.000
 
-~Lights Internal Gains,~ SPACE3-1 LIGHTS 1, LIGHTS-1, SPACE3-1, 96.48, 11.0, 1584.000, 16.418, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 79.200, 1584.000
+~Lights Internal Gains Nominal, SPACE2-1 LIGHTS 1, LIGHTS-1, SPACE2-1, 42.37, 5.0, 678.142, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 1.000, General, 33.907, 678.142, 33.907, 678.1, 33.907, 33.907, 33.907, 678.142, 33.907, 33.907
 
-~Lights Internal Gains,~ SPACE4-1 LIGHTS 1, LIGHTS-1, SPACE4-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 34.200, 684.000
+~Lights Internal Gains Nominal,  SPACE2-1 LIGHTS 2,LIGHTS-1, SPACE2-1, 42.37, 5.0, 684.000, 16.144, 137.982, 0.200, 0.590, 0.200, 1.000E-002, 0.000, Accent Lighting, 34.200, 684.000, 34.200, 684.0, 34.200, 34.200, 34.200, 684.000, 34.200, 34.200
 
-~Lights Internal Gains,~ SPACE5-1 LIGHTS 1, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 0.000, GeneralLights, 148.200, 2964.000
+~Lights Internal Gains Nominal, SPACE3-1 LIGHTS 1, LIGHTS-1, SPACE3-1, 96.48, 11.0, 1584.000, 16.418, 144.000, 0.200, 0.590, 0.200, 1.000E-002, 1.000, General, 79.200, 1584.000, 79.200, 1584.0, 79.200, 79.200, 79.200, 1584.000, 79.200, 79.200
+
+~Lights Internal Gains Nominal, SPACE3-1 LIGHTS 2, LIGHTS-1, SPACE3-1, 96.48, 11.0, 480.000, 4.975, 43.636, 0.200, 0.590, 0.200, 1.000E-002, 1.000, Task Lights, 24.000, 480.000, 24.000, 480.0, 24.000, 24.000, 24.000, 480.000, 24.000, 24.000
+
+~Lights Internal Gains Nominal, SPACE4-1 LIGHTS 1, LIGHTS-1, SPACE4-1, 42.74, 5.0, 684.000, 16.006, 136.800, 0.200, 0.590, 0.200, 1.000E-002, 1.000, General, 34.200, 684.000, 34.200, 684.0, 34.200, 34.200, 34.200, 684.000, 34.200, 34.200
+
+~Lights Internal Gains Nominal, SPACE5-1 LIGHTS 1, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 1.000, General, 148.200, 2964.000, 148.200, 2964.0, 148.200, 148.200, 148.200, 2964.000, 148.200, 148.200
+
+~Lights Internal Gains Nominal, SPACE5-1 LIGHTS 2, LIGHTS-1, SPACE5-1, 182.49, 20.0, 2964.000, 16.242, 148.200, 0.200, 0.590, 0.200, 1.000E-002, 0.000, Task Lights, 148.200, 2964.000, 148.200, 2964.0, 148.200, 148.200, 148.200, 2964.000, 148.200, 148.200
+
+~Lights Internal Gains Nominal, PROCESS LIGHTING, EQUIP-1, SPACE5-1, 182.49, 20.0, 500.000, 2.740, 25.000, 0.000, 0.200, 0.200, 0.600, 1.000, Interior Lighting-Process, 10.000, 450.000, 10.000, 450.0, 100.000, 100.000, 10.000, 450.000, 100.000, 100.000
+
 
 \subsubsection{Field: \textless{}Lights Internal Gains - Nominal\textgreater{}}\label{field-lights-internal-gains---nominal}
 
@@ -1205,29 +1248,84 @@ This is the fraction replaceable for this lighting level. For daylighting calcul
 
 This field shows the end-use category for this lights statement. Usage can be reported by end-use category.
 
-\subsubsection{Field: Nominal Minimum Lighting Level \{W\}}\label{field-nominal-minimum-lighting-level-w}
+\subsubsection{Field: Minimum Lighting Level for All Day Types \{W\}}\label{field-minimum-lighting-level-for-all-day-types-w}
 
-This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value (annual) for the lights schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value for the lights schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
 
-\subsubsection{Field: Nominal Maximum Lighting Level \{W\}}\label{field-nominal-maximum-lighting-level-w}
+\subsubsection{Field: Maximum Lighting Level for All Day Types \{W\}}\label{field-maximum-lighting-level-for-all-day-types-w}
 
-This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value (annual) for the lights schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value for the lights schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Minimum Lighting Level for Weekdays \{W\}}\label{field-minimum-lighting-level-for-weekdays-w}
+
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value for the lights schedule for weekday day types (Monday through Friday).
+
+\subsubsection{Field: Maximum Lighting Level for Weekdays \{W\}}\label{field-maximum-lighting-level-for-weekdays-w}
+
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value for the lights schedule for weekday day types (Monday through Friday).
+
+\subsubsection{Field: Minimum Lighting Level for Weekends/Holidays \{W\}}\label{field-minimum-lighting-level-for-weekends-holidays-w}
+
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value for the lights schedule for weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Maximum Lighting Level for Weekends/Holidays \{W\}}\label{field-maximum-lighting-level-for-weekends-holidays-w}
+
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value for the lights schedule for weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Minimum Lighting Level for Summer Design Days \{W\}}\label{field-minimum-lighting-level-for-summer-designdays-w}
+
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value for the lights schedule for the summer design day type.
+
+\subsubsection{Field: Maximum Lighting Level for Summer Design Days \{W\}}\label{field-maximum-lighting-level-for-summer-designdays-w}
+
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value for the lights schedule for the summer design day type.
+
+\subsubsection{Field: Minimum Lighting Level for Winter Design Days \{W\}}\label{field-minimum-lighting-level-for-winter-designdays-w}
+
+This numeric field is the calculated minimum amount of lighting in Watts based on the calculated lighting level (above) * the minimum value for the lights schedule for the winter design day type.
+
+\subsubsection{Field: Maximum Lighting Level for Winter Design Days \{W\}}\label{field-maximum-lighting-level-for-winter-designdays-w}
+
+This numeric field is the calculated maximum amount of lighting in Watts based on the calculated lighting level (above) * the maximum value for the lights schedule for the winter design day type.
 
 \subsection{Equipment (Electric, Gas, Steam, Hot Water) Gains}\label{equipment-electric-gas-steam-hot-water-gains}
 
 These equipments are all reported similarly. Electric Equipment is used in the example below:
 
-! \textless{}ElectricEquipment Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, End-Use SubCategory, Nominal Minimum Equipment Level \{W\}, Nominal Maximum Equipment Level \{W\}
+! \textless{}ElectricEquipment Internal Gains Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants,Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\},Fraction Latent,Fraction Radiant, Fraction Lost, Fraction Convected, End-Use SubCategory, Minimum Equipment Level for All Day Types \{W\}, Maximum Equipment Level for All Day Types \{W\}, Minimum Equipment Level for Weekdays \{W\}, Maximum Equipment Level for Weekdays \{W\}, Minimum Equipment Level for Weekends/Holidays \{W\}, Maximum Equipment Level for Weekends /Holidays \{W\}, Minimum Equipment Level for Design Days \{W\}, Maximum Equipment Level for Design Days \{W\}
 
-ElectricEquipment Internal Gains,~ SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 99.16, 11.0, 1056.000, 10.649, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+ElectricEquipment Internal Gains Nominal,~ SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 90.00, 10.0, 958.410, 10.649, 95.937, 0.000, 0.300, 0.000, 0.700, Computers, 19.168, 862.569, 19.168, 862.569, 191.682, 191.682, 19.168, 862.569
 
-~ElectricEquipment Internal Gains,~ SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+~ElectricEquipment Internal Gains Nominal,~ SPACE1-1 ELECEQ 2, EQUIP-1, SPACE1-1, 90.00, 10.0, 200.000, 2.222, 20.020, 0.000, 0.300, 0.000, 0.700, Copy Machines, 4.000, 180.000, 4.000, 180.000, 40.000, 40.000, 4.000, 180.000
 
-~ElectricEquipment Internal Gains,~ SPACE3-1 ELECEQ 1, EQUIP-1, SPACE3-1, 96.48, 11.0, 1056.000, 10.945, 96.000, 0.000, 0.300, 0.000, 0.700, General, 21.120, 950.400
+~ElectricEquipment Internal Gains Nominal,~ SPACE1-1 ELECEQ 3, EQUIP-1, SPACE1-1, 90.00, 10.0, 200.000, 2.222, 20.020, 0.000, 0.100, 0.000, 0.900, People Movers, 4.000, 180.000, 4.000, 180.000, 40.000, 40.000, 4.000, 180.000
 
-~ElectricEquipment Internal Gains,~ SPACE4-1 ELECEQ 1, EQUIP-1, SPACE4-1, 42.74, 5.0, 456.000, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, General, 9.120, 410.400
+~ElectricEquipment Internal Gains Nominal,~ SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.37, 5.0, 452.095, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, Computers, 9.042, 406.885, 9.042, 406.885, 90.419, 90.419, 9.042, 406.885
 
-~ElectricEquipment Internal Gains,~ SPACE5-1 ELECEQ 1, EQUIP-1, SPACE5-1, 182.49, 20.0, 1976.000, 10.828, 98.800, 0.000, 0.300, 0.000, 0.700, General, 39.520, 1778.400
+
+! \textless{}ElectricEquipment Internal Gains Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, End-Use SubCategory, Minimum Equipment Level for All Day Types \{W\}, Maximum Equipment Level for All Day Types \{W\}, Minimum Equipment Level for Weekdays \{W\},  Maximum Equipment Level for Weekdays \{W\}, Minimum Equipment Level for Weekends/Holidays \{W\},  Maximum Equipment Level for Weekends /Holidays \{W\}, Minimum Equipment Level for Summer Design Days \{W\},  Maximum Equipment Level for Summer Design Days \{W\}, Minimum Equipment Level for Winter Design Days \{W\}, Maximum Equipment Level for Winter Design Days \{W\}
+
+ ElectricEquipment Internal Gains Nominal, SPACE1-1 ELECEQ 1, EQUIP-1, SPACE1-1, 90.00, 10.0, 958.410, 10.649, 95.937, 0.000, 0.300, 0.000, 0.700, Computers, 19.168, 862.569, 19.168, 862.569, 191.682, 191.682, 19.168, 862.569, 191.682, 191.682
+
+~ElectricEquipment Internal Gains Nominal, SPACE1-1 ELECEQ 2, EQUIP-1, SPACE1-1, 90.00, 10.0, 200.000, 2.222, 20.020, 0.000, 0.300, 0.000, 0.700, Copy Machines, 4.000, 180.000, 4.000, 180.000, 40.000, 40.000, 4.000, 180.000, 40.000, 40.000
+
+~ElectricEquipment Internal Gains Nominal,  SPACE1-1 ELECEQ 3, EQUIP-1, SPACE1-1, 90.00, 10.0, 200.000, 2.222, 20.020, 0.000, 0.100, 0.000, 0.900, People Movers, 4.000, 180.000, 4.000, 180.000, 40.000, 40.000, 4.000, 180.000, 40.000, 40.000
+
+~ElectricEquipment Internal Gains Nominal, SPACE2-1 ELECEQ 1, EQUIP-1, SPACE2-1, 42.37, 5.0, 452.095, 10.670, 91.200, 0.000, 0.300, 0.000, 0.700, Computers, 9.042, 406.885, 9.042, 406.885, 90.419, 90.419, 9.042, 406.885, 90.419, 90.419
+
+~ElectricEquipment Internal Gains Nominal, INDUSTRIAL EQUIP, EQUIP-1, SPACE3-1, 96.48, 11.0, 3000.000, 31.095, 272.727, 0.000, 0.200, 0.200, 0.600, Industrial Process, 60.000, 2700.000, 60.000, 2700.000, 600.000, 600.000, 60.000, 2700.000, 600.000, 600.000
+
+~ElectricEquipment Internal Gains Nominal, VERTICAL TRANSPORTATION, OCCUPY-1, SPACE2-1, 42.37, 5.0, 1000.000, 23.602, 201.728, 0.000, 0.000, 0.000, 1.000, Elevators and Escalators, 0.000, 1000.000, 80.000, 400.000, 60.000, 250.000, 950.000, 1000.000, 0.000, 50.000
+
+~ElectricEquipment Internal Gains Nominal, SPACE3-1 ELECEQ 1, EQUIP-1, SPACE3-1, 96.48, 11.0, 1056.000, 10.945, 96.000, 0.000, 0.300, 0.000, 0.700, Computers, 21.120, 950.400, 21.120, 950.400, 211.200, 211.200, 21.120, 950.400, 211.200, 211.200~
+
+~ElectricEquipment Internal Gains Nominal, SPACE3-1 ELECEQ 2, EQUIP-1, SPACE3-1, 96.48, 11.0, 200.000, 2.073, 18.182, 0.000, 0.300, 0.000, 0.700, Fax Machines, 4.000, 180.000, 4.000, 180.000, 40.000, 40.000, 4.000, 180.000, 40.000, 40.000
+
+~ElectricEquipment Internal Gains Nominal, SPACE4-1 ELECEQ 1, EQUIP-1, SPACE4-1, 42.74, 5.0, 100.000, 2.340, 20.000, 0.000, 0.300, 0.000, 0.700, Laundry, 2.000, 90.000, 2.000, 90.000, 20.000, 20.000, 2.000, 90.000, 20.000, 20.000
+
+~ElectricEquipment Internal Gains Nominal, SPACE5-1 ELECEQ 1, EQUIP-1, SPACE5-1, 182.49, 20.0, 1976.000, 10.828, 98.800, 0.000, 0.300, 0.000, 0.700, Computers, 39.520, 1778.400, 39.520, 1778.400, 395.200, 395.200, 39.520, 1778.400, 395.200, 395.200
+
+
 
 \subsubsection{Field: \textless{}{[}Specific{]} Equipment Internal Gains - Nominal\textgreater{}}\label{field-specific-equipment-internal-gains---nominal}
 
@@ -1285,23 +1383,57 @@ This is the fraction convected for this equipment.
 
 This field shows the end-use category for this statement. Usage can be reported by end-use category.
 
-\subsubsection{Field: Nominal Minimum Equipment Level \{W\}}\label{field-nominal-minimum-equipment-level-w}
 
-This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
 
-\subsubsection{Field: Nominal Maximum Equipment Level \{W\}}\label{field-nominal-maximum-equipment-level-w}
+\subsubsection{Field: Minimum Equipment Level for All Day Types \{W\}}\label{field-minimum-equipment-level-for-all-day-types-w}
 
-This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Maximum Equipment Level for All Day Types \{W\}}\label{field-maximum-equipment-level-for-all-day-types-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Minimum Equipment Level for Weekdays \{W\}}\label{field-minimum-equipment-level-for-weekdays-w}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across weekday day types (Monday through Friday).
+
+\subsubsection{Field: Maximum Equipment Level for Weekdays \{W\}}\label{field-maximum-equipment-level-for-weekdays-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across weekday day types (Monday through Friday).
+
+\subsubsection{Field: Minimum Equipment Level for Weekends/Holidays \{W\}}\label{field-minimum-equipment-level-for-weekends-holidays-w}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Maximum Equipment Level for Weekends/Holidays \{W\}}\label{field-maximum-equipment-level-for-weekends-holidays-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Minimum Equipment Level for Summer Design Days \{W\}}\label{field-minimum-equipment-level-for-summer-designdays-w}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule for the summer design day type.
+
+\subsubsection{Field: Maximum Equipment Level for Summer Design Days \{W\}}\label{field-maximum-equipment-level-for-summer-designdays-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule for the summer design day type.
+
+\subsubsection{Field: Minimum Equipment Level for Winter Design Days \{W\}}\label{field-minimum-equipment-level-for-winter-designdays-w}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule for the winter design day type.
+
+\subsubsection{Field: Maximum Equipment Level for Winter Design Days \{W\}}\label{field-maximum-equipment-level-for-winter-designdays-w}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule for the winter design day type.
 
 \subsection{Other Equipment Gains}\label{other-equipment-gains}
 
 Other equipment report is shown below (does not have an end-use category -- is not attached to any normal meter):
 
-! \textless{}OtherEquipment Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, Nominal Minimum Equipment Level \{W\}, Nominal Maximum Equipment Level \{W\}
+! \textless{}OtherEquipment Internal Gains - Nominal\textgreater{}, Name, Schedule Name, Zone Name, Zone Floor Area \{m2\}, \# Zone Occupants, Equipment Level \{W\}, Equipment/Floor Area \{W/m2\}, Equipment per person \{W/person\}, Fraction Latent, Fraction Radiant, Fraction Lost, Fraction Convected, Minimum Equipment Level for All Day Types \{W\}, Maximum Equipment Level for All Day Types \{W\}, Minimum Equipment Level for Weekdays \{W\}, Maximum Equipment Level for Weekdays \{W\}, Minimum Equipment Level for Weekends/Holidays \{W\}, Maximum Equipment Level for Weekends /Holidays \{W\}, Minimum Equipment Level for Summer Design Days \{W\}, Maximum Equipment Level for Summer Design Days \{W\}, Minimum Equipment Level for Winter Design Days \{W\}, Maximum Equipment Level for Winter Design Days \{W\}
 
-OtherEquipment Internal Gains,~ TEST 352A, ALWAYSON, ZONE ONE, 232.26, 0.0, 352.000, 1.516, N/A, 0.000, 0.000, 0.000, 1.000, 352.000, 352.000
+OtherEquipment Internal Gains,~ TEST 352A, ALWAYSON, ZONE ONE, 232.26, 0.0, 352.000, 1.516, N/A, 0.000, 0.000, 0.000, 1.000, 352.000, 352.000, 352.000, 352.000
 
-~OtherEquipment Internal Gains,~ TEST 352 MINUS, ALWAYSON, ZONE ONE, 232.26, 0.0, -352.000, -1.516, N/A, 0.000, 0.000, 0.000, 1.000, -352.000, -352.000
+~OtherEquipment Internal Gains,~ TEST 352 MINUS, ALWAYSON, ZONE ONE, 232.26, 0.0, -352.000, -1.516, N/A, 0.000, 0.000, 0.000, 1.000, -352.000, -352.000, -352.000, -352.000
 
 \subsubsection{Field: \textless{}Other Equipment Internal Gains - Nominal\textgreater{}}\label{field-other-equipment-internal-gains---nominal}
 
@@ -1355,13 +1487,49 @@ This is the fraction lost (not attributed to the zone) for this equipment.
 
 This is the fraction convected for this equipment.
 
-\subsubsection{Field: Nominal Minimum Equipment Level \{W\}}\label{field-nominal-minimum-equipment-level-w-1}
 
-This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
 
-\subsubsection{Field: Nominal Maximum Equipment Level \{W\}}\label{field-nominal-maximum-equipment-level-w-1}
 
-This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value (annual) for the equipment schedule. It may be useful in diagnosing errors that occur during simulation.
+\subsubsection{Field: Minimum Equipment Level for All Day Types \{W\}}\label{field-minimum-equipment-level-for-all-day-types-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Maximum Equipment Level for All Day Types \{W\}}\label{field-maximum-equipment-level-for-all-day-types-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across all day types (weekday, weekends, holidays, design days and custom days). It may be useful in diagnosing errors that occur during simulation.
+
+\subsubsection{Field: Minimum Equipment Level for Weekdays \{W\}}\label{field-minimum-equipment-level-for-weekdays-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across weekday day types (Monday through Friday).
+
+\subsubsection{Field: Maximum Equipment Level for Weekdays \{W\}}\label{field-maximum-equipment-level-for-weekdays-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across weekday day types (Monday through Friday).
+
+\subsubsection{Field: Minimum Equipment Level for Weekends/Holidays \{W\}}\label{field-minimum-equipment-level-for-weekends-holidays-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule across weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Maximum Equipment Level for Weekends/Holidays \{W\}}\label{field-maximum-equipment-level-for-weekends-holidays-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule across weekend (Saturday and Sunday) or holiday day types.
+
+\subsubsection{Field: Minimum Equipment Level for Summer Design Days \{W\}}\label{field-minimum-equipment-level-for-summer-designdays-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule for the summer design day type.
+
+\subsubsection{Field: Maximum Equipment Level for Summer Design Days \{W\}}\label{field-maximum-equipment-level-for-summer-designdays-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule for the summer design day type.
+
+\subsubsection{Field: Minimum Equipment Level for Winter Design Days \{W\}}\label{field-minimum-equipment-level-for-winter-designdays-w-1}
+
+This numeric field is the calculated minimum amount of the equipment in Watts based on the calculated design level (above) * the minimum value for the equipment schedule for the winter design day type.
+
+\subsubsection{Field: Maximum Equipment Level for Winter Design Days \{W\}}\label{field-maximum-equipment-level-for-winter-designdays-w-1}
+
+This numeric field is the calculated maximum amount of the equipment in Watts based on the calculated design level (above) * the maximum value for the equipment schedule for the winter design day type.
+
 
 \subsection{Outdoor Controlled Baseboard Heat}\label{outdoor-controlled-baseboard-heat}
 

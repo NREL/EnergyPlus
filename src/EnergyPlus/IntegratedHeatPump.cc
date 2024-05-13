@@ -74,16 +74,16 @@ using namespace DataLoopNode;
 Real64 constexpr WaterDensity(986.0); // standard water density at 60 C
 
 void SimIHP(EnergyPlusData &state,
-            std::string_view CompName,                               // Coil Name
-            int &CompIndex,                                          // Index for Component name
-            int const CyclingScheme,                                 // Continuous fan OR cycling compressor
-            DataHVACGlobals::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
-            Real64 const PartLoadFrac,                               // part load fraction
-            int const SpeedNum,                                      // compressor speed number
-            Real64 const SpeedRatio,                                 // compressor speed ratio
-            Real64 const SensLoad,                                   // Sensible demand load [W]
-            Real64 const LatentLoad,                                 // Latent demand load [W]
-            bool const IsCallbyWH, // whether the call from the water heating loop or air loop, true = from water heating loop
+            std::string_view CompName,                    // Coil Name
+            int &CompIndex,                               // Index for Component name
+            int const CyclingScheme,                      // Continuous fan OR cycling compressor
+            HVAC::CompressorOperation const CompressorOp, // compressor on/off. 0 = off; 1= on
+            Real64 const PartLoadFrac,                    // part load fraction
+            int const SpeedNum,                           // compressor speed number
+            Real64 const SpeedRatio,                      // compressor speed ratio
+            Real64 const SensLoad,                        // Sensible demand load [W]
+            Real64 const LatentLoad,                      // Latent demand load [W]
+            bool const IsCallbyWH,                        // whether the call from the water heating loop or air loop, true = from water heating loop
             [[maybe_unused]] bool const FirstHVACIteration,   // TRUE if First iteration of simulation
             ObjexxFCL::Optional<Real64 const> OnOffAirFlowRat // ratio of comp on to comp off air flow rate
 )
@@ -1088,106 +1088,106 @@ void GetIHPInput(EnergyPlusData &state)
                             "Integrated Heat Pump Air Loop Mass Flow Rate",
                             Constant::Units::kg_s,
                             ihp.AirLoopFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Condenser Water Mass Flow Rate",
                             Constant::Units::kg_s,
                             ihp.TankSourceWaterMassFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Total Cooling Rate",
                             Constant::Units::W,
                             ihp.TotalCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Heating Rate",
                             Constant::Units::W,
                             ihp.TotalSpaceHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Water Heating Rate",
                             Constant::Units::W,
                             ihp.TotalWaterHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Electricity Rate",
                             Constant::Units::W,
                             ihp.TotalPower,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Latent Cooling Rate",
                             Constant::Units::W,
                             ihp.TotalLatentLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Source Heat Transfer Rate",
                             Constant::Units::W,
                             ihp.Qsource,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump COP",
                             Constant::Units::None,
                             ihp.TotalCOP,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Electricity Energy",
                             Constant::Units::J,
                             ihp.Energy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Total Cooling Energy",
                             Constant::Units::J,
                             ihp.EnergyLoadTotalCooling,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Heating Energy",
                             Constant::Units::J,
                             ihp.EnergyLoadTotalHeating,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Water Heating Energy",
                             Constant::Units::J,
                             ihp.EnergyLoadTotalWaterHeating,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Air Latent Cooling Energy",
                             Constant::Units::J,
                             ihp.EnergyLatent,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
         SetupOutputVariable(state,
                             "Integrated Heat Pump Source Heat Transfer Energy",
                             Constant::Units::J,
                             ihp.EnergySource,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             ihp.Name);
     }
 }
@@ -1466,7 +1466,7 @@ void DecideWorkMode(EnergyPlusData &state,
     // it should be called by an air loop parent object, when FirstHVACIteration == true
 
     // Using/Aliasing
-    using DataHVACGlobals::SmallLoad;
+    using HVAC::SmallLoad;
     using WaterThermalTanks::GetWaterThermalTankInput;
 
     Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
@@ -1630,22 +1630,14 @@ void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     auto &ihp = state.dataIntegratedHP->IntegratedHeatPumps(DXCoilNum);
 
     // clear up
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCDWHCoolCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCDWHWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHDWHHeatCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHDWHWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SCCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.SHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-    SimVariableSpeedCoils(
-        state, std::string(), ihp.DWHCoilIndex, CycFanCycCoil, DataHVACGlobals::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCDWHCoolCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHDWHHeatCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHDWHWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SCCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.SHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+    SimVariableSpeedCoils(state, std::string(), ihp.DWHCoilIndex, CycFanCycCoil, HVAC::CompressorOperation::On, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 }
 
 IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)
