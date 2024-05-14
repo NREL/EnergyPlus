@@ -219,7 +219,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
-    if (coilMode == HVAC::CoilMode::SubcoolReheat) {
+    if (maxAvailCoilMode == HVAC::CoilMode::SubcoolReheat) {
         Real64 totalCoolingRate;
         Real64 sensNorRate;
         Real64 sensSubRate;
