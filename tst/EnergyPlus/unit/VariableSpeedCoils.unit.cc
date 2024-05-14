@@ -7153,8 +7153,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoolingCoils_AutosizePumpPower)
          "    ,                        !- Fan Delay Time",
          "    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name",
          "    ,                        !- Condenser Air Inlet Node Name",
-         "    EvaporativelyCooled,               !- Condenser Type",
-         "    Autosize,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+         "    EvaporativelyCooled,     !- Condenser Type",
+         "    Autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}",
          "    0.0,                     !- Crankcase Heater Capacity {W}",
          "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
          "    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
@@ -7236,51 +7236,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoolingCoils_AutosizePumpPower)
     // Get coil inputs
     VariableSpeedCoils::GetVarSpeedCoilInput(*state);
 
-    // Set input processing flag
-    state->dataVariableSpeedCoils->GetCoilsInputFlag = false;
+    auto DXCoilNum = 1;
 
-    // Setting predefined tables is needed though
-    OutputReportPredefined::SetPredefinedTables(*state);
-    // Set up some environmental parameters
-    state->dataEnvrn->OutDryBulbTemp = -5.0;
-    state->dataEnvrn->OutHumRat = 0.0009;
-    state->dataEnvrn->OutBaroPress = 99000.0;
-    state->dataEnvrn->OutWetBulbTemp =
-        Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
-    state->dataEnvrn->WindSpeed = 5.0;
-    state->dataEnvrn->WindDir = 270.0;
-    state->dataEnvrn->StdRhoAir = 1.1;
-
-    // Set coil parameters
-    int DXCoilNum = 1;
-    int const CyclingScheme = HVAC::ContFanCycCoil;
-
-    int constexpr SpeedCal = 1;
-    Real64 SpeedRatio = 0.2;
-
-    Real64 SensLoad = 1000.0;
-    Real64 LatentLoad = 0.0;
-    Real64 PartLoadFrac = 0.7;
-    Real64 OnOffAirFlowRatio = 1.0;
-
-    state->dataLoopNodes->Node(1).MassFlowRate = 0.2;
-    state->dataLoopNodes->Node(2).MassFlowRate = 0.2;
-    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate = 0.2;
-    state->dataEnvrn->OutDryBulbTemp = -5.0;
-
-    // Run a compressor "On" scenario first
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
-    VariableSpeedCoils::SimVariableSpeedCoils(*state,
-                                              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
-                                              DXCoilNum,
-                                              CyclingScheme,
-                                              CompressorOp, // compressor on/off. 0 = off; 1= on
-                                              PartLoadFrac,
-                                              SpeedCal,
-                                              SpeedRatio,
-                                              SensLoad,
-                                              LatentLoad,
-                                              OnOffAirFlowRatio);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).EvapCondPumpElecNomPower, DataSizing::AutoSize);
 }
 
 } // namespace EnergyPlus
