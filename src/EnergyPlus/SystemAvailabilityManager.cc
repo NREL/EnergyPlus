@@ -187,7 +187,7 @@ namespace Avail {
                                                  availMgr.availManagers(PriAirSysAvailMgrNum).Name,
                                                  availMgr.availManagers(PriAirSysAvailMgrNum).Num,
                                                  PriAirSysNum,
-                                                 availStatus);
+                                                 previousAvailStatus);
 
                 if (availStatus == Status::ForceOff) {
                     availMgr.availStatus = Status::ForceOff;
