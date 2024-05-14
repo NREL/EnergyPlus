@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -1576,10 +1577,18 @@ void FanComponent::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 0.0);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, "N/A");
-    OutputReportPredefined::PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchFanAirLoopName,
-                                             Name,
-                                             airLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name : "N/A");
+    if (airLoopNum == 0) {
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, "N/A");
+    } else if (airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchFanAirLoopName,
+            Name,
+            state.dataAirLoopHVACDOAS->airloopDOAS[airLoopNum - state.dataHVACGlobal->NumPrimaryAirSys - 1].Name);
+    }
 
     if (nightVentPerfNum > 0) {
         if (state.dataFans->NightVentPerf(nightVentPerfNum).MaxAirFlowRate == DataSizing::AutoSize) {
@@ -2673,10 +2682,18 @@ void FanSystem::set_size(EnergyPlusData &state)
                                              state.dataOutRptPredefined->pdchFanMotorHeatZone,
                                              Name,
                                              heatLossDest == HeatLossDest::Zone ? state.dataHeatBal->Zone(zoneNum).Name : "N/A");
-    OutputReportPredefined::PreDefTableEntry(state,
-                                             state.dataOutRptPredefined->pdchFanAirLoopName,
-                                             Name,
-                                             airLoopNum > 0 ? state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name : "N/A");
+    if (airLoopNum == 0) {
+        OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, "N/A");
+    } else if (airLoopNum <= state.dataHVACGlobal->NumPrimaryAirSys) {
+        OutputReportPredefined::PreDefTableEntry(
+            state, state.dataOutRptPredefined->pdchFanAirLoopName, Name, state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Name);
+    } else {
+        OutputReportPredefined::PreDefTableEntry(
+            state,
+            state.dataOutRptPredefined->pdchFanAirLoopName,
+            Name,
+            state.dataAirLoopHVACDOAS->airloopDOAS[airLoopNum - state.dataHVACGlobal->NumPrimaryAirSys - 1].Name);
+    }
 }
 
 Real64 FanSystem::report_fei(
