@@ -1350,6 +1350,7 @@ void FanComponent::set_size(EnergyPlusData &state)
     state.dataSize->DataAutosizable = maxAirFlowRateIsAutosized;
     state.dataSize->DataEMSOverrideON = EMSMaxAirFlowRateOverrideOn;
     state.dataSize->DataEMSOverride = EMSMaxAirFlowRateValue;
+    airLoopNum = state.dataSize->CurSysNum;
 
     bool errorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
@@ -1574,7 +1575,7 @@ void FanComponent::set_size(EnergyPlusData &state)
                                              maxAirFlowRateIsAutosized ? "Yes" : "No"); // autosizable vs. autosized equivalent?
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 0.0);
-    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, "n/a");
+    OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, "N/A");
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAirLoopName,
                                              Name,
@@ -2583,6 +2584,7 @@ void FanSystem::set_size(EnergyPlusData &state)
     state.dataSize->DataAutosizable = true;
     state.dataSize->DataEMSOverrideON = EMSMaxAirFlowRateOverrideOn;
     state.dataSize->DataEMSOverride = EMSMaxAirFlowRateValue;
+    airLoopNum = state.dataSize->CurSysNum;
 
     bool ErrorsFound = false;
     SystemAirFlowSizer sizerSystemAirFlow;
@@ -2667,10 +2669,10 @@ void FanSystem::set_size(EnergyPlusData &state)
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanAutosized, Name, maxAirFlowRateIsAutosized ? "Yes" : "No");
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorEff, Name, motorEff);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanMotorHeatToZoneFrac, Name, 1 - motorInAirFrac);
-    if (heatLossDest == HeatLossDest::Zone) {
-        OutputReportPredefined::PreDefTableEntry(
-            state, state.dataOutRptPredefined->pdchFanMotorHeatZone, Name, state.dataHeatBal->Zone(zoneNum).Name);
-    }
+    OutputReportPredefined::PreDefTableEntry(state,
+                                             state.dataOutRptPredefined->pdchFanMotorHeatZone,
+                                             Name,
+                                             heatLossDest == HeatLossDest::Zone ? state.dataHeatBal->Zone(zoneNum).Name : "N/A");
     OutputReportPredefined::PreDefTableEntry(state,
                                              state.dataOutRptPredefined->pdchFanAirLoopName,
                                              Name,
