@@ -6611,7 +6611,7 @@ TEST_F(EnergyPlusFixture, CurveFit_alternateMode_IEER2022ValueTest)
     auto speed2 = thisCoil.performance.normalMode.speeds[1];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
 
-    auto coilMode = thisCoil.performance.coilMode;
+    auto coilMode = thisCoil.performance.maxAvailCoilMode;
     auto normalMode = thisCoil.performance.normalMode.speeds;
     auto alternateMode1 = thisCoil.performance.alternateMode;
     EXPECT_EQ((int)HVAC::CoilMode::Enhanced, (int)coilMode);
@@ -6918,7 +6918,7 @@ TEST_F(EnergyPlusFixture, CurveFit_3Speed_IEER2022ValueTest)
     auto speed3 = thisCoil.performance.normalMode.speeds[2];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3.name);
 
-    HVAC::CoilMode coilMode = thisCoil.performance.coilMode;
+    HVAC::CoilMode coilMode = thisCoil.performance.maxAvailCoilMode;
     auto alternateMode1 = thisCoil.performance.alternateMode.speeds; // Do you know what auto types to here?
     auto alternateMode2 = thisCoil.performance.alternateMode2.speeds;
     EXPECT_EQ((int)HVAC::CoilMode::Normal, (int)coilMode);

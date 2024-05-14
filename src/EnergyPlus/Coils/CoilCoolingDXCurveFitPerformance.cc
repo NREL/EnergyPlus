@@ -100,7 +100,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
 
     if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
-        this->coilMode = HVAC::CoilMode::Enhanced;
+        this->maxAvailCoilMode = HVAC::CoilMode::Enhanced;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode.oneTimeInit(state); // oneTimeInit does not need to be delayed in this use case
     }
@@ -113,7 +113,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlus::Ener
     }
 
     if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
-        this->coilMode = HVAC::CoilMode::SubcoolReheat;
+        this->maxAvailCoilMode = HVAC::CoilMode::SubcoolReheat;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode2_name);
         setOperMode(state, this->normalMode, 1);
@@ -204,7 +204,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlus::E
 void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &state,
                                                 const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
-                                                HVAC::CoilMode maxAvailCoilMode,
+                                                HVAC::CoilMode currentCoilMode,
                                                 Real64 &PLR,
                                                 int &speedNum,
                                                 Real64 &speedRatio,
@@ -219,7 +219,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
     this->recoveredEnergyRate = 0.0;
     this->NormalSHR = 0.0;
 
-    if (maxAvailCoilMode == HVAC::CoilMode::SubcoolReheat) {
+    if (currentCoilMode == HVAC::CoilMode::SubcoolReheat) {
         Real64 totalCoolingRate;
         Real64 sensNorRate;
         Real64 sensSubRate;
@@ -335,7 +335,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlus::EnergyPlusData &stat
                 outletNode.HumRat = Psychrometrics::PsyWFnTdbH(state, tsat, outletNode.Enthalpy);
             }
         }
-    } else if (maxAvailCoilMode == HVAC::CoilMode::Enhanced) {
+    } else if (currentCoilMode == HVAC::CoilMode::Enhanced) {
         this->calculate(
             state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode);
         this->OperatingMode = 2;
@@ -392,10 +392,10 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlus::EnergyPlusData &state)
     if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag) {
         this->normalMode.parentName = this->parentName;
         this->normalMode.size(state);
-        if (this->coilMode == HVAC::CoilMode::Enhanced) {
+        if (this->maxAvailCoilMode == HVAC::CoilMode::Enhanced) {
             this->alternateMode.size(state);
         }
-        if (this->coilMode == HVAC::CoilMode::SubcoolReheat) {
+        if (this->maxAvailCoilMode == HVAC::CoilMode::SubcoolReheat) {
             this->alternateMode.size(state);
             this->alternateMode2.size(state);
         }

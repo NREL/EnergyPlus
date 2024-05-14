@@ -574,8 +574,9 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
 
 int CoilCoolingDX::getNumModes()
 {
+    // TODO: should this support all 3 modes?
     int numModes = 1;
-    if (this->performance.coilMode != HVAC::CoilMode::Normal) {
+    if (this->performance.maxAvailCoilMode != HVAC::CoilMode::Normal) {
         numModes++;
     }
     return numModes;
@@ -583,6 +584,7 @@ int CoilCoolingDX::getNumModes()
 
 int CoilCoolingDX::getOpModeCapFTIndex(HVAC::CoilMode const mode)
 {
+    // TODO: should this support all 3 modes?
     if (mode != HVAC::CoilMode::Normal) {
         return this->altModeNomSpeed().indexCapFT;
     } else {
@@ -640,6 +642,7 @@ CoilCoolingDXCurveFitSpeed &CoilCoolingDX::altModeNomSpeed()
 
 Real64 CoilCoolingDX::condMassFlowRate(HVAC::CoilMode const mode)
 {
+    // TODO: should this support all 3 modes?
     if (mode != HVAC::CoilMode::Normal) {
         return this->altModeNomSpeed().RatedCondAirMassFlowRate;
     } else {
@@ -929,7 +932,8 @@ void CoilCoolingDX::setToHundredPercentDOAS()
         speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
         speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
     }
-    if (this->performance.coilMode != HVAC::CoilMode::Normal) {
+    // TODO: should this support all 3 modes?
+    if (this->performance.maxAvailCoilMode != HVAC::CoilMode::Normal) {
         for (auto &speed : this->performance.alternateMode.speeds) {
             speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
             speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
