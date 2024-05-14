@@ -2387,8 +2387,8 @@ void FanComponent::report(EnergyPlusData &state)
     totalEnergy = totalPower * state.dataHVACGlobal->TimeStepSysSec;
     deltaTemp = outletAirTemp - inletAirTemp;
 
-    if (type == HVAC::FanType::OnOff) {
-        if (airLoopNum > 0) {
+    if (isAFNFan && (airLoopNum > 0)) {
+        if (type == HVAC::FanType::OnOff) {
             state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = runtimeFrac;
         }
     }
@@ -3078,12 +3078,10 @@ void FanSystem::update(EnergyPlusData &state) // does not change state of object
         state.dataLoopNodes->Node(outletNodeNum).GenContam = state.dataLoopNodes->Node(inletNodeNum).GenContam;
     }
 
-    if (speedControl == SpeedControl::Continuous) {
-        if (airLoopNum > 0) {
+    if (isAFNFan && (airLoopNum > 0)) {
+        if (speedControl == SpeedControl::Continuous) {
             state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = runtimeFracAtSpeed[0];
-        }
-    } else {
-        if (airLoopNum > 0) {
+        } else {
             if (numSpeeds == 1) {
                 state.dataAirLoop->AirLoopAFNInfo(airLoopNum).AFNLoopOnOffFanRTF = outletAirMassFlowRate / maxAirMassFlowRate;
             } else if (outletAirMassFlowRate <= massFlowAtSpeed[0]) {
