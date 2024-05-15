@@ -1394,6 +1394,7 @@ namespace DataHeatBalance {
         // Members
         Real64 MeanAirTemp = 0.0;            // Mean Air Temperature {C}
         Real64 OperativeTemp = 0.0;          // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
+        Real64 WetbulbGlobeTemp = 0.0;       // Wet-bulb Globe Temperature
         Real64 MeanAirHumRat = 0.0;          // Mean Air Humidity Ratio {kg/kg} (averaged over zone time step)
         Real64 MeanAirDewPointTemp = 0.0;    // Mean Air Dewpoint Temperature {C}
         Real64 ThermOperativeTemp = 0.0;     // Mix of MRT and MAT for Zone Control:Thermostatic:Operative Temperature {C}

@@ -380,6 +380,8 @@
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
+  Output:Variable,*,Zone Wetbulb Globe Temperature,hourly;
+
   Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
 
   Output:Variable,*,Zone Mean Radiant Temperature,hourly;

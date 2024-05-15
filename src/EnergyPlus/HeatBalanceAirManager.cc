@@ -4928,6 +4928,8 @@ void calcMeanAirTemps(EnergyPlusData &state,
     thisAirRpt.MeanAirTemp = ZTAV;
     thisAirRpt.MeanAirHumRat = airHumRatAvg;
     thisAirRpt.OperativeTemp = 0.5 * (ZTAV + MRT);
+    thisAirRpt.WetbulbGlobeTemp =
+        0.7 * Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress) + 0.3 * thisAirRpt.OperativeTemp;
     thisAirRpt.MeanAirDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, thisAirRpt.MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
     // if operative temperature control is being used, then radiative fraction/weighting
