@@ -3376,18 +3376,20 @@ void SizePlantLoop(EnergyPlusData &state,
         }
     }
 
-    if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
-        BaseSizer::reportSizerOutput(state,
-                                     "PlantLoop",
-                                     state.dataPlnt->PlantLoop(LoopNum).Name,
-                                     "Minimum Loop Flow Rate [m3/s]",
-                                     state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
-    } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
-        BaseSizer::reportSizerOutput(state,
-                                     "CondenserLoop",
-                                     state.dataPlnt->PlantLoop(LoopNum).Name,
-                                     "Minimum Loop Flow Rate [m3/s]",
-                                     state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
+    if (state.dataPlnt->PlantFinalSizesOkayToReport) {
+        if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Plant) {
+            BaseSizer::reportSizerOutput(state,
+                                         "PlantLoop",
+                                         state.dataPlnt->PlantLoop(LoopNum).Name,
+                                         "Minimum Loop Flow Rate [m3/s]",
+                                         state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
+        } else if (state.dataPlnt->PlantLoop(LoopNum).TypeOfLoop == LoopType::Condenser) {
+            BaseSizer::reportSizerOutput(state,
+                                         "CondenserLoop",
+                                         state.dataPlnt->PlantLoop(LoopNum).Name,
+                                         "Minimum Loop Flow Rate [m3/s]",
+                                         state.dataPlnt->PlantLoop(LoopNum).MinVolFlowRate);
+        }
     }
 
     // should now have plant volume, calculate plant volume's mass for fluid type
