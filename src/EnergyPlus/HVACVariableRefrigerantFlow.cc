@@ -11687,36 +11687,36 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
             // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
             Counter = 1;
-        Label20:;
-            Ncomp_new = Ncomp;
-            Q_c_OU = max(0.0, Q_h_TU_PL - Ncomp);
+            bool not_converged;
+            do {
+                Ncomp_new = Ncomp;
+                Q_c_OU = max(0.0, Q_h_TU_PL - Ncomp);
 
-            // *VRF OU Te calculations
-            m_air = this->OUAirFlowRate * RhoAir;
-            SH_OU = this->SH;
-            this->VRFOU_TeTc(
-                state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
-            this->SH = SH_OU;
+                // *VRF OU Te calculations
+                m_air = this->OUAirFlowRate * RhoAir;
+                SH_OU = this->SH;
+                this->VRFOU_TeTc(
+                    state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
+                this->SH = SH_OU;
 
-            // *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
-            this->VRFOU_CalcCompH(state,
-                                  TU_HeatingLoad,
-                                  this->EvaporatingTemp,
-                                  Tdischarge,
-                                  h_IU_cond_out_ave,
-                                  this->IUCondensingTemp,
-                                  CapMinTe,
-                                  Tfs,
-                                  Pipe_Q_h,
-                                  Q_c_OU,
-                                  CompSpdActual,
-                                  Ncomp_new);
+                // *VRF OU Compressor Simulation at heating mode: Specify the compressor speed and power consumption
+                this->VRFOU_CalcCompH(state,
+                                      TU_HeatingLoad,
+                                      this->EvaporatingTemp,
+                                      Tdischarge,
+                                      h_IU_cond_out_ave,
+                                      this->IUCondensingTemp,
+                                      CapMinTe,
+                                      Tfs,
+                                      Pipe_Q_h,
+                                      Q_c_OU,
+                                      CompSpdActual,
+                                      Ncomp_new);
 
-            if ((std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp)) && (Counter < 30)) {
+                bool not_converged = (std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp));
                 Ncomp = Ncomp_new;
                 Counter = Counter + 1;
-                goto Label20;
-            }
+            } while (not_converged && (Counter < 30));
 
             // Update h_comp_out in iteration Label23
             P_comp_in = GetSatPressureRefrig(state, this->RefrigerantName, this->EvaporatingTemp, RefrigerantIndex, RoutineName);
