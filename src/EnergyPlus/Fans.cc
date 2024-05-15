@@ -2642,7 +2642,8 @@ void FanSystem::set_size(EnergyPlusData &state)
             }
         }
     }
-    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress, state.dataEnvrn->StdRhoAir);
+    Real64 _rhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataLoopNodes->Node(inletNodeNum).Press, inletAirTemp, inletAirHumRat);
+    designPointFEI = report_fei(state, maxAirFlowRate, designElecPower, deltaPress, _rhoAir);
 
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanType, Name, HVAC::fanTypeNames[(int)type]);
     OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchFanTotEff, Name, totalEff);
