@@ -446,9 +446,6 @@ namespace OutputReportPredefined {
         s->pdchFanMotorEff = newPreDefColumn(state, s->pdstFan, "Motor Efficiency");
         s->pdchFanMotorHeatToZoneFrac = newPreDefColumn(state, s->pdstFan, "Motor Heat to Zone Fraction");
         s->pdchFanMotorHeatZone = newPreDefColumn(state, s->pdstFan, "Motor Loss Zone Name");
-        s->pdchFanOccOper = newPreDefColumn(state, s->pdstFan, "Occupied Operation");
-        s->pdchFanUnoccOper = newPreDefColumn(state, s->pdstFan, "Unoccupied Operation");
-        s->pdchFanLockOutDurCentHt = newPreDefColumn(state, s->pdstFan, "Locked Out During Central Heating");
         s->pdchFanAirLoopName = newPreDefColumn(state, s->pdstFan, "Airloop Name");
 
         s->pdstPump = newPreDefSubTable(state, s->pdrEquip, "Pumps");
@@ -535,7 +532,6 @@ namespace OutputReportPredefined {
         s->pdchPLCLProvCool = newPreDefColumn(state, s->pdstPLCL, "Provides Cooling");
         s->pdchPLCLMaxLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Maximum Loop Flow Rate [m3/s]");
         s->pdchPLCLMinLoopFlowRate = newPreDefColumn(state, s->pdstPLCL, "Minimum Loop Flow Rate [m3/s]");
-        s->pdchPLCLTotPumpPow = newPreDefColumn(state, s->pdstPLCL, "Total Pump Power on Loop [W]");
 
         // Std 229 Air Terminal Table in Equipment Summary
         s->pdstAirTerm = newPreDefSubTable(state, s->pdrEquip, "Air Terminals");

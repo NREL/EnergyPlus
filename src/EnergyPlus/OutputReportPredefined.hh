@@ -248,9 +248,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchFanMotorEff = 0;
     int pdchFanMotorHeatToZoneFrac = 0; // Motor Heat to Zone Fraction
     int pdchFanMotorHeatZone = 0;       // Motor Loss Zone Name
-    int pdchFanOccOper = 0;             // Occupied Operation
-    int pdchFanUnoccOper = 0;           // Unoccupied Operation
-    int pdchFanLockOutDurCentHt = 0;    // Locked Out During Central Heating
     int pdchFanAirLoopName = 0;
 
     // Pump subtable
@@ -443,7 +440,6 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchPLCLProvCool = 0;        // provides cooling
     int pdchPLCLMaxLoopFlowRate = 0; // Maximum Loop Flow Rate
     int pdchPLCLMinLoopFlowRate = 0; // Minimum Loop Flow Rate
-    int pdchPLCLTotPumpPow = 0;      // Total Pump Power on Loop
 
     // Std 229 Air Terminal Table in Equipment Summary
     int pdstAirTerm = 0;
