@@ -1142,8 +1142,6 @@ namespace HeatBalanceManager {
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
