@@ -75,9 +75,10 @@ namespace ChillerElectricEIR {
         bool RefCapWasAutoSized = false;                                            // reference capacity was autosized on input
         Real64 RefCOP = 0.0;                                                        // Reference coefficient of performance [W/W]
         DataPlant::FlowMode FlowMode = DataPlant::FlowMode::Invalid;                // one of 3 modes for component flow during operation
-        bool ModulatedFlowSetToLoop = false;                                        // True if the setpoint is missing at the outlet node
-        bool ModulatedFlowErrDone = false;                                          // true if setpoint warning issued
-        bool HRSPErrDone = false;                                                   // TRUE if set point warning issued for heat recovery loop
+        DataPlant::CondenserFlowControl CondenserFlowControl = DataPlant::CondenserFlowControl::Invalid;
+        bool ModulatedFlowSetToLoop = false;      // True if the setpoint is missing at the outlet node
+        bool ModulatedFlowErrDone = false;        // true if setpoint warning issued
+        bool HRSPErrDone = false;                 // TRUE if set point warning issued for heat recovery loop
         Real64 EvapVolFlowRate = 0.0;             // Reference water volumetric flow rate through the evaporator [m3/s]
         bool EvapVolFlowRateWasAutoSized = false; // true if previous was autosize input
         Real64 EvapMassFlowRate = 0.0;
@@ -187,6 +188,10 @@ namespace ChillerElectricEIR {
         Real64 CondenserFanEnergyConsumption = 0.0; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption = 0.0;        // Basin heater energy consumption (J)
         bool IPLVFlag = true;
+        int ChillerCondLoopFlowFLoopPLRIndex = 0; // Condenser loop flow rate fraction function of loop PLR
+        int CondDT = 0;                           // Temperature difference across condenser
+        int CondDTScheduleNum = 0;                // Temperature difference across condenser schedule index
+        Real64 MinCondFlowRatio = 0.0;            // Minimum condenser flow fraction
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
 
         static ElectricEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
