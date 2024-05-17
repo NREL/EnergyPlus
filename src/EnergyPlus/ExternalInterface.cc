@@ -1955,7 +1955,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
         if (state.dataExternalInterface->FirstCallWUp) {
             // set the report during warmup to true so that variables are also updated during the warmup
-            // UpdateDataDuringWarmupExternalInterface = true;
+            state.dataSysVars->UpdateDataDuringWarmupExternalInterface = true;
             state.dataExternalInterface->hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
             state.dataExternalInterface->tStart = GetCurSimStartTimeSeconds(state);
             state.dataExternalInterface->tStop = state.dataExternalInterface->tStart + 24.0 * 3600.0;
