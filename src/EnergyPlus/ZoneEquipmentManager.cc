@@ -4550,15 +4550,16 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 
                 if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingOnly ||
                     state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingThenReturn) {
-                    ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
-                    Real64 AdjustedTotalReturnMassFlow = 0;
                     massConservation.RetMassFlowRate = FinalTotalReturnMassFlow;
                     ZoneReturnAirMassFlowRate = FinalTotalReturnMassFlow;
                     if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustMixingThenReturn) {
 
                         // Calculate return air flow rate using mass conservation equation
-                        AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
-                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                        Real64 AdjustedTotalReturnMassFlow =
+                            max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
+                        if (!state.dataGlobal->DoingSizing) {
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                        }
                         // add adjust zone return node air flow calc
                         CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
                         massConservation.RetMassFlowRate = FinalTotalReturnMassFlow;
@@ -4570,10 +4571,11 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
                 } else if (state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnOnly ||
                            state.dataHeatBal->ZoneAirMassFlow.ZoneFlowAdjustment == DataHeatBalance::AdjustmentType::AdjustReturnThenMixing) {
 
-                    Real64 AdjustedTotalReturnMassFlow = 0;
                     // Calculate return air flow rate using mass conservation equation
-                    AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
-                    AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                    Real64 AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
+                    if (!state.dataGlobal->DoingSizing) {
+                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                    }
 
                     // add adjust zone return node air flow calculation
                     CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
@@ -4589,7 +4591,9 @@ void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration)
 
                         // Calculate return air flow rate using mass conservation equation
                         AdjustedTotalReturnMassFlow = max(0.0, TotInletAirMassFlowRate - TotExhaustAirMassFlowRate + ZoneMixingNetAirMassFlowRate);
-                        AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                        if (!state.dataGlobal->DoingSizing) {
+                            AdjustedTotalReturnMassFlow = min(AdjustedTotalReturnMassFlow, zoneEquipConfig.AirLoopDesSupply);
+                        }
 
                         // add adjust zone return node air flow calc
                         CalcZoneReturnFlows(state, ZoneNum, AdjustedTotalReturnMassFlow, FinalTotalReturnMassFlow);
