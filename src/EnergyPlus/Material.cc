@@ -2929,7 +2929,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
 
     // Now we need to normalize phi and theta to the 0 to Pi/2 range using reflection.
     if (phi > Constant::PiOvr2) phi = Constant::Pi - phi;
-    if (theta > Constant::PiOvr2) theta = Constant::Pi - phi;
+    if (theta > Constant::PiOvr2) theta = Constant::Pi - theta;
     
     // calculate compliment of relative solar azimuth
     Real64 Beta = Constant::PiOvr2 - theta;
