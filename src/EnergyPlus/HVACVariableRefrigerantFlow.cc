@@ -11687,7 +11687,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
             // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
             Counter = 1;
-            bool not_converged;
+            bool converged;
             do {
                 Ncomp_new = Ncomp;
                 Q_c_OU = max(0.0, Q_h_TU_PL - Ncomp);
@@ -11713,10 +11713,10 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                       CompSpdActual,
                                       Ncomp_new);
 
-                bool not_converged = (std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp));
+                bool converged = !(std::abs(Ncomp_new - Ncomp) > (Tolerance * Ncomp));
                 Ncomp = Ncomp_new;
                 Counter = Counter + 1;
-            } while (not_converged && (Counter < 30));
+            } while ((!converged) && (Counter < 30));
 
             // Update h_comp_out in iteration Label23
             P_comp_in = GetSatPressureRefrig(state, this->RefrigerantName, this->EvaporatingTemp, RefrigerantIndex, RoutineName);
