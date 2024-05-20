@@ -99,6 +99,14 @@ namespace HVACManager {
 
     void CheckAirLoopFlowBalance(EnergyPlusData &state);
 
+    void ConvergenceErrors(EnergyPlusData &state,
+                           std::array<bool, 3> HVACNotConverged,
+                           std::array<Real64, 10> DemandToSupply,
+                           std::array<Real64, 10> SupplyDeck1ToDemand,
+                           std::array<Real64, 10> SupplyDeck2ToDemand,
+                           int const AirSysNum,
+                           int const index);
+
 } // namespace HVACManager
 
 struct HVACManagerData : BaseGlobalStruct
