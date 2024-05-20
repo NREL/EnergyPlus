@@ -603,9 +603,12 @@ namespace HeatBalanceIntRadExchange {
                 // If there is user input, use that as the approximate view factors.
                 // If there is no user input, but UseRepresentativeSurfaceCalculations is true, then calc approximate view factors
                 // If no user input and not UseRepresentativeSurfaceCalculations, then copy final view factors from the solar enclosure
-                bool useSolarViewFactors = (NoUserInputF && !state.dataSurface->UseRepresentativeSurfaceCalculations);
-                if (NoUserInputF && state.dataSurface->UseRepresentativeSurfaceCalculations) {
+                bool useSolarViewFactors = (NoUserInputF && !state.dataSurface->UseRepresentativeSurfaceCalculations &&
+                                            !state.dataViewFactor->EnclSolInfo(enclosureNum).F.empty());
 
+                if (useSolarViewFactors) {
+                    thisEnclosure.F = state.dataViewFactor->EnclSolInfo(enclosureNum).F;
+                } else {
                     // Calculate the view factors and make sure they satisfy reciprocity
                     CalcApproximateViewFactors(state,
                                                thisEnclosure.NumOfSurfaces,
@@ -614,10 +617,7 @@ namespace HeatBalanceIntRadExchange {
                                                thisEnclosure.Tilt,
                                                thisEnclosure.F,
                                                thisEnclosure.SurfacePtr);
-                }
-                if (useSolarViewFactors) {
-                    thisEnclosure.F = state.dataViewFactor->EnclSolInfo(enclosureNum).F;
-                } else {
+
                     if (ViewFactorReport) { // Allocate and save user or approximate view factors for reporting.
                         SaveApproximateViewFactors.allocate(thisEnclosure.NumOfSurfaces, thisEnclosure.NumOfSurfaces);
                         SaveApproximateViewFactors = thisEnclosure.F;
