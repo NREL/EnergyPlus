@@ -38,3 +38,7 @@ with
 - Maximum for Winter Design Days
 
 These changes will also make corresponding changes in the HTML Intialization Summary report
+
+### Adding an Output:Variable, Wetbulb Globe Temperature
+
+An output variable will be added, Wetbulb Globe Temperature.
