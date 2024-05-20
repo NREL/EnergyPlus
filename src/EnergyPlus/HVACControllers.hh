@@ -161,7 +161,7 @@ namespace HVACControllers {
         Real64 SensedValue;                           // The sensed control variable of any type
         Real64 DeltaSensed;                           // Difference of sensed to setpoint value for calculating proportional gain
         Real64 Offset;                                // This is the tolerance or droop from the error
-        SetPointManager::CtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
+        HVAC::CtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
         // --------------------
         // Other controller inputs, not yet used
         // --------------------
@@ -191,7 +191,7 @@ namespace HVACControllers {
               ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
               ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoc{}, SensedNode(0), IsSetPointDefinedFlag(false),
-              SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0),
+              SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(HVAC::CtrlVarType::Invalid), Range(0.0),
               Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
               FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {

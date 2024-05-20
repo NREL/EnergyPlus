@@ -14359,7 +14359,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     int Iter;
     Real64 ExternalStatic;
     Real64 FanStaticPressureRise;
-    bool ErrorsFound(false);
     Real64 FanHeatCorrection;
     Real64 FanPowerCorrection;
     Real64 FanPowerPerEvapAirFlowRate = 0.0;
@@ -14953,7 +14952,6 @@ void GetFanIndexForTwoSpeedCoil(
     int AirSysNum;
     int BranchNum;
     int CompNum;
-    bool ErrorsFound(false);
 
     FoundBranch = 0;
     FoundAirSysNum = 0;

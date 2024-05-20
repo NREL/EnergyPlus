@@ -655,7 +655,7 @@ namespace Humidifiers {
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         CheckIfNodeSetPointManagedByEMS(
-                            state, AirOutNode, EMSManager::SPControlType::HumidityRatioMinSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                            state, AirOutNode, HVAC::CtrlVarType::MinHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("Humidifiers: Missing humidity setpoint for {} = {}",

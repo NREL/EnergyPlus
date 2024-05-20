@@ -471,28 +471,28 @@ namespace Weather {
             SetupOutputVariable(state,
                                 "Site Ground Temperature",
                                 Constant::Units::C,
-                                state.dataEnvrn->GroundTemp,
+                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface],
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Surface Ground Temperature",
                                 Constant::Units::C,
-                                state.dataEnvrn->GroundTemp_Surface,
+                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow],
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Deep Ground Temperature",
                                 Constant::Units::C,
-                                state.dataEnvrn->GroundTemp_Deep,
+                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep],
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 "Environment");
             SetupOutputVariable(state,
                                 "Site Simple Factor Model Ground Temperature",
                                 Constant::Units::C,
-                                state.dataEnvrn->GroundTempFC,
+                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod],
                                 OutputProcessor::TimeStepType::Zone,
                                 OutputProcessor::StoreType::Average,
                                 "Environment");
@@ -2009,14 +2009,14 @@ namespace Weather {
         state.dataGlobal->SimTimeSteps = (state.dataGlobal->DayOfSim - 1) * 24 * state.dataGlobal->NumOfTimeStepInHour +
                                          (state.dataGlobal->HourOfDay - 1) * state.dataGlobal->NumOfTimeStepInHour + state.dataGlobal->TimeStep;
 
-        state.dataEnvrn->GroundTemp =
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] =
             state.dataWeather->siteBuildingSurfaceGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp + Constant::Kelvin;
-        state.dataEnvrn->GroundTempFC =
+        state.dataEnvrn->GroundTempKelvin = state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] + Constant::Kelvin;
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod] =
             state.dataWeather->siteFCFactorMethodGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTemp_Surface =
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow] =
             state.dataWeather->siteShallowGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
-        state.dataEnvrn->GroundTemp_Deep = state.dataWeather->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
+        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep] = state.dataWeather->siteDeepGroundTempsPtr->getGroundTempAtTimeInMonths(state, 0, state.dataEnvrn->Month);
         state.dataEnvrn->GndReflectance = state.dataWeather->GroundReflectances(state.dataEnvrn->Month);
         state.dataEnvrn->GndReflectanceForDayltg = state.dataEnvrn->GndReflectance;
 

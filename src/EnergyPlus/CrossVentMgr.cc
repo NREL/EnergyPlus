@@ -409,7 +409,7 @@ namespace RoomAir {
                 auto &thisOSC = state.dataSurface->OSC(thisSurface.OSCPtr);
                 thisOSC.OSCTempCalc =
                     (thisOSC.ZoneAirTempCoef * thisZoneHB.MAT + thisOSC.ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(surfNum) +
-                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                      thisOSC.WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(surfNum) * state.dataSurface->SurfOutDryBulbTemp(surfNum));
                 state.dataRoomAir->Tin(ZoneNum) = thisOSC.OSCTempCalc;
             } else {
@@ -535,7 +535,7 @@ namespace RoomAir {
                 auto &thisOSC = state.dataSurface->OSC(thisSurface.OSCPtr);
                 thisOSC.OSCTempCalc =
                     (thisOSC.ZoneAirTempCoef * thisZoneHB.MAT + thisOSC.ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(surfNum) +
-                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                      thisOSC.WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(surfNum) * state.dataSurface->SurfOutDryBulbTemp(surfNum));
                 state.dataRoomAir->Tin(ZoneNum) = thisOSC.OSCTempCalc;
             } else {
@@ -584,7 +584,7 @@ namespace RoomAir {
                 auto &thisOSC = state.dataSurface->OSC(thisSurface.OSCPtr);
                 thisOSC.OSCTempCalc =
                     (thisOSC.ZoneAirTempCoef * thisZoneHB.MAT + thisOSC.ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(surfNum) +
-                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                      thisOSC.WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(surfNum) * state.dataSurface->SurfOutDryBulbTemp(surfNum));
                 state.dataRoomAir->Tin(ZoneNum) = thisOSC.OSCTempCalc;
 
@@ -652,7 +652,7 @@ namespace RoomAir {
                 auto &thisOSC = state.dataSurface->OSC(thisSurface.OSCPtr);
                 thisOSC.OSCTempCalc =
                     (thisOSC.ZoneAirTempCoef * thisZoneHB.MAT + thisOSC.ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(surfNum) +
-                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp +
+                     thisOSC.ConstTempCoef * thisOSC.ConstTemp + thisOSC.GroundTempCoef * state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                      thisOSC.WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(surfNum) * state.dataSurface->SurfOutDryBulbTemp(surfNum));
                 state.dataRoomAir->Tin(ZoneNum) = thisOSC.OSCTempCalc;
             } else {

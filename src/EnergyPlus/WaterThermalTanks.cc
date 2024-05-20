@@ -12433,7 +12433,6 @@ bool GetHeatPumpWaterHeaterNodeNumber(EnergyPlusData &state, int const NodeNumbe
             }
 
             // Get fan inlet node index
-            bool ErrorsFound{false};
             int FanInletNodeIndex = state.dataFans->fans(HPWH.FanNum)->inletNodeNum;
 
             // Fan inlet node

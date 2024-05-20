@@ -463,7 +463,6 @@ namespace AirflowNetwork {
                 }
 
                 // This breaks the component model, need to fix
-                bool fanErrorFound = false;
                 int fanIndex = GetFanIndex(m_state, thisObjectName);
                 if (fanIndex == 0) {
                     ShowSevereError(m_state,
@@ -1388,8 +1387,6 @@ namespace AirflowNetwork {
                     }
 
                 } else {
-                    bool FanErrorFound = false;
-
                     fanIndex = GetFanIndex(m_state, fan_name);
 
                     if (fanIndex == 0) {
@@ -12052,7 +12049,6 @@ namespace AirflowNetwork {
         int NodeMixer = 0;
         int NodeZoneIntlet = 0;
         int NodeZoneReturn = 0;
-        int NumOfBranches = 0;
         int AFNNodeNum;
         int AFNLinkNum;
         int AFNLinkNum1;
