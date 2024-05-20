@@ -85,8 +85,8 @@ namespace DataZoneControls {
 
         // these are all allocated to NumControlTypes, should be a struct allocated once
         Array1D_string ControlType; // from IDF, the "types" (string-should be an enum) of control modes for this particular thermostat - delete this
-        Array1D_string ControlTypeName;                           // from IDF, the names of the control modes for this particular thermostat
-        Array1D<DataHVACGlobals::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
+        Array1D_string ControlTypeName;                // from IDF, the names of the control modes for this particular thermostat
+        Array1D<HVAC::ThermostatType> ControlTypeEnum; // from IDF, the enum types of each control mode for this particular thermostat
 
         // these now reflect that actual underlying setpoint temperature schedule indexes for each possible control type,
         // so they can be used to call directly to ScheduleValue(...)

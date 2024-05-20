@@ -911,8 +911,6 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData(*state);
-
     BaseboardElectric::GetBaseboardInput(*state);
 
     state->dataGlobal->ZoneSizingCalc = true;
@@ -1465,8 +1463,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData(*state);
-
     BaseboardElectric::GetBaseboardInput(*state);
 
     state->dataGlobal->ZoneSizingCalc = true;
@@ -1521,8 +1517,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
-
-    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1579,8 +1573,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData(*state);
-
     BaseboardElectric::GetBaseboardInput(*state);
 
     state->dataGlobal->ZoneSizingCalc = true;
@@ -1635,8 +1627,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
-
-    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 
@@ -1693,8 +1683,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
 
-    DataZoneEquipment::GetZoneEquipmentData(*state);
-
     BaseboardElectric::GetBaseboardInput(*state);
 
     state->dataGlobal->ZoneSizingCalc = true;
@@ -1749,8 +1737,6 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays(*state);
-
-    DataZoneEquipment::GetZoneEquipmentData(*state);
 
     BaseboardElectric::GetBaseboardInput(*state);
 

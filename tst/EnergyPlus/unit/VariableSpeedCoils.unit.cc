@@ -3001,9 +3001,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.1;
     // set coil parameters
-    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int const CyclingScheme = HVAC::ContFanCycCoil;
     int DXCoilNum = 1;
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off;
     int constexpr SpeedCal = 1;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;
@@ -3018,7 +3018,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
     // test 1: compressor is On but PLR = 0
-    CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = HVAC::CompressorOperation::On;
     PartLoadFrac = 0.0;
     // set coil inlet air flow rate to speed 1
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
@@ -3038,7 +3038,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
     ;
     // test 2: compressor is On and PLR > 0
-    CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    CompressorOp = HVAC::CompressorOperation::On;
     PartLoadFrac = 0.1;
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
@@ -6911,7 +6911,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     // Set coil parameters
     int DXCoilNum = 1;
-    int const CyclingScheme = DataHVACGlobals::ContFanCycCoil;
+    int const CyclingScheme = HVAC::ContFanCycCoil;
 
     int constexpr SpeedCal = 1;
     Real64 SpeedRatio = 0.2;
@@ -6927,7 +6927,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     state->dataEnvrn->OutDryBulbTemp = -5.0;
 
     // Run a compressor "On" scenario first
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
@@ -6942,11 +6942,27 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 908.10992432432420, 1e-3);
 
+    // Check that when DefrostTime == 0 the performance of the coil is not degraded
+    Real64 COPwDefrost = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostTime == 0;
+    VariableSpeedCoils::SimVariableSpeedCoils(*state,
+                                              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
+                                              DXCoilNum,
+                                              CyclingScheme,
+                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              PartLoadFrac,
+                                              SpeedCal,
+                                              SpeedRatio,
+                                              SensLoad,
+                                              LatentLoad,
+                                              OnOffAirFlowRatio);
+    EXPECT_NEAR(COPwDefrost, state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).COP, 0.001);
+
     // Now simulate the coil with "CompressorOperation" command to be "Off":
     // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
     // Otherwise the problem reported in Issue 10108 will show up.
 
-    CompressorOp = DataHVACGlobals::CompressorOperation::Off;
+    CompressorOp = HVAC::CompressorOperation::Off;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
@@ -6961,6 +6977,162 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     // Without the current PR (PR 10109), the DefrostPower would remain 908.1 and fail the following test:
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).DefrostPower, 0.0, 1e-3);
+}
+
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
+{
+    // Code borrowed/modified from another test (VariableSpeedCoils_ContFanCycCoil_Test) above
+    std::string const idf_objects = delimited_string({
+        "  Coil:Cooling:DX:VariableSpeed,",
+        "    VS DXCOIL,               !- Name",
+        "    VS DXCOIL_CoolCNode,     !- Air Inlet Node Name",
+        "    VS DXCOIL_HeatCNode,     !- Air Outlet Node Name",
+        "    5,                       !- Number of Speeds {dimensionless}",
+        "    5,                       !- Nominal Speed Level {dimensionless}",
+        "    0.0,                     !- Rated Total Cooling Capacity At Selected Nominal Speed Level {w}",
+        "    5.00,                    !- Rated Volumetric Air Flow Rate At Selected Nominal Speed Level {m3/s}",
+        "    0,                       !- Nominal Time for Condensate to Begin Leaving the Coil {s}",
+        "    0,                       !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}",
+        "    ,                        !- Maximum Cycling Rate",
+        "    ,                        !- Latent Capacity Time Constant",
+        "    ,                        !- Fan Delay Time",
+        "    PLF Curve,               !- Energy Part Load Fraction Curve Name",
+        "    ,                        !- Condenser Air Inlet Node Name",
+        "    AirCooled,               !- Condenser Type",
+        "    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Crankcase Heater Capacity {W}",
+        "    ,                        !- Crankcase Heater Capacity Function of Temperature Curve Name",
+        "    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    ,                        !- Condensate Collection Water Storage Tank Name",
+        "    ,                        !- Basin Heater Capacity {W/K}",
+        "    2,                       !- Basin Heater Setpoint Temperature {C}",
+        "    ,                        !- Basin Heater Operating Schedule Name",
+        "    33000.0,                 !- Speed 1 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.70,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.34,                    !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    1.40,                    !- Speed 1 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 1 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 1 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    4.03,                    !- Speed 1 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 1 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    35000.0,                 !- Speed 2 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.78,                    !- Speed 2 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.54,                    !- Speed 2 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    1.90,                    !- Speed 2 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 2 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 2 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    5.47,                    !- Speed 2 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 2 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    70000.0,                 !- Speed 3 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.70,                    !- Speed 3 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    4.20,                    !- Speed 3 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    2.89,                    !- Speed 3 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 3 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 3 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    8.26,                    !- Speed 3 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 3 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    120000.0,                !- Speed 4 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.62,                    !- Speed 4 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    3.47,                    !- Speed 4 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    3.56,                    !- Speed 4 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 4 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 4 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    10.25,                   !- Speed 4 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 4 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve,             !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+        "    140000.0,                !- Speed 5 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
+        "    0.69,                    !- Speed 5 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
+        "    3.84,                    !- Speed 5 Reference Unit COP At Rated Conditions {dimensionless}",
+        "    5.68,                    !- Speed 5 Reference Unit Air Flow Rate At Rated Conditions {m3/s}",
+        "    773.3,                   !- Speed 5 2017 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    934.4,                   !- Speed 5 2023 Rated Evaporator Fan Power Per Volume Flow Rate",
+        "    16.36,                   !- Speed 5 Reference Unit Condenser Flow Rate at Rated Conditions {m3/s}",
+        "    ,                        !- Speed 5 Reference Unit Pad Effectiveness of Evap Precooling at Rated Conditions {dimensionless}",
+        "    CapacityCurve,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name",
+        "    CAPFF Curve,             !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name",
+        "    PowerCurve,              !- Speed 5 Energy Input Ratio Function of Temperature Curve Name",
+        "    EIRFF Curve;             !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name",
+
+        "Curve:Biquadratic,",
+        "    CapacityCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Biquadratic,",
+        "    PowerCurve, 1, 0, 0, 0, 0, 0, 10, 25.5, 7.2, 48.8, , , Temperature, Temperature, Dimensionless;",
+        "Curve:Cubic,",
+        "    CAPFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+        "Curve:Cubic,",
+        "    EIRFF Curve, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless;",
+        "Curve:Quadratic,",
+        "    PLF Curve, 0.85, 0.8333, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless;",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    // get coil inputs
+    VariableSpeedCoils::GetVarSpeedCoilInput(*state);
+    // Setting predefined tables is needed though
+    OutputReportPredefined::SetPredefinedTables(*state);
+    // Set up some environmental parameters
+    state->dataEnvrn->OutDryBulbTemp = 5.0;
+    state->dataEnvrn->OutHumRat = 0.0009;
+    state->dataEnvrn->OutBaroPress = 99000.0;
+    state->dataEnvrn->OutWetBulbTemp =
+        Psychrometrics::PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
+    state->dataEnvrn->WindSpeed = 5.0;
+    state->dataEnvrn->WindDir = 270.0;
+    state->dataEnvrn->StdRhoAir = 1.1;
+    // set coil parameters
+    int const CyclingScheme = HVAC::ContFanCycCoil;
+    int DXCoilNum = 1;
+    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off;
+    int constexpr SpeedCal = 1;
+    Real64 SensLoad = 0.0;
+    Real64 LatentLoad = 0.0;
+    Real64 PartLoadFrac = 0.0;
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 SpeedRatio = 0.0;
+
+    // run coil init
+    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    // set coil inlet condition
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
+    // test 1: compressor is On, PLR > 0, but RatedCapCoolTotal
+    CompressorOp = HVAC::CompressorOperation::On;
+    PartLoadFrac = 1.0;
+    // set coil inlet air flow rate to speed 1
+    state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).MSRatedAirMassFlowRate(1) * 0.1;
+    state->dataVariableSpeedCoils->LoadSideMassFlowRate = state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
+        state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
+    VariableSpeedCoils::CalcVarSpeedCoilCooling(
+        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    VariableSpeedCoils::UpdateVarSpeedCoil(*state, DXCoilNum);
+    // check coil outlet and inlet air conditions match
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
+    EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy,
+              state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
 }
 
 } // namespace EnergyPlus

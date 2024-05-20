@@ -128,8 +128,6 @@ void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Bereket Nigusse
     //       DATE WRITTEN   May 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Initializes the optical properties for the Equivalent Layer (ASHWAT) Window
@@ -137,9 +135,6 @@ void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Gets the EquivalentLayer Window Layers Inputs.  Fills in the derived data type
     // based on the inputs specified.
-
-    int ConstrNum; // Construction number
-    int SurfNum;   // surface number
 
     if (state.dataWindowEquivLayer->TotWinEquivLayerConstructs < 1) return;
     if (!allocated(state.dataWindowEquivLayer->CFS)) state.dataWindowEquivLayer->CFS.allocate(state.dataWindowEquivLayer->TotWinEquivLayerConstructs);
@@ -151,7 +146,7 @@ void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
     state.dataWindowEquivalentLayer->EQLDiffPropFlag = true;
     state.dataWindowEquivalentLayer->CFSDiffAbsTrans = 0.0;
 
-    for (ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
+    for (int ConstrNum = 1; ConstrNum <= state.dataHeatBal->TotConstructs; ++ConstrNum) {
         if (!state.dataConstruction->Construct(ConstrNum).TypeIsWindow) continue;
         if (!state.dataConstruction->Construct(ConstrNum).WindowTypeEQL) continue; // skip if not equivalent layer window
 
@@ -159,8 +154,7 @@ void InitEquivalentLayerWindowCalculations(EnergyPlusData &state)
 
     } //  end do for TotConstructs
 
-    for (SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-        if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).TypeIsWindow) continue;
+    for (int SurfNum : state.dataSurface->AllHTWindowSurfaceList) {
         if (!state.dataConstruction->Construct(state.dataSurface->Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
         state.dataSurface->SurfWinWindowModelType(SurfNum) = WindowModel::EQL;
@@ -821,7 +815,9 @@ void EQLWindowSurfaceHeatBalance(EnergyPlusData &state,
     ConvHeatGainWindow = state.dataSurface->Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
     // Window heat gain (or loss) is calculated here
     state.dataSurface->SurfWinHeatGain(SurfNum) =
-        state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+        state.dataSurface->SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural -
+        (state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) +
+         state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) * state.dataSurface->Surface(SurfNum).Area);
     state.dataSurface->SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
     state.dataSurface->SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
     state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;

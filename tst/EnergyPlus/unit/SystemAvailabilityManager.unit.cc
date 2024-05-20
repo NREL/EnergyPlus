@@ -327,10 +327,10 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
         state->dataSystemAvailabilityManager->OptimumStartData(1).ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
     EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
     EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
-    EXPECT_EQ(DataHVACGlobals::NoAction,
+    EXPECT_EQ(HVAC::NoAction,
               state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should not yet be set
 
-    EXPECT_EQ(DataHVACGlobals::NoAction,
+    EXPECT_EQ(HVAC::NoAction,
               state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should not be set until 6 AM
 
     state->dataGlobal->WarmupFlag = false;
@@ -344,21 +344,21 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
         state->dataSystemAvailabilityManager->OptimumStartData(1).ATGWCZoneNumHi); // zone 1 is default for cooling set point when heating load exists
     EXPECT_EQ(-3.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffLo); // zone 3 is 3C below set point
     EXPECT_EQ(0.0, state->dataSystemAvailabilityManager->OptimumStartData(1).TempDiffHi);  // cooling data did not get set so is 0
-    EXPECT_EQ(DataHVACGlobals::NoAction,
+    EXPECT_EQ(HVAC::NoAction,
               state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should not yet be set
 
-    EXPECT_EQ(DataHVACGlobals::NoAction,
+    EXPECT_EQ(HVAC::NoAction,
               state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should not be set until 6 AM
 
     state->dataGlobal->CurrentTime = 7.0; // set the current time to 7 AM which is past time to pre-start HVAC
     SystemAvailabilityManager::ManageSystemAvailability(*state);
 
-    EXPECT_EQ(DataHVACGlobals::CycleOn,
+    EXPECT_EQ(HVAC::CycleOn,
               state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should be set to cycle on
     EXPECT_EQ(1.5,
               state->dataSystemAvailabilityManager->OptimumStartData(1).NumHoursBeforeOccupancy); // 1.5 hours = 3C from SP divided by 2C/hour
 
-    EXPECT_EQ(DataHVACGlobals::CycleOn,
+    EXPECT_EQ(HVAC::CycleOn,
               state->dataSystemAvailabilityManager->OptimumStartData(2).AvailStatus); // avail manager should be set at 6 AM
 
     // #8013 - Check that the optimum start is available during the correct times when using a partial hour fan start
@@ -379,7 +379,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_OptimumStart)
     SystemAvailabilityManager::ManageSystemAvailability(*state);
     ZoneTempPredictorCorrector::CalcZoneAirTempSetPoints(*state);
 
-    EXPECT_EQ(DataHVACGlobals::NoAction,
+    EXPECT_EQ(HVAC::NoAction,
               state->dataSystemAvailabilityManager->OptimumStartData(1).AvailStatus); // avail manager should be set to no action
     EXPECT_EQ(15.0, state->dataHeatBalFanSys->ZoneThermostatSetPointLo(1));           // 15.0C is the unoccupied heating setpoint
     EXPECT_EQ(29.4, state->dataHeatBalFanSys->ZoneThermostatSetPointHi(1));           // 29.4C is the unoccupied cooling setpoint
@@ -395,19 +395,19 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycle_ZoneOutOfTolerance)
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi.allocate(NumZones);
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo.allocate(NumZones);
 
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempTstatAir(1) = 30.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
 
-    state->dataHeatBalFanSys->TempControlType(2) = DataHVACGlobals::ThermostatType::SingleHeatCool;
+    state->dataHeatBalFanSys->TempControlType(2) = HVAC::ThermostatType::SingleHeatCool;
     state->dataHeatBalFanSys->TempTstatAir(2) = 25.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(2) = 25.0;
 
-    state->dataHeatBalFanSys->TempControlType(3) = DataHVACGlobals::ThermostatType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(3) = HVAC::ThermostatType::SingleHeating;
     state->dataHeatBalFanSys->TempTstatAir(3) = 10.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(3) = 20.0;
 
-    state->dataHeatBalFanSys->TempControlType(4) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(4) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     state->dataHeatBalFanSys->TempTstatAir(4) = 30.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointHi(4) = 25.0;
     state->dataHeatBalFanSys->ZoneThermostatSetPointLo(4) = 20.0;
@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_HybridVentilation_OT_CO2Control)
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(2, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // No change
     state->dataSystemAvailabilityManager->HybridVentData(1).TimeVentDuration = 11.0;
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     SystemAvailabilityManager::CalcHybridVentSysAvailMgr(*state, 1, 1);
     EXPECT_EQ(1, state->dataSystemAvailabilityManager->HybridVentData(1).VentilationCtrl); // Can change
@@ -654,7 +654,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
 
@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // starting time is equal to stopping time
     state->dataGlobal->SimTimeSteps = 4;
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime = 4.0;
@@ -693,7 +693,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is no action mode
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
@@ -705,7 +705,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
@@ -716,7 +716,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // Check that the system is cycling On, run time has no effect, // 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // Reduce zone air temperature, control is driven by temp differential
     state->dataGlobal->SimTimeSteps = 4;
@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // Check that the system is no action mode, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // current time is the end of run time period
@@ -740,7 +740,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is cycling On, zone air temp is outside T tolerance limits of 0.05, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // current time is the end of run time period
     state->dataGlobal->SimTimeSteps = 4;
@@ -751,14 +751,14 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleZone_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the system is no action mode, zone air temp is outside T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
     state->dataGlobal->WarmupFlag = true;
     state->dataGlobal->BeginDayFlag = true;
     state->dataGlobal->SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StartTime);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataHVACGlobal->ZoneComp(1).ZoneCompAvailMgrs(1).StopTime);
 }
@@ -777,7 +777,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempControlTypeRpt.allocate(NumZones);
     state->dataHeatBalFanSys->TempTstatAir.allocate(NumZones);
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint.allocate(NumZones);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleCooling;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 25.0;
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     state->dataHeatBal->Zone.allocate(NumZones);
@@ -818,7 +818,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NightCycleData(1).PriorAvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     // Starting time is equal to stopping time
     state->dataGlobal->SimTimeSteps = 4;
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime = 4.0;
@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus = 2;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode because of run time limit
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat,  Run Time has no effect
     // starting time is less than stopping time, control is driven by temp differential
@@ -839,7 +839,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime = 4.0;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
@@ -851,7 +851,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, run time has no effect, // 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = Thermostat, Run Time has no effect
     // starting time and stopping time are the same, control is driven by temp differential
@@ -863,7 +863,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // starting time and stopping time are the same, control is driven by temp differential
@@ -876,7 +876,7 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.1;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is cycling On, zone air temp is outside T tolerance limits of 0.05, 25.1 > 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::CycleOn, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Cycling Run Time Control Type = ThermostatWithMinimumRunTime and
     // starting time and stopping time are the same, control is driven by temp differential
@@ -888,14 +888,14 @@ TEST_F(EnergyPlusFixture, SysAvailManager_NightCycleSys_CalcNCycSysAvailMgr)
     state->dataHeatBalFanSys->TempTstatAir(1) = 25.04;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
     // Check that the system is no action mode, zone air temp is within T tolerance limits of 0.05, 25.04 < 25.0 + 0.05
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
 
     // Test cycle time reset at beginning of day during warmup
     state->dataGlobal->WarmupFlag = true;
     state->dataGlobal->BeginDayFlag = true;
     state->dataGlobal->SimTimeSteps = 96;
     SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus);
-    EXPECT_EQ(DataHVACGlobals::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
+    EXPECT_EQ(HVAC::NoAction, state->dataSystemAvailabilityManager->NightCycleData(1).AvailStatus);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StartTime);
     EXPECT_EQ(state->dataGlobal->SimTimeSteps, state->dataAirLoop->PriAirSysAvailMgr(PriAirSysNum).StopTime);
 }

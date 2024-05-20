@@ -812,7 +812,7 @@ void EIRPlantLoopHeatPump::sizeLoadSide(EnergyPlusData &state)
     if (pltLoadSizNum > 0) {
         // this first IF block is really just about calculating the local tmpCapacity and tmpLoadVolFlow values
         // these represent what the unit would size those to, whether it is doing auto-sizing or not
-        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+        if (state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate > HVAC::SmallWaterVolFlow) {
             tmpLoadVolFlow = state.dataSize->PlantSizData(pltLoadSizNum).DesVolFlowRate * this->sizingFactor;
             Real64 deltaT = state.dataSize->PlantSizData(pltLoadSizNum).DeltaT;
             if (this->companionHeatPumpCoil) {

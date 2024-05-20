@@ -576,32 +576,55 @@ void ManageHVAC(EnergyPlusData &state)
             ReportDebug = !state.dataGlobal->WarmupFlag;
         }
         if ((ReportDebug) && (state.dataGlobal->DayOfSim > 0)) { // Report the node data
+            // report node name list and column header each time number of nodes changes
+            static int numNodes = 0;
+            if (isize(state.dataLoopNodes->Node) > numNodes) state.dataHVACMgr->DebugNamesReported = false;
             if (size(state.dataLoopNodes->Node) > 0 && !state.dataHVACMgr->DebugNamesReported) {
-                print(state.files.debug, "{}\n", "node #   Name");
+                numNodes = isize(state.dataLoopNodes->Node);
+                print(state.files.debug, "{}\n", "node #   Node Type      Name");
                 for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                    print(state.files.debug, " {:3}     {}\n", NodeNum, state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug,
+                          " {:3}        {}         {}\n",
+                          NodeNum,
+                          DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)],
+                          state.dataLoopNodes->NodeID(NodeNum));
+                }
+                print(state.files.debug, "Day of Sim, Hour of Day, TimeStep,");
+                for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
+                    print(state.files.debug, "{}: Temp,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMinAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMaxAv,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: TempSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassFlow,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMin,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassMax,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: MassSP,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Press,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Enth,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: HumRat,", state.dataLoopNodes->NodeID(NodeNum));
+                    print(state.files.debug, "{}: Fluid Type,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                        print(state.files.debug, "{}: CO2Conc,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                        print(state.files.debug, "{}: GenericContamConc,", state.dataLoopNodes->NodeID(NodeNum));
+                    if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
                 }
                 state.dataHVACMgr->DebugNamesReported = true;
             }
             if (size(state.dataLoopNodes->Node) > 0) {
-                print(state.files.debug, "\n\n Day of Sim     Hour of Day    Time\n");
                 print(state.files.debug,
-                      "{:12}{:12} {:22.15N} \n",
+                      "{:12},{:12}, {:22.15N},",
                       state.dataGlobal->DayOfSim,
                       state.dataGlobal->HourOfDay,
                       state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone);
-                print(state.files.debug,
-                      "{}\n",
-                      "node #   Temp   MassMinAv  MassMaxAv TempSP      MassFlow       MassMin       MassMax        MassSP    Press        "
-                      "Enthal     HumRat Fluid Type");
             }
+            static constexpr std::string_view Format_20{
+                " {:8.2F},  {:8.3F},  {:8.3F},  {:8.2F}, {:13.2F}, {:13.2F}, {:13.2F}, {:13.2F},  {:#7.0F},  {:11.2F},  {:9.5F},  {},"};
+            static constexpr std::string_view Format_21{" {:8.2F},"};
             for (int NodeNum = 1; NodeNum <= isize(state.dataLoopNodes->Node); ++NodeNum) {
-                static constexpr std::string_view Format_20{
-                    " {:3} {:8.2F}  {:8.3F}  {:8.3F}  {:8.2F} {:13.2F} {:13.2F} {:13.2F} {:13.2F}  {:#7.0F}  {:11.2F}  {:9.5F}  {}\n"};
 
                 print(state.files.debug,
                       Format_20,
-                      NodeNum,
                       state.dataLoopNodes->Node(NodeNum).Temp,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMinAvail,
                       state.dataLoopNodes->Node(NodeNum).MassFlowRateMaxAvail,
@@ -614,6 +637,11 @@ void ManageHVAC(EnergyPlusData &state)
                       state.dataLoopNodes->Node(NodeNum).Enthalpy,
                       state.dataLoopNodes->Node(NodeNum).HumRat,
                       DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNum).FluidType)]);
+                if (state.dataContaminantBalance->Contaminant.CO2Simulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).CO2);
+                if (state.dataContaminantBalance->Contaminant.GenericContamSimulation)
+                    print(state.files.debug, Format_21, state.dataLoopNodes->Node(NodeNum).GenContam);
+                if (NodeNum == isize(state.dataLoopNodes->Node)) print(state.files.debug, "\n");
             }
         }
     }
@@ -1986,8 +2014,8 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
 
         auto &AirToZoneNodeInfo = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex);
 
-        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
-            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Cooling) { // check for cooling duct
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) { // loop over the air loop supply outlets
+            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Cooling) {      // check for cooling duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
                 int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
@@ -2035,8 +2063,8 @@ void ResolveAirLoopFlowLimits(EnergyPlusData &state)
                 }
             }
         }
-        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) {       // loop over the air loop supply outlets
-            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == DataHVACGlobals::AirDuctType::Heating) { // check for heating duct
+        for (int SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo.NumSupplyNodes; ++SupplyIndex) { // loop over the air loop supply outlets
+            if (AirToZoneNodeInfo.SupplyDuctType(SupplyIndex) == HVAC::AirDuctType::Heating) {      // check for heating duct
                 // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                 // node mass flow max avail to what air loop can supply
                 int SupplyNode = AirToZoneNodeInfo.AirLoopSupplyNodeNum(SupplyIndex);
@@ -2247,8 +2275,7 @@ void ReportInfiltrations(EnergyPlusData &state)
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(NZ)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == DataHVACGlobals::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(NZ) == DataHVACGlobals::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOn || state.dataZoneEquip->ZoneEquipAvail(NZ) == HVAC::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(NZ))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2346,8 +2373,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         H2OHtOfVap = Psychrometrics::PsyHgAirFnWTdb(state.dataEnvrn->OutHumRat, zone.OutDryBulbTemp);
         ADSCorrectionFactor = 1.0;
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop)) {
                 ADSCorrectionFactor = 0.0;
             }
@@ -2356,16 +2383,16 @@ void ReportAirHeatBalance(EnergyPlusData &state)
         znAirRpt.ExhTotalLoss = 0;
         znAirRpt.ExhSensiLoss = 0;
 
-        for (int FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
-            auto const &thisFan = state.dataFans->Fan(FanNum);
+        for (int FanNum = 1; FanNum <= state.dataFans->fans.size(); ++FanNum) {
+            auto const *thisFan = state.dataFans->fans(FanNum);
             //  Add reportable vars
-            if (thisFan.fanType == DataHVACGlobals::FanType::Exhaust) {
+            if (thisFan->type == HVAC::FanType::Exhaust) {
                 for (int ExhNum = 1; ExhNum <= zoneEquipConfig.NumExhaustNodes; ExhNum++) {
-                    if (thisFan.InletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
+                    if (thisFan->inletNodeNum == zoneEquipConfig.ExhaustNode(ExhNum)) {
                         znAirRpt.ExhTotalLoss +=
-                            thisFan.OutletAirMassFlowRate * (thisFan.OutletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
+                            thisFan->outletAirMassFlowRate * (thisFan->outletAirEnthalpy - state.dataEnvrn->OutEnthalpy) * ADSCorrectionFactor;
                         znAirRpt.ExhSensiLoss +=
-                            thisFan.OutletAirMassFlowRate * CpAir * (thisFan.OutletAirTemp - zone.OutDryBulbTemp) * ADSCorrectionFactor;
+                            thisFan->outletAirMassFlowRate * CpAir * (thisFan->outletAirTemp - zone.OutDryBulbTemp) * ADSCorrectionFactor;
                         break;
                     }
                 }
@@ -2402,8 +2429,8 @@ void ReportAirHeatBalance(EnergyPlusData &state)
 
         if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
             // CR7608 IF (TurnFansOn .AND. AirflowNetworkZoneFlag(ZoneLoop)) ADSCorrectionFactor=0
-            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOn ||
-                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == DataHVACGlobals::CycleOnZoneFansOnly) &&
+            if ((state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOn ||
+                 state.dataZoneEquip->ZoneEquipAvail(ZoneLoop) == HVAC::CycleOnZoneFansOnly) &&
                 state.afn->AirflowNetworkZoneFlag(ZoneLoop))
                 ADSCorrectionFactor = 0.0;
         }
@@ -2882,9 +2909,9 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
         auto &airLoopControlInfo = state.dataAirLoop->AirLoopControlInfo(AirLoopNum);
         if (airLoopControlInfo.CycFanSchedPtr > 0) {
             if (ScheduleManager::GetCurrentScheduleValue(state, airLoopControlInfo.CycFanSchedPtr) == 0.0) {
-                airLoopControlInfo.FanOpMode = DataHVACGlobals::CycFanCycCoil;
+                airLoopControlInfo.FanOpMode = HVAC::CycFanCycCoil;
             } else {
-                airLoopControlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                airLoopControlInfo.FanOpMode = HVAC::ContFanCycCoil;
             }
         }
     }
@@ -2899,7 +2926,7 @@ void SetHeatToReturnAirFlag(EnergyPlusData &state)
             for (int zoneInNode = 1; zoneInNode <= zoneEquipConfig.NumInletNodes; ++zoneInNode) {
                 int AirLoopNum = zoneEquipConfig.InletNodeAirLoopNum(zoneInNode);
                 if (AirLoopNum > 0) {
-                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::ContFanCycCoil) {
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::ContFanCycCoil) {
                         thisZone.NoHeatToReturnAir = false;
                         break;
                     }
@@ -2949,7 +2976,7 @@ void CheckAirLoopFlowBalance(EnergyPlusData &state)
             auto &thisAirLoopFlow = state.dataAirLoop->AirLoopFlow(AirLoopNum);
             if (!thisAirLoopFlow.FlowError) {
                 Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
-                if (unbalancedExhaustDelta > DataHVACGlobals::SmallMassFlow) {
+                if (unbalancedExhaustDelta > HVAC::SmallMassFlow) {
                     ShowSevereError(state,
                                     format("CheckAirLoopFlowBalance: AirLoopHVAC {} is unbalanced. Supply is > return plus outdoor air.",
                                            state.dataAirSystemsData->PrimaryAirSystems(AirLoopNum).Name));

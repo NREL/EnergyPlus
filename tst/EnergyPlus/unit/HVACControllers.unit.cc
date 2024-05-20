@@ -433,7 +433,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).CompType_Num = SimAirServingZones::CompType::WaterCoil_Cooling;
 
     bool WaterCoilOnAirLoop = true;
-    std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater); //"Coil:Cooling:Water";
+    std::string CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater); //"Coil:Cooling:Water";
     std::string CompName = "CHILLED WATER COIL";
     SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_Cooling;
 
@@ -514,7 +514,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
     state->dataAirLoop->OutsideAirSys(1).NumComponents = 2;
     state->dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = HVAC::cAllCoilTypes(HVAC::Coil_HeatingWater);
     state->dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
     state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = state->dataWaterCoils->WaterCoil(1).Name;
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     bool WaterCoilOnAirLoop = true;
-    std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
+    std::string CompType = HVAC::cAllCoilTypes(HVAC::Coil_HeatingWater);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
     SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_SimpleHeat;
 
@@ -646,7 +646,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirLoop->OutsideAirSys(1).ControllerName(1) = "OA CONTROLLER 1";
     state->dataAirLoop->OutsideAirSys(1).NumComponents = 2;
     state->dataAirLoop->OutsideAirSys(1).ComponentType.allocate(2);
-    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilWater_CoolingHXAssisted);
+    state->dataAirLoop->OutsideAirSys(1).ComponentType(1) = HVAC::cAllCoilTypes(HVAC::CoilWater_CoolingHXAssisted);
     state->dataAirLoop->OutsideAirSys(1).ComponentType(2) = "OutdoorAir:Mixer";
     state->dataAirLoop->OutsideAirSys(1).ComponentName.allocate(2);
     state->dataAirLoop->OutsideAirSys(1).ComponentName(1) = "HXAssisting Cooling Coil";
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     bool WaterCoilOnAirLoop = true;
-    std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWaterDetailed);
+    std::string CompType = HVAC::cAllCoilTypes(HVAC::Coil_CoolingWaterDetailed);
     std::string CompName = state->dataWaterCoils->WaterCoil(1).Name;
     SimAirServingZones::CompType CoilTypeNum = SimAirServingZones::CompType::WaterCoil_DetailedCool;
 
@@ -1006,7 +1006,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     // This should have been reset to zero
     EXPECT_EQ(state->dataHVACControllers->ControllerProps(1).MinVolFlowActuated, 0.0);
 
-    Real64 expectedOffset = (0.001 / (2100.0 * DataHVACGlobals::SmallWaterVolFlow)) * (DataConvergParams::HVACEnergyToler / 10.0);
+    Real64 expectedOffset = (0.001 / (2100.0 * HVAC::SmallWaterVolFlow)) * (DataConvergParams::HVACEnergyToler / 10.0);
     // do not let the controller tolerance exceed 1/10 of the loop temperature tolerance.
     expectedOffset = min(0.1 * DataConvergParams::HVACTemperatureToler, expectedOffset);
     EXPECT_EQ(expectedOffset, 0.1 * DataConvergParams::HVACTemperatureToler);
