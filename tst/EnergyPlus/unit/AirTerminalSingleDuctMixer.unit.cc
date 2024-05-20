@@ -2522,6 +2522,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // set input variables
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0098;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
+
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -2548,12 +2555,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
-    // set input variables
-    state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataEnvrn->OutDryBulbTemp = 35.0;
-    state->dataEnvrn->OutHumRat = 0.0098;
-    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
     SecondaryAirMassFlowRate = HVACInletMassFlowRate - PrimaryAirMassFlowRate; // seconday air flow is VRFTU flow less primary air flow
@@ -3205,6 +3206,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
+    // set input variables before input processing
+    state->dataEnvrn->OutBaroPress = 101325.0;
+    state->dataEnvrn->OutDryBulbTemp = 35.0;
+    state->dataEnvrn->OutHumRat = 0.0098;
+    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
+    state->dataEnvrn->StdRhoAir = 1.20;
+
     state->dataGlobal->NumOfTimeStepInHour = 1;
     state->dataGlobal->TimeStep = 1;
     state->dataGlobal->MinutesPerTimeStep = 60;
@@ -3230,12 +3238,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
 
     state->dataGlobal->BeginEnvrnFlag = false;
 
-    // set input variables
-    state->dataEnvrn->OutBaroPress = 101325.0;
-    state->dataEnvrn->OutDryBulbTemp = 35.0;
-    state->dataEnvrn->OutHumRat = 0.0098;
-    state->dataEnvrn->OutEnthalpy = Psychrometrics::PsyHFnTdbW(state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat);
-    state->dataEnvrn->StdRhoAir = 1.20;
     HVACInletMassFlowRate = 0.50;
     PrimaryAirMassFlowRate = 0.1;
     SecondaryAirMassFlowRate = HVACInletMassFlowRate; // seconday air mass flow rate is the same as that of the VRF terminal unit
