@@ -590,7 +590,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
 TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
 {
     int i;
-    int const AirSysNum = 1;
+    int AirSysNum = 1;
     int index;
     std::array<bool, 3> HVACNotConverged;
     std::array<Real64, 10> DemandToSupply;
