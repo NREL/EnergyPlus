@@ -2919,7 +2919,7 @@ void ConvergenceErrors(EnergyPlusData &state,
     if (index == 4) CaseName = "energy";
     if (index == 5) CaseName = "CO2";
     if (index == 6) CaseName = "generic contaminant";
-    
+
     auto &arrayRef = HVACNotConverged;
     if (std::any_of(std::begin(arrayRef), std::end(arrayRef), [](bool i) { return i; })) {
 
