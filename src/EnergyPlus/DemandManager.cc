@@ -472,56 +472,56 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                                 "Demand Manager Meter Demand Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.MeterDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Average Demand Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.AverageDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Peak Demand Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.PeakDemand,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Scheduled Limit Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.ScheduledLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Demand Limit Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.DemandLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Power",
                                 Constant::Units::W,
                                 thisDemandMgrList.OverLimit,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 thisDemandMgrList.Name);
 
             SetupOutputVariable(state,
                                 "Demand Manager Over Limit Time",
                                 Constant::Units::hr,
                                 thisDemandMgrList.OverLimitDuration,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 thisDemandMgrList.Name);
 
             if (ErrorsFound) {
@@ -535,24 +535,24 @@ void GetDemandManagerListInput(EnergyPlusData &state)
                             "Demand Manager Exterior Energy Iteration Count",
                             Constant::Units::None,
                             state.dataDemandManager->DemandManagerExtIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             "ManageDemand");
 
         SetupOutputVariable(state,
                             "Demand Manager Heat Balance Iteration Count",
                             Constant::Units::None,
                             state.dataDemandManager->DemandManagerHBIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             "ManageDemand");
 
         SetupOutputVariable(state,
                             "Demand Manager HVAC Iteration Count",
                             Constant::Units::None,
                             state.dataDemandManager->DemandManagerHVACIterations,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             "ManageDemand");
     }
 }
@@ -1599,7 +1599,7 @@ void LoadInterface(EnergyPlusData &state, DemandAction const Action, int const M
         }
         if (state.dataZoneCtrls->NumComfortControlledZones > 0) {
             if (state.dataHeatBalFanSys->ComfortControlType(state.dataZoneCtrls->TempControlledZone(LoadPtr).ActualZoneNum) !=
-                DataHVACGlobals::ThermostatType::Uncontrolled) {
+                HVAC::ThermostatType::Uncontrolled) {
                 if (Action == DemandAction::CheckCanReduce) {
                     if (state.dataHeatBalFanSys->ZoneThermostatSetPointLo(state.dataZoneCtrls->ComfortControlledZone(LoadPtr).ActualZoneNum) >
                             demandMgr.LowerLimit ||

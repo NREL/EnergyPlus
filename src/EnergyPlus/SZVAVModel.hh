@@ -101,7 +101,7 @@ namespace SZVAVModel {
                         bool HXUnitOn,
                         int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        DataHVACGlobals::CompressorOperation CompressorONFlag
+                        HVAC::CompressorOperation CompressorONFlag
 
     );
 
@@ -116,7 +116,7 @@ namespace SZVAVModel {
                         bool HXUnitOn,
                         int AirLoopNum,
                         Real64 &PartLoadFrac,
-                        DataHVACGlobals::CompressorOperation CompressorONFlag);
+                        HVAC::CompressorOperation CompressorONFlag);
 
 } // namespace SZVAVModel
 
