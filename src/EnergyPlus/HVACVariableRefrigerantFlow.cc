@@ -12841,6 +12841,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
 
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::CycFanCycCoil &&
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::VAV) {
+        state.dataFans->fans(this->FanIndex)->totalPower *= state.dataHVACGlobal->OnOffFanPartLoadFraction;
+    }
     // track fan power per terminal unit for calculating COP
     this->FanPower = state.dataFans->fans(this->FanIndex)->totalPower;
 
