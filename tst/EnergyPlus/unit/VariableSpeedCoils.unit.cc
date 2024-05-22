@@ -7139,7 +7139,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
 {
     int coilNum = 1;
-    Real64 const closeEnough = 0.001;
+    Real64 constexpr closeEnough = 0.001;
     state->dataVariableSpeedCoils->VarSpeedCoil.allocate(1);
     auto &thisVarSpeedCoil = state->dataVariableSpeedCoils->VarSpeedCoil(1);
     state->dataLoopNodes->Node.allocate(2);
