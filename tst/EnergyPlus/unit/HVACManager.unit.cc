@@ -591,7 +591,6 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
 {
     int i;
     int AirSysNum = 1;
-    int index;
     std::array<bool, 3> HVACNotConverged;
     std::array<Real64, 10> DemandToSupply;
     std::array<Real64, 10> SupplyDeck1ToDemand;
@@ -610,8 +609,8 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.1 * i;
         SupplyDeck2ToDemand[i] = 0.0;
     }
-    index = 1;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::MassFlow);
 
     std::string const expectedErrString1 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for mass flow rate",
@@ -628,8 +627,8 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.1 * i;
         SupplyDeck2ToDemand[i] = 0.0;
     }
-    index = 2;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::HumidityRatio);
 
     std::string const expectedErrString2 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for humidity ratio",
@@ -646,8 +645,8 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.1 * i;
         SupplyDeck2ToDemand[i] = 0.0;
     }
-    index = 3;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Temperature);
 
     std::string const expectedErrString3 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for temperature",
@@ -664,8 +663,8 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.0;
         SupplyDeck2ToDemand[i] = 0.0;
     }
-    index = 4;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Energy);
 
     std::string const expectedErrString4 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for energy",
@@ -682,8 +681,8 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.1 * i;
         SupplyDeck2ToDemand[i] = 0.0;
     }
-    index = 5;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::CO2);
 
     std::string const expectedErrString5 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for CO2",
@@ -700,9 +699,9 @@ TEST_F(EnergyPlusFixture, HVACConvergenceErrorTest)
         SupplyDeck1ToDemand[i] = 0.0;
         SupplyDeck2ToDemand[i] = 0.1 * i;
     }
-    index = 6;
     state->dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes = 2;
-    HVACManager::ConvergenceErrors(*state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, index);
+    HVACManager::ConvergenceErrors(
+        *state, HVACNotConverged, DemandToSupply, SupplyDeck1ToDemand, SupplyDeck2ToDemand, AirSysNum, ConvErrorCallType::Generic);
 
     std::string const expectedErrString6 =
         delimited_string({"   **   ~~~   ** Air System Named = AirLoop1 did not converge for generic contaminant",
