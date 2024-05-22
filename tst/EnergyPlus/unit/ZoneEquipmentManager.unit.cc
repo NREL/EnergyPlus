@@ -5240,6 +5240,10 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     mixSpace2Node.Press = 100020.0;
     mixSpace3Node.Press = 99400.0;
 
+    mixSpace1Node.GenContam = 10.0;
+    mixSpace2Node.GenContam = 20.0;
+    mixSpace3Node.GenContam = 30.0;
+
     equipInletNode.Temp = 19.2;
     equipInletNode.HumRat = 0.005;
     equipInletNode.CO2 = 100.0;
@@ -5251,6 +5255,8 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
         mixSpace1Node.HumRat * mixSpace1.fraction + mixSpace2Node.HumRat * mixSpace2.fraction + mixSpace3Node.HumRat * mixSpace3.fraction;
     Real64 expectedInletCO2 =
         mixSpace1Node.CO2 * mixSpace1.fraction + mixSpace2Node.CO2 * mixSpace2.fraction + mixSpace3Node.CO2 * mixSpace3.fraction;
+    Real64 expectedInletGenContam =
+        mixSpace1Node.GenContam * mixSpace1.fraction + mixSpace2Node.GenContam * mixSpace2.fraction + mixSpace3Node.GenContam * mixSpace3.fraction;
     Real64 expectedInletPress =
         mixSpace1Node.Press * mixSpace1.fraction + mixSpace2Node.Press * mixSpace2.fraction + mixSpace3Node.Press * mixSpace3.fraction;
     Real64 expectedInletTemp = Psychrometrics::PsyTdbFnHW(expectedInletEnthalpy, expectedInletHumRat);
@@ -5259,6 +5265,7 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     EXPECT_NEAR(expectedInletTemp, equipInletNode.Temp, 0.0001);
     EXPECT_NEAR(expectedInletHumRat, equipInletNode.HumRat, 0.0001);
     EXPECT_NEAR(expectedInletCO2, equipInletNode.CO2, 0.0001);
+    EXPECT_NEAR(expectedInletGenContam, equipInletNode.GenContam, 0.0001);
     EXPECT_NEAR(expectedInletPress, equipInletNode.Press, 0.0001);
 
     equipInletNode.MassFlowRate = 0.1;
