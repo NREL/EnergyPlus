@@ -4903,21 +4903,24 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the AirHeatBalance.
 
-    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
-        auto &thisZone = state.dataHeatBal->Zone(ZoneLoop);
-        for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-            if (Util::SameString(reqVar->key, thisZone.Name) || reqVar->key.empty()) {
-                if (Util::SameString(reqVar->name, "Zone Wetbulb Globe Temperature")) {
+    if (state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag) {
+        for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+            auto &thisZone = state.dataHeatBal->Zone(ZoneLoop);
+            for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+                if (Util::SameString(reqVar->key, thisZone.Name) || reqVar->key.empty()) {
+                    if (Util::SameString(reqVar->name, "Zone Wetbulb Globe Temperature")) {
+                        thisZone.ReportWBGT = true;
+                    }
+                }
+            }
+            for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+                if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == thisZone.Name &&
+                    Util::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, "Zone Wetbulb Globe Temperature")) {
                     thisZone.ReportWBGT = true;
                 }
             }
         }
-        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
-            if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == thisZone.Name &&
-                Util::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, "Zone Wetbulb Globe Temperature")) {
-                thisZone.ReportWBGT = true;
-            }
-        }
+        state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag = false;
     }
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
