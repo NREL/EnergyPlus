@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -4909,6 +4910,12 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                 if (Util::SameString(reqVar->name, "Zone Wetbulb Globe Temperature")) {
                     thisZone.ReportWBGT = true;
                 }
+            }
+        }
+        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+            if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == thisZone.Name &&
+                Util::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, "Zone Wetbulb Globe Temperature")) {
+                thisZone.ReportWBGT = true;
             }
         }
     }
