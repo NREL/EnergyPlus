@@ -2484,109 +2484,109 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     }
 
     // Run and Check: VRFOU_CompSpd
-    { //   Test the method VRFOU_CompSpd, which calculates the compressor speed at given
-        //   operational conditions to meet the evaporator or condenser capacity provided.
+    {//   Test the method VRFOU_CompSpd, which calculates the compressor speed at given
+     //   operational conditions to meet the evaporator or condenser capacity provided.
 
-        { // a. Evaporator
+     {// a. Evaporator
 
-            // Inputs_condition
-            Real64 constexpr Q_req = 6971;          // Required capacity [W]
-            Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
-            Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-            Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-            Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-            Real64 CompSpdActual;                   // Actual compressor running speed [rps]
+      // Inputs_condition
+      Real64 constexpr Q_req = 6971;        // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-                *state, Q_req, HXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, HXOpMode::EvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
-            // Test
-            EXPECT_NEAR(1295, CompSpdActual, 5);
-        }
+    // Test
+    EXPECT_NEAR(1295, CompSpdActual, 5);
+}
 
-        {
-            // b. Condenser
+{
+    // b. Condenser
 
-            // Inputs_condition
-            Real64 constexpr Q_req = 6953;          // Required capacity [W]
-            Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
-            Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-            Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-            Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-            Real64 CompSpdActual;                   // Actual compressor running speed [rps]
+    // Inputs_condition
+    Real64 constexpr Q_req = 6953;          // Required capacity [W]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 CompSpdActual;                   // Actual compressor running speed [rps]
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
-                *state, Q_req, HXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompSpd(
+        *state, Q_req, HXOpMode::CondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
-            // Test
-            EXPECT_NEAR(950, CompSpdActual, 5);
-        }
-    } // namespace EnergyPlus
+    // Test
+    EXPECT_NEAR(950, CompSpdActual, 5);
+}
+} // namespace EnergyPlus
 
-    // Run and Check: VRFOU_CompCap
-    {
-        //   Test the method VRFOU_CompCap, which calculates the compressor performance (power and capacity)
-        //   at given compressor speed and operational conditions.
+// Run and Check: VRFOU_CompCap
+{
+    //   Test the method VRFOU_CompCap, which calculates the compressor performance (power and capacity)
+    //   at given compressor speed and operational conditions.
 
-        // Inputs_condition
-        Real64 constexpr CompSpdActual = 1298;  // Actual compressor running speed [rps]
-        Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
-        Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
-        Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
-        Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
-        Real64 Q_c_tot;                         // Compressor evaporative capacity [W]
-        Real64 Ncomp;                           // Compressor power [W]
+    // Inputs_condition
+    Real64 constexpr CompSpdActual = 1298;  // Actual compressor running speed [rps]
+    Real64 constexpr T_suction = -13.35;    // Compressor suction temperature Te' [C]
+    Real64 constexpr T_discharge = 36.37;   // Compressor discharge temperature Tc' [C]
+    Real64 constexpr h_IU_evap_in = 225016; // Enthalpy of IU at inlet, for C_cap_operation calculation [kJ/kg]
+    Real64 constexpr h_comp_in = 429529;    // Enthalpy after piping loss (compressor inlet), for C_cap_operation calculation [kJ/kg]
+    Real64 Q_c_tot;                         // Compressor evaporative capacity [W]
+    Real64 Ncomp;                           // Compressor power [W]
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CompCap(*state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
 
-        // Test
-        EXPECT_NEAR(6990, Q_c_tot, 10);
-        EXPECT_NEAR(1601, Ncomp, 10);
-    }
+    // Test
+    EXPECT_NEAR(6990, Q_c_tot, 10);
+    EXPECT_NEAR(1601, Ncomp, 10);
+}
 
-    // Run and Check: VRFOU_CalcComp
-    {
-        //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it
-        //   sepcifies the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the
-        //   specified speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load
-        //   conditions. The low load modification logics are different for cooling mode and heating mode.
+// Run and Check: VRFOU_CalcComp
+{
+    //   Test the method VRFOU_CalcCompH, which simulates the compressor performance at given oprtaional conditions. More specifically, it
+    //   sepcifies the compressor speed to provide sufficient evaporative capacity, and calculate the power of the compressor running at the
+    //   specified speed. Note that it may be needed to manipulate the operational conditions to further adjust system capacity at low load
+    //   conditions. The low load modification logics are different for cooling mode and heating mode.
 
-        // Inputs_condition
-        Real64 TU_load = 6006;              // Indoor unit cooling load [W]
-        Real64 T_suction = 8.86;            // Compressor suction temperature Te' [C]
-        Real64 T_discharge = 40.26;         // Compressor discharge temperature Tc' [C]
-        Real64 Pipe_h_out_ave = 233428;     // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
-        Real64 IUMaxCondTemp = 36;          // VRV IU condensing temperature, max among all indoor units [C]
-        Real64 MinOutdoorUnitTe = -72;      // The minimum temperature that OU Te can be at cooling mode (only used for calculating Min capacity)
-        Real64 Tfs = 10.90;                 // Temperature of the air at the OU evaporator coil surface [C]]
-        Real64 Pipe_Q = 162.67;             // Piping Loss Algorithm Parameter: Heat loss [W]
-        Real64 OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
-        Real64 Ncomp = 1058;                // Compressor power [W]
-        Real64 CompSpdActual;               // Actual compressor running speed [rps]
+    // Inputs_condition
+    Real64 TU_load = 6006;              // Indoor unit cooling load [W]
+    Real64 T_suction = 8.86;            // Compressor suction temperature Te' [C]
+    Real64 T_discharge = 40.26;         // Compressor discharge temperature Tc' [C]
+    Real64 Pipe_h_out_ave = 233428;     // Average Enthalpy of the refrigerant leaving IUs [kJ/kg]
+    Real64 IUMaxCondTemp = 36;          // VRV IU condensing temperature, max among all indoor units [C]
+    Real64 MinOutdoorUnitTe = -72;      // The minimum temperature that OU Te can be at cooling mode (only used for calculating Min capacity)
+    Real64 Tfs = 10.90;                 // Temperature of the air at the OU evaporator coil surface [C]]
+    Real64 Pipe_Q = 162.67;             // Piping Loss Algorithm Parameter: Heat loss [W]
+    Real64 OUEvapHeatExtract = 5110.40; // Evaporator heat extract [W]
+    Real64 Ncomp = 1058;                // Compressor power [W]
+    Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
-        // Run
-        state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
-                                                                TU_load,
-                                                                T_suction,
-                                                                T_discharge,
-                                                                Pipe_h_out_ave,
-                                                                IUMaxCondTemp,
-                                                                MinOutdoorUnitTe,
-                                                                Tfs,
-                                                                Pipe_Q,
-                                                                OUEvapHeatExtract,
-                                                                CompSpdActual,
-                                                                Ncomp);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_CalcCompH(*state,
+                                                            TU_load,
+                                                            T_suction,
+                                                            T_discharge,
+                                                            Pipe_h_out_ave,
+                                                            IUMaxCondTemp,
+                                                            MinOutdoorUnitTe,
+                                                            Tfs,
+                                                            Pipe_Q,
+                                                            OUEvapHeatExtract,
+                                                            CompSpdActual,
+                                                            Ncomp);
 
-        // Test
-        EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
-        EXPECT_NEAR(1500, CompSpdActual, 1);
-        EXPECT_NEAR(2080, Ncomp, 1);
-        EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
-    }
+    // Test
+    EXPECT_NEAR(5110, OUEvapHeatExtract, 1);
+    EXPECT_NEAR(1500, CompSpdActual, 1);
+    EXPECT_NEAR(2080, Ncomp, 1);
+    EXPECT_EQ(state->dataLoopNodes->Node(state->dataHVACVarRefFlow->VRFTU(1).VRFTUInletNodeNum).MassFlowRate, 0.0);
+}
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
@@ -2629,165 +2629,163 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Coil)
     InitializePsychRoutines(*state);
 
     // Run and Check: VRFOU_Cap
-    {     //   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature,
-          //   i.e., condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
-        { // a. Condenser
+    { //   Test the method VRFOU_Cap, which determines the VRF OU heat transfer rate, given refrigerant side temperature,
+      //   i.e., condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
+     {// a. Condenser
 
-            // Inputs_condition
-            m_air = 3.6;
-            OutDryBulbTemp = 28;
-            OutHumRat = 0.0146;
-            SC = 1;
-            Tdischarge = 36;
+      // Inputs_condition
+      m_air = 3.6;
+    OutDryBulbTemp = 28;
+    OutHumRat = 0.0146;
+    SC = 1;
+    Tdischarge = 36;
 
-            // Run
-            Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
+    // Run
+    Q_h_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::CondMode, Tdischarge, SC, m_air, OutDryBulbTemp, OutHumRat);
 
-            // Test
-            EXPECT_NEAR(27551, Q_h_OU, 10);
-        }
+    // Test
+    EXPECT_NEAR(27551, Q_h_OU, 10);
+}
 
-        {
-            // b. Evaporator
+{
+    // b. Evaporator
 
-            // Inputs_condition
-            m_air = 3.6;
-            OutDryBulbTemp = 7;
-            OutHumRat = 0.0019;
-            SH = 1;
-            Tsuction = -3;
+    // Inputs_condition
+    m_air = 3.6;
+    OutDryBulbTemp = 7;
+    OutHumRat = 0.0019;
+    SH = 1;
+    Tsuction = -3;
 
-            // Run
-            Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
+    // Run
+    Q_c_OU = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_Cap(*state, HXOpMode::EvapMode, Tsuction, SH, m_air, OutDryBulbTemp, OutHumRat);
 
-            // Test
-            EXPECT_NEAR(24456, Q_c_OU, 10);
-        }
-    } // namespace EnergyPlus
+    // Test
+    EXPECT_NEAR(24456, Q_c_OU, 10);
+}
+} // namespace EnergyPlus
 
-    // Run and Check: VRFOU_FlowRate
-    {     //   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e.,
-          //   condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
-        { // a. Condenser
+// Run and Check: VRFOU_FlowRate
+{ //   Test the method VRFOU_Cap, which calculates the outdoor unit fan flow rate, given VRF OU load and refrigerant side temperature, i.e.,
+  //   condensing temperature and SC for condenser, or evaporating temperature and SH for evaporator.
+ {// a. Condenser
 
-            // Inputs_condition
-            Q_h_OU = 27551;
-            OutDryBulbTemp = 28;
-            OutHumRat = 0.0146;
-            SC = 1;
-            Tdischarge = 36;
+  // Inputs_condition
+  Q_h_OU = 27551;
+OutDryBulbTemp = 28;
+OutHumRat = 0.0146;
+SC = 1;
+Tdischarge = 36;
 
-            // Run
-            m_air =
-                state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
+// Run
+m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::CondMode, Tdischarge, SC, Q_h_OU, OutDryBulbTemp, OutHumRat);
 
-            // Test
-            EXPECT_NEAR(3.6, m_air, 0.01);
-        }
+// Test
+EXPECT_NEAR(3.6, m_air, 0.01);
+}
 
-        {
-            // b. Evaporator
+{
+    // b. Evaporator
 
-            // Inputs_condition
-            Q_c_OU = 24456;
-            OutDryBulbTemp = 7;
-            OutHumRat = 0.0019;
-            SH = 1;
-            Tsuction = -3;
+    // Inputs_condition
+    Q_c_OU = 24456;
+    OutDryBulbTemp = 7;
+    OutHumRat = 0.0019;
+    SH = 1;
+    Tsuction = -3;
 
-            // Run
-            m_air =
-                state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
+    // Run
+    m_air = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_FlowRate(*state, HXOpMode::EvapMode, Tsuction, SH, Q_c_OU, OutDryBulbTemp, OutHumRat);
 
-            // Test
-            EXPECT_NEAR(3.6, m_air, 0.01);
-        }
-    }
+    // Test
+    EXPECT_NEAR(3.6, m_air, 0.01);
+}
+}
 
-    // Run and Check: VRFOU_TeTc
-    {     //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
-          //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
-          //   release/extract amount and air side parameters.
-        { // a. Condenser
+// Run and Check: VRFOU_TeTc
+{ //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
+  //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
+  //   release/extract amount and air side parameters.
+ {// a. Condenser
 
-            // Inputs_condition
-            m_air = 3.6;
-            Q_h_OU = 27551;
-            OutDryBulbTemp = 28;
-            OutHumRat = 0.0146;
-            SC = 1;
+  // Inputs_condition
+  m_air = 3.6;
+Q_h_OU = 27551;
+OutDryBulbTemp = 28;
+OutHumRat = 0.0146;
+SC = 1;
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-                *state, HXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
+// Run
+state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+    *state, HXOpMode::CondMode, Q_h_OU, SC, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tdischarge);
 
-            // Test
-            EXPECT_NEAR(36, Tdischarge, 0.05);
-        }
+// Test
+EXPECT_NEAR(36, Tdischarge, 0.05);
+}
 
-        {
-            // b. Evaporator
+{
+    // b. Evaporator
 
-            // Inputs_condition
-            m_air = 3.6;
-            Q_c_OU = 24456;
-            OutDryBulbTemp = 7;
-            OutHumRat = 0.0019;
-            SH = 1;
-            Tsuction = -3;
+    // Inputs_condition
+    m_air = 3.6;
+    Q_c_OU = 24456;
+    OutDryBulbTemp = 7;
+    OutHumRat = 0.0019;
+    SH = 1;
+    Tsuction = -3;
 
-            // Run
-            state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
-                *state, HXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
+    // Run
+    state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_TeTc(
+        *state, HXOpMode::EvapMode, Q_c_OU, SH, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress, temp, Tsuction);
 
-            // Test
-            EXPECT_NEAR(-3, Tsuction, 0.05);
-        }
-    }
+    // Test
+    EXPECT_NEAR(-3, Tsuction, 0.05);
+}
+}
 
-    // Run and Check: VRFOU_SCSH
+// Run and Check: VRFOU_SCSH
+{
+    //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
+    //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
+    //   release/extract amount and air side parameters.
     {
-        //   Test the method VRFOU_Cap, which calculates the VRF OU refrigerant side temperature, i.e., condensing temperature
-        //   at cooling mode, or evaporating temperature at heating mode, given the coil heat
-        //   release/extract amount and air side parameters.
-        {
-            // a. Condenser
+        // a. Condenser
 
-            // Inputs_condition
-            m_air = 3.6;
-            Q_h_OU = 27551;
-            OutDryBulbTemp = 28;
-            OutHumRat = 0.0146;
-            Tdischarge = 36;
+        // Inputs_condition
+        m_air = 3.6;
+        Q_h_OU = 27551;
+        OutDryBulbTemp = 28;
+        OutHumRat = 0.0146;
+        Tdischarge = 36;
 
-            // Run
-            SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-                *state, HXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+        // Run
+        SC = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, HXOpMode::CondMode, Q_h_OU, Tdischarge, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
 
-            // Test
-            EXPECT_NEAR(1, SC, 0.01);
-        }
-
-        {
-            // b. Evaporator
-
-            // Inputs_condition
-            m_air = 3.6;
-            Q_c_OU = 24456;
-            OutDryBulbTemp = 7;
-            OutHumRat = 0.0019;
-            Tsuction = -3;
-
-            // Run
-            SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
-                *state, HXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
-
-            // Test
-            EXPECT_NEAR(1, SH, 0.01);
-        }
+        // Test
+        EXPECT_NEAR(1, SC, 0.01);
     }
-    // Clean up
-    state->dataHVACVarRefFlow->VRF.deallocate();
+
+    {
+        // b. Evaporator
+
+        // Inputs_condition
+        m_air = 3.6;
+        Q_c_OU = 24456;
+        OutDryBulbTemp = 7;
+        OutHumRat = 0.0019;
+        Tsuction = -3;
+
+        // Run
+        SH = state->dataHVACVarRefFlow->VRF(VRFCond).VRFOU_SCSH(
+            *state, HXOpMode::EvapMode, Q_c_OU, Tsuction, m_air, OutDryBulbTemp, OutHumRat, OutBaroPress);
+
+        // Test
+        EXPECT_NEAR(1, SH, 0.01);
+    }
+}
+// Clean up
+state->dataHVACVarRefFlow->VRF.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_GetCoilInput)
@@ -24257,17 +24255,6 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
 {
     // Test for #10514
 
-    // static constexpr std::string_view RoutineName( "VRFTest_NoLoadOAFlowTest" );
-    bool ErrorsFound(false);       // function returns true on error
-    bool FirstHVACIteration(true); // simulate the first pass through HVAC simulation, use false for next iteration
-    int VRFTUNum(1);               // index to VRF terminal unit
-    int CurZoneNum(1);             // index to zone
-    int ZoneInletAirNode(0);       // zone inlet node number
-    int OutsideAirNode(0);         // VRFTU Outside air inlet node
-    int ZoneNum(1);                // current zone index
-    Real64 QZnReq(0.0);            // current zone load to set point
-    Real64 OnOffAirFlowRatio(1.0); // ratio of compressor ON airflow to average airflow over timestep
-
     std::string const idf_objects = delimited_string({
 
         "  ScheduleTypeLimits,",
@@ -24544,6 +24531,93 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
         "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
         "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
 
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
+        "    Level1:Office4 VRF Indoor Unit,  !- Zone Terminal Unit Name",
+        "    AlwaysOn,                !- Terminal Unit Availability Schedule",
+        "    Level1:Office4 VRF Indoor Unit Return,  !- Terminal Unit Air Inlet Node Name",
+        "    Level1:Office4 VRF Indoor Unit Supply Inlet,  !- Terminal Unit Air Outlet Node Name",
+        "    0.111000,                !- Cooling Supply Air Flow Rate {m3/s}",
+        "    0.056000,                !- No Cooling Supply Air Flow Rate {m3/s}",
+        "    0.111000,                !- Heating Supply Air Flow Rate {m3/s}",
+        "    0.056000,                !- No Heating Supply Air Flow Rate {m3/s}",
+        "    0.028000,                !- Cooling Outdoor Air Flow Rate {m3/s}",
+        "    0.028000,                !- Heating Outdoor Air Flow Rate {m3/s}",
+        "    0.014000,                !- No Load Outdoor Air Flow Rate {m3/s}",
+        "    AlwaysOn,                !- Supply Air Fan Operating Mode Schedule Name",
+        "    BlowThrough,             !- Supply Air Fan Placement",
+        "    Fan:ConstantVolume,      !- Supply Air Fan Object Type",
+        "    Level1:Office4 VRF Indoor Unit Supply Fan,  !- Supply Air Fan Object Name",
+        "    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type",
+        "    Level1:Office4 VRF Indoor Unit Outdoor Air Mixer,  !- Outside Air Mixer Object Name",
+        "    Coil:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type",
+        "    Level1:Office4 VRF Indoor Unit DX Cooling Coil,  !- Cooling Coil Object Name",
+        "    Coil:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type",
+        "    Level1:Office4 VRF Indoor Unit DX Heating Coil,  !- Heating Coil Object Name",
+        "    30.0000,                 !- Zone Terminal Unit On Parasitic Electric Energy Use {W}",
+        "    20.0000;                 !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Level1:Office4 Equipment,!- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "    Level1:Office4 VRF Indoor Unit,  !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Level1:Office4,          !- Zone Name",
+        "    Level1:Office4 Equipment,!- Zone Conditioning Equipment List Name",
+        "    Level1:Office4 Air Inlet Node List,  !- Zone Air Inlet Node or NodeList Name",
+        "    Level1:Office4 Air Exhaust Node List,  !- Zone Air Exhaust Node or NodeList Name",
+        "    Level1:Office4 Zone Air Node,  !- Zone Air Node Name",
+        "    Level1:Office4 Return Outlet;  !- Zone Return Air Node Name",
+
+        "  Zone,",
+        "    Level1:Office4,          !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    ,                        !- Ceiling Height {m}",
+        "    68.2413,                 !- Volume {m3}",
+        "    19.4975,                 !- Floor Area {m2}",
+        "    TARP;                    !- Zone Inside Convection Algorithm",
+
+        "  Fan:ConstantVolume,",
+        "    Level1:Office4 VRF Indoor Unit Supply Fan,  !- Name",
+        "    AlwaysOn,                 !- Availability Schedule Name",
+        "    0.70,                    !- Fan Total Efficiency",
+        "    100.00,                  !- Pressure Rise {Pa}",
+        "    0.111000,                !- Maximum Flow Rate {m3/s}",
+        "    0.90,                    !- Motor Efficiency",
+        "    1.00,                    !- Motor In Airstream Fraction",
+        "    Level1:Office4 VRF Indoor Unit Mixed Air Outlet,  !- Air Inlet Node Name",
+        "    Level1:Office4 VRF Indoor Unit Supply Fan Outlet,  !- Air Outlet Node Name",
+        "    General;                 !- End-Use Subcategory",
+
+        "  Coil:Cooling:DX:VariableRefrigerantFlow,",
+        "    Level1:Office4 VRF Indoor Unit DX Cooling Coil,  !- Name",
+        "    AlwaysOn,                 !- Availability Schedule Name",
+        "    4000.0,                  !- Gross Rated Total Cooling Capacity {W}",
+        "    0.75,                    !- Gross Rated Sensible Heat Ratio",
+        "    0.111000,                !- Rated Air Flow Rate {m3/s}",
+        "    VRFTUCoolCapFT,          !- Cooling Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF,         !- Cooling Capacity Modifier Curve Function of Flow Fraction Name",
+        "    Level1:Office4 VRF Indoor Unit Supply Fan Outlet,  !- Coil Air Inlet Node",
+        "    Level1:Office4 VRF Indoor Unit DX Cooling Coil Outlet;  !- Coil Air Outlet Node",
+
+        "  Coil:Heating:DX:VariableRefrigerantFlow,",
+        "    Level1:Office4 VRF Indoor Unit DX Heating Coil,  !- Name",
+        "    AlwaysOn,                !- Availability Schedule",
+        "    4000.0,                  !- Gross Rated Heating Capacity {W}",
+        "    0.111000,                !- Rated Air Flow Rate {m3/s}",
+        "    Level1:Office4 VRF Indoor Unit DX Cooling Coil Outlet,  !- Coil Air Inlet Node",
+        "    Level1:Office4 VRF Indoor Unit Supply Inlet,  !- Coil Air Outlet Node",
+        "    VRFTUHeatCapFT,          !- Heating Capacity Ratio Modifier Function of Temperature Curve Name",
+        "    VRFACCoolCapFFF;         !- Heating Capacity Modifier Function of Flow Fraction Curve Name",
+
         "  AirConditioner:VariableRefrigerantFlow,",
         "    VRF Outdoor Unit 1,        !- Heat Pump Name",
         "    AlwaysOn,                !- Availability Schedule Name",
@@ -24710,6 +24784,89 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
         "    1,                       !- Initial Heat Recovery Heating Energy Fraction {W/W}",
         "    0;                       !- Heat Recovery Heating Energy Time Constant {hr}",
 
+        "  AirConditioner:VariableRefrigerantFlow,",
+        "    VRF Outdoor Unit 3,        !- Heat Pump Name",
+        "    AlwaysOn,                !- Availability Schedule Name",
+        "    7040.0,                  !- Gross Rated Total Cooling Capacity {W}",
+        "    3.3,                     !- Gross Rated Cooling COP {W/W}",
+        "    -6,                      !- Minimum Outdoor Temperature in Cooling Mode {C}",
+        "    43,                      !- Maximum Outdoor Temperature in Cooling Mode {C}",
+        "    VRFCoolCapFT,            !- Cooling Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolCapFTBoundary,    !- Cooling Capacity Ratio Boundary Curve Name",
+        "    VRFCoolCapFTHi,          !- Cooling Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFCoolEIRFT,            !- Cooling Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFCoolEIRFTBoundary,    !- Cooling Energy Input Ratio Boundary Curve Name",
+        "    VRFCoolEIRFTHi,          !- Cooling Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    CoolingEIRLowPLR,        !- Cooling Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    CoolingEIRHiPLR,         !- Cooling Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    CoolingCombRatio,        !- Cooling Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Cooling Part-Load Fraction Correlation Curve Name",
+        "    autosize,                !- Gross Rated Heating Capacity {W}",
+        "    1,                       !- Rated Heating Capacity Sizing Ratio {W/W}",
+        "    3.4,                     !- Gross Rated Heating COP {W/W}",
+        "    -20,                     !- Minimum Outdoor Temperature in Heating Mode {C}",
+        "    40,                      !- Maximum Outdoor Temperature in Heating Mode {C}",
+        "    VRFHeatCapFT,            !- Heating Capacity Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatCapFTBoundary,    !- Heating Capacity Ratio Boundary Curve Name",
+        "    VRFHeatCapFTHi,          !- Heating Capacity Ratio Modifier Function of High Temperature Curve Name",
+        "    VRFHeatEIRFT,            !- Heating Energy Input Ratio Modifier Function of Low Temperature Curve Name",
+        "    VRFHeatEIRFTBoundary,    !- Heating Energy Input Ratio Boundary Curve Name",
+        "    VRFHeatEIRFTHi,          !- Heating Energy Input Ratio Modifier Function of High Temperature Curve Name",
+        "    WetBulbTemperature,      !- Heating Performance Curve Outdoor Temperature Type",
+        "    HeatingEIRLowPLR,        !- Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name",
+        "    HeatingEIRHiPLR,         !- Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name",
+        "    HeatingCombRatio,        !- Heating Combination Ratio Correction Factor Curve Name",
+        "    VRFCPLFFPLR,             !- Heating Part-Load Fraction Correlation Curve Name",
+        "    0.15,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}",
+        "    <Select zone>,           !- Zone Name for Master Thermostat Location",
+        "    LoadPriority,            !- Master Thermostat Priority Control Type",
+        "    ,                        !- Thermostat Priority Schedule Name",
+        "    VRF Outdoor Unit Zone List 3,  !- Zone Terminal Unit List Name",
+        "    Yes,                      !- Heat Pump Waste Heat Recovery",
+        "    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}",
+        "    15,                      !- Vertical Height used for Piping Correction Factor {m}",
+        "    CoolingLengthCorrectionFactor,  !- Piping Correction Factor for Length in Cooling Mode Curve Name",
+        "    -.000386,                !- Piping Correction Factor for Height in Cooling Mode Coefficient {1/m}",
+        "    50,                      !- Equivalent Piping Length used for Piping Correction Factor in Heating Mode {m}",
+        "    VRF Piping Correction Factor for Length in Heating Mode,  !- Piping Correction Factor for Length in Heating Mode Curve Name",
+        "    0,                       !- Piping Correction Factor for Height in Heating Mode Coefficient {1/m}",
+        "    15,                      !- Crankcase Heater Power per Compressor {W}",
+        "    2,                       !- Number of Compressors {dimensionless}",
+        "    0.5,                     !- Ratio of Compressor Size to Total Compressor Capacity {W/W}",
+        "    5,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}",
+        "    Resistive,               !- Defrost Strategy",
+        "    Timed,                   !- Defrost Control",
+        "    DXHtgCoilDefrostEIRFT,   !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name",
+        "    0.058333,                !- Defrost Time Period Fraction {dimensionless}",
+        "    autosize,                !- Resistive Defrost Heater Capacity {W}",
+        "    5,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}",
+        "    AirCooled,               !- Condenser Type",
+        "    VRF Outdoor Unit Outdoor Air Node,  !- Condenser Inlet Node Name",
+        "    ,                        !- Condenser Outlet Node Name",
+        "    autosize,                !- Water Condenser Volume Flow Rate {m3/s}",
+        "    0.9,                     !- Evaporative Condenser Effectiveness {dimensionless}",
+        "    autosize,                !- Evaporative Condenser Air Flow Rate {m3/s}",
+        "    autosize,                !- Evaporative Condenser Pump Rated Power Consumption {W}",
+        "    ,                        !- Supply Water Storage Tank Name",
+        "    0,                       !- Basin Heater Capacity {W/K}",
+        "    2,                       !- Basin Heater Setpoint Temperature {C}",
+        "    AlwaysOn,                 !- Basin Heater Operating Schedule Name",
+        "    Electricity,             !- Fuel Type",
+        "    -10,                     !- Minimum Outdoor Temperature in Heat Recovery Mode {C}",
+        "    40,                      !- Maximum Outdoor Temperature in Heat Recovery Mode {C}",
+        "    VRF Heat Recovery Cooling Capacity Modifier,  !- Heat Recovery Cooling Capacity Modifier Curve Name",
+        "    0.5,                     !- Initial Heat Recovery Cooling Capacity Fraction {W/W}",
+        "    0.15,                    !- Heat Recovery Cooling Capacity Time Constant {hr}",
+        "    VRF Heat Recovery Cooling Energy Modifier,  !- Heat Recovery Cooling Energy Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Cooling Energy Fraction {W/W}",
+        "    0,                       !- Heat Recovery Cooling Energy Time Constant {hr}",
+        "    VRF Heat Recovery Heating Capacity Modifier,  !- Heat Recovery Heating Capacity Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Heating Capacity Fraction {W/W}",
+        "    0.15,                    !- Heat Recovery Heating Capacity Time Constant {hr}",
+        "    VRF Heat Recovery Heating Energy Modifier,  !- Heat Recovery Heating Energy Modifier Curve Name",
+        "    1,                       !- Initial Heat Recovery Heating Energy Fraction {W/W}",
+        "    0;                       !- Heat Recovery Heating Energy Time Constant {hr}",
+
         "  ZoneTerminalUnitList,",
         "    VRF Outdoor Unit Zone List 2,  !- Zone Terminal Unit List Name",
         "    Level1:Office3 VRF Indoor Unit;  !- Zone Terminal Unit Name 1",
@@ -24718,6 +24875,10 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
         "    VRF Outdoor Unit Zone List 1,  !- Zone Terminal Unit List Name",
         "    Level1:Office1 VRF Indoor Unit,  !- Zone Terminal Unit Name 1",
         "    Level1:Office2 VRF Indoor Unit;  !- Zone Terminal Unit Name 1",
+
+        "  ZoneTerminalUnitList,",
+        "    VRF Outdoor Unit Zone List 3,  !- Zone Terminal Unit List Name",
+        "    Level1:Office4 VRF Indoor Unit;  !- Zone Terminal Unit Name 1",
 
         "  OutdoorAir:Mixer,",
         "    Level1:Office2 VRF Indoor Unit Outdoor Air Mixer,  !- Name",
@@ -24775,6 +24936,24 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
 
         "  OutdoorAir:NodeList,",
         "    Level1:Office3 VRF Indoor Unit Outdoor Air Node Name;  !- Node or NodeList Name 1",
+
+        "  OutdoorAir:Mixer,",
+        "    Level1:Office4 VRF Indoor Unit Outdoor Air Mixer,  !- Name",
+        "    Level1:Office4 VRF Indoor Unit Mixed Air Outlet,  !- Mixed Air Node Name",
+        "    Level1:Office4 VRF Indoor Unit Outdoor Air Node Name,  !- Outdoor Air Stream Node Name",
+        "    Level1:Office4 VRF Indoor Unit Air Relief Node Name,  !- Relief Air Stream Node Name",
+        "    Level1:Office4 VRF Indoor Unit Return;  !- Return Air Stream Node Name",
+
+        "  NodeList,",
+        "    Level1:Office4 Air Inlet Node List,  !- Name",
+        "    Level1:Office4 VRF Indoor Unit Supply Inlet;  !- Node 1 Name",
+
+        "  NodeList,",
+        "    Level1:Office4 Air Exhaust Node List,  !- Name",
+        "    Level1:Office4 VRF Indoor Unit Return;  !- Node 1 Name",
+
+        "  OutdoorAir:NodeList,",
+        "    Level1:Office4 VRF Indoor Unit Outdoor Air Node Name;  !- Node or NodeList Name 1",
 
         "  Curve:Linear,",
         "    CoolingCombRatio,        !- Name",
@@ -25231,30 +25410,26 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_HeatRecoveryCheck)
     state->dataGlobal->MinutesPerTimeStep = 60;
     state->dataSize->ZoneEqSizing.allocate(1);
 
+    bool ErrorsFound = false;                             // function returns true on error
     Curve::GetCurveInput(*state);                         // read curves
     HeatBalanceManager::GetZoneData(*state, ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(*state); // read equipment list and connections
-    state->dataAirLoop->AirLoopInputsFilled = true;
-    state->dataHVACVarRefFlow->MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(*state, VRFTUNum);                     // trigger GetVRFInput by calling a mining function
-    OutsideAirNode = state->dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0; // No load
-    state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0; // No load
-    QZnReq = state->dataZoneEnergyDemand->ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired; // No load
-    state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
-    // Initialize terminal unit
-    state->dataScheduleMgr->Schedule(state->dataHVACVarRefFlow->VRFTU(VRFTUNum).FanOpModeSchedPtr).CurrentValue =
-        1.0; // set continuous fan operating mode
 
-    std::string const error_string = "Heat recovery will be disabled";
+    GetVRFInput(*state);
+    std::string const error_string = "Heat recovery will be disabled"; // VRF3 should get disabled
+    EXPECT_TRUE(compare_err_stream_substring(error_string));
 
-    EXPECT_FALSE(compare_err_stream_substring(error_string));
-    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(1).HeatRecoveryUsed);
-    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(2).HeatRecoveryUsed);
+    // VRF1 serves 2 TUs and Heat Pump Waste Heat Recovery=Yes, expect true
+    int const vrf1 = Util::FindItemInList("VRF OUTDOOR UNIT 1", state->dataHVACVarRefFlow->VRF);
+    EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(vrf1).HeatRecoveryUsed);
+    // VRF2 serves 1 TU and Heat Pump Waste Heat Recovery=No, expect false
+    int const vrf2 = Util::FindItemInList("VRF OUTDOOR UNIT 2", state->dataHVACVarRefFlow->VRF);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(vrf2).HeatRecoveryUsed);
+    // VRF3 serves 1 TU and Heat Pump Waste Heat Recovery=Yes, expect heat recovery to be disabled, false
+    int const vrf3 = Util::FindItemInList("VRF OUTDOOR UNIT 3", state->dataHVACVarRefFlow->VRF);
+    EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(vrf3).HeatRecoveryUsed);
 }
 
 } // end of namespace EnergyPlus
