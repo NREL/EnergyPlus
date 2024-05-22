@@ -698,6 +698,9 @@ namespace DataHeatBalance {
         bool zoneOAQuadratureSum = false; // True when zone OA balance method is Quadrature
         int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
+        // reporting flags
+        bool ReportWBGT = false;  // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
+
         // Spaces
         EPVector<int> spaceIndexes; // Indexes to spaces in this zone
         int numSpaces = 0;          // Number of spaces in this zone

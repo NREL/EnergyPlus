@@ -4903,6 +4903,16 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     // This subroutine updates the report variables for the AirHeatBalance.
 
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+        auto &thisZone = state.dataHeatBal->Zone(ZoneLoop);
+        for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+            if (Util::SameString(reqVar->key, thisZone.Name) || reqVar->key.empty()) {
+                if (Util::SameString(reqVar->name, "Zone Wetbulb Globe Temperature")) {
+                    thisZone.ReportWBGT = true;
+                }
+            }
+        }
+    }
+    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
         calcMeanAirTemps(state, thisZoneHB.ZTAV, thisZoneHB.airHumRatAvg, thisZoneHB.MRT, state.dataHeatBal->ZnAirRpt(ZoneLoop), ZoneLoop);
         if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
@@ -4928,9 +4938,6 @@ void calcMeanAirTemps(EnergyPlusData &state,
     thisAirRpt.MeanAirTemp = ZTAV;
     thisAirRpt.MeanAirHumRat = airHumRatAvg;
     thisAirRpt.OperativeTemp = 0.5 * (ZTAV + MRT);
-    thisAirRpt.WetbulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress);
-    thisAirRpt.WetbulbGlobeTemp =
-        0.7 * Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress) + 0.3 * thisAirRpt.OperativeTemp;
     thisAirRpt.MeanAirDewPointTemp = Psychrometrics::PsyTdpFnWPb(state, thisAirRpt.MeanAirHumRat, state.dataEnvrn->OutBaroPress);
 
     // if operative temperature control is being used, then radiative fraction/weighting
@@ -4952,6 +4959,13 @@ void calcMeanAirTemps(EnergyPlusData &state,
                 thisAirRpt.ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV + thisMRTFraction * MRT;
             }
         }
+    }
+    auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
+    if (thisZone.ReportWBGT) {
+        // note that the WetBulbTemp here is for temporary verification, it will not be another added reporting variable
+        thisAirRpt.WetbulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress);
+        thisAirRpt.WetbulbGlobeTemp =
+            0.7 * Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress) + 0.3 * thisAirRpt.OperativeTemp;
     }
 }
 
