@@ -4616,9 +4616,9 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     } // end Number of VRF Terminal Unit Loop
 
     //   perform additional error checking
-    for (auto &thisTUList : state.dataHVACVarRefFlow->TerminalUnitList) {
+    for (auto const &thisTUList : state.dataHVACVarRefFlow->TerminalUnitList) {
         for (int VRFTUNum = 1; VRFTUNum <= thisTUList.NumTUInList; ++VRFTUNum) {
-            int tuPtr = thisTUList.ZoneTUPtr(VRFTUNum);
+            int const tuPtr = thisTUList.ZoneTUPtr(VRFTUNum);
             if (tuPtr == 0) {
                 // TU name in zone terminal unit list not found
                 ShowSevereError(state, format("ZoneTerminalUnitList \"{}\"", thisTUList.Name));
@@ -4628,7 +4628,7 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowContinueError(state, "...or the ZoneTerminalUnitList object is not named in an AirConditioner:VariableRefrigerantFlow object.");
                 ErrorsFound = true;
             } else {
-                int sysNum = state.dataHVACVarRefFlow->VRFTU(tuPtr).VRFSysNum;
+                int const sysNum = state.dataHVACVarRefFlow->VRFTU(tuPtr).VRFSysNum;
                 if (sysNum > 0) {
                     auto &thisVRFSys = state.dataHVACVarRefFlow->VRF(sysNum);
                     if (thisTUList.NumTUInList == 1 && thisVRFSys.VRFAlgorithmType == AlgorithmType::SysCurve) {
