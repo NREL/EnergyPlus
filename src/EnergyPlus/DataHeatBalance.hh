@@ -698,9 +698,6 @@ namespace DataHeatBalance {
         bool zoneOAQuadratureSum = false; // True when zone OA balance method is Quadrature
         int zoneOABalanceIndex = 0;       // Index to ZoneAirBalance for this zone, if any
 
-        // reporting flags
-        bool ReportWBGT = false; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
-
         // Spaces
         EPVector<int> spaceIndexes; // Indexes to spaces in this zone
         int numSpaces = 0;          // Number of spaces in this zone
@@ -1480,6 +1477,8 @@ namespace DataHeatBalance {
         Real64 OABalanceFanElec = 0.0;       // Fan Electricity {W} due to OA air balance
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
+        // reporting flags
+        bool ReportWBGT = true; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
 
         void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };

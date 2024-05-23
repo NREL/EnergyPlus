@@ -3792,6 +3792,10 @@ ZoneAirHeatBalanceAlgorithm,
 
   Output:Variable,*,Zone Air Temperature,hourly;
   Output:Variable,*,Space Air Temperature,hourly;
+  Output:Variable,Space 5 Office,Space Wetbulb Temperature,hourly; !- Zone Average [C]
+  Output:Variable,Space 5 Office,Space Wetbulb Globe Temperature,hourly;
+  Output:Variable,*,Zone Wetbulb Temperature,hourly; !- Zone Average [C]
+  Output:Variable,*,Zone Wetbulb Globe Temperature,hourly;
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly; !- HVAC Average []
   Output:Variable,*,Zone Air Relative Humidity,hourly; !- HVAC Average [%]

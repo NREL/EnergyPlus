@@ -4904,19 +4904,30 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
     // This subroutine updates the report variables for the AirHeatBalance.
 
     if (state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag) {
-        for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
-            auto &thisZone = state.dataHeatBal->Zone(ZoneLoop);
-            for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-                if (Util::SameString(reqVar->key, thisZone.Name) || reqVar->key.empty()) {
-                    if (Util::SameString(reqVar->name, "Zone Wetbulb Globe Temperature")) {
-                        thisZone.ReportWBGT = true;
+        for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+            if (reqVar->name == "ZONE WETBULB GLOBE TEMPERATURE") {
+                if (reqVar->key.empty()) {
+                    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+                        if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                            for (int spaceNum : state.dataHeatBal->Zone(ZoneLoop).spaceIndexes) {
+                                auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                                thisSpaceAirRpt.ReportWBGT = true;
+                            }
+                        } else {
+                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                            thisZnAirRpt.ReportWBGT = true;
+                        }
                     }
-                }
-            }
-            for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
-                if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == thisZone.Name &&
-                    Util::SameString(state.dataRuntimeLang->Sensor(loop).OutputVarName, "Zone Wetbulb Globe Temperature")) {
-                    thisZone.ReportWBGT = true;
+                } else {
+                    if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                        int spaceNum =  Util::FindItemInList(reqVar->name, state.dataHeatBal->space);
+                        auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                        thisSpaceAirRpt.ReportWBGT = true;
+                    } else {
+                        int ZoneLoop = Util::FindItemInList(reqVar->name, state.dataHeatBal->Zone);
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
+                    }
                 }
             }
         }
@@ -4970,8 +4981,7 @@ void calcMeanAirTemps(EnergyPlusData &state,
             }
         }
     }
-    auto const &thisZone = state.dataHeatBal->Zone(zoneNum);
-    if (thisZone.ReportWBGT) {
+    if (thisAirRpt.ReportWBGT) {
         // note that the WetBulbTemp here is for temporary verification, it will not be another added reporting variable
         thisAirRpt.WetbulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress);
         thisAirRpt.WetbulbGlobeTemp =
