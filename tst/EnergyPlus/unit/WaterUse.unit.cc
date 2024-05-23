@@ -1265,3 +1265,30 @@ TEST_F(EnergyPlusFixture, WaterUse_Default_Target_Temperature_Test2)
 
     EXPECT_NEAR(thisWaterEquipment.ColdMassFlowRate + thisWaterEquipment.HotMassFlowRate, thisWaterEquipment.TotalMassFlowRate, 1e-8);
 }
+
+TEST_F(EnergyPlusFixture, WaterUse_calcH2ODensity_Test)
+{
+    Real64 functionResult;
+    Real64 expectedResult;
+    Real64 allowedTolerance = 0.001;
+
+    // Test 1: Set the flag to false means don't recalculate.  This means it wasn't set so this should be the default value.
+    state->dataWaterUse->calcRhoH2O = false;
+    expectedResult = 1000.0;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
+
+    // Test 2: Now set the flag to true so that an actual value is calculated and flag should come back false.
+    state->dataWaterUse->calcRhoH2O = true;
+    expectedResult = 999.898;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
+
+    // Test 2: Now the flag is still false.  The actual value should have been preserved and returned; flag should come back false.
+    expectedResult = 999.898;
+    functionResult = calcH2ODensity(*state);
+    EXPECT_NEAR(functionResult, expectedResult, allowedTolerance);
+    EXPECT_FALSE(state->dataWaterUse->calcRhoH2O);
+}
