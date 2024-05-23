@@ -996,10 +996,6 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     auto &NodeSpecificHeatSchedPtr = state.dataNodeInputMgr->NodeSpecificHeatSchedPtr;
     auto &nodeReportingStrings = state.dataNodeInputMgr->nodeReportingStrings;
     auto &nodeFluidNames = state.dataNodeInputMgr->nodeFluidNames;
-    bool ReportWetBulb;
-    bool ReportRelHumidity;
-    bool ReportDewPoint;
-    bool ReportSpecificHeat;
     Real64 SteamDensity;
     Real64 EnthSteamInDry;
     Real64 RhoAirCurrent; // temporary value for current air density f(baro, db , W)
@@ -1033,198 +1029,193 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
             nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
             nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
 
-            for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-                if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
-                    if (Util::SameString(reqVar->name, "System Node Wetbulb Temperature")) {
-                        state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
-                        NodeWetBulbSchedPtr(iNode) = reqVar->SchedPtr;
-                    } else if (Util::SameString(reqVar->name, "System Node Relative Humidity")) {
-                        NodeRelHumidityRepReq(iNode) = true;
-                        NodeRelHumiditySchedPtr(iNode) = reqVar->SchedPtr;
-                    } else if (Util::SameString(reqVar->name, "System Node Dewpoint Temperature")) {
-                        NodeDewPointRepReq(iNode) = true;
-                        NodeDewPointSchedPtr(iNode) = reqVar->SchedPtr;
-                    } else if (Util::SameString(reqVar->name, "System Node Specific Heat")) {
-                        NodeSpecificHeatRepReq(iNode) = true;
-                        NodeSpecificHeatSchedPtr(iNode) = reqVar->SchedPtr;
+            if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Air) {
+                if (state.dataLoopNodes->Node(iNode).SPMNodeWetBulbRepReq) {
+                    state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                }
+                for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+                    bool foundWB = false;
+                    bool foundRH = false;
+                    bool foundDP = false;
+                    bool foundCP = false;
+                    if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
+                        if (reqVar->name == "SYSTEM NODE WETBULB TEMPERATURE") {
+                            state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
+                            NodeWetBulbSchedPtr(iNode) = reqVar->SchedPtr;
+                            foundWB = true;
+                            state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                        } else if (reqVar->name == "SYSTEM NODE RELATIVE HUMIDITY") {
+                            NodeRelHumidityRepReq(iNode) = true;
+                            NodeRelHumiditySchedPtr(iNode) = reqVar->SchedPtr;
+                            foundRH = true;
+                            state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                        } else if (reqVar->name == "SYSTEM NODE DEWPOINT TEMPERATURE") {
+                            NodeDewPointRepReq(iNode) = true;
+                            NodeDewPointSchedPtr(iNode) = reqVar->SchedPtr;
+                            foundDP = true;
+                            state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                        } else if (reqVar->name == "SYSTEM NODE SPECIFIC HEAT") {
+                            NodeSpecificHeatRepReq(iNode) = true;
+                            NodeSpecificHeatSchedPtr(iNode) = reqVar->SchedPtr;
+                            foundCP = true;
+                            state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                        }
+                        if (foundWB && foundRH && foundDP && foundCP) break;
                     }
                 }
-            }
-            if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
-                state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
-                NodeWetBulbSchedPtr(iNode) = 0;
-            }
-            if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
-                NodeRelHumidityRepReq(iNode) = true;
-                NodeRelHumiditySchedPtr(iNode) = 0;
-            }
-            if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
-                NodeDewPointRepReq(iNode) = true;
-                NodeDewPointSchedPtr(iNode) = 0;
-            }
-            if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
-                NodeSpecificHeatRepReq(iNode) = true;
-                NodeSpecificHeatSchedPtr(iNode) = 0;
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Wetbulb Temperature")) {
+                    state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
+                    NodeWetBulbSchedPtr(iNode) = 0;
+                    state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                }
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Relative Humidity")) {
+                    NodeRelHumidityRepReq(iNode) = true;
+                    NodeRelHumiditySchedPtr(iNode) = 0;
+                    state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                }
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Dewpoint Temperature")) {
+                    NodeDewPointRepReq(iNode) = true;
+                    NodeDewPointSchedPtr(iNode) = 0;
+                    state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                }
+                if (EMSManager::CheckIfNodeMoreInfoSensedByEMS(state, iNode, "System Node Specific Heat")) {
+                    NodeSpecificHeatRepReq(iNode) = true;
+                    NodeSpecificHeatSchedPtr(iNode) = 0;
+                    state.dataNodeInputMgr->anyMoreNodeCalcsReq = true;
+                }
             }
         }
         state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag = false;
     }
 
-    for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
-        ReportWetBulb = false;
-        ReportRelHumidity = false;
-        ReportDewPoint = false;
-        ReportSpecificHeat = false;
-        if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
-            ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
-        } else if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
-            ReportWetBulb = true;
-        } else if (state.dataLoopNodes->Node(iNode).SPMNodeWetBulbRepReq) {
-            ReportWetBulb = true;
-        }
-        if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) > 0) {
-            ReportRelHumidity = (GetCurrentScheduleValue(state, NodeRelHumiditySchedPtr(iNode)) > 0.0);
-        } else if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) == 0) {
-            ReportRelHumidity = true;
-        }
-        if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) > 0) {
-            ReportDewPoint = (GetCurrentScheduleValue(state, NodeDewPointSchedPtr(iNode)) > 0.0);
-        } else if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) == 0) {
-            ReportDewPoint = true;
-        }
-        if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) > 0) {
-            ReportSpecificHeat = (GetCurrentScheduleValue(state, NodeSpecificHeatSchedPtr(iNode)) > 0.0);
-        } else if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) == 0) {
-            ReportSpecificHeat = true;
-        }
-        // calculate the volume flow rate
-        if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Air) {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirStdInit;
-            // if Node%Press was reliable could be used here.
-            RhoAirCurrent = PsyRhoAirFnPbTdbW(
-                state, state.dataEnvrn->OutBaroPress, state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
-            state.dataLoopNodes->MoreNodeInfo(iNode).Density = RhoAirCurrent;
-            if (RhoAirCurrent != 0.0)
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateCrntRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirCurrent;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                PsyHFnTdbW(state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
-            if (ReportWetBulb) {
-                // if Node%Press was reliable could be used here.
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state,
-                                                                                      state.dataLoopNodes->Node(iNode).Temp,
-                                                                                      state.dataLoopNodes->Node(iNode).HumRat,
-                                                                                      state.dataEnvrn->OutBaroPress,
-                                                                                      nodeReportingStrings[iNode - 1]);
-            } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
+    if (state.dataNodeInputMgr->anyMoreNodeCalcsReq) {
+        for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
+            auto &thisNode = state.dataLoopNodes->Node(iNode);
+            if (thisNode.FluidType == DataLoopNode::NodeFluidType::Air) {
+                bool ReportWetBulb = false;
+                bool ReportRelHumidity = false;
+                bool ReportDewPoint = false;
+                bool ReportSpecificHeat = false;
+                if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) > 0) {
+                    ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
+                } else if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
+                    ReportWetBulb = true;
+                } else if (state.dataLoopNodes->Node(iNode).SPMNodeWetBulbRepReq) {
+                    ReportWetBulb = true;
+                }
+                if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) > 0) {
+                    ReportRelHumidity = (GetCurrentScheduleValue(state, NodeRelHumiditySchedPtr(iNode)) > 0.0);
+                } else if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) == 0) {
+                    ReportRelHumidity = true;
+                }
+                if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) > 0) {
+                    ReportDewPoint = (GetCurrentScheduleValue(state, NodeDewPointSchedPtr(iNode)) > 0.0);
+                } else if (NodeDewPointRepReq(iNode) && NodeDewPointSchedPtr(iNode) == 0) {
+                    ReportDewPoint = true;
+                }
+                if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) > 0) {
+                    ReportSpecificHeat = (GetCurrentScheduleValue(state, NodeSpecificHeatSchedPtr(iNode)) > 0.0);
+                } else if (NodeSpecificHeatRepReq(iNode) && NodeSpecificHeatSchedPtr(iNode) == 0) {
+                    ReportSpecificHeat = true;
+                }
+                auto &thisMoreNodeInfo = state.dataLoopNodes->MoreNodeInfo(iNode);
+                if (ReportWetBulb) {
+                    // if Node%Press was reliable could be used here.
+                    thisMoreNodeInfo.WetBulbTemp =
+                        PsyTwbFnTdbWPb(state, thisNode.Temp, thisNode.HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
+                } else {
+                    thisMoreNodeInfo.WetBulbTemp = 0.0;
+                }
+                if (ReportDewPoint) {
+                    thisMoreNodeInfo.AirDewPointTemp = PsyTdpFnWPb(state, thisNode.HumRat, state.dataEnvrn->OutBaroPress);
+                } else {
+                    thisMoreNodeInfo.AirDewPointTemp = 0.0;
+                }
+                if (ReportRelHumidity) {
+                    // if Node%Press was reliable could be used here.
+                    // following routines don't issue psych errors and may be more reliable.
+                    thisMoreNodeInfo.RelHumidity =
+                        100.0 * PsyRhFnTdbWPb(state, thisNode.Temp, thisNode.HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
+                } else {
+                    thisMoreNodeInfo.RelHumidity = 0.0;
+                }
+                if (ReportSpecificHeat) { // only call psych routine if needed.
+                    thisMoreNodeInfo.SpecificHeat = PsyCpAirFnW(thisNode.HumRat);
+                } else {
+                    thisMoreNodeInfo.SpecificHeat = 0.0;
+                }
             }
-            if (ReportDewPoint) {
-                state.dataLoopNodes->MoreNodeInfo(iNode).AirDewPointTemp =
-                    PsyTdpFnWPb(state, state.dataLoopNodes->Node(iNode).HumRat, state.dataEnvrn->OutBaroPress);
-            } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).AirDewPointTemp = 0.0;
-            }
-            if (ReportRelHumidity) {
-                // if Node%Press was reliable could be used here.
-                // following routines don't issue psych errors and may be more reliable.
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 100.0 * PsyRhFnTdbWPb(state,
-                                                                                             state.dataLoopNodes->Node(iNode).Temp,
-                                                                                             state.dataLoopNodes->Node(iNode).HumRat,
-                                                                                             state.dataEnvrn->OutBaroPress,
-                                                                                             nodeReportingStrings[iNode - 1]);
-            } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
-            }
-            if (ReportSpecificHeat) { // only call psych routine if needed.
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(state.dataLoopNodes->Node(iNode).HumRat);
-            } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
-            }
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
+        }
+    }
 
-            if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) &&
-                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
+    // The following are always calculated
+    for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
+        auto &thisNode = state.dataLoopNodes->Node(iNode);
+        auto &thisMoreNodeInfo = state.dataLoopNodes->MoreNodeInfo(iNode);
+        // calculate the volume flow rate
+        switch (thisNode.FluidType) {
+        case DataLoopNode::NodeFluidType::Air: {
+            thisMoreNodeInfo.VolFlowRateStdRho = thisNode.MassFlowRate / RhoAirStdInit;
+            // if Node%Press was reliable could be used here.
+            RhoAirCurrent = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, thisNode.Temp, thisNode.HumRat);
+            thisMoreNodeInfo.Density = RhoAirCurrent;
+            if (RhoAirCurrent != 0.0) thisMoreNodeInfo.VolFlowRateCrntRho = thisNode.MassFlowRate / RhoAirCurrent;
+            thisMoreNodeInfo.ReportEnthalpy = PsyHFnTdbW(thisNode.Temp, thisNode.HumRat);
+        } break;
+        case DataLoopNode::NodeFluidType::Water: {
+
+            if (!((thisNode.FluidIndex > 0) && (thisNode.FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
                 rho = RhoWaterStdInit;
                 rhoStd = RhoWaterStdInit;
-                Cp = CPCW(state.dataLoopNodes->Node(iNode).Temp);
+                Cp = CPCW(thisNode.Temp);
             } else {
-                Cp = GetSpecificHeatGlycol(state,
-                                           nodeFluidNames[iNode - 1],
-                                           state.dataLoopNodes->Node(iNode).Temp,
-                                           state.dataLoopNodes->Node(iNode).FluidIndex,
-                                           nodeReportingStrings[iNode - 1]);
-                rhoStd = GetDensityGlycol(state,
-                                          nodeFluidNames[iNode - 1],
-                                          Constant::InitConvTemp,
-                                          state.dataLoopNodes->Node(iNode).FluidIndex,
-                                          nodeReportingStrings[iNode - 1]);
-                rho = GetDensityGlycol(state,
-                                       nodeFluidNames[iNode - 1],
-                                       state.dataLoopNodes->Node(iNode).Temp,
-                                       state.dataLoopNodes->Node(iNode).FluidIndex,
-                                       nodeReportingStrings[iNode - 1]);
+                Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], thisNode.Temp, thisNode.FluidIndex, nodeReportingStrings[iNode - 1]);
+                rhoStd =
+                    GetDensityGlycol(state, nodeFluidNames[iNode - 1], Constant::InitConvTemp, thisNode.FluidIndex, nodeReportingStrings[iNode - 1]);
+                rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], thisNode.Temp, thisNode.FluidIndex, nodeReportingStrings[iNode - 1]);
             }
 
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / rhoStd;
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateCrntRho = state.dataLoopNodes->Node(iNode).MassFlowRate / rho;
-            state.dataLoopNodes->MoreNodeInfo(iNode).Density = rho;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = Cp * state.dataLoopNodes->Node(iNode).Temp;
-            state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = Cp; // always fill since cp already always being calculated anyway
-            state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 100.0;
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Steam) {
-            if (state.dataLoopNodes->Node(iNode).Quality == 1.0) {
-                SteamDensity = GetSatDensityRefrig(state,
-                                                   fluidNameSteam,
-                                                   state.dataLoopNodes->Node(iNode).Temp,
-                                                   state.dataLoopNodes->Node(iNode).Quality,
-                                                   state.dataLoopNodes->Node(iNode).FluidIndex,
-                                                   RoutineName);
-                EnthSteamInDry = GetSatEnthalpyRefrig(state,
-                                                      fluidNameSteam,
-                                                      state.dataLoopNodes->Node(iNode).Temp,
-                                                      state.dataLoopNodes->Node(iNode).Quality,
-                                                      state.dataLoopNodes->Node(iNode).FluidIndex,
-                                                      RoutineName);
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / SteamDensity;
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = EnthSteamInDry;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
-            } else if (state.dataLoopNodes->Node(iNode).Quality == 0.0) { // The node has condensate water through it
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoWaterStdInit;
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    CPCW(state.dataLoopNodes->Node(iNode).Temp) * state.dataLoopNodes->Node(iNode).Temp;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
+            thisMoreNodeInfo.VolFlowRateStdRho = thisNode.MassFlowRate / rhoStd;
+            thisMoreNodeInfo.VolFlowRateCrntRho = thisNode.MassFlowRate / rho;
+            thisMoreNodeInfo.Density = rho;
+            thisMoreNodeInfo.ReportEnthalpy = Cp * thisNode.Temp;
+            thisMoreNodeInfo.SpecificHeat = Cp; // always fill since cp already always being calculated anyway
+            // thisMoreNodeInfo.WetBulbTemp = 0.0; for water nodes, initialized to zero
+            thisMoreNodeInfo.RelHumidity = 100.0;
+        } break;
+        case DataLoopNode::NodeFluidType::Steam: {
+            if (thisNode.Quality == 1.0) {
+                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, thisNode.Temp, thisNode.Quality, thisNode.FluidIndex, RoutineName);
+                EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, thisNode.Temp, thisNode.Quality, thisNode.FluidIndex, RoutineName);
+                thisMoreNodeInfo.VolFlowRateStdRho = thisNode.MassFlowRate / SteamDensity;
+                thisMoreNodeInfo.ReportEnthalpy = EnthSteamInDry;
+                // thisMoreNodeInfo.WetBulbTemp = 0.0;  for steam nodes, initialized to zero
+                // thisMoreNodeInfo.RelHumidity = 0.0;  for steam nodes, initialized to zero
+            } else if (thisNode.Quality == 0.0) { // The node has condensate water through it
+                thisMoreNodeInfo.VolFlowRateStdRho = thisNode.MassFlowRate / RhoWaterStdInit;
+                thisMoreNodeInfo.ReportEnthalpy = CPCW(thisNode.Temp) * thisNode.Temp;
+                // thisMoreNodeInfo.WetBulbTemp = 0.0;  for steam nodes, initialized to zero
+                // thisMoreNodeInfo.RelHumidity = 0.0;  for steam nodes, initialized to zero
             }
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Electric) {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
-        } else {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirStdInit;
-            if (state.dataLoopNodes->Node(iNode).HumRat > 0.0) {
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    PsyHFnTdbW(state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
-                if (ReportWetBulb) {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(
-                        state, state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat, state.dataEnvrn->StdBaroPress);
-                } else {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                }
-                if (ReportSpecificHeat) {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(state.dataLoopNodes->Node(iNode).HumRat);
-                } else {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
-                }
+        } break;
+        case DataLoopNode::NodeFluidType::Electric: {
+            // These are all initialized to zero, no need to reset here
+            // thisMoreNodeInfo.VolFlowRateStdRho = 0.0;
+            // thisMoreNodeInfo.ReportEnthalpy = 0.0;
+            // thisMoreNodeInfo.WetBulbTemp = 0.0;
+            // thisMoreNodeInfo.RelHumidity = 0.0;
+            // thisMoreNodeInfo.SpecificHeat = 0.0;
+        } break;
+        default: {
+            thisMoreNodeInfo.VolFlowRateStdRho = thisNode.MassFlowRate / RhoAirStdInit;
+            if (thisNode.HumRat > 0.0) {
+                thisMoreNodeInfo.ReportEnthalpy = PsyHFnTdbW(thisNode.Temp, thisNode.HumRat);
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    CPCW(state.dataLoopNodes->Node(iNode).Temp) * state.dataLoopNodes->Node(iNode).Temp;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
+                thisMoreNodeInfo.ReportEnthalpy = CPCW(thisNode.Temp) * thisNode.Temp;
+                thisMoreNodeInfo.WetBulbTemp = 0.0;
+                thisMoreNodeInfo.SpecificHeat = 0.0;
             }
+        } break;
         }
     }
 }

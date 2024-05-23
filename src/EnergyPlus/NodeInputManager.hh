@@ -167,6 +167,7 @@ struct NodeInputManagerData : BaseGlobalStruct
     bool NodeVarsSetup = false;      // Setup indicator of node vars for reporting (also that all nodes have been entered)
     Array1D_bool NodeWetBulbRepReq;
     bool CalcMoreNodeInfoMyOneTimeFlag = true; // one time flag
+    bool anyMoreNodeCalcsReq = false; // true only if any of system node wetbul, dewpoint, RH, or specific heat requested for output
     Array1D_int GetOnlySingleNodeNodeNums;
     bool GetOnlySingleNodeFirstTime = true;
 
