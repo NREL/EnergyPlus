@@ -11363,62 +11363,21 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             GetSatEnthalpyRefrig(state, this->RefrigerantName, OutdoorDryBulb + 10 - this->SC, 0.0, RefrigerantIndex, RoutineName); // Tc = Tamb+10
 
         NumIteHIUIn = 1;
-    Label12:;
-        m_ref_IU_evap = 0;
-        h_IU_evap_out = 0;
-        h_IU_evap_out_i = 0;
-        m_ref_IU_evap_i = 0;
-        SH_IU_merged = 0;
+        bool converged_12;
+        do {
+            m_ref_IU_evap = 0;
+            h_IU_evap_out = 0;
+            h_IU_evap_out_i = 0;
+            m_ref_IU_evap_i = 0;
+            SH_IU_merged = 0;
 
-        // Calculate total IU refrigerant flow rate and SH_IU_merged
-        if (Q_c_TU_PL > CompEvaporatingCAPSpdMax) {
-            // Required load is beyond the max system capacity
+            // Calculate total IU refrigerant flow rate and SH_IU_merged
+            if (Q_c_TU_PL > CompEvaporatingCAPSpdMax) {
+                // Required load is beyond the max system capacity
 
-            Q_c_TU_PL = CompEvaporatingCAPSpdMax;
-            TU_CoolingLoad = CompEvaporatingCAPSpdMax;
-            this->TUCoolingLoad = TU_CoolingLoad;
-            RefTSat = GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-            h_IU_evap_out = GetSupHeatEnthalpyRefrig(state,
-                                                     this->RefrigerantName,
-                                                     max(RefTSat, this->IUEvaporatingTemp + 3),
-                                                     max(min(Pevap, RefPHigh), RefPLow),
-                                                     RefrigerantIndex,
-                                                     RoutineName);
-            SH_IU_merged = 3;
-            m_ref_IU_evap = TU_CoolingLoad / (h_IU_evap_out - h_IU_evap_in);
-
-        } else {
-
-            for (NumTU = 1; NumTU <= NumTUInList; NumTU++) { // Calc total refrigerant flow rate
-                if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0) {
-                    TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
-                    CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
-
-                    RefTSat =
-                        GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-                    h_IU_evap_out_i =
-                        GetSupHeatEnthalpyRefrig(state,
-                                                 this->RefrigerantName,
-                                                 max(RefTSat, this->IUEvaporatingTemp + state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH),
-                                                 max(min(Pevap, RefPHigh), RefPLow),
-                                                 RefrigerantIndex,
-                                                 RoutineName);
-
-                    if (h_IU_evap_out_i > h_IU_evap_in) {
-                        m_ref_IU_evap_i = (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) <= 0.0)
-                                              ? 0.0
-                                              : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) /
-                                                 (h_IU_evap_out_i - h_IU_evap_in)); // Ref Flow Rate in the IU( kg/s )
-                        m_ref_IU_evap = m_ref_IU_evap + m_ref_IU_evap_i;
-                        h_IU_evap_out = h_IU_evap_out + m_ref_IU_evap_i * h_IU_evap_out_i;
-                        SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH;
-                    }
-                }
-            }
-            if (m_ref_IU_evap > 0) {
-                h_IU_evap_out = h_IU_evap_out / m_ref_IU_evap;
-                SH_IU_merged = SH_IU_merged / m_ref_IU_evap;
-            } else {
+                Q_c_TU_PL = CompEvaporatingCAPSpdMax;
+                TU_CoolingLoad = CompEvaporatingCAPSpdMax;
+                this->TUCoolingLoad = TU_CoolingLoad;
                 RefTSat = GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
                 h_IU_evap_out = GetSupHeatEnthalpyRefrig(state,
                                                          this->RefrigerantName,
@@ -11428,96 +11387,146 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                                          RoutineName);
                 SH_IU_merged = 3;
                 m_ref_IU_evap = TU_CoolingLoad / (h_IU_evap_out - h_IU_evap_in);
-            }
-        }
 
-        // *Calculate piping loss
-        this->VRFOU_PipeLossC(
-            state, m_ref_IU_evap, max(min(Pevap, RefPHigh), RefPLow), h_IU_evap_out, SH_IU_merged, OutdoorDryBulb, Pipe_Q_c, Pipe_DeltP_c, h_comp_in);
-        Tsuction =
-            GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap - Pipe_DeltP_c, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-        Psuction = Pevap - Pipe_DeltP_c; // This Psuction is used for rps > min; will be updated for rps = min
+            } else {
 
-        // Perform iteration to calculate T_comp_in
-        T_comp_in = GetSupHeatTempRefrig(state,
-                                         this->RefrigerantName,
-                                         max(min(Pevap - Pipe_DeltP_c, RefPHigh), RefPLow),
-                                         h_comp_in,
-                                         Tsuction + 3,
-                                         Tsuction + 30,
-                                         RefrigerantIndex,
-                                         RoutineName);
-        SH_Comp = T_comp_in - Tsuction; // This is used for rps > min; will be updated for rps = min
+                for (NumTU = 1; NumTU <= NumTUInList; NumTU++) { // Calc total refrigerant flow rate
+                    if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0) {
+                        TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
+                        CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
 
-        Q_c_TU_PL = TU_CoolingLoad + Pipe_Q_c;
-        Q_h_OU = Q_c_TU_PL + CompEvaporatingPWRSpdMin;
+                        RefTSat =
+                            GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                        h_IU_evap_out_i =
+                            GetSupHeatEnthalpyRefrig(state,
+                                                     this->RefrigerantName,
+                                                     max(RefTSat, this->IUEvaporatingTemp + state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH),
+                                                     max(min(Pevap, RefPHigh), RefPLow),
+                                                     RefrigerantIndex,
+                                                     RoutineName);
 
-        // *Calculate capacity modification factor
-        C_cap_operation = this->VRFOU_CapModFactor(
-            state, h_comp_in, h_IU_evap_in, max(min(Psuction, RefPHigh), RefPLow), Tsuction + SH_Comp, Tsuction + 8, CapMinTc - 5);
-
-        if (Q_c_TU_PL * C_cap_operation < CompEvaporatingCAPSpdMin) {
-            // Required cooling load is less than the min cooling capacity, on-off strategy
-
-            this->VRFOperationSimPath = 11;
-
-            CyclingRatio = Q_c_TU_PL * C_cap_operation / CompEvaporatingCAPSpdMin;
-            double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
-            double HPRTF = CyclingRatio / CyclingRatioFrac;
-            Ncomp = CompEvaporatingPWRSpdMin * HPRTF; //
-            CompSpdActual = this->CompressorSpeed(1); //
-            this->CondensingTemp = CapMinTc;          //
-
-        } else {
-            // Required cooling load is greater than or equal to the min cooling capacity
-
-            // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label10)
-            Counter = 1;
-            Ncomp = TU_CoolingLoad / this->CoolingCOP;
-            Ncomp_new = Ncomp;
-            bool converged_10;
-            do {
-                Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
-
-                // *VRF OU TeTc calculations
-                m_air = this->OUAirFlowRate * RhoAir;
-                SC_OU = this->SC;
-                this->VRFOU_TeTc(
-                    state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
-                this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
-                this->SC = SC_OU;
-
-                // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
-                this->VRFOU_CalcCompC(state,
-                                      TU_CoolingLoad,
-                                      Tsuction,
-                                      this->CondensingTemp,
-                                      Psuction,
-                                      T_comp_in,
-                                      h_comp_in,
-                                      h_IU_evap_in,
-                                      Pipe_Q_c,
-                                      CapMaxTc,
-                                      Q_h_OU,
-                                      CompSpdActual,
-                                      Ncomp);
-
-                Counter = Counter + 1;
-                converged_10 = (std::abs(Ncomp - Ncomp_new) <= (Tolerance * Ncomp_new)) || (Counter >= 30);
-                if (!converged_10) {
-                    Ncomp_new = Ncomp;
+                        if (h_IU_evap_out_i > h_IU_evap_in) {
+                            m_ref_IU_evap_i = (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) <= 0.0)
+                                                  ? 0.0
+                                                  : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) /
+                                                     (h_IU_evap_out_i - h_IU_evap_in)); // Ref Flow Rate in the IU( kg/s )
+                            m_ref_IU_evap = m_ref_IU_evap + m_ref_IU_evap_i;
+                            h_IU_evap_out = h_IU_evap_out + m_ref_IU_evap_i * h_IU_evap_out_i;
+                            SH_IU_merged = SH_IU_merged + m_ref_IU_evap_i * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH;
+                        }
+                    }
                 }
-            } while (!converged_10);
-        }
+                if (m_ref_IU_evap > 0) {
+                    h_IU_evap_out = h_IU_evap_out / m_ref_IU_evap;
+                    SH_IU_merged = SH_IU_merged / m_ref_IU_evap;
+                } else {
+                    RefTSat =
+                        GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Pevap, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                    h_IU_evap_out = GetSupHeatEnthalpyRefrig(state,
+                                                             this->RefrigerantName,
+                                                             max(RefTSat, this->IUEvaporatingTemp + 3),
+                                                             max(min(Pevap, RefPHigh), RefPLow),
+                                                             RefrigerantIndex,
+                                                             RoutineName);
+                    SH_IU_merged = 3;
+                    m_ref_IU_evap = TU_CoolingLoad / (h_IU_evap_out - h_IU_evap_in);
+                }
+            }
 
-        // Update h_IU_evap_in in iterations Label12
-        h_IU_evap_in_new = GetSatEnthalpyRefrig(state, this->RefrigerantName, this->CondensingTemp - this->SC, 0.0, RefrigerantIndex, RoutineName);
-        if ((std::abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in) && (h_IU_evap_in < h_IU_evap_in_up) &&
-            (h_IU_evap_in > h_IU_evap_in_low)) {
+            // *Calculate piping loss
+            this->VRFOU_PipeLossC(state,
+                                  m_ref_IU_evap,
+                                  max(min(Pevap, RefPHigh), RefPLow),
+                                  h_IU_evap_out,
+                                  SH_IU_merged,
+                                  OutdoorDryBulb,
+                                  Pipe_Q_c,
+                                  Pipe_DeltP_c,
+                                  h_comp_in);
+            Tsuction = GetSatTemperatureRefrig(
+                state, this->RefrigerantName, max(min(Pevap - Pipe_DeltP_c, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+            Psuction = Pevap - Pipe_DeltP_c; // This Psuction is used for rps > min; will be updated for rps = min
+
+            // Perform iteration to calculate T_comp_in
+            T_comp_in = GetSupHeatTempRefrig(state,
+                                             this->RefrigerantName,
+                                             max(min(Pevap - Pipe_DeltP_c, RefPHigh), RefPLow),
+                                             h_comp_in,
+                                             Tsuction + 3,
+                                             Tsuction + 30,
+                                             RefrigerantIndex,
+                                             RoutineName);
+            SH_Comp = T_comp_in - Tsuction; // This is used for rps > min; will be updated for rps = min
+
+            Q_c_TU_PL = TU_CoolingLoad + Pipe_Q_c;
+            Q_h_OU = Q_c_TU_PL + CompEvaporatingPWRSpdMin;
+
+            // *Calculate capacity modification factor
+            C_cap_operation = this->VRFOU_CapModFactor(
+                state, h_comp_in, h_IU_evap_in, max(min(Psuction, RefPHigh), RefPLow), Tsuction + SH_Comp, Tsuction + 8, CapMinTc - 5);
+
+            if (Q_c_TU_PL * C_cap_operation < CompEvaporatingCAPSpdMin) {
+                // Required cooling load is less than the min cooling capacity, on-off strategy
+
+                this->VRFOperationSimPath = 11;
+
+                CyclingRatio = Q_c_TU_PL * C_cap_operation / CompEvaporatingCAPSpdMin;
+                double CyclingRatioFrac = 0.85 + 0.15 * CyclingRatio;
+                double HPRTF = CyclingRatio / CyclingRatioFrac;
+                Ncomp = CompEvaporatingPWRSpdMin * HPRTF; //
+                CompSpdActual = this->CompressorSpeed(1); //
+                this->CondensingTemp = CapMinTc;          //
+
+            } else {
+                // Required cooling load is greater than or equal to the min cooling capacity
+
+                // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label10)
+                Counter = 1;
+                Ncomp = TU_CoolingLoad / this->CoolingCOP;
+                Ncomp_new = Ncomp;
+                bool converged_10;
+                do {
+                    Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
+
+                    // *VRF OU TeTc calculations
+                    m_air = this->OUAirFlowRate * RhoAir;
+                    SC_OU = this->SC;
+                    this->VRFOU_TeTc(
+                        state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
+                    this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
+                    this->SC = SC_OU;
+
+                    // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
+                    this->VRFOU_CalcCompC(state,
+                                          TU_CoolingLoad,
+                                          Tsuction,
+                                          this->CondensingTemp,
+                                          Psuction,
+                                          T_comp_in,
+                                          h_comp_in,
+                                          h_IU_evap_in,
+                                          Pipe_Q_c,
+                                          CapMaxTc,
+                                          Q_h_OU,
+                                          CompSpdActual,
+                                          Ncomp);
+
+                    Counter = Counter + 1;
+                    converged_10 = (std::abs(Ncomp - Ncomp_new) <= (Tolerance * Ncomp_new)) || (Counter >= 30);
+                    if (!converged_10) {
+                        Ncomp_new = Ncomp;
+                    }
+                } while (!converged_10);
+            }
+
+            // Update h_IU_evap_in in iterations Label12
+            h_IU_evap_in_new =
+                GetSatEnthalpyRefrig(state, this->RefrigerantName, this->CondensingTemp - this->SC, 0.0, RefrigerantIndex, RoutineName);
+            converged_12 = (std::abs(h_IU_evap_in - h_IU_evap_in_new) <= Tolerance * h_IU_evap_in) || (h_IU_evap_in >= h_IU_evap_in_up) ||
+                           (h_IU_evap_in <= h_IU_evap_in_low);
             h_IU_evap_in = h_IU_evap_in_new;
             NumIteHIUIn = NumIteHIUIn + 1;
-            goto Label12;
-        }
+        } while (!converged_12);
         if ((std::abs(h_IU_evap_in - h_IU_evap_in_new) > Tolerance * h_IU_evap_in)) {
             h_IU_evap_in = 0.5 * (h_IU_evap_in_low + h_IU_evap_in_up);
         } else if (h_IU_evap_in > h_IU_evap_in_up) {
