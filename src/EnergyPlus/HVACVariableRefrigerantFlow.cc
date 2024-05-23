@@ -11475,37 +11475,39 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             Counter = 1;
             Ncomp = TU_CoolingLoad / this->CoolingCOP;
             Ncomp_new = Ncomp;
-        Label10:;
-            Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
+            bool converged_10;
+            do {
+                Q_h_OU = Q_c_TU_PL + Ncomp_new; // Ncomp_new may be updated during Iteration_Ncomp Label10
 
-            // *VRF OU TeTc calculations
-            m_air = this->OUAirFlowRate * RhoAir;
-            SC_OU = this->SC;
-            this->VRFOU_TeTc(
-                state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
-            this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
-            this->SC = SC_OU;
+                // *VRF OU TeTc calculations
+                m_air = this->OUAirFlowRate * RhoAir;
+                SC_OU = this->SC;
+                this->VRFOU_TeTc(
+                    state, HXOpMode::CondMode, Q_h_OU, SC_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->CondensingTemp);
+                this->CondensingTemp = min(CapMaxTc, this->CondensingTemp);
+                this->SC = SC_OU;
 
-            // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
-            this->VRFOU_CalcCompC(state,
-                                  TU_CoolingLoad,
-                                  Tsuction,
-                                  this->CondensingTemp,
-                                  Psuction,
-                                  T_comp_in,
-                                  h_comp_in,
-                                  h_IU_evap_in,
-                                  Pipe_Q_c,
-                                  CapMaxTc,
-                                  Q_h_OU,
-                                  CompSpdActual,
-                                  Ncomp);
+                // *VEF OU Compressor Simulation at cooling mode: Specify the compressor speed and power consumption
+                this->VRFOU_CalcCompC(state,
+                                      TU_CoolingLoad,
+                                      Tsuction,
+                                      this->CondensingTemp,
+                                      Psuction,
+                                      T_comp_in,
+                                      h_comp_in,
+                                      h_IU_evap_in,
+                                      Pipe_Q_c,
+                                      CapMaxTc,
+                                      Q_h_OU,
+                                      CompSpdActual,
+                                      Ncomp);
 
-            if ((std::abs(Ncomp - Ncomp_new) > (Tolerance * Ncomp_new)) && (Counter < 30)) {
-                Ncomp_new = Ncomp;
                 Counter = Counter + 1;
-                goto Label10;
-            }
+                converged_10 = (std::abs(Ncomp - Ncomp_new) <= (Tolerance * Ncomp_new)) || (Counter >= 30);
+                if (!converged_10) {
+                    Ncomp_new = Ncomp;
+                }
+            } while (!converged_10);
         }
 
         // Update h_IU_evap_in in iterations Label12
