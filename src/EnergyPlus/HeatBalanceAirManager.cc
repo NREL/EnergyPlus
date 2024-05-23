@@ -4920,7 +4920,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                     }
                 } else {
                     if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-                        int spaceNum =  Util::FindItemInList(reqVar->name, state.dataHeatBal->space);
+                        int spaceNum = Util::FindItemInList(reqVar->name, state.dataHeatBal->space);
                         auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
                         thisSpaceAirRpt.ReportWBGT = true;
                     } else {
