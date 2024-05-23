@@ -144,7 +144,7 @@ TEST_F(AutoSizingFixture, WaterHeatingCoilUASizingGauntlet)
     state->dataSize->DataWaterFlowUsedForSizing = 0.0002;
     state->dataSize->DataFlowUsedForSizing = 0.2;
     state->dataSize->DataCoilNum = 1;
-    state->dataSize->DataFanOpMode = HVAC::ContFanCycCoil;
+    state->dataSize->DataFanOp = HVAC::FanOp::Continuous;
     state->dataSize->DataPltSizHeatNum = 1;
     state->dataSize->DataWaterCoilSizHeatDeltaT = 5.0;
     state->dataSize->DataDesInletAirTemp = 21.0;

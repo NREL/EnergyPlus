@@ -521,7 +521,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysNum = AirLoopNum;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = false;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).NightVent = false;
-        state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = HVAC::ContFanCycCoil;
+        state->dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp = HVAC::FanOp::Continuous;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet = false;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus = true;
         state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
@@ -1740,7 +1740,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
 
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoLockout = false;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).NightVent = false;
-    state->dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = HVAC::CycFanCycCoil;
+    state->dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp = HVAC::FanOp::Cycling;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).LoopFlowRateSet = false;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).CheckHeatRecoveryBypassStatus = true;
     state->dataAirLoop->AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
@@ -6921,7 +6921,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
+    AirLoopCntrlInfo.fanOp = HVAC::FanOp::Continuous;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7111,7 +7111,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
+    AirLoopCntrlInfo.fanOp = HVAC::FanOp::Continuous;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7315,7 +7315,7 @@ TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
+    AirLoopCntrlInfo.fanOp = HVAC::FanOp::Continuous;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
@@ -7564,7 +7564,7 @@ TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
     AirLoopCntrlInfo.OASysNum = AirLoopNum;
     AirLoopCntrlInfo.EconoLockout = false;
     AirLoopCntrlInfo.NightVent = false;
-    AirLoopCntrlInfo.FanOpMode = HVAC::ContFanCycCoil;
+    AirLoopCntrlInfo.fanOp = HVAC::FanOp::Continuous;
     AirLoopCntrlInfo.LoopFlowRateSet = false;
     AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
     AirLoopCntrlInfo.OASysComponentsSimulated = true;
