@@ -14096,88 +14096,87 @@ void VRFCondenserEquipment::VRFOU_CalcCompC(EnergyPlusData &state,
                     MaxNumIteTe = (this->EvaporatingTemp - SmallLoadTe) / 0.1 + 1; // upper bound and lower bound of Te iterations
                     Pipe_Te_assumed = this->EvaporatingTemp - 0.1;
 
-                Label11:;
-                    Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
+                    bool converged_11_2;
+                    do {
+                        Pipe_m_ref = 0; // Total Ref Flow Rate( kg/s )
 
-                    // Re-calculate Piping loss due to the Te and SH updates
-                    Pipe_h_IU_out = 0;
-                    Pipe_h_IU_out_i = 0;
-                    Pipe_m_ref_i = 0;
-                    Pipe_SH_merged = 0;
-                    Pipe_Pe_assumed = GetSatPressureRefrig(state, this->RefrigerantName, Pipe_Te_assumed, RefrigerantIndex, RoutineName);
+                        // Re-calculate Piping loss due to the Te and SH updates
+                        Pipe_h_IU_out = 0;
+                        Pipe_h_IU_out_i = 0;
+                        Pipe_m_ref_i = 0;
+                        Pipe_SH_merged = 0;
+                        Pipe_Pe_assumed = GetSatPressureRefrig(state, this->RefrigerantName, Pipe_Te_assumed, RefrigerantIndex, RoutineName);
 
-                    // Re-calculate total refrigerant flow rate, with updated SH
-                    for (int NumTU = 1; NumTU <= NumTUInList; NumTU++) {
-                        if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0) {
-                            TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
-                            CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
+                        // Re-calculate total refrigerant flow rate, with updated SH
+                        for (int NumTU = 1; NumTU <= NumTUInList; NumTU++) {
+                            if (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) > 0) {
+                                TUIndex = state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
+                                CoolCoilIndex = state.dataHVACVarRefFlow->VRFTU(TUIndex).CoolCoilIndex;
 
-                            Tfs = this->EvaporatingTemp + (this->C3Te * pow_2(state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH) +
-                                                           this->C2Te * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
+                                Tfs = this->EvaporatingTemp + (this->C3Te * pow_2(state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH) +
+                                                               this->C2Te * state.dataDXCoils->DXCoil(CoolCoilIndex).ActualSH + this->C1Te);
 
-                            // Modifi_SH is the updated SH for a specific IU
-                            if (this->C3Te == 0)
-                                Modifi_SHin = -(this->C1Te - Tfs + Pipe_Te_assumed) / this->C2Te; // 150130 Modifi_SH>Modifi_SHin
-                            else
-                                Modifi_SHin =
-                                    (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + Pipe_Te_assumed) * this->C3Te), 0.5)) /
-                                    (2 * this->C3Te);
+                                // Modifi_SH is the updated SH for a specific IU
+                                if (this->C3Te == 0)
+                                    Modifi_SHin = -(this->C1Te - Tfs + Pipe_Te_assumed) / this->C2Te; // 150130 Modifi_SH>Modifi_SHin
+                                else
+                                    Modifi_SHin =
+                                        (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + Pipe_Te_assumed) * this->C3Te), 0.5)) /
+                                        (2 * this->C3Te);
 
-                            RefTSat = GetSatTemperatureRefrig(
-                                state, this->RefrigerantName, max(min(Pipe_Pe_assumed, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-                            Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig(state,
-                                                                       this->RefrigerantName,
-                                                                       max(RefTSat, Pipe_Te_assumed + Modifi_SHin),
-                                                                       max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
-                                                                       RefrigerantIndex,
-                                                                       RoutineName);
+                                RefTSat = GetSatTemperatureRefrig(
+                                    state, this->RefrigerantName, max(min(Pipe_Pe_assumed, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                                Pipe_h_IU_out_i = GetSupHeatEnthalpyRefrig(state,
+                                                                           this->RefrigerantName,
+                                                                           max(RefTSat, Pipe_Te_assumed + Modifi_SHin),
+                                                                           max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
+                                                                           RefrigerantIndex,
+                                                                           RoutineName);
 
-                            if (Pipe_h_IU_out_i > Pipe_h_IU_in) {
-                                Pipe_m_ref_i = (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) <= 0.0)
-                                                   ? 0.0
-                                                   : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) /
-                                                      (Pipe_h_IU_out_i - Pipe_h_IU_in));
-                                Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
-                                Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * Modifi_SHin;
-                                Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;
+                                if (Pipe_h_IU_out_i > Pipe_h_IU_in) {
+                                    Pipe_m_ref_i = (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) <= 0.0)
+                                                       ? 0.0
+                                                       : (state.dataHVACVarRefFlow->TerminalUnitList(TUListNum).TotalCoolLoad(NumTU) /
+                                                          (Pipe_h_IU_out_i - Pipe_h_IU_in));
+                                    Pipe_m_ref = Pipe_m_ref + Pipe_m_ref_i;
+                                    Pipe_SH_merged = Pipe_SH_merged + Pipe_m_ref_i * Modifi_SHin;
+                                    Pipe_h_IU_out = Pipe_h_IU_out + Pipe_m_ref_i * Pipe_h_IU_out_i;
+                                }
                             }
                         }
-                    }
-                    if (Pipe_m_ref > 0) {
-                        Pipe_h_IU_out = Pipe_h_IU_out / Pipe_m_ref;
-                        Pipe_SH_merged = Pipe_SH_merged / Pipe_m_ref;
-                    } else {
-                        Pipe_SH_merged = this->SH;
-                        RefTSat = GetSatTemperatureRefrig(
-                            state, this->RefrigerantName, max(min(Pipe_Pe_assumed, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-                        Pipe_h_IU_out = GetSupHeatEnthalpyRefrig(state,
-                                                                 this->RefrigerantName,
-                                                                 max(RefTSat, Pipe_Te_assumed + Pipe_SH_merged),
-                                                                 max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
-                                                                 RefrigerantIndex,
-                                                                 RoutineName);
-                    }
+                        if (Pipe_m_ref > 0) {
+                            Pipe_h_IU_out = Pipe_h_IU_out / Pipe_m_ref;
+                            Pipe_SH_merged = Pipe_SH_merged / Pipe_m_ref;
+                        } else {
+                            Pipe_SH_merged = this->SH;
+                            RefTSat = GetSatTemperatureRefrig(
+                                state, this->RefrigerantName, max(min(Pipe_Pe_assumed, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                            Pipe_h_IU_out = GetSupHeatEnthalpyRefrig(state,
+                                                                     this->RefrigerantName,
+                                                                     max(RefTSat, Pipe_Te_assumed + Pipe_SH_merged),
+                                                                     max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
+                                                                     RefrigerantIndex,
+                                                                     RoutineName);
+                        }
 
-                    // Re-calculate piping loss
-                    this->VRFOU_PipeLossC(state,
-                                          Pipe_m_ref,
-                                          max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
-                                          Pipe_h_IU_out,
-                                          Pipe_SH_merged,
-                                          OutdoorDryBulb,
-                                          Pipe_Q,
-                                          Pipe_DeltP,
-                                          Pipe_h_comp_in);
+                        // Re-calculate piping loss
+                        this->VRFOU_PipeLossC(state,
+                                              Pipe_m_ref,
+                                              max(min(Pipe_Pe_assumed, RefPHigh), RefPLow),
+                                              Pipe_h_IU_out,
+                                              Pipe_SH_merged,
+                                              OutdoorDryBulb,
+                                              Pipe_Q,
+                                              Pipe_DeltP,
+                                              Pipe_h_comp_in);
 
-                    T_suction = GetSatTemperatureRefrig(
-                        state, this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-
-                    if ((std::abs(T_suction - SmallLoadTe) > 0.5) && (Pipe_Te_assumed < this->EvaporatingTemp) && (Pipe_Te_assumed > SmallLoadTe) &&
-                        (NumIteTe < MaxNumIteTe)) {
-                        Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
+                        T_suction = GetSatTemperatureRefrig(
+                            state, this->RefrigerantName, max(min(Pipe_Pe_assumed - Pipe_DeltP, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                        converged_11_2 = (std::abs(T_suction - SmallLoadTe) <= 0.5) || (Pipe_Te_assumed >= this->EvaporatingTemp) ||
+                                         (Pipe_Te_assumed <= SmallLoadTe) || (NumIteTe >= MaxNumIteTe);
                         NumIteTe = NumIteTe + 1;
-                        goto Label11;
-                    }
+                        Pipe_Te_assumed = Pipe_Te_assumed - 0.1;
+                    } while (!converged_11_2);
 
                     if (std::abs(T_suction - SmallLoadTe) > 0.5) {
                         NumIteTe = 999;
