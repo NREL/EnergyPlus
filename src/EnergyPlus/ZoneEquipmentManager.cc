@@ -245,14 +245,14 @@ void InitZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration) // 
     // Do the Begin Environment initializations
     if (state.dataZoneEquipmentManager->InitZoneEquipmentEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
 
-        state.dataZoneEquip->ZoneEquipAvail = HVAC::NoAction;
+        state.dataZoneEquip->ZoneEquipAvail = Avail::Status::NoAction;
 
-        if (allocated(state.dataHVACGlobal->ZoneComp)) {
+        if (allocated(state.dataAvail->ZoneComp)) {
             for (int ZoneEquipType = 1; ZoneEquipType <= NumValidSysAvailZoneComponents; ++ZoneEquipType) {
-                if (allocated(state.dataHVACGlobal->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
-                    auto &zoneComp = state.dataHVACGlobal->ZoneComp(ZoneEquipType);
+                if (allocated(state.dataAvail->ZoneComp(ZoneEquipType).ZoneCompAvailMgrs)) {
+                    auto &zoneComp = state.dataAvail->ZoneComp(ZoneEquipType);
                     for (int ZoneCompNum = 1; ZoneCompNum <= zoneComp.TotalNumComp; ++ZoneCompNum) {
-                        zoneComp.ZoneCompAvailMgrs(ZoneCompNum).AvailStatus = HVAC::NoAction;
+                        zoneComp.ZoneCompAvailMgrs(ZoneCompNum).availStatus = Avail::Status::NoAction;
                         zoneComp.ZoneCompAvailMgrs(ZoneCompNum).StartTime = 0;
                         zoneComp.ZoneCompAvailMgrs(ZoneCompNum).StopTime = 0;
                     }
@@ -3204,16 +3204,14 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
 
             if ((int)zoneEquipType <= NumValidSysAvailZoneComponents) ValidSAMComp = true;
 
-            auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
-
             if (ZoneCompNum > 0 && ValidSAMComp) {
 
-                SystemAvailabilityManager::GetZoneEqAvailabilityManager(state, zoneEquipType, ZoneCompNum, ErrorFlag);
+                Avail::GetZoneEqAvailabilityManager(state, zoneEquipType, ZoneCompNum, ErrorFlag);
 
-                if (ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == HVAC::CycleOn) {
+                if (state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).availStatus == Avail::Status::CycleOn) {
                     state.dataHVACGlobal->TurnFansOn = true;
                     state.dataHVACGlobal->TurnFansOff = false;
-                } else if (ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).AvailStatus == HVAC::ForceOff) {
+                } else if (state.dataAvail->ZoneComp((int)zoneEquipType).ZoneCompAvailMgrs(ZoneCompNum).availStatus == Avail::Status::ForceOff) {
                     state.dataHVACGlobal->TurnFansOn = false;
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
@@ -3231,11 +3229,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // Air loop system availability manager status only applies to PIU and exhaust fans
                 // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                 // and set fan on/off flags accordingly.
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::CycleOn ||
-                    state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::CycleOnZoneFansOnly) {
+                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::CycleOn ||
+                    state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::CycleOnZoneFansOnly) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::ForceOff) {
+                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
 
@@ -3444,11 +3442,11 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                 // Air loop system availability manager status only applies to PIU and exhaust fans
                 // Check to see if System Availability Managers are asking for fans to cycle on or shut off
                 // and set fan on/off flags accordingly.
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::CycleOn ||
-                    state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::CycleOnZoneFansOnly) {
+                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::CycleOn ||
+                    state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::CycleOnZoneFansOnly) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == HVAC::ForceOff) {
+                if (state.dataZoneEquip->ZoneEquipAvail(ControlledZoneNum) == Avail::Status::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
 
@@ -3465,7 +3463,7 @@ void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool
                                               state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                               FirstHVACIteration,
                                               zoneEquipList.EquipIndex(EquipPtr),
-                                              HVAC::ContFanCycCoil);
+                                              HVAC::FanOp::Continuous);
             } break;
 
             case ZoneEquipType::EnergyRecoveryVentilator: { // 'ZoneHVAC:EnergyRecoveryVentilator'
@@ -5458,8 +5456,8 @@ void CalcAirFlowSimple(EnergyPlusData &state,
                 if (state.afn->simulation_control.type == AirflowNetwork::ControlType::MultizoneWithDistributionOnlyDuringFanOperation) {
                     // CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(zoneNum)) &
                     if (!state.dataGlobal->KickOffSimulation) {
-                        if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == HVAC::CycleOn ||
-                              state.dataZoneEquip->ZoneEquipAvail(zoneNum) == HVAC::CycleOnZoneFansOnly) ||
+                        if (!(state.dataZoneEquip->ZoneEquipAvail(zoneNum) == Avail::Status::CycleOn ||
+                              state.dataZoneEquip->ZoneEquipAvail(zoneNum) == Avail::Status::CycleOnZoneFansOnly) ||
                             !state.afn->AirflowNetworkZoneFlag(zoneNum))
                             state.dataHeatBal->ZnAirRpt(zoneNum).VentilFanElec += thisVentilation.FanPower * state.dataHVACGlobal->TimeStepSysSec;
                     } else if (!state.afn->AirflowNetworkZoneFlag(zoneNum)) {

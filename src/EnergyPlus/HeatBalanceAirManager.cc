@@ -537,7 +537,7 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
         }
 
         // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-        bool ControlFlag = SystemAvailabilityManager::GetHybridVentilationControlStatus(state, thisZoneAirBalance.ZonePtr);
+        bool ControlFlag = Avail::GetHybridVentilationControlStatus(state, thisZoneAirBalance.ZonePtr);
         if (ControlFlag && thisZoneAirBalance.BalanceMethod == DataHeatBalance::AirBalance::Quadrature) {
             thisZoneAirBalance.BalanceMethod = DataHeatBalance::AirBalance::None;
             ShowWarningError(
