@@ -14386,58 +14386,59 @@ void VRFCondenserEquipment::VRFOU_CalcCompH(
                 // Low Load Modifications
 
                 NumIteCcap = 1;
-            Label19:;
-                Q_evap_req = max(0.0, TU_load + Pipe_Q - Ncomp);
+                bool converged_19;
+                // triggered in VariableRefrigerantFlow_FluidTCtrl_HR_5Zone.idf
+                do {
+                    Q_evap_req = max(0.0, TU_load + Pipe_Q - Ncomp);
 
-                // Update Te'( SmallLoadTe ) to meet the required evaporator capacity
-                CompSpdActual = this->CompressorSpeed(1);
-                Real64 CondHeat = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
-                int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
+                    // Update Te'( SmallLoadTe ) to meet the required evaporator capacity
+                    CompSpdActual = this->CompressorSpeed(1);
+                    Real64 CondHeat = Q_evap_req * C_cap_operation / this->RatedEvapCapacity;
+                    int CAPFT = this->OUCoolingCAPFT(CounterCompSpdTemp);
 
-                auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
-                    return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
-                };
+                    auto f = [&state, T_discharge, CondHeat, CAPFT](Real64 const T_suc) {
+                        return CompResidual_FluidTCtrl(state, T_discharge, CondHeat, CAPFT, T_suc);
+                    };
 
-                General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
-                if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
+                    General::SolveRoot(state, 1.0e-3, MaxIter, SolFla, SmallLoadTe, f, MinOutdoorUnitTe, T_suction);
+                    if (SolFla < 0) SmallLoadTe = MinOutdoorUnitTe;
 
-                T_suction = SmallLoadTe;
+                    T_suction = SmallLoadTe;
 
-                // Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
-                if (this->C3Te == 0)
-                    Modifi_SH = -(this->C1Te - Tfs + T_suction) / this->C2Te;
-                else
-                    Modifi_SH =
-                        (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
+                    // Update SH and Pe to calculate Modification Factor, which is used to update rps to for N_comp calculations
+                    if (this->C3Te == 0)
+                        Modifi_SH = -(this->C1Te - Tfs + T_suction) / this->C2Te;
+                    else
+                        Modifi_SH =
+                            (-this->C2Te + std::pow((pow_2(this->C2Te) - 4 * (this->C1Te - Tfs + T_suction) * this->C3Te), 0.5)) / (2 * this->C3Te);
 
-                Modifi_Pe = GetSatPressureRefrig(state, this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName);
+                    Modifi_Pe = GetSatPressureRefrig(state, this->RefrigerantName, T_suction, RefrigerantIndex, RoutineName);
 
-                // Calculate capacity modification factor
-                RefTSat =
-                    GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Modifi_Pe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
-                Pipe_h_comp_in = GetSupHeatEnthalpyRefrig(state,
-                                                          this->RefrigerantName,
-                                                          max(RefTSat, T_suction + Modifi_SH),
-                                                          max(min(Modifi_Pe, RefPHigh), RefPLow),
-                                                          RefrigerantIndex,
-                                                          RoutineName);
-                C_cap_operation = this->VRFOU_CapModFactor(state,
-                                                           Pipe_h_comp_in,
-                                                           Pipe_h_out_ave,
-                                                           max(min(Modifi_Pe, RefPHigh), RefPLow),
-                                                           T_suction + Modifi_SH,
-                                                           T_suction + 8,
-                                                           IUMaxCondTemp - 5);
+                    // Calculate capacity modification factor
+                    RefTSat =
+                        GetSatTemperatureRefrig(state, this->RefrigerantName, max(min(Modifi_Pe, RefPHigh), RefPLow), RefrigerantIndex, RoutineName);
+                    Pipe_h_comp_in = GetSupHeatEnthalpyRefrig(state,
+                                                              this->RefrigerantName,
+                                                              max(RefTSat, T_suction + Modifi_SH),
+                                                              max(min(Modifi_Pe, RefPHigh), RefPLow),
+                                                              RefrigerantIndex,
+                                                              RoutineName);
+                    C_cap_operation = this->VRFOU_CapModFactor(state,
+                                                               Pipe_h_comp_in,
+                                                               Pipe_h_out_ave,
+                                                               max(min(Modifi_Pe, RefPHigh), RefPLow),
+                                                               T_suction + Modifi_SH,
+                                                               T_suction + 8,
+                                                               IUMaxCondTemp - 5);
 
-                Cap_Eva0 = Q_evap_req * C_cap_operation;
-                Cap_Eva1 =
-                    this->CoffEvapCap * this->RatedEvapCapacity * CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
-                CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
+                    Cap_Eva0 = Q_evap_req * C_cap_operation;
+                    Cap_Eva1 = this->CoffEvapCap * this->RatedEvapCapacity *
+                               CurveValue(state, this->OUCoolingCAPFT(CounterCompSpdTemp), T_discharge, T_suction);
+                    CapDiff = std::abs(Cap_Eva1 - Cap_Eva0);
 
-                if ((CapDiff > (Tolerance * Cap_Eva0)) && (NumIteCcap < 30)) {
+                    converged_19 = (CapDiff <= (Tolerance * Cap_Eva0)) || (NumIteCcap >= 30);
                     NumIteCcap = NumIteCcap + 1;
-                    goto Label19;
-                }
+                } while (!converged_19);
                 if (CapDiff > (Tolerance * Cap_Eva0)) NumIteCcap = 999;
 
                 Ncomp = this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(CounterCompSpdTemp), T_discharge, T_suction);
