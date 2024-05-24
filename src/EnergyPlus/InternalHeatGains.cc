@@ -3342,7 +3342,7 @@ namespace InternalHeatGains {
                             Real64 TAirInSizing = 0.0;
                             // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite
                             // object
-                            SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
+                            SetPointManager::GetSetPointManagerInputs(state);
                             for (auto *spm : state.dataSetPointManager->spms) {
                                 if (spm->type != SetPointManager::SPMType::SZCooling) continue;
                                 auto *spmSZC = dynamic_cast<SetPointManager::SPMSingleZoneTemp *>(spm);

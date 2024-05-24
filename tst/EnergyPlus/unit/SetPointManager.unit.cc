@@ -1426,18 +1426,18 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
 
     state->dataLoopNodes->Node.allocate(3);
 
+    SetPointManager::GetSetPointManagerInputs(*state);
+    
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = Util::FindItemInList("KITCHEN AIR NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitCool.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
+    state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4; // There are only three nodes
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-
-    SetPointManager::GetSetPointManagerInputs(*state);
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
@@ -1493,8 +1493,10 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 
     state->dataLoopNodes->Node.allocate(3);
 
+    SetPointManager::GetSetPointManagerInputs(*state);
+
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
-    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = 1;
+    state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = Util::FindItemInList("ZSF1 NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
     state->dataZoneEquip->ZoneEquipConfig(1).IsControlled = true;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode.allocate(1);
@@ -1503,8 +1505,6 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     state->dataZoneEquip->ZoneEquipConfig(1).AirDistUnitHeat.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).InletNode(1) = 4;
     state->dataZoneEquip->ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-
-    SetPointManager::GetSetPointManagerInputs(*state);
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     state->dataAirLoop->AirLoopInputsFilled = true;
