@@ -113,7 +113,7 @@ namespace HeatRecovery {
                          std::string_view CompName,                          // name of the heat exchanger unit
                          bool const FirstHVACIteration,                      // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                                     // Pointer to Component
-                         int const FanOpMode,                                // Supply air fan operating mode
+                         HVAC::FanOp const fanOp,                            // Supply air fan operating mode
                          ObjexxFCL::Optional<Real64 const> HXPartLoadRatio,  // Part load ratio requested of DX compressor
                          ObjexxFCL::Optional_bool_const HXUnitEnable,        // Flag to operate heat exchanger
                          ObjexxFCL::Optional_int_const CompanionCoilIndex,   // index of companion cooling coil
@@ -193,22 +193,22 @@ namespace HeatRecovery {
         thisExch.initialize(state, CompanionCoilNum, companionCoilType);
 
         // call the correct heat exchanger calculation routine
-        switch (state.dataHeatRecovery->ExchCond(HeatExchNum).ExchType) {
-        case HVAC::HX_AIRTOAIR_FLATPLATE:
+        switch (state.dataHeatRecovery->ExchCond(HeatExchNum).type) {
+        case HVAC::HXType::AirToAir_FlatPlate:
             thisExch.CalcAirToAirPlateHeatExch(state, HXUnitOn, EconomizerFlag, HighHumCtrlFlag);
             break;
 
-        case HVAC::HX_AIRTOAIR_GENERIC:
-            thisExch.CalcAirToAirGenericHeatExch(state, HXUnitOn, FirstHVACIteration, FanOpMode, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
+        case HVAC::HXType::AirToAir_Generic:
+            thisExch.CalcAirToAirGenericHeatExch(state, HXUnitOn, FirstHVACIteration, fanOp, EconomizerFlag, HighHumCtrlFlag, HXPartLoadRatio);
             break;
 
-        case HVAC::HX_DESICCANT_BALANCED:
+        case HVAC::HXType::Desiccant_Balanced:
             Real64 PartLoadRatio = present(HXPartLoadRatio) ? Real64(HXPartLoadRatio) : 1.0; // Part load ratio requested of DX compressor
             bool RegInIsOANode = present(RegenInletIsOANode) && bool(RegenInletIsOANode);
             thisExch.CalcDesiccantBalancedHeatExch(state,
                                                    HXUnitOn,
                                                    FirstHVACIteration,
-                                                   FanOpMode,
+                                                   fanOp,
                                                    PartLoadRatio,
                                                    CompanionCoilNum,
                                                    companionCoilType,
@@ -292,7 +292,7 @@ namespace HeatRecovery {
                                                      ErrorsFound);
 
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisExchanger.ExchType = HVAC::HX_AIRTOAIR_FLATPLATE;
+            thisExchanger.type = HVAC::HXType::AirToAir_FlatPlate;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -373,7 +373,7 @@ namespace HeatRecovery {
                                                             DataLoopNode::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state,
-                                               HVAC::cHXTypes(thisExchanger.ExchType),
+                                               HVAC::hxTypeNames[(int)thisExchanger.type],
                                                thisExchanger.Name,
                                                state.dataIPShortCut->cAlphaArgs(5),
                                                state.dataIPShortCut->cAlphaArgs(6),
@@ -409,7 +409,7 @@ namespace HeatRecovery {
                                                      ErrorsFound);
 
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisExchanger.ExchType = HVAC::HX_AIRTOAIR_GENERIC;
+            thisExchanger.type = HVAC::HXType::AirToAir_Generic;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -524,7 +524,7 @@ namespace HeatRecovery {
                 Curve::GetCurveIndex(state, state.dataIPShortCut->cAlphaArgs(14)); // convert curve name to number
 
             BranchNodeConnections::TestCompSet(state,
-                                               HVAC::cHXTypes(thisExchanger.ExchType),
+                                               HVAC::hxTypeNames[(int)thisExchanger.type],
                                                thisExchanger.Name,
                                                state.dataIPShortCut->cAlphaArgs(3),
                                                state.dataIPShortCut->cAlphaArgs(4),
@@ -559,7 +559,7 @@ namespace HeatRecovery {
                                                      ErrorsFound);
 
             thisExchanger.Name = state.dataIPShortCut->cAlphaArgs(1);
-            thisExchanger.ExchType = HVAC::HX_DESICCANT_BALANCED;
+            thisExchanger.type = HVAC::HXType::Desiccant_Balanced;
             if (state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                 thisExchanger.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
             } else {
@@ -619,7 +619,7 @@ namespace HeatRecovery {
 
             // Set up the component set for the process side of the HX (Sec = Process)
             BranchNodeConnections::TestCompSet(state,
-                                               HVAC::cHXTypes(thisExchanger.ExchType),
+                                               HVAC::hxTypeNames[(int)thisExchanger.type],
                                                thisExchanger.Name,
                                                state.dataLoopNodes->NodeID(thisExchanger.SecInletNode),
                                                state.dataLoopNodes->NodeID(thisExchanger.SecOutletNode),
@@ -1019,7 +1019,7 @@ namespace HeatRecovery {
                 }
             }
             if (thisExchanger.PerfDataIndex == 0) {
-                ShowSevereError(state, format("{} \"{}\"", HVAC::cHXTypes(thisExchanger.ExchType), thisExchanger.Name));
+                ShowSevereError(state, format("{} \"{}\"", HVAC::hxTypeNames[(int)thisExchanger.type], thisExchanger.Name));
                 ShowContinueError(state, format("... Performance data set not found = {}", thisExchanger.HeatExchPerfName));
                 ErrorsFound = true;
             } else {
@@ -1234,8 +1234,8 @@ namespace HeatRecovery {
             CpAir = Psychrometrics::PsyCpAirFnW(0.0);
 
             CalculateNTUBoundsErrors ErrStat = CalculateNTUBoundsErrors::NoError;
-            switch (this->ExchType) {
-            case HVAC::HX_AIRTOAIR_FLATPLATE:
+            switch (this->type) {
+            case HVAC::HXType::AirToAir_FlatPlate:
                 this->NomSupAirMassFlow = RhoAir * this->NomSupAirVolFlow;
                 this->NomSecAirMassFlow = RhoAir * this->NomSecAirVolFlow;
                 // Note: the capacity stream is here simply the mass flow
@@ -1355,12 +1355,12 @@ namespace HeatRecovery {
                 }
                 break;
 
-            case HVAC::HX_AIRTOAIR_GENERIC:
+            case HVAC::HXType::AirToAir_Generic:
                 if (this->SupOutletNode > 0 && this->ControlToTemperatureSetPoint) {
                     if (state.dataLoopNodes->Node(this->SupOutletNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
                         if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             ShowSevereError(state,
-                                            format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
+                                            format("Missing temperature setpoint for {} \"{}\" :", HVAC::hxTypeNames[(int)this->type], this->Name));
                             ShowContinueError(
                                 state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                             ShowFatalError(state, " Previous condition causes program termination.");
@@ -1368,8 +1368,8 @@ namespace HeatRecovery {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->SupOutletNode, HVAC::CtrlVarType::Temp, FatalError);
                             if (FatalError) {
-                                ShowSevereError(state,
-                                                format("Missing temperature setpoint for {} \"{}\" :", HVAC::cHXTypes(this->ExchType), this->Name));
+                                ShowSevereError(
+                                    state, format("Missing temperature setpoint for {} \"{}\" :", HVAC::hxTypeNames[(int)this->type], this->Name));
                                 ShowContinueError(
                                     state, "  use a Setpoint Manager to establish a setpoint at the supply air outlet node of the Heat Exchanger.");
                                 ShowContinueError(
@@ -1430,19 +1430,20 @@ namespace HeatRecovery {
 
         //  Initialize inlet conditions
 
-        switch (this->ExchType) {
-        case HVAC::HX_AIRTOAIR_FLATPLATE:
-        case HVAC::HX_AIRTOAIR_GENERIC:
+        switch (this->type) {
+        case HVAC::HXType::AirToAir_FlatPlate:
+        case HVAC::HXType::AirToAir_Generic:
             break;
 
-        case HVAC::HX_DESICCANT_BALANCED:
+        case HVAC::HXType::Desiccant_Balanced:
             if (this->MySetPointTest) {
                 if (!state.dataGlobal->SysSizingCalc && state.dataHVACGlobal->DoSetPointTest) {
                     if (!state.dataHeatRecovery->CalledFromParentObject) {
                         if (state.dataLoopNodes->Node(this->SecOutletNode).HumRatMax == DataLoopNode::SensedNodeFlagValue) {
                             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                                 ShowWarningError(
-                                    state, format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::cHXTypes(this->ExchType), this->Name));
+                                    state,
+                                    format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::hxTypeNames[(int)this->type], this->Name));
                                 ShowContinueError(state,
                                                   "...the simulation will continue without control of the desiccant heat exchanger to a maximum "
                                                   "humidity ratio setpoint.");
@@ -1458,7 +1459,7 @@ namespace HeatRecovery {
                                 if (LocalWarningError) {
                                     ShowWarningError(
                                         state,
-                                        format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::cHXTypes(this->ExchType), this->Name));
+                                        format("Missing optional HumRatMax setpoint for {} \"{}\"", HVAC::hxTypeNames[(int)this->type], this->Name));
                                     ShowContinueError(state,
                                                       "...the simulation will continue without control of the desiccant heat exchanger to a "
                                                       "maximum humidity ratio setpoint.");
@@ -1544,14 +1545,14 @@ namespace HeatRecovery {
         state.dataSize->HRFlowSizingFlag = true;
         bool PrintFlag = true; // true when sizing information is reported in the eio file
         int FieldNum = 0;      // IDD numeric field index where input field description is found
-        switch (this->ExchType) {
-        case HVAC::HX_DESICCANT_BALANCED:
+        switch (this->type) {
+        case HVAC::HXType::Desiccant_Balanced:
             PrintFlag = false;
             break;
-        case HVAC::HX_AIRTOAIR_GENERIC:
+        case HVAC::HXType::AirToAir_Generic:
             FieldNum = 1;
             break;
-        case HVAC::HX_AIRTOAIR_FLATPLATE:
+        case HVAC::HXType::AirToAir_FlatPlate:
             FieldNum = 2;
             break;
         default:
@@ -1559,7 +1560,7 @@ namespace HeatRecovery {
         }
 
         std::string CompName = this->Name;
-        std::string CompType = HVAC::cHXTypes(this->ExchType);
+        std::string CompType = std::string(HVAC::hxTypeNames[(int)this->type]);
         if (FieldNum > 0) {
             SizingString = this->NumericFieldNames(FieldNum) + " [m3/s]";
         } else {
@@ -1599,11 +1600,11 @@ namespace HeatRecovery {
         this->NomSupAirVolFlow = sizerSystemAirFlow.size(state, TempSize, errorsFound);
         state.dataSize->DataConstantUsedForSizing = 0.0;
         state.dataSize->DataFractionUsedForSizing = 0.0;
-        if (this->ExchType == HVAC::HX_AIRTOAIR_FLATPLATE) {
+        if (this->type == HVAC::HXType::AirToAir_FlatPlate) {
             PrintFlag = true;
             FieldNum = 5;
             CompName = this->Name;
-            CompType = HVAC::cHXTypes(this->ExchType);
+            CompType = HVAC::hxTypeNames[(int)this->type];
             SizingString = this->NumericFieldNames(FieldNum) + " [m3/s]";
             if (this->NomSecAirVolFlow == DataSizing::AutoSize) {
                 state.dataSize->DataConstantUsedForSizing = this->NomSupAirVolFlow;
@@ -1625,7 +1626,7 @@ namespace HeatRecovery {
             state.dataSize->DataFractionUsedForSizing = 0.0;
         }
         state.dataSize->HRFlowSizingFlag = false;
-        if (this->ExchType == HVAC::HX_DESICCANT_BALANCED) {
+        if (this->type == HVAC::HXType::Desiccant_Balanced) {
 
             int const BalDesDehumPerfIndex = this->PerfDataIndex; // index of dehum performance data1 object
 
@@ -1659,13 +1660,13 @@ namespace HeatRecovery {
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirHRInputObjType,
                                                  this->Name,
-                                                 this->ExchType == HVAC::HX_AIRTOAIR_FLATPLATE
+                                                 this->type == HVAC::HXType::AirToAir_FlatPlate
                                                      ? "Flat Plate"
-                                                     : (this->ExchType == HVAC::HX_DESICCANT_BALANCED ? "Dessicant Balanced" : "Generic"));
+                                                     : (this->type == HVAC::HXType::Desiccant_Balanced ? "Dessicant Balanced" : "Generic"));
         OutputReportPredefined::PreDefTableEntry(state,
                                                  state.dataOutRptPredefined->pdchAirHRPlateOrRotary,
                                                  this->Name,
-                                                 this->ExchType == HVAC::HX_AIRTOAIR_FLATPLATE ? "FlatPlate" : " Rotary");
+                                                 this->type == HVAC::HXType::AirToAir_FlatPlate ? "FlatPlate" : " Rotary");
 
         OutputReportPredefined::PreDefTableEntry(
             state, state.dataOutRptPredefined->pdchAirHRSenEffAt100PerHeatAirFlow, this->Name, this->HeatEffectSensible100);
@@ -1865,7 +1866,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                              // flag to simulate heat exchanger heat recovery
         bool const FirstHVACIteration,                    // first HVAC iteration flag
-        int const FanOpMode,                              // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                          // Supply air fan operating mode (1=cycling, 2=constant)
         ObjexxFCL::Optional_bool_const EconomizerFlag,    // economizer flag pass by air loop or OA sys
         ObjexxFCL::Optional_bool_const HighHumCtrlFlag,   // high humidity control flag passed by airloop or OA sys
         ObjexxFCL::Optional<Real64 const> HXPartLoadRatio //
@@ -1981,7 +1982,7 @@ namespace HeatRecovery {
         if (UnitOn) {
             bool FrostControlFlag = false; // unit is in frost control mode when TRUE
             // Unit is on.
-            if (present(HXPartLoadRatio) && FanOpMode == HVAC::CycFanCycCoil) {
+            if (present(HXPartLoadRatio) && fanOp == HVAC::FanOp::Cycling) {
                 if (HXPartLoadRatio > 0) {
                     AirSidePLR = HXPartLoadRatio;
                 } else {
@@ -1991,7 +1992,7 @@ namespace HeatRecovery {
                 AirSidePLR = 1.0;
             }
 
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 this->SupInMassFlow /= AirSidePLR;
                 this->SupOutMassFlow /= AirSidePLR;
                 this->SecInMassFlow /= AirSidePLR;
@@ -2012,7 +2013,7 @@ namespace HeatRecovery {
                         if (this->UnBalancedErrCount <= 2) {
                             ShowSevereError(state,
                                             format("{}: \"{}\" unbalanced air volume flow ratio through the heat exchanger is greater than 2:1.",
-                                                   HVAC::cHXTypes(this->ExchType),
+                                                   HVAC::hxTypeNames[(int)this->type],
                                                    this->Name));
                             ShowContinueErrorTimeStamp(
                                 state, format("...HX Supply air to Exhaust air flow ratio = {:.5R}.", HXSupAirVolFlowRate / HXSecAirVolFlowRate));
@@ -2020,7 +2021,7 @@ namespace HeatRecovery {
                             ShowRecurringWarningErrorAtEnd(
                                 state,
                                 format("{} \"{}\":  Unbalanced air volume flow ratio exceeds 2:1 warning continues. HX flow ratio statistics follow.",
-                                       HVAC::cHXTypes(this->ExchType),
+                                       HVAC::hxTypeNames[(int)this->type],
                                        this->Name),
                                 this->UnBalancedErrIndex,
                                 HXSupAirVolFlowRate / HXSecAirVolFlowRate,
@@ -2037,7 +2038,7 @@ namespace HeatRecovery {
                 if (!state.dataGlobal->WarmupFlag && !FirstHVACIteration) {
                     ++this->LowFlowErrCount;
                     if (this->LowFlowErrCount == 1) {
-                        ShowWarningError(state, format("{} \"{}\"", HVAC::cHXTypes(this->ExchType), this->Name));
+                        ShowWarningError(state, format("{} \"{}\"", HVAC::hxTypeNames[(int)this->type], this->Name));
                         ShowContinueError(state, "Average air volume flow rate is <50% or >130% of the nominal HX supply air volume flow rate.");
                         ShowContinueErrorTimeStamp(state, format("Air volume flow rate ratio = {:.3R}.", HXAirVolFlowRatio));
                     } else {
@@ -2045,7 +2046,7 @@ namespace HeatRecovery {
                             state,
                             format(
                                 "{} \"{}\":  Average air volume flow rate is <50% or >130% warning continues. Air flow rate ratio statistics follow.",
-                                HVAC::cHXTypes(this->ExchType),
+                                HVAC::hxTypeNames[(int)this->type],
                                 this->Name),
                             this->LowFlowErrIndex,
                             HXAirVolFlowRatio,
@@ -2311,14 +2312,14 @@ namespace HeatRecovery {
 
             } // ENDIF for "IF(thisExch%ControlToTemperatureSetPoint .AND... THEN, ELSE"
 
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 this->SupInMassFlow *= AirSidePLR;
                 this->SupOutMassFlow *= AirSidePLR;
                 this->SecInMassFlow *= AirSidePLR;
                 this->SecOutMassFlow *= AirSidePLR;
                 this->SupBypassMassFlow *= AirSidePLR;
                 this->SecBypassMassFlow *= AirSidePLR;
-            } else if (FanOpMode == HVAC::ContFanCycCoil) {
+            } else if (fanOp == HVAC::FanOp::Continuous) {
                 this->SupOutTemp = this->SupOutTemp * AirSidePLR + this->SupInTemp * (1.0 - AirSidePLR);
                 this->SupOutHumRat = this->SupOutHumRat * AirSidePLR + this->SupInHumRat * (1.0 - AirSidePLR);
                 this->SupOutEnth = this->SupOutEnth * AirSidePLR + this->SupOutEnth * (1.0 - AirSidePLR);
@@ -2394,7 +2395,7 @@ namespace HeatRecovery {
         EnergyPlusData &state,
         bool const HXUnitOn,                           // flag to simulate heat exchager heat recovery
         bool const FirstHVACIteration,                 // First HVAC iteration flag
-        int const FanOpMode,                           // Supply air fan operating mode (1=cycling, 2=constant)
+        HVAC::FanOp const fanOp,                       // Supply air fan operating mode (1=cycling, 2=constant)
         Real64 const PartLoadRatio,                    // Part load ratio requested of DX compressor
         int const CompanionCoilIndex,                  // index of companion cooling coil
         int const CompanionCoilType,                   // type of cooling coil
@@ -2510,11 +2511,11 @@ namespace HeatRecovery {
             // In constant fan mode, process air mass flow rate is full flow and supply (regen) air cycles based on PLR.
             // If supply (regen) inlet is OA node, regen mass flow rate is proportional to PLR.
             // If both of the above is true then boost local variable up to full flow
-            if ((FanOpMode == HVAC::ContFanCycCoil) && RegenInletIsOANode) {
+            if ((fanOp == HVAC::FanOp::Continuous) && RegenInletIsOANode) {
                 local_SupInMassFlow /= HXPartLoadRatio;
             }
             // for cycling fan case, boost both local variables up to full flow
-            if (FanOpMode == HVAC::CycFanCycCoil) {
+            if (fanOp == HVAC::FanOp::Cycling) {
                 local_SupInMassFlow /= HXPartLoadRatio; // supply = regen
                 local_SecInMassFlow /= HXPartLoadRatio; // secondary = process
             }
@@ -2635,7 +2636,7 @@ namespace HeatRecovery {
             }
 
             Real64 constexpr lowerLimit = 1.e-5;
-            if (FanOpMode == HVAC::CycFanCycCoil || RegenInletIsOANode) {
+            if (fanOp == HVAC::FanOp::Cycling || RegenInletIsOANode) {
                 //       Supply (regen) air stream mass flow rate is cycling and proportional to PLR, outlet conditions are full load
                 //       conditions
                 this->SupOutTemp = this->SupInTemp + FullLoadDeltaT;
@@ -4748,7 +4749,7 @@ namespace HeatRecovery {
                     ShowRecurringWarningErrorAtEnd(state,
                                                    format("{} \"{}\" - unbalanced air flow rate is limited to 2% error continues with the imbalanced "
                                                           "fraction statistics reported...",
-                                                          HVAC::cHXTypes(this->ExchType),
+                                                          HVAC::hxTypeNames[(int)this->type],
                                                           this->Name),
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.index,
                                                    state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.last,
@@ -4771,7 +4772,7 @@ namespace HeatRecovery {
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.print = true;
 
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer1 =
-                format("{} \"{}\" - unbalanced air flow rate is limited to 2%.", HVAC::cHXTypes(this->ExchType), this->Name);
+                format("{} \"{}\" - unbalanced air flow rate is limited to 2%.", HVAC::hxTypeNames[(int)this->type], this->Name);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer2 = format(
                 "...Regeneration air mass flow rate is {} and process air mass flow rate is {}.", thisError.OutputCharLo, thisError.OutputCharHi);
             state.dataHeatRecovery->BalDesDehumPerfData(this->PerfDataIndex).imbalancedFlowErr.buffer3 = format(
@@ -4942,9 +4943,9 @@ namespace HeatRecovery {
         }
     }
 
-    int GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
-                                      std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
-                                      bool &ErrorsFound          // set to true if problem
+    HVAC::HXType GetHeatExchangerObjectTypeNum(EnergyPlusData &state,
+                                               std::string const &HXName, // must match HX names for the state.dataHeatRecovery->ExchCond type
+                                               bool &ErrorsFound          // set to true if problem
     )
     {
 
@@ -4966,11 +4967,11 @@ namespace HeatRecovery {
 
         int const WhichHX = Util::FindItemInList(HXName, state.dataHeatRecovery->ExchCond);
         if (WhichHX != 0) {
-            return state.dataHeatRecovery->ExchCond(WhichHX).ExchType;
+            return state.dataHeatRecovery->ExchCond(WhichHX).type;
         } else {
             ShowSevereError(state, format("GetHeatExchangerObjectTypeNum: Could not find heat exchanger = \"{}\"", HXName));
             ErrorsFound = true;
-            return 0;
+            return HVAC::HXType::Invalid;
         }
     }
 

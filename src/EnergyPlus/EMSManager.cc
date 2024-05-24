@@ -1670,7 +1670,7 @@ namespace EMSManager {
                                  "Availability Status",
                                  "[ ]",
                                  state.dataEMSMgr->lDummy2,
-                                 state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
+                                 (int &)state.dataAirLoop->PriAirSysAvailMgr(Loop).availStatus);
             }
         }
     }

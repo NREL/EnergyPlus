@@ -3488,7 +3488,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
 
             // set evap unit to cycling mode for all fan types. Note OpMode var is not used
             // with used for ZONECOOLINGLOADVARIABLESPEEDFAN Cooler Unit Control Method
-            thisZoneEvapUnit.OpMode = HVAC::CycFanCycCoil;
+            thisZoneEvapUnit.fanOp = HVAC::FanOp::Cycling;
 
             FanVolFlow = 0.0;
             if (errFlag) {
@@ -3714,7 +3714,7 @@ void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Zone Evaporative Cooler Unit Fan Availability Status",
                             Constant::Units::None,
-                            thisZoneEvapUnit.FanAvailStatus,
+                            (int &)thisZoneEvapUnit.FanAvailStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             thisZoneEvapUnit.Name);
@@ -3743,15 +3743,15 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &zoneEvapUnit = state.dataEvapCoolers->ZoneEvapUnit(UnitNum);
 
-    if (allocated(state.dataHVACGlobal->ZoneComp)) {
+    if (allocated(state.dataAvail->ZoneComp)) {
         if (zoneEvapUnit.MyZoneEq) { // initialize the name of each availability manager list and zone number
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
+            state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
                 zoneEvapUnit.AvailManagerListName;
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
+            state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).ZoneNum = ZoneNum;
             zoneEvapUnit.MyZoneEq = false;
         }
         zoneEvapUnit.FanAvailStatus =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).AvailStatus;
+            state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::EvaporativeCooler).ZoneCompAvailMgrs(UnitNum).availStatus;
     }
 
     if (!state.dataEvapCoolers->ZoneEquipmentListChecked && state.dataZoneEquip->ZoneEquipInputsFilled) {
@@ -3839,7 +3839,7 @@ void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state,
         zoneEvapUnit.UnitLatentHeatingEnergy = 0.0;
         zoneEvapUnit.UnitLatentCoolingRate = 0.0;
         zoneEvapUnit.UnitLatentCoolingEnergy = 0.0;
-        zoneEvapUnit.FanAvailStatus = 0.0;
+        zoneEvapUnit.FanAvailStatus = Avail::Status::NoAction;
 
         // place default cold setpoints on control nodes of select evap coolers
         if ((zoneEvapUnit.EvapCooler_1_Type_Num == EvapCoolerType::DirectResearchSpecial) ||
@@ -4047,7 +4047,7 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
             if (zoneEvapUnit.IsOnThisTimestep) {
 
-                if (zoneEvapUnit.OpMode == HVAC::ContFanCycCoil) {
+                if (zoneEvapUnit.fanOp == HVAC::FanOp::Continuous) {
                     PartLoadRatio = 1.0;
                     zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
@@ -4074,7 +4074,7 @@ void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state,
 
             if ((ZoneCoolingLoad < CoolingLoadThreashold) && zoneEvapUnit.UnitIsAvailable) {
 
-                if (zoneEvapUnit.OpMode == HVAC::ContFanCycCoil) {
+                if (zoneEvapUnit.fanOp == HVAC::FanOp::Continuous) {
                     PartLoadRatio = 1.0;
                     zoneEvapUnit.UnitPartLoadRatio = PartLoadRatio;
                     CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, SensibleOutputProvided, LatentOutputProvided);
