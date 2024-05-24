@@ -181,7 +181,6 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace Psychrometrics;
-    auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     // Locals
@@ -216,17 +215,17 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
     state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = 0;
+    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = Avail::Status::NoAction;
 
     // set the availability status based on the availability manager list name
-    if (allocated(ZoneComp)) {
-        auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
+    if (allocated(state.dataAvail->ZoneComp)) {
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
         if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
             state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum) = false;
         }
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = availMgr.AvailStatus;
+        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = availMgr.availStatus;
     }
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
