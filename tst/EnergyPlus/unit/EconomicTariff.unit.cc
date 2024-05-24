@@ -703,7 +703,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics_ZeroMeterIndex)
     state->dataOutputProcessor->meters.push_back(meter);
 
     GatherForEconomics(*state);
-    EXPECT_EQ(100, state->dataEconTariff->tariff(1).gatherEnergy(1,1));
+    EXPECT_EQ(100, state->dataEconTariff->tariff(1).gatherEnergy(1, 1));
 }
 
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
