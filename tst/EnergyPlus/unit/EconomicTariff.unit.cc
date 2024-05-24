@@ -686,6 +686,26 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(3, state->dataEconTariff->tariff(1).seasonForMonth(6));
 }
 
+TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics_ZeroMeterIndex)
+{
+    state->dataEconTariff->numTariff = 1;
+    state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
+    state->dataEconTariff->tariff(1).reportMeterIndx = 0;
+    state->dataEconTariff->tariff(1).demWinTime = 1.;
+    state->dataEconTariff->tariff(1).energyConv = 1.;
+
+    state->dataGlobal->TimeStepZoneSec = 3600;
+    state->dataEnvrn->Month = 1;
+
+    Meter *meter = nullptr;
+    meter = new Meter("FacElec");
+    meter->CurTSValue = 100;
+    state->dataOutputProcessor->meters.push_back(meter);
+
+    GatherForEconomics(*state);
+    EXPECT_EQ(100, state->dataEconTariff->tariff(1).gatherEnergy(1,1));
+}
+
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 {
     // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
