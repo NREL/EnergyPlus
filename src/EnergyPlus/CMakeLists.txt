@@ -473,7 +473,6 @@ set(SRC
     Plant/LoopSidePumpInformation.hh
     Plant/MeterData.hh
     Plant/MixerData.hh
-    Plant/PlantAvailManager.hh
     Plant/PlantConvergencePoint.hh
     Plant/PlantLocation.hh
     Plant/PlantManager.cc

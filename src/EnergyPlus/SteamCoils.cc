@@ -112,7 +112,7 @@ namespace SteamCoils {
                                      int &CompIndex,
                                      ObjexxFCL::Optional<Real64 const> QCoilReq, // coil load to be met
                                      ObjexxFCL::Optional<Real64> QCoilActual,    // coil load actually delivered returned to calling component
-                                     ObjexxFCL::Optional_int_const FanOpMode,
+                                     ObjexxFCL::Optional<HVAC::FanOp const> fanOpMode,
                                      ObjexxFCL::Optional<Real64 const> PartLoadRatio)
     {
 
@@ -128,7 +128,7 @@ namespace SteamCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 QCoilActualTemp; // coil load actually delivered returned to calling component
         int CoilNum;            // The SteamCoil that you are currently loading input into
-        int OpMode;             // fan operating mode
+        HVAC::FanOp fanOp;      // fan operating mode
         Real64 PartLoadFrac;    // part-load fraction of heating coil
         Real64 QCoilReqLocal;   // local required heating load optional
 
@@ -170,10 +170,10 @@ namespace SteamCoils {
         // With the correct CoilNum Initialize
         InitSteamCoil(state, CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
 
-        if (present(FanOpMode)) {
-            OpMode = FanOpMode;
+        if (present(fanOpMode)) {
+            fanOp = fanOpMode;
         } else {
-            OpMode = HVAC::ContFanCycCoil;
+            fanOp = HVAC::FanOp::Continuous;
         }
         if (present(PartLoadRatio)) {
             PartLoadFrac = PartLoadRatio;
@@ -187,7 +187,7 @@ namespace SteamCoils {
         }
 
         CalcSteamAirCoil(
-            state, CoilNum, QCoilReqLocal, QCoilActualTemp, OpMode, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
+            state, CoilNum, QCoilReqLocal, QCoilActualTemp, fanOp, PartLoadFrac); // Autodesk:OPTIONAL QCoilReq used without PRESENT check
         if (present(QCoilActual)) QCoilActual = QCoilActualTemp;
 
         // Update the current SteamCoil to the outlet nodes
@@ -1008,7 +1008,7 @@ namespace SteamCoils {
                           int const CoilNum,
                           Real64 const QCoilRequested, // requested coil load
                           Real64 &QCoilActual,         // coil load actually delivered
-                          int const FanOpMode,         // fan operating mode
+                          HVAC::FanOp const fanOp,     // fan operating mode
                           Real64 const PartLoadRatio   // part-load ratio of heating coil
     )
     {
@@ -1081,7 +1081,7 @@ namespace SteamCoils {
         }
 
         //  adjust mass flow rates for cycling fan cycling coil operation
-        if (FanOpMode == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             if (PartLoadRatio > 0.0) {
                 AirMassFlow = state.dataSteamCoils->SteamCoil(CoilNum).InletAirMassFlowRate / PartLoadRatio;
                 SteamMassFlowRate = min(state.dataSteamCoils->SteamCoil(CoilNum).InletSteamMassFlowRate / PartLoadRatio,
@@ -1405,7 +1405,7 @@ namespace SteamCoils {
             assert(false);
         }
 
-        if (FanOpMode == HVAC::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             HeatingCoilLoad *= PartLoadRatio;
         }
 

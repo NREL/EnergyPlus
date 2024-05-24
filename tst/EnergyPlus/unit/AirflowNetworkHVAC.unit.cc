@@ -2201,7 +2201,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
     //    state->dataAirLoop->LoopOnOffFanPartLoadRatio.allocate(1);
-    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = HVAC::FanOp::Invalid;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     state->afn->PressureControllerData(1).OANodeNum = state->afn->DisSysCompReliefAirData(1).OutletNode;
@@ -5998,8 +5998,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     state->afn->AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(2);
-    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    state->dataAirLoop->AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = HVAC::FanOp::Invalid;
+    state->dataAirLoop->AirLoopAFNInfo(2).LoopFanOperationMode = HVAC::FanOp::Cycling;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
     state->dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
@@ -10473,7 +10473,7 @@ TEST_F(EnergyPlusFixture, DISABLED_AirLoopNumTest)
     }
 
     state->dataAirLoop->AirLoopAFNInfo.allocate(1);
-    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = HVAC::FanOp::Invalid;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
     state->afn->AirflowNetworkFanActivated = false;
@@ -10802,7 +10802,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestNoZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->fans(2)->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
@@ -10995,7 +10995,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = state->dataFans->fans(2)->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected warning
@@ -11173,7 +11173,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneEqpSupportUnbalancedZoneERV)
     state->dataHVACStandAloneERV->StandAloneERV(1).SupplyAirInletNode = 2;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanName = fan2->Name;
     state->dataHVACStandAloneERV->StandAloneERV(1).ExhaustAirFanIndex = 2;
-    state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerTypeNum = HVAC::HX_AIRTOAIR_GENERIC;
+    state->dataHVACStandAloneERV->StandAloneERV(1).hxType = HVAC::HXType::AirToAir_Generic;
     state->dataHVACStandAloneERV->StandAloneERV(1).HeatExchangerName = "ERV Heat Exchanger";
 
     // Check validation and expected errors
@@ -16266,7 +16266,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_DuctSizingTest)
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state);
     SimAirServingZones::GetAirPathData(*state);
 
-    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 1;
+    state->dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = HVAC::FanOp::Cycling;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     state->dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     state->afn->AirflowNetworkLinkageData(17).AirLoopNum = 1;

@@ -108,8 +108,6 @@ namespace EnergyPlus::SingleDuct {
 using namespace DataLoopNode;
 using BranchNodeConnections::SetUpCompSets;
 using BranchNodeConnections::TestCompSet;
-using HVAC::ATMixer_InletSide;
-using HVAC::ATMixer_SupplySide;
 using HVAC::SmallAirVolFlow;
 using HVAC::SmallLoad;
 using HVAC::SmallMassFlow;
@@ -5585,8 +5583,6 @@ void GetATMixers(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
     using BranchNodeConnections::TestCompSet;
-    using HVAC::ATMixer_InletSide;
-    using HVAC::ATMixer_SupplySide;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumNums;    // Number of REAL(r64) numbers returned by GetObjectItem
@@ -5604,6 +5600,9 @@ void GetATMixers(EnergyPlusData &state)
         return;
     }
     state.dataSingleDuct->GetATMixerFlag = false;
+
+    auto &ipsc = state.dataIPShortCut;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
     state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -5629,13 +5628,13 @@ void GetATMixers(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
+
+        auto &atMixer = state.dataSingleDuct->SysATMixer(ATMixerNum);
         Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_InletSide; // inlet side mixer
-        } else if (state.dataIPShortCut->cAlphaArgs(7) == "SUPPLYSIDE") {
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_SupplySide; // supply side mixer
-        }
+
+        atMixer.type = static_cast<HVAC::MixerType>(getEnumValue(HVAC::mixerTypeLocNamesUC, ipsc->cAlphaArgs(7)));
+
         if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 1;
         } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:FOURPIPEFANCOIL") {
@@ -5774,7 +5773,7 @@ void GetATMixers(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
 
-            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType == ATMixer_InletSide) {
+            if (state.dataSingleDuct->SysATMixer(ATMixerNum).type == HVAC::MixerType::InletSide) {
                 // Air Terminal inlet node must be the same as a zone exhaust node
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
@@ -5845,7 +5844,7 @@ void GetATMixers(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType == ATMixer_SupplySide) {
+            if (state.dataSingleDuct->SysATMixer(ATMixerNum).type == HVAC::MixerType::SupplySide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -6014,7 +6013,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
                 max(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMin);
         }
     }
-    if (this->MixerType == ATMixer_InletSide) {
+    if (this->type == HVAC::MixerType::InletSide) {
         state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
             min(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->MixedAirOutNode).MassFlowRate);
     }
@@ -6062,7 +6061,7 @@ void CalcATMixer(EnergyPlusData &state, int const SysNum)
     state.dataSingleDuct->SecAirHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).HumRat;
     state.dataSingleDuct->SecAirTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Temp;
 
-    if (state.dataSingleDuct->SysATMixer(SysNum).MixerType == ATMixer_SupplySide) {
+    if (state.dataSingleDuct->SysATMixer(SysNum).type == HVAC::MixerType::SupplySide) {
         state.dataSingleDuct->MixedAirMassFlowRateCATM = state.dataSingleDuct->SecAirMassFlowRateCATM + state.dataSingleDuct->PriMassFlowRateCATM;
     } else {
         // for inlet side mixer, the mixed air flow has been set, but we don't know the secondary flow
@@ -6166,7 +6165,7 @@ void GetATMixer(EnergyPlusData &state,
                 std::string const &ZoneEquipName, // zone unit name name
                 std::string &ATMixerName,         // air terminal mixer name
                 int &ATMixerNum,                  // air terminal mixer index
-                int &ATMixerType,                 // air teminal mixer type
+                HVAC::MixerType &ATMixerType,     // air teminal mixer type
                 int &ATMixerPriNode,              // air terminal mixer primary air node number
                 int &ATMixerSecNode,              // air terminal mixer secondary air node number
                 int &ATMixerOutNode,              // air terminal mixer outlet air node number
@@ -6198,7 +6197,7 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = 0;
         ATMixerSecNode = 0;
         ATMixerOutNode = 0;
-        ATMixerType = 0;
+        ATMixerType = HVAC::MixerType::Invalid;
         return;
     }
 
@@ -6209,8 +6208,8 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).PriInNode;
         ATMixerSecNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).SecInNode;
         ATMixerOutNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixedAirOutNode;
-        ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixerType;
-        if (ATMixerType == ATMixer_InletSide) {
+        ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).type;
+        if (ATMixerType == HVAC::MixerType::InletSide) {
             state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ZoneEquipOutletNode;
         } else {
             state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ATMixerOutNode;
@@ -6222,7 +6221,7 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = 0;
         ATMixerSecNode = 0;
         ATMixerOutNode = 0;
-        ATMixerType = 0;
+        ATMixerType = HVAC::MixerType::Invalid;
     }
 }
 
@@ -6272,10 +6271,10 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     if (inletATMixerIndex == 0) return; // protect this function from bad inputs
     if (controlledZoneNum == 0) return;
     if (curZoneEqNum == 0) return;
-    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == HVAC::No_ATMixer) return;
+    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).type == HVAC::MixerType::Invalid) return;
 
     // ATMixer properties only affect coil sizing when the mixer is on the inlet side of zone equipment
-    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == HVAC::ATMixer_SupplySide) {
+    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).type == HVAC::MixerType::SupplySide) {
         // check if user has selected No to account for DOAS system
         if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
             if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
