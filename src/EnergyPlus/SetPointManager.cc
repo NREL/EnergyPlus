@@ -1138,7 +1138,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 spmCET->MinimumLift = ip->getRealFieldValue(fields, props, "minimum_lift");
                 
                 spmCET->MaxCondenserEnteringTemp = ip->getRealFieldValue(fields, props, "maximum_condenser_entering_water_temperature");
-                spmCET->TowerDesignInletAirWetBulbTemp = ip->getRealFieldValue(fields, props, "cooling_tower_design_inlet_air_wet-bulb_temperature");
+                spmCET->TowerDesignInletAirWetBulbTemp = ip->getRealFieldValue(fields, props, "cooling_tower_design_inlet_air_wet_bulb_temperature");
 
                 
                 if (spmCET->MaxCondenserEnteringTemp < spmCET->TowerDesignInletAirWetBulbTemp) {
@@ -1712,14 +1712,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                         }
                     }
                     
-                    spmSZR->FanNodeIn = FanNodeIn;
-                    spmSZR->FanNodeOut = FanNodeOut;
-                    spmSZR->MixedAirNode = MixedAirNode;
-                    spmSZR->OAInNode = primaryAirSystem.OAMixOAInNodeNum;
+                    spmSZR->FanInNodeNum = FanNodeIn;
+                    spmSZR->FanOutNodeNum = FanNodeOut;
+                    spmSZR->MixedAirNodeNum = MixedAirNode;
+                    spmSZR->OAInNodeNum = primaryAirSystem.OAMixOAInNodeNum;
                     // this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil
                     // or other component in there first? does it matter?
-                    spmSZR->RetNode = primaryAirSystem.OASysInletNodeNum;
-                    spmSZR->LoopInNode = LoopInNode;
+                    spmSZR->RetNodeNum = primaryAirSystem.OASysInletNodeNum;
+                    spmSZR->LoopInNodeNum = LoopInNode;
 
                 } break;
 
@@ -1886,12 +1886,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                         for (int iNode = 1; iNode <= spmCET->numCtrlNodes; ++iNode) {
                             if (plantLoop.TempSetPointNodeNum != spmCET->ctrlNodes(iNode)) continue;
 
-                            for (auto const &branch : plantLoop.LoopSide(LoopSideLocation::Demand).Branch) {
+                            for (auto const &branch : plantLoop.LoopSide(LoopSideLocation::Supply).Branch) {
                                 for (auto const &comp : branch.Comp) { 
-
-                                    // Check if cooling tower is single speed and generate and error
-                                    state.dataSetPointManager->InitType = comp.Type;
-                                    if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_SingleSpd) {
+                                    if (comp.Type == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state, format("{}=\"{}\", invalid tower found", spmTypeName, spmName));
                                         ShowContinueError(state, format("Found SingleSpeed Cooling Tower, Cooling Tower={}", comp.Name));
                                         ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager.");
@@ -1901,14 +1898,12 @@ void InitSetPointManagers(EnergyPlusData &state)
                             }
 
                             // Scan all attached chillers in the condenser loop index found to find the chiller index
-                            for (int BranchNum = 1; BranchNum <= plantLoop.LoopSide(LoopSideLocation::Supply).TotalBranches; ++BranchNum) {
-                                auto &branch = plantLoop.LoopSide(LoopSideLocation::Supply).Branch(BranchNum);
+                            for (int BranchNum = 1; BranchNum <= plantLoop.LoopSide(LoopSideLocation::Demand).TotalBranches; ++BranchNum) {
+                                auto &branch = plantLoop.LoopSide(LoopSideLocation::Demand).Branch(BranchNum);
                                     
                                 for (int CompNum = 1; CompNum <= branch.TotalComponents; ++CompNum) {
                                     auto &comp = branch.Comp(CompNum);
-
-                                    state.dataSetPointManager->InitType = comp.Type;
-                                    switch (state.dataSetPointManager->InitType) {
+                                    switch (comp.Type) {
 
                                     case PlantEquipmentType::Chiller_Absorption:
                                     case PlantEquipmentType::Chiller_Indirect_Absorption:
@@ -1920,7 +1915,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     case PlantEquipmentType::Chiller_ElectricReformEIR:
                                     case PlantEquipmentType::Chiller_EngineDriven: {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
-                                        state.dataSetPointManager->ChillerType = comp.Type;
+                                        DataPlant::PlantEquipmentType ChillerType = comp.Type;
                                         for (int LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops;
                                              ++LoopNum2) {
                                             auto &plantLoop2 = state.dataPlnt->PlantLoop(LoopNum2);
@@ -1930,14 +1925,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 
                                                 for (int CompNum2 = 1; CompNum2 <= branch2.TotalComponents; ++CompNum2) {
                                                     auto const &comp2 = branch2.Comp(CompNum2);  
-                                                    if (comp2.Type == state.dataSetPointManager->ChillerType) {
+                                                    if (comp2.Type == ChillerType) {
                                                         spmCET->plantPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum2, CompNum2};
                                                         break;
                                                     }
                                                 }
                                             }
                                         }
-                                        spmCET->ChillerType = state.dataSetPointManager->ChillerType;
+                                        spmCET->ChillerType = ChillerType;
                                         spmCET->demandPloc = {LoopNum, LoopSideLocation::Demand, BranchNum, CompNum};
                                     } break;
 
@@ -1954,7 +1949,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                     auto *spmIdealCET = dynamic_cast<SPMIdealCondenserEnteringTemp *>(spm);
                     assert(spmIdealCET != nullptr);
                     
-                    state.dataSetPointManager->InitSetPointManagerNumChiller = 0;
+                    PlantEquipmentType InitType = PlantEquipmentType::Invalid;
+                    int NumChiller = 0;
 
                     // Scan loops and find the loop index that includes the condenser cooling tower node used as setpoint
                     // Begin demand side loops ... When condenser is added becomes NumLoops
@@ -1969,20 +1965,20 @@ void InitSetPointManagers(EnergyPlusData &state)
                                 for (int CompNum = 1; branch.TotalComponents; ++CompNum) {
                                     auto &comp = branch.Comp(CompNum);
                                     // Check if cooling tower is single speed and generate and error
-                                    state.dataSetPointManager->InitType = comp.Type;
-                                    if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_SingleSpd) {
+                                    InitType = comp.Type;
+                                    if (InitType == PlantEquipmentType::CoolingTower_SingleSpd) {
                                         ShowSevereError(state, format("{}=\"{}\", invalid cooling tower found", spmTypeName, spmName));
                                         ShowContinueError(state, format("Found Single Speed Cooling Tower, Cooling Tower={}", comp.Name));
                                         ShowContinueError(state, "SingleSpeed cooling towers cannot be used with this setpoint manager on each loop");
                                         ErrorsFound = true;
-                                    } else if (state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_TwoSpd ||
-                                               state.dataSetPointManager->InitType == PlantEquipmentType::CoolingTower_VarSpd) {
+                                    } else if (InitType == PlantEquipmentType::CoolingTower_TwoSpd ||
+                                               InitType == PlantEquipmentType::CoolingTower_VarSpd) {
                                         spmIdealCET->TowerPlocs.push_back(PlantLocation(LoopNum, LoopSideLocation::Supply, BranchNum, CompNum));
                                         spmIdealCET->NumTowers++;
                                     }
                                     // Scan the pump on the condenser water loop
-                                    if (state.dataSetPointManager->InitType == PlantEquipmentType::PumpVariableSpeed ||
-                                        state.dataSetPointManager->InitType == PlantEquipmentType::PumpConstantSpeed) {
+                                    if (InitType == PlantEquipmentType::PumpVariableSpeed ||
+                                        InitType == PlantEquipmentType::PumpConstantSpeed) {
                                         spmIdealCET->CondenserPumpPloc = {LoopNum, LoopSideLocation::Supply, BranchNum, CompNum};
                                     }
                                 }
@@ -1994,10 +1990,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                                 auto &branch = demandSide.Branch(BranchNum);
                                 for (int CompNum = 1; CompNum <= branch.TotalComponents; ++CompNum) {
                                     auto &comp = branch.Comp(CompNum);
-                                    state.dataSetPointManager->InitType = comp.Type;
+                                    InitType = comp.Type;
 
-                                    switch (state.dataSetPointManager->InitType) {
-
+                                    switch (InitType) {
                                     case PlantEquipmentType::Chiller_Absorption:
                                     case PlantEquipmentType::Chiller_Indirect_Absorption:
                                     case PlantEquipmentType::Chiller_CombTurbine:
@@ -2008,7 +2003,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     case PlantEquipmentType::Chiller_ElectricReformEIR:
                                     case PlantEquipmentType::Chiller_EngineDriven: {
                                         // Scan the supply side to find the chiller index and branch index on plantloop
-                                        state.dataSetPointManager->ChillerType = comp.Type;
+                                        DataPlant::PlantEquipmentType ChillerType = comp.Type;
                                         for (int LoopNum2 = 1; LoopNum2 <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops; ++LoopNum2) {
                                             auto &plantLoop2 = state.dataPlnt->PlantLoop(LoopNum2);
                                             auto &supplySide2 = plantLoop2.LoopSide(LoopSideLocation::Supply);
@@ -2016,18 +2011,18 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 auto &branch2 = supplySide2.Branch(BranchNum2);
                                                 for (int CompNum2 = 1; CompNum2 <= branch2.TotalComponents; ++CompNum2) {
                                                     auto &comp2 = branch2.Comp(CompNum2);
-                                                    state.dataSetPointManager->InitType = comp2.Type;
-                                                    if (state.dataSetPointManager->InitType == state.dataSetPointManager->ChillerType) {
-                                                        ++state.dataSetPointManager->InitSetPointManagerNumChiller;
+                                                    InitType = comp2.Type;
+                                                    if (InitType == ChillerType) {
+                                                        ++NumChiller;
                                                         spmIdealCET->ChillerPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum2, CompNum2}; 
                                                         // Scan the pump on the chilled water loop
                                                         for (int BranchNum3 = 1; BranchNum3 <= supplySide2.TotalBranches; ++BranchNum3) {
                                                             auto &branch3 = supplySide2.Branch(BranchNum3);
                                                             for (int CompNum3 = 1; CompNum3 <= branch3.TotalComponents; ++CompNum3) {
-                                                                    auto &comp3 = branch3.Comp(CompNum3);
-                                                                state.dataSetPointManager->InitType = comp3.Type;
-                                                                if (state.dataSetPointManager->InitType == PlantEquipmentType::PumpVariableSpeed ||
-                                                                    state.dataSetPointManager->InitType == PlantEquipmentType::PumpConstantSpeed) {
+                                                                auto &comp3 = branch3.Comp(CompNum3);
+                                                                InitType = comp3.Type;
+                                                                if (InitType == PlantEquipmentType::PumpVariableSpeed ||
+                                                                    InitType == PlantEquipmentType::PumpConstantSpeed) {
                                                                     spmIdealCET->ChilledWaterPumpPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum3, CompNum3};
                                                                 }
                                                             }
@@ -2036,13 +2031,13 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 }
                                             }
                                         }
-                                        if (state.dataSetPointManager->InitSetPointManagerNumChiller > 1) {
+                                        if (NumChiller > 1) {
                                             ShowSevereError(state, format("{}=\"{}\", too many chillers found", spmTypeName, spmName));
                                             ShowContinueError(state, "only one chiller can be used with this setpoint manager on each loop");
                                             ShowContinueError(state, format("Found more than one chiller, chiller ={}", comp.Name));
                                             ErrorsFound = true;
                                         }
-                                        spmIdealCET->ChillerType = state.dataSetPointManager->ChillerType;
+                                        spmIdealCET->ChillerType = ChillerType;
                                         spmIdealCET->CondenserPumpPloc.loopNum = LoopNum;
                                     } break;
 
@@ -2051,7 +2046,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                     } // switch (InitType)
                                 } // for (CompNum)
                             } // for (BranchNum)
-                            state.dataSetPointManager->InitSetPointManagerNumChiller = 0;
+                            NumChiller = 0;
                         } // for (iNode)
                     } // for (LoopNum)
                 } break;
@@ -2566,23 +2561,11 @@ void SPMScheduledDual::calculate(EnergyPlusData &state)
 
 void SPMOutsideAir::calculate(EnergyPlusData &state)
 {
-    Real64 OutLowTemp;
-    Real64 OutHighTemp;
-    Real64 SetTempAtOutLow;
-    Real64 SetTempAtOutHigh;
-
     Real64 SchedVal = (this->SchedPtr > 0) ? GetCurrentScheduleValue(state, this->SchedPtr) : 0.0;
 
     if (SchedVal == 2.0) {
-        OutLowTemp = this->OutLow2;
-        OutHighTemp = this->OutHigh2;
-        SetTempAtOutLow = this->OutLowSetPt2;
-        SetTempAtOutHigh = this->OutHighSetPt2;
+        this->SetPt = interpSetPoint(this->OutLow2, this->OutHigh2, state.dataEnvrn->OutDryBulbTemp, this->OutLowSetPt2, this->OutHighSetPt2);
     } else {
-        OutLowTemp = this->OutLow1;
-        OutHighTemp = this->OutHigh1;
-        SetTempAtOutLow = this->OutLowSetPt1;
-        SetTempAtOutHigh = this->OutHighSetPt1;
         if ((this->SchedPtr > 0) && (SchedVal != 1.0)) { // Since schedule is optional, only check this if the user entered a schedule
             ++this->setPtErrorCount;
             if (this->setPtErrorCount <= 10) {
@@ -2597,9 +2580,9 @@ void SPMOutsideAir::calculate(EnergyPlusData &state)
                     this->invalidSchedValErrorIndex);
             }
         }
+        this->SetPt = interpSetPoint(this->OutLow1, this->OutHigh1, state.dataEnvrn->OutDryBulbTemp, this->OutLowSetPt1, this->OutHighSetPt1);
     }
 
-    this->SetPt = interpSetPoint(OutLowTemp, OutHighTemp, state.dataEnvrn->OutDryBulbTemp, SetTempAtOutLow, SetTempAtOutHigh);
 } // SPMOutsideAir::calculate()
 
 void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
@@ -2615,120 +2598,79 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    using HVAC::SmallLoad;
-    using HVAC::SmallMassFlow;
     using Psychrometrics::PsyTdbFnHW;
 
-    Real64 ZoneLoad;     // required zone load [W]
-    Real64 ZoneMassFlow; // zone inlet mass flow rate [kg/s]
-    Real64 CpAir;        // inlet air specific heat [J/kg-C]
-    int ZoneInletNode;
-    int ZoneNode;
-    int ZoneNum;
-    Real64 ZoneTemp;
-    Real64 ZoneLoadToCoolSetPt;
-    Real64 ZoneLoadToHeatSetPt;
     Real64 TSetPt;
-    Real64 TSetPt1;
-    Real64 TSetPt2;
-    bool DeadBand;
-    int FanNodeIn;
-    int FanNodeOut;
-    int RetNode;
-    int OAMixOAInNode;
-    Real64 FanDeltaT;
-    Real64 TMixAtMinOA;
-    Real64 EnthMixAtMinOA;
-    Real64 HumRatMixAtMinOA;
-    Real64 OAFrac;
-    int LoopInNode;
+    
+    auto const &retNode = state.dataLoopNodes->Node(this->RetNodeNum);
+    auto const &zoneInletNode = state.dataLoopNodes->Node(this->ZoneInletNodeNum);
 
-    ZoneInletNode = this->ZoneInletNodeNum;
-    ZoneNum = this->ControlZoneNum;
-    ZoneNode = this->ZoneNodeNum;
-    FanNodeIn = this->FanNodeIn;
-    FanNodeOut = this->FanNodeOut;
-    RetNode = this->RetNode;
-    OAMixOAInNode = this->OAInNode;
-    AirLoopNum = this->AirLoopNum;
-    OAFrac =
-        state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
-    ZoneMassFlow = state.dataLoopNodes->Node(ZoneInletNode).MassFlowRate;
-    ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
-    ZoneLoadToCoolSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
-    ZoneLoadToHeatSetPt = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).OutputRequiredToHeatingSP;
-    DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(ZoneNum);
-    ZoneTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-    LoopInNode = this->LoopInNode;
-    if (OAMixOAInNode > 0) {
-        HumRatMixAtMinOA = (1.0 - OAFrac) * state.dataLoopNodes->Node(RetNode).HumRat + OAFrac * state.dataLoopNodes->Node(OAMixOAInNode).HumRat;
-        EnthMixAtMinOA = (1.0 - OAFrac) * state.dataLoopNodes->Node(RetNode).Enthalpy + OAFrac * state.dataLoopNodes->Node(OAMixOAInNode).Enthalpy;
+    // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
+    Real64 OAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac; 
+    Real64 ZoneMassFlow = zoneInletNode.MassFlowRate;
+
+    auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum);
+    Real64 ZoneLoad = zoneSysEnergyDemand.TotalOutputRequired;
+    Real64 ZoneLoadToCoolSetPt = zoneSysEnergyDemand.OutputRequiredToCoolingSP;
+    Real64 ZoneLoadToHeatSetPt = zoneSysEnergyDemand.OutputRequiredToHeatingSP;
+    bool DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(this->ControlZoneNum);
+    Real64 ZoneTemp = state.dataLoopNodes->Node(this->ZoneNodeNum).Temp;
+
+    Real64 TMixAtMinOA;
+    if (this->OAInNodeNum > 0) {
+        auto const &oaInNode = state.dataLoopNodes->Node(this->OAInNodeNum);
+        Real64 HumRatMixAtMinOA = (1.0 - OAFrac) * retNode.HumRat + OAFrac * oaInNode.HumRat;
+        Real64 EnthMixAtMinOA = (1.0 - OAFrac) * retNode.Enthalpy + OAFrac * oaInNode.Enthalpy;
         TMixAtMinOA = PsyTdbFnHW(EnthMixAtMinOA, HumRatMixAtMinOA);
     } else {
-        TMixAtMinOA = state.dataLoopNodes->Node(LoopInNode).Temp;
+        TMixAtMinOA = state.dataLoopNodes->Node(this->LoopInNodeNum).Temp;
     }
-    if (FanNodeOut > 0 && FanNodeIn > 0) {
-        FanDeltaT = state.dataLoopNodes->Node(FanNodeOut).Temp - state.dataLoopNodes->Node(FanNodeIn).Temp;
+
+    Real64 FanDeltaT;
+    if (this->FanOutNodeNum > 0 && this->FanInNodeNum > 0) {
+        FanDeltaT = state.dataLoopNodes->Node(this->FanOutNodeNum).Temp - state.dataLoopNodes->Node(this->FanInNodeNum).Temp;
     } else {
         FanDeltaT = 0.0;
     }
-    state.dataSetPointManager->TSupNoHC = TMixAtMinOA + FanDeltaT;
-    CpAir = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneInletNode).HumRat);
-    state.dataSetPointManager->ExtrRateNoHC = CpAir * ZoneMassFlow * (state.dataSetPointManager->TSupNoHC - ZoneTemp);
-    if (ZoneMassFlow <= SmallMassFlow) {
-        TSetPt = state.dataSetPointManager->TSupNoHC;
-    } else if (DeadBand || std::abs(ZoneLoad) < SmallLoad) {
+
+    Real64 TSupNoHC = TMixAtMinOA + FanDeltaT;
+    Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
+    Real64 ExtrRateNoHC = CpAir * ZoneMassFlow * (TSupNoHC - ZoneTemp);
+    if (ZoneMassFlow <= HVAC::SmallMassFlow) {
+        TSetPt = TSupNoHC;
+
+    } else if (DeadBand || std::abs(ZoneLoad) < HVAC::SmallLoad) {
         // if air with no active heating or cooling provides cooling
-        if (state.dataSetPointManager->ExtrRateNoHC < 0.0) {
+        if (ExtrRateNoHC < 0.0) {
             // if still in deadband, do no active heating or cooling;
             // if below heating setpoint, set a supply temp that will cool to the heating setpoint
-            if (state.dataSetPointManager->ExtrRateNoHC >= ZoneLoadToHeatSetPt) {
-                TSetPt = state.dataSetPointManager->TSupNoHC;
-            } else {
-                TSetPt = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
-            }
+            TSetPt = (ExtrRateNoHC >= ZoneLoadToHeatSetPt) ? TSupNoHC : (ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow));
+
             // if air with no active heating or cooling provides heating
-        } else if (state.dataSetPointManager->ExtrRateNoHC > 0.0) {
+        } else if (ExtrRateNoHC > 0.0) {
             // if still in deadband, do no active heating or cooling;
             // if above cooling setpoint, set a supply temp that will heat to the cooling setpoint
-            if (state.dataSetPointManager->ExtrRateNoHC <= ZoneLoadToCoolSetPt) {
-                TSetPt = state.dataSetPointManager->TSupNoHC;
-            } else {
-                TSetPt = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
-            }
+            TSetPt = (ExtrRateNoHC <= ZoneLoadToCoolSetPt) ? TSupNoHC : (ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow));
+            
         } else {
-            TSetPt = state.dataSetPointManager->TSupNoHC;
+            TSetPt = TSupNoHC;
         }
-    } else if (ZoneLoad < (-1.0 * SmallLoad)) {
-        TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
-        TSetPt2 = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
-        if (TSetPt1 > state.dataSetPointManager->TSupNoHC) {
-            if (TSetPt2 > state.dataSetPointManager->TSupNoHC) {
-                TSetPt = TSetPt2;
-            } else {
-                TSetPt = state.dataSetPointManager->TSupNoHC;
-            }
-        } else {
-            TSetPt = TSetPt1;
-        }
-    } else if (ZoneLoad > SmallLoad) {
-        TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
-        TSetPt2 = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
-        if (TSetPt1 < state.dataSetPointManager->TSupNoHC) {
-            if (TSetPt2 < state.dataSetPointManager->TSupNoHC) {
-                TSetPt = TSetPt2;
-            } else {
-                TSetPt = state.dataSetPointManager->TSupNoHC;
-            }
-        } else {
-            TSetPt = TSetPt1;
-        }
+        
+    } else if (ZoneLoad < (-1.0 * HVAC::SmallLoad)) {
+        Real64 TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
+        Real64 TSetPt2 = ZoneTemp + ZoneLoadToHeatSetPt / (CpAir * ZoneMassFlow);
+        TSetPt = (TSetPt1 <= TSupNoHC) ? TSetPt1 : ((TSetPt2 > TSupNoHC) ? TSetPt2 : TSupNoHC);
+        
+    } else if (ZoneLoad > HVAC::SmallLoad) {
+        Real64 TSetPt1 = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlow);
+        Real64 TSetPt2 = ZoneTemp + ZoneLoadToCoolSetPt / (CpAir * ZoneMassFlow);
+        TSetPt = (TSetPt1 >= TSupNoHC) ? TSetPt1 : ((TSetPt2 < TSupNoHC) ? TSetPt2 : TSupNoHC);
+        
     } else {
-        TSetPt = state.dataSetPointManager->TSupNoHC;
+        TSetPt = TSupNoHC;
     }
 
-    TSetPt = max(min(TSetPt, this->MaxSetTemp), this->MinSetTemp);
-    this->SetPt = TSetPt;
+    this->SetPt = max(min(TSetPt, this->MaxSetTemp), this->MinSetTemp);
 } // SPMSZReheat::calculate()
 
 void SPMSingleZoneTemp::calculate(EnergyPlusData &state)

@@ -210,12 +210,12 @@ namespace SetPointManager {
         int ControlZoneNum = 0;          // number (index into Zone array) of control zone
         int ZoneNodeNum = 0;             // zone node number
         int ZoneInletNodeNum = 0;        // inlet node number for the SZRH air
-        int MixedAirNode = 0;            // mixed air node number
-        int FanNodeIn = 0;               // fan inlet node number
-        int FanNodeOut = 0;              // fan outlet node number
-        int OAInNode = 0;                // outside airstream inlet node to the OA mixer
-        int RetNode = 0;                 // return node inlet to OA mixer
-        int LoopInNode = 0;              // Primary Air System inlet node
+        int MixedAirNodeNum = 0;            // mixed air node number
+        int FanInNodeNum = 0;               // fan inlet node number
+        int FanOutNodeNum = 0;              // fan outlet node number
+        int OAInNodeNum = 0;                // outside airstream inlet node to the OA mixer
+        int RetNodeNum = 0;                 // return node inlet to OA mixer
+        int LoopInNodeNum = 0;              // Primary Air System inlet node
 
         void calculate(EnergyPlusData &state);
     };
@@ -236,8 +236,8 @@ namespace SetPointManager {
     struct SPMSingleZoneHum : SPMBase // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
     {
         // Members
-        int ZoneNodeNum;   // zone node numbers of zones being controlled
-        int CtrlZoneNum; // index into ZoneEquipConfig
+        int ZoneNodeNum = 0;   // zone node numbers of zones being controlled
+        int CtrlZoneNum = 0; // index into ZoneEquipConfig
 
         void calculate(EnergyPlusData &state);
     };
@@ -513,14 +513,8 @@ namespace SetPointManager {
 
 struct SetPointManagerData : BaseGlobalStruct
 {
-    Real64 TSupNoHC = 0.0;     // supply temperature with no heating or cooling
-    Real64 ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
-
     int GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
     int GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-    DataPlant::PlantEquipmentType ChillerType = DataPlant::PlantEquipmentType::Invalid;
-    int InitSetPointManagerNumChiller = 0;
-    DataPlant::PlantEquipmentType InitType = DataPlant::PlantEquipmentType::Invalid;
 
     bool ManagerOn = false;
     bool GetInputFlag = true; // First time, input is "gotten"
@@ -554,15 +548,8 @@ struct SetPointManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-
-        TSupNoHC = 0.0;     // supply temperature with no heating or cooling
-        ExtrRateNoHC = 0.0; // the heating (>0) or cooling (<0) that can be done by supply air at TSupNoHC [W]
-
         GetSetPointManagerInputMaxNumAlphas = 0;  // argument for call to GetObjectDefMaxArgs
         GetSetPointManagerInputMaxNumNumbers = 0; // argument for call to GetObjectDefMaxArgs
-        ChillerType = DataPlant::PlantEquipmentType::Invalid;
-        InitSetPointManagerNumChiller = 0;
-        InitType = DataPlant::PlantEquipmentType::Invalid;
 
         ManagerOn = false;
         GetInputFlag = true; // First time, input is "gotten"
@@ -574,6 +561,7 @@ struct SetPointManagerData : BaseGlobalStruct
             delete spms[iSPM];
         }
         spms.deallocate();
+        spmMap.clear();
 
         NoGroundTempObjWarning = {true, true, true, true};
         InitSetPointManagersMyEnvrnFlag = true;
