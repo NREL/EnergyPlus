@@ -1740,4 +1740,5 @@ void ShowWarningItemNotFound(
     ShowContinueError(state, format("{} = {}, item not found, {} will be used.", fieldName, fieldVal, defaultVal));
 }
 
+
 } // namespace EnergyPlus

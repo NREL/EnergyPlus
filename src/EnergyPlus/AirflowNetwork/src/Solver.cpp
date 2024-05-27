@@ -6313,9 +6313,6 @@ namespace AirflowNetwork {
         using General::SolveRoot;
         using HVAC::VerySmallMassFlow;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int i;
         int j;

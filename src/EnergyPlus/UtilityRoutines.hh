@@ -695,12 +695,18 @@ constexpr int getEnumValue(const gsl::span<const std::string_view> sList, const 
     return -1;
 }
 
+constexpr std::array<std::string_view, 2> yesNoNamesUC = {"NO", "YES"};
+        
 constexpr BooleanSwitch getYesNoValue(const std::string_view s)
 {
-    constexpr std::array<std::string_view, 2> yesNo = {"NO", "YES"};
-    return static_cast<BooleanSwitch>(getEnumValue(yesNo, s));
+    return static_cast<BooleanSwitch>(getEnumValue(yesNoNamesUC, s));
 }
-
+        
+constexpr Real64 fclamp(Real64 v, Real64 min, Real64 max)
+{
+    return (v < min) ? min : ((v > max) ? max : v);
+}
+        
 struct UtilityRoutinesData : BaseGlobalStruct
 {
 

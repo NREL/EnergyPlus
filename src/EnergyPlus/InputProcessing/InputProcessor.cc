@@ -621,6 +621,11 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
 {
     // Return the value of fieldName in ep_object as a string.
     // If the field is not present in ep_object then return its default if there is one, or return an empty string
+    auto const &fprops = schema_obj_props[fieldName];
+    assert(!fprops.empty()); // Check that field name exists in the schema for this object type
+
+    uc = (fprops.find("retaincase") == fprops.end());
+
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &val = it.value();
@@ -629,8 +634,6 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
             return uc ? Util::makeUPPER(val.get<std::string>()) : val.get<std::string>();
     }
     
-    auto const &fprops = schema_obj_props[fieldName];
-    assert(!fprops.empty()); // Check that field name exists in the schema for this object type
 
     auto const it2 = fprops.find("default");
     return (it2 != fprops.end()) ? (uc ? Util::makeUPPER(it2.value().get<std::string>()) : it2.value().get<std::string>()) : std::string();
@@ -640,10 +643,6 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
         i64toa(default_val.get<std::int64_t>(), s);
     } else if (default_val.is_number()) { 
         dtoa(default_val.get<double>(), s);
-    }
-
-    if (schema_field_obj.find("retaincase") == schema_field_obj.end()) {
-        default_value = Util::makeUPPER(default_value);
     }
 #endif // GET_OUT
 }
