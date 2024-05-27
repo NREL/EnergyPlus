@@ -245,10 +245,10 @@ constexpr std::array<std::string_view, (int)AirTempType::Num> nodeTempTypeNamesU
     "OUTDOORAIRWETBULB", "OUTDOORAIRDRYBULB"};
 
 constexpr std::array<std::string_view, (int)DataEnvironment::GroundTempType::Num> groundTempObjectTypeNamesUC = {
-    "Site:GroundTemperature:BuildingSurface",
-    "Site:GroundTemperature:Shallow",
-    "Site:GroundTemperature:Deep",
-    "Site:GroundTemperature:FCfactorMethod"
+    "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE",
+    "SITE:GROUNDTEMPERATURE:SHALLOW",
+    "SITE:GROUNDTEMPERATURE:DEEP",
+    "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD"
 };
 
 constexpr std::array<std::string_view, (int)ReturnTempType::Num> returnTempTypeNamesUC = {
@@ -433,6 +433,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::MZMaxHumAverage: 
             case SPMType::MZMinHum:
             case SPMType::MZMaxHum: { spm = new SPMMultiZoneHum; } break;
+            case SPMType::ReturnAirBalance: { spm = new SPMReturnAirBalanceFlow; } break;
             case SPMType::FollowOutsideAirTemp: { spm = new SPMFollowOutsideAirTemp; } break;
             case SPMType::FollowSystemNodeTemp: { spm = new SPMFollowSysNodeTemp; } break;
             case SPMType::FollowGroundTemp: { spm = new SPMFollowGroundTemp; } break;
@@ -471,7 +472,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::SZOneStageHeating: { spm->ctrlVar = HVAC::CtrlVarType::Temp; } break;
             case SPMType::ChilledWaterReturnTemp:
             case SPMType::HotWaterReturnTemp: { spm->ctrlVar = HVAC::CtrlVarType::Temp; } break;
-                    
+            case SPMType::ReturnAirBalance: { spm->ctrlVar = HVAC::CtrlVarType::MassFlowRate; } break;
+
             default: {
                 ctrlVarName = ip->getAlphaFieldValue(fields, props, "control_variable");
                 spm->ctrlVar = static_cast<HVAC::CtrlVarType>(getEnumValue(ctrlVarTypeNamesUC, ctrlVarName));
@@ -608,43 +610,43 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     
             // SetpointManager:Scheduled
             case SPMType::Scheduled: {
-                auto *spmSched = dynamic_cast<SPMScheduled *>(spm);
-                assert(spmSched != nullptr);
+                auto *spmS = dynamic_cast<SPMScheduled *>(spm);
+                assert(spmS != nullptr);
 
                 std::string schedName = ip->getAlphaFieldValue(fields, props, "schedule_name");
-                spmSched->SchedPtr = GetScheduleIndex(state, schedName);
-                if (spmSched->SchedPtr == 0) {
+                spmS->SchedPtr = GetScheduleIndex(state, schedName);
+                if (spmS->SchedPtr == 0) {
                     ShowSevereItemNotFound(state, eoh, "schedule_name", schedName);
                     ErrorsFound = true;
                 }
-                spmSched->SetPt = 0.0;
+                spmS->SetPt = 0.0;
             } break;
 
             // SetpointManager:Scheduled:DualSetpoint
             case SPMType::ScheduledDual: {
-                auto *spmSchedDual = dynamic_cast<SPMScheduledDual *>(spm);
-                assert(spmSchedDual != nullptr);
+                auto *spmSD = dynamic_cast<SPMScheduledDual *>(spm);
+                assert(spmSD != nullptr);
 
-                if (spmSchedDual->ctrlVar != HVAC::CtrlVarType::Temp) {
+                if (spmSD->ctrlVar != HVAC::CtrlVarType::Temp) {
                     ShowSevereInvalidKey(state, eoh, "control_variable", ctrlVarName);
                     ErrorsFound = true;
                 }
 
                 std::string schedHiName = ip->getAlphaFieldValue(fields, props, "high_setpoint_schedule_name");
-                spmSchedDual->SchedPtrHi = GetScheduleIndex(state, schedHiName);
-                if (spmSchedDual->SchedPtrHi == 0) {
+                spmSD->SchedPtrHi = GetScheduleIndex(state, schedHiName);
+                if (spmSD->SchedPtrHi == 0) {
                         ShowSevereItemNotFound(state, eoh, "high_setpoint_schedule_name", schedHiName);
                         ErrorsFound = true;
                 }
                 
                 std::string schedLoName = ip->getAlphaFieldValue(fields, props, "low_setpoint_schedule_name");
-                spmSchedDual->SchedPtrLo = GetScheduleIndex(state, schedLoName);
-                if (spmSchedDual->SchedPtrLo == 0) {
+                spmSD->SchedPtrLo = GetScheduleIndex(state, schedLoName);
+                if (spmSD->SchedPtrLo == 0) {
                         ShowSevereItemNotFound(state, eoh, "low_setpoint_schedule_name", schedLoName);
                         ErrorsFound = true;
                 }
-                spmSchedDual->SetPtHi = 0.0;
-                spmSchedDual->SetPtLo = 0.0;
+                spmSD->SetPtHi = 0.0;
+                spmSD->SetPtLo = 0.0;
 
             } break;
                     
@@ -1019,15 +1021,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmRAB = dynamic_cast<SPMReturnAirBalanceFlow *>(spm);
                 assert(spmRAB != nullptr);
                 
-                if (spmRAB->ctrlVar != HVAC::CtrlVarType::MassFlowRate) {
-                    ShowSevereInvalidKey(state, eoh, "control_variable", ctrlVarName);
-                    ErrorsFound = true;
-                }
-
-                std::string schedName = ip->getAlphaFieldValue(fields, props, "schedule_name");
+                std::string schedName = ip->getAlphaFieldValue(fields, props, "temperature_setpoint_schedule_name");
                 spmRAB->SchedPtr = GetScheduleIndex(state, schedName);
                 if (spmRAB->SchedPtr == 0) {
-                    ShowSevereItemNotFound(state, eoh, "schedule_name", schedName);
+                    ShowSevereItemNotFound(state, eoh, "temperature_setpoint_schedule_name", schedName);
                     ErrorsFound = true;
                 }
             } break;
@@ -1051,65 +1048,65 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     
             // SetpointManager:FollowSystemNodeTemperature
             case SPMType::FollowSystemNodeTemp: {
-                auto *spmFollowNodeTemp = dynamic_cast<SPMFollowSysNodeTemp *>(spm);
-                assert(spmFollowNodeTemp != nullptr);
+                auto *spmFNT = dynamic_cast<SPMFollowSysNodeTemp *>(spm);
+                assert(spmFNT != nullptr);
                     
-                if (spmFollowNodeTemp->ctrlVar != HVAC::CtrlVarType::Temp &&
-                    spmFollowNodeTemp->ctrlVar != HVAC::CtrlVarType::MaxTemp &&
-                    spmFollowNodeTemp->ctrlVar != HVAC::CtrlVarType::MinTemp) {
+                if (spmFNT->ctrlVar != HVAC::CtrlVarType::Temp &&
+                    spmFNT->ctrlVar != HVAC::CtrlVarType::MaxTemp &&
+                    spmFNT->ctrlVar != HVAC::CtrlVarType::MinTemp) {
                         ShowSevereInvalidKey(state, eoh, "control_variable", ctrlVarName);
                         ErrorsFound = true;
                 }
 
-                spmFollowNodeTemp->RefNodeNum =
+                spmFNT->RefNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "reference_node_name"), 
                                       ErrorsFound,
                                       DataLoopNode::ConnectionObjectType::SetpointManagerFollowSystemNodeTemperature,
-                                      spmFollowNodeTemp->Name,
+                                      spmFNT->Name,
                                       DataLoopNode::NodeFluidType::Blank,
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
 
-                spmFollowNodeTemp->RefTempType =
+                spmFNT->RefTempType =
                     static_cast<AirTempType>(getEnumValue(nodeTempTypeNamesUC,
                                                           ip->getAlphaFieldValue(fields, props, "reference_temperature_type")));
 
-                spmFollowNodeTemp->Offset = ip->getRealFieldValue(fields, props, "reference_temperature_offset");
+                spmFNT->Offset = ip->getRealFieldValue(fields, props, "reference_temperature_offset");
             } break;
                     
             // SetpointManager:FollowGroundTemperature
             case SPMType::FollowGroundTemp: {
-                auto *spmFollowGroundTemp = dynamic_cast<SPMFollowGroundTemp *>(spm);
-                assert(spmFollowGroundTemp != nullptr);
+                auto *spmFGT = dynamic_cast<SPMFollowGroundTemp *>(spm);
+                assert(spmFGT != nullptr);
 
-                if (spmFollowGroundTemp->ctrlVar != HVAC::CtrlVarType::Temp &&
-                    spmFollowGroundTemp->ctrlVar != HVAC::CtrlVarType::MaxTemp &&
-                    spmFollowGroundTemp->ctrlVar != HVAC::CtrlVarType::MinTemp) {
+                if (spmFGT->ctrlVar != HVAC::CtrlVarType::Temp &&
+                    spmFGT->ctrlVar != HVAC::CtrlVarType::MaxTemp &&
+                    spmFGT->ctrlVar != HVAC::CtrlVarType::MinTemp) {
                     // should not come here if idd type choice and key list is working
                     ShowSevereItemNotFound(state, eoh, "control_variable", ctrlVarName);
                     ErrorsFound = true;
                 }
 
-                spmFollowGroundTemp->RefTempType = static_cast<DataEnvironment::GroundTempType>(
+                spmFGT->RefTempType = static_cast<DataEnvironment::GroundTempType>(
                     getEnumValue(groundTempObjectTypeNamesUC, ip->getAlphaFieldValue(fields, props, "reference_ground_temperature_object_type")));
 
                 
-                if (state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFollowGroundTemp->RefTempType]) {
-                    if (!state.dataEnvrn->GroundTempInputs[(int)spmFollowGroundTemp->RefTempType]) {
+                if (state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->RefTempType]) {
+                    if (!state.dataEnvrn->GroundTempInputs[(int)spmFGT->RefTempType]) {
                         ShowWarningError(state,
                                          format("{}: {}=\"{}\" requires \"Site:GroundTemperature:BuildingSurface\" in the input..",
                                                 routineName,
                                                 cCurrentModuleObject,
-                                                spmFollowGroundTemp->Name));
+                                                spmFGT->Name));
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.",
-                                                        state.dataEnvrn->GroundTemp[(int)spmFollowGroundTemp->RefTempType]));
+                                                        state.dataEnvrn->GroundTemp[(int)spmFGT->RefTempType]));
                     }
-                    state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFollowGroundTemp->RefTempType] = false;
+                    state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->RefTempType] = false;
                 }
 
-                spmFollowGroundTemp->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
+                spmFGT->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
             } break;
 
             // SetpointManager:CondenserEnteringReset
@@ -1122,10 +1119,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                std::string condenserEnteringTempSchedName = ip->getAlphaFieldValue(fields, props, "condenser_entering_water_temperature_schedule_name");
+                std::string condenserEnteringTempSchedName = ip->getAlphaFieldValue(fields, props, "default_condenser_entering_water_temperature_schedule_name");
                 spmCET->CondenserEnteringTempSchedPtr = GetScheduleIndex(state, condenserEnteringTempSchedName);
                 if (spmCET->CondenserEnteringTempSchedPtr == 0) {
-                    ShowSevereItemNotFound(state, eoh, "condenser_entering_water_temperature_schedule_name", condenserEnteringTempSchedName);
+                    ShowSevereItemNotFound(state, eoh, "default_condenser_entering_water_temperature_schedule_name", condenserEnteringTempSchedName);
                     ErrorsFound = true;
                 }
 
@@ -1795,6 +1792,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                             spmRAB->MixOutNodeNum = primaryAirSystem.MixOutNode;
                             spmRAB->RABSplitOutNodeNum = primaryAirSystem.RABSplitOutNode;
                             spmRAB->SysOutNodeNum = state.dataAirLoop->AirToZoneNodeInfo(spmRAB->AirLoopNum).AirLoopSupplyNodeNum(1);
+                            spmRAB->ctrlNodes.allocate(1);
                             spmRAB->ctrlNodes(1) = spmRAB->RABSplitOutNodeNum;
                         } else {
                             ShowSevereError(state, format("{}=\"{}\", no RAB in air loop found:", spmTypeName, spmName));
@@ -2082,14 +2080,14 @@ void InitSetPointManagers(EnergyPlusData &state)
 
             switch (spm->type) {
             case SPMType::Scheduled: {
-                auto *spmSched = dynamic_cast<SPMScheduled *>(spm);
-                assert (spmSched != nullptr);
+                auto *spmS = dynamic_cast<SPMScheduled *>(spm);
+                assert (spmS != nullptr);
                         
-                for (int iNode = 1; iNode <= spmSched->numCtrlNodes; ++iNode) {
-                    auto &node = state.dataLoopNodes->Node(spmSched->ctrlNodes(iNode));
-                    Real64 SchedValue = GetCurrentScheduleValue(state, spmSched->SchedPtr);
+                for (int iNode = 1; iNode <= spmS->numCtrlNodes; ++iNode) {
+                    auto &node = state.dataLoopNodes->Node(spmS->ctrlNodes(iNode));
+                    Real64 SchedValue = GetCurrentScheduleValue(state, spmS->SchedPtr);
                     // Initialize scheduled setpoints
-                    switch (spmSched->ctrlVar) {
+                    switch (spmS->ctrlVar) {
                     case HVAC::CtrlVarType::Temp: { node.TempSetPoint = SchedValue; } break;
                     case HVAC::CtrlVarType::MaxTemp: { node.TempSetPointHi = SchedValue; } break;
                     case HVAC::CtrlVarType::MinTemp: { node.TempSetPointLo = SchedValue; } break;
@@ -2105,13 +2103,13 @@ void InitSetPointManagers(EnergyPlusData &state)
             } break;
 
             case SPMType::ScheduledDual: { 
-                auto *spmSchedDual = dynamic_cast<SPMScheduledDual *>(spm);
-                assert(spmSchedDual != nullptr);
-                for (int iNode = 1; iNode <= spmSchedDual->numCtrlNodes; ++iNode) {
-                    auto &node = state.dataLoopNodes->Node(spmSchedDual->ctrlNodes(iNode));
-                    if (spmSchedDual->ctrlVar == HVAC::CtrlVarType::Temp) {
-                        node.TempSetPointHi = GetCurrentScheduleValue(state, spmSchedDual->SchedPtrHi);
-                        node.TempSetPointLo = GetCurrentScheduleValue(state, spmSchedDual->SchedPtrLo);
+                auto *spmSD = dynamic_cast<SPMScheduledDual *>(spm);
+                assert(spmSD != nullptr);
+                for (int iNode = 1; iNode <= spmSD->numCtrlNodes; ++iNode) {
+                    auto &node = state.dataLoopNodes->Node(spmSD->ctrlNodes(iNode));
+                    if (spmSD->ctrlVar == HVAC::CtrlVarType::Temp) {
+                        node.TempSetPointHi = GetCurrentScheduleValue(state, spmSD->SchedPtrHi);
+                        node.TempSetPointLo = GetCurrentScheduleValue(state, spmSD->SchedPtrLo);
                         node.TempSetPoint = (node.TempSetPointHi + node.TempSetPointLo) / 2.0;
                     }
                 }
@@ -2502,50 +2500,18 @@ void SimSetPointManagers(EnergyPlusData &state)
     // Setpoint Manager algorithm.
 
     for (auto *spm : state.dataSetPointManager->spms) {
-        // The Scheduled Setpoint Managers
-        // The Scheduled TES Setpoint Managers
-        // The Scheduled Dual Setpoint Managers
-        // The Outside Air Setpoint Managers
-        // The Single Zone Reheat Setpoint Managers
-        // The Single Zone Heating Setpoint Managers
-        // The Single Zone Cooling Setpoint Managers
-        // The Single Zone Minimum Humidity Setpoint Managers
-        // The Single Zone Maximum Humidity Setpoint Managers
-        // The Warmest Setpoint Managers
-        // The Coldest Setpoint Managers
-        // The Warmest Temp Flow Setpoint Managers
-        // The RAB Temp Flow Setpoint Managers
-        // The Multizone Average Cooling Setpoint Managers
-        // The Multizone Average Heating Setpoint Managers
-        // The Multizone Average Minimum Humidity Setpoint Managers
-        // The Multizone Average Maximum Humidity Setpoint Managers
-        // The Multizone Minimum Humidity Ratio Setpoint Managers
-        // The Multizone Maximum Humidity Ratio Setpoint Managers
-        // The Follow Outdoor Air  Temperature Setpoint Managers
-        // The Follow System Node Temp Setpoint Managers
-        // The Ground Temp Setpoint Managers
-        // The Condenser Entering Water Temperature Set Point Managers
-        // The Ideal Condenser Entering Water Temperature Set Point Managers
-        // the single zone cooling on/off staged control setpoint managers
-        // the single zone heating on/off staged control setpoint managers
-        // chilled-water return reset
-        // hot-water return water reset
-        // The System Node Reset Temperature Setpoint Managers
-        // The System Node Reset Humidity Setpoint Managers
         spm->calculate(state);
     }
 } // SimSetPointManagers()
 
 void SPMScheduled::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 1998
 
     // PURPOSE OF THIS SUBROUTINE:
     // Set the setpoint using a simple schedule.
-
     this->SetPt = GetCurrentScheduleValue(state, this->SchedPtr);
 }
 
