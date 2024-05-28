@@ -4618,27 +4618,28 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
     } // end Number of VRF Terminal Unit Loop
 
     //   perform additional error checking
-    for (int NumList = 1; NumList <= state.dataHVACVarRefFlow->NumVRFTULists; ++NumList) {
-        for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->TerminalUnitList(NumList).NumTUInList; ++VRFTUNum) {
-            if (state.dataHVACVarRefFlow->TerminalUnitList(NumList).ZoneTUPtr(VRFTUNum) == 0) {
+    for (auto const &thisTUList : state.dataHVACVarRefFlow->TerminalUnitList) {
+        for (int VRFTUNum = 1; VRFTUNum <= thisTUList.NumTUInList; ++VRFTUNum) {
+            int const tuPtr = thisTUList.ZoneTUPtr(VRFTUNum);
+            if (tuPtr == 0) {
                 // TU name in zone terminal unit list not found
-                ShowSevereError(state, format("ZoneTerminalUnitList \"{}\"", state.dataHVACVarRefFlow->TerminalUnitList(NumList).Name));
-                ShowContinueError(state,
-                                  "...Zone Terminal Unit = " + state.dataHVACVarRefFlow->TerminalUnitList(NumList).ZoneTUName(VRFTUNum) +
-                                      " improperly connected to system.");
+                ShowSevereError(state, format("ZoneTerminalUnitList \"{}\"", thisTUList.Name));
+                ShowContinueError(state, format("...Zone Terminal Unit = {} improperly connected to system.", thisTUList.ZoneTUName(VRFTUNum)));
                 ShowContinueError(state, "...either the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object does not exist,");
                 ShowContinueError(state, "...the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object name is misspelled,");
                 ShowContinueError(state, "...or the ZoneTerminalUnitList object is not named in an AirConditioner:VariableRefrigerantFlow object.");
                 ErrorsFound = true;
-            }
-            if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum > 0) {
-                if (state.dataHVACVarRefFlow->TerminalUnitList(NumList).NumTUInList == 1 &&
-                    state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).VRFAlgorithmType == AlgorithmType::SysCurve) {
-                    if (state.dataHVACVarRefFlow->VRF(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).VRFSysNum).HeatRecoveryUsed) {
-                        ShowWarningError(state, "ZoneTerminalUnitList \"" + state.dataHVACVarRefFlow->TerminalUnitList(NumList).Name + "\"");
-                        ShowWarningError(state, "...Only 1 Terminal Unit connected to system and heat recovery is selected.");
-                        ShowContinueError(state, "...Heat recovery will be disabled.");
-                        state.dataHVACVarRefFlow->VRF(VRFTUNum).HeatRecoveryUsed = false;
+            } else {
+                int const sysNum = state.dataHVACVarRefFlow->VRFTU(tuPtr).VRFSysNum;
+                if (sysNum > 0) {
+                    auto &thisVRFSys = state.dataHVACVarRefFlow->VRF(sysNum);
+                    if (thisTUList.NumTUInList == 1 && thisVRFSys.VRFAlgorithmType == AlgorithmType::SysCurve) {
+                        if (thisVRFSys.HeatRecoveryUsed) {
+                            ShowWarningError(state, format("ZoneTerminalUnitList \"{}\"", thisTUList.Name));
+                            ShowWarningError(state, "...Only 1 Terminal Unit connected to system and heat recovery is selected.");
+                            ShowContinueError(state, format("...Heat recovery will be disabled for {}.", thisVRFSys.Name));
+                            thisVRFSys.HeatRecoveryUsed = false;
+                        }
                     }
                 }
             }
