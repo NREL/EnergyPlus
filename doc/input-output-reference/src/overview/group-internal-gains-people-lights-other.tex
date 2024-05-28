@@ -10,7 +10,7 @@ Each internal gains object has a field for ``\hyperref[zone]{Zone} or  \hyperref
   \item[Space Name] will result in one instance of the internal gain, named \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to the Space using the design level, space floor area, or space occupancy as appropriate.
   \item[SpaceList Name] will result in one instance of the internal gain for each Space in the SpaceList, named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to each Space in the SpaceList using the design level, space floor area, or space occupancy as appropriate.
   \item[Zone Name] will result in one instance of the internal gain for each Space in the Zone. If there is only one Space in the Zone, then the single instance will be named \textless{}Object Name\textgreater{}. If there is more than one Space in the Zone, then each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be split between the Spaces in the Zone apportioned by the Space floor area or occupancy depending on the input method.
-  \item[ZoneList Name] will result in one instance of the internal gain for each Space in each Zone in the ZoneList. Each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. 
+  \item[ZoneList Name] will result in one instance of the internal gain for each Space in each Zone in the ZoneList. Each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}.
   The full magnitude of the gain will be applied to each Zone in the ZoneList then split between the Spaces in each Zone apportioned by the Space floor area or occupancy depending on the input method.
 \end{description}
 
@@ -91,7 +91,7 @@ This field is the name of the schedule (ref: Schedules) that modifies the number
 This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal number of occupants (people) in the Zone. The key/choices are:
 
 \begin{description}
-	
+
 \item[People] With this choice, the method used will be a straight insertion of the number of occupants (people).~ (The Number of People field should be filled.)
 
 \item[People/Area] With this choice, the method used will be a factor per floor area of the zone or space. (The People per Zone Floor Area field should be filled).
@@ -267,32 +267,32 @@ This field is the name of the schedule that approximates the amount of air movem
 The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55, AdaptiveCEN15251, CoolingEffectASH55, and AnkleDraftASH55, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251, ASHRAE Standard 55 Elevated Air Cooling Effect model, and ASHRAE Standard 55 Ankle Draft Risk model results for this particular people statement. Detailed descriptions and requirements of the seven models as listed below.
 
 \begin{description}
-  \item[Fanger] 
+  \item[Fanger]
   Fanger’s Comfort model is applied to calculate related thermal comfort metrics. Fanger Model PMV, PPD, and Clothing Surface Temperature are calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[Pierce] 
+  \item[Pierce]
   The Pierce Two-Node model is applied to calculate related thermal comfort metrics. Pierce Model Effective Temperature PMV, Standard Effective Temperature PMV, Discomfort Index, Thermal Sensation Index, and Standard Effective Temperature are calculated and reported as each time step.Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[KSU] 
+  \item[KSU]
   The KSU Two-Node Model is applied to calculate related thermal comfort metrics. KSU Model Thermal Sensation Vote is calculated and reported as each time step. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[AdaptiveASH55] 
+  \item[AdaptiveASH55]
   Adaptive Comfort Model Based on ASHRAE Standard 55-2010 is applied to calculate related thermal comfort metrics. ASHRAE 55 Adaptive Model 90\% Acceptability Status, 80\% Acceptability Status, Running Average Outdoor Air Temperature, and the Adaptive Model Temperature are calculated and reported as each time step. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.
 
-  \item[AdaptiveCEN15251] 
+  \item[AdaptiveCEN15251]
   Adaptive Comfort Model Based on European Standard EN15251-2007 is applied to calculate related thermal comfort metrics. CEN 15251 Adaptive Model Category I/II/II Status, Running Average Outdoor Air Temperature, and the Adaptive Model Temperature are calculated and reported as each time step. AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C.
 
-  \item[CoolingEffectASH55] 
+  \item[CoolingEffectASH55]
   ASHRAE 55-2017 Elevated Air Speed Cooling Effect Model is applied to calculate related thermal comfort metrics. Elevated Air Speed Cooling Effect, Cooling Effect Adjusted PMV, and Cooling Effect Adjusted PPD are calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[AnkleDraftASH55] 
+  \item[AnkleDraftASH55]
   ASHRAE 55-2017 Ankle Draft Risk Model is applied to calculate related thermal comfort metrics. Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD is calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, Air Velocity Schedule Name, and Ankle Level Air Velocity Schedule Name. Ankle draft PPD calculations are only applicable for relative air velocity is below 0.2 m/s, and the subject’s metabolic rate and clothing level should be kept below 1.3 met and 0.7 clo. PPD at ankle draft will be set to -1.0 if if these conditions are not met.
 
 \end{description}
 
  For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
- Note that since up to seven models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all seven models if desired. 
+ Note that since up to seven models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all seven models if desired.
 
 
 \paragraph{Field: Ankle Level Air Velocity Schedule Name}\label{field-ankle-level-air-velocity-schedule-name}
@@ -681,15 +681,15 @@ This field is the calculated Cooling Effect of the elevated air speed in degree 
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-pmv}
 
-This field is the ``predicted mean vote'' (PMV) calculated using the Fanger PMV model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PMV for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+This field is the ``predicted mean vote'' (PMV) calculated using the Fanger PMV model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PMV for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s).
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger PMV-PPD model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger PMV-PPD model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s).
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD}\label{zone-thermal-comfort-ashrae55-ankle-draft-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). 
+This field is the ``predicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m).
 
 \subsubsection{Outputs}\label{outputs-1-014}
 
@@ -871,7 +871,7 @@ The name of the schedule that modifies the lighting power design level (see Desi
 This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal lighting level in the Zone. The key/choice options are:
 
 \begin{description}
-	
+
 \item[LightingLevel] With this choice, the method used will be a straight insertion of the lighting level (Watts) for the Zone.~ (The Lighting Level field should be filled.)
 
 \item[Watts/Area] With this choice, the method used will be a factor per floor area of the zone or space. (The Watts per Floor Area field should be filled).
@@ -2350,7 +2350,7 @@ The total heat gain from equipment. It is the sum of the following components: T
 
 \subsection{IndoorLivingWall}\label{indoorlivingwall}
 
-Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or soil-based. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus. 
+Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or soil-based. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus.
 
 \subsubsection{Inputs}\label{inputs-indoorlivingwall}
 
@@ -2360,41 +2360,41 @@ The name of the IndoorLivingWall object, which must be unique across all IndoorL
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-indoorlivingwall}
 
-This field is the name of the schedule (ref: Schedules) that modifies the presence of indoor living walls. The schedule values can be zero or one. Zero represents the scenario that the indoor living wall was removed from the thermal zone while one represents the scenario that the indoor living wall is in the presence of the thermal zone. 
+This field is the name of the schedule (ref: \hyperref[group-schedules]{Schedules}) that modifies the presence of indoor living walls. The schedule values can be zero or one. Zero represents the scenario that the indoor living wall was removed from the thermal zone while one represents the scenario that the indoor living wall is in the presence of the thermal zone.
 
-\paragraph{Field: ET Calculation Method}\label{field-et-calculation-method}
+\paragraph{Field: ET Calculation Method}\label{field-et-calculation-method-indoorlivingwall}
 
-This field lists two choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model and Stanghellini model. Users can also develop a customize ET function to override ET rates of indoor living walls through Energy Management System (EMS) objects, Python PlugIns objects, and Python API. 
+This field lists two choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model and Stanghellini model. Users can also develop a customize ET function to override ET rates of indoor living walls through Energy Management System (EMS) objects, Python PlugIns objects, and Python API.
 
-\paragraph{Field: Lighting Method}\label{field-lighting-method}
+\paragraph{Field: Lighting Method}\label{field-lighting-method-indoorlivingwall}
 
-This field lists three different methods to obtain net radiation for indoor living walls. They are artificial grow lights only (LED), daylighting only (Daylight), and artificial lights and daylight (LED-Daylight). If the LED lighting method is selected,  the field LED Intensity Schedule Name should be used to define the LED lighting intensity level. If the Daylight or LED-Daylight method is selected, the field Daylighting Reference Point Name should be used to determine the daylighting sensor location. If the LED-Daylight method is selected, a targeted lighting intensity schedule should be defined. Based on the available daylighting, the required LED lighting level and power will be automatically adjusted to meet the targeted LED intensity level. 
+This field lists three different methods to obtain net radiation for indoor living walls. They are artificial grow lights only (LED), daylighting only (Daylight), and artificial lights and daylight (LED-Daylight). If the LED lighting method is selected,  the field LED Intensity Schedule Name should be used to define the LED lighting intensity level. If the Daylight or LED-Daylight method is selected, the field Daylighting Reference Point Name should be used to determine the daylighting sensor location. If the LED-Daylight method is selected, a targeted lighting intensity schedule should be defined. Based on the available daylighting, the required LED lighting level and power will be automatically adjusted to meet the targeted LED intensity level.
 
-\paragraph{Field: LED Schedule Name}\label{field-LED-schedule-name}
+\paragraph{Field: LED Schedule Name}\label{field-LED-schedule-name-indoorlivingwall}
 
-This field is the name of the schedule (ref: Schedules) that defines the fraction of LED nominal intensity level for indoor living walls. The scheduled value can be any fractional value between 0 and 1. 
+This field is the name of the schedule (ref: Schedules) that defines the fraction of LED nominal intensity level for indoor living walls. The scheduled value can be any fractional value between 0 and 1.
 
-\paragraph{Field: Daylighting Control Name}\label{field-daylighting-control-name}
+\paragraph{Field: Daylighting Control Name}\label{field-daylighting-control-name-indoorlivingwall}
 
-If daylighting is used in the selected lighting methods (Daylight or LED-Daylight), users should define an object of Daylighting:Control to obtain the daylighting illuminance level and an object for Daylighing:ReferencePoint for the daylighting sensor location in the thermal zone. The name of the object of Daylighting:Controls should be specified in this field.       
+If daylighting is used in the selected lighting methods (Daylight or LED-Daylight), users should define an object of Daylighting:Control to obtain the daylighting illuminance level and an object for Daylighing:ReferencePoint for the daylighting sensor location in the thermal zone. The name of the object of Daylighting:Controls should be specified in this field.
 
-\paragraph{Field: LED-Daylight Targeted Lighting Intensity Schedule Name}\label{field-led-daylight-targeted-lighting-intensity-schedule-name}
+\paragraph{Field: LED-Daylight Targeted Lighting Intensity Schedule Name}\label{field-led-daylight-targeted-lighting-intensity-schedule-name-indoorlivingwall}
 
-This field is the name of the schedule that defines targeted LED intensity levels the photosynthetic photon flux density (PPFD) in the unit of \unit{\micro\mole\per\square\meter\per\second} for indoor living wall systems when LED-Daylight method is used. The schedule values can be any positive number representing the targeted PPFD.
+This field defines targeted LED intensity levels the photosynthetic photon flux density (PPFD) in the unit of \si{\umolperAreaperSecond} for indoor living wall systems. The schedule values can be any positive number representing the targeted PPFD.
 
-\paragraph{Field: Total Leaf Area}\label{field-total-leaf-area}
+\paragraph{Field: Total Leaf Area}\label{field-total-leaf-area-indoorlivingwall}
 
-This field is the estimated one-sided leaf area {[}\unit{\square\meter}{]} of an indoor living wall. Based on the users’ input, leaf area index (LAI) is calculated as the ratio of the total leaf area and the partition wall area. Typical LAIs are 1.0 for grass and 3.0 for bushes and shrubs. The maximum LAI is 2.0 for the IndoorLivingWall module in EnergyPlus. If the calculated LAI is greater than 2.0, the maximum value of 2.0 is used for LAI in the simulation. 
+This field is the estimated one-sided leaf area {[}\si{\area}{]} of an indoor living wall. Based on the users’ input, leaf area index (LAI) is calculated as the ratio of the total leaf area and the partition wall area. Typical LAIs are 1.0 for grass and 3.0 for bushes and shrubs. The maximum LAI is 2.0 for the IndoorLivingWall module in EnergyPlus. If the calculated LAI is greater than 2.0, the maximum value of 2.0 is used for LAI in the simulation.
 
-\paragraph{Field: LED Nominal Intensity}\label{field-led-nominal-intensity}
+\paragraph{Field: LED Nominal Intensity}\label{field-led-nominal-intensity-indoorlivingwall}
 
-This field defines the nominal LED intensity level for indoor living wall systems. The value represents the photosynthetic photon flux density (PPFD) of LED grow light. PPFD is measured in \unit{\micro\mole\per\square\meter\per\second} which establishes exactly how many photosynthetically active radiation (PAR) photons are landing on a specific area.
+This field defines the nominal LED intensity level for indoor living wall systems. The value represents the photosynthetic photon flux density (PPFD) of LED grow light. PPFD is measured in \si{\umolperAreaperSecond} which establishes exactly how many photosynthetically active radiation (PAR) photons are landing on a specific area.
 
-\paragraph{Field: LED Nominal Power}\label{field-led-nominal-power}
+\paragraph{Field: LED Nominal Power}\label{field-led-nominal-power-indoorlivingwall}
 
-This field defines the nominal total LED power {[}\unit{\W}{]} for an indoor living wall system.  
+This field defines nominal total LED power {[}\si{\watt}{]} for an indoor living wall system.
 
-\paragraph{Field: Radiant Fraction of LED Lights}\label{field-radiant-fraction-of-led-lights}
+\paragraph{Field: Radiant Fraction of LED Lights}\label{field-radiant-fraction-of-led-lights-indoorlivingwall}
 
 This field defines the radiant fraction of the LED lighting power input. The remaining power input is dissipated by convection and contributes to the zone air heat balance.
 
@@ -2411,7 +2411,7 @@ IndoorLivingWall,
   ,                           !-Daylighting Control Name
   ,                           !-LED - Daylight Targeted Lighting Intensity Schedule Name
   30,                         !- Total Leaf Area {m2}
-  32.5,                       !- LED Nominal Intensity {umol/(m2s)}
+  32.5,                       !- LED Nominal Intensity {umol/m2-s}
   640,                        !- LED Nominal Power {W}
   0.6;                        !- Radiant Fraction of LED Lights
 \end{lstlisting}
@@ -2429,13 +2429,13 @@ IndoorLivingWall objects have output variables for individual objects. The follo
 \item
   Zone,Average,Indoor Living Wall Latent Heat Gain Rate {[}W{]}
 \item
-  Zone,Average,Indoor Living Wall Evapotranspiration Rate {[}\unit{\kilo\gram\per\square\meter\per\second}{]}
+  Zone,Average,Indoor Living Wall Evapotranspiration Rate {[}\si{\evapotranspirationRate}{]}
 \item
-  Zone,Average,Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area {[}\unit{W/m^2}{]}
+  Zone,Average,Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area {[}\si{\watt\per\area}{]}
 \item
-  Zone,Average,Indoor Living Wall LED Operational PPFD {[}\unit{\micro\mole\per\square\meter\per\second}{]}
+  Zone,Average,Indoor Living Wall LED Operational PPFD {[}\si{\umolperAreaperSecond}{]}
 \item
-  Zone,Average,Indoor Living Wall PPFD {[}\unit{\micro\mole\per\square\meter\per\second}{]}
+  Zone,Average,Indoor Living Wall PPFD {[}\si{\umolperAreaperSecond}{]}
 \item
   Zone,Average,Indoor Living Wall Vapor Pressure Deficit {[}Pa{]}
 \item
@@ -2445,6 +2445,7 @@ IndoorLivingWall objects have output variables for individual objects. The follo
 \item
   Zone,Sum,Indoor Living Wall LED Electricity Energy {[}J{]}
 \end{itemize}
+
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
 
@@ -2476,7 +2477,7 @@ This field is a key/choice field that tells which of the next two fields are fil
 
 \begin{description}
 	\item[Watts/Unit:] With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
-	
+
 	\item[Watts/Area:] With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Floor Area field should be filled).
 \end{description}
 
@@ -2530,7 +2531,7 @@ Specifies the entering air temperature in $^\circ$C at design conditions. The de
 
 Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time.'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
 
-The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
+The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}:
 
 \begin{longtable}[c]{@{}lrrrrrrr@{}}
 	\caption{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \label{table:ite-aircooled-air-inlet-code-specification-limits} \tabularnewline
@@ -2538,13 +2539,13 @@ The related reporting variables (such as ``ITE Air Inlet Operating Range Exceede
 	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
 	\midrule
 	\endfirsthead
-	
+
 	\caption[]{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \tabularnewline
 	\toprule
 	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
 	\midrule
 	\endhead
-	
+
 	Dry-Bulb$_{min}$ [$^{\circ}$C]    &  15 &  10 &   5 &   5 &  5 &  5 &   5 \tabularnewline
 	Dry-Bulb$_{max}$ [$^{\circ}$C]    &  32 &  35 &  40 &  45 & 35 & 40 &  25 \tabularnewline
 	Dew-Point$_{min}$ [$^{\circ}$C]   & -12 & -12 & -12 & -12 & -- & -- & -12 \tabularnewline
@@ -2561,9 +2562,9 @@ Specifies the type of connection between the zone and the ITE air inlet node. Th
 
 \begin{description}
 	\item[AdjustedSupply:] This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
-	
+
 	\item[ZoneAirNode:] This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
-	
+
 	\item[RoomAirModel:] This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
 \end{description}
 
@@ -3270,7 +3271,7 @@ This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\
 
 \paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j-2}
 
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. 
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
 
 \paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w-2}
 
