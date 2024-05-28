@@ -55,32 +55,35 @@
 
 namespace EnergyPlus {
 
+// A restartable Timer (stopwatch) with formatting convenience functions
 struct Timer
 {
-public:
+    using DurationType = std::chrono::milliseconds;
+    using ClockType = std::chrono::system_clock;
+    using TimePointType = ClockType::time_point;
+
     Timer() = default;
 
-    auto start() const;
-    auto end() const;
+    TimePointType start() const;
+    TimePointType end() const;
 
     // Reset start to now, end to none
     void tick();
 
-    // Capture end time
+    // Capture end time, add to duration
     void tock();
 
-    auto duration() const;
+    DurationType duration() const;
 
     std::string formatAsHourMinSecs() const;
 
     Real64 elapsedSeconds() const;
 
 private:
-    using DurationType = std::chrono::milliseconds;
-    using ClockType = std::chrono::system_clock;
-    using TimePointType = decltype(ClockType::now());
-
-    TimePointType m_start; // = ClockType::now();
+    TimePointType m_start;
     TimePointType m_end;
+    DurationType m_duration{};
 };
 } // namespace EnergyPlus
+
+#endif // Timer_hh_INCLUDED

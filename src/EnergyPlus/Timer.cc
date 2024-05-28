@@ -52,12 +52,12 @@
 
 namespace EnergyPlus {
 
-auto Timer::start() const
+Timer::TimePointType Timer::start() const
 {
     return m_start;
 }
 
-auto Timer::end() const
+Timer::TimePointType Timer::end() const
 {
     return m_end;
 }
@@ -71,14 +71,15 @@ void Timer::tick()
 void Timer::tock()
 {
     m_end = ClockType::now();
+    m_duration = m_duration + std::chrono::duration_cast<DurationType>(m_end - m_start);
 }
 
-auto Timer::duration() const
+Timer::DurationType Timer::duration() const
 {
     if (m_end == TimePointType{}) {
         throw std::runtime_error("Timer was not stopped");
     }
-    return std::chrono::duration_cast<DurationType>(m_end - m_start);
+    return m_duration;
 }
 
 std::string Timer::formatAsHourMinSecs() const
