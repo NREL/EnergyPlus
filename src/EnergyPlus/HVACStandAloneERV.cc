@@ -263,7 +263,7 @@ void GetStandAloneERV(EnergyPlusData &state)
             state, Alphas(3), CurrentModuleObject, cAlphaFields(3), state.dataHVACStandAloneERV->HeatExchangerUniqueNames, ErrorsFound);
         standAloneERV.HeatExchangerName = Alphas(3);
         bool errFlag = false;
-        standAloneERV.HeatExchangerTypeNum = HeatRecovery::GetHeatExchangerObjectTypeNum(state, standAloneERV.HeatExchangerName, errFlag);
+        standAloneERV.hxType = HeatRecovery::GetHeatExchangerObjectTypeNum(state, standAloneERV.HeatExchangerName, errFlag);
         if (errFlag) {
             ShowContinueError(state, format("... occurs in {} \"{}\"", CurrentModuleObject, standAloneERV.Name));
             ErrorsFound = true;
@@ -1030,7 +1030,7 @@ void GetStandAloneERV(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Zone Ventilator Supply Fan Availability Status",
                             Constant::Units::None,
-                            standAloneERV.AvailStatus,
+                            (int &)standAloneERV.availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             standAloneERV.Name);
@@ -1074,15 +1074,14 @@ void InitStandAloneERV(EnergyPlusData &state,
         state.dataHVACStandAloneERV->MyOneTimeFlag = false;
     }
 
-    if (allocated(state.dataHVACGlobal->ZoneComp)) {
-        auto &availMgr =
-            state.dataHVACGlobal->ZoneComp(DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator).ZoneCompAvailMgrs(StandAloneERVNum);
+    if (allocated(state.dataAvail->ZoneComp)) {
+        auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator).ZoneCompAvailMgrs(StandAloneERVNum);
         if (state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum)) { // initialize the name of each availability manager list and zone number
             availMgr.AvailManagerListName = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
             state.dataHVACStandAloneERV->MyZoneEqFlag(StandAloneERVNum) = false;
         }
-        state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).AvailStatus = availMgr.AvailStatus;
+        state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).availStatus = availMgr.availStatus;
     }
 
     // need to check all units to see if they are on Zone Equipment List or issue warning
@@ -1433,7 +1432,7 @@ void CalcStandAloneERV(EnergyPlusData &state,
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerName,
                                   FirstHVACIteration,
                                   state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).HeatExchangerIndex,
-                                  HVAC::ContFanCycCoil,
+                                  HVAC::FanOp::Continuous,
                                   _,
                                   HXUnitOn,
                                   _,

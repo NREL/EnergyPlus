@@ -257,24 +257,24 @@ namespace VariableSpeedCoils {
         // end variables for water system interactions
 
         // begin varibles for HPWH
-        Real64 RatedCapWH;                  // Rated water heating Capacity [W]
-        int InletAirTemperatureType;        // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
-        Real64 WHRatedInletDBTemp;          // Rated inlet air dry-bulb temperature [C]
-        Real64 WHRatedInletWBTemp;          // Rated inlet air wet-bulb temperature [C]
-        Real64 WHRatedInletWaterTemp;       // Rated condenser water inlet temperature [C]
-        Real64 HPWHCondPumpElecNomPower;    // Nominal power input to the condenser water circulation pump [W]
-        Real64 HPWHCondPumpFracToWater;     // Nominal power fraction to water for the condenser water circulation pump
-        Real64 RatedHPWHCondWaterFlow;      // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
-        Real64 ElecWaterHeatingPower;       // Total electric power consumed by compressor and condenser pump [W]
-        Real64 ElecWaterHeatingConsumption; // Total electric consumption by compressor and condenser pump [J]
-        bool FanPowerIncludedInCOP;         // Indicates that fan heat is included in heating capacity and COP
-        bool CondPumpHeatInCapacity;        // Indicates that condenser pump heat is included in heating capacity
-        bool CondPumpPowerInCOP;            // Indicates that condenser pump power is included in heating COP
-        bool AirVolFlowAutoSized;           // Used to report autosizing info for the HPWH DX coil
-        bool WaterVolFlowAutoSized;         // Used to report autosizing info for the HPWH DX coil
-        Real64 TotalHeatingEnergy;          // total water heating energy
-        Real64 TotalHeatingEnergyRate;      // total WH energy rate
-        bool bIsDesuperheater;              // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
+        Real64 RatedCapWH;                                              // Rated water heating Capacity [W]
+        HVAC::OATType InletAirTemperatureType = HVAC::OATType::Invalid; // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
+        Real64 WHRatedInletDBTemp;                                      // Rated inlet air dry-bulb temperature [C]
+        Real64 WHRatedInletWBTemp;                                      // Rated inlet air wet-bulb temperature [C]
+        Real64 WHRatedInletWaterTemp;                                   // Rated condenser water inlet temperature [C]
+        Real64 HPWHCondPumpElecNomPower;                                // Nominal power input to the condenser water circulation pump [W]
+        Real64 HPWHCondPumpFracToWater;                                 // Nominal power fraction to water for the condenser water circulation pump
+        Real64 RatedHPWHCondWaterFlow;                                  // Rated water flow rate through the condenser of the HPWH DX coil [m3/s]
+        Real64 ElecWaterHeatingPower;                                   // Total electric power consumed by compressor and condenser pump [W]
+        Real64 ElecWaterHeatingConsumption;                             // Total electric consumption by compressor and condenser pump [J]
+        bool FanPowerIncludedInCOP;                                     // Indicates that fan heat is included in heating capacity and COP
+        bool CondPumpHeatInCapacity;                                    // Indicates that condenser pump heat is included in heating capacity
+        bool CondPumpPowerInCOP;                                        // Indicates that condenser pump power is included in heating COP
+        bool AirVolFlowAutoSized;                                       // Used to report autosizing info for the HPWH DX coil
+        bool WaterVolFlowAutoSized;                                     // Used to report autosizing info for the HPWH DX coil
+        Real64 TotalHeatingEnergy;                                      // total water heating energy
+        Real64 TotalHeatingEnergyRate;                                  // total WH energy rate
+        bool bIsDesuperheater; // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
         // end variables for HPWH
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
@@ -319,7 +319,6 @@ namespace VariableSpeedCoils {
               InletSourceAirTemp(0.0), InletSourceAirEnthalpy(0.0),
               // begin varibles for HPWH
               RatedCapWH(0.0),                  // Rated water heating Capacity [W]
-              InletAirTemperatureType(0),       // Specifies to use either air wet-bulb or dry-bulb temp for curve objects
               WHRatedInletDBTemp(0.0),          // Rated inlet air dry-bulb temperature [C]
               WHRatedInletWBTemp(0.0),          // Rated inlet air wet-bulb temperature [C]
               WHRatedInletWaterTemp(0.0),       // Rated condenser water inlet temperature [C]
@@ -345,10 +344,10 @@ namespace VariableSpeedCoils {
     };
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
-                               std::string_view CompName,              // Coil Name
-                               int &CompIndex,                         // Index for Component name
-                               int const CyclingScheme,                // Continuous fan OR cycling compressor
-                               HVAC::CompressorOperation CompressorOp, // compressor on/off. 0 = off; 1= on
+                               std::string_view CompName,       // Coil Name
+                               int &CompIndex,                  // Index for Component name
+                               HVAC::FanOp const fanOp,         // Continuous fan OR cycling compressor
+                               HVAC::CompressorOp compressorOp, // compressor on/off. 0 = off; 1= on
                                Real64 const PartLoadFrac,
                                int const SpeedNum,                  // compressor speed number
                                Real64 const SpeedRatio,             // compressor speed ratio
@@ -366,7 +365,7 @@ namespace VariableSpeedCoils {
                           int const DXCoilNum,            // Current DXCoilNum under simulation
                           Real64 const SensLoad,          // Control zone sensible load[W]
                           Real64 const LatentLoad,        // Control zone latent load[W]
-                          int const CyclingScheme,        // fan operating mode
+                          HVAC::FanOp const fanOp,        // fan operating mode
                           Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                           Real64 const SpeedRatio,        // compressor speed ratio
                           int const SpeedNum              // compressor speed number
@@ -375,26 +374,26 @@ namespace VariableSpeedCoils {
     void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum, bool &ErrorsFound);
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
-                                 int const DXCoilNum,                    // Heat Pump Number
-                                 int const CyclingScheme,                // Fan/Compressor cycling scheme indicator
-                                 Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
-                                 Real64 const LatentDemand,              // Cooling Latent Demand [W]
-                                 HVAC::CompressorOperation CompressorOp, // compressor operation flag
-                                 Real64 const PartLoadRatio,             // compressor part load ratio
-                                 Real64 const OnOffAirFlowRatio,         // ratio of compressor on flow to average flow over time step
-                                 Real64 const SpeedRatio,                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                                 int const SpeedNum                      // Speed number, high bound
+                                 int const DXCoilNum,             // Heat Pump Number
+                                 HVAC::FanOp const fanOp,         // Fan/Compressor cycling scheme indicator
+                                 Real64 const SensDemand,         // Cooling Sensible Demand [W] !unused1208
+                                 Real64 const LatentDemand,       // Cooling Latent Demand [W]
+                                 HVAC::CompressorOp compressorOp, // compressor operation flag
+                                 Real64 const PartLoadRatio,      // compressor part load ratio
+                                 Real64 const OnOffAirFlowRatio,  // ratio of compressor on flow to average flow over time step
+                                 Real64 const SpeedRatio,         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+                                 int const SpeedNum               // Speed number, high bound
     );
 
     void CalcVarSpeedCoilHeating(EnergyPlusData &state,
-                                 int const DXCoilNum,                    // Heat Pump Number
-                                 int const CyclingScheme,                // Fan/Compressor cycling scheme indicator
-                                 Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
-                                 HVAC::CompressorOperation CompressorOp, // compressor operation flag
-                                 Real64 const PartLoadRatio,             // compressor part load ratio
-                                 Real64 const OnOffAirFlowRatio,         // ratio of compressor on flow to average flow over time step
-                                 Real64 const SpeedRatio,                // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
-                                 int const SpeedNum                      // Speed number, high bound, i.e. SpeedNum - 1 is the other side
+                                 int const DXCoilNum,             // Heat Pump Number
+                                 HVAC::FanOp const fanOp,         // Fan/Compressor cycling scheme indicator
+                                 Real64 const SensDemand,         // Cooling Sensible Demand [W] !unused1208
+                                 HVAC::CompressorOp compressorOp, // compressor operation flag
+                                 Real64 const PartLoadRatio,      // compressor part load ratio
+                                 Real64 const OnOffAirFlowRatio,  // ratio of compressor on flow to average flow over time step
+                                 Real64 const SpeedRatio,         // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
+                                 int const SpeedNum               // Speed number, high bound, i.e. SpeedNum - 1 is the other side
     );
 
     Real64 GetCoilCapacityVariableSpeed(EnergyPlusData &state,
@@ -468,7 +467,7 @@ namespace VariableSpeedCoils {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const DXCoilNum,     // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // Fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -509,7 +508,7 @@ namespace VariableSpeedCoils {
                           Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
                           Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
                           int const SpeedNum,         // Speed number, high bound capacity
-                          int const CyclingScheme     // Continuous fan OR cycling compressor
+                          HVAC::FanOp const fanOp     // Continuous fan OR cycling compressor
     );
 
     Real64 getVarSpeedPartLoadRatio(EnergyPlusData &state, int const DXCoilNum); // the number of the DX coil to mined for current PLR

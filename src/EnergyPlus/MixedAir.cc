@@ -458,7 +458,7 @@ void SimOAComponent(EnergyPlusData &state,
     OAHeatingCoil = false;
     OACoolingCoil = false;
     OAHX = false;
-    int FanOpMode;
+    HVAC::FanOp fanOp;
     bool HeatingActive = false;
     bool CoolingActive = false;
     Real64 sensOut = 0.0;
@@ -577,7 +577,7 @@ void SimOAComponent(EnergyPlusData &state,
             // get water coil and controller data if not called previously
             if (CompIndex == 0)
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(
-                    state, CompName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CompIndex, HVAC::ContFanCycCoil);
+                    state, CompName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, CompIndex, HVAC::FanOp::Continuous);
             // iterate on OA sys controller and water coil at the same time
             SimAirServingZones::SolveWaterCoilController(state,
                                                          FirstHVACIteration,
@@ -635,14 +635,15 @@ void SimOAComponent(EnergyPlusData &state,
         if (Sim) {
             Real64 AirloopPLR = 1;
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                FanOpMode = HVAC::ContFanCycCoil;
+                fanOp = HVAC::FanOp::Continuous;
             } else {
-                if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::CycFanCycCoil) {
-                    FanOpMode = HVAC::CycFanCycCoil;
+                if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp == HVAC::FanOp::Cycling) {
+                    fanOp = HVAC::FanOp::Cycling;
                 } else {
-                    FanOpMode = HVAC::ContFanCycCoil;
+                    fanOp = HVAC::FanOp::Continuous;
                 }
-                if (FanOpMode == HVAC::CycFanCycCoil) {
+
+                if (fanOp == HVAC::FanOp::Cycling) {
                     // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
                     // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
                     // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
@@ -651,13 +652,13 @@ void SimOAComponent(EnergyPlusData &state,
                 }
             }
             if (state.dataAirLoop->OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
-                HeatRecovery::SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
+                HeatRecovery::SimHeatRecovery(state, CompName, FirstHVACIteration, CompIndex, fanOp, AirloopPLR, _, _, _, _, _);
             } else {
                 HeatRecovery::SimHeatRecovery(state,
                                               CompName,
                                               FirstHVACIteration,
                                               CompIndex,
-                                              FanOpMode,
+                                              fanOp,
                                               AirloopPLR,
                                               _,
                                               _,
@@ -1131,7 +1132,7 @@ void GetOutsideAirSysInputs(EnergyPlusData &state)
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::UnitarySystemModel ||
                 state.dataAirLoop->OutsideAirSys(OASysNum).ComponentTypeEnum(CompNum) == SimAirServingZones::CompType::DXSystem) {
                 state.dataAirLoop->OutsideAirSys(OASysNum).compPointer[CompNum] = UnitarySystems::UnitarySys::factory(
-                    state, HVAC::UnitarySys_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                    state, HVAC::UnitarySysType::Unitary_AnyCoilType, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
             }
         }
     }
@@ -3349,7 +3350,7 @@ void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoo
     bool HighHumidityOperationFlag = false; // TRUE if zone humidistat senses a high humidity condition
 
     if (AirLoopNum > 0) {
-        AirLoopCyclingFan = (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == HVAC::CycFanCycCoil);
+        AirLoopCyclingFan = (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp == HVAC::FanOp::Cycling);
     } else {
         AirLoopCyclingFan = false;
     }

@@ -59,6 +59,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/WindowAC.hh>
 
 using namespace EnergyPlus;

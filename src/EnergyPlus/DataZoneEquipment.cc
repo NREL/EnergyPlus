@@ -271,7 +271,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // found in the input file.  This may or may not
     // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
-    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, HVAC::NoAction);
+    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
     if (state.dataZoneEquip->NumOfZoneEquipLists != numControlledZones) {
@@ -946,7 +946,7 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                         // loop index accesses correct pointer to equipment on this equipment list
                         // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
-                            state, HVAC::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                            state, HVAC::UnitarySysType::Unitary_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
                         thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
                     }
 
