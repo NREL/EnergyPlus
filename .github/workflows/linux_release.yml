@@ -8,7 +8,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
-  Python_REQUIRED_VERSION: 3.8
+  Python_REQUIRED_VERSION: 3.12.2
 
 jobs:
   build_installer_artifact:
@@ -30,7 +30,7 @@ jobs:
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
-      uses: actions/setup-python@v5
+      uses: jmarrec/setup-python@v5
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 

@@ -10,6 +10,7 @@ env:
   BUILD_TYPE: Release
   FC: gfortran-13
   SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+  Python_REQUIRED_VERSION: 3.12.2
 
 jobs:
   build_installer_artifact:
@@ -19,23 +20,20 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        macos_dev_target: [11.6, 12.1]  #, 13.0]
+        macos_dev_target: [11.6, 12.1, 13.0]
         include:
         - macos_dev_target: 11.6
           os: macos-11
           allow_failure: false
           arch: x86_64
-          python: 3.8
         - macos_dev_target: 12.1
           os: macos-12
           allow_failure: false
           arch: x86_64
-          python: 3.8
-#        - macos_dev_target: 13.0
-#          os: macos-14
-#          allow_failure: false
-#          arch: arm64
-#          python: 3.12.0  # Make sure to add the package testing below for ARM once we add this build to GHA
+        - macos_dev_target: 13.0
+          os: macos-14
+          allow_failure: false
+          arch: arm64
     permissions:
       # Needed permission to upload the release asset
       contents: write
@@ -43,11 +41,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python }}
+    - name: Remove python ${{ env.Python_REQUIRED_VERSION }} from the toolcache
+      run: |
+        ls $RUNNER_TOOL_CACHE/Python || true
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}"
+        rm -Rf "$RUNNER_TOOL_CACHE/Python/${{ env.Python_REQUIRED_VERSION }}*/"
+
+    - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
-      uses: actions/setup-python@v5
+      uses: jmarrec/setup-python@v5
       with:
-        python-version: ${{ matrix.python }}
+        python-version: ${{ env.Python_REQUIRED_VERSION }}
+        # check-latest: true # Force pick up the python I built instead of the (potential) toolcache one. I could also do `rm -Rf $RUNNER_TOOL_CACHE/Python/3.12.2` before this action
 
     - name: Setup QtIFW 4.x
       uses: jmarrec/setup-qtifw@v1
