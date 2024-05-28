@@ -533,13 +533,13 @@ struct SetPointManagerData : BaseGlobalStruct
     Array1D<SetPointManager::SPMBase *> spms;
     std::map<std::string, int> spmMap;
         
-    // Real64 CondWaterSetPoint = 0; // Condenser entering water temperature setpoint this timestep, C
+    Real64 CondenserWaterSetPt = 0; // Condenser entering water temperature setpoint this timestep, C
 
-        // Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
-        // Real64 CondTempLimit = 0;     // Condenser entering water temperature setpoint lower limit
-        // Real64 CurLoad = 0;           // Current cooling load, W
-        // Real64 TotEnergy = 0;         // Total energy consumptions at this time step
-        // Real64 TotEnergyPre = 0;      // Total energy consumptions at the previous time step
+    // Real64 EvapOutletTemp = 0;    // Evaporator water outlet temperature (C)
+    // Real64 CondTempLimit = 0;     // Condenser entering water temperature setpoint lower limit
+    // Real64 CurLoad = 0;           // Current cooling load, W
+    // Real64 TotEnergy = 0;         // Total energy consumptions at this time step
+    Real64 TotEnergyPre = 0;      // Total energy consumptions at the previous time step
 
     Real64 ActualLoadSum = 0.0;
     Real64 DesignLoadSum = 0.0;
@@ -568,12 +568,12 @@ struct SetPointManagerData : BaseGlobalStruct
         RunSubOptCondEntTemp = false;
         RunFinalOptCondEntTemp = false;
 
-        // CondWaterSetPoint = 0;
+        CondenserWaterSetPt = 0;
         // EvapOutletTemp = 0;
         // CondTempLimit = 0;
         // CurLoad = 0;
         // TotEnergy = 0;
-        // TotEnergyPre = 0;
+        TotEnergyPre = 0;
     }
 };
 

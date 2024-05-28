@@ -942,6 +942,21 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 spmWTF->Strategy = static_cast<ControlStrategy>(getEnumValue(strategyNamesUC, ip->getAlphaFieldValue(fields, props, "strategy")));
+
+                SetupOutputVariable(state,
+                                    "Setpoint Manager Warmest Temperature Critical Zone Number",
+                                    Constant::Units::None,
+                                    spmWTF->CritZoneNum,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
+                                    spmWTF->Name);
+                SetupOutputVariable(state,
+                                    "Setpoint Manager Warmest Temperature Turndown Flow Fraction",
+                                    Constant::Units::None,
+                                    spmWTF->Turndown,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
+                                    spmWTF->Name);
             } break;
                 
             // SetpointManager:ReturnAirBypassFlow
@@ -1369,24 +1384,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         } // for (instance)
     } // for (iSPM)
             
-#ifdef WHAT_IS_THIS_DOING_HERE
-    for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
-        SetupOutputVariable(state,
-                            "Setpoint Manager Warmest Temperature Critical Zone Number",
-                            Constant::Units::None,
-                            spmWTF->CritZoneNum,
-                            OutputProcessor::TimeStepType::System,
-                            OutputProcessor::StoreType::Average,
-                            spmWTF->Name);
-        SetupOutputVariable(state,
-                            "Setpoint Manager Warmest Temperature Turndown Flow Fraction",
-                            Constant::Units::None,
-                            spmWTF->Turndown,
-                            OutputProcessor::TimeStepType::System,
-                            OutputProcessor::StoreType::Average,
-                            spmWTF->Name);
-    }
-#endif // WHAT_IS_THIS_DOING_HERE
 } // GetSetPointManagerInputData()
 
 void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
@@ -3289,16 +3286,18 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         int CtrlZoneNum = airToZoneNode.CoolCtrlZoneNums(iZoneNum);
         auto &zoneInletNode = state.dataLoopNodes->Node(airToZoneNode.CoolZoneInletNodes(iZoneNum));
         auto &zoneNode = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).ZoneNode);
-
+        auto &zoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum);
         Real64 ZoneMassFlowRate = zoneInletNode.MassFlowRate;
-        Real64 MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
+        Real64 MoistureLoad = (this->type == SPMType::MZMinHum || this->type == SPMType::MZMinHumAverage) ?
+            zoneMoistureDemand.OutputRequiredToHumidifyingSP : zoneMoistureDemand.OutputRequiredToDehumidifyingSP;
+        
         Real64 ZoneHum = zoneNode.HumRat;
-        SumMdotTot += ZoneMassFlowRate;
-        SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
         // For humidification the moisture load is positive
 
         switch (this->type) {
         case SPMType::MZMinHumAverage: {
+            SumMdotTot += ZoneMassFlowRate;
+            SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
             if (MoistureLoad > 0.0) {
                 SumMdot += ZoneMassFlowRate;
                 SumMoistureLoad += MoistureLoad;
@@ -3306,6 +3305,8 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         } break;                
 
         case SPMType::MZMaxHumAverage: {
+            SumMdotTot += ZoneMassFlowRate;
+            SumProductMdotHumTot += ZoneMassFlowRate * ZoneHum;
             if (MoistureLoad < 0.0) {
                 SumMdot += ZoneMassFlowRate;
                 SumMoistureLoad += MoistureLoad;                    
@@ -3338,20 +3339,18 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         } // switch (this->type)
     }
     
-    Real64 AverageZoneHum = (SumMdotTot > HVAC::SmallMassFlow) ? (SumProductMdotHumTot / SumMdotTot) : 0.0;
-
-    if (SumMdot > HVAC::SmallMassFlow) {
-        SetPointHum = max(0.0, AverageZoneHum + SumMoistureLoad / SumMdot);
-    }
-
-    SetPointHum = std::clamp(SetPointHum, this->MinSetHum, this->MaxSetHum);
-
-    if ((this->type == SPMType::MZMinHum || this->type == SPMType::MZMaxHum) &&
-        (SumMoistureLoad < SmallMoistureLoad)) {
-        SetPointHum = (this->type == SPMType::MZMinHum) ? this->MinSetHum : this->MaxSetHum;
+    if (this->type == SPMType::MZMinHumAverage || this->type == SPMType::MZMaxHumAverage) {
+        Real64 AverageZoneHum = (SumMdotTot > HVAC::SmallMassFlow) ? (SumProductMdotHumTot / SumMdotTot) : 0.0;
+        if (SumMdot > HVAC::SmallMassFlow) {
+            SetPointHum = max(0.0, AverageZoneHum + SumMoistureLoad / SumMdot);
+        }
+    } else {
+        if (std::abs(SumMoistureLoad) < SmallMoistureLoad) {
+            SetPointHum = (this->type == SPMType::MZMinHum) ? this->MinSetHum : this->MaxSetHum;
+        }
     }
     
-    this->SetPt = SetPointHum;
+    this->SetPt = std::clamp(SetPointHum, this->MinSetHum, this->MaxSetHum);
 } // SPMMultiZoneHum::calculate()
 
 void SPMFollowOutsideAirTemp::calculate(EnergyPlusData &state)
@@ -3639,12 +3638,10 @@ void SPMIdealCondenserEnteringTemp::calculate(EnergyPlusData &state)
         }
     }
 
-    Real64 CondenserWaterSetPt = 0;
     if (state.dataGlobal->MetersHaveBeenInitialized && state.dataGlobal->RunOptCondEntTemp) {
 
         // If chiller is on
         Real64 CurLoad = std::abs(supplyComp.MyLoad);
-        Real64 TotEnergyPre = 0.0;
 
         if (CurLoad > 0) {
 
@@ -3660,26 +3657,26 @@ void SPMIdealCondenserEnteringTemp::calculate(EnergyPlusData &state)
             Real64 TotEnergy = this->calculateCurrentEnergyUsage(state);
 
             this->setupSetPointAndFlags(TotEnergy,
-                                        TotEnergyPre,
-                                        CondenserWaterSetPt,
+                                        state.dataSetPointManager->TotEnergyPre,
+                                        state.dataSetPointManager->CondenserWaterSetPt,
                                         CondTempLimit,
                                         state.dataGlobal->RunOptCondEntTemp,
                                         state.dataSetPointManager->RunSubOptCondEntTemp,
                                         state.dataSetPointManager->RunFinalOptCondEntTemp);
 
         } else {
-            CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
-            TotEnergyPre = 0.0;
+            state.dataSetPointManager->CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
+            state.dataSetPointManager->TotEnergyPre = 0.0;
             state.dataGlobal->RunOptCondEntTemp = false;
             state.dataSetPointManager->RunSubOptCondEntTemp = false;
         }
     } else {
-        CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
+        state.dataSetPointManager->CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
         state.dataGlobal->RunOptCondEntTemp = false;
         state.dataSetPointManager->RunSubOptCondEntTemp = false;
     }
 
-    this->SetPt = CondenserWaterSetPt;
+    this->SetPt = state.dataSetPointManager->CondenserWaterSetPt;
 }
 
 void SPMIdealCondenserEnteringTemp::setupSetPointAndFlags(Real64 &TotEnergy,
