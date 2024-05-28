@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 from pathlib import Path
@@ -74,8 +75,16 @@ def get_replacements(uses: Set[str], latests: dict[str, Version]) -> dict[str, s
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Update GHA Actions.")
+    parser.add_argument("--safe", action="store_true", default=False, help="Only update official GHA actions/xxx")
+    args = parser.parse_args()
+
     workflows = list(WORKFLOW_DIR.glob("*.yml"))
     uses = get_uses(workflows=workflows)
+    if args.safe:
+        print("Limiting to official GHA actions/xxx")
+        uses = set([x for x in uses if x.startswith("actions/")])
+
     latests = check_latest(uses=uses)
     replacements = get_replacements(uses=uses, latests=latests)
     for workflow_path in workflows:
