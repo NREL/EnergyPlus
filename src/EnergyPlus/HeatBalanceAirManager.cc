@@ -4905,7 +4905,7 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
 
     if (state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag) {
         for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-            if (reqVar->name == "ZONE WETBULB GLOBE TEMPERATURE") {
+            if (reqVar->name == "ZONE WETBULB GLOBE TEMPERATURE" || reqVar->name == "SPACE WETBULB GLOBE TEMPERATURE") {
                 if (reqVar->key.empty()) {
                     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
                         if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
@@ -4913,20 +4913,26 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                                 auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
                                 thisSpaceAirRpt.ReportWBGT = true;
                             }
-                        } else {
-                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
-                            thisZnAirRpt.ReportWBGT = true;
                         }
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
                     }
                 } else {
                     if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-                        int spaceNum = Util::FindItemInList(reqVar->name, state.dataHeatBal->space);
-                        auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
-                        thisSpaceAirRpt.ReportWBGT = true;
+                        int spaceNum = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->space);
+                        if (spaceNum > 0) {
+                            auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                            thisSpaceAirRpt.ReportWBGT = true;
+                            int ZoneLoop = state.dataHeatBal->space(spaceNum).zoneNum;
+                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                            thisZnAirRpt.ReportWBGT = true;
+                        }
                     } else {
-                        int ZoneLoop = Util::FindItemInList(reqVar->name, state.dataHeatBal->Zone);
-                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
-                        thisZnAirRpt.ReportWBGT = true;
+                        int ZoneLoop = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->Zone);
+                        if (ZoneLoop > 0) {
+                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                            thisZnAirRpt.ReportWBGT = true;
+                        }
                     }
                 }
             }
