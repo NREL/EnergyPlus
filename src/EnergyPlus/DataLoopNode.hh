@@ -586,7 +586,7 @@ namespace DataLoopNode {
     struct NodeSetpointCheckData
     {
         bool needsSetpointChecking = false;
-        std::array<bool, (int)HVAC::CtrlVarType::Num> checkSetPoint;
+        std::array<bool, (int)HVAC::CtrlVarType::Num> checkSetPoint = {false, false, false, false, false, false, false, false, false};
     };
 } // namespace DataLoopNode
 

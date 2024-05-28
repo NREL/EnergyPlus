@@ -291,7 +291,7 @@ void ManageSetPoints(EnergyPlusData &state)
         // The Outside Air Pretreat Setpoint Managers (since they depend on other setpoints, they must be calculated
         // and updated last).
         for (auto *spm : state.dataSetPointManager->spms) {
-            if (spm->type == SPMType::OutsideAir)
+            if (spm->type == SPMType::OutsideAirPretreat)
                 spm->calculate(state);
         }
 
@@ -2492,7 +2492,9 @@ void SimSetPointManagers(EnergyPlusData &state)
     // Setpoint Manager algorithm.
 
     for (auto *spm : state.dataSetPointManager->spms) {
-        spm->calculate(state);
+        if (spm->type != SPMType::MixedAir && spm->type != SPMType::OutsideAirPretreat) {
+            spm->calculate(state);
+        }
     }
 } // SimSetPointManagers()
 
@@ -4107,6 +4109,12 @@ void UpdateSetPointManagers(EnergyPlusData &state)
                 state.dataLoopNodes->Node(spmRWT->plantSetPtNodeNum).TempSetPoint = spmRWT->currentSupplySetPt;
             }
         } break;
+
+        // MixedAir and OutsideAirPretreat SPMs have to be handled separately because they depend on other SPMs
+        case SPMType::MixedAir: 
+        case SPMType::OutsideAirPretreat: {
+        } break;
+                
 
         default: break;
         } // switch (sys->type)
