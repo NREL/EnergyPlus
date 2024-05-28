@@ -117,7 +117,7 @@ namespace SetPointManager {
         Warmest,
         Coldest,
         WarmestTempFlow,
-        ReturnAirBalance,
+        ReturnAirBypass,
         MZCoolingAverage,
         MZHeatingAverage,
         MZMinHumAverage,
@@ -289,7 +289,7 @@ namespace SetPointManager {
         void calculate(EnergyPlusData &state);
     };
 
-    struct SPMReturnAirBalanceFlow : SPMBase
+    struct SPMReturnAirBypassFlow : SPMBase
     {
         // Members
         int SchedPtr = 0;            // index of the above schedule

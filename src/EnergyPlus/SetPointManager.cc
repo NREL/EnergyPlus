@@ -214,7 +214,7 @@ constexpr std::array<DataLoopNode::ConnectionObjectType, (int)SPMType::Num> spmN
     DataLoopNode::ConnectionObjectType::SetpointManagerWarmest,
     DataLoopNode::ConnectionObjectType::SetpointManagerColdest,
     DataLoopNode::ConnectionObjectType::SetpointManagerWarmestTemperatureFlow,
-    DataLoopNode::ConnectionObjectType::Invalid, // SPMType::ReturnAirBalance
+    DataLoopNode::ConnectionObjectType::Invalid, // SPMType::ReturnAirBypass
     DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneCoolingAverage,
     DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneHeatingAverage,
     DataLoopNode::ConnectionObjectType::SetpointManagerMultiZoneMinimumHumidityAverage,
@@ -402,6 +402,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         auto const &props = ip->getObjectSchemaProps(state, cCurrentModuleObject);
         for (auto instance = instances.value().begin(); instance != instances.value().end(); ++instance) {
 
+            ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+            
             std::string name = Util::makeUPPER(instance.key());
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, name};
 
@@ -409,7 +411,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 ShowSevereDuplicateName(state, eoh);
                 ErrorsFound = true;
             }
-                    
+
             SPMBase *spm = nullptr;
 
             // Create a SetPointManagerObject of the right child type
@@ -433,7 +435,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::MZMaxHumAverage: 
             case SPMType::MZMinHum:
             case SPMType::MZMaxHum: { spm = new SPMMultiZoneHum; } break;
-            case SPMType::ReturnAirBalance: { spm = new SPMReturnAirBalanceFlow; } break;
+            case SPMType::ReturnAirBypass: { spm = new SPMReturnAirBypassFlow; } break;
             case SPMType::FollowOutsideAirTemp: { spm = new SPMFollowOutsideAirTemp; } break;
             case SPMType::FollowSystemNodeTemp: { spm = new SPMFollowSysNodeTemp; } break;
             case SPMType::FollowGroundTemp: { spm = new SPMFollowGroundTemp; } break;
@@ -472,45 +474,13 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::SZOneStageHeating: { spm->ctrlVar = HVAC::CtrlVarType::Temp; } break;
             case SPMType::ChilledWaterReturnTemp:
             case SPMType::HotWaterReturnTemp: { spm->ctrlVar = HVAC::CtrlVarType::Temp; } break;
-            case SPMType::ReturnAirBalance: { spm->ctrlVar = HVAC::CtrlVarType::MassFlowRate; } break;
+            case SPMType::ReturnAirBypass: { spm->ctrlVar = HVAC::CtrlVarType::MassFlowRate; } break;
 
             default: {
                 ctrlVarName = ip->getAlphaFieldValue(fields, props, "control_variable");
                 spm->ctrlVar = static_cast<HVAC::CtrlVarType>(getEnumValue(ctrlVarTypeNamesUC, ctrlVarName));
             } break;
             } // switch (spm->type)
-
-            // Load control node list
-            if (spm->type != SPMType::ReturnAirBalance &&
-                spm->type != SPMType::ChilledWaterReturnTemp &&
-                spm->type != SPMType::HotWaterReturnTemp) {
-                std::string ctrlNodeListName = ip->getAlphaFieldValue(fields, props, "setpoint_node_or_nodelist_name");
-                NodeListError = false;
-                GetNodeNums(state,
-                            ctrlNodeListName,
-                            NumNodes,
-                            NodeNums,
-                            NodeListError,
-                            DataLoopNode::NodeFluidType::Blank,
-                            spmNodeObjectTypes[iSPM],
-                            name, 
-                            DataLoopNode::ConnectionType::SetPoint,
-                            NodeInputManager::CompFluidStream::Primary,
-                            ObjectIsNotParent,
-                            false,
-                            "setpoint_node_or_nodelist_name");
-                
-                if (!NodeListError) {
-                    spm->numCtrlNodes = NumNodes;
-                    spm->ctrlNodes.allocate(spm->numCtrlNodes);
-                    
-                    for (int iNode = 1; iNode <= spm->numCtrlNodes; ++iNode) {
-                        spm->ctrlNodes(iNode) = NodeNums(iNode);
-                    }
-                } else {
-                   ErrorsFound = true;
-                }
-            }
 
             // Load Min and Max Temp setpoints for some SPMs
             switch (spm->type) {
@@ -591,7 +561,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::Warmest:
             case SPMType::Coldest:
             case SPMType::WarmestTempFlow:
-            case SPMType::ReturnAirBalance:
+            case SPMType::ReturnAirBypass:
             case SPMType::MZCoolingAverage:
             case SPMType::MZHeatingAverage:
             case SPMType::MZMinHumAverage:
@@ -872,48 +842,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-
-
-                if (FindNumberInList(spmMA->RefNodeNum, spmMA->ctrlNodes, spmMA->numCtrlNodes) > 0) {
-                    ShowSevereError(state, format("{}: {}=\"{}\", reference node.", routineName, cCurrentModuleObject, spmMA->Name));
-                    if (spmMA->numCtrlNodes > 1) {
-                        ShowContinueError(state, "..Reference Node is the same as one of the nodes in SetPoint NodeList");
-                    } else {
-                        ShowContinueError(state, "..Reference Node is the same as the SetPoint Node");
-                    }
-                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmMA->RefNodeNum)));
-                    ErrorsFound = true;
-                }
-
-                if (auto found = fields.find("cooling_coil_inlet_node_name"); found != fields.end()) {
-                    spmMA->CoolCoilInNodeNum =
-                        GetOnlySingleNode(state,
-                                          Util::makeUPPER(found.value().get<std::string>()),
-                                          ErrorsFound,
-                                          spmNodeObjectTypes[(int)spm->type],
-                                          spmMA->Name,
-                                          DataLoopNode::NodeFluidType::Air,
-                                          DataLoopNode::ConnectionType::Sensor,
-                                          NodeInputManager::CompFluidStream::Primary,
-                                          ObjectIsNotParent);
-                }
-
-                if (auto found = fields.find("cooling_coil_outlet_node_name"); found != fields.end()) {
-                    spmMA->CoolCoilOutNodeNum =
-                        GetOnlySingleNode(state,
-                                          Util::makeUPPER(found.value().get<std::string>()),
-                                          ErrorsFound,
-                                          spmNodeObjectTypes[(int)spm->type],
-                                          spmMA->Name,
-                                          DataLoopNode::NodeFluidType::Air,
-                                          DataLoopNode::ConnectionType::Sensor,
-                                          NodeInputManager::CompFluidStream::Primary,
-                                          ObjectIsNotParent);
-                }
-
-                if (auto found = fields.find("minimum_temperature_at_cooling_coil_outlet_node"); found != fields.end()) {
-                    spmMA->MinCoolCoilOutTemp = found.value().get<Real64>();
-                }
             } break;
                     
             // SetpointManager:OutdoorAirPretreat
@@ -1017,8 +945,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             } break;
                 
             // SetpointManager:ReturnAirBypassFlow
-            case SPMType::ReturnAirBalance: {
-                auto *spmRAB = dynamic_cast<SPMReturnAirBalanceFlow *>(spm);
+            case SPMType::ReturnAirBypass: {
+                auto *spmRAB = dynamic_cast<SPMReturnAirBypassFlow *>(spm);
                 assert(spmRAB != nullptr);
                 
                 std::string schedName = ip->getAlphaFieldValue(fields, props, "temperature_setpoint_schedule_name");
@@ -1353,10 +1281,94 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     
             default: break;
             } // switch (spm->type)
+
+            // Load control node list
+            // Do this at the end to preserve node order
+            if (spm->type != SPMType::ReturnAirBypass &&
+                spm->type != SPMType::ChilledWaterReturnTemp &&
+                spm->type != SPMType::HotWaterReturnTemp) {
+                std::string ctrlNodeListName = ip->getAlphaFieldValue(fields, props, "setpoint_node_or_nodelist_name");
+                NodeListError = false;
+                GetNodeNums(state,
+                            ctrlNodeListName,
+                            NumNodes,
+                            NodeNums,
+                            NodeListError,
+                            DataLoopNode::NodeFluidType::Blank,
+                            spmNodeObjectTypes[iSPM],
+                            name, 
+                            DataLoopNode::ConnectionType::SetPoint,
+                            NodeInputManager::CompFluidStream::Primary,
+                            ObjectIsNotParent,
+                            false,
+                            "setpoint_node_or_nodelist_name");
+                
+                if (!NodeListError) {
+                    spm->numCtrlNodes = NumNodes;
+                    spm->ctrlNodes.allocate(spm->numCtrlNodes);
+                    
+                    for (int iNode = 1; iNode <= spm->numCtrlNodes; ++iNode) {
+                        spm->ctrlNodes(iNode) = NodeNums(iNode);
+                    }
+                } else {
+                   ErrorsFound = true;
+                }
+            }
+
+            // Now load all of the optional fields
+            switch (spm->type) {
+            case SPMType::MixedAir: {
+                auto *spmMA = dynamic_cast<SPMMixedAir *>(spm);
+                assert(spmMA != nullptr);
+                if (auto found = fields.find("cooling_coil_inlet_node_name"); found != fields.end()) {
+                    spmMA->CoolCoilInNodeNum =
+                        GetOnlySingleNode(state,
+                                          Util::makeUPPER(found.value().get<std::string>()),
+                                          ErrorsFound,
+                                          spmNodeObjectTypes[(int)spm->type],
+                                          spmMA->Name,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Sensor,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
+                }
+
+                if (auto found = fields.find("cooling_coil_outlet_node_name"); found != fields.end()) {
+                    spmMA->CoolCoilOutNodeNum =
+                        GetOnlySingleNode(state,
+                                          Util::makeUPPER(found.value().get<std::string>()),
+                                          ErrorsFound,
+                                          spmNodeObjectTypes[(int)spm->type],
+                                          spmMA->Name,
+                                          DataLoopNode::NodeFluidType::Air,
+                                          DataLoopNode::ConnectionType::Sensor,
+                                          NodeInputManager::CompFluidStream::Primary,
+                                          ObjectIsNotParent);
+                }
+
+                if (auto found = fields.find("minimum_temperature_at_cooling_coil_outlet_node"); found != fields.end()) {
+                    spmMA->MinCoolCoilOutTemp = found.value().get<Real64>();
+                }
+
+                // Also, do this check now that we have both RefNodeNum and ctrlNodeNums
+                if (FindNumberInList(spmMA->RefNodeNum, spmMA->ctrlNodes, spmMA->numCtrlNodes) > 0) {
+                    ShowSevereError(state, format("{}: {}=\"{}\", reference node.", routineName, cCurrentModuleObject, spmMA->Name));
+                    if (spmMA->numCtrlNodes > 1) {
+                        ShowContinueError(state, "..Reference Node is the same as one of the nodes in SetPoint NodeList");
+                    } else {
+                        ShowContinueError(state, "..Reference Node is the same as the SetPoint Node");
+                    }
+                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmMA->RefNodeNum)));
+                    ErrorsFound = true;
+                }
+            } break;
+
+            default: break;
+            } // switch (spm->type)
             
         } // for (instance)
     } // for (iSPM)
-        
+            
 #ifdef WHAT_IS_THIS_DOING_HERE
     for (SetPtMgrNum = 1; SetPtMgrNum <= state.dataSetPointManager->NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
         SetupOutputVariable(state,
@@ -1430,7 +1442,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
 
             if (spm == spm2) continue;
             
-            if (spm->type == SPMType::ReturnAirBalance && spm2->type == SPMType::ReturnAirBalance) {
+            if (spm->type == SPMType::ReturnAirBypass && spm2->type == SPMType::ReturnAirBypass) {
 
                 //     check the air loop name for duplicates in this SP manager type
                 if (spm->AirLoopNum == spm2->AirLoopNum) {
@@ -1470,7 +1482,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                             continue;
 
                         //         only warn if scheduled setpoint manager is setting mass flow rate on the same node used by RAB
-                        if (spm->type == SPMType::ReturnAirBalance || spm2->type == SPMType::ReturnAirBalance) {
+                        if (spm->type == SPMType::ReturnAirBypass || spm2->type == SPMType::ReturnAirBypass) {
                             ShowWarningError(state, format("{}=\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
                             ShowContinueError(state, format("...conflicting setpoint manager ={}:\"{}\"", spmTypeNames[(int)spm2->type], spm2->Name));
@@ -1769,8 +1781,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                     }
                 } break;
 
-                case SPMType::ReturnAirBalance: {
-                    auto *spmRAB = dynamic_cast<SPMReturnAirBalanceFlow *>(spm);
+                case SPMType::ReturnAirBypass: {
+                    auto *spmRAB = dynamic_cast<SPMReturnAirBypassFlow *>(spm);
                     assert(spmRAB != nullptr);
                     
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
@@ -2253,10 +2265,10 @@ void InitSetPointManagers(EnergyPlusData &state)
                 }
             } break;
 
-            case SPMType::ReturnAirBalance: {
+            case SPMType::ReturnAirBypass: {
                 if (state.dataZoneEquip->ZoneEquipInputsFilled && state.dataAirLoop->AirLoopInputsFilled) {
                             
-                    auto *spmRAB = dynamic_cast<SPMReturnAirBalanceFlow *>(spm);
+                    auto *spmRAB = dynamic_cast<SPMReturnAirBypassFlow *>(spm);
                     assert(spmRAB != nullptr);
                 
                     if (spmRAB->ctrlVar == HVAC::CtrlVarType::MassFlowRate) {
@@ -3151,7 +3163,7 @@ void SPMWarmestTempFlow::calculate(EnergyPlusData &state)
     }
 } // SPMWarmestTempFlow::calculate()
 
-void SPMReturnAirBalanceFlow::calculate(EnergyPlusData &state)
+void SPMReturnAirBypassFlow::calculate(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4092,8 +4104,8 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             }
         } break;
 
-        case SPMType::ReturnAirBalance: {
-            auto *spmRAB = dynamic_cast<SPMReturnAirBalanceFlow *>(spm);
+        case SPMType::ReturnAirBypass: {
+            auto *spmRAB = dynamic_cast<SPMReturnAirBypassFlow *>(spm);
             assert(spmRAB != nullptr);
 
             if (spmRAB->ctrlVar == HVAC::CtrlVarType::MassFlowRate) {
