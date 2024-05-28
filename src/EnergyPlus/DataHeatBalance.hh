@@ -1478,7 +1478,7 @@ namespace DataHeatBalance {
         Real64 SumEnthalpyM = 0.0;           // Zone sum of EnthalpyM
         Real64 SumEnthalpyH = 0.0;           // Zone sum of EnthalpyH
         // reporting flags
-        bool ReportWBGT = true; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
+        bool ReportWBGT = false; // whether the wetbulb globe temperature is reqeusted as an output variable or used as an EMS sensor
 
         void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &name);
     };
