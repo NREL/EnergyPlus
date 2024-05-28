@@ -688,6 +688,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
 TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics_ZeroMeterIndex)
 {
+    // Test for PR #10521 and Issue #10519
     state->dataEconTariff->numTariff = 1;
     state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
     state->dataEconTariff->tariff(1).reportMeterIndx = 0;
@@ -704,6 +705,106 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics_ZeroMeterIndex)
 
     GatherForEconomics(*state);
     EXPECT_EQ(100, state->dataEconTariff->tariff(1).gatherEnergy(1, 1));
+}
+
+TEST_F(EnergyPlusFixture, EconomicTariff_PushPopStack)
+{
+    state->dataEconTariff->numTariff = 1;
+    state->dataEconTariff->tariff.allocate(state->dataEconTariff->numTariff);
+
+    Array1D<Real64> aMonths(MaxNumMonths);
+    int aVarPt;
+
+    Array1D<Real64> bMonths(MaxNumMonths);
+    int bVarPt;
+
+    Array1D<Real64> cMonths(MaxNumMonths);
+    int cVarPt;
+
+    aMonths = {1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6};
+    aVarPt = 0;
+
+    pushStack(*state, aMonths, aVarPt);
+
+    EXPECT_EQ(1, state->dataEconTariff->topOfStack);
+    EXPECT_EQ(0, state->dataEconTariff->stack(1).varPt);
+    EXPECT_EQ(aMonths(1), state->dataEconTariff->stack(1).values(1));
+    EXPECT_EQ(aMonths(2), state->dataEconTariff->stack(1).values(2));
+    EXPECT_EQ(aMonths(3), state->dataEconTariff->stack(1).values(3));
+    EXPECT_EQ(aMonths(4), state->dataEconTariff->stack(1).values(4));
+    EXPECT_EQ(aMonths(5), state->dataEconTariff->stack(1).values(5));
+    EXPECT_EQ(aMonths(6), state->dataEconTariff->stack(1).values(6));
+
+    bMonths = {2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6};
+    bVarPt = 0;
+
+    pushStack(*state, bMonths, bVarPt);
+
+    EXPECT_EQ(2, state->dataEconTariff->topOfStack);
+    EXPECT_EQ(0, state->dataEconTariff->stack(1).varPt);
+    EXPECT_EQ(aMonths(1), state->dataEconTariff->stack(1).values(1));
+    EXPECT_EQ(aMonths(2), state->dataEconTariff->stack(1).values(2));
+    EXPECT_EQ(aMonths(3), state->dataEconTariff->stack(1).values(3));
+    EXPECT_EQ(aMonths(4), state->dataEconTariff->stack(1).values(4));
+    EXPECT_EQ(aMonths(5), state->dataEconTariff->stack(1).values(5));
+    EXPECT_EQ(aMonths(6), state->dataEconTariff->stack(1).values(6));
+    EXPECT_EQ(0, state->dataEconTariff->stack(2).varPt);
+    EXPECT_EQ(bMonths(1), state->dataEconTariff->stack(2).values(1));
+    EXPECT_EQ(bMonths(2), state->dataEconTariff->stack(2).values(2));
+    EXPECT_EQ(bMonths(3), state->dataEconTariff->stack(2).values(3));
+    EXPECT_EQ(bMonths(4), state->dataEconTariff->stack(2).values(4));
+    EXPECT_EQ(bMonths(5), state->dataEconTariff->stack(2).values(5));
+    EXPECT_EQ(bMonths(6), state->dataEconTariff->stack(2).values(6));
+
+    popStack(*state, cMonths, cVarPt);
+    EXPECT_EQ(1, state->dataEconTariff->topOfStack);
+    EXPECT_EQ(0, state->dataEconTariff->stack(1).varPt);
+    EXPECT_EQ(aMonths(1), state->dataEconTariff->stack(1).values(1));
+    EXPECT_EQ(aMonths(2), state->dataEconTariff->stack(1).values(2));
+    EXPECT_EQ(aMonths(3), state->dataEconTariff->stack(1).values(3));
+    EXPECT_EQ(aMonths(4), state->dataEconTariff->stack(1).values(4));
+    EXPECT_EQ(aMonths(5), state->dataEconTariff->stack(1).values(5));
+    EXPECT_EQ(aMonths(6), state->dataEconTariff->stack(1).values(6));
+    EXPECT_EQ(bMonths(1), cMonths(1));
+    EXPECT_EQ(bMonths(2), cMonths(2));
+    EXPECT_EQ(bMonths(3), cMonths(3));
+    EXPECT_EQ(bMonths(4), cMonths(4));
+    EXPECT_EQ(bMonths(5), cMonths(5));
+    EXPECT_EQ(bMonths(6), cMonths(6));
+    EXPECT_EQ(bVarPt, cVarPt);
+
+    popStack(*state, cMonths, cVarPt);
+    EXPECT_EQ(0, state->dataEconTariff->topOfStack);
+    EXPECT_EQ(aMonths(1), cMonths(1));
+    EXPECT_EQ(aMonths(2), cMonths(2));
+    EXPECT_EQ(aMonths(3), cMonths(3));
+    EXPECT_EQ(aMonths(4), cMonths(4));
+    EXPECT_EQ(aMonths(5), cMonths(5));
+    EXPECT_EQ(aMonths(6), cMonths(6));
+    EXPECT_EQ(aVarPt, cVarPt);
+
+    state->dataEconTariff->econVar.allocate(10);
+    state->dataEconTariff->econVar(1).isEvaluated = false;
+    state->dataEconTariff->econVar(1).kindOfObj = ObjType::Variable;
+
+    Array1D<Real64> dMonths(MaxNumMonths);
+    int dVarPt;
+
+    dMonths = {3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6};
+    dVarPt = 1;
+
+    state->dataEconTariff->econVar(dVarPt).values = dMonths;
+
+    pushStack(*state, aMonths, dVarPt); // note the aMonths should not be used
+    popStack(*state, cMonths, cVarPt);
+    EXPECT_EQ(0, state->dataEconTariff->topOfStack);
+    EXPECT_EQ(dMonths(1), cMonths(1));
+    EXPECT_EQ(dMonths(2), cMonths(2));
+    EXPECT_EQ(dMonths(3), cMonths(3));
+    EXPECT_EQ(dMonths(4), cMonths(4));
+    EXPECT_EQ(dMonths(5), cMonths(5));
+    EXPECT_EQ(dMonths(6), cMonths(6));
+    EXPECT_EQ(dVarPt, cVarPt);
 }
 
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
