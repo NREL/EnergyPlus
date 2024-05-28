@@ -5222,6 +5222,8 @@ TEST_F(EnergyPlusFixture, SpaceHVACMixerTest)
     auto &mixSpace1Node = state->dataLoopNodes->Node(mixSpace1.spaceNodeNum);
     auto &mixSpace2Node = state->dataLoopNodes->Node(mixSpace2.spaceNodeNum);
     auto &mixSpace3Node = state->dataLoopNodes->Node(mixSpace3.spaceNodeNum);
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
 
     // Case 1
 

@@ -1810,15 +1810,23 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
         sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
-        sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
-        sumGenContam += spaceOutletNode.GenContam * mixerSpace.fraction;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            sumGenContam += spaceOutletNode.GenContam * mixerSpace.fraction;
+        }
         sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
         sumFractions += mixerSpace.fraction;
     }
     equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
     equipInletNode.HumRat = sumHumRat / sumFractions;
-    equipInletNode.CO2 = sumCO2 / sumFractions;
-    equipInletNode.GenContam = sumGenContam / sumFractions;
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        equipInletNode.CO2 = sumCO2 / sumFractions;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        equipInletNode.GenContam = sumGenContam / sumFractions;
+    }
     equipInletNode.Press = sumPressure / sumFractions;
 
     // Use Enthalpy and humidity ratio to get outlet temperature from psych chart
