@@ -4923,16 +4923,12 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                         if (spaceNum > 0) {
                             auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
                             thisSpaceAirRpt.ReportWBGT = true;
-                            int ZoneLoop = state.dataHeatBal->space(spaceNum).zoneNum;
-                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
-                            thisZnAirRpt.ReportWBGT = true;
                         }
-                    } else {
-                        int ZoneLoop = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->Zone);
-                        if (ZoneLoop > 0) {
-                            auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
-                            thisZnAirRpt.ReportWBGT = true;
-                        }
+                    }
+                    int ZoneLoop = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->Zone);
+                    if (ZoneLoop > 0) {
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
                     }
                 }
             }
