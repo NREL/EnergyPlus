@@ -45,44 +45,76 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef Timer_hh_INCLUDED
-#define Timer_hh_INCLUDED
+// EnergyPlus::Timer Unit Tests
 
-#include <EnergyPlus/api/TypeDefs.h>
+// Google Test Headers
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <gtest/gtest.h>
 
+// EnergyPlus Headers
+#include <EnergyPlus/Timer.hh>
+
+// Standard library headers
 #include <chrono>
-#include <string>
+#include <thread>
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
 
-// A restartable Timer (stopwatch) with formatting convenience functions
-struct Timer
+TEST_F(EnergyPlusFixture, Timer_ticktock)
 {
-    using DurationType = std::chrono::milliseconds;
-    using ClockType = std::chrono::system_clock;
-    using TimePointType = ClockType::time_point;
+    Timer t;
+    t.tick();
+    std::this_thread::sleep_for(std::chrono::milliseconds(62));
+    t.tock();
+    EXPECT_EQ(62, t.duration().count());
+    EXPECT_DOUBLE_EQ(0.062, t.elapsedSeconds());
 
-    Timer() = default;
+    std::this_thread::sleep_for(std::chrono::milliseconds(13));
 
-    DurationType duration() const;
+    t.tick();
+    std::this_thread::sleep_for(std::chrono::milliseconds(62));
+    t.tock();
+    EXPECT_EQ(124, t.duration().count());
+    EXPECT_EQ(0.124, t.elapsedSeconds());
+}
 
-    // Reset start to now, end to none
-    void tick();
+#ifndef NDEBUG
+TEST_F(EnergyPlusFixture, Timer_throw_if_not_stopped)
+{
+    Timer t;
+    ASSERT_THROW(t.tock(), std::runtime_error);     // Timer not started
+    ASSERT_THROW(t.duration(), std::runtime_error); // Timer not stopped
+}
+#endif
 
-    // Capture end time, add to duration
-    void tock();
-
-    std::string formatAsHourMinSecs() const;
-
-    Real64 elapsedSeconds() const;
-
-    // private:
-    TimePointType m_start;
-    TimePointType m_end;
-
-private:
-    DurationType m_duration{};
-};
-} // namespace EnergyPlus
-
-#endif // Timer_hh_INCLUDED
+TEST_F(EnergyPlusFixture, Timer_formatter)
+{
+    {
+        Timer t;
+        t.tick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(62));
+        t.tock();
+        EXPECT_EQ("00hr 00min  0.06sec", t.formatAsHourMinSecs());
+    }
+    {
+        Timer t;
+        t.m_start =
+            Timer::ClockType::now() - (std::chrono::hours(2) + std::chrono::minutes(25) + std::chrono::seconds(51) + std::chrono::milliseconds(341));
+        t.tock();
+        EXPECT_EQ("02hr 25min 51.34sec", t.formatAsHourMinSecs());
+    }
+    {
+        Timer t;
+        t.m_start =
+            Timer::ClockType::now() - (std::chrono::hours(13) + std::chrono::minutes(25) + std::chrono::seconds(51) + std::chrono::milliseconds(341));
+        t.tock();
+        EXPECT_EQ("13hr 25min 51.34sec", t.formatAsHourMinSecs());
+    }
+    {
+        Timer t;
+        t.m_start =
+            Timer::ClockType::now() - (std::chrono::hours(25) + std::chrono::minutes(25) + std::chrono::seconds(51) + std::chrono::milliseconds(341));
+        t.tock();
+        EXPECT_EQ("25hr 25min 51.34sec", t.formatAsHourMinSecs());
+    }
+}

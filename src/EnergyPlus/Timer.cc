@@ -48,19 +48,11 @@
 #include <EnergyPlus/Timer.hh>
 
 #include <fmt/format.h>
+#ifndef NDEBUG
 #include <stdexcept>
+#endif
 
 namespace EnergyPlus {
-
-Timer::TimePointType Timer::start() const
-{
-    return m_start;
-}
-
-Timer::TimePointType Timer::end() const
-{
-    return m_end;
-}
 
 void Timer::tick()
 {
@@ -70,15 +62,22 @@ void Timer::tick()
 
 void Timer::tock()
 {
+#ifndef NDEBUG
+    if (m_start == TimePointType{}) {
+        throw std::runtime_error("Timer was not started");
+    }
+#endif
     m_end = ClockType::now();
     m_duration = m_duration + std::chrono::duration_cast<DurationType>(m_end - m_start);
 }
 
 Timer::DurationType Timer::duration() const
 {
+#ifndef NDEBUG
     if (m_end == TimePointType{}) {
         throw std::runtime_error("Timer was not stopped");
     }
+#endif
     return m_duration;
 }
 

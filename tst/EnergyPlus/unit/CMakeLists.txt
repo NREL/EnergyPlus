@@ -230,6 +230,7 @@ set(test_src
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc
+    Timer.unit.cc
     ThermalChimney.unit.cc
     ThermalComfort.unit.cc
     TranspiredCollector.unit.cc
