@@ -787,6 +787,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_PushPopStack)
     state->dataEconTariff->econVar(1).isEvaluated = false;
     state->dataEconTariff->econVar(1).kindOfObj = ObjType::Variable;
 
+
+    // test getting econ variable
     Array1D<Real64> dMonths(MaxNumMonths);
     int dVarPt;
 
@@ -807,6 +809,94 @@ TEST_F(EnergyPlusFixture, EconomicTariff_PushPopStack)
     EXPECT_EQ(dVarPt, cVarPt);
 }
 
+TEST_F(EnergyPlusFixture, EconomicTariff_evaluateChargeSimple)
+{
+    int curTariff = 6;
+    state->dataEconTariff->tariff.allocate(curTariff);
+
+    int curEconVar = 7;
+    state->dataEconTariff->econVar.allocate(curEconVar);
+    state->dataEconTariff->econVar(curEconVar).tariffIndx = curTariff;
+    state->dataEconTariff->econVar(curEconVar).kindOfObj = ObjType::Variable;
+    Array1D<Real64> results(MaxNumMonths);
+
+    int sourceEconVar = 4;
+    Array1D<Real64> sourceMonths(MaxNumMonths);
+    sourceMonths = {310, 320, 330, 340, 350, 360, 360, 350, 340, 330, 320, 310};
+    state->dataEconTariff->econVar(sourceEconVar).values = sourceMonths;
+
+    int costPerEconVar = 6;
+    Array1D<Real64> costPerMonths(MaxNumMonths);
+    costPerMonths = {0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1};
+    state->dataEconTariff->econVar(costPerEconVar).values = costPerMonths;
+
+    int curSimpChg = 3;
+    state->dataEconTariff->econVar(curEconVar).index = curSimpChg;
+    state->dataEconTariff->chargeSimple.allocate(curSimpChg);
+    state->dataEconTariff->chargeSimple(curSimpChg).namePt = curEconVar;
+    state->dataEconTariff->chargeSimple(curSimpChg).tariffIndx = curTariff;
+    state->dataEconTariff->chargeSimple(curSimpChg).sourcePt = sourceEconVar;
+    state->dataEconTariff->chargeSimple(curSimpChg).costPerPt = costPerEconVar;
+    state->dataEconTariff->chargeSimple(curSimpChg).season = seasonAnnual;
+
+    evaluateChargeSimple(*state, curEconVar);
+    results = state->dataEconTariff->econVar(curEconVar).values;
+
+    EXPECT_NEAR(results(1), 310 * 0.1, 0.01);
+    EXPECT_NEAR(results(2), 320 * 0.1, 0.01);
+    EXPECT_NEAR(results(3), 330 * 0.1, 0.01);
+    EXPECT_NEAR(results(4), 340 * 0.2, 0.01);
+    EXPECT_NEAR(results(5), 350 * 0.2, 0.01);
+    EXPECT_NEAR(results(6), 360 * 0.2, 0.01);
+    EXPECT_NEAR(results(7), 360 * 0.2, 0.01);
+    EXPECT_NEAR(results(8), 350 * 0.2, 0.01);
+    EXPECT_NEAR(results(9), 340 * 0.1, 0.01);
+    EXPECT_NEAR(results(10), 330 * 0.1, 0.01);
+    EXPECT_NEAR(results(11), 320 * 0.1, 0.01);
+    EXPECT_NEAR(results(12), 310 * 0.1, 0.01);
+
+    state->dataEconTariff->chargeSimple(curSimpChg).costPerPt = 0;
+    state->dataEconTariff->chargeSimple(curSimpChg).costPerVal = 0.15;
+
+    evaluateChargeSimple(*state, curEconVar);
+    results = state->dataEconTariff->econVar(curEconVar).values;
+
+    EXPECT_NEAR(results(1), 310 * 0.15, 0.01);
+    EXPECT_NEAR(results(2), 320 * 0.15, 0.01);
+    EXPECT_NEAR(results(3), 330 * 0.15, 0.01);
+    EXPECT_NEAR(results(4), 340 * 0.15, 0.01);
+    EXPECT_NEAR(results(5), 350 * 0.15, 0.01);
+    EXPECT_NEAR(results(6), 360 * 0.15, 0.01);
+    EXPECT_NEAR(results(7), 360 * 0.15, 0.01);
+    EXPECT_NEAR(results(8), 350 * 0.15, 0.01);
+    EXPECT_NEAR(results(9), 340 * 0.15, 0.01);
+    EXPECT_NEAR(results(10), 330 * 0.15, 0.01);
+    EXPECT_NEAR(results(11), 320 * 0.15, 0.01);
+    EXPECT_NEAR(results(12), 310 * 0.15, 0.01);
+
+    state->dataEconTariff->chargeSimple(curSimpChg).season = seasonSummer;
+    int summerEconVar = 2;
+    Array1D<Real64> summerMonths(MaxNumMonths);
+    costPerMonths = {0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0};
+    state->dataEconTariff->econVar(summerEconVar).values = costPerMonths;
+    state->dataEconTariff->tariff(curTariff).nativeIsSummer = summerEconVar;
+
+    evaluateChargeSimple(*state, curEconVar);
+    results = state->dataEconTariff->econVar(curEconVar).values;
+
+    EXPECT_NEAR(results(1), 0., 0.01);
+    EXPECT_NEAR(results(2), 0., 0.01);
+    EXPECT_NEAR(results(3), 0., 0.01);
+    EXPECT_NEAR(results(4), 0., 0.01);
+    EXPECT_NEAR(results(5), 350 * 0.15, 0.01);
+    EXPECT_NEAR(results(6), 360 * 0.15, 0.01);
+    EXPECT_NEAR(results(7), 360 * 0.15, 0.01);
+    EXPECT_NEAR(results(8), 350 * 0.15, 0.01);
+    EXPECT_NEAR(results(9), 340 * 0.15, 0.01);
+    EXPECT_NEAR(results(10), 0., 0.01);
+    EXPECT_NEAR(results(11), 0., 0.01);
+    EXPECT_NEAR(results(12), 0., 0.01);
+}
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 {
     // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
