@@ -258,28 +258,6 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
     }
 }
 
-// json CsvParser::parse_value(std::string_view csv, size_t &index, bool &success)
-//{
-//    Token token;
-//    token = look_ahead(csv, index);
-//
-//    switch (token) {
-//        case Token::STRING: {
-//            return parse_string(csv, index);
-//        }
-//        case Token::Num: {
-//            return parse_number(csv, index);
-//        }
-//        case Token::FILE_END:
-//        case Token::LINE_END:
-//        case Token::DELIMITER:
-//        default:
-//            break;
-//    }
-//    success = false;
-//    return nullptr;
-//}
-
 json CsvParser::parse_value(std::string_view csv, size_t &index)
 {
     eat_whitespace(csv, index);
@@ -329,72 +307,9 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
         }
         return rtrim(value);
     }
-    //    double integral;
-    //    double fractional = std::modf(val, &integral);
-    //    if (fractional == 0) {
-    //        return static_cast<int>(fractional);
-    //    }
+
     return val;
-
-    //    auto const convert_double = [](std::string_view str) -> json {
-    //        double val;
-    //        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
-    //        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
-    //            return rtrim(str);
-    //        }
-    //        return val;
-    //    };
-    //
-    //    auto const convert_int = [&convert_double](std::string_view str) -> json {
-    //        int val;
-    //        auto result = std::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
-    //        if (result.ec == std::errc::result_out_of_range) {
-    //            return convert_double(str);
-    //        } else if (result.ec == std::errc::invalid_argument) {
-    //            if (*result.ptr == '.') {
-    //                return convert_double(str);
-    //            } else {
-    //                return rtrim(str);
-    //            }
-    //        } else if (result.ptr != str.end()) {
-    //            if (*result.ptr == '.' || *result.ptr == 'e' || *result.ptr == 'E') {
-    //                return convert_double(str);
-    //            } else {
-    //                return rtrim(str);
-    //            }
-    //        }
-    //        return val;
-    //    };
-    //
-    //    return convert_int(value);
 }
-
-// std::string CsvParser::parse_string(std::string_view csv, size_t &index)
-//{
-//    eat_whitespace(csv, index);
-//
-//    std::string str;
-//    char c;
-//
-//    while (true) {
-//        if (index == csv_size) {
-//            break;
-//        }
-//
-//        c = csv[index];
-//        increment_both_index(index, index_into_cur_line);
-//        if (c == delimiter || c == '\n') {
-//            decrement_both_index(index, index_into_cur_line);
-//            break;
-//        } else if (c == '\r') {
-//            continue;
-//        } else {
-//            str += c;
-//        }
-//    }
-//
-//    return rtrim(str);
-//}
 
 CsvParser::Token CsvParser::look_ahead(std::string_view csv, size_t index)
 {
