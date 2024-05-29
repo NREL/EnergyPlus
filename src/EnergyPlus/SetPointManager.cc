@@ -2700,7 +2700,7 @@ void SPMSingleZoneTemp::calculate(EnergyPlusData &state)
     
     Real64 ZoneTemp = state.dataLoopNodes->Node(this->ZoneNodeNum).Temp;
     if (zoneInletNode.MassFlowRate <= HVAC::SmallMassFlow) {
-        this->SetPt = this->MinSetTemp;
+        this->SetPt = (this->type == SPMType::SZHeating) ? this->MinSetTemp : this->MaxSetTemp;
     } else {
         Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
         this->SetPt = ZoneTemp + ZoneLoadToSP / (CpAir * zoneInletNode.MassFlowRate);
