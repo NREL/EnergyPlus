@@ -257,7 +257,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataSysAirFlowSizer = std::make_unique<SystemAirFlowSizerData>();
     this->dataSysRpts = std::make_unique<SystemReportsData>();
     this->dataSysVars = std::make_unique<SystemVarsData>();
-    this->dataSystemAvailabilityManager = std::make_unique<SystemAvailabilityManagerData>();
+    this->dataAvail = std::make_unique<SystemAvailabilityManagerData>();
     this->dataTARCOGCommon = std::make_unique<TARCOGCommonData>();
     this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
     this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
@@ -512,7 +512,7 @@ void EnergyPlusData::clear_state()
     this->dataSysAirFlowSizer->clear_state();
     this->dataSysRpts->clear_state();
     this->dataSysVars->clear_state();
-    this->dataSystemAvailabilityManager->clear_state();
+    this->dataAvail->clear_state();
     this->dataTARCOGCommon->clear_state();
     this->dataTARCOGOutputs->clear_state();
     this->dataThermalChimneys->clear_state();

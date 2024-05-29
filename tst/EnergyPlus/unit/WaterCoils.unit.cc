@@ -821,11 +821,11 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     EXPECT_NEAR(2479.27, state->dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.01);
 
     Real64 DesCoilInletWaterTempUsed = 0.0;
-    Real64 DataFanOpMode = HVAC::ContFanCycCoil;
+    HVAC::FanOp fanOp = HVAC::FanOp::Continuous;
     Real64 UAMax = state->dataWaterCoils->WaterCoil(CoilNum).DesWaterHeatingCoilRate;
 
     // check if coil design inlet water temperature is increased above the plant loop exit temp
-    EstimateCoilInletWaterTemp(*state, CoilNum, DataFanOpMode, 1.0, UAMax, DesCoilInletWaterTempUsed);
+    EstimateCoilInletWaterTemp(*state, CoilNum, fanOp, 1.0, UAMax, DesCoilInletWaterTempUsed);
     EXPECT_GT(DesCoilInletWaterTempUsed, state->dataSize->PlantSizData(1).ExitTemp);
     EXPECT_NEAR(48.73, DesCoilInletWaterTempUsed, 0.01);
 }
@@ -1200,7 +1200,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
         "   **   ~~~   ** Coil:Cooling:Water:DetailedGeometry could be resized/autosized to handle capacity",
     });
 
-    CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, 2, 1);
+    CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, HVAC::FanOp::Continuous, 1);
 
     compare_err_stream(expected_error, true);
 
@@ -1227,7 +1227,7 @@ TEST_F(WaterCoilsTest, CoilCoolingWaterDetailed_WarningMath)
         "   ..... Last severe error=Coil:Cooling:Water:DetailedGeometry in Coil =Test Detailed Water Cooling Coil",
     });
 
-    EXPECT_ANY_THROW(CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, 2, 1));
+    EXPECT_ANY_THROW(CalcDetailFlatFinCoolingCoil(*state, CoilNum, 2, HVAC::FanOp::Continuous, 1));
 
     compare_err_stream(expected_fatal_error, true);
 }
