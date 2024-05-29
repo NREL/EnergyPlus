@@ -256,7 +256,7 @@ constexpr std::array<std::string_view, (int)DataEnvironment::GroundTempType::Num
 constexpr std::array<std::string_view, (int)ReturnTempType::Num> returnTempTypeNamesUC = {
     "SCHEDULED",
     "CONSTANT",
-    "SETPOINT"
+    "RETURNTEMPERATURESETPOINT"
 };
         
 void ManageSetPoints(EnergyPlusData &state)
