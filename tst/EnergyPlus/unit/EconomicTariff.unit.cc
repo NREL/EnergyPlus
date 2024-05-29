@@ -897,6 +897,73 @@ TEST_F(EnergyPlusFixture, EconomicTariff_evaluateChargeSimple)
     EXPECT_NEAR(results(11), 0., 0.01);
     EXPECT_NEAR(results(12), 0., 0.01);
 }
+
+TEST_F(EnergyPlusFixture, EconomicTariff_evaluateChargeBlock)
+{
+    int curTariff = 8;
+    state->dataEconTariff->tariff.allocate(curTariff);
+
+    int curEconVar = 11;
+    state->dataEconTariff->econVar.allocate(curEconVar);
+    state->dataEconTariff->econVar(curEconVar).tariffIndx = curTariff;
+    state->dataEconTariff->econVar(curEconVar).kindOfObj = ObjType::Variable;
+    Array1D<Real64> results(MaxNumMonths);
+
+    int sourceEconVar = 4;
+    Array1D<Real64> sourceMonths(MaxNumMonths);
+    sourceMonths = {450, 650, 950, 1350, 1850, 2850, 500, 1000, 1500, 501, 1001, 1501};
+    state->dataEconTariff->econVar(sourceEconVar).values = sourceMonths;
+
+    int curChgBlk = 3;
+    state->dataEconTariff->econVar(curEconVar).index = curChgBlk;
+    state->dataEconTariff->chargeBlock.allocate(curChgBlk);
+    state->dataEconTariff->chargeBlock(curChgBlk).namePt = curEconVar;
+    state->dataEconTariff->chargeBlock(curChgBlk).tariffIndx = curTariff;
+    state->dataEconTariff->chargeBlock(curChgBlk).sourcePt = sourceEconVar;
+    state->dataEconTariff->chargeBlock(curChgBlk).season = seasonAnnual;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzMultPt = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzMultVal = 1;
+
+    int numBlocks = 3;
+    state->dataEconTariff->chargeBlock(curChgBlk).numBlk = numBlocks;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzPt.allocate(numBlocks);
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzVal.allocate(numBlocks);
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostPt.allocate(numBlocks);
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostVal.allocate(numBlocks);
+
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzPt(1) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzVal(1) = 500;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostPt(1) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostVal(1) = 0.15;
+
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzPt(2) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzVal(2) = 1000;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostPt(2) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostVal(2) = 0.12;
+
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzPt(3) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkSzVal(3) = 999999999; // a big number
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostPt(3) = 0;
+    state->dataEconTariff->chargeBlock(curChgBlk).blkCostVal(3) = 0.10;
+
+    evaluateChargeBlock(*state, curEconVar);
+    results = state->dataEconTariff->econVar(curEconVar).values;
+
+    EXPECT_NEAR(results(1), 450 * 0.15, 0.01);
+    EXPECT_NEAR(results(2), 500 * 0.15 + 150 * 0.12, 0.01);
+    EXPECT_NEAR(results(3), 500 * 0.15 + 450 * 0.12, 0.01);
+    EXPECT_NEAR(results(4), 500 * 0.15 + 850 * 0.12, 0.01);
+    EXPECT_NEAR(results(5), 500 * 0.15 + 1000 * 0.12 + 350 * 0.10, 0.01);
+    EXPECT_NEAR(results(6), 500 * 0.15 + 1000 * 0.12 + 1350 * 0.10, 0.01);
+    EXPECT_NEAR(results(7), 500 * 0.15, 0.01);
+    EXPECT_NEAR(results(8), 500 * 0.15 + 500 * 0.12, 0.01);
+    EXPECT_NEAR(results(9), 500 * 0.15 + 1000 * 0.12, 0.01);
+    EXPECT_NEAR(results(10), 500 * 0.15 + 1 * 0.12, 0.01);
+    EXPECT_NEAR(results(11), 500 * 0.15 + 501 * 0.12, 0.01);
+    EXPECT_NEAR(results(12), 500 * 0.15 + 1000 * 0.12 + 1 * 0.10, 0.01);
+}
+
+
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 {
     // Tests for PR #8456 and Issue #8455 ... Case 0 of Cases 0-3
