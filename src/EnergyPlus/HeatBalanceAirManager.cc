@@ -311,6 +311,9 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
             for (int spaceNum : state.dataHeatBal->Zone(Loop).spaceIndexes) {
                 state.dataHeatBal->spaceAirRpt(spaceNum).setUpOutputVars(
                     state, DataStringGlobals::spacePrefix, state.dataHeatBal->space(spaceNum).Name);
+                std::string const &spaceName = state.dataHeatBal->space(spaceNum).Name;
+                auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                SetupEMSInternalVariable(state, "Space Wetbulb Globe Temperature", spaceName, "[C]", thisSpaceAirRpt.WetbulbGlobeTemp);
             }
         }
 
@@ -374,6 +377,8 @@ void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound) // IF err
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             name);
+
+        SetupEMSInternalVariable(state, "Zone Wetbulb Globe Temperature", name, "[C]", thisZnAirRpt.WetbulbGlobeTemp);
     }
 
     SetupOutputVariable(state,
@@ -4933,6 +4938,21 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                 }
             }
         }
+
+        // EMS sensor request WBGT check
+        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+            if (state.dataRuntimeLang->Sensor(loop).OutputVarName == "ZONE WETBULB GLOBE TEMPERATURE" ||
+                state.dataRuntimeLang->Sensor(loop).OutputVarName == "SPACE WETBULB GLOBE TEMPERATURE") {
+                for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+                    auto &thisZone = state.dataHeatBal->Zone(ZoneLoop);
+                    if (state.dataRuntimeLang->Sensor(loop).UniqueKeyName == thisZone.Name) {
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
+                    }
+                }
+            }
+        }
+
         state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag = false;
     }
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
