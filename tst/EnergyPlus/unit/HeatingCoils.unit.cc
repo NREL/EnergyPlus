@@ -172,7 +172,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     state->dataHeatingCoils->HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.0, 1, HVAC::FanOp::Continuous);
     Real64 HeatLoad00 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad00, state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.5, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 0.5, 1, HVAC::FanOp::Continuous);
     Real64 HeatLoad05 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad05, state->dataHeatingCoils->HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 1.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(*state, CoilNum, 0.0, 1.0, 1, HVAC::FanOp::Continuous);
     Real64 HeatLoad10 = state->dataHeatingCoils->HeatingCoil(CoilNum).InletAirMassFlowRate *
                         (Psychrometrics::PsyHFnTdbW(state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirTemp,
                                                     state->dataHeatingCoils->HeatingCoil(CoilNum).OutletAirHumRat) -

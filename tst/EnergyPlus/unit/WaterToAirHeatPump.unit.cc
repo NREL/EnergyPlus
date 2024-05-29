@@ -240,14 +240,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     Real64 SensLoad(38000.0);
     Real64 LatentLoad(0.0);
     Real64 PartLoadRatio(1.0);
-    int CyclingScheme(1);
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     bool FirstHVACIteration(true);
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPCooling(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPCooling(*state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPHeating(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPHeating(*state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);

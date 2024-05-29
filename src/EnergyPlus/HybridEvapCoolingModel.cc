@@ -1843,7 +1843,7 @@ namespace HybridEvapCoolingModel {
         UnitOn = 1;
         bool ForceOff = false;
         StandBy = false;
-        if (GetCurrentScheduleValue(state, SchedPtr) <= 0 || AvailStatus == 1) {
+        if (GetCurrentScheduleValue(state, SchedPtr) <= 0 || availStatus == Avail::Status::ForceOff) {
             UnitOn = 0;
             ForceOff = true;
         }
