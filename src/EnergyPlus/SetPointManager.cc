@@ -402,11 +402,48 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         if (instances == ip->epJSON.end()) continue; // No SetPointManagers of this type
 
         auto const &props = ip->getObjectSchemaProps(state, cCurrentModuleObject);
-        for (auto instance = instances.value().begin(); instance != instances.value().end(); ++instance) {
 
-            ip->markObjectAsUsed(cCurrentModuleObject, instance.key());
+#define PRESERVE_IDF_ORDER        
+#ifdef PRESERVE_IDF_ORDER
+        
+        // Try to read these in IDF order (for now, can revert to simpler begin(), ++, end() iterator later)
+
+        // Begin by grabbing the keys and IDF numbers of the objects.
+        // Have to grab the keys because once you are no longer
+        // dealing with the map iterator, you lose access to the key,
+        // which you also need because it is the object name.
+        
+        std::vector<int> idfNums;
+        std::vector<std::string> idfKeys;
+        for (auto instance = instances.value().begin(); instance != instances.value().end(); ++instance) {
+            idfNums.push_back(instance.value().at("idf_order").get<int>());
+            idfKeys.push_back(instance.key());
+        }
+
+        // Now sort the IDF numbers
+        std::vector<int> idfSortedNums = idfNums;
+        std::sort(idfSortedNums.begin(), idfSortedNums.end());
+
+        // Iterate through the sorted IDF numbers
+        for (int idfSortedNum : idfSortedNums) {
+            // Find that number's position in the epJSON order
+            int epJsonNum = std::find(idfNums.begin(), idfNums.end(), idfSortedNum) - idfNums.begin();
+            // Grab the corresponding name
+            std::string const &key = idfKeys[epJsonNum];
+            auto const &fields = instances.value().at(key);
+
+#else // !PRESERVE_IDF_ORDER
             
-            std::string name = Util::makeUPPER(instance.key());
+        // epJson order
+        for (auto instance = instances.value().begin(); instance != instances.value().end(); ++instance) {
+            std::string const &key = instance.key();
+            auto const &fields = instance.value();
+
+#endif // PRESERVE_IDF_ORDER
+            
+            ip->markObjectAsUsed(cCurrentModuleObject, key);
+            std::string name = Util::makeUPPER(key);
+            
             ErrorObjectHeader eoh{routineName, cCurrentModuleObject, name};
 
             if (state.dataSetPointManager->spmMap.find(name) != state.dataSetPointManager->spmMap.end()) {
@@ -458,8 +495,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             spm->type = type;
             state.dataSetPointManager->spms.push_back(spm);
             state.dataSetPointManager->spmMap.insert_or_assign(spm->Name, state.dataSetPointManager->spms.size());
-            
-            auto const &fields = instance.value();
 
             // control variable type
             std::string ctrlVarName;
