@@ -238,11 +238,13 @@ constexpr std::array<DataLoopNode::ConnectionObjectType, (int)SPMType::Num> spmN
 constexpr std::array<std::string_view, (int)SupplyFlowTempStrategy::Num> supplyFlowTempStrategyNamesUC = {
     "MAXIMUMTEMPERATURE", "MINIMUMTEMPERATURE"};
         
+// Why?
 constexpr std::array<std::string_view, (int)AirTempType::Num> oaTempTypeNamesUC = {
     "OUTDOORAIRWETBULB", "OUTDOORAIRDRYBULB"};
 
+// No really, why?
 constexpr std::array<std::string_view, (int)AirTempType::Num> nodeTempTypeNamesUC = {
-    "OUTDOORAIRWETBULB", "OUTDOORAIRDRYBULB"};
+    "NODEWETBULB", "NODEDRYBULB"};
 
 constexpr std::array<std::string_view, (int)DataEnvironment::GroundTempType::Num> groundTempObjectTypeNamesUC = {
     "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE",
@@ -2779,8 +2781,9 @@ void SPMSingleZoneHum::calculate(EnergyPlusData &state)
 
     Real64 ZoneMassFlow = zoneNode.MassFlowRate;
     if (ZoneMassFlow > HVAC::SmallMassFlow) {
-
-        Real64 MoistureLoad = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum).OutputRequiredToHumidifyingSP;
+        auto const &zoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum);
+        Real64 MoistureLoad = (this->type == SPMType::SZMinHum) ?
+            zoneMoistureDemand.OutputRequiredToHumidifyingSP : zoneMoistureDemand.OutputRequiredToDehumidifyingSP;
 
         // This function handles both SZMinHum and SZMaxHum
         // MoistureLoad (negative for dehumidification) may be so large that a negative humrat results, cap at 0.00001
