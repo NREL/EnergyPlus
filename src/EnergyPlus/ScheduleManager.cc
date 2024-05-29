@@ -524,7 +524,7 @@ namespace ScheduleManager {
                                         Alphas(1)));
                 ShowContinueError(state, "This was a problem in E+ 22.2.0 and below, consider removing it from the file to suppress this warning.");
                 schedule_file_shading_result->second["header"].erase(NumCSVAllColumnsSchedules);
-                schedule_file_shading_result->second["values"].erase(NumCSVAllColumnsSchedules);
+                assert(schedule_file_shading_result->second["header"].size() == schedule_file_shading_result->second["values"].size());
                 --NumCSVAllColumnsSchedules;
             }
 

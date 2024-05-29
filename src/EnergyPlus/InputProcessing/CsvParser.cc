@@ -104,6 +104,7 @@ void CsvParser::skip_rows(std::string_view csv, size_t &index)
 int CsvParser::find_number_columns(std::string_view csv, size_t &index)
 {
     Token token;
+    Token prev_token;
     int num_columns = 0;
 
     size_t save_index = index;
@@ -118,9 +119,13 @@ int CsvParser::find_number_columns(std::string_view csv, size_t &index)
         } else if (token == Token::DELIMITER) {
             ++num_columns;
         } else if (token == Token::LINE_END) {
-            ++num_columns;
+            // Catch a trailing comma, such as Shading files from E+ 22.2.0 and below
+            if (prev_token != Token::DELIMITER) {
+                ++num_columns;
+            }
             break;
         }
+        prev_token = token;
     }
 
     cur_line_num = save_line_num;
@@ -157,6 +162,10 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index)
             break;
         } else {
             if (check_first_row) {
+                // Parse the header first, it could have an extra '()' for shading in 22.2.0 and below
+                if (has_header) {
+                    parse_header(csv, index, header);
+                }
                 int num_columns = find_number_columns(csv, index);
                 check_first_row = false;
 
@@ -166,9 +175,6 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index)
                     columns.push_back(std::move(arr));
                 }
 
-                if (has_header) {
-                    parse_header(csv, index, header);
-                }
                 continue;
             }
 
