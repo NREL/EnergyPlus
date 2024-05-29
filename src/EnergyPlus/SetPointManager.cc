@@ -505,10 +505,21 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
             case SPMType::SZReheat: 
             case SPMType::SZHeating:
-            case SPMType::SZCooling: 
-            case SPMType::FollowSystemNodeTemp: {
+            case SPMType::SZCooling: {
                 spm->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_supply_air_temperature");
                 spm->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_supply_air_temperature");
+                if (spm->MaxSetTemp < spm->MinSetTemp) {
+                    ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
+                    ShowContinueError(state,
+                                      format("...maximum_supply_air_temperature=[{:.1R}] is less than minimum_supply_air_temperature=[{:.1R}].",
+                                             spm->MaxSetTemp,
+                                             spm->MinSetTemp));
+                }
+            } break;
+
+            case SPMType::FollowSystemNodeTemp: {
+                spm->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_limit_setpoint_temperature");
+                spm->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_limit_setpoint_temperature");
                 if (spm->MaxSetTemp < spm->MinSetTemp) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state,
@@ -997,8 +1008,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 if (spmFNT->ctrlVar != HVAC::CtrlVarType::Temp &&
                     spmFNT->ctrlVar != HVAC::CtrlVarType::MaxTemp &&
                     spmFNT->ctrlVar != HVAC::CtrlVarType::MinTemp) {
-                        ShowSevereInvalidKey(state, eoh, "control_variable", ctrlVarName);
-                        ErrorsFound = true;
+                    ShowSevereInvalidKey(state, eoh, "control_variable", ctrlVarName);
+                    ErrorsFound = true;
                 }
 
                 spmFNT->RefNodeNum =
@@ -1016,7 +1027,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     static_cast<AirTempType>(getEnumValue(nodeTempTypeNamesUC,
                                                           ip->getAlphaFieldValue(fields, props, "reference_temperature_type")));
 
-                spmFNT->Offset = ip->getRealFieldValue(fields, props, "reference_temperature_offset");
+                spmFNT->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
             } break;
                     
             // SetpointManager:FollowGroundTemperature
@@ -1113,14 +1124,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmSZOneStageCooling = dynamic_cast<SPMSingleZoneOneStageCooling *>(spm);
                 assert(spmSZOneStageCooling != nullptr);
 
-                spmSZOneStageCooling->CoolingOnSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_on_suppply_air_setpoint_temperature");
-                spmSZOneStageCooling->CoolingOffSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_off_suppply_air_setpoint_temperature");
+                spmSZOneStageCooling->CoolingOnSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_on_supply_air_setpoint_temperature");
+                spmSZOneStageCooling->CoolingOffSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_off_supply_air_setpoint_temperature");
                 
                 if (spmSZOneStageCooling->CoolingOffSetPt < spmSZOneStageCooling->CoolingOnSetPt) {
                         // throw warning, off must be warmer than on
                         ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOneStageCooling->Name));
                         ShowContinueError(state,
-                                          format("...cooling_stage_off_suppply_air_setpoint_temperature=[{:.1R}] is less than cooling_stage_on_suppply_air_setpoint_temperature=[{:.1R}].",
+                                          format("...cooling_stage_off_supply_air_setpoint_temperature=[{:.1R}] is less than cooling_stage_on_supply_air_setpoint_temperature=[{:.1R}].",
                                                  spmSZOneStageCooling->CoolingOffSetPt,
                                                  spmSZOneStageCooling->CoolingOnSetPt));
                 }
@@ -1149,14 +1160,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmSZOSH = dynamic_cast<SPMSingleZoneOneStageHeating *>(spm);
                 assert(spmSZOSH != nullptr);
 
-                spmSZOSH->HeatingOnSetPt = ip->getRealFieldValue(fields, props, "heating_stage_on_suppply_air_setpoint_temperature");
-                spmSZOSH->HeatingOffSetPt = ip->getRealFieldValue(fields, props, "heating_stage_off_suppply_air_setpoint_temperature");
+                spmSZOSH->HeatingOnSetPt = ip->getRealFieldValue(fields, props, "heating_stage_on_supply_air_setpoint_temperature");
+                spmSZOSH->HeatingOffSetPt = ip->getRealFieldValue(fields, props, "heating_stage_off_supply_air_setpoint_temperature");
                 
                 if (spmSZOSH->HeatingOffSetPt < spmSZOSH->HeatingOnSetPt) {
                     // throw warning, off must be warmer than on
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOSH->Name));
                     ShowContinueError(state,
-                                      format("...heating_stage_off_suppply_air_setpoint_temperature=[{:.1R}] is less than heating_stage_on_suppply_air_setpoint_temperature=[{:.1R}].",
+                                      format("...heating_stage_off_supply_air_setpoint_temperature=[{:.1R}] is less than heating_stage_on_supply_air_setpoint_temperature=[{:.1R}].",
                                              spmSZOSH->HeatingOffSetPt,
                                              spmSZOSH->HeatingOnSetPt));
                 }
@@ -2610,7 +2621,6 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
 
     Real64 TSetPt;
     
-    auto const &retNode = state.dataLoopNodes->Node(this->RetNodeNum);
     auto const &zoneInletNode = state.dataLoopNodes->Node(this->ZoneInletNodeNum);
 
     // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
@@ -2627,6 +2637,7 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
     Real64 TMixAtMinOA;
     if (this->OAInNodeNum > 0) {
         auto const &oaInNode = state.dataLoopNodes->Node(this->OAInNodeNum);
+        auto const &retNode = state.dataLoopNodes->Node(this->RetNodeNum);
         Real64 HumRatMixAtMinOA = (1.0 - OAFrac) * retNode.HumRat + OAFrac * oaInNode.HumRat;
         Real64 EnthMixAtMinOA = (1.0 - OAFrac) * retNode.Enthalpy + OAFrac * oaInNode.Enthalpy;
         TMixAtMinOA = PsyTdbFnHW(EnthMixAtMinOA, HumRatMixAtMinOA);
