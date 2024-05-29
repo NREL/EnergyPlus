@@ -3366,6 +3366,7 @@ namespace SurfaceGeometry {
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Name = state.dataIPShortCut->cAlphaArgs(1); // Set the Surface Name in the Derived Type
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).Class = ClassItem;
                 state.dataSurfaceGeometry->SurfaceTmp(SurfNum).HeatTransSurf = false;
+                state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtSolar = true;
                 // Base transmittance of a shadowing (sub)surface
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(2)) {
                     // Schedule for a shadowing (sub)surface
