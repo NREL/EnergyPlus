@@ -1577,11 +1577,11 @@ namespace RoomAir {
         }         // loop thru TotNumOfRAFNNodeGainsLists
 
         // Get data of HVAC equipment
-        ipsc->cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
-        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        std::string const cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
+        TotNumOfRAFNNodeHVACLists = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
         for (int Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
-                                                                     ipsc->cCurrentModuleObject,
+                                                                     cCurrentModuleObject,
                                                                      Loop,
                                                                      ipsc->cAlphaArgs,
                                                                      NumAlphas,
@@ -1593,10 +1593,10 @@ namespace RoomAir {
                                                                      ipsc->cAlphaFieldNames,
                                                                      ipsc->cNumericFieldNames);
 
-            ErrorObjectHeader eoh{routineName, ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)};
+            ErrorObjectHeader eoh{routineName, cCurrentModuleObject, ipsc->cAlphaArgs(1)};
 
             if (mod((NumAlphas + NumNumbers - 1), 4) != 0) {
-                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("GetRoomAirflowNetworkData: For {}: {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
                                   format("Extensible field set are not evenly divisable by 4. Number of data entries = {}",
                                          fmt::to_string(NumAlphas + NumNumbers - 1)));
@@ -1619,8 +1619,8 @@ namespace RoomAir {
                 auto &roomAFNNode = roomAFNZoneInfo.Node(RAFNNodeNum);
                 if (allocated(roomAFNNode.HVAC)) {
                     ShowSevereError(state, format("GetRoomAirflowNetworkData: Invalid {} = {}", ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state, format("Entered in {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
-                    ShowContinueError(state, format("Duplicate {} name.", ipsc->cCurrentModuleObject));
+                    ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                    ShowContinueError(state, format("Duplicate {} name.", cCurrentModuleObject));
                     ErrorsFound = true;
                     continue;
                 }
@@ -1670,7 +1670,7 @@ namespace RoomAir {
                                         format("GetRoomAirflowNetworkData: Invalid {} = {}",
                                                ipsc->cAlphaFieldNames(3 + (iEquip - 1) * 2),
                                                ipsc->cAlphaArgs(2 + (iEquip - 1) * 2)));
-                        ShowContinueError(state, format("Entered in {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
+                        ShowContinueError(state, format("Entered in {} = {}", cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                         ShowContinueError(state, "Internal gain did not match correctly");
                         ErrorsFound = true;
                     }
@@ -2733,8 +2733,8 @@ namespace RoomAir {
             SupplyNodeNum = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
-            SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex);
-            ReturnNodeNum = FanCoilUnits::GetFanCoilAirInNode(state, EquipIndex);
+            SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex, EquipName);
+            ReturnNodeNum = FanCoilUnits::GetFanCoilAirInNode(state, EquipIndex, EquipName);
         } break;
         case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
             SupplyNodeNum = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, EquipIndex);

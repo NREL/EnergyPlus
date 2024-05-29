@@ -318,9 +318,9 @@ namespace FanCoilUnits {
 
     void ReportFanCoilUnit(EnergyPlusData &state, int FanCoilNum); // number of the current fan coil unit being simulated
 
-    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int FanCoilNum);
+    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int &FanCoilNum, std::string_view CompName = "");
 
-    int GetFanCoilAirInNode(EnergyPlusData &state, int FanCoilNum);
+    int GetFanCoilAirInNode(EnergyPlusData &state, int &FanCoilNum, std::string_view CompName = "");
 
     int GetFanCoilOutAirNode(EnergyPlusData &state, int FanCoilNum);
 
