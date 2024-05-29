@@ -3258,10 +3258,11 @@ void SPMMultiZoneTemp::calculate(EnergyPlusData &state)
         } 
     }
     Real64 ZoneAverageTemp = (SumProductMdotCpTot > 0.0) ? (SumProductMdotCpTZoneTot / SumProductMdotCpTot) : 0.0;
-    Real64 SetPointTemp =  (SumProductMdotCp > 0.0) ? (ZoneAverageTemp + SumLoad / SumProductMdotCp) : 0.0;
+    Real64 SetPointTemp =  (SumProductMdotCp > 0.0) ? (ZoneAverageTemp + SumLoad / SumProductMdotCp) :
+        ((this->type == SPMType::MZHeatingAverage) ? this->MinSetTemp : this->MaxSetTemp);
 
     SetPointTemp = std::clamp(SetPointTemp, this->MinSetTemp, this->MaxSetTemp);
-    if (SumLoad < HVAC::SmallLoad) {
+    if (std::abs(SumLoad) < HVAC::SmallLoad) {
         SetPointTemp = (this->type == SPMType::MZHeatingAverage) ? this->MinSetTemp : this->MaxSetTemp;
     }
     this->SetPt = SetPointTemp;
