@@ -787,7 +787,6 @@ TEST_F(EnergyPlusFixture, EconomicTariff_PushPopStack)
     state->dataEconTariff->econVar(1).isEvaluated = false;
     state->dataEconTariff->econVar(1).kindOfObj = ObjType::Variable;
 
-
     // test getting econ variable
     Array1D<Real64> dMonths(MaxNumMonths);
     int dVarPt;
@@ -962,7 +961,6 @@ TEST_F(EnergyPlusFixture, EconomicTariff_evaluateChargeBlock)
     EXPECT_NEAR(results(11), 500 * 0.15 + 501 * 0.12, 0.01);
     EXPECT_NEAR(results(12), 500 * 0.15 + 1000 * 0.12 + 1 * 0.10, 0.01);
 }
-
 
 TEST_F(EnergyPlusFixture, InputEconomics_UtilityCost_Variable_Test0)
 {
