@@ -16581,11 +16581,15 @@ namespace UnitarySystems {
         return airNode;
     }
 
-    int
-    getIndex(EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, bool &errFlag)
+    int getIndex(EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, bool &errFlag)
     {
 
-        int EquipIndex = 0;
+        if (state.dataUnitarySystems->getInputOnceFlag) {
+            UnitarySystems::UnitarySys::getUnitarySystemInput(state, UnitarySysName, false, 0);
+            state.dataUnitarySystems->getInputOnceFlag = false;
+        }
+
+        int EquipIndex = -1;
         for (int UnitarySysNum = 0; UnitarySysNum < state.dataUnitarySystems->numUnitarySystems; ++UnitarySysNum) {
             if (Util::SameString(UnitarySysName, state.dataUnitarySystems->unitarySys[UnitarySysNum].Name)) {
                 if (zoneEquipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
