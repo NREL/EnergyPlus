@@ -3872,6 +3872,8 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
                 }
             }
         }
+    } else {
+        fluidIndex = state.dataPlnt->PlantLoop(this->plantLoopNum).FluidIndex;
     }
 
     // we don't need fluid names since we have a real index, so just pass in the temperature and get properties
