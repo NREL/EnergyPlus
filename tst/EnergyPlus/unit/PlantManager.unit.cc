@@ -215,10 +215,10 @@ namespace PlantManager {
 
         // Schedule Setpoint Manager assigned at a plant loop supply outlet node
         EXPECT_EQ((int)state->dataSetPointManager->spms(1)->ctrlVar, (int)HVAC::CtrlVarType::Temp);
-        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(1)->ctrlNodes(1)), "CHILLED WATER LOOP SUPPLY OUTLET");
+        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(1)->ctrlNodeNums[0]), "CHILLED WATER LOOP SUPPLY OUTLET");
         // OAReset Setpoint Manager assigned at a plant loop supply inlet node
         EXPECT_EQ((int)state->dataSetPointManager->spms(2)->ctrlVar, (int)HVAC::CtrlVarType::Temp);
-        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(2)->ctrlNodes(1)), "CHILLED WATER LOOP SUPPLY INLET");
+        EXPECT_EQ(state->dataLoopNodes->NodeID(state->dataSetPointManager->spms(2)->ctrlNodeNums[0]), "CHILLED WATER LOOP SUPPLY INLET");
     }
 } // namespace PlantManager
 
