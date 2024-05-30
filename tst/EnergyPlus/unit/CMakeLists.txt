@@ -197,6 +197,7 @@ set(test_src
     Psychrometrics.unit.cc
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
+    RefrigeratedCase.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirModelUserTempPattern.unit.cc
