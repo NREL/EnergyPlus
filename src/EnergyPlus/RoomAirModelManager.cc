@@ -2733,8 +2733,9 @@ namespace RoomAir {
             SupplyNodeNum = HVACStandAloneERV::GetStandAloneERVOutAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil
-            SupplyNodeNum = FanCoilUnits::GetFanCoilZoneInletAirNode(state, EquipIndex, EquipName);
-            ReturnNodeNum = FanCoilUnits::GetFanCoilAirInNode(state, EquipIndex, EquipName);
+            EquipIndex = FanCoilUnits::getEqIndex(state, EquipName, errorfound);
+            SupplyNodeNum = state.dataFanCoilUnits->FanCoil(EquipIndex).AirOutNode;
+            ReturnNodeNum = state.dataFanCoilUnits->FanCoil(EquipIndex).AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: { // ZoneHVAC : OutdoorAirUnit
             SupplyNodeNum = OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode(state, EquipIndex);

@@ -4097,7 +4097,7 @@ namespace FanCoilUnits {
         }
     }
 
-    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int &FanCoilNum, std::string_view CompName)
+    int GetFanCoilZoneInletAirNode(EnergyPlusData &state, int const FanCoilNum)
     {
 
         // FUNCTION INFORMATION:
@@ -4116,17 +4116,10 @@ namespace FanCoilUnits {
             return state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode;
         }
 
-        if (FanCoilNum == 0 && CompName != "") {
-            FanCoilNum = Util::FindItemInList(CompName, state.dataFanCoilUnits->FanCoil);
-            if (FanCoilNum == 0) {
-                ShowFatalError(state, format("SimFanCoil: Unit not found={}", CompName));
-            }
-            return state.dataFanCoilUnits->FanCoil(FanCoilNum).AirOutNode;
-        }
         return 0;
     }
 
-    int GetFanCoilAirInNode(EnergyPlusData &state, int &FanCoilNum, std::string_view CompName)
+    int GetFanCoilAirInNode(EnergyPlusData &state, int const FanCoilNum)
     {
 
         // FUNCTION INFORMATION:
@@ -4145,13 +4138,6 @@ namespace FanCoilUnits {
             return state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode;
         }
 
-        if (FanCoilNum == 0 && CompName != "") {
-            FanCoilNum = Util::FindItemInList(CompName, state.dataFanCoilUnits->FanCoil);
-            if (FanCoilNum == 0) {
-                ShowFatalError(state, format("SimFanCoil: Unit not found={}", CompName));
-            }
-            return state.dataFanCoilUnits->FanCoil(FanCoilNum).AirInNode;
-        }
         return 0;
     }
 
@@ -4453,6 +4439,25 @@ namespace FanCoilUnits {
         } else {
             return (QUnitOut - QZnReq) / QZnReq;
         }
+    }
+
+    int getEqIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    {
+        if (state.dataFanCoilUnits->GetFanCoilInputFlag) {
+            GetFanCoilUnits(state);
+            state.dataFanCoilUnits->GetFanCoilInputFlag = false;
+        }
+
+        errFlag = true;
+        for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->Num4PipeFanCoils; ++FanCoilIndex) {
+            auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilIndex);
+            if (Util::SameString(fanCoil.Name, CompName)) {
+                errFlag = false;
+                return FanCoilIndex;
+            }
+        }
+
+        return 0;
     }
 
 } // namespace FanCoilUnits
