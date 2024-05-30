@@ -12852,7 +12852,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         }
     }
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).OpMode == HVAC::CycFanCycCoil &&
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling &&
         state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::VAV) {
         state.dataFans->fans(this->FanIndex)->totalPower *= state.dataHVACGlobal->OnOffFanPartLoadFraction;
     }
