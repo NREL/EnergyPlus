@@ -1202,7 +1202,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 spmSZOSH->heatingOnSetPt = ip->getRealFieldValue(fields, props, "heating_stage_on_supply_air_setpoint_temperature");
                 spmSZOSH->heatingOffSetPt = ip->getRealFieldValue(fields, props, "heating_stage_off_supply_air_setpoint_temperature");
                 
-                if (spmSZOSH->heatingOffSetPt < spmSZOSH->heatingOnSetPt) {
+                if (spmSZOSH->heatingOffSetPt > spmSZOSH->heatingOnSetPt) {
                     // throw warning, off must be warmer than on
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOSH->Name));
                     ShowContinueError(state,

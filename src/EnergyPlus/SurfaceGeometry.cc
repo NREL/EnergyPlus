@@ -3922,7 +3922,7 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = Ground;
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
                             ShowWarningError(state,
                                              "GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, format("Found first in surface={}", state.dataIPShortCut->cAlphaArgs(1)));
@@ -4592,7 +4592,7 @@ namespace SurfaceGeometry {
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
                             ShowWarningError(state,
                                              "GetRectSurfaces: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, format("Found first in surface={}", state.dataIPShortCut->cAlphaArgs(1)));
