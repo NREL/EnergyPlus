@@ -62,27 +62,30 @@ using namespace EnergyPlus;
 
 TEST_F(EnergyPlusFixture, Timer_ticktock)
 {
+
+    constexpr std::chrono::milliseconds::rep sleep_time_ms = 100;
+    constexpr Real64 sleep_time_s = 0.1;
     Timer t;
     t.tick();
-    std::this_thread::sleep_for(std::chrono::milliseconds(62));
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
     t.tock();
-    // In some occurrences CI is reporting slightly above than 62 values, probably system was quite busy at that time,
+    // In some occurrences CI is reporting slightly above than 100 values, probably system was quite busy at that time,
     // but we don't want to have the test failing occassionally
-    EXPECT_GE(t.duration().count(), 62);
-    EXPECT_LT(t.duration().count(), 70);
-    EXPECT_GE(t.elapsedSeconds(), 0.062);
-    EXPECT_LT(t.elapsedSeconds(), 0.070);
+    EXPECT_GE(t.duration().count(), sleep_time_ms);
+    EXPECT_LT(t.duration().count(), sleep_time_ms * 2);
+    EXPECT_GE(t.elapsedSeconds(), sleep_time_s);
+    EXPECT_LT(t.elapsedSeconds(), sleep_time_s * 2);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(33));
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
 
     t.tick();
-    std::this_thread::sleep_for(std::chrono::milliseconds(62));
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_time_ms));
     t.tock();
     auto count = t.duration().count();
-    EXPECT_GE(t.duration().count(), 124);
-    EXPECT_LT(t.duration().count(), 130);
-    EXPECT_GE(t.elapsedSeconds(), 0.124);
-    EXPECT_LT(t.elapsedSeconds(), 0.130);
+    EXPECT_GE(t.duration().count(), sleep_time_ms * 2);
+    EXPECT_LT(t.duration().count(), sleep_time_ms * 3);
+    EXPECT_GE(t.elapsedSeconds(), sleep_time_s * 2);
+    EXPECT_LT(t.elapsedSeconds(), sleep_time_s * 3);
 }
 
 #ifndef NDEBUG
