@@ -66,16 +66,23 @@ TEST_F(EnergyPlusFixture, Timer_ticktock)
     t.tick();
     std::this_thread::sleep_for(std::chrono::milliseconds(62));
     t.tock();
-    EXPECT_EQ(62, t.duration().count());
-    EXPECT_DOUBLE_EQ(0.062, t.elapsedSeconds());
+    // In some occurrences CI is reporting slightly above than 62 values, probably system was quite busy at that time,
+    // but we don't want to have the test failing occassionally
+    EXPECT_GE(t.duration().count(), 62);
+    EXPECT_LT(t.duration().count(), 70);
+    EXPECT_GE(t.elapsedSeconds(), 0.062);
+    EXPECT_LT(t.elapsedSeconds(), 0.070);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(13));
+    std::this_thread::sleep_for(std::chrono::milliseconds(33));
 
     t.tick();
     std::this_thread::sleep_for(std::chrono::milliseconds(62));
     t.tock();
-    EXPECT_EQ(124, t.duration().count());
-    EXPECT_EQ(0.124, t.elapsedSeconds());
+    auto count = t.duration().count();
+    EXPECT_GE(t.duration().count(), 124);
+    EXPECT_LT(t.duration().count(), 130);
+    EXPECT_GE(t.elapsedSeconds(), 0.124);
+    EXPECT_LT(t.elapsedSeconds(), 0.130);
 }
 
 #ifndef NDEBUG
@@ -92,7 +99,7 @@ TEST_F(EnergyPlusFixture, Timer_formatter)
     {
         Timer t;
         t.tick();
-        std::this_thread::sleep_for(std::chrono::milliseconds(62));
+        t.m_start = Timer::ClockType::now() - std::chrono::milliseconds(62);
         t.tock();
         EXPECT_EQ("00hr 00min  0.06sec", t.formatAsHourMinSecs());
     }
