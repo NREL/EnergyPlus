@@ -59,6 +59,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -1461,7 +1462,7 @@ TEST_F(EnergyPlusFixture, ScheduleFile_Blanks)
 {
 
     // On the third line (second data record after header), there is a blank in the second column
-    fs::path scheduleFile = configured_source_directory() / "tst/EnergyPlus/unit/Resources/schedule_file_with_blank.csv";
+    fs::path scheduleFile = FileSystem::makeNativePath(configured_source_directory() / "tst/EnergyPlus/unit/Resources/schedule_file_with_blank.csv");
 
     std::string const idf_objects = delimited_string({
         "Schedule:File,",
