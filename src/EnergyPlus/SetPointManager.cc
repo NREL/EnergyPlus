@@ -121,7 +121,6 @@ namespace EnergyPlus::SetPointManager {
 //                        Added new setpoint managers:
 //                          SetpointManager:SystemNodeReset:Temperature
 //                          SetpointManager:SystemNodeReset:Humidity
-//       RE-ENGINEERED  na
 
 // PURPOSE OF THIS MODULE:
 // To encapsulate the data and algorithms required to
@@ -265,7 +264,6 @@ void ManageSetPoints(EnergyPlusData &state)
     //       AUTHOR         Russ Taylor, Rick Strand
     //       DATE WRITTEN   May 1998
     //       MODIFIED       Fred Buhl May 2000
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
 
@@ -353,8 +351,6 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
 
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS SUBROUTINE
     // Input the SetPointManager data and store it in the SetPtMgrIn array.
     // Examine the Controllers in the input data and determine which ones
@@ -415,8 +411,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
         
         std::vector<int> idfNums;
         std::vector<std::string> idfKeys;
+        int idfFakeNum = 0;
         for (auto instance = instances.value().begin(); instance != instances.value().end(); ++instance) {
-            idfNums.push_back(instance.value().at("idf_order").get<int>());
+            // If the input comes from epJson then there are no idf_order fields.
+            if (state.dataGlobal->isEpJSON || !state.dataGlobal->preserveIDFOrder) {
+                idfNums.push_back(++idfFakeNum); 
+            } else {
+                idfNums.push_back(instance.value().at("idf_order").get<int>());
+            }
             idfKeys.push_back(instance.key());
         }
 
@@ -529,40 +531,40 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::MZHeatingAverage:
             case SPMType::FollowOutsideAirTemp:
             case SPMType::FollowGroundTemp: {
-                spm->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_setpoint_temperature");
-                spm->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_setpoint_temperature");
-                if (spm->MaxSetTemp < spm->MinSetTemp) {
+                spm->minSetTemp = ip->getRealFieldValue(fields, props, "minimum_setpoint_temperature");
+                spm->maxSetTemp = ip->getRealFieldValue(fields, props, "maximum_setpoint_temperature");
+                if (spm->maxSetTemp < spm->minSetTemp) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state,
                                       format("...maximum_supply_air_temperature=[{:.1R}] is less than minimum_supply_air_temperature=[{:.1R}].",
-                                             spm->MaxSetTemp,
-                                             spm->MinSetTemp));
+                                             spm->maxSetTemp,
+                                             spm->minSetTemp));
                 }
             } break;
 
             case SPMType::SZReheat: 
             case SPMType::SZHeating:
             case SPMType::SZCooling: {
-                spm->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_supply_air_temperature");
-                spm->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_supply_air_temperature");
-                if (spm->MaxSetTemp < spm->MinSetTemp) {
+                spm->minSetTemp = ip->getRealFieldValue(fields, props, "minimum_supply_air_temperature");
+                spm->maxSetTemp = ip->getRealFieldValue(fields, props, "maximum_supply_air_temperature");
+                if (spm->maxSetTemp < spm->minSetTemp) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state,
                                       format("...maximum_supply_air_temperature=[{:.1R}] is less than minimum_supply_air_temperature=[{:.1R}].",
-                                             spm->MaxSetTemp,
-                                             spm->MinSetTemp));
+                                             spm->maxSetTemp,
+                                             spm->minSetTemp));
                 }
             } break;
 
             case SPMType::FollowSystemNodeTemp: {
-                spm->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_limit_setpoint_temperature");
-                spm->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_limit_setpoint_temperature");
-                if (spm->MaxSetTemp < spm->MinSetTemp) {
+                spm->minSetTemp = ip->getRealFieldValue(fields, props, "minimum_limit_setpoint_temperature");
+                spm->maxSetTemp = ip->getRealFieldValue(fields, props, "maximum_limit_setpoint_temperature");
+                if (spm->maxSetTemp < spm->minSetTemp) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state,
                                       format("...maximum_supply_air_temperature=[{:.1R}] is less than minimum_supply_air_temperature=[{:.1R}].",
-                                             spm->MaxSetTemp,
-                                             spm->MinSetTemp));
+                                             spm->maxSetTemp,
+                                             spm->minSetTemp));
                 }
             } break;
 
@@ -577,27 +579,27 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::MZMaxHumAverage: 
             case SPMType::MZMinHum:
             case SPMType::MZMaxHum: {
-                spm->MinSetHum = ip->getRealFieldValue(fields, props, "minimum_setpoint_humidity_ratio");
-                spm->MaxSetHum = ip->getRealFieldValue(fields, props, "maximum_setpoint_humidity_ratio");
-                if (spm->MaxSetHum < spm->MinSetHum) {
+                spm->minSetHum = ip->getRealFieldValue(fields, props, "minimum_setpoint_humidity_ratio");
+                spm->maxSetHum = ip->getRealFieldValue(fields, props, "maximum_setpoint_humidity_ratio");
+                if (spm->maxSetHum < spm->minSetHum) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state,
                                       format("...maximum_setpoint_humidity_ratio=[{:.1R}] is less than minimum_setpoint_humidity_ratio=[{:.1R}].",
-                                             spm->MaxSetHum,
-                                             spm->MinSetHum));
+                                             spm->maxSetHum,
+                                             spm->minSetHum));
                 }
 
                 // Because a zero humidity ratio setpoint is a special value indicating "off" or "no load"
                 // must not allow MinSetHumRat or MaxSetHumRat to be <=0.0
-                if (spm->MinSetHum <= 0.0) {
+                if (spm->minSetHum <= 0.0) {
                     ShowWarningError(state, format("{}: {}=\"{}\", invalid value.", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state, "Minimum setpoint humidity ratio <=0.0, resetting to 0.00001");
-                    spm->MinSetHum = 0.00001;
+                    spm->minSetHum = 0.00001;
                 }
-                if (spm->MaxSetHum <= 0.0) {
+                if (spm->maxSetHum <= 0.0) {
                     ShowWarningError(state, format("{}: {}=\"{}\", invalid value.", routineName, cCurrentModuleObject, spm->Name));
                     ShowContinueError(state, "Maximum setpoint humidity ratio <=0.0, resetting to 0.00001");
-                    spm->MaxSetHum = 0.00001;
+                    spm->maxSetHum = 0.00001;
                 }
 
             } break; 
@@ -616,8 +618,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
             case SPMType::MZMaxHumAverage: 
             case SPMType::MZMinHum: 
             case SPMType::MZMaxHum: {
-                spm->AirLoopName = ip->getAlphaFieldValue(fields, props, "hvac_air_loop_name");
-                spm->AirLoopNum = 0;
+                spm->airLoopName = ip->getAlphaFieldValue(fields, props, "hvac_air_loop_name");
+                spm->airLoopNum = 0;
             } break;
                     
             default: break;
@@ -632,12 +634,12 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 assert(spmS != nullptr);
 
                 std::string schedName = ip->getAlphaFieldValue(fields, props, "schedule_name");
-                spmS->SchedPtr = GetScheduleIndex(state, schedName);
-                if (spmS->SchedPtr == 0) {
+                spmS->schedNum = GetScheduleIndex(state, schedName);
+                if (spmS->schedNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "schedule_name", schedName);
                     ErrorsFound = true;
                 }
-                spmS->SetPt = 0.0;
+                spmS->setPt = 0.0;
             } break;
 
             // SetpointManager:Scheduled:DualSetpoint
@@ -651,20 +653,20 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 std::string schedHiName = ip->getAlphaFieldValue(fields, props, "high_setpoint_schedule_name");
-                spmSD->SchedPtrHi = GetScheduleIndex(state, schedHiName);
-                if (spmSD->SchedPtrHi == 0) {
-                        ShowSevereItemNotFound(state, eoh, "high_setpoint_schedule_name", schedHiName);
-                        ErrorsFound = true;
+                spmSD->schedNumHi = GetScheduleIndex(state, schedHiName);
+                if (spmSD->schedNumHi == 0) {
+                    ShowSevereItemNotFound(state, eoh, "high_setpoint_schedule_name", schedHiName);
+                    ErrorsFound = true;
                 }
                 
                 std::string schedLoName = ip->getAlphaFieldValue(fields, props, "low_setpoint_schedule_name");
-                spmSD->SchedPtrLo = GetScheduleIndex(state, schedLoName);
-                if (spmSD->SchedPtrLo == 0) {
+                spmSD->schedNumLo = GetScheduleIndex(state, schedLoName);
+                if (spmSD->schedNumLo == 0) {
                         ShowSevereItemNotFound(state, eoh, "low_setpoint_schedule_name", schedLoName);
                         ErrorsFound = true;
                 }
-                spmSD->SetPtHi = 0.0;
-                spmSD->SetPtLo = 0.0;
+                spmSD->setPtHi = 0.0;
+                spmSD->setPtLo = 0.0;
 
             } break;
                     
@@ -677,22 +679,22 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
                 
-                spmOA->OutLowSetPt1 = ip->getRealFieldValue(fields, props, "setpoint_at_outdoor_low_temperature");
-                spmOA->OutLow1 = ip->getRealFieldValue(fields, props, "outdoor_low_temperature");
-                spmOA->OutHighSetPt1 = ip->getRealFieldValue(fields, props, "setpoint_at_outdoor_high_temperature");
-                spmOA->OutHigh1 = ip->getRealFieldValue(fields, props, "outdoor_high_temperature");
+                spmOA->lowSetPt1 = ip->getRealFieldValue(fields, props, "setpoint_at_outdoor_low_temperature");
+                spmOA->low1 = ip->getRealFieldValue(fields, props, "outdoor_low_temperature");
+                spmOA->highSetPt1 = ip->getRealFieldValue(fields, props, "setpoint_at_outdoor_high_temperature");
+                spmOA->high1 = ip->getRealFieldValue(fields, props, "outdoor_high_temperature");
 
                 // Get optional input: schedule and 2nd reset rule
                 if (auto foundSched = fields.find("schedule_name"); foundSched != fields.end()) {
                     std::string schedName = Util::makeUPPER(foundSched.value().get<std::string>());
-                    spmOA->SchedPtr = GetScheduleIndex(state, schedName);
-                    if (spmOA->SchedPtr == 0) {
+                    spmOA->schedNum = GetScheduleIndex(state, schedName);
+                    if (spmOA->schedNum == 0) {
                         ShowSevereItemNotFound(state, eoh, "schedule_name", schedName);
                         ErrorsFound = true;
                     }
                     
-                    Real64 minValSched = GetScheduleMinValue(state, spmOA->SchedPtr);
-                    Real64 maxValSched = GetScheduleMaxValue(state, spmOA->SchedPtr);
+                    Real64 minValSched = GetScheduleMinValue(state, spmOA->schedNum);
+                    Real64 maxValSched = GetScheduleMaxValue(state, spmOA->schedNum);
                     if ((minValSched < 1.0) || (maxValSched > 2.0)) {
                         ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", routineName, cCurrentModuleObject, name));
                         ShowContinueError(state, "..Schedule Values for the Outdoor Reset Schedule must be either 1 or 2");
@@ -703,27 +705,27 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     }
 
                     if (auto found = fields.find("setpoint_at_outdoor_low_temperature_2"); found != fields.end())
-                        spmOA->OutLowSetPt2 = found.value().get<Real64>();
+                        spmOA->lowSetPt2 = found.value().get<Real64>();
                     if (auto found = fields.find("outdoor_low_temperature_2"); found != fields.end())
-                        spmOA->OutLow2 = found.value().get<Real64>();
+                        spmOA->low2 = found.value().get<Real64>();
                     if (auto found = fields.find("setpoint_at_outdoor_high_temperature_2"); found != fields.end())
-                        spmOA->OutHighSetPt2 = found.value().get<Real64>();
+                        spmOA->highSetPt2 = found.value().get<Real64>();
                     if (auto found = fields.find("outdoor_high_temperature_2"); found != fields.end())
-                        spmOA->OutHigh2 = found.value().get<Real64>();
-                    if (spmOA->OutHigh2 < spmOA->OutLow2) {
+                        spmOA->high2 = found.value().get<Real64>();
+                    if (spmOA->high2 < spmOA->low2) {
                             ShowWarningError(state, format("{}: {}=\"{}\", invalid field.", routineName, cCurrentModuleObject, spmOA->Name));
                             ShowContinueError(state, format("...{}=[{:.1R}] is less than {}=[{:.1R}].",
                                                             "outdoor_high_temperature_2",
-                                                            spmOA->OutHigh2,
+                                                            spmOA->high2,
                                                             "outdoor_low_temperature_2",
-                                                            spmOA->OutLow2));
+                                                            spmOA->low2));
                     }
                 } else { // !foundSched
-                    spmOA->SchedPtr = 0;
-                    spmOA->OutLowSetPt2 = 0.0;
-                    spmOA->OutLow2 = 0.0;
-                    spmOA->OutHighSetPt2 = 0.0;
-                    spmOA->OutHigh2 = 0.0;
+                    spmOA->schedNum = 0;
+                    spmOA->lowSetPt2 = 0.0;
+                    spmOA->low2 = 0.0;
+                    spmOA->highSetPt2 = 0.0;
+                    spmOA->high2 = 0.0;
                 }
             } break;
                     
@@ -739,14 +741,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
                 std::string ctrlZoneName = ip->getAlphaFieldValue(fields, props, "control_zone_name");
                 // get the actual zone number of the control zone
-                spmSZR->ControlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
-                if (spmSZR->ControlZoneNum == 0) {
+                spmSZR->ctrlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
+                if (spmSZR->ctrlZoneNum == 0) {
                         ShowSevereItemNotFound(state, eoh, "control_zone_name", ctrlZoneName);
                         ErrorsFound = true;
                 }
-                spmSZR->SetPt = 0.0;
+                spmSZR->setPt = 0.0;
                 
-                spmSZR->ZoneNodeNum =
+                spmSZR->zoneNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "zone_node_name"),
                                       ErrorsFound,
@@ -756,7 +758,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmSZR->ZoneInletNodeNum =
+                spmSZR->zoneInletNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "zone_inlet_node_name"),
                                       ErrorsFound,
@@ -781,14 +783,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 std::string ctrlZoneName = ip->getAlphaFieldValue(fields, props, "control_zone_name");
-                spmSZTemp->ControlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
-                if (spmSZTemp->ControlZoneNum == 0) {
+                spmSZTemp->ctrlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
+                if (spmSZTemp->ctrlZoneNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "control_zone_name", ctrlZoneName);
                     ErrorsFound = true;
                 }
-                spmSZTemp->SetPt = 0.0;
+                spmSZTemp->setPt = 0.0;
 
-                spmSZTemp->ZoneNodeNum =
+                spmSZTemp->zoneNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "zone_node_name"),
                                       ErrorsFound,
@@ -798,7 +800,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmSZTemp->ZoneInletNodeNum =
+                spmSZTemp->zoneInletNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "zone_inlet_node_name"),
                                       ErrorsFound,
@@ -846,8 +848,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmSZHum->ZoneNodeNum = NodeNums(1);
-                spmSZHum->CtrlZoneNum = 0;
+                spmSZHum->zoneNodeNum = NodeNums(1);
+                spmSZHum->ctrlZoneNum = 0;
             } break;
                     
             // SetpointManager:MixedAir
@@ -860,7 +862,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmMA->RefNodeNum =
+                spmMA->refNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "reference_setpoint_node_name"),
                                       ErrorsFound,
@@ -870,7 +872,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmMA->FanInNodeNum =
+                spmMA->fanInNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "fan_inlet_node_name"),
                                       ErrorsFound,
@@ -880,7 +882,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmMA->FanOutNodeNum =
+                spmMA->fanOutNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "fan_outlet_node_name"),
                                       ErrorsFound,
@@ -897,7 +899,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmOAP = dynamic_cast<SPMOutsideAirPretreat *>(spm);
                 assert(spmOAP != nullptr);
 
-                spmOAP->RefNodeNum =
+                spmOAP->refNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "reference_setpoint_node_name"),
                                       ErrorsFound,
@@ -907,7 +909,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmOAP->MixedOutNodeNum =
+                spmOAP->mixedOutNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "mixed_air_stream_node_name"),
                                       ErrorsFound,
@@ -917,7 +919,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmOAP->OAInNodeNum =
+                spmOAP->oaInNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "outdoor_air_stream_node_name"),
                                       ErrorsFound,
@@ -927,7 +929,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       DataLoopNode::ConnectionType::Sensor,
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
-                spmOAP->ReturnInNodeNum =
+                spmOAP->returnInNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "return_air_stream_node_name"),
                                       ErrorsFound,
@@ -938,14 +940,14 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
 
-                if (FindNumberInList(spmOAP->RefNodeNum, spmOAP->ctrlNodes, spmOAP->numCtrlNodes) > 0) {
+                if (std::find(spmOAP->ctrlNodeNums.begin(), spmOAP->ctrlNodeNums.end(), spmOAP->refNodeNum) != spmOAP->ctrlNodeNums.end()) {
                     ShowSevereError(state, format("{}: {}=\"{}\", reference node.", routineName, cCurrentModuleObject, spmOAP->Name));
-                    if (spmOAP->numCtrlNodes > 1) {
+                    if (spmOAP->ctrlNodeNums.size() > 1) {
                         ShowContinueError(state, "..Reference Node is the same as one of the nodes in SetPoint NodeList");
                     } else {
                         ShowContinueError(state, "..Reference Node is the same as the SetPoint Node");
                     }
-                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmOAP->RefNodeNum)));
+                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmOAP->refNodeNum)));
                     ErrorsFound = true;
                 }
             } break;
@@ -963,10 +965,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 std::string strategyName = ip->getAlphaFieldValue(fields, props, "strategy");
-                spmEst->Strategy = static_cast<SupplyFlowTempStrategy>(getEnumValue(supplyFlowTempStrategyNamesUC, strategyName));
+                spmEst->strategy = static_cast<SupplyFlowTempStrategy>(getEnumValue(supplyFlowTempStrategyNamesUC, strategyName));
                                            
-                if ((spmEst->type == SPMType::Warmest && spmEst->Strategy != SupplyFlowTempStrategy::MaxTemp) ||
-                    (spmEst->type == SPMType::Coldest && spmEst->Strategy != SupplyFlowTempStrategy::MinTemp)) {
+                if ((spmEst->type == SPMType::Warmest && spmEst->strategy != SupplyFlowTempStrategy::MaxTemp) ||
+                    (spmEst->type == SPMType::Coldest && spmEst->strategy != SupplyFlowTempStrategy::MinTemp)) {
                     ShowSevereInvalidKey(state, eoh, "strategy", strategyName);
                     ErrorsFound = true;
                 }
@@ -982,26 +984,26 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
                 
-                spmWTF->MinTurndown = ip->getRealFieldValue(fields, props, "minimum_turndown_ratio");
-                if (spmWTF->MinTurndown >= 0.8) {
+                spmWTF->minTurndown = ip->getRealFieldValue(fields, props, "minimum_turndown_ratio");
+                if (spmWTF->minTurndown >= 0.8) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmWTF->Name));
-                    ShowContinueError(state, format("...minimum_turndown_ratio=[{:.2R}] is greater than 0.8;", spmWTF->MinTurndown));
+                    ShowContinueError(state, format("...minimum_turndown_ratio=[{:.2R}] is greater than 0.8;", spmWTF->minTurndown));
                     ShowContinueError(state, "...typical values for minimum_turndown_ratio are less than 0.8.");
                 }
 
-                spmWTF->Strategy = static_cast<ControlStrategy>(getEnumValue(strategyNamesUC, ip->getAlphaFieldValue(fields, props, "strategy")));
+                spmWTF->strategy = static_cast<ControlStrategy>(getEnumValue(strategyNamesUC, ip->getAlphaFieldValue(fields, props, "strategy")));
 
                 SetupOutputVariable(state,
                                     "Setpoint Manager Warmest Temperature Critical Zone Number",
                                     Constant::Units::None,
-                                    spmWTF->CritZoneNum,
+                                    spmWTF->critZoneNum,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     spmWTF->Name);
                 SetupOutputVariable(state,
                                     "Setpoint Manager Warmest Temperature Turndown Flow Fraction",
                                     Constant::Units::None,
-                                    spmWTF->Turndown,
+                                    spmWTF->turndown,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
                                     spmWTF->Name);
@@ -1013,8 +1015,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 assert(spmRAB != nullptr);
                 
                 std::string schedName = ip->getAlphaFieldValue(fields, props, "temperature_setpoint_schedule_name");
-                spmRAB->SchedPtr = GetScheduleIndex(state, schedName);
-                if (spmRAB->SchedPtr == 0) {
+                spmRAB->schedNum = GetScheduleIndex(state, schedName);
+                if (spmRAB->schedNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "temperature_setpoint_schedule_name", schedName);
                     ErrorsFound = true;
                 }
@@ -1030,11 +1032,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmFOAT->RefTempType =
+                spmFOAT->refTempType =
                     static_cast<AirTempType>(getEnumValue(oaTempTypeNamesUC,
                                                           ip->getAlphaFieldValue(fields, props, "reference_temperature_type")));
                 
-                spmFOAT->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
+                spmFOAT->offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
             } break;
                     
             // SetpointManager:FollowSystemNodeTemperature
@@ -1049,7 +1051,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmFNT->RefNodeNum =
+                spmFNT->refNodeNum =
                     GetOnlySingleNode(state,
                                       ip->getAlphaFieldValue(fields, props, "reference_node_name"), 
                                       ErrorsFound,
@@ -1060,11 +1062,11 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       NodeInputManager::CompFluidStream::Primary,
                                       ObjectIsNotParent);
 
-                spmFNT->RefTempType =
+                spmFNT->refTempType =
                     static_cast<AirTempType>(getEnumValue(nodeTempTypeNamesUC,
                                                           ip->getAlphaFieldValue(fields, props, "reference_temperature_type")));
 
-                spmFNT->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
+                spmFNT->offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
             } break;
                     
             // SetpointManager:FollowGroundTemperature
@@ -1080,23 +1082,23 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmFGT->RefTempType = static_cast<DataEnvironment::GroundTempType>(
+                spmFGT->refTempType = static_cast<DataEnvironment::GroundTempType>(
                     getEnumValue(groundTempObjectTypeNamesUC, ip->getAlphaFieldValue(fields, props, "reference_ground_temperature_object_type")));
                 
-                if (state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->RefTempType]) {
-                    if (!state.dataEnvrn->GroundTempInputs[(int)spmFGT->RefTempType]) {
+                if (state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->refTempType]) {
+                    if (!state.dataEnvrn->GroundTempInputs[(int)spmFGT->refTempType]) {
                         ShowWarningError(state,
                                          format("{}: {}=\"{}\" requires \"Site:GroundTemperature:BuildingSurface\" in the input..",
                                                 routineName,
                                                 cCurrentModuleObject,
                                                 spmFGT->Name));
                         ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.",
-                                                        state.dataEnvrn->GroundTemp[(int)spmFGT->RefTempType]));
+                                                        state.dataEnvrn->GroundTemp[(int)spmFGT->refTempType]));
                     }
-                    state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->RefTempType] = false;
+                    state.dataSetPointManager->NoGroundTempObjWarning[(int)spmFGT->refTempType] = false;
                 }
 
-                spmFGT->Offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
+                spmFGT->offset = ip->getRealFieldValue(fields, props, "offset_temperature_difference");
             } break;
 
             // SetpointManager:CondenserEnteringReset
@@ -1110,33 +1112,33 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 std::string condenserEnteringTempSchedName = ip->getAlphaFieldValue(fields, props, "default_condenser_entering_water_temperature_schedule_name");
-                spmCET->CondenserEnteringTempSchedPtr = GetScheduleIndex(state, condenserEnteringTempSchedName);
-                if (spmCET->CondenserEnteringTempSchedPtr == 0) {
+                spmCET->condenserEnteringTempSchedNum = GetScheduleIndex(state, condenserEnteringTempSchedName);
+                if (spmCET->condenserEnteringTempSchedNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "default_condenser_entering_water_temperature_schedule_name", condenserEnteringTempSchedName);
                     ErrorsFound = true;
                 }
 
                 std::string minDesignWetBulbCurveName = ip->getAlphaFieldValue(fields, props, "minimum_design_wetbulb_temperature_curve_name");
-                spmCET->MinTowerDesignWetBulbCurveNum = GetCurveIndex(state, minDesignWetBulbCurveName);
+                spmCET->minTowerDesignWetBulbCurveNum = GetCurveIndex(state, minDesignWetBulbCurveName);
 
                 std::string minOAWetBulbCurveName = ip->getAlphaFieldValue(fields, props, "minimum_outside_air_wetbulb_temperature_curve_name");
-                spmCET->MinOAWetBulbCurveNum = GetCurveIndex(state, minOAWetBulbCurveName);
+                spmCET->minOAWetBulbCurveNum = GetCurveIndex(state, minOAWetBulbCurveName);
 
                 std::string optCondenserEnteringTempCurveName = ip->getAlphaFieldValue(fields, props, "optimized_cond_entering_water_temperature_curve_name");
                 
-                spmCET->OptCondenserEnteringTempCurveNum = GetCurveIndex(state, optCondenserEnteringTempCurveName);
-                spmCET->MinimumLift = ip->getRealFieldValue(fields, props, "minimum_lift");
+                spmCET->optCondenserEnteringTempCurveNum = GetCurveIndex(state, optCondenserEnteringTempCurveName);
+                spmCET->minLift = ip->getRealFieldValue(fields, props, "minimum_lift");
                 
-                spmCET->MaxCondenserEnteringTemp = ip->getRealFieldValue(fields, props, "maximum_condenser_entering_water_temperature");
-                spmCET->TowerDesignInletAirWetBulbTemp = ip->getRealFieldValue(fields, props, "cooling_tower_design_inlet_air_wet_bulb_temperature");
+                spmCET->maxCondenserEnteringTemp = ip->getRealFieldValue(fields, props, "maximum_condenser_entering_water_temperature");
+                spmCET->towerDesignInletAirWetBulbTemp = ip->getRealFieldValue(fields, props, "cooling_tower_design_inlet_air_wet_bulb_temperature");
 
                 
-                if (spmCET->MaxCondenserEnteringTemp < spmCET->TowerDesignInletAirWetBulbTemp) {
+                if (spmCET->maxCondenserEnteringTemp < spmCET->towerDesignInletAirWetBulbTemp) {
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmCET->Name));
                     ShowContinueError(state,
                                       format("...maximum_condenser_entering_water_temperature=[{:.1R}] is less than cooling_tower_design_inlet_air_wet-bulb_temperature=[{:.1R}].",
-                                             spmCET->MaxCondenserEnteringTemp,
-                                             spmCET->TowerDesignInletAirWetBulbTemp));
+                                             spmCET->maxCondenserEnteringTemp,
+                                             spmCET->towerDesignInletAirWetBulbTemp));
                 }
 
             } break;
@@ -1151,39 +1153,39 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmIdealCET->MinimumLift = ip->getRealFieldValue(fields, props, "minimum_lift");
-                spmIdealCET->MaxCondenserEnteringTemp = ip->getRealFieldValue(fields, props, "maximum_condenser_entering_water_temperature");
+                spmIdealCET->minLift = ip->getRealFieldValue(fields, props, "minimum_lift");
+                spmIdealCET->maxCondenserEnteringTemp = ip->getRealFieldValue(fields, props, "maximum_condenser_entering_water_temperature");
 
             } break;
                 
             // SetpointManager:SingleZone:OneStageCooling
             case SPMType::SZOneStageCooling: {
-                auto *spmSZOneStageCooling = dynamic_cast<SPMSingleZoneOneStageCooling *>(spm);
-                assert(spmSZOneStageCooling != nullptr);
+                auto *spmSZOSC = dynamic_cast<SPMSingleZoneOneStageCooling *>(spm);
+                assert(spmSZOSC != nullptr);
 
-                spmSZOneStageCooling->CoolingOnSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_on_supply_air_setpoint_temperature");
-                spmSZOneStageCooling->CoolingOffSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_off_supply_air_setpoint_temperature");
+                spmSZOSC->coolingOnSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_on_supply_air_setpoint_temperature");
+                spmSZOSC->coolingOffSetPt = ip->getRealFieldValue(fields, props, "cooling_stage_off_supply_air_setpoint_temperature");
                 
-                if (spmSZOneStageCooling->CoolingOffSetPt < spmSZOneStageCooling->CoolingOnSetPt) {
+                if (spmSZOSC->coolingOffSetPt < spmSZOSC->coolingOnSetPt) {
                         // throw warning, off must be warmer than on
-                        ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOneStageCooling->Name));
+                        ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOSC->Name));
                         ShowContinueError(state,
                                           format("...cooling_stage_off_supply_air_setpoint_temperature=[{:.1R}] is less than cooling_stage_on_supply_air_setpoint_temperature=[{:.1R}].",
-                                                 spmSZOneStageCooling->CoolingOffSetPt,
-                                                 spmSZOneStageCooling->CoolingOnSetPt));
+                                                 spmSZOSC->coolingOffSetPt,
+                                                 spmSZOSC->coolingOnSetPt));
                 }
                 
                 std::string ctrlZoneName = ip->getAlphaFieldValue(fields, props, "control_zone_name");
                 // get the actual zone number of the control zone
-                spmSZOneStageCooling->ControlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
-                if (spmSZOneStageCooling->ControlZoneNum == 0) {
+                spmSZOSC->ctrlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
+                if (spmSZOSC->ctrlZoneNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "control_zone_name", ctrlZoneName);
                     ErrorsFound = true;
                 } else {
-                    spmSZOneStageCooling->ZoneNodeNum = GetSystemNodeNumberForZone(state, spmSZOneStageCooling->ControlZoneNum);
+                    spmSZOSC->zoneNodeNum = GetSystemNodeNumberForZone(state, spmSZOSC->ctrlZoneNum);
                     if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
-                        if (!state.dataZoneCtrls->StageZoneLogic(spmSZOneStageCooling->ControlZoneNum)) {
-                            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", routineName, cCurrentModuleObject, spmSZOneStageCooling->Name));
+                        if (!state.dataZoneCtrls->StageZoneLogic(spmSZOSC->ctrlZoneNum)) {
+                            ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", routineName, cCurrentModuleObject, spmSZOSC->Name));
                             ShowContinueError(state, format("..invalid control_zone_name=\"{}\".", ctrlZoneName));
                             ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
                             ErrorsFound = true;
@@ -1197,28 +1199,28 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmSZOSH = dynamic_cast<SPMSingleZoneOneStageHeating *>(spm);
                 assert(spmSZOSH != nullptr);
 
-                spmSZOSH->HeatingOnSetPt = ip->getRealFieldValue(fields, props, "heating_stage_on_supply_air_setpoint_temperature");
-                spmSZOSH->HeatingOffSetPt = ip->getRealFieldValue(fields, props, "heating_stage_off_supply_air_setpoint_temperature");
+                spmSZOSH->heatingOnSetPt = ip->getRealFieldValue(fields, props, "heating_stage_on_supply_air_setpoint_temperature");
+                spmSZOSH->heatingOffSetPt = ip->getRealFieldValue(fields, props, "heating_stage_off_supply_air_setpoint_temperature");
                 
-                if (spmSZOSH->HeatingOffSetPt < spmSZOSH->HeatingOnSetPt) {
+                if (spmSZOSH->heatingOffSetPt < spmSZOSH->heatingOnSetPt) {
                     // throw warning, off must be warmer than on
                     ShowWarningError(state, format("{}: {}=\"{}\",", routineName, cCurrentModuleObject, spmSZOSH->Name));
                     ShowContinueError(state,
                                       format("...heating_stage_off_supply_air_setpoint_temperature=[{:.1R}] is less than heating_stage_on_supply_air_setpoint_temperature=[{:.1R}].",
-                                             spmSZOSH->HeatingOffSetPt,
-                                             spmSZOSH->HeatingOnSetPt));
+                                             spmSZOSH->heatingOffSetPt,
+                                             spmSZOSH->heatingOnSetPt));
                 }
                 
                 std::string ctrlZoneName = ip->getAlphaFieldValue(fields, props, "control_zone_name");
                 // get the actual zone number of the control zone
-                spmSZOSH->ControlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
-                if (spmSZOSH->ControlZoneNum == 0) {
+                spmSZOSH->ctrlZoneNum = Util::FindItemInList(ctrlZoneName, state.dataHeatBal->Zone);
+                if (spmSZOSH->ctrlZoneNum == 0) {
                     ShowSevereItemNotFound(state, eoh, "control_zone_name", ctrlZoneName);
                     ErrorsFound = true;
                 } else {
-                    spmSZOSH->ZoneNodeNum = GetSystemNodeNumberForZone(state, spmSZOSH->ControlZoneNum);
+                    spmSZOSH->zoneNodeNum = GetSystemNodeNumberForZone(state, spmSZOSH->ctrlZoneNum);
                     if (allocated(state.dataZoneCtrls->StageZoneLogic)) {
-                        if (!state.dataZoneCtrls->StageZoneLogic(spmSZOSH->ControlZoneNum)) {
+                        if (!state.dataZoneCtrls->StageZoneLogic(spmSZOSH->ctrlZoneNum)) {
                             ShowSevereError(state, format("{}: {}=\"{}\", invalid field.", routineName, cCurrentModuleObject, spmSZOSH->Name));
                             ShowContinueError(state, format("..invalid control_zone_name=\"{}\".", ctrlZoneName));
                             ShowContinueError(state, "Zone thermostat must use ZoneControl:Thermostat:StagedDualSetpoint.");
@@ -1260,8 +1262,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                                       "plant_loop_supply_inlet_node"); // setpoint nodes
                 
                 // process the setpoint inputs
-                spmRWT->MinSetTemp = ip->getRealFieldValue(fields, props, "minimum_supply_temperature_setpoint");
-                spmRWT->MaxSetTemp = ip->getRealFieldValue(fields, props, "maximum_supply_temperature_setpoint");
+                spmRWT->minSetTemp = ip->getRealFieldValue(fields, props, "minimum_supply_temperature_setpoint");
+                spmRWT->maxSetTemp = ip->getRealFieldValue(fields, props, "maximum_supply_temperature_setpoint");
 
                 spmRWT->returnTempType = static_cast<ReturnTempType>(
                     getEnumValue(returnTempTypeNamesUC,
@@ -1291,12 +1293,12 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmSNRTemp->LowRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_low_reference_temperature");
-                spmSNRTemp->HighRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_high_reference_temperature");
-                spmSNRTemp->LowRef = ip->getRealFieldValue(fields, props, "low_reference_temperature");
-                spmSNRTemp->HighRef = ip->getRealFieldValue(fields, props, "high_reference_temperature");
+                spmSNRTemp->lowRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_low_reference_temperature");
+                spmSNRTemp->highRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_high_reference_temperature");
+                spmSNRTemp->lowRef = ip->getRealFieldValue(fields, props, "low_reference_temperature");
+                spmSNRTemp->highRef = ip->getRealFieldValue(fields, props, "high_reference_temperature");
                 
-                spmSNRTemp->RefNodeNum = GetOnlySingleNode(state,
+                spmSNRTemp->refNodeNum = GetOnlySingleNode(state,
                                                            ip->getAlphaFieldValue(fields, props, "reference_node_name"),
                                                            ErrorsFound,
                                                            spmNodeObjectTypes[(int)spm->type],
@@ -1319,12 +1321,12 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                     ErrorsFound = true;
                 }
 
-                spmSNRHum->LowRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_low_reference_humidity_ratio");
-                spmSNRHum->HighRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_high_reference_humidity_ratio");
-                spmSNRHum->LowRef = ip->getRealFieldValue(fields, props, "low_reference_humidity_ratio");
-                spmSNRHum->HighRef = ip->getRealFieldValue(fields, props, "high_reference_humidity_ratio");
+                spmSNRHum->lowRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_low_reference_humidity_ratio");
+                spmSNRHum->highRefSetPt = ip->getRealFieldValue(fields, props, "setpoint_at_high_reference_humidity_ratio");
+                spmSNRHum->lowRef = ip->getRealFieldValue(fields, props, "low_reference_humidity_ratio");
+                spmSNRHum->highRef = ip->getRealFieldValue(fields, props, "high_reference_humidity_ratio");
                 
-                spmSNRHum->RefNodeNum = GetOnlySingleNode(state,
+                spmSNRHum->refNodeNum = GetOnlySingleNode(state,
                                                           ip->getAlphaFieldValue(fields, props, "reference_node_name"),
                                                           ErrorsFound,
                                                           spmNodeObjectTypes[(int)spm->type],
@@ -1367,11 +1369,8 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                             "setpoint_node_or_nodelist_name");
                 
                 if (!NodeListError) {
-                    spm->numCtrlNodes = NumNodes;
-                    spm->ctrlNodes.allocate(spm->numCtrlNodes);
-                    
-                    for (int iNode = 1; iNode <= spm->numCtrlNodes; ++iNode) {
-                        spm->ctrlNodes(iNode) = NodeNums(iNode);
+                    for (int iNode = 1; iNode <= NumNodes; ++iNode) {
+                        spm->ctrlNodeNums.push_back(NodeNums(iNode));
                     }
                 } else {
                    ErrorsFound = true;
@@ -1384,7 +1383,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *spmMA = dynamic_cast<SPMMixedAir *>(spm);
                 assert(spmMA != nullptr);
                 if (auto found = fields.find("cooling_coil_inlet_node_name"); found != fields.end()) {
-                    spmMA->CoolCoilInNodeNum =
+                    spmMA->coolCoilInNodeNum =
                         GetOnlySingleNode(state,
                                           Util::makeUPPER(found.value().get<std::string>()),
                                           ErrorsFound,
@@ -1397,7 +1396,7 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (auto found = fields.find("cooling_coil_outlet_node_name"); found != fields.end()) {
-                    spmMA->CoolCoilOutNodeNum =
+                    spmMA->coolCoilOutNodeNum =
                         GetOnlySingleNode(state,
                                           Util::makeUPPER(found.value().get<std::string>()),
                                           ErrorsFound,
@@ -1410,18 +1409,18 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
                 }
 
                 if (auto found = fields.find("minimum_temperature_at_cooling_coil_outlet_node"); found != fields.end()) {
-                    spmMA->MinCoolCoilOutTemp = found.value().get<Real64>();
+                    spmMA->minCoolCoilOutTemp = found.value().get<Real64>();
                 }
 
                 // Also, do this check now that we have both RefNodeNum and ctrlNodeNums
-                if (FindNumberInList(spmMA->RefNodeNum, spmMA->ctrlNodes, spmMA->numCtrlNodes) > 0) {
+                if (std::find(spmMA->ctrlNodeNums.begin(), spmMA->ctrlNodeNums.end(), spmMA->refNodeNum) != spmMA->ctrlNodeNums.end()) {
                     ShowSevereError(state, format("{}: {}=\"{}\", reference node.", routineName, cCurrentModuleObject, spmMA->Name));
-                    if (spmMA->numCtrlNodes > 1) {
+                    if (spmMA->ctrlNodeNums.size() > 1) {
                         ShowContinueError(state, "..Reference Node is the same as one of the nodes in SetPoint NodeList");
                     } else {
                         ShowContinueError(state, "..Reference Node is the same as the SetPoint Node");
                     }
-                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmMA->RefNodeNum)));
+                    ShowContinueError(state, format("Reference Node Name=\"{}\".", state.dataLoopNodes->NodeID(spmMA->refNodeNum)));
                     ErrorsFound = true;
                 }
             } break;
@@ -1436,12 +1435,10 @@ void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
 
 void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &ErrorsFound) // flag to denote node conflicts in input. !unused1208
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Raustad, FSEC
     //       DATE WRITTEN   July 2008
     //       MODIFIED       Rick Strand, Aug 2014 (removed deallocation of AllSetPtMgrs so ScheduledTES could also verify control nodes)
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Check the SetPointManager data to eliminate conflicts.
@@ -1464,19 +1461,17 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
     // 3) For SET POINT MANAGER:RETURN AIR BYPASS FLOW
     //    check for duplicate air loop names.
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
     for (int iSPM = 1; iSPM <= (int)state.dataSetPointManager->spms.size(); ++iSPM) {
         auto const *spm = state.dataSetPointManager->spms(iSPM);
 
         // check for duplicate nodes in each setpoint managers control node list (node lists of size 1 do not need verification)
         // issue warning only since duplicate node names within a setpoint manager does not cause a conflict (i.e., same
         // value written to node) but may indicate an error in the node name.
-        for (int iNode = 1; iNode <= spm->numCtrlNodes - 1; ++iNode) {
-            for (int jNode = iNode + 1; jNode <= spm->numCtrlNodes; ++jNode) {
-                if (spm->ctrlNodes(iNode) != spm->ctrlNodes(jNode)) continue;
+        for (int iNode = 0; iNode < (int)spm->ctrlNodeNums.size() - 1; ++iNode) {
+            for (int jNode = iNode + 1; (int)jNode < spm->ctrlNodeNums.size(); ++jNode) {
+                if (spm->ctrlNodeNums[iNode] != spm->ctrlNodeNums[jNode]) continue;
                 ShowWarningError(state, format("{} =\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
-                ShowContinueError(state, format("...duplicate node specified = {}", state.dataLoopNodes->NodeID(spm->ctrlNodes(iNode))));
+                ShowContinueError(state, format("...duplicate node specified = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));
                 ShowContinueError(state, format("...control type variable    = {}", ctrlVarTypeNamesUC[(int)spm->ctrlVar]));
             }
         }
@@ -1490,24 +1485,24 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
             if (spm->type == SPMType::ReturnAirBypass && spm2->type == SPMType::ReturnAirBypass) {
 
                 //     check the air loop name for duplicates in this SP manager type
-                if (spm->AirLoopNum == spm2->AirLoopNum) {
+                if (spm->airLoopNum == spm2->airLoopNum) {
                     ShowWarningError(state, format("{}=\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                     ShowContinueError(state, "...air loop name conflicts with another setpoint manager.");
                     ShowContinueError(state, format("...conflicting setpoint manager = {} \"{}\"", spmTypeNames[(int)spm2->type], spm2->Name));
-                    ShowContinueError(state, format("...conflicting air loop name = {}", spm->AirLoopName));
+                    ShowContinueError(state, format("...conflicting air loop name = {}", spm->airLoopName));
                     //        ErrorsFound=.TRUE.
                 }
 
                 //     check for duplicate control nodes
                 if (spm->ctrlVar != spm2->ctrlVar) continue;   
 
-                for (int iNode = 1; iNode <= spm->numCtrlNodes; ++iNode) {
-                    for (int jNode = 1; jNode <= spm2->numCtrlNodes; ++jNode) {
-                        if ((spm->ctrlNodes(iNode) == spm2->ctrlNodes(jNode)) && spm->ctrlNodes(iNode) != 0) {
+                for (int iNode = 0; iNode < (int)spm->ctrlNodeNums.size(); ++iNode) {
+                    for (int jNode = 0; jNode < (int)spm2->ctrlNodeNums.size(); ++jNode) {
+                        if ((spm->ctrlNodeNums[iNode] == spm2->ctrlNodeNums[jNode]) && spm->ctrlNodeNums[iNode] != 0) {
                             ShowWarningError(state, format("{}=\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
                             ShowContinueError(state, format("...conflicting setpoint manager = {} \"{}\"", spmTypeNames[(int)spm2->type], spm2->Name));
-                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodes(iNode))));
+                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));
                             ShowContinueError(state, format("...control type variable = {}", ctrlVarTypeNames[(int)spm->ctrlVar]));
                             //            ErrorsFound=.TRUE.
                         }
@@ -1520,10 +1515,10 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                 if (spm->ctrlVar != spm2->ctrlVar)
                     continue;
 
-                for (int iNode = 1; iNode <= spm->numCtrlNodes; ++iNode) {
-                    for (int jNode = 1; jNode <= spm2->numCtrlNodes; ++jNode) {
+                for (int iNode = 0; iNode < (int)spm->ctrlNodeNums.size(); ++iNode) {
+                    for (int jNode = 0; jNode < (int)spm2->ctrlNodeNums.size(); ++jNode) {
 
-                        if (spm->ctrlNodes(iNode) != spm2->ctrlNodes(jNode))
+                        if (spm->ctrlNodeNums[iNode] != spm2->ctrlNodeNums[jNode])
                             continue;
 
                         //         only warn if scheduled setpoint manager is setting mass flow rate on the same node used by RAB
@@ -1531,7 +1526,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                             ShowWarningError(state, format("{}=\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
                             ShowContinueError(state, format("...conflicting setpoint manager ={}:\"{}\"", spmTypeNames[(int)spm2->type], spm2->Name));
-                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodes(iNode))));
+                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));
                             ShowContinueError(state, format("...control type variable = {}", ctrlVarTypeNames[(int)spm->ctrlVar]));
                             ShowContinueError(state,
                                               "...return air bypass flow setpoint manager will have priority setting mass flow rate on this node.");
@@ -1539,7 +1534,7 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
                             ShowWarningError(state, format("{}=\"{}\"", spmTypeNames[(int)spm->type], spm->Name));
                             ShowContinueError(state, "...setpoint node conflicts with another setpoint manager.");
                             ShowContinueError(state, format("...conflicting setpoint manager = {}:\"{}\"", spmTypeNames[(int)spm2->type], spm2->Name));
-                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodes(iNode))));
+                            ShowContinueError(state, format("...conflicting node name = {}", state.dataLoopNodes->NodeID(spm->ctrlNodeNums[iNode])));
                             ShowContinueError(state, format("...control type variable = {}", ctrlVarTypeNames[(int)spm->ctrlVar]));
                             //            ErrorsFound=.TRUE.
                         }
@@ -1557,7 +1552,6 @@ void VerifySetPointManagers(EnergyPlusData &state, [[maybe_unused]] bool &Errors
 
 void InitSetPointManagers(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   October 2000
@@ -1585,8 +1579,6 @@ void InitSetPointManagers(EnergyPlusData &state)
     //                         Added new setpoint managers:
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
-    //
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine is for initializations of the Setpoint Manager objects.
@@ -1627,27 +1619,27 @@ void InitSetPointManagers(EnergyPlusData &state)
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     int ConZoneNum = 0;
                     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZT->ZoneNodeNum) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZT->zoneNodeNum) {
                             ConZoneNum = ZoneNum;
                         }
                     }
                     if (ConZoneNum == 0) {
                         ShowSevereError(state, format("{}=\"{}\", Zone Node not found:", spmTypeName, spmName));
                         ShowContinueError(state, format("Node=\"{}\", not found in any controlled Zone",
-                                                        state.dataLoopNodes->NodeID(spmSZT->ZoneNodeNum)));
+                                                        state.dataLoopNodes->NodeID(spmSZT->zoneNodeNum)));
                         ErrorsFound = true;
                     } else {
                         auto &zoneEquip = state.dataZoneEquip->ZoneEquipConfig(ConZoneNum);
                         bool found = false;
                         for (int zoneInNode = 1; zoneInNode <= zoneEquip.NumInletNodes; ++zoneInNode) {
-                            if (spmSZT->ZoneInletNodeNum == zoneEquip.InletNode(zoneInNode)) {
+                            if (spmSZT->zoneInletNodeNum == zoneEquip.InletNode(zoneInNode)) {
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state,
                                             format("{}=\"{}\", The zone inlet node of {}",
-                                                   spmTypeName, spmName, state.dataLoopNodes->NodeID(spmSZT->ZoneInletNodeNum)));
+                                                   spmTypeName, spmName, state.dataLoopNodes->NodeID(spmSZT->zoneInletNodeNum)));
                             ShowContinueError(state, format("is not found in Zone = {}. Please check inputs.", zoneEquip.ZoneName));
                             ErrorsFound = true;
                         }
@@ -1661,27 +1653,27 @@ void InitSetPointManagers(EnergyPlusData &state)
 
                     // set the actual and controlled zone numbers
                     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZH->ZoneNodeNum) {
-                            spmSZH->CtrlZoneNum = ZoneNum;
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZH->zoneNodeNum) {
+                            spmSZH->ctrlZoneNum = ZoneNum;
                             break;
                         }
                     }
                     // still need to validate...
-                    if (spmSZH->CtrlZoneNum == 0) { // didn't find
-                        ShowSevereCustomMessage(state, eoh, format("could not find Controlled Zone={}", state.dataHeatBal->Zone(spmSZH->CtrlZoneNum).Name));
+                    if (spmSZH->ctrlZoneNum == 0) { // didn't find
+                        ShowSevereCustomMessage(state, eoh, format("could not find Controlled Zone={}", state.dataHeatBal->Zone(spmSZH->ctrlZoneNum).Name));
                         ErrorsFound = true;
                     } else {
                         // make sure humidity controlled zone
                         bool HstatZoneFound = false;
                         for (int iZone = 1; iZone <= state.dataZoneCtrls->NumHumidityControlZones; ++iZone) {
-                            if (state.dataZoneCtrls->HumidityControlZone(iZone).ActualZoneNum ==  spmSZH->CtrlZoneNum) {
+                            if (state.dataZoneCtrls->HumidityControlZone(iZone).ActualZoneNum ==  spmSZH->ctrlZoneNum) {
                                 HstatZoneFound = true;
                                 break;
                             }
                         }
                         if (!HstatZoneFound) {
                             ShowSevereError(state, format("{}=\"{}\", invalid humidistat specification", spmTypeName, spmName));
-                            ShowContinueError(state, format("could not locate Humidistat in Zone={}", state.dataHeatBal->Zone(spmSZH->CtrlZoneNum).Name));
+                            ShowContinueError(state, format("could not locate Humidistat in Zone={}", state.dataHeatBal->Zone(spmSZH->ctrlZoneNum).Name));
                             ErrorsFound = true;
                         }
                     }
@@ -1701,7 +1693,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                     // find the index in the ZoneEquipConfig array of the control zone (the one with the main or only thermostat)
                     int ConZoneNum = 0;
                     for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZR->ZoneNodeNum) {
+                        if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode == spmSZR->zoneNodeNum) {
                             ConZoneNum = ZoneNum;
                         }
                     }
@@ -1709,31 +1701,31 @@ void InitSetPointManagers(EnergyPlusData &state)
                     if (ConZoneNum == 0) {
                         ShowSevereError(state,format("{}=\"{}\", Zone Node not found:", spmTypeName, spmName));
                         ShowContinueError(state, format("Node=\"{}\", not found in any controlled Zone",
-                                                        state.dataLoopNodes->NodeID(spmSZR->ZoneNodeNum)));
+                                                        state.dataLoopNodes->NodeID(spmSZR->zoneNodeNum)));
                         ErrorsFound = true;
                     } else {
                         bool found = false;
                         auto const &zoneEquip = state.dataZoneEquip->ZoneEquipConfig(ConZoneNum);
                         for (int zoneInNode = 1; zoneInNode <= zoneEquip.NumInletNodes; ++zoneInNode) {
-                            if (spmSZR->ZoneInletNodeNum ==  zoneEquip.InletNode(zoneInNode)) {
-                                spmSZR->AirLoopNum = zoneEquip.InletNodeAirLoopNum(zoneInNode);
+                            if (spmSZR->zoneInletNodeNum ==  zoneEquip.InletNode(zoneInNode)) {
+                                spmSZR->airLoopNum = zoneEquip.InletNodeAirLoopNum(zoneInNode);
                                 found = true;
                             }
                         }
                         if (!found) {
                             ShowSevereError(state, format("{}=\"{}\", The zone inlet node of {}", spmTypeName, spmName,
-                                                          state.dataLoopNodes->NodeID(spmSZR->ZoneInletNodeNum)));
+                                                          state.dataLoopNodes->NodeID(spmSZR->zoneInletNodeNum)));
                             ShowContinueError(state, format("is not found in Zone = {}. Please check inputs.", zoneEquip.ZoneName));
                             ErrorsFound = true;
                         }
-                        if (spmSZR->AirLoopNum == 0) {
+                        if (spmSZR->airLoopNum == 0) {
                             ShowSevereError(state, format("{}=\"{}\", The zone inlet node is not connected to an air loop.", spmTypeName, spmName));
                             ErrorsFound = true;
                             continue;
                         }
                     }
                     
-                    auto const &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmSZR->AirLoopNum);
+                    auto const &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmSZR->airLoopNum);
                     MixedAirNode = primaryAirSystem.OASysOutletNodeNum;
                     InletBranchNum = primaryAirSystem.InletBranchNum[0];
                     LoopInNode = primaryAirSystem.Branch(InletBranchNum).NodeNumIn;
@@ -1766,14 +1758,14 @@ void InitSetPointManagers(EnergyPlusData &state)
                         }
                     }
                     
-                    spmSZR->FanInNodeNum = FanNodeIn;
-                    spmSZR->FanOutNodeNum = FanNodeOut;
-                    spmSZR->MixedAirNodeNum = MixedAirNode;
-                    spmSZR->OAInNodeNum = primaryAirSystem.OAMixOAInNodeNum;
+                    spmSZR->fanInNodeNum = FanNodeIn;
+                    spmSZR->fanOutNodeNum = FanNodeOut;
+                    spmSZR->mixedAirNodeNum = MixedAirNode;
+                    spmSZR->oaInNodeNum = primaryAirSystem.OAMixOAInNodeNum;
                     // this next line assumes that OA system is the first thing on the branch, what if there is a relief fan or heat recovery coil
                     // or other component in there first? does it matter?
-                    spmSZR->RetNodeNum = primaryAirSystem.OASysInletNodeNum;
-                    spmSZR->LoopInNodeNum = LoopInNode;
+                    spmSZR->retNodeNum = primaryAirSystem.OASysInletNodeNum;
+                    spmSZR->loopInNodeNum = LoopInNode;
 
                 } break;
 
@@ -1782,15 +1774,15 @@ void InitSetPointManagers(EnergyPlusData &state)
                     auto *spmT = dynamic_cast<SPMTempest *>(spm);
                     assert(spmT != nullptr);
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                        spmT->AirLoopNum = Util::FindItemInList(spmT->AirLoopName,
+                        spmT->airLoopNum = Util::FindItemInList(spmT->airLoopName,
                                                                 state.dataAirLoop->AirToZoneNodeInfo,
                                                                 &AirLoopZoneEquipConnectData::AirLoopName);
-                        if (spmT->AirLoopNum == 0) {
-                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmT->AirLoopName);
+                        if (spmT->airLoopNum == 0) {
+                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmT->airLoopName);
                             ErrorsFound = true;
-                        } else if (state.dataAirLoop->AirToZoneNodeInfo(spmT->AirLoopNum).NumZonesCooled == 0) {
+                        } else if (state.dataAirLoop->AirToZoneNodeInfo(spmT->airLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(state, format("{}=\"{}\", no zones with cooling found:", spmTypeName, spmName));
-                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmT->AirLoopName));
+                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmT->airLoopName));
                             ErrorsFound = true;
                         }
                     } else {
@@ -1805,18 +1797,18 @@ void InitSetPointManagers(EnergyPlusData &state)
                     assert(spmWTF != nullptr);
                     
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                        spmWTF->AirLoopNum = Util::FindItemInList(spmWTF->AirLoopName,
+                        spmWTF->airLoopNum = Util::FindItemInList(spmWTF->airLoopName,
                                                                   state.dataAirLoop->AirToZoneNodeInfo,
                                                                   &AirLoopZoneEquipConnectData::AirLoopName);
-                        if (spmWTF->AirLoopNum == 0) {
-                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmWTF->AirLoopName);
+                        if (spmWTF->airLoopNum == 0) {
+                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmWTF->airLoopName);
                             ErrorsFound = true;
                         } else {
-                            spmWTF->SimReady = true;
+                            spmWTF->simReady = true;
                         }
-                        if (state.dataAirLoop->AirToZoneNodeInfo(spmWTF->AirLoopNum).NumZonesCooled == 0) {
+                        if (state.dataAirLoop->AirToZoneNodeInfo(spmWTF->airLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(state, format("{}=\"{}\", no zones with cooling found:", spmTypeName, spmName));
-                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmWTF->AirLoopName));
+                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmWTF->airLoopName));
                             ErrorsFound = true;
                         }
                     } else {
@@ -1831,26 +1823,25 @@ void InitSetPointManagers(EnergyPlusData &state)
                     assert(spmRAB != nullptr);
                     
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                        spmRAB->AirLoopNum = Util::FindItemInList(spmRAB->AirLoopName,
+                        spmRAB->airLoopNum = Util::FindItemInList(spmRAB->airLoopName,
                                                                   state.dataAirLoop->AirToZoneNodeInfo,
                                                                   &AirLoopZoneEquipConnectData::AirLoopName);
-                        if (spmRAB->AirLoopNum == 0) {
-                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmRAB->AirLoopName);
+                        if (spmRAB->airLoopNum == 0) {
+                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmRAB->airLoopName);
                             ErrorsFound = true;
                         }
 
-                        auto &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmRAB->AirLoopNum);
+                        auto &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmRAB->airLoopNum);
                         if (primaryAirSystem.RABExists) {
-                            spmRAB->RABMixInNodeNum = primaryAirSystem.RABMixInNode;
-                            spmRAB->SupMixInNodeNum = primaryAirSystem.SupMixInNode;
-                            spmRAB->MixOutNodeNum = primaryAirSystem.MixOutNode;
-                            spmRAB->RABSplitOutNodeNum = primaryAirSystem.RABSplitOutNode;
-                            spmRAB->SysOutNodeNum = state.dataAirLoop->AirToZoneNodeInfo(spmRAB->AirLoopNum).AirLoopSupplyNodeNum(1);
-                            spmRAB->ctrlNodes.allocate(1);
-                            spmRAB->ctrlNodes(1) = spmRAB->RABSplitOutNodeNum;
+                            spmRAB->rabMixInNodeNum = primaryAirSystem.RABMixInNode;
+                            spmRAB->supMixInNodeNum = primaryAirSystem.SupMixInNode;
+                            spmRAB->mixOutNodeNum = primaryAirSystem.MixOutNode;
+                            spmRAB->rabSplitOutNodeNum = primaryAirSystem.RABSplitOutNode;
+                            spmRAB->sysOutNodeNum = state.dataAirLoop->AirToZoneNodeInfo(spmRAB->airLoopNum).AirLoopSupplyNodeNum(1);
+                            spmRAB->ctrlNodeNums.push_back(spmRAB->rabSplitOutNodeNum);
                         } else {
                             ShowSevereError(state, format("{}=\"{}\", no RAB in air loop found:", spmTypeName, spmName));
-                            ShowContinueError(state, format("Air Loop=\"{}\".", spmRAB->AirLoopName));
+                            ShowContinueError(state, format("Air Loop=\"{}\".", spmRAB->airLoopName));
                             ErrorsFound = true;
                         }
                     } else {
@@ -1866,17 +1857,17 @@ void InitSetPointManagers(EnergyPlusData &state)
                     assert(spmMZTemp != nullptr);
                     
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                        spmMZTemp->AirLoopNum = Util::FindItemInList(spmMZTemp->AirLoopName,
+                        spmMZTemp->airLoopNum = Util::FindItemInList(spmMZTemp->airLoopName,
                                                                      state.dataAirLoop->AirToZoneNodeInfo,
                                                                      &AirLoopZoneEquipConnectData::AirLoopName);
-                        if (spmMZTemp->AirLoopNum == 0) {
-                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmMZTemp->AirLoopName);
+                        if (spmMZTemp->airLoopNum == 0) {
+                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmMZTemp->airLoopName);
                             ErrorsFound = true;
                         }
                         
-                        if (state.dataAirLoop->AirToZoneNodeInfo(spmMZTemp->AirLoopNum).NumZonesCooled == 0) {
+                        if (state.dataAirLoop->AirToZoneNodeInfo(spmMZTemp->airLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(state, format("{}=\"{}\", no zones with cooling found:", spmTypeName, spmName));
-                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmMZTemp->AirLoopName));
+                            ShowContinueError(state, format("Air Loop provides no cooling, Air Loop=\"{}\".", spmMZTemp->airLoopName));
                             ErrorsFound = true;
                         }
                     } else {
@@ -1894,16 +1885,16 @@ void InitSetPointManagers(EnergyPlusData &state)
                     assert( spmMZHum != nullptr);
 
                     if (state.dataHVACGlobal->NumPrimaryAirSys > 0) {
-                        spmMZHum->AirLoopNum = Util::FindItemInList(spmMZHum->AirLoopName,
+                        spmMZHum->airLoopNum = Util::FindItemInList(spmMZHum->airLoopName,
                                                                     state.dataAirLoop->AirToZoneNodeInfo,
                                                                     &AirLoopZoneEquipConnectData::AirLoopName);
-                        if (spmMZHum->AirLoopNum == 0) {
-                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmMZHum->AirLoopName);
+                        if (spmMZHum->airLoopNum == 0) {
+                            ShowSevereItemNotFound(state, eoh, "hvac_air_loop_name", spmMZHum->airLoopName);
                             ErrorsFound = true;
                         } else {
                             // make sure humidity controlled zone
-                            auto const &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmMZHum->AirLoopNum);
-                            auto const &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(spmMZHum->AirLoopNum);
+                            auto const &primaryAirSystem = state.dataAirSystemsData->PrimaryAirSystems(spmMZHum->airLoopNum);
+                            auto const &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(spmMZHum->airLoopNum);
                             bool HstatZoneFound = false;
                             for (int iZone = 1; iZone <= state.dataZoneCtrls->NumHumidityControlZones; ++iZone) {
                                 for (int jZone = 1; jZone <= airToZoneNode.NumZonesCooled; ++jZone) {
@@ -1937,8 +1928,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                     // Begin demand side loops ... When condenser is added becomes NumLoops
                     for (int LoopNum = 1; LoopNum <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops; ++LoopNum) {
                         auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
-                        for (int iNode = 1; iNode <= spmCET->numCtrlNodes; ++iNode) {
-                            if (plantLoop.TempSetPointNodeNum != spmCET->ctrlNodes(iNode)) continue;
+                        for (int ctrlNodeNum : spmCET->ctrlNodeNums) {
+                            if (plantLoop.TempSetPointNodeNum != ctrlNodeNum) continue;
 
                             for (auto const &branch : plantLoop.LoopSide(LoopSideLocation::Supply).Branch) {
                                 for (auto const &comp : branch.Comp) { 
@@ -1986,7 +1977,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                 }
                                             }
                                         }
-                                        spmCET->ChillerType = ChillerType;
+                                        spmCET->chillerType = ChillerType;
                                         spmCET->demandPloc = {LoopNum, LoopSideLocation::Demand, BranchNum, CompNum};
                                     } break;
 
@@ -2011,8 +2002,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                     for (int LoopNum = 1; LoopNum <= state.dataHVACGlobal->NumCondLoops + state.dataHVACGlobal->NumPlantLoops; ++LoopNum) {
                         auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
                         auto &supplySide = plantLoop.LoopSide(LoopSideLocation::Supply);
-                        for (int iNode = 1; iNode <= spmIdealCET->numCtrlNodes; ++iNode) {
-                            if (plantLoop.TempSetPointNodeNum != spmIdealCET->ctrlNodes(iNode)) continue;
+                        for (int ctrlNodeNum : spmIdealCET->ctrlNodeNums) {
+                            if (plantLoop.TempSetPointNodeNum != ctrlNodeNum) continue;
                                 
                             for (int BranchNum = 1; BranchNum <= supplySide.TotalBranches; ++BranchNum) {
                                 auto &branch = supplySide.Branch(BranchNum);
@@ -2027,13 +2018,13 @@ void InitSetPointManagers(EnergyPlusData &state)
                                         ErrorsFound = true;
                                     } else if (InitType == PlantEquipmentType::CoolingTower_TwoSpd ||
                                                InitType == PlantEquipmentType::CoolingTower_VarSpd) {
-                                        spmIdealCET->TowerPlocs.push_back(PlantLocation(LoopNum, LoopSideLocation::Supply, BranchNum, CompNum));
-                                        spmIdealCET->NumTowers++;
+                                        spmIdealCET->towerPlocs.push_back(PlantLocation(LoopNum, LoopSideLocation::Supply, BranchNum, CompNum));
+                                        spmIdealCET->numTowers++;
                                     }
                                     // Scan the pump on the condenser water loop
                                     if (InitType == PlantEquipmentType::PumpVariableSpeed ||
                                         InitType == PlantEquipmentType::PumpConstantSpeed) {
-                                        spmIdealCET->CondenserPumpPloc = {LoopNum, LoopSideLocation::Supply, BranchNum, CompNum};
+                                        spmIdealCET->condenserPumpPloc = {LoopNum, LoopSideLocation::Supply, BranchNum, CompNum};
                                     }
                                 }
                             }
@@ -2068,7 +2059,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                     InitType = comp2.Type;
                                                     if (InitType == ChillerType) {
                                                         ++NumChiller;
-                                                        spmIdealCET->ChillerPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum2, CompNum2}; 
+                                                        spmIdealCET->chillerPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum2, CompNum2}; 
                                                         // Scan the pump on the chilled water loop
                                                         for (int BranchNum3 = 1; BranchNum3 <= supplySide2.TotalBranches; ++BranchNum3) {
                                                             auto &branch3 = supplySide2.Branch(BranchNum3);
@@ -2077,7 +2068,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                                                                 InitType = comp3.Type;
                                                                 if (InitType == PlantEquipmentType::PumpVariableSpeed ||
                                                                     InitType == PlantEquipmentType::PumpConstantSpeed) {
-                                                                    spmIdealCET->ChilledWaterPumpPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum3, CompNum3};
+                                                                    spmIdealCET->chilledWaterPumpPloc = {LoopNum2, LoopSideLocation::Supply, BranchNum3, CompNum3};
                                                                 }
                                                             }
                                                         }
@@ -2091,8 +2082,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                                             ShowContinueError(state, format("Found more than one chiller, chiller ={}", comp.Name));
                                             ErrorsFound = true;
                                         }
-                                        spmIdealCET->ChillerType = ChillerType;
-                                        spmIdealCET->CondenserPumpPloc.loopNum = LoopNum;
+                                        spmIdealCET->chillerType = ChillerType;
+                                        spmIdealCET->condenserPumpPloc.loopNum = LoopNum;
                                     } break;
 
                                     default:
@@ -2132,9 +2123,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmS = dynamic_cast<SPMScheduled *>(spm);
                 assert (spmS != nullptr);
                         
-                for (int iNode = 1; iNode <= spmS->numCtrlNodes; ++iNode) {
-                    auto &node = state.dataLoopNodes->Node(spmS->ctrlNodes(iNode));
-                    Real64 SchedValue = GetCurrentScheduleValue(state, spmS->SchedPtr);
+                for (int ctrlNodeNum : spmS->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
+                    Real64 SchedValue = GetCurrentScheduleValue(state, spmS->schedNum);
                     // Initialize scheduled setpoints
                     switch (spmS->ctrlVar) {
                     case HVAC::CtrlVarType::Temp: { node.TempSetPoint = SchedValue; } break;
@@ -2154,11 +2145,11 @@ void InitSetPointManagers(EnergyPlusData &state)
             case SPMType::ScheduledDual: { 
                 auto *spmSD = dynamic_cast<SPMScheduledDual *>(spm);
                 assert(spmSD != nullptr);
-                for (int iNode = 1; iNode <= spmSD->numCtrlNodes; ++iNode) {
-                    auto &node = state.dataLoopNodes->Node(spmSD->ctrlNodes(iNode));
+                for (int ctrlNodeNum : spmSD->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                     if (spmSD->ctrlVar == HVAC::CtrlVarType::Temp) {
-                        node.TempSetPointHi = GetCurrentScheduleValue(state, spmSD->SchedPtrHi);
-                        node.TempSetPointLo = GetCurrentScheduleValue(state, spmSD->SchedPtrLo);
+                        node.TempSetPointHi = GetCurrentScheduleValue(state, spmSD->schedNumHi);
+                        node.TempSetPointLo = GetCurrentScheduleValue(state, spmSD->schedNumLo);
                         node.TempSetPoint = (node.TempSetPointHi + node.TempSetPointLo) / 2.0;
                     }
                 }
@@ -2168,16 +2159,16 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmOA = dynamic_cast<SPMOutsideAir *>(spm);
                 assert(spmOA != nullptr);
                     
-                for (int NodeNum : spmOA->ctrlNodes) {
+                for (int NodeNum : spmOA->ctrlNodeNums) {
                     spmOA->calculate(state); // Why is this calculated for every node?
 
                     auto &node = state.dataLoopNodes->Node(NodeNum);
                     if (spmOA->ctrlVar == HVAC::CtrlVarType::Temp) {
-                        node.TempSetPoint = spmOA->SetPt;
+                        node.TempSetPoint = spmOA->setPt;
                     } else if (spmOA->ctrlVar == HVAC::CtrlVarType::MaxTemp) {
-                        node.TempSetPointHi = spmOA->SetPt;
+                        node.TempSetPointHi = spmOA->setPt;
                     } else if (spmOA->ctrlVar == HVAC::CtrlVarType::MinTemp) {
-                        node.TempSetPointLo = spmOA->SetPt;
+                        node.TempSetPointLo = spmOA->setPt;
                     }
                 }
             } break;
@@ -2186,9 +2177,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmSZH = dynamic_cast<SPMSingleZoneHum *>(spm);
                 assert(spmSZH != nullptr);
                 
-                state.dataLoopNodes->Node(spmSZH->ZoneNodeNum).MassFlowRate = 0.0;
-                for (int CtrlNodeNum : spmSZH->ctrlNodes) {
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMin = 0.007;
+                state.dataLoopNodes->Node(spmSZH->zoneNodeNum).MassFlowRate = 0.0;
+                for (int ctrlNodeNum : spmSZH->ctrlNodeNums) {
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMin = 0.007;
                 }
             } break;
 
@@ -2196,9 +2187,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmSZH = dynamic_cast<SPMSingleZoneHum *>(spm);
                 assert(spmSZH != nullptr);
 
-                state.dataLoopNodes->Node(spmSZH->ZoneNodeNum).MassFlowRate = 0.0;
-                for (int CtrlNodeNum : spmSZH->ctrlNodes) {
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMax = 0.011;
+                state.dataLoopNodes->Node(spmSZH->zoneNodeNum).MassFlowRate = 0.0;
+                for (int ctrlNodeNum : spmSZH->ctrlNodeNums) {
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMax = 0.011;
                 }
             } break;
 
@@ -2206,11 +2197,11 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmSZR = dynamic_cast<SPMSingleZoneReheat *>(spm);
                 assert(spmSZR != nullptr);
                 
-                state.dataLoopNodes->Node(spmSZR->ZoneInletNodeNum).MassFlowRate = 0.0;
-                state.dataLoopNodes->Node(spmSZR->ZoneNodeNum).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(spmSZR->zoneInletNodeNum).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(spmSZR->zoneNodeNum).MassFlowRate = 0.0;
                 if (spmSZR->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmSZR->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
+                    for (int ctrlNodeNum : spmSZR->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
 
@@ -2221,12 +2212,12 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmSZT = dynamic_cast<SPMSingleZoneTemp *>(spm);
                 assert (spmSZT != nullptr);
 
-                state.dataLoopNodes->Node(spmSZT->ZoneInletNodeNum).MassFlowRate = 0.0;
-                state.dataLoopNodes->Node(spmSZT->ZoneNodeNum).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(spmSZT->zoneInletNodeNum).MassFlowRate = 0.0;
+                state.dataLoopNodes->Node(spmSZT->zoneNodeNum).MassFlowRate = 0.0;
 
                 if (spmSZT->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmSZT->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
+                    for (int ctrlNodeNum : spmSZT->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
             } break;
@@ -2235,9 +2226,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmMA = dynamic_cast<SPMMixedAir *>(spm);
                 assert(spmMA != nullptr);
 
-                auto &refNode = state.dataLoopNodes->Node(spmMA->RefNodeNum);
-                auto &fanInNode = state.dataLoopNodes->Node(spmMA->FanInNodeNum);
-                auto &fanOutNode = state.dataLoopNodes->Node(spmMA->FanOutNodeNum);
+                auto &refNode = state.dataLoopNodes->Node(spmMA->refNodeNum);
+                auto &fanInNode = state.dataLoopNodes->Node(spmMA->fanInNodeNum);
+                auto &fanOutNode = state.dataLoopNodes->Node(spmMA->fanOutNodeNum);
 
                 refNode.MassFlowRate = fanInNode.MassFlowRate = fanOutNode.MassFlowRate = 0.0;
                 refNode.Temp = fanInNode.Temp = fanOutNode.Temp = 20.0;
@@ -2247,8 +2238,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                 refNode.Enthalpy = fanInNode.Enthalpy = fanOutNode.Enthalpy = PsyHFnTdbW(20.0, state.dataEnvrn->OutHumRat);
 
                 if (spmMA->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmMA->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
+                    for (int ctrlNodeNum : spmMA->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
 
@@ -2258,10 +2249,10 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmOAP = dynamic_cast<SPMOutsideAirPretreat *>(spm);
                 assert (spmOAP != nullptr);
 
-                auto &refNode = state.dataLoopNodes->Node(spmOAP->RefNodeNum);
-                auto &mixedOutNode = state.dataLoopNodes->Node(spmOAP->MixedOutNodeNum);
-                auto &oaInNode = state.dataLoopNodes->Node(spmOAP->OAInNodeNum);
-                auto &returnInNode = state.dataLoopNodes->Node(spmOAP->ReturnInNodeNum);
+                auto &refNode = state.dataLoopNodes->Node(spmOAP->refNodeNum);
+                auto &mixedOutNode = state.dataLoopNodes->Node(spmOAP->mixedOutNodeNum);
+                auto &oaInNode = state.dataLoopNodes->Node(spmOAP->oaInNodeNum);
+                auto &returnInNode = state.dataLoopNodes->Node(spmOAP->returnInNodeNum);
 
                 refNode.MassFlowRate = mixedOutNode.MassFlowRate = oaInNode.MassFlowRate = returnInNode.MassFlowRate = 0.0;
                 refNode.Temp = mixedOutNode.Temp = oaInNode.Temp = returnInNode.Temp = 20.0;
@@ -2270,8 +2261,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                 refNode.Press = mixedOutNode.Press = oaInNode.Press = returnInNode.Press = state.dataEnvrn->OutBaroPress;
                 refNode.Enthalpy = mixedOutNode.Enthalpy = oaInNode.Enthalpy = returnInNode.Enthalpy = PsyHFnTdbW(20.0, state.dataEnvrn->OutHumRat);
 
-                for (int CtrlNodeNum : spmOAP->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+                for (int ctrlNodeNum : spmOAP->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                     if (spmOAP->ctrlVar == HVAC::CtrlVarType::Temp) {
                         node.TempSetPoint = 20.0; // Set the setpoint
                     } else if (spmOAP->ctrlVar == HVAC::CtrlVarType::MaxHumRat) {
@@ -2287,9 +2278,9 @@ void InitSetPointManagers(EnergyPlusData &state)
             case SPMType::Warmest:
             case SPMType::Coldest: { 
 
-                for (int CtrlNodeNum : spm->ctrlNodes) {
+                for (int ctrlNodeNum : spm->ctrlNodeNums) {
                     if (spm->ctrlVar == HVAC::CtrlVarType::Temp) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
 
@@ -2300,11 +2291,11 @@ void InitSetPointManagers(EnergyPlusData &state)
                 assert (spmWTF != nullptr);
 
                 if (spmWTF->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmWTF->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the temperature setpoint
-                        if (spmWTF->AirLoopNum != 0) {
-                            state.dataAirLoop->AirLoopFlow(spmWTF->AirLoopNum).ReqSupplyFrac = 1.0; // PH 10/09/04 Set the flow
-                            state.dataAirLoop->AirLoopControlInfo(spmWTF->AirLoopNum).LoopFlowRateSet = true; // PH 10/09/04 Set the flag
+                    for (int ctrlNodeNum : spmWTF->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the temperature setpoint
+                        if (spmWTF->airLoopNum != 0) {
+                            state.dataAirLoop->AirLoopFlow(spmWTF->airLoopNum).ReqSupplyFrac = 1.0; // PH 10/09/04 Set the flow
+                            state.dataAirLoop->AirLoopControlInfo(spmWTF->airLoopNum).LoopFlowRateSet = true; // PH 10/09/04 Set the flag
                         }
                     }
                 }
@@ -2317,7 +2308,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                     assert(spmRAB != nullptr);
                 
                     if (spmRAB->ctrlVar == HVAC::CtrlVarType::MassFlowRate) {
-                        state.dataLoopNodes->Node(spmRAB->RABSplitOutNodeNum).MassFlowRateSetPoint = 0.0;
+                        state.dataLoopNodes->Node(spmRAB->rabSplitOutNodeNum).MassFlowRateSetPoint = 0.0;
                     }
                 }
             } break;
@@ -2325,8 +2316,8 @@ void InitSetPointManagers(EnergyPlusData &state)
             case SPMType::MZCoolingAverage:
             case SPMType::MZHeatingAverage: { 
                 if (spm->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spm->ctrlNodes) { 
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
+                    for (int ctrlNodeNum : spm->ctrlNodeNums) { 
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = 20.0; // Set the setpoint
                     }
                 }
             } break;
@@ -2334,25 +2325,25 @@ void InitSetPointManagers(EnergyPlusData &state)
 
             case SPMType::MZMinHumAverage:
             case SPMType::MZMinHum: {
-                for (int CtrlNodeNum : spm->ctrlNodes) {
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMin = 0.007;                                               // Set the setpoint
+                for (int ctrlNodeNum : spm->ctrlNodeNums) {
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMin = 0.007;                                               // Set the setpoint
                 }
             } break;
 
             case SPMType::MZMaxHumAverage:
             case SPMType::MZMaxHum: { 
-                for (int CtrlNodeNum : spm->ctrlNodes) {
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMax = 0.011;                                               // Set the setpoint
+                for (int ctrlNodeNum : spm->ctrlNodeNums) {
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMax = 0.011;                                               // Set the setpoint
                 }
             } break;
 
             case SPMType::FollowOutsideAirTemp: {
                 auto *spmFOAT = dynamic_cast<SPMFollowOutsideAirTemp *>(spm);
                 assert(spmFOAT != nullptr);
-                bool isWetBulb = spmFOAT->RefTempType == AirTempType::WetBulb;
+                bool isWetBulb = spmFOAT->refTempType == AirTempType::WetBulb;
                 
-                for (int CtrlNodeNum : spm->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+                for (int ctrlNodeNum : spm->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                     if (spmFOAT->ctrlVar == HVAC::CtrlVarType::Temp) {
                         node.TempSetPoint = isWetBulb ? state.dataEnvrn->OutWetBulbTemp : state.dataEnvrn->OutDryBulbTemp;
                     } else if (spmFOAT->ctrlVar == HVAC::CtrlVarType::MaxTemp) {
@@ -2367,11 +2358,11 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmFSNT = dynamic_cast<SPMFollowSysNodeTemp *>(spm);
                 assert(spmFSNT != nullptr);
 
-                bool isWetBulb = spmFSNT->RefTempType == AirTempType::WetBulb;
-                auto &refNode = state.dataLoopNodes->Node(spmFSNT->RefNodeNum);
-                for (int CtrlNodeNum : spmFSNT->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
-                    if (CheckOutAirNodeNumber(state, spmFSNT->RefNodeNum)) {
+                bool isWetBulb = spmFSNT->refTempType == AirTempType::WetBulb;
+                auto &refNode = state.dataLoopNodes->Node(spmFSNT->refNodeNum);
+                for (int ctrlNodeNum : spmFSNT->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
+                    if (CheckOutAirNodeNumber(state, spmFSNT->refNodeNum)) {
                         refNode.SPMNodeWetBulbRepReq = isWetBulb;
                         if (spmFSNT->ctrlVar == HVAC::CtrlVarType::Temp) {
                             node.TempSetPoint = isWetBulb ? state.dataEnvrn->OutWetBulbTemp : state.dataEnvrn->OutDryBulbTemp;
@@ -2383,9 +2374,9 @@ void InitSetPointManagers(EnergyPlusData &state)
                     } else { // If reference node is a water node, then set RefTypeMode to NodeDryBulb
 
                         if (refNode.FluidType == DataLoopNode::NodeFluidType::Water) {
-                            spmFSNT->RefTempType = AirTempType::DryBulb;
+                            spmFSNT->refTempType = AirTempType::DryBulb;
                         } else if (refNode.FluidType == DataLoopNode::NodeFluidType::Air) {
-                            if (spmFSNT->RefTempType == AirTempType::WetBulb) {
+                            if (spmFSNT->refTempType == AirTempType::WetBulb) {
                                 refNode.SPMNodeWetBulbRepReq = true;
                             }
                         }
@@ -2404,10 +2395,10 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmFGT = dynamic_cast<SPMFollowGroundTemp *>(spm);
                 assert (spmFGT != nullptr);
                 
-                Real64 GroundTemp = state.dataEnvrn->GroundTemp[(int)spmFGT->RefTempType];
+                Real64 GroundTemp = state.dataEnvrn->GroundTemp[(int)spmFGT->refTempType];
                 
-                for (int CtrlNodeNum : spmFGT->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+                for (int ctrlNodeNum : spmFGT->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                     if (spmFGT->ctrlVar == HVAC::CtrlVarType::Temp) {
                         node.TempSetPoint = GroundTemp; 
                     } else if (spmFGT->ctrlVar == HVAC::CtrlVarType::MaxTemp) {
@@ -2421,10 +2412,10 @@ void InitSetPointManagers(EnergyPlusData &state)
             case SPMType::CondenserEnteringTemp: {
                 auto *spmCER = dynamic_cast<SPMCondenserEnteringTemp *>(spm);
                 assert (spmCER != nullptr);
-                Real64 SchedValue = GetCurrentScheduleValue(state, spmCER->CondenserEnteringTempSchedPtr);
-                for (int CtrlNodeNum : spmCER->ctrlNodes) {
+                Real64 SchedValue = GetCurrentScheduleValue(state, spmCER->condenserEnteringTempSchedNum);
+                for (int ctrlNodeNum : spmCER->ctrlNodeNums) {
                     if (spmCER->ctrlVar == HVAC::CtrlVarType::Temp) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = SchedValue;
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = SchedValue;
                     }                                    
                 }
             } break;
@@ -2434,8 +2425,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                 assert (spmICER != nullptr);
 
                 if (spmICER->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmICER->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spmICER->MaxCondenserEnteringTemp;
+                    for (int ctrlNodeNum : spmICER->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spmICER->maxCondenserEnteringTemp;
                     }
                 }
             } break;
@@ -2445,8 +2436,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                 assert (spmSZOSC != nullptr);
                 
                 if (spmSZOSC->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmSZOSC->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spmSZOSC->CoolingOffSetPt;
+                    for (int ctrlNodeNum : spmSZOSC->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spmSZOSC->coolingOffSetPt;
                     }
                 }
             } break;
@@ -2456,8 +2447,8 @@ void InitSetPointManagers(EnergyPlusData &state)
                 assert (spmSZOSH != nullptr);
                 
                 if (spmSZOSH->ctrlVar == HVAC::CtrlVarType::Temp) {
-                    for (int CtrlNodeNum : spmSZOSH->ctrlNodes) {
-                        state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spmSZOSH->HeatingOffSetPt;
+                    for (int ctrlNodeNum : spmSZOSH->ctrlNodeNums) {
+                        state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spmSZOSH->heatingOffSetPt;
                     }
                 }
                 
@@ -2467,7 +2458,7 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmRWT = dynamic_cast<SPMReturnWaterTemp *>(spm);
                 assert (spmRWT != nullptr);
                 
-                state.dataLoopNodes->Node(spmRWT->supplyNodeNum).TempSetPoint = spmRWT->MinSetTemp;
+                state.dataLoopNodes->Node(spmRWT->supplyNodeNum).TempSetPoint = spmRWT->minSetTemp;
                 
             } break;
 
@@ -2475,21 +2466,21 @@ void InitSetPointManagers(EnergyPlusData &state)
                 auto *spmRWT = dynamic_cast<SPMReturnWaterTemp *>(spm);
                 assert (spmRWT != nullptr);
                 
-                state.dataLoopNodes->Node(spmRWT->supplyNodeNum).TempSetPoint = spmRWT->MaxSetTemp;
+                state.dataLoopNodes->Node(spmRWT->supplyNodeNum).TempSetPoint = spmRWT->maxSetTemp;
             } break;
 
             case SPMType::SystemNodeTemp:
             case SPMType::SystemNodeHum: { 
-                for (int CtrlNodeNum : spm->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+                for (int ctrlNodeNum : spm->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                     spm->calculate(state);
                     switch (spm->ctrlVar) {
-                    case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->SetPt; } break;
-                    case HVAC::CtrlVarType::MaxTemp: { node.TempSetPointHi = spm->SetPt; } break;
-                    case HVAC::CtrlVarType::MinTemp: { node.TempSetPointLo = spm->SetPt; } break;
-                    case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->SetPt; } break;
-                    case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->SetPt; } break;
-                    case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->SetPt; } break;
+                    case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->setPt; } break;
+                    case HVAC::CtrlVarType::MaxTemp: { node.TempSetPointHi = spm->setPt; } break;
+                    case HVAC::CtrlVarType::MinTemp: { node.TempSetPointLo = spm->setPt; } break;
+                    case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->setPt; } break;
+                    case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->setPt; } break;
+                    case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->setPt; } break;
                     default: break;
                     }
                 }
@@ -2515,7 +2506,6 @@ void InitSetPointManagers(EnergyPlusData &state)
 
 void SimSetPointManagers(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 1998
@@ -2542,7 +2532,6 @@ void SimSetPointManagers(EnergyPlusData &state)
     //                        Added new setpoint managers:
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE
     // Loop over all the Setpoint Managers and invoke the correct
@@ -2563,12 +2552,11 @@ void SPMScheduled::calculate(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // Set the setpoint using a simple schedule.
-    this->SetPt = GetCurrentScheduleValue(state, this->SchedPtr);
-}
+    this->setPt = GetCurrentScheduleValue(state, this->schedNum);
+} // SPMScheduled::calculate()
 
 void SPMTESScheduled::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   Aug 2014
@@ -2582,47 +2570,46 @@ void SPMTESScheduled::calculate(EnergyPlusData &state)
     // Locals
     Real64 constexpr OnVal(0.5);
 
-    Real64 CurSchValOnPeak = GetCurrentScheduleValue(state, this->SchedPtr);
-    Real64 CurSchValCharge = GetCurrentScheduleValue(state, this->SchedPtrCharge);
+    Real64 CurSchValOnPeak = GetCurrentScheduleValue(state, this->schedNum);
+    Real64 CurSchValCharge = GetCurrentScheduleValue(state, this->schedNumCharge);
 
     // CtrlType bug
     //        if (this->CompOpType == DataPlant::CtrlType::CoolingOp) { // this is some sort of chiller
-    if (this->CompOpType == DataPlant::CtrlType::HeatingOp) { // this is some sort of chiller
+    if (this->compOpType == DataPlant::CtrlType::HeatingOp) { // this is some sort of chiller
         if (CurSchValOnPeak >= OnVal) {
-            this->SetPt = this->NonChargeCHWTemp;
+            this->setPt = this->nonChargeCHWTemp;
         } else if (CurSchValCharge < OnVal) {
-            this->SetPt = this->NonChargeCHWTemp;
+            this->setPt = this->nonChargeCHWTemp;
         } else {
-            this->SetPt = this->ChargeCHWTemp;
+            this->setPt = this->chargeCHWTemp;
         }
         // CtrlType Bug
         //        } else if (this->CompOpType == DataPlant::CtrlType::DualOp) { // this is some sort of ice storage system
-    } else if (this->CompOpType == DataPlant::CtrlType::CoolingOp) { // this is some sort of ice storage system
-        this->SetPt = this->NonChargeCHWTemp;
+    } else if (this->compOpType == DataPlant::CtrlType::CoolingOp) { // this is some sort of ice storage system
+        this->setPt = this->nonChargeCHWTemp;
     }
-}
+} // SPMTESSScheduled::calculate()
 
 void SPMScheduledDual::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Richard Liesen
     //       DATE WRITTEN   May 2004
 
     // PURPOSE OF THIS SUBROUTINE:
     // Set the both setpoint using a simple schedule.
-    this->SetPtHi = GetCurrentScheduleValue(state, this->SchedPtrHi);
-    this->SetPtLo = GetCurrentScheduleValue(state, this->SchedPtrLo);
+    this->setPtHi = GetCurrentScheduleValue(state, this->schedNumHi);
+    this->setPtLo = GetCurrentScheduleValue(state, this->schedNumLo);
 } // SPMScheduledDual::calculate()
 
 void SPMOutsideAir::calculate(EnergyPlusData &state)
 {
-    Real64 SchedVal = (this->SchedPtr > 0) ? GetCurrentScheduleValue(state, this->SchedPtr) : 0.0;
+    Real64 SchedVal = (this->schedNum > 0) ? GetCurrentScheduleValue(state, this->schedNum) : 0.0;
 
     if (SchedVal == 2.0) {
-        this->SetPt = interpSetPoint(this->OutLow2, this->OutHigh2, state.dataEnvrn->OutDryBulbTemp, this->OutLowSetPt2, this->OutHighSetPt2);
+        this->setPt = interpSetPoint(this->low2, this->high2, state.dataEnvrn->OutDryBulbTemp, this->lowSetPt2, this->highSetPt2);
     } else {
-        if ((this->SchedPtr > 0) && (SchedVal != 1.0)) { // Since schedule is optional, only check this if the user entered a schedule
+        if ((this->schedNum > 0) && (SchedVal != 1.0)) { // Since schedule is optional, only check this if the user entered a schedule
             ++this->setPtErrorCount;
             if (this->setPtErrorCount <= 10) {
                 ShowSevereError(state,
@@ -2636,14 +2623,13 @@ void SPMOutsideAir::calculate(EnergyPlusData &state)
                     this->invalidSchedValErrorIndex);
             }
         }
-        this->SetPt = interpSetPoint(this->OutLow1, this->OutHigh1, state.dataEnvrn->OutDryBulbTemp, this->OutLowSetPt1, this->OutHighSetPt1);
+        this->setPt = interpSetPoint(this->low1, this->high1, state.dataEnvrn->OutDryBulbTemp, this->lowSetPt1, this->highSetPt1);
     }
 
 } // SPMOutsideAir::calculate()
 
 void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2000
@@ -2658,33 +2644,33 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
 
     Real64 TSetPt;
     
-    auto const &zoneInletNode = state.dataLoopNodes->Node(this->ZoneInletNodeNum);
+    auto const &zoneInletNode = state.dataLoopNodes->Node(this->zoneInletNodeNum);
 
     // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
-    Real64 OAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac; 
+    Real64 OAFrac = state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac; 
     Real64 ZoneMassFlow = zoneInletNode.MassFlowRate;
 
-    auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum);
+    auto const &zoneSysEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ctrlZoneNum);
     Real64 ZoneLoad = zoneSysEnergyDemand.TotalOutputRequired;
     Real64 ZoneLoadToCoolSetPt = zoneSysEnergyDemand.OutputRequiredToCoolingSP;
     Real64 ZoneLoadToHeatSetPt = zoneSysEnergyDemand.OutputRequiredToHeatingSP;
-    bool DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(this->ControlZoneNum);
-    Real64 ZoneTemp = state.dataLoopNodes->Node(this->ZoneNodeNum).Temp;
+    bool DeadBand = state.dataZoneEnergyDemand->DeadBandOrSetback(this->ctrlZoneNum);
+    Real64 ZoneTemp = state.dataLoopNodes->Node(this->zoneNodeNum).Temp;
 
     Real64 TMixAtMinOA;
-    if (this->OAInNodeNum > 0) {
-        auto const &oaInNode = state.dataLoopNodes->Node(this->OAInNodeNum);
-        auto const &retNode = state.dataLoopNodes->Node(this->RetNodeNum);
+    if (this->oaInNodeNum > 0) {
+        auto const &oaInNode = state.dataLoopNodes->Node(this->oaInNodeNum);
+        auto const &retNode = state.dataLoopNodes->Node(this->retNodeNum);
         Real64 HumRatMixAtMinOA = (1.0 - OAFrac) * retNode.HumRat + OAFrac * oaInNode.HumRat;
         Real64 EnthMixAtMinOA = (1.0 - OAFrac) * retNode.Enthalpy + OAFrac * oaInNode.Enthalpy;
         TMixAtMinOA = PsyTdbFnHW(EnthMixAtMinOA, HumRatMixAtMinOA);
     } else {
-        TMixAtMinOA = state.dataLoopNodes->Node(this->LoopInNodeNum).Temp;
+        TMixAtMinOA = state.dataLoopNodes->Node(this->loopInNodeNum).Temp;
     }
 
     Real64 FanDeltaT;
-    if (this->FanOutNodeNum > 0 && this->FanInNodeNum > 0) {
-        FanDeltaT = state.dataLoopNodes->Node(this->FanOutNodeNum).Temp - state.dataLoopNodes->Node(this->FanInNodeNum).Temp;
+    if (this->fanOutNodeNum > 0 && this->fanInNodeNum > 0) {
+        FanDeltaT = state.dataLoopNodes->Node(this->fanOutNodeNum).Temp - state.dataLoopNodes->Node(this->fanInNodeNum).Temp;
     } else {
         FanDeltaT = 0.0;
     }
@@ -2726,12 +2712,11 @@ void SPMSingleZoneReheat::calculate(EnergyPlusData &state)
         TSetPt = TSupNoHC;
     }
 
-    this->SetPt = std::clamp(TSetPt, this->MinSetTemp, this->MaxSetTemp);
+    this->setPt = std::clamp(TSetPt, this->minSetTemp, this->maxSetTemp);
 } // SPMSZReheat::calculate()
 
 void SPMSingleZoneTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         M. J. Witte based on CalcSingZoneRhSetPoint by Fred Buhl,
     //                        Work supported by ASHRAE research project 1254-RP
@@ -2740,26 +2725,25 @@ void SPMSingleZoneTemp::calculate(EnergyPlusData &state)
     // PURPOSE OF THIS SUBROUTINE:
     // From the heating load of the control zone, calculate the supply air setpoint
     // needed to meet that zone load (based on CalcSingZoneRhSetPoint)
-    auto const &zoneInletNode = state.dataLoopNodes->Node(this->ZoneInletNodeNum);
+    auto const &zoneInletNode = state.dataLoopNodes->Node(this->zoneInletNodeNum);
     
     // This function handles both heating and cooling
-    auto const &zoneEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum);
+    auto const &zoneEnergyDemand = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ctrlZoneNum);
     Real64 ZoneLoadToSP = (this->type == SPMType::SZHeating) ? zoneEnergyDemand.OutputRequiredToHeatingSP : zoneEnergyDemand.OutputRequiredToCoolingSP;
     
-    Real64 ZoneTemp = state.dataLoopNodes->Node(this->ZoneNodeNum).Temp;
+    Real64 ZoneTemp = state.dataLoopNodes->Node(this->zoneNodeNum).Temp;
     if (zoneInletNode.MassFlowRate <= HVAC::SmallMassFlow) {
-        this->SetPt = (this->type == SPMType::SZHeating) ? this->MinSetTemp : this->MaxSetTemp;
+        this->setPt = (this->type == SPMType::SZHeating) ? this->minSetTemp : this->maxSetTemp;
     } else {
         Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
-        this->SetPt = ZoneTemp + ZoneLoadToSP / (CpAir * zoneInletNode.MassFlowRate);
-        this->SetPt = std::clamp(this->SetPt, this->MinSetTemp, this->MaxSetTemp);
+        this->setPt = ZoneTemp + ZoneLoadToSP / (CpAir * zoneInletNode.MassFlowRate);
+        this->setPt = std::clamp(this->setPt, this->minSetTemp, this->maxSetTemp);
     }
 } // SPMSZTemp::calculate()
 
 
 void SPMSingleZoneOneStageCooling::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   August 2013
@@ -2770,13 +2754,12 @@ void SPMSingleZoneOneStageCooling::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-    this->SetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum >= 0) ? this->CoolingOffSetPt : this->CoolingOnSetPt;
+    this->setPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ctrlZoneNum).StageNum >= 0) ? this->coolingOffSetPt : this->coolingOnSetPt;
     // negative so a cooling stage is set
-}
+} // SPMSingleZoneOneStageCooling::calculate()
 
 void SPMSingleZoneOneStageHeating::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. Griffith
     //       DATE WRITTEN   August 2013
@@ -2787,12 +2770,11 @@ void SPMSingleZoneOneStageHeating::calculate(EnergyPlusData &state)
     // METHODOLOGY EMPLOYED:
     // Evaluate stage in zone energy demand structure and choose setpoint accordingly
 
-    this->SetPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ControlZoneNum).StageNum <= 0) ? this->HeatingOffSetPt : this->HeatingOnSetPt;
-}
+    this->setPt = (state.dataZoneEnergyDemand->ZoneSysEnergyDemand(this->ctrlZoneNum).StageNum <= 0) ? this->heatingOffSetPt : this->heatingOnSetPt;
+} // SPMSingleZoneOneStageHeating::calculate()
 
 void SPMSingleZoneHum::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   October 2000
@@ -2812,11 +2794,11 @@ void SPMSingleZoneHum::calculate(EnergyPlusData &state)
     using Psychrometrics::PsyWFnTdbRhPb;
 
     // Only use one zone for now
-    auto &zoneNode = state.dataLoopNodes->Node(this->ZoneNodeNum);
+    auto &zoneNode = state.dataLoopNodes->Node(this->zoneNodeNum);
 
     Real64 ZoneMassFlow = zoneNode.MassFlowRate;
     if (ZoneMassFlow > HVAC::SmallMassFlow) {
-        auto const &zoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->CtrlZoneNum);
+        auto const &zoneMoistureDemand = state.dataZoneEnergyDemand->ZoneSysMoistureDemand(this->ctrlZoneNum);
         Real64 MoistureLoad = (this->type == SPMType::SZMinHum) ?
             zoneMoistureDemand.OutputRequiredToHumidifyingSP : zoneMoistureDemand.OutputRequiredToDehumidifyingSP;
 
@@ -2826,19 +2808,18 @@ void SPMSingleZoneHum::calculate(EnergyPlusData &state)
 
         // Positive Humidity Ratio MoistureLoad means a humidification load and only humidifying can raise up to a minimum
         //  IF(MoistureLoad .GT. 0.0) SZMinHumSetPtMgr(SetPtMgrNum)%SetPt = SupplyAirHumRat
-        this->SetPt = max(MaxHum, zoneNode.HumRat + MoistureLoad / ZoneMassFlow);
+        this->setPt = max(MaxHum, zoneNode.HumRat + MoistureLoad / ZoneMassFlow);
 
         // This hum rat is currently used in Controller:Simple, control variable "TEMPandHUMRAT" (Jan 2004)
         // Negative MoistureLoad means a dehumidification load
     } else {
-        this->SetPt = 0.0;
+        this->setPt = 0.0;
     }            
 } // SPMSingleZoneHum::calculate()
 
 
 void SPMMixedAir::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2001
@@ -2850,29 +2831,29 @@ void SPMMixedAir::calculate(EnergyPlusData &state)
     using EMSManager::CheckIfNodeSetPointManagedByEMS;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &fanInNode = state.dataLoopNodes->Node(this->FanInNodeNum);
-    auto &fanOutNode = state.dataLoopNodes->Node(this->FanOutNodeNum);
-    auto &refNode = state.dataLoopNodes->Node(this->RefNodeNum);
+    auto &fanInNode = state.dataLoopNodes->Node(this->fanInNodeNum);
+    auto &fanOutNode = state.dataLoopNodes->Node(this->fanOutNodeNum);
+    auto &refNode = state.dataLoopNodes->Node(this->refNodeNum);
     
-    this->FreezeCheckEnable = false;
+    this->freezeCheckEnable = false;
 
-    if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
+    if (!state.dataGlobal->SysSizingCalc && this->mySetPointCheckFlag) {
 
         if (refNode.TempSetPoint == SensedNodeFlagValue) {
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 ShowSevereError(state,
                                 format("CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager {}", this->Name));
-                ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->RefNodeNum)));
+                ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->refNodeNum)));
                 ShowContinueError(
                     state, "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node.");
                 state.dataHVACGlobal->SetPointErrorFlag = true;
             } else {
                 // need call to check if this is the target of an EnergyManagementSystem:Actuator object
-                CheckIfNodeSetPointManagedByEMS(state, this->RefNodeNum, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
+                CheckIfNodeSetPointManagedByEMS(state, this->refNodeNum, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                     ShowSevereError(
                         state, format("CalcMixedAirSetPoint: Missing reference temperature setpoint for Mixed Air Setpoint Manager {}", this->Name));
-                    ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->RefNodeNum)));
+                    ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->refNodeNum)));
                     ShowContinueError(
                         state, "  use an additional Setpoint Manager with Control Variable = \"Temperature\" to establish a setpoint at this node.");
                     ShowContinueError(state, "Or add EMS Actuator to provide temperature setpoint at this node");
@@ -2880,23 +2861,23 @@ void SPMMixedAir::calculate(EnergyPlusData &state)
             }
         }
 
-        this->MySetPointCheckFlag = false;
+        this->mySetPointCheckFlag = false;
     }
 
-    this->SetPt = refNode.TempSetPoint - (fanOutNode.Temp - fanInNode.Temp);
-    if (this->CoolCoilInNodeNum > 0 && this->CoolCoilOutNodeNum > 0) {
-        auto &coolCoilInNode = state.dataLoopNodes->Node(this->CoolCoilInNodeNum);
-        auto &coolCoilOutNode = state.dataLoopNodes->Node(this->CoolCoilOutNodeNum);
+    this->setPt = refNode.TempSetPoint - (fanOutNode.Temp - fanInNode.Temp);
+    if (this->coolCoilInNodeNum > 0 && this->coolCoilOutNodeNum > 0) {
+        auto &coolCoilInNode = state.dataLoopNodes->Node(this->coolCoilInNodeNum);
+        auto &coolCoilOutNode = state.dataLoopNodes->Node(this->coolCoilOutNodeNum);
         Real64 dtFan = fanOutNode.Temp - fanInNode.Temp;
         Real64 dtCoolCoil = coolCoilInNode.Temp - coolCoilOutNode.Temp;
-        if (dtCoolCoil > 0.0 && this->MinCoolCoilOutTemp > state.dataEnvrn->OutDryBulbTemp) {
-            this->FreezeCheckEnable = true;
+        if (dtCoolCoil > 0.0 && this->minCoolCoilOutTemp > state.dataEnvrn->OutDryBulbTemp) {
+            this->freezeCheckEnable = true;
             if (refNode.Temp == coolCoilOutNode.Temp) { // blow through
-                this->SetPt = max(refNode.TempSetPoint, this->MinCoolCoilOutTemp) - dtFan + dtCoolCoil;
-            } else if (this->RefNodeNum != this->CoolCoilOutNodeNum) { // // draw through Ref node is outlet node
-                this->SetPt = max(refNode.TempSetPoint - dtFan, this->MinCoolCoilOutTemp) + dtCoolCoil;
+                this->setPt = max(refNode.TempSetPoint, this->minCoolCoilOutTemp) - dtFan + dtCoolCoil;
+            } else if (this->refNodeNum != this->coolCoilOutNodeNum) { // // draw through Ref node is outlet node
+                this->setPt = max(refNode.TempSetPoint - dtFan, this->minCoolCoilOutTemp) + dtCoolCoil;
             } else {
-                this->SetPt = max(refNode.TempSetPoint, this->MinCoolCoilOutTemp) + dtCoolCoil;
+                this->setPt = max(refNode.TempSetPoint, this->minCoolCoilOutTemp) + dtCoolCoil;
             }
         }
     }
@@ -2904,14 +2885,12 @@ void SPMMixedAir::calculate(EnergyPlusData &state)
 
 void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         M. J. Witte based on CalcMixedAirSetPoint by Fred Buhl,
     //                        Work supported by ASHRAE research project 1254-RP
     //       DATE WRITTEN   January 2005
     //       MODIFIED       Witte (GARD), Sep 2006
     //                      Griffith( NREL), May 2009, added EMS setpoint checks
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Starting with the setpoint at the reference node, determine the required
@@ -2928,10 +2907,10 @@ void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
     Real64 MinSetPoint = 0;     // minimum allowed setpoint
     Real64 MaxSetPoint = 0;     // maximum allowed setpoint
 
-    auto &refNode = state.dataLoopNodes->Node(this->RefNodeNum);
-    auto &mixedOutNode = state.dataLoopNodes->Node(this->MixedOutNodeNum);
-    auto &oaInNode = state.dataLoopNodes->Node(this->OAInNodeNum);
-    auto &returnInNode = state.dataLoopNodes->Node(this->ReturnInNodeNum);
+    auto &refNode = state.dataLoopNodes->Node(this->refNodeNum);
+    auto &mixedOutNode = state.dataLoopNodes->Node(this->mixedOutNodeNum);
+    auto &oaInNode = state.dataLoopNodes->Node(this->oaInNodeNum);
+    auto &returnInNode = state.dataLoopNodes->Node(this->returnInNodeNum);
 
     bool isHumiditySetPoint = false;
 
@@ -2939,41 +2918,41 @@ void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
     case HVAC::CtrlVarType::Temp: { // 'Temperature'
         RefNodeSetPoint = refNode.TempSetPoint;
         ReturnInValue = returnInNode.Temp;
-        MinSetPoint = this->MinSetTemp;
-        MaxSetPoint = this->MaxSetTemp;
+        MinSetPoint = this->minSetTemp;
+        MaxSetPoint = this->maxSetTemp;
     } break;
     case HVAC::CtrlVarType::MaxHumRat: { // 'HUMRATMAX'
         RefNodeSetPoint = refNode.HumRatMax;
         ReturnInValue = returnInNode.HumRat;
-        MinSetPoint = this->MinSetHum;
-        MaxSetPoint = this->MaxSetHum;
+        MinSetPoint = this->minSetHum;
+        MaxSetPoint = this->maxSetHum;
         isHumiditySetPoint = true;
     } break;
     case HVAC::CtrlVarType::MinHumRat: { // 'HUMRATMIN'
         RefNodeSetPoint = refNode.HumRatMin;
         ReturnInValue = returnInNode.HumRat;
-        MinSetPoint = this->MinSetHum;
-        MaxSetPoint = this->MaxSetHum;
+        MinSetPoint = this->minSetHum;
+        MaxSetPoint = this->maxSetHum;
         isHumiditySetPoint = true;
     } break;
     case HVAC::CtrlVarType::HumRat: { // 'HumidityRatio'
         RefNodeSetPoint = refNode.HumRatSetPoint;
         ReturnInValue = returnInNode.HumRat;
-        MinSetPoint = this->MinSetHum;
-        MaxSetPoint = this->MaxSetHum;
+        MinSetPoint = this->minSetHum;
+        MaxSetPoint = this->maxSetHum;
         isHumiditySetPoint = true;
     } break;
     default:
         break;
     }
 
-    if (!state.dataGlobal->SysSizingCalc && this->MySetPointCheckFlag) {
-        this->MySetPointCheckFlag = false;
+    if (!state.dataGlobal->SysSizingCalc && this->mySetPointCheckFlag) {
+        this->mySetPointCheckFlag = false;
         if (RefNodeSetPoint == SensedNodeFlagValue) {
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 ShowSevereError(
                     state, format("CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager {}", this->Name));
-                ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->RefNodeNum)));
+                ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->refNodeNum)));
                 ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at this node.");
                 ShowFatalError(state, "Missing reference setpoint.");
             } else {
@@ -2983,7 +2962,7 @@ void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
                 case HVAC::CtrlVarType::MaxHumRat:  // 'HUMRATMAX'
                 case HVAC::CtrlVarType::MinHumRat:  // 'HUMRATMIN'
                 case HVAC::CtrlVarType::HumRat: { // 'HumidityRatio'
-                    CheckIfNodeSetPointManagedByEMS(state, this->RefNodeNum, this->ctrlVar, LocalSetPointCheckFailed);
+                    CheckIfNodeSetPointManagedByEMS(state, this->refNodeNum, this->ctrlVar, LocalSetPointCheckFailed);
                 } break;
                 default:
                     break;
@@ -2991,7 +2970,7 @@ void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
                 if (LocalSetPointCheckFailed) {
                     ShowSevereError(
                         state, format("CalcOAPretreatSetPoint: Missing reference setpoint for Outdoor Air Pretreat Setpoint Manager {}", this->Name));
-                    ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->RefNodeNum)));
+                    ShowContinueError(state, format("Node Referenced ={}", state.dataLoopNodes->NodeID(this->refNodeNum)));
                     ShowContinueError(state, "use a Setpoint Manager to establish a setpoint at this node.");
                     ShowContinueError(state, "Or use an EMS actuator to control a setpoint at this node.");
                     ShowFatalError(state, "Missing reference setpoint.");
@@ -3000,22 +2979,21 @@ void SPMOutsideAirPretreat::calculate(EnergyPlusData &state)
         }
     }
     if ((mixedOutNode.MassFlowRate <= 0.0) || (oaInNode.MassFlowRate <= 0.0)) {
-        this->SetPt = RefNodeSetPoint;
+        this->setPt = RefNodeSetPoint;
     } else if (isHumiditySetPoint && (RefNodeSetPoint == 0.0)) {
         // For humidity setpoints, zero is special meaning "off" or "no load"
         // so pass through zero setpoints without enforcing the max/min setpoint limits
-        this->SetPt = 0.0;
+        this->setPt = 0.0;
     } else {
         Real64 OAFraction = oaInNode.MassFlowRate / mixedOutNode.MassFlowRate;
-        this->SetPt = ReturnInValue + (RefNodeSetPoint - ReturnInValue) / OAFraction;
+        this->setPt = ReturnInValue + (RefNodeSetPoint - ReturnInValue) / OAFraction;
         // Apply maximum and minimum values
-        this->SetPt = std::clamp(this->SetPt, MinSetPoint, MaxSetPoint);
+        this->setPt = std::clamp(this->setPt, MinSetPoint, MaxSetPoint);
     }
 } // SPMOutsideAirPretreat::calculate()
 
 void SPMTempest::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2002
@@ -3030,12 +3008,12 @@ void SPMTempest::calculate(EnergyPlusData &state)
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Real64 SetPointTemp = 0.0;
 
-    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->AirLoopNum);
+    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->airLoopNum);
 
     if (this->type == SPMType::Warmest) {
                 
         Real64 TotCoolLoad = 0.0;
-        SetPointTemp = this->MaxSetTemp;
+        SetPointTemp = this->maxSetTemp;
 
         for (int iZoneNum = 1; iZoneNum <= airToZoneNode.NumZonesCooled; ++iZoneNum) {
             int CtrlZoneNum = airToZoneNode.CoolCtrlZoneNums(iZoneNum);
@@ -3045,7 +3023,7 @@ void SPMTempest::calculate(EnergyPlusData &state)
             Real64 ZoneMassFlowMax = zoneInletNode.MassFlowRateMax;
             Real64 ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             Real64 ZoneTemp = zoneNode.Temp;
-            Real64 ZoneSetPointTemp = this->MaxSetTemp;
+            Real64 ZoneSetPointTemp = this->maxSetTemp;
             if (ZoneLoad < 0.0) {
                 TotCoolLoad += std::abs(ZoneLoad);
                 Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
@@ -3056,14 +3034,14 @@ void SPMTempest::calculate(EnergyPlusData &state)
             SetPointTemp = min(SetPointTemp, ZoneSetPointTemp);
         }
         
-        SetPointTemp = std::clamp(SetPointTemp, this->MinSetTemp, MaxSetTemp);
+        SetPointTemp = std::clamp(SetPointTemp, this->minSetTemp, this->maxSetTemp);
         if (TotCoolLoad < HVAC::SmallLoad) {
-            SetPointTemp = this->MaxSetTemp;
+            SetPointTemp = this->maxSetTemp;
         }
 
     } else { // (spm->type == SPMType::Coldest)
         Real64 TotHeatLoad = 0.0;
-        SetPointTemp = this->MinSetTemp;
+        SetPointTemp = this->minSetTemp;
 
         if (airToZoneNode.NumZonesHeated > 0) {
             // dual-duct heated only zones
@@ -3074,7 +3052,7 @@ void SPMTempest::calculate(EnergyPlusData &state)
                 Real64 ZoneMassFlowMax = zoneInletNode.MassFlowRateMax;
                 Real64 ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
                 Real64 ZoneTemp = zoneNode.Temp;
-                Real64 ZoneSetPointTemp = this->MinSetTemp;
+                Real64 ZoneSetPointTemp = this->minSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
                     Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
@@ -3093,7 +3071,7 @@ void SPMTempest::calculate(EnergyPlusData &state)
                 Real64 ZoneMassFlowMax = zoneInletNode.MassFlowRateMax;
                 Real64 ZoneLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
                 Real64 ZoneTemp = zoneNode.Temp;
-                Real64 ZoneSetPointTemp = this->MinSetTemp;
+                Real64 ZoneSetPointTemp = this->minSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
                     Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
@@ -3105,24 +3083,22 @@ void SPMTempest::calculate(EnergyPlusData &state)
             }
         }
         
-        SetPointTemp = std::clamp(SetPointTemp, this->MinSetTemp, this->MaxSetTemp);
+        SetPointTemp = std::clamp(SetPointTemp, this->minSetTemp, this->maxSetTemp);
         if (TotHeatLoad < HVAC::SmallLoad) {
-           SetPointTemp = this->MinSetTemp;
+           SetPointTemp = this->minSetTemp;
         }
     }
 
-    this->SetPt = SetPointTemp;
+    this->setPt = SetPointTemp;
 } // SMPTempest::calculate()
 
 
 void SPMWarmestTempFlow::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2002
     //       MODIFIED       Haves, Oct 2004
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Calculate the "warmest" supply air setpoint temperature that will satisfy the cooling
@@ -3133,17 +3109,17 @@ void SPMWarmestTempFlow::calculate(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    if (!this->SimReady) return;
+    if (!this->simReady) return;
     Real64 TotCoolLoad = 0.0;
-    Real64 MaxSetPointTemp = this->MaxSetTemp;
+    Real64 MaxSetPointTemp = this->maxSetTemp;
     Real64 SetPointTemp = MaxSetPointTemp;
-    Real64 MinSetPointTemp = this->MinSetTemp;
-    Real64 MinFracFlow = this->MinTurndown;
+    Real64 MinSetPointTemp = this->minSetTemp;
+    Real64 MinFracFlow = this->minTurndown;
     Real64 FracFlow = MinFracFlow;
     int CritZoneNumTemp = 0;
     int CritZoneNumFlow = 0;
 
-    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->AirLoopNum);
+    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->airLoopNum);
     
     for (int iZoneNum = 1; iZoneNum <= airToZoneNode.NumZonesCooled; ++iZoneNum) {
         int CtrlZoneNum = airToZoneNode.CoolCtrlZoneNums(iZoneNum);
@@ -3160,7 +3136,7 @@ void SPMWarmestTempFlow::calculate(EnergyPlusData &state)
             TotCoolLoad += std::abs(ZoneLoad);
             Real64 CpAir = PsyCpAirFnW(zoneInletNode.HumRat);
             if (ZoneMassFlowMax > HVAC::SmallMassFlow) {
-                if (this->Strategy == ControlStrategy::TempFirst) {
+                if (this->strategy == ControlStrategy::TempFirst) {
                     // First find supply air temperature required to meet the load at minimum flow. If this is
                     // below the minimum supply air temperature, calculate the fractional flow rate required to meet the
                     // load at the minimum supply air temperature.
@@ -3200,18 +3176,17 @@ void SPMWarmestTempFlow::calculate(EnergyPlusData &state)
         FracFlow = MinFracFlow;
     }
 
-    this->SetPt = SetPointTemp;
-    this->Turndown = FracFlow;
-    if (this->Strategy == ControlStrategy::TempFirst) {
-        this->CritZoneNum = (CritZoneNumFlow != 0) ? CritZoneNumFlow : CritZoneNumTemp;
+    this->setPt = SetPointTemp;
+    this->turndown = FracFlow;
+    if (this->strategy == ControlStrategy::TempFirst) {
+        this->critZoneNum = (CritZoneNumFlow != 0) ? CritZoneNumFlow : CritZoneNumTemp;
     } else { // ControlStrategy = FlowFirst
-        this->CritZoneNum = (CritZoneNumTemp != 0) ? CritZoneNumTemp : CritZoneNumFlow;
+        this->critZoneNum = (CritZoneNumTemp != 0) ? CritZoneNumTemp : CritZoneNumFlow;
     }
 } // SPMWarmestTempFlow::calculate()
 
 void SPMReturnAirBypassFlow::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 2005
@@ -3221,12 +3196,12 @@ void SPMReturnAirBypassFlow::calculate(EnergyPlusData &state)
     // return asir branch that will deliver the desired temperature at the loop outlet
     // node.
 
-    auto &mixerRABInNode = state.dataLoopNodes->Node(this->RABMixInNodeNum);
-    auto &mixerSupInNode = state.dataLoopNodes->Node(this->SupMixInNodeNum);
-    auto &mixerOutNode = state.dataLoopNodes->Node(this->MixOutNodeNum);
-    auto &loopOutNode = state.dataLoopNodes->Node(this->SysOutNodeNum);
+    auto &mixerRABInNode = state.dataLoopNodes->Node(this->rabMixInNodeNum);
+    auto &mixerSupInNode = state.dataLoopNodes->Node(this->supMixInNodeNum);
+    auto &mixerOutNode = state.dataLoopNodes->Node(this->mixOutNodeNum);
+    auto &loopOutNode = state.dataLoopNodes->Node(this->sysOutNodeNum);
 
-    Real64 TempSetPt = GetCurrentScheduleValue(state, this->SchedPtr);
+    Real64 TempSetPt = GetCurrentScheduleValue(state, this->schedNum);
     Real64 TempSetPtMod = TempSetPt - (loopOutNode.Temp - mixerOutNode.Temp);
     Real64 SupFlow = mixerSupInNode.MassFlowRate;
     Real64 TempSup = mixerSupInNode.Temp;
@@ -3265,7 +3240,7 @@ void SPMMultiZoneTemp::calculate(EnergyPlusData &state)
     // all zones in the air loop [W]
     Real64 SumProductMdotCpTZoneTot = 0.0;
 
-    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
+    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->airLoopNum);
     for (int iZoneNum = 1; iZoneNum <= airToZoneNode.NumZonesCooled; ++iZoneNum) {
         // DO ZonesHeatedIndex=1,AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
         // Using AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
@@ -3294,13 +3269,13 @@ void SPMMultiZoneTemp::calculate(EnergyPlusData &state)
     }
     Real64 ZoneAverageTemp = (SumProductMdotCpTot > 0.0) ? (SumProductMdotCpTZoneTot / SumProductMdotCpTot) : 0.0;
     Real64 SetPointTemp =  (SumProductMdotCp > 0.0) ? (ZoneAverageTemp + SumLoad / SumProductMdotCp) :
-        ((this->type == SPMType::MZHeatingAverage) ? this->MinSetTemp : this->MaxSetTemp);
+        ((this->type == SPMType::MZHeatingAverage) ? this->minSetTemp : this->maxSetTemp);
 
-    SetPointTemp = std::clamp(SetPointTemp, this->MinSetTemp, this->MaxSetTemp);
+    SetPointTemp = std::clamp(SetPointTemp, this->minSetTemp, this->maxSetTemp);
     if (std::abs(SumLoad) < HVAC::SmallLoad) {
-        SetPointTemp = (this->type == SPMType::MZHeatingAverage) ? this->MinSetTemp : this->MaxSetTemp;
+        SetPointTemp = (this->type == SPMType::MZHeatingAverage) ? this->minSetTemp : this->maxSetTemp;
     }
-    this->SetPt = SetPointTemp;
+    this->setPt = SetPointTemp;
 } // SPMMultiZoneTemp::calculate()
 
 void SPMMultiZoneHum::calculate(EnergyPlusData &state)
@@ -3328,9 +3303,9 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
     // and humidity ratio at zones air node for all zones in the airloop [kgWater/s]
     Real64 SumProductMdotHumTot = 0.0;
 
-    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum);
+    auto &airToZoneNode = state.dataAirLoop->AirToZoneNodeInfo(this->airLoopNum);
 
-    Real64 SetPointHum = (this->type == SPMType::MZMinHum || this->type == SPMType::MZMinHumAverage) ? this->MinSetHum : this->MaxSetHum;
+    Real64 SetPointHum = (this->type == SPMType::MZMinHum || this->type == SPMType::MZMinHumAverage) ? this->minSetHum : this->maxSetHum;
     
     for (int iZoneNum = 1; iZoneNum <= airToZoneNode.NumZonesCooled; ++iZoneNum) {
         int CtrlZoneNum = airToZoneNode.CoolCtrlZoneNums(iZoneNum);
@@ -3364,7 +3339,7 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         } break;
 
         case SPMType::MZMinHum: {
-            Real64 ZoneSetPointHum = this->MinSetHum;
+            Real64 ZoneSetPointHum = this->minSetHum;
             if (MoistureLoad > 0.0) {
                 SumMoistureLoad += MoistureLoad;
                 if (ZoneMassFlowRate > HVAC::SmallMassFlow) {
@@ -3375,7 +3350,7 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         } break;
 
         case SPMType::MZMaxHum: {
-            Real64 ZoneSetPointHum = this->MaxSetHum;
+            Real64 ZoneSetPointHum = this->maxSetHum;
             if (MoistureLoad < 0.0) {
                 SumMoistureLoad += MoistureLoad;
                 if (ZoneMassFlowRate > HVAC::SmallMassFlow) {
@@ -3396,16 +3371,15 @@ void SPMMultiZoneHum::calculate(EnergyPlusData &state)
         }
     } else {
         if (std::abs(SumMoistureLoad) < SmallMoistureLoad) {
-            SetPointHum = (this->type == SPMType::MZMinHum) ? this->MinSetHum : this->MaxSetHum;
+            SetPointHum = (this->type == SPMType::MZMinHum) ? this->minSetHum : this->maxSetHum;
         }
     }
     
-    this->SetPt = std::clamp(SetPointHum, this->MinSetHum, this->MaxSetHum);
+    this->setPt = std::clamp(SetPointHum, this->minSetHum, this->maxSetHum);
 } // SPMMultiZoneHum::calculate()
 
 void SPMFollowOutsideAirTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Chandan Sharma, FSEC
     //       DATE WRITTEN   July 2011
@@ -3418,20 +3392,17 @@ void SPMFollowOutsideAirTemp::calculate(EnergyPlusData &state)
     // the setpoint is calculated as OutWetBulbTemp(Or OutDryBulbTemp) + Offset.
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
-    this->SetPt = ((this->RefTempType == AirTempType::WetBulb) ? state.dataEnvrn->OutWetBulbTemp : state.dataEnvrn->OutDryBulbTemp) + this->Offset;
+    this->setPt = ((this->refTempType == AirTempType::WetBulb) ? state.dataEnvrn->OutWetBulbTemp : state.dataEnvrn->OutDryBulbTemp) + this->offset;
 
     // Apply maximum and minimum values
-    this->SetPt = std::clamp(this->SetPt, this->MinSetTemp, this->MaxSetTemp);
-}
+    this->setPt = std::clamp(this->setPt, this->minSetTemp, this->maxSetTemp);
+} // SPMFollowOutsideAirTemp::calculate()
 
 void SPMFollowSysNodeTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Chandan Sharma, FSEC
     //       DATE WRITTEN   July 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Set the setpoint based on current temperatures at a separate system node.
@@ -3449,23 +3420,20 @@ void SPMFollowSysNodeTemp::calculate(EnergyPlusData &state)
     // the resulting setpoint.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 RefNodeTemp = (this->RefTempType == AirTempType::DryBulb) ? state.dataLoopNodes->Node(this->RefNodeNum).Temp :
-        (allocated(state.dataLoopNodes->MoreNodeInfo) ? state.dataLoopNodes->MoreNodeInfo(this->RefNodeNum).WetBulbTemp : 0.0);
+    Real64 RefNodeTemp = (this->refTempType == AirTempType::DryBulb) ? state.dataLoopNodes->Node(this->refNodeNum).Temp :
+        (allocated(state.dataLoopNodes->MoreNodeInfo) ? state.dataLoopNodes->MoreNodeInfo(this->refNodeNum).WetBulbTemp : 0.0);
 
-    this->SetPt = RefNodeTemp + this->Offset;
+    this->setPt = RefNodeTemp + this->offset;
 
     // Apply maximum and minimum values
-    this->SetPt = std::clamp(this->SetPt, this->MinSetTemp, this->MaxSetTemp);
-}
+    this->setPt = std::clamp(this->setPt, this->minSetTemp, this->maxSetTemp);
+} // SPMFollowSysNodeTemp::calculate()
 
 void SPMFollowGroundTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Chandan Sharma, FSEC
     //       DATE WRITTEN   July 2011
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // Set the setpoint based on current ground temperature
@@ -3475,15 +3443,14 @@ void SPMFollowGroundTemp::calculate(EnergyPlusData &state)
     // the setpoint is calculated as GroundTemperature + Offset.
     // The sign convention is that a positive Offset will increase the resulting setpoint.
     // Final value of the setpoint is limited by the Max and Min limit specified in the setpoint manager.
-    this->SetPt = state.dataEnvrn->GroundTemp[(int)this->RefTempType] + this->Offset;
+    this->setPt = state.dataEnvrn->GroundTemp[(int)this->refTempType] + this->offset;
 
     // Apply maximum and minimum values
-    this->SetPt = std::clamp(this->SetPt, this->MinSetTemp, this->MaxSetTemp);
-}
+    this->setPt = std::clamp(this->setPt, this->minSetTemp, this->maxSetTemp);
+} // SPMFollowGrounTemp::calculate()
 
 void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Atefe Makhmalbaf and Heejin Cho, PNNL
     //       DATE WRITTEN   March 2012
@@ -3501,22 +3468,16 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
     using ScheduleManager::GetCurrentScheduleValue;
     using namespace DataPlant;
 
+    auto &dspm = state.dataSetPointManager;
+    
     // Current timestep's condenser water entering setpoint
-    Real64 CondenserEnteringTempSetPoint = GetCurrentScheduleValue(state, this->CondenserEnteringTempSchedPtr);
+    Real64 CondenserEnteringTempSetPoint = GetCurrentScheduleValue(state, this->condenserEnteringTempSchedNum);
 
     auto &supplyLoop = state.dataPlnt->PlantLoop(this->plantPloc.loopNum).LoopSide(LoopSideLocation::Supply);
     auto &supplyComp = supplyLoop.Branch(this->plantPloc.branchNum).Comp(this->plantPloc.compNum);
 
     auto &demandLoop = state.dataPlnt->PlantLoop(this->demandPloc.loopNum).LoopSide(LoopSideLocation::Demand);
     auto &demandComp = demandLoop.Branch(this->demandPloc.branchNum).Comp(this->demandPloc.compNum);
-
-    Real64 WeightedLoadRatio = 0.0;
-    Real64 OptCondenserEnteringTemp = 0.0;
-    Real64 DesignEnteringCondenserTemp = 0.0;
-    Real64 CurMinLift = 0.0;
-    Real64 DesignMinCondenserSetPt = 0.0;
-    Real64 MinDesignWetBulbTemp = 0.0;
-    Real64 MinActualWetBulbTemp = 0.0;
     
     // If chiller is on
     Real64 CurLoad = std::abs(supplyComp.MyLoad);
@@ -3533,19 +3494,19 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
         // Get from tower design values
         constexpr Real64 NormDesignCondenserFlow = 5.38e-8; // m3/s per watt (typically 3 gpm/ton)=(Volume of condenser fluid)/(ton of heat rejection)
     
-        if (this->ChillerType == PlantEquipmentType::Chiller_Absorption ||
-            this->ChillerType == PlantEquipmentType::Chiller_CombTurbine ||
-            this->ChillerType == PlantEquipmentType::Chiller_Electric ||
-            this->ChillerType == PlantEquipmentType::Chiller_ElectricReformEIR ||
-            this->ChillerType == PlantEquipmentType::Chiller_EngineDriven) {
+        if (this->chillerType == PlantEquipmentType::Chiller_Absorption ||
+            this->chillerType == PlantEquipmentType::Chiller_CombTurbine ||
+            this->chillerType == PlantEquipmentType::Chiller_Electric ||
+            this->chillerType == PlantEquipmentType::Chiller_ElectricReformEIR ||
+            this->chillerType == PlantEquipmentType::Chiller_EngineDriven) {
             DesignCondenserInTemp = supplyComp.TempDesCondIn;
             CondInletTemp = state.dataLoopNodes->Node(demandComp.NodeNumIn).Temp;
             EvapOutletTemp = state.dataLoopNodes->Node(supplyComp.NodeNumOut).Temp;
             DesignEvapOutTemp = supplyComp.TempDesEvapOut;
             DesignLoad = supplyComp.MaxLoad;
             ActualLoad = state.dataPlnt->PlantLoop(this->plantPloc.loopNum).CoolingDemand;
-        } else if (this->ChillerType == PlantEquipmentType::Chiller_Indirect_Absorption ||
-                   this->ChillerType == PlantEquipmentType::Chiller_DFAbsorption) {
+        } else if (this->chillerType == PlantEquipmentType::Chiller_Indirect_Absorption ||
+                   this->chillerType == PlantEquipmentType::Chiller_DFAbsorption) {
             DesignCondenserInTemp = supplyComp.TempDesCondIn;
             DesignEvapOutTemp = 6.666;
         } else {
@@ -3554,27 +3515,27 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
         }
 
         // for attached chillers (that are running this timestep) find their Dsn_MinCondSetpt and Dsn_EntCondTemp
-        DesignMinCondenserSetPt = 999.0;
-        DesignEnteringCondenserTemp = 0.0;
+        dspm->CET_DesignMinCondenserSetPt = 999.0;
+        dspm->CET_DesignEnteringCondenserTemp = 0.0;
 
         // Design Minimum Condenser Entering as a function of the minimum lift and TEvapLvg
         // for chillers operating on current cond loop this timestep
-        Real64 DesignMinCondenserEnteringTempThisChiller = DesignEvapOutTemp + (this->MinimumLift);
-        DesignMinCondenserSetPt = min(DesignMinCondenserSetPt, DesignMinCondenserEnteringTempThisChiller);
+        Real64 DesignMinCondenserEnteringTempThisChiller = DesignEvapOutTemp + (this->minLift);
+        dspm->CET_DesignMinCondenserSetPt = min(dspm->CET_DesignMinCondenserSetPt, DesignMinCondenserEnteringTempThisChiller);
 
         // Design entering condenser water temperature for chillers operating
         // on current cond loop this timestep
-        DesignEnteringCondenserTemp = max(DesignEnteringCondenserTemp, DesignCondenserInTemp);
+        dspm->CET_DesignEnteringCondenserTemp = max(dspm->CET_DesignEnteringCondenserTemp, DesignCondenserInTemp);
 
         // ***** Load Calculations *****
         // In this section the sum of the actual load (watts) and design load (watts)
         // of the chillers that are on is calculated.
-        state.dataSetPointManager->ActualLoadSum += ActualLoad;
-        state.dataSetPointManager->DesignLoadSum += DesignLoad;
+        dspm->CET_ActualLoadSum += ActualLoad;
+        dspm->CET_DesignLoadSum += DesignLoad;
 
         // Exit if the chillers are all off this hour
-        if (state.dataSetPointManager->ActualLoadSum <= 0) {
-            CondenserEnteringTempSetPoint = DesignEnteringCondenserTemp;
+        if (dspm->CET_ActualLoadSum <= 0) {
+            CondenserEnteringTempSetPoint = dspm->CET_DesignEnteringCondenserTemp;
             return;
         }
 
@@ -3584,65 +3545,65 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
         // the Weighted Ratio is found.
         Real64 WeightedActualLoad = 0.0;                    // Actual load weighting of each chiller, W
         Real64 WeightedDesignLoad = 0.0;                    // Design capacity of each chiller, W
-        if (state.dataSetPointManager->ActualLoadSum != 0 && state.dataSetPointManager->DesignLoadSum != 0) {
-            WeightedActualLoad = ((ActualLoad / state.dataSetPointManager->ActualLoadSum) * ActualLoad); 
-            WeightedDesignLoad = ((DesignLoad / state.dataSetPointManager->DesignLoadSum) * DesignLoad);
+        if (dspm->CET_ActualLoadSum != 0 && dspm->CET_DesignLoadSum != 0) {
+            WeightedActualLoad = ((ActualLoad / dspm->CET_ActualLoadSum) * ActualLoad); 
+            WeightedDesignLoad = ((DesignLoad / dspm->CET_DesignLoadSum) * DesignLoad);
         } 
         
-        state.dataSetPointManager->WeightedActualLoadSum += WeightedActualLoad;
-        state.dataSetPointManager->WeightedDesignLoadSum += WeightedDesignLoad;
-        WeightedLoadRatio = state.dataSetPointManager->WeightedActualLoadSum / state.dataSetPointManager->WeightedDesignLoadSum;
+        dspm->CET_WeightedActualLoadSum += WeightedActualLoad;
+        dspm->CET_WeightedDesignLoadSum += WeightedDesignLoad;
+        dspm->CET_WeightedLoadRatio = dspm->CET_WeightedActualLoadSum / dspm->CET_WeightedDesignLoadSum;
 
         // ***** Optimal Temperature Calculation *****
         // In this section the optimal temperature is computed along with the minimum
         // design wet bulb temp and the minimum actual wet bulb temp.
         // Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
-        MinDesignWetBulbTemp = EnergyPlus::Curve::CurveValue(state,
-                                                             this->MinTowerDesignWetBulbCurveNum,
-                                                             state.dataEnvrn->OutWetBulbTemp,
-                                                             WeightedLoadRatio,
-                                                             this->TowerDesignInletAirWetBulbTemp,
-                                                             NormDesignCondenserFlow);
+        dspm->CET_DesignMinWetBulbTemp = EnergyPlus::Curve::CurveValue(state,
+                                                                       this->minTowerDesignWetBulbCurveNum,
+                                                                       state.dataEnvrn->OutWetBulbTemp,
+                                                                       dspm->CET_WeightedLoadRatio,
+                                                                       this->towerDesignInletAirWetBulbTemp,
+                                                                       NormDesignCondenserFlow);
         
         // Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
-        MinActualWetBulbTemp = EnergyPlus::Curve::CurveValue(state,
-                                                             this->MinOAWetBulbCurveNum,
-                                                             MinDesignWetBulbTemp,
-                                                             WeightedLoadRatio,
-                                                             this->TowerDesignInletAirWetBulbTemp,
-                                                             NormDesignCondenserFlow);
+        dspm->CET_MinActualWetBulbTemp = EnergyPlus::Curve::CurveValue(state,
+                                                                       this->minOAWetBulbCurveNum,
+                                                                       dspm->CET_DesignMinWetBulbTemp,
+                                                                       dspm->CET_WeightedLoadRatio,
+                                                                       this->towerDesignInletAirWetBulbTemp,
+                                                                       NormDesignCondenserFlow);
         
         // Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
-        OptCondenserEnteringTemp = EnergyPlus::Curve::CurveValue(state,
-                                                                 this->OptCondenserEnteringTempCurveNum,
+        dspm->CET_OptCondenserEnteringTemp = EnergyPlus::Curve::CurveValue(state,
+                                                                 this->optCondenserEnteringTempCurveNum,
                                                                  state.dataEnvrn->OutWetBulbTemp,
-                                                                 WeightedLoadRatio,
-                                                                 this->TowerDesignInletAirWetBulbTemp,
+                                                                 dspm->CET_WeightedLoadRatio,
+                                                                 this->towerDesignInletAirWetBulbTemp,
                                                                  NormDesignCondenserFlow);
         
         // ***** Calculate (Cond ent - Evap lvg) Section *****
         // In this section we find the worst case of (Cond ent - Evap lvg) for the
         // chillers that are running.
-        CurMinLift = 9999.0;
+        dspm->CET_CurMinLift = 9999.0;
         // temp_MinLiftTD = 20.0 / 1.8;
         Real64 TempMinLift = CondInletTemp - EvapOutletTemp;
-        CurMinLift = min(CurMinLift, TempMinLift);
+        dspm->CET_CurMinLift = min(dspm->CET_CurMinLift, TempMinLift);
     }
 
     Real64 SetPoint = 0.0;               // Condenser entering water temperature setpoint this timestep, C
 
     // ***** Limit conditions Section *****
     // Check for limit conditions and control to the proper value.
-    if ((WeightedLoadRatio >= 0.90) &&
-        (OptCondenserEnteringTemp >= (DesignEnteringCondenserTemp + 1.0))) {
+    if ((dspm->CET_WeightedLoadRatio >= 0.90) &&
+        (dspm->CET_OptCondenserEnteringTemp >= (dspm->CET_DesignEnteringCondenserTemp + 1.0))) {
         // Optimized value exceeds the design condenser entering condition or chillers
         // near full load condition; reset condenser entering setpoint to its design value
-        SetPoint = DesignEnteringCondenserTemp + 1.0;
-    } else if ((state.dataEnvrn->OutWetBulbTemp >= MinActualWetBulbTemp) &&
-               (this->TowerDesignInletAirWetBulbTemp >= MinDesignWetBulbTemp) &&
-               (CurMinLift > this->MinimumLift)) {
+        SetPoint = dspm->CET_DesignEnteringCondenserTemp + 1.0;
+    } else if ((state.dataEnvrn->OutWetBulbTemp >= dspm->CET_MinActualWetBulbTemp) &&
+               (this->towerDesignInletAirWetBulbTemp >= dspm->CET_DesignMinWetBulbTemp) &&
+               (dspm->CET_CurMinLift > this->minLift)) {
         // Boundaries are satified; use optimized condenser entering water temp
-        SetPoint = OptCondenserEnteringTemp;
+        SetPoint = dspm->CET_OptCondenserEnteringTemp;
     } else {
         // Boundaries violated; Reset to scheduled value of condenser water entering setpoint
         SetPoint = CondenserEnteringTempSetPoint;
@@ -3650,12 +3611,11 @@ void SPMCondenserEnteringTemp::calculate(EnergyPlusData &state)
     
     // Do not allow new setpoint to be less than the design condenser minimum entering condition,
     // i.e., TCondWaterEnt not allowed to be less than DsnEvapWaterLvg + MinimumLiftTD
-    this->SetPt = max(SetPoint, DesignMinCondenserSetPt);
+    this->setPt = max(SetPoint, dspm->CET_DesignMinCondenserSetPt);
 } // SPMCondenserEneteringTemp::calculate()
 
 void SPMIdealCondenserEnteringTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Heejin Cho, PNNL
     //       DATE WRITTEN   March 2012
@@ -3676,15 +3636,17 @@ void SPMIdealCondenserEnteringTemp::calculate(EnergyPlusData &state)
     // Using/Aliasing
     using namespace DataPlant;
 
+    auto &dspm = state.dataSetPointManager;
+    
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    auto &supplyLoop = state.dataPlnt->PlantLoop(this->ChillerPloc.loopNum).LoopSide(LoopSideLocation::Supply);
-    auto &supplyComp = supplyLoop.Branch(this->ChillerPloc.branchNum).Comp(this->ChillerPloc.compNum);
+    auto &supplyLoop = state.dataPlnt->PlantLoop(this->chillerPloc.loopNum).LoopSide(LoopSideLocation::Supply);
+    auto &supplyComp = supplyLoop.Branch(this->chillerPloc.branchNum).Comp(this->chillerPloc.compNum);
 
     if (state.dataGlobal->MetersHaveBeenInitialized) {
         // Setup meter vars
-        if (this->SetupIdealCondEntSetPtVars) {
+        if (this->setupIdealCondEntSetPtVars) {
             this->SetupMeteredVarsForSetPt(state);
-            this->SetupIdealCondEntSetPtVars = false;
+            this->setupIdealCondEntSetPtVars = false;
         }
     }
 
@@ -3695,39 +3657,39 @@ void SPMIdealCondenserEnteringTemp::calculate(EnergyPlusData &state)
 
         if (CurLoad > 0) {
 
-            Real64 EvapOutletTemp = (this->ChillerType == PlantEquipmentType::Chiller_Absorption ||
-                                     this->ChillerType == PlantEquipmentType::Chiller_CombTurbine ||
-                                     this->ChillerType == PlantEquipmentType::Chiller_Electric ||
-                                     this->ChillerType == PlantEquipmentType::Chiller_ElectricReformEIR ||
-                                     this->ChillerType == PlantEquipmentType::Chiller_EngineDriven) ?
+            Real64 EvapOutletTemp = (this->chillerType == PlantEquipmentType::Chiller_Absorption ||
+                                     this->chillerType == PlantEquipmentType::Chiller_CombTurbine ||
+                                     this->chillerType == PlantEquipmentType::Chiller_Electric ||
+                                     this->chillerType == PlantEquipmentType::Chiller_ElectricReformEIR ||
+                                     this->chillerType == PlantEquipmentType::Chiller_EngineDriven) ?
                     state.dataLoopNodes->Node(supplyComp.NodeNumOut).Temp : 6.666;
 
-            Real64 CondTempLimit = this->MinimumLift + EvapOutletTemp;
+            Real64 CondTempLimit = this->minLift + EvapOutletTemp;
 
             Real64 TotEnergy = this->calculateCurrentEnergyUsage(state);
 
             this->setupSetPointAndFlags(TotEnergy,
-                                        state.dataSetPointManager->TotEnergyPre,
-                                        state.dataSetPointManager->CondenserWaterSetPt,
+                                        dspm->ICET_TotEnergyPre,
+                                        dspm->ICET_CondenserWaterSetPt,
                                         CondTempLimit,
                                         state.dataGlobal->RunOptCondEntTemp,
-                                        state.dataSetPointManager->RunSubOptCondEntTemp,
-                                        state.dataSetPointManager->RunFinalOptCondEntTemp);
+                                        dspm->ICET_RunSubOptCondEntTemp,
+                                        dspm->ICET_RunFinalOptCondEntTemp);
 
         } else {
-            state.dataSetPointManager->CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
-            state.dataSetPointManager->TotEnergyPre = 0.0;
+            dspm->ICET_CondenserWaterSetPt = this->maxCondenserEnteringTemp;
+            dspm->ICET_TotEnergyPre = 0.0;
             state.dataGlobal->RunOptCondEntTemp = false;
-            state.dataSetPointManager->RunSubOptCondEntTemp = false;
+            dspm->ICET_RunSubOptCondEntTemp = false;
         }
     } else {
-        state.dataSetPointManager->CondenserWaterSetPt = this->MaxCondenserEnteringTemp;
+        dspm->ICET_CondenserWaterSetPt = this->maxCondenserEnteringTemp;
         state.dataGlobal->RunOptCondEntTemp = false;
-        state.dataSetPointManager->RunSubOptCondEntTemp = false;
+        dspm->ICET_RunSubOptCondEntTemp = false;
     }
 
-    this->SetPt = state.dataSetPointManager->CondenserWaterSetPt;
-}
+    this->setPt = dspm->ICET_CondenserWaterSetPt;
+} // SPMIdealCondenserEnteringTemp::calculate()
 
 void SPMIdealCondenserEnteringTemp::setupSetPointAndFlags(Real64 &TotEnergy,
                                                           Real64 &TotEnergyPre,
@@ -3771,7 +3733,7 @@ void SPMIdealCondenserEnteringTemp::setupSetPointAndFlags(Real64 &TotEnergy,
             }
         }
     } else {
-        CondWaterSetPoint = this->MaxCondenserEnteringTemp - 1.0;
+        CondWaterSetPoint = this->maxCondenserEnteringTemp - 1.0;
         TotEnergyPre = TotEnergy;
         RunOptCondEntTemp = true;
         RunSubOptCondEntTemp = false;
@@ -3780,19 +3742,18 @@ void SPMIdealCondenserEnteringTemp::setupSetPointAndFlags(Real64 &TotEnergy,
 
 Real64 SPMIdealCondenserEnteringTemp::calculateCurrentEnergyUsage(EnergyPlusData &state)
 {
-    Real64 ChillerEnergy = GetInternalVariableValue(state, this->ChillerVar.Type, this->ChillerVar.Num);
-    Real64 ChilledPumpEnergy = GetInternalVariableValue(state, this->ChilledWaterPumpVar.Type, this->ChilledWaterPumpVar.Num);
+    Real64 ChillerEnergy = GetInternalVariableValue(state, this->chillerVar.Type, this->chillerVar.Num);
+    Real64 ChilledPumpEnergy = GetInternalVariableValue(state, this->chilledWaterPumpVar.Type, this->chilledWaterPumpVar.Num);
     Real64 TowerFanEnergy = 0;
-    for (int i = 1; i <= this->NumTowers; i++) {
-        TowerFanEnergy += GetInternalVariableValue(state, this->TowerVars(i).Type, this->TowerVars(i).Num);
+    for (int i = 1; i <= this->numTowers; i++) {
+        TowerFanEnergy += GetInternalVariableValue(state, this->towerVars(i).Type, this->towerVars(i).Num);
     }
-    Real64 CondPumpEnergy = GetInternalVariableValue(state, this->CondenserPumpVar.Type, this->CondenserPumpVar.Num);
+    Real64 CondPumpEnergy = GetInternalVariableValue(state, this->condenserPumpVar.Type, this->condenserPumpVar.Num);
     return (ChillerEnergy + ChilledPumpEnergy + TowerFanEnergy + CondPumpEnergy);
 } // SPMIdealCondenserEnteringTemp::calculateCurrentEnergyUsage()
 
 void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Edwin Lee, NREL
     //       DATE WRITTEN   May 2015
@@ -3859,7 +3820,7 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
 
     // check for strange conditions
     if (Qdemand < 0) {
-        this->currentSupplySetPt = (this->type == SPMType::ChilledWaterReturnTemp) ? this->MinSetTemp : this->MaxSetTemp;
+        this->currentSupplySetPt = (this->type == SPMType::ChilledWaterReturnTemp) ? this->minSetTemp : this->maxSetTemp;
         return;
     }
 
@@ -3887,22 +3848,19 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
     }
 
     // calculate the supply setpoint to use, default to the design value if flow is zero
-    Real64 T_supply_setpoint = (this->type == SPMType::ChilledWaterReturnTemp) ? this->MinSetTemp : this->MaxSetTemp;
+    Real64 T_supply_setpoint = (this->type == SPMType::ChilledWaterReturnTemp) ? this->minSetTemp : this->maxSetTemp;
     if (mdot > DataConvergParams::PlantFlowRateToler) {
         T_supply_setpoint = T_return_target + ((this->type == SPMType::ChilledWaterReturnTemp) ? -Qdemand : Qdemand) / (mdot * cp);
     }
 
-    this->currentSupplySetPt = std::clamp(T_supply_setpoint, this->MinSetTemp, this->MaxSetTemp);
+    this->currentSupplySetPt = std::clamp(T_supply_setpoint, this->minSetTemp, this->maxSetTemp);
 } // SPMReturnWaterTemp::calculate()
 
 void SPMIdealCondenserEnteringTemp::SetupMeteredVarsForSetPt(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   Sep 2013
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
     // For the Ideal Cond reset setpoint manager, this sets up the
@@ -3918,53 +3876,53 @@ void SPMIdealCondenserEnteringTemp::SetupMeteredVarsForSetPt(EnergyPlusData &sta
     Array1D<OutputProcessor::MeteredVar> meteredVars;
     int NumVariables;
 
-    auto &plantLoop = state.dataPlnt->PlantLoop(this->ChillerPloc.loopNum);
-    auto &supplySide = plantLoop.LoopSide(this->ChillerPloc.loopSideNum);
-    auto &chillerBranch = supplySide.Branch(this->ChillerPloc.branchNum);
-    auto &chillerComp = chillerBranch.Comp(this->ChillerPloc.compNum);
+    auto &plantLoop = state.dataPlnt->PlantLoop(this->chillerPloc.loopNum);
+    auto &supplySide = plantLoop.LoopSide(this->chillerPloc.loopSideNum);
+    auto &chillerBranch = supplySide.Branch(this->chillerPloc.branchNum);
+    auto &chillerComp = chillerBranch.Comp(this->chillerPloc.compNum);
     
     NumVariables = GetNumMeteredVariables(state, chillerComp.TypeOf, chillerComp.Name);
     meteredVars.allocate(NumVariables);
 
     GetMeteredVariables(state, chillerComp.Name, meteredVars);
-    this->ChillerVar.Type = meteredVars(1).varType;
-    this->ChillerVar.Num = meteredVars(1).num;
+    this->chillerVar.Type = meteredVars(1).varType;
+    this->chillerVar.Num = meteredVars(1).num;
 
-    auto &chilledWaterPumpBranch = supplySide.Branch(this->ChilledWaterPumpPloc.branchNum);
-    auto &chilledWaterPumpComp = chilledWaterPumpBranch.Comp(this->ChilledWaterPumpPloc.compNum);
+    auto &chilledWaterPumpBranch = supplySide.Branch(this->chilledWaterPumpPloc.branchNum);
+    auto &chilledWaterPumpComp = chilledWaterPumpBranch.Comp(this->chilledWaterPumpPloc.compNum);
     
 
     NumVariables = GetNumMeteredVariables(state, chilledWaterPumpComp.TypeOf, chilledWaterPumpComp.Name);
     meteredVars.allocate(NumVariables);
 
     GetMeteredVariables(state, chilledWaterPumpComp.Name, meteredVars);
-    this->ChilledWaterPumpVar.Type = meteredVars(1).varType;
-    this->ChilledWaterPumpVar.Num = meteredVars(1).num;
+    this->chilledWaterPumpVar.Type = meteredVars(1).varType;
+    this->chilledWaterPumpVar.Num = meteredVars(1).num;
 
-    auto &towerLoopSide = state.dataPlnt->PlantLoop(this->TowerPlocs(1).loopNum).LoopSide(this->TowerPlocs(1).loopSideNum);
+    auto &towerLoopSide = state.dataPlnt->PlantLoop(this->towerPlocs(1).loopNum).LoopSide(this->towerPlocs(1).loopSideNum);
     
-    for (int i = 1; i <= this->NumTowers; i++) {
-        auto &towerComp = towerLoopSide.Branch(this->TowerPlocs(i).branchNum).Comp(this->TowerPlocs(i).compNum);
+    for (int i = 1; i <= this->numTowers; i++) {
+        auto &towerComp = towerLoopSide.Branch(this->towerPlocs(i).branchNum).Comp(this->towerPlocs(i).compNum);
         NumVariables = GetNumMeteredVariables(state, towerComp.TypeOf, towerComp.Name);
         meteredVars.allocate(NumVariables);
 
         GetMeteredVariables(state, towerComp.Name, meteredVars);
-        this->TowerVars.push_back({meteredVars(1).varType, meteredVars(1).num});
+        this->towerVars.push_back({meteredVars(1).varType, meteredVars(1).num});
     }
 
-    auto &condenserPumpComp = towerLoopSide.Branch(this->CondenserPumpPloc.branchNum).Comp(this->CondenserPumpPloc.compNum);
+    auto &condenserPumpComp = towerLoopSide.Branch(this->condenserPumpPloc.branchNum).Comp(this->condenserPumpPloc.compNum);
     NumVariables = GetNumMeteredVariables(state, condenserPumpComp.TypeOf, condenserPumpComp.Name);
     meteredVars.allocate(NumVariables);
 
     GetMeteredVariables(state, condenserPumpComp.Name, meteredVars);
-    this->CondenserPumpVar = {meteredVars(1).varType, meteredVars(1).num};
-}
+    this->condenserPumpVar = {meteredVars(1).varType, meteredVars(1).num};
+} // SPMIdealCondenserEnteringTemp::SetupMeteredVarsForSetPt()
 
 void SPMSystemNode::calculate(EnergyPlusData &state)
 {
     Real64 RefValue = 0; // Reference value from the Reference node
 
-    auto &refNode = state.dataLoopNodes->Node(this->RefNodeNum);
+    auto &refNode = state.dataLoopNodes->Node(this->refNodeNum);
 
     switch (this->ctrlVar) {
     case HVAC::CtrlVarType::Temp: 
@@ -3976,7 +3934,7 @@ void SPMSystemNode::calculate(EnergyPlusData &state)
     default: break;
     }
 
-    this->SetPt = interpSetPoint(this->LowRef, this->HighRef, RefValue, this->LowRefSetPt, this->HighRefSetPt);
+    this->setPt = interpSetPoint(this->lowRef, this->highRef, RefValue, this->lowRefSetPt, this->highRefSetPt);
 } // SPMSystemNode::calculate()
 
 Real64 interpSetPoint(Real64 const LowVal, Real64 const HighVal, Real64 const RefVal, Real64 const SetptAtLowVal, Real64 const SetptAtHighVal)
@@ -3994,7 +3952,6 @@ Real64 interpSetPoint(Real64 const LowVal, Real64 const HighVal, Real64 const Re
 
 void UpdateSetPointManagers(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   July 1998
@@ -4031,8 +3988,6 @@ void UpdateSetPointManagers(EnergyPlusData &state)
     //                          SetpointManager:SystemNodeReset:Temperature
     //                          SetpointManager:SystemNodeReset:Humidity
 
-    //       RE-ENGINEERED  na
-
     // PURPOSE OF THIS SUBROUTINE
     // Loop over all the Setpoint Managers and use their output arrays
     // to set the node setpoints.
@@ -4048,19 +4003,19 @@ void UpdateSetPointManagers(EnergyPlusData &state)
         case SPMType::Scheduled: 
         case SPMType::SystemNodeTemp:
         case SPMType::SystemNodeHum: {
-            for (int CtrlNodeNum : spm->ctrlNodes) { 
-                auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+            for (int ctrlNodeNum : spm->ctrlNodeNums) { 
+                auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
                 switch (spm->ctrlVar) {
                 // set the setpoint depending on the type of variable being controlled
-                case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MaxTemp: { node.TempSetPointHi = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MinTemp: { node.TempSetPointLo = spm->SetPt; } break;
-                case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MassFlowRate: { node.MassFlowRateSetPoint = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MaxMassFlowRate: { node.MassFlowRateMax = spm->SetPt; } break;
-                case HVAC::CtrlVarType::MinMassFlowRate: { node.MassFlowRateMin = spm->SetPt; } break;
+                case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->setPt; } break;
+                case HVAC::CtrlVarType::MaxTemp: { node.TempSetPointHi = spm->setPt; } break;
+                case HVAC::CtrlVarType::MinTemp: { node.TempSetPointLo = spm->setPt; } break;
+                case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->setPt; } break;
+                case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->setPt; } break;
+                case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->setPt; } break;
+                case HVAC::CtrlVarType::MassFlowRate: { node.MassFlowRateSetPoint = spm->setPt; } break;
+                case HVAC::CtrlVarType::MaxMassFlowRate: { node.MassFlowRateMax = spm->setPt; } break;
+                case HVAC::CtrlVarType::MinMassFlowRate: { node.MassFlowRateMin = spm->setPt; } break;
                 default: break;
                 }
             } // for (CtrlNodeNum)
@@ -4070,7 +4025,7 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             auto *spmTESS = dynamic_cast<SPMTESScheduled *>(spm);
             assert(spmTESS != nullptr);
             
-            state.dataLoopNodes->Node(spmTESS->CtrlNodeNum).TempSetPoint = spm->SetPt;
+            state.dataLoopNodes->Node(spmTESS->ctrlNodeNum).TempSetPoint = spm->setPt;
         } break;
 
         case SPMType::ScheduledDual: {
@@ -4078,11 +4033,11 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             assert(spmSD != nullptr);
 
             if (spmSD->ctrlVar == HVAC::CtrlVarType::Temp) {
-                for (int CtrlNodeNum : spmSD->ctrlNodes) {
-                    auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+                for (int ctrlNodeNum : spmSD->ctrlNodeNums) {
+                    auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
 
-                    node.TempSetPointHi = spmSD->SetPtHi; // Set the setpoint High
-                    node.TempSetPointLo = spmSD->SetPtLo; // Set the setpoint Low
+                    node.TempSetPointHi = spmSD->setPtHi; // Set the setpoint High
+                    node.TempSetPointLo = spmSD->setPtLo; // Set the setpoint Low
                     node.TempSetPoint = (node.TempSetPointHi + node.TempSetPointLo) / 2.0; // average of the high and low
                 }
             }
@@ -4092,11 +4047,11 @@ void UpdateSetPointManagers(EnergyPlusData &state)
         case SPMType::FollowOutsideAirTemp:
         case SPMType::FollowSystemNodeTemp:
         case SPMType::FollowGroundTemp: {
-            for (int CtrlNodeNum : spm->ctrlNodes) { 
-                auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
-                if (spm->ctrlVar == HVAC::CtrlVarType::Temp) { node.TempSetPoint = spm->SetPt; }
-                else if (spm->ctrlVar == HVAC::CtrlVarType::MaxTemp) { node.TempSetPointHi = spm->SetPt; }
-                else if (spm->ctrlVar == HVAC::CtrlVarType::MinTemp) { node.TempSetPointLo = spm->SetPt; }
+            for (int ctrlNodeNum : spm->ctrlNodeNums) { 
+                auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
+                if (spm->ctrlVar == HVAC::CtrlVarType::Temp) { node.TempSetPoint = spm->setPt; }
+                else if (spm->ctrlVar == HVAC::CtrlVarType::MaxTemp) { node.TempSetPointHi = spm->setPt; }
+                else if (spm->ctrlVar == HVAC::CtrlVarType::MinTemp) { node.TempSetPointLo = spm->setPt; }
             }
 
         } break;
@@ -4113,8 +4068,8 @@ void UpdateSetPointManagers(EnergyPlusData &state)
         case SPMType::SZOneStageCooling:
         case SPMType::SZOneStageHeating: { 
             if (spm->ctrlVar == HVAC::CtrlVarType::Temp) {
-                for (int CtrlNodeNum : spm->ctrlNodes) { 
-                    state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spm->SetPt; // Set the setpoint
+                for (int ctrlNodeNum : spm->ctrlNodeNums) { 
+                    state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spm->setPt; // Set the setpoint
                 }
             }
         } break;
@@ -4122,18 +4077,18 @@ void UpdateSetPointManagers(EnergyPlusData &state)
         case SPMType::SZMinHum:
         case SPMType::MZMinHumAverage:
         case SPMType::MZMinHum: { 
-            for (int CtrlNodeNum : spm->ctrlNodes) { 
+            for (int ctrlNodeNum : spm->ctrlNodeNums) { 
                 if (spm->type == SPMType::SZMinHum || spm->ctrlVar == HVAC::CtrlVarType::MinHumRat) // Why is SZMinHum not tested for this?
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMin = spm->SetPt; 
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMin = spm->setPt; 
             }
         } break;
             
         case SPMType::SZMaxHum:
         case SPMType::MZMaxHumAverage:
         case SPMType::MZMaxHum: {
-            for (int CtrlNodeNum : spm->ctrlNodes) { 
+            for (int ctrlNodeNum : spm->ctrlNodeNums) { 
                 if (spm->type == SPMType::SZMaxHum || spm->ctrlVar == HVAC::CtrlVarType::MaxHumRat) // Why is SZMaxHum not tested for this?
-                    state.dataLoopNodes->Node(CtrlNodeNum).HumRatMax = spm->SetPt; 
+                    state.dataLoopNodes->Node(ctrlNodeNum).HumRatMax = spm->setPt; 
             }
         } break;
             
@@ -4142,12 +4097,12 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             assert(spmWTF != nullptr);
 
             if (spmWTF->ctrlVar == HVAC::CtrlVarType::Temp) {
-                for (int CtrlNodeNum : spmWTF->ctrlNodes) {
-                    state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spmWTF->SetPt; // Set the supply air temperature setpoint
+                for (int ctrlNodeNum : spmWTF->ctrlNodeNums) {
+                    state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spmWTF->setPt; // Set the supply air temperature setpoint
                 }
                 
-                state.dataAirLoop->AirLoopFlow(spmWTF->AirLoopNum).ReqSupplyFrac = spmWTF->Turndown; // Set the supply air flow rate
-                state.dataAirLoop->AirLoopControlInfo(spmWTF->AirLoopNum).LoopFlowRateSet = true; // PH 8/17/07
+                state.dataAirLoop->AirLoopFlow(spmWTF->airLoopNum).ReqSupplyFrac = spmWTF->turndown; // Set the supply air flow rate
+                state.dataAirLoop->AirLoopControlInfo(spmWTF->airLoopNum).LoopFlowRateSet = true; // PH 8/17/07
             }
         } break;
 
@@ -4156,7 +4111,7 @@ void UpdateSetPointManagers(EnergyPlusData &state)
             assert(spmRAB != nullptr);
 
             if (spmRAB->ctrlVar == HVAC::CtrlVarType::MassFlowRate) {
-                state.dataLoopNodes->Node(spmRAB->RABSplitOutNodeNum).MassFlowRateSetPoint = spmRAB->FlowSetPt; // Set the flow setpoint
+                state.dataLoopNodes->Node(spmRAB->rabSplitOutNodeNum).MassFlowRateSetPoint = spmRAB->FlowSetPt; // Set the flow setpoint
             }
         } break;
                 
@@ -4182,7 +4137,6 @@ void UpdateSetPointManagers(EnergyPlusData &state)
 
 void UpdateMixedAirSetPoints(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Fred Buhl
     //       DATE WRITTEN   May 2001
@@ -4194,15 +4148,14 @@ void UpdateMixedAirSetPoints(EnergyPlusData &state)
     for (auto *spm : state.dataSetPointManager->spms) {
         if (spm->type != SPMType::MixedAir) continue;
         if (spm->ctrlVar != HVAC::CtrlVarType::Temp) continue;
-        for (int CtrlNodeNum : spm->ctrlNodes)
-            state.dataLoopNodes->Node(CtrlNodeNum).TempSetPoint = spm->SetPt; // Set the setpoint
+        for (int ctrlNodeNum : spm->ctrlNodeNums)
+            state.dataLoopNodes->Node(ctrlNodeNum).TempSetPoint = spm->setPt; // Set the setpoint
     }
 } // UpdateMixedAirSetPoints()
 
 
 void UpdateOAPretreatSetPoints(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         M. J. Witte based on UpdateMixedAirSetPoints by Fred Buhl,
     //                        Work supported by ASHRAE research project 1254-RP
@@ -4214,13 +4167,13 @@ void UpdateOAPretreatSetPoints(EnergyPlusData &state)
 
     for (auto *spm : state.dataSetPointManager->spms) {
         if (spm->type != SPMType::OutsideAirPretreat) continue;
-        for (int CtrlNodeNum : spm->ctrlNodes)  {
-            auto &node = state.dataLoopNodes->Node(CtrlNodeNum);
+        for (int ctrlNodeNum : spm->ctrlNodeNums)  {
+            auto &node = state.dataLoopNodes->Node(ctrlNodeNum);
             switch (spm->ctrlVar) {
-            case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->SetPt; } break;
-            case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->SetPt; } break;
-            case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->SetPt; } break;
-            case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->SetPt; } break;
+            case HVAC::CtrlVarType::Temp: { node.TempSetPoint = spm->setPt; } break;
+            case HVAC::CtrlVarType::MaxHumRat: { node.HumRatMax = spm->setPt; } break;
+            case HVAC::CtrlVarType::MinHumRat: { node.HumRatMin = spm->setPt; } break;
+            case HVAC::CtrlVarType::HumRat: { node.HumRatSetPoint = spm->setPt; } break;
             default: break;
             }
         }
@@ -4241,10 +4194,10 @@ int GetSetPointManagerIndexByNode(EnergyPlusData &state, int const NodeNum, HVAC
         if (spm->ctrlVar != ctrlVar) continue;
         
         if (isRefNode) {
-            if (NodeNum == spm->RefNodeNum) return iSPM;
+            if (NodeNum == spm->refNodeNum) return iSPM;
         } else {
-            for (int CtrlNodeNum : spm->ctrlNodes) {
-                if (NodeNum == CtrlNodeNum) return iSPM;
+            for (int ctrlNodeNum : spm->ctrlNodeNums) {
+                if (NodeNum == ctrlNodeNum) return iSPM;
             }
         }
     }
@@ -4254,7 +4207,6 @@ int GetSetPointManagerIndexByNode(EnergyPlusData &state, int const NodeNum, HVAC
 
 bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, HVAC::CtrlVarType const ctrlVar)
 {
-
     // FUNCTION INFORMATION:
     //       AUTHOR         Sankaranarayanan K P
     //       DATE WRITTEN   January 2007
@@ -4275,8 +4227,8 @@ bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, HVAC::CtrlVa
 
     for (auto const *spm : state.dataSetPointManager->spms) {
         if (spm->ctrlVar != ctrlVar) continue;
-        for (int CtrlNodeNum : spm->ctrlNodes) {
-            if (NodeNum == CtrlNodeNum) return true;
+        for (int ctrlNodeNum : spm->ctrlNodeNums) {
+            if (NodeNum == ctrlNodeNum) return true;
         }
     }
 
@@ -4285,7 +4237,6 @@ bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, HVAC::CtrlVa
 
 bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, HVAC::CtrlVarType const ctrlVar)
 {
-
     // FUNCTION INFORMATION:
     //       AUTHOR         Chandan Sharma
     //       DATE WRITTEN   March 2013
@@ -4304,8 +4255,8 @@ bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, HVAC::CtrlV
 
     for (auto const *spm : state.dataSetPointManager->spms) {
         if (spm->ctrlVar != ctrlVar) continue;
-        for (int CtrlNodeNum : spm->ctrlNodes) { 
-            if (NodeNum == CtrlNodeNum) return true;
+        for (int ctrlNodeNum : spm->ctrlNodeNums) { 
+            if (NodeNum == ctrlNodeNum) return true;
         }
     }
 
@@ -4314,7 +4265,6 @@ bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, HVAC::CtrlV
 
 void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
 {
-
     // FUNCTION INFORMATION:
     //       AUTHOR         Bereket Nigusse
     //       DATE WRITTEN   August 2015
@@ -4336,8 +4286,8 @@ void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
 
     for (auto *spm : state.dataSetPointManager->spms) {
         if (spm->ctrlVar != HVAC::CtrlVarType::HumRat) continue;
-        for (int CtrlNodeNum : spm->ctrlNodes) {
-            if (NodeNum != CtrlNodeNum) continue;
+        for (int ctrlNodeNum : spm->ctrlNodeNums) {
+            if (NodeNum != ctrlNodeNum) continue;
 
             spm->ctrlVar = HVAC::CtrlVarType::MaxHumRat;
             ShowWarningError(state, format("ResetHumidityRatioCtrlVarType: {}=\"{}\". ", spmTypeNames[(int)spm->type], spm->Name));
@@ -4352,7 +4302,6 @@ void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
 
 void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Heejin Cho, PNNL
     //       DATE WRITTEN   March 2012
@@ -4366,7 +4315,6 @@ void CheckIfAnyIdealCondEntSetPoint(EnergyPlusData &state)
 
 HVAC::CtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int const NodeNum)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         B. A. Nigusse
     //       DATE WRITTEN   December 2013
@@ -4380,43 +4328,30 @@ HVAC::CtrlVarType GetHumidityRatioVariableType(EnergyPlusData &state, int const 
         state.dataSetPointManager->GetInputFlag = false;
     }
 
-    // Loop over the single zone maximum humidity setpoint Managers
     for (auto const *spm : state.dataSetPointManager->spms) {
-        switch (spm->type) {
-        case SPMType::SZMaxHum:
-        case SPMType::MZMaxHum:
-        case SPMType::MZMaxHumAverage: {
-            for (int CtrlNodeNum : spm->ctrlNodes) {
-                if (CtrlNodeNum == NodeNum) {
-                    return HVAC::CtrlVarType::MaxHumRat;
-                }
-            }
-        } break;
+        if (spm->type != SPMType::SZMaxHum && spm->type != SPMType::MZMaxHum && spm->type != SPMType::MZMaxHumAverage) continue;
+        if (std::find(spm->ctrlNodeNums.begin(), spm->ctrlNodeNums.end(), NodeNum) != spm->ctrlNodeNums.end()) {
+            return HVAC::CtrlVarType::MaxHumRat;
+        }
+    }
 
-        case SPMType::SZMinHum:
-        case SPMType::MZMinHum:
-        case SPMType::MZMinHumAverage: {
-            for (int CtrlNodeNum : spm->ctrlNodes) {
-                if (CtrlNodeNum == NodeNum) {
-                    return HVAC::CtrlVarType::MinHumRat;
-                }
-            }
-        } break;
-                    
-        case SPMType::Scheduled: {
-            for (int CtrlNodeNum : spm->ctrlNodes) {
-                if (CtrlNodeNum == NodeNum) {
-                        return spm->ctrlVar;
-                }
-            }
-        } break;
-
-        default: break;
-        } // switch (spm->type)
+    for (auto const *spm : state.dataSetPointManager->spms) {
+        if (spm->type != SPMType::SZMinHum && spm->type != SPMType::MZMinHum && spm->type != SPMType::MZMinHumAverage) continue;
+        if (std::find(spm->ctrlNodeNums.begin(), spm->ctrlNodeNums.end(), NodeNum) != spm->ctrlNodeNums.end()) {
+            return HVAC::CtrlVarType::MaxHumRat;
+        }
     }
     
+    for (auto const *spm : state.dataSetPointManager->spms) {
+        if (spm->type != SPMType::Scheduled) continue;
+        if (std::find(spm->ctrlNodeNums.begin(), spm->ctrlNodeNums.end(), NodeNum) != spm->ctrlNodeNums.end()) {
+           if (spm->ctrlVar == HVAC::CtrlVarType::HumRat || spm->ctrlVar == HVAC::CtrlVarType::MaxHumRat)
+              return spm->ctrlVar;
+        }
+    } 
+    
     return HVAC::CtrlVarType::HumRat;
-}
+} // GetHumidityRatioVariableType()
 
 void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
                                   int const SchedPtr,
@@ -4445,19 +4380,17 @@ void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
     state.dataSetPointManager->spms.push_back(spm);
     state.dataSetPointManager->spmMap.insert_or_assign(spm->Name, state.dataSetPointManager->spms.size());
     
-    spm->SchedPtr = SchedPtr;
-    spm->SchedPtrCharge = SchedPtrCharge;
-    spm->NonChargeCHWTemp = NonChargeCHWTemp;
-    spm->ChargeCHWTemp = ChargeCHWTemp;
-    spm->CompOpType = CompOpType;
-    spm->CtrlNodeNum = ControlNodeNum;
+    spm->schedNum = SchedPtr;
+    spm->schedNumCharge = SchedPtrCharge;
+    spm->nonChargeCHWTemp = NonChargeCHWTemp;
+    spm->chargeCHWTemp = ChargeCHWTemp;
+    spm->compOpType = CompOpType;
+    spm->ctrlNodeNum = ControlNodeNum;
 
     // Set up the all setpoint manager information for "verification" that no other setpoint manager controls the node that this new ones does
-    spm->ctrlNodes.allocate(1);
-    spm->ctrlNodes(1) = spm->CtrlNodeNum;
+    spm->ctrlNodeNums.push_back(spm->ctrlNodeNum);
     spm->type = SPMType::TESScheduled;
     spm->ctrlVar = HVAC::CtrlVarType::Temp;
-    spm->numCtrlNodes = 1;
 
     // Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
     bool ErrorsFoundinTESSchSetup = false;
@@ -4472,12 +4405,11 @@ void SetUpNewScheduledTESSetPtMgr(EnergyPlusData &state,
     spm->calculate(state);
 
     // Now update reusing code from Update routine specialized to only doing the current (new) setpoint manager and then we are done
-    state.dataLoopNodes->Node(spm->CtrlNodeNum).TempSetPoint = spm->SetPt;
+    state.dataLoopNodes->Node(spm->ctrlNodeNum).TempSetPoint = spm->setPt;
 } // end of SetUpNewScheduledTESSetPtMgr
 
 bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const spmNum)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         L. Gu
     //       DATE WRITTEN   Nov. 2015
@@ -4491,12 +4423,11 @@ bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const spmNum)
 
     auto *spmMA = dynamic_cast<SPMMixedAir *>(state.dataSetPointManager->spms(spmNum));
     assert(spmMA != nullptr);
-    return spmMA->FreezeCheckEnable;
+    return spmMA->freezeCheckEnable;
 } // GetCoilFreezingCheckFlag()
 
 int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAirNode)
 {
-
     // SUBROUTINE INFORMATION:
     //       AUTHOR         L. Gu
     //       DATE WRITTEN   Nov. 2015
@@ -4516,10 +4447,9 @@ int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAi
         auto *spmMA = dynamic_cast<SPMMixedAir *>(spm);
         assert(spmMA != nullptr);
             
-        for (int CtrlNodeNum : spmMA->ctrlNodes) {
-            if (CtrlNodeNum == MixedAirNode && spmMA->CoolCoilInNodeNum > 0 && spmMA->CoolCoilOutNodeNum > 0) {
-                return iSPM; // Is this really thing we are returning? Not the number of the SPM?  Why?
-            }
+        if (std::find(spmMA->ctrlNodeNums.begin(), spmMA->ctrlNodeNums.end(), MixedAirNode) != spmMA->ctrlNodeNums.end() &&
+            spmMA->coolCoilInNodeNum > 0 && spmMA->coolCoilOutNodeNum > 0) {
+            return iSPM; // Is this really thing we are returning? Not the number of the SPM?  Why?
         }
     }
 
