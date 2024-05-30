@@ -221,7 +221,7 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
             if (parsed_values != num_columns) {
                 success = false;
 
-                size_t found_index = csv.find_first_of('\n', this_beginning_of_line_index);
+                size_t found_index = csv.find_first_of("\r\n", this_beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
                     line = csv.substr(this_beginning_of_line_index, found_index - this_beginning_of_line_index);
