@@ -16581,11 +16581,12 @@ namespace UnitarySystems {
         return airNode;
     }
 
-    int getIndex(EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, bool &errFlag)
+    int getZoneEqIndex(
+        EnergyPlusData &state, std::string const &UnitarySysName, DataZoneEquipment::ZoneEquipType zoneEquipType, bool &errFlag, int const OAUnitNum)
     {
 
         if (state.dataUnitarySystems->getInputOnceFlag) {
-            UnitarySystems::UnitarySys::getUnitarySystemInput(state, UnitarySysName, false, 0);
+            UnitarySystems::UnitarySys::getUnitarySystemInput(state, UnitarySysName, false, OAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;
         }
 
@@ -16594,7 +16595,8 @@ namespace UnitarySystems {
             if (Util::SameString(UnitarySysName, state.dataUnitarySystems->unitarySys[UnitarySysNum].Name)) {
                 if (zoneEquipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
                     zoneEquipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
-                    zoneEquipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir) {
+                    zoneEquipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
+                    zoneEquipType == DataZoneEquipment::ZoneEquipType::UnitarySystem) {
                     EquipIndex = UnitarySysNum;
                     break;
                 }

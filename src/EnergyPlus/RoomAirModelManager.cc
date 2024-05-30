@@ -2741,12 +2741,12 @@ namespace RoomAir {
             ReturnNodeNum = OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner: { // ZoneHVAC : PackagedTerminalAirConditioner
-            EquipIndex = UnitarySystems::getIndex(state, EquipName, zoneEquipType, errorfound);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType, errorfound);
             SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
             ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump: { // ZoneHVAC : PackagedTerminalHeatPump
-            EquipIndex = UnitarySystems::getIndex(state, EquipName, zoneEquipType, errorfound);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType, errorfound);
             SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
             ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
@@ -2763,7 +2763,7 @@ namespace RoomAir {
             SupplyNodeNum = VentilatedSlab::GetVentilatedSlabZoneAirInNode(state, EquipIndex);
         } break;
         case DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir: { // ZoneHVAC : WaterToAirHeatPump
-            EquipIndex = UnitarySystems::getIndex(state, EquipName, zoneEquipType, errorfound);
+            EquipIndex = UnitarySystems::getZoneEqIndex(state, EquipName, zoneEquipType, errorfound);
             SupplyNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirOutNode;
             ReturnNodeNum = state.dataUnitarySystems->unitarySys[EquipIndex].AirInNode;
         } break;
