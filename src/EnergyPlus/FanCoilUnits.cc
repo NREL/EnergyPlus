@@ -4448,16 +4448,16 @@ namespace FanCoilUnits {
             state.dataFanCoilUnits->GetFanCoilInputFlag = false;
         }
 
-        errFlag = true;
+        int EquipIndex = 0;
         for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->Num4PipeFanCoils; ++FanCoilIndex) {
             auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilIndex);
             if (Util::SameString(fanCoil.Name, CompName)) {
-                errFlag = false;
-                return FanCoilIndex;
+                EquipIndex = FanCoilIndex;
             }
         }
 
-        return 0;
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
     }
 
 } // namespace FanCoilUnits

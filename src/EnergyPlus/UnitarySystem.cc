@@ -16586,7 +16586,7 @@ namespace UnitarySystems {
     {
 
         if (state.dataUnitarySystems->getInputOnceFlag) {
-            UnitarySystems::UnitarySys::getUnitarySystemInput(state, UnitarySysName, false, OAUnitNum);
+            UnitarySystems::UnitarySys::getUnitarySystemInput(state, UnitarySysName, true, OAUnitNum);
             state.dataUnitarySystems->getInputOnceFlag = false;
         }
 
