@@ -14480,41 +14480,41 @@ TEST_F(EnergyPlusFixture, ExtSolarForShadingTest)
 
     // First processed surface will be the detailed site shading surface
     EXPECT_EQ(thisSG->SurfaceTmp(1).Name, "SHADETEST2SITEDETAILED");
-    EXPECT_EQ(thisSG->SurfaceTmp(1).Class, SurfaceClass::Detached_F);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(1).Class, SurfaceClass::Detached_F));
     EXPECT_FALSE(thisSG->SurfaceTmp(1).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(1).ExtSolar);
     EXPECT_EQ(thisSG->SurfaceTmp(2).Name, "Mir-SHADETEST2SITEDETAILED");
-    EXPECT_EQ(thisSG->SurfaceTmp(2).Class, SurfaceClass::Detached_F);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(2).Class, SurfaceClass::Detached_F));
     EXPECT_FALSE(thisSG->SurfaceTmp(2).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(2).ExtSolar);
 
     // Second processed surface will be the detailed building shading surface
     EXPECT_EQ(thisSG->SurfaceTmp(3).Name, "SHADETEST1BUILDINGDETAILED");
-    EXPECT_EQ(thisSG->SurfaceTmp(3).Class, SurfaceClass::Detached_B);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(3).Class, SurfaceClass::Detached_B));
     EXPECT_FALSE(thisSG->SurfaceTmp(3).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(3).ExtSolar);
     EXPECT_EQ(thisSG->SurfaceTmp(4).Name, "Mir-SHADETEST1BUILDINGDETAILED");
-    EXPECT_EQ(thisSG->SurfaceTmp(4).Class, SurfaceClass::Detached_B);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(4).Class, SurfaceClass::Detached_B));
     EXPECT_FALSE(thisSG->SurfaceTmp(4).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(4).ExtSolar);
 
     // Third processed surface will be the site (simple) shading surface
     EXPECT_EQ(thisSG->SurfaceTmp(5).Name, "SHADETEST4SITE");
-    EXPECT_EQ(thisSG->SurfaceTmp(5).Class, SurfaceClass::Detached_F);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(5).Class, SurfaceClass::Detached_F));
     EXPECT_FALSE(thisSG->SurfaceTmp(5).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(5).ExtSolar);
     EXPECT_EQ(thisSG->SurfaceTmp(6).Name, "Mir-SHADETEST4SITE");
-    EXPECT_EQ(thisSG->SurfaceTmp(6).Class, SurfaceClass::Detached_F);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(6).Class, SurfaceClass::Detached_F));
     EXPECT_FALSE(thisSG->SurfaceTmp(6).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(6).ExtSolar);
 
     // Fourth processed surface will be the building (simple) shading surface
     EXPECT_EQ(thisSG->SurfaceTmp(7).Name, "SHADETEST3BUILDING");
-    EXPECT_EQ(thisSG->SurfaceTmp(7).Class, SurfaceClass::Detached_B);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(7).Class, SurfaceClass::Detached_B));
     EXPECT_FALSE(thisSG->SurfaceTmp(7).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(7).ExtSolar);
     EXPECT_EQ(thisSG->SurfaceTmp(8).Name, "Mir-SHADETEST3BUILDING");
-    EXPECT_EQ(thisSG->SurfaceTmp(8).Class, SurfaceClass::Detached_B);
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(8).Class, SurfaceClass::Detached_B));
     EXPECT_FALSE(thisSG->SurfaceTmp(8).HeatTransSurf);
     EXPECT_TRUE(thisSG->SurfaceTmp(8).ExtSolar);
 }
