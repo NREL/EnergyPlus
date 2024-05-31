@@ -2392,8 +2392,8 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
                 }
             } else {
                 ShowFatalError(state,
-                               format("CalcElectricEIRChillerModel: The ModulatedLoopPLR condenser flow control requires a Sizing:Plant object for "
-                                      "both loops connected to the condenser and evaporator of the chiller."));
+                               "CalcElectricEIRChillerModel: The ModulatedLoopPLR condenser flow control requires a Sizing:Plant object for "
+                               "both loops connected to the condenser and evaporator of the chiller.");
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
