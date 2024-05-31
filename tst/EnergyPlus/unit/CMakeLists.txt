@@ -199,6 +199,7 @@ set(test_src
     Psychrometrics.unit.cc
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
+    RefrigeratedCase.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirModelUserTempPattern.unit.cc
@@ -222,6 +223,7 @@ set(test_src
     SizeWaterHeatingCoil.unit.cc
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
+    SolarCollectors.unit.cc
     SolarShading.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc

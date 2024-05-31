@@ -525,7 +525,7 @@ struct EnergyPlusData : BaseGlobalStruct
     std::unique_ptr<SurfacesData> dataSurface;
     std::unique_ptr<SwimmingPoolsData> dataSwimmingPools;
     std::unique_ptr<SystemAirFlowSizerData> dataSysAirFlowSizer;
-    std::unique_ptr<SystemAvailabilityManagerData> dataSystemAvailabilityManager;
+    std::unique_ptr<SystemAvailabilityManagerData> dataAvail;
     std::unique_ptr<SystemReportsData> dataSysRpts;
     std::unique_ptr<SystemVarsData> dataSysVars;
     std::unique_ptr<TARCOGCommonData> dataTARCOGCommon;

@@ -2640,7 +2640,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     state->dataSingleDuct->SysATMixer(1).OAPerPersonMode = DataZoneEquipment::PerPersonVentRateMode::DCVByCurrentLevel;
 
     // InletSideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
-    state->dataSingleDuct->SysATMixer(1).MixerType = HVAC::ATMixer_InletSide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::InletSide;
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
@@ -2651,7 +2651,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.10, 0.0001);
 
     // SupplySideMixer, Mixed air outlet mass flow > OA requirement, expect primary flow to equal OA requirement
-    state->dataSingleDuct->SysATMixer(1).MixerType = HVAC::ATMixer_SupplySide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::SupplySide;
     state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).MixedAirOutNode).MassFlowRate = 1.0;
     state->dataSingleDuct->SysATMixer(1).InitATMixer(*state, true);
     EXPECT_NEAR(state->dataLoopNodes->Node(state->dataSingleDuct->SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
@@ -2786,7 +2786,7 @@ TEST_F(EnergyPlusFixture, setATMixerSizingProperties_Test)
     state->dataSingleDuct->SysATMixer.allocate(1);
     state->dataSingleDuct->SysATMixer(1).CtrlZoneInNodeIndex = 1;
     state->dataSingleDuct->SysATMixer(1).DesignPrimaryAirVolRate = state->dataSize->FinalSysSizing(1).DesMainVolFlow;
-    state->dataSingleDuct->SysATMixer(1).MixerType = HVAC::ATMixer_InletSide;
+    state->dataSingleDuct->SysATMixer(1).type = HVAC::MixerType::InletSide;
 
     state->dataAirSystemsData->PrimaryAirSystems.allocate(1);
     state->dataAirSystemsData->PrimaryAirSystems(1).CentralCoolCoilExists = true;

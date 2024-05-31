@@ -92,6 +92,10 @@ namespace EnergyPlus::Fans {
 // To encapsulate the data and algorithms required to
 // manage the Fan System Component
 
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNames = {"Fraction", "FixedFlowRate"};
+
+constexpr std::array<std::string_view, (int)MinFlowFracMethod::Num> minFlowFracMethodNamesUC = {"FRACTION", "FIXEDFLOWRATE"};
+
 void FanBase::simulate(EnergyPlusData &state,
                        bool const _FirstHVACIteration,
                        ObjexxFCL::Optional<Real64 const> _speedRatio, // SpeedRatio for Fan:SystemModel
@@ -396,11 +400,8 @@ void GetFanInput(EnergyPlusData &state)
                 format("{}=\"{}\" has specified 0.0 max air flow rate. It will not be used in the simulation.", cCurrentModuleObject, fan->Name));
         }
         fan->maxAirFlowRateIsAutosized = true;
-        if (Util::SameString(cAlphaArgs(3), "Fraction")) {
-            fan->minAirFracMethod = HVAC::MinFrac;
-        } else if (Util::SameString(cAlphaArgs(3), "FixedFlowRate")) {
-            fan->minAirFracMethod = HVAC::FixedMin;
-        }
+        fan->minAirFracMethod = static_cast<MinFlowFracMethod>(getEnumValue(minFlowFracMethodNamesUC, cAlphaArgs(3)));
+
         fan->minFrac = rNumericArgs(4);
         fan->fixedMin = rNumericArgs(5);
         fan->motorEff = rNumericArgs(6);
@@ -1256,10 +1257,10 @@ void FanComponent::init(EnergyPlusData &state)
         // Change the Volume Flow Rates to Mass Flow Rates
 
         maxAirMassFlowRate = maxAirFlowRate * rhoAirStdInit;
-        if (minAirFracMethod == HVAC::MinFrac) {
+        if (minAirFracMethod == MinFlowFracMethod::MinFrac) {
             minAirFlowRate = maxAirFlowRate * minFrac;
             minAirMassFlowRate = minAirFlowRate * rhoAirStdInit;
-        } else if (minAirFracMethod == HVAC::FixedMin) {
+        } else if (minAirFracMethod == MinFlowFracMethod::FixedMin) {
             minAirFlowRate = fixedMin;
             minAirMassFlowRate = minAirFlowRate * rhoAirStdInit;
         }

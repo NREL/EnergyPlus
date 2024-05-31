@@ -1979,7 +1979,7 @@ namespace SolarCollectors {
             CondOfAir = Conductivity[Index];
             PrOfAir = Pr[Index];
             DensOfAir = Density[Index];
-        } else if (Index > NumOfPropDivisions) {
+        } else if (Index >= NumOfPropDivisions) { // 0-index, hence MaxIndex = NumOfPropDivisions - 1
             Index = NumOfPropDivisions - 1;
             VisDOfAir = Mu[Index];
             CondOfAir = Conductivity[Index];

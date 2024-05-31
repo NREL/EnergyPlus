@@ -268,7 +268,6 @@ void GetAirPathData(EnergyPlusData &state)
     using MixedAir::GetOASystemNumber;
     using NodeInputManager::GetNodeNums;
     using NodeInputManager::GetOnlySingleNode;
-    using SystemAvailabilityManager::GetAirLoopAvailabilityManager;
     using WaterCoils::GetCoilWaterInletNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -432,8 +431,8 @@ void GetAirPathData(EnergyPlusData &state)
         primaryAirSystems.OASysOutletNodeNum = 0;
         primaryAirSystems.NumOAHeatCoils = 0;
         primaryAirSystems.NumOACoolCoils = 0;
-        AirLoopControlInfo(AirSysNum).FanOpMode = HVAC::ContFanCycCoil; // initialize to constant fan mode for all air loops
-        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;         // initialize to 1 for all air loops
+        AirLoopControlInfo(AirSysNum).fanOp = HVAC::FanOp::Continuous; // initialize to constant fan mode for all air loops
+        state.dataAirLoop->AirLoopFlow(AirSysNum).FanPLR = 1.0;        // initialize to 1 for all air loops
 
         CurrentModuleObject = "AirLoopHVAC";
 
@@ -1140,7 +1139,7 @@ void GetAirPathData(EnergyPlusData &state)
         }
 
         errFlag = false;
-        GetAirLoopAvailabilityManager(state, AvailManagerListName, AirSysNum, NumPrimaryAirSys, errFlag);
+        Avail::GetAirLoopAvailabilityManager(state, AvailManagerListName, AirSysNum, NumPrimaryAirSys, errFlag);
 
         if (errFlag) {
             ShowContinueError(state, format("Occurs in {} = {}", CurrentModuleObject, primaryAirSystems.Name));
@@ -1221,13 +1220,13 @@ void GetAirPathData(EnergyPlusData &state)
                     } else if (componentType == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::UnitarySystemModel;
                         UnitarySystems::UnitarySys thisSys;
-                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
+                            state, HVAC::UnitarySysType::Unitary_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "COILSYSTEM:COOLING:WATER") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::CoilSystemWater;
                         UnitarySystems::UnitarySys thisSys;
-                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer =
-                            thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
+                        primaryAirSystems.Branch(BranchNum).Comp(CompNum).compPointer = thisSys.factory(
+                            state, HVAC::UnitarySysType::Unitary_AnyCoilType, primaryAirSystems.Branch(BranchNum).Comp(CompNum).Name, false, 0);
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY") {
                         primaryAirSystems.Branch(BranchNum).Comp(CompNum).CompType_Num = CompType::Furnace_UnitarySys_HeatOnly;
                     } else if (componentType == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL") {
@@ -1378,7 +1377,7 @@ void GetAirPathData(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Air System Simulation Cycle On Off Status",
                             Constant::Units::None,
-                            state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).AvailStatus,
+                            (int &)state.dataAirLoop->PriAirSysAvailMgr(AirSysNum).availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataAirSystemsData->PrimaryAirSystems(AirSysNum).Name);
@@ -2104,7 +2103,7 @@ void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE 
 
         if (numPrimaryAirSys > 0) {
             for (auto &e : state.dataAirLoop->PriAirSysAvailMgr) {
-                e.AvailStatus = HVAC::NoAction;
+                e.availStatus = Avail::Status::NoAction;
                 e.StartTime = 0;
                 e.StopTime = 0;
             }
@@ -2485,10 +2484,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
         state.dataHVACGlobal->TurnFansOn = false;
         state.dataHVACGlobal->TurnFansOff = false;
         state.dataHVACGlobal->NightVentOn = false;
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::CycleOn) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::CycleOn) {
             state.dataHVACGlobal->TurnFansOn = true;
         }
-        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::ForceOff) {
+        if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::ForceOff) {
             state.dataHVACGlobal->TurnFansOff = true;
         }
         if (AirLoopControlInfo(AirLoopNum).NightVent) {
@@ -2560,10 +2559,10 @@ void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &Sim
                 state.dataHVACGlobal->TurnFansOn = false;
                 state.dataHVACGlobal->TurnFansOff = false;
                 state.dataHVACGlobal->NightVentOn = false;
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::CycleOn) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::CycleOn) {
                     state.dataHVACGlobal->TurnFansOn = true;
                 }
-                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).AvailStatus == HVAC::ForceOff) {
+                if (state.dataAirLoop->PriAirSysAvailMgr(AirLoopNum).availStatus == Avail::Status::ForceOff) {
                     state.dataHVACGlobal->TurnFansOff = true;
                 }
                 if (AirLoopControlInfo(AirLoopNum).NightVent) {
@@ -3108,7 +3107,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
     // Evaluate water coils with new actuated variables
     if (HXAssistedWaterCoil) {
-        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CompIndex, HVAC::ContFanCycCoil);
+        SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, CompIndex, HVAC::FanOp::Continuous);
     } else {
         SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
     }
@@ -3186,7 +3185,7 @@ void SolveWaterCoilController(EnergyPlusData &state,
 
             // Re-evaluate air loop components with new actuated variables
             if (HXAssistedWaterCoil) {
-                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, HVAC::CompressorOperation::On, 0.0, CompIndex, HVAC::ContFanCycCoil);
+                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, HVAC::CompressorOp::On, 0.0, CompIndex, HVAC::FanOp::Continuous);
             } else {
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
             }
@@ -3475,10 +3474,10 @@ void SimAirLoopComponent(EnergyPlusData &state,
         SimHXAssistedCoolingCoil(state,
                                  CompName,
                                  FirstHVACIteration,
-                                 HVAC::CompressorOperation::On,
+                                 HVAC::CompressorOp::On,
                                  DataPrecisionGlobals::constant_zero,
                                  CompIndex,
-                                 HVAC::ContFanCycCoil,
+                                 HVAC::FanOp::Continuous,
                                  _,
                                  _,
                                  _,
@@ -3519,7 +3518,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
     case CompType::DXSystem: { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
         if (CompPointer == nullptr) {
             UnitarySystems::UnitarySys thisSys;
-            CompPointer = thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, CompName, false, 0);
+            CompPointer = thisSys.factory(state, HVAC::UnitarySysType::Unitary_AnyCoilType, CompName, false, 0);
             // temporary fix for saving pointer, eventually apply to UnitarySystem 25 lines down
             state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
         }
@@ -3565,7 +3564,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
     case CompType::CoilSystemWater: { // 'CoilSystemCooling:Water'
         if (CompPointer == nullptr) {
             UnitarySystems::UnitarySys thisSys;
-            CompPointer = thisSys.factory(state, HVAC::UnitarySys_AnyCoilType, CompName, false, 0);
+            CompPointer = thisSys.factory(state, HVAC::UnitarySysType::Unitary_AnyCoilType, CompName, false, 0);
             // temporary fix for saving pointer, eventually apply to UnitarySystem 16 lines above
             state.dataAirSystemsData->PrimaryAirSystems(airLoopNum).Branch(branchNum).Comp(compNum).compPointer = CompPointer;
         }
@@ -3617,7 +3616,7 @@ void SimAirLoopComponent(EnergyPlusData &state,
                         CompName,
                         FirstHVACIteration,
                         CompIndex,
-                        AirLoopControlInfo(AirLoopNum).FanOpMode,
+                        AirLoopControlInfo(AirLoopNum).fanOp,
                         state.dataAirLoop->AirLoopFlow(AirLoopNum).FanPLR,
                         _,
                         _,

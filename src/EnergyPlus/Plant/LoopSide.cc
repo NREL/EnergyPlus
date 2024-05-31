@@ -1175,7 +1175,7 @@ namespace DataPlant {
 
         // overrides the loop solver flow request to allow loop pump to turn off when not in use
         if (this_loop_side.TotalPumps == 1) {
-            if (LoopFlow < DataConvergParams::PlantLowFlowRateToler) { // Update from dataconvergetols...
+            if (LoopFlow < HVAC::VerySmallMassFlow) { // Update from dataconvergetols...
                 for (int BranchCounter = 1; BranchCounter <= this_loop_side.TotalBranches; ++BranchCounter) {
                     // reference
                     auto &branch(this_loop_side.Branch(BranchCounter));

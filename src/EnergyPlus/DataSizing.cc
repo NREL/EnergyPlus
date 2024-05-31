@@ -419,7 +419,7 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataPltSizHeatNum = 0;
     state.dataSize->DataWaterLoopNum = 0;
     state.dataSize->DataCoilNum = 0;
-    state.dataSize->DataFanOpMode = 0;
+    state.dataSize->DataFanOp = HVAC::FanOp::Invalid;
     state.dataSize->DataCoilIsSuppHeater = false;
     state.dataSize->DataIsDXCoil = false;
     state.dataSize->DataAutosizable = true;

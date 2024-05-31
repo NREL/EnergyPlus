@@ -75,7 +75,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                 // find the design UA.
                 auto f = [&state, this](Real64 const UA) {
                     state.dataWaterCoils->WaterCoil(this->dataCoilNum).UACoilVariable = UA;
-                    WaterCoils::CalcSimpleHeatingCoil(state, this->dataCoilNum, this->dataFanOpMode, 1.0, state.dataWaterCoils->SimCalc);
+                    WaterCoils::CalcSimpleHeatingCoil(state, this->dataCoilNum, this->dataFanOp, 1.0, state.dataWaterCoils->SimCalc);
                     state.dataSize->DataDesignCoilCapacity = state.dataWaterCoils->WaterCoil(this->dataCoilNum).TotWaterHeatingCoilRate;
                     return (dataCapacityUsedForSizing - state.dataWaterCoils->WaterCoil(this->dataCoilNum).TotWaterHeatingCoilRate) /
                            dataCapacityUsedForSizing;
@@ -251,7 +251,7 @@ Real64 WaterHeatingCoilUASizer::size(EnergyPlusData &state, Real64 _originalValu
                 // find the design UA.
                 auto f = [&state, this](Real64 const UA) {
                     state.dataWaterCoils->WaterCoil(this->dataCoilNum).UACoilVariable = UA;
-                    WaterCoils::CalcSimpleHeatingCoil(state, this->dataCoilNum, this->dataFanOpMode, 1.0, state.dataWaterCoils->SimCalc);
+                    WaterCoils::CalcSimpleHeatingCoil(state, this->dataCoilNum, this->dataFanOp, 1.0, state.dataWaterCoils->SimCalc);
                     state.dataSize->DataDesignCoilCapacity = state.dataWaterCoils->WaterCoil(this->dataCoilNum).TotWaterHeatingCoilRate;
                     return (dataCapacityUsedForSizing - state.dataWaterCoils->WaterCoil(this->dataCoilNum).TotWaterHeatingCoilRate) /
                            dataCapacityUsedForSizing;
