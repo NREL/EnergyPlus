@@ -669,6 +669,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             ShowContinueError(state, "Available choices are ConstantFlow, ModulatedChillerPLR, ModulatedLoopPLR, or ModulatedDeltaTemperature");
             ShowContinueError(state, "Flow mode ConstantFlow is assumed and the simulation continues.");
             thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ConstantFlow;
+            ErrorsFound = true;
         };
 
         if (NumAlphas > 17) {
@@ -1949,6 +1950,23 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         ReferenceCOP = ReferenceCOP_ff * this->FaultyChillerFoulingFactor;
     }
 
+    // Set initial mass flow rates
+    if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
+        this->CondMassFlowRate = this->CondMassFlowRateMax;
+        PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
+        PlantUtilities::PullCompInterconnectTrigger(
+            state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
+
+        if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+            if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
+                // Use PlantUtilities::SetComponentFlowRate to decide actual flow
+                PlantUtilities::SetComponentFlowRate(
+                    state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
+            }
+            return;
+        }
+    }
+
     switch (state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopDemandCalcScheme) {
     case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
         if ((this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) ||
@@ -2351,29 +2369,31 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         case DataPlant::CondenserFlowControl::ModulatedLoopPLR: {
             int PltSizNum = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).PlantSizNum;
             int CondPltSizNum = state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).PlantSizNum;
-            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               Constant::CWInitConvTemp,
-                                                               state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
+            if (PltSizNum > 0 && CondPltSizNum > 0) {
+                Real64 chwLoopCap = state.dataSize->PlantSizData(PltSizNum).DesCapacity;
+                Real64 chwLoopDemand =
+                    std::abs(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).LoopSide(this->CWPlantLoc.loopSideNum).UpdatedDemandToLoopSetPoint);
+                Real64 cwhLoopPLR = 0.0;
+                if (chwLoopDemand > 0) {
+                    cwhLoopPLR = chwLoopDemand / chwLoopCap;
+                }
+                Real64 condWaterFlowFrac = Curve::CurveValue(state, this->ChillerCondLoopFlowFLoopPLRIndex, cwhLoopPLR);
+                Real64 cwLoopDesVolFlowRate = state.dataSize->PlantSizData(CondPltSizNum).DesVolFlowRate;
+                Real64 cwLoopVolFlowRate = condWaterFlowFrac * cwLoopDesVolFlowRate;
+                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
+                                                               this->TempRefCondIn,
+                                                               state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
-                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                           Constant::CWInitConvTemp,
-                                                           state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
-                                                           RoutineName);
-            Real64 chwLoopCap = Cp * rho * state.dataSize->PlantSizData(PltSizNum).DeltaT * state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
-            Real64 chwLoopDemand = state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).CoolingDemand;
-            Real64 cwhLoopPLR = 0.0;
-            if (chwLoopDemand > 0) {
-                cwhLoopPLR = chwLoopDemand / chwLoopCap;
-            }
-            Real64 condWaterFlowFrac = Curve::CurveValue(state, this->ChillerCondLoopFlowFLoopPLRIndex, cwhLoopPLR);
-            Real64 cwLoopDesVolFlowRate = state.dataSize->PlantSizData(CondPltSizNum).DesVolFlowRate;
-            Real64 cwLoopVolFlowRate = condWaterFlowFrac * cwLoopDesVolFlowRate;
-            if (chwLoopDemand > 0) {
-                this->CondMassFlowRate = cwLoopVolFlowRate * rho * this->QEvaporator / chwLoopDemand;
+                if (chwLoopDemand > 0) {
+                    this->CondMassFlowRate = cwLoopVolFlowRate * rho * this->QEvaporator / chwLoopDemand;
+                } else {
+                    this->CondMassFlowRate = 0.0;
+                }
             } else {
-                this->CondMassFlowRate = 0.0;
+                ShowFatalError(state,
+                               format("CalcElectricEIRChillerModel: The ModulatedLoopPLR condenser flow control requires a Sizing:Plant object for "
+                                      "both loops connected to the condenser and evaporator of the chiller."));
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
