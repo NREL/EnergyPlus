@@ -271,7 +271,7 @@ void GetZoneEquipmentData(EnergyPlusData &state)
     // found in the input file.  This may or may not
     // be the same as the number of zones in the building
     state.dataZoneEquip->ZoneEquipList.allocate(state.dataGlobal->NumOfZones);
-    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, HVAC::NoAction);
+    state.dataZoneEquip->ZoneEquipAvail.dimension(state.dataGlobal->NumOfZones, Avail::Status::NoAction);
     state.dataZoneEquip->UniqueZoneEquipListNames.reserve(state.dataGlobal->NumOfZones);
 
     if (state.dataZoneEquip->NumOfZoneEquipLists != numControlledZones) {
@@ -946,7 +946,7 @@ void processZoneEquipmentInput(EnergyPlusData &state,
                         // loop index accesses correct pointer to equipment on this equipment list
                         // EquipIndex is used to access specific equipment for a single class of equipment (e.g., PTAC 1, 2 and 3)
                         thisZoneEquipList.compPointer[ZoneEquipTypeNum] = UnitarySystems::UnitarySys::factory(
-                            state, HVAC::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
+                            state, HVAC::UnitarySysType::Unitary_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
                         thisZoneEquipList.EquipIndex(ZoneEquipTypeNum) = thisZoneEquipList.compPointer[ZoneEquipTypeNum]->getEquipIndex();
                     }
 
@@ -1802,6 +1802,7 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
     Real64 sumEnthalpy = 0.0;
     Real64 sumHumRat = 0.0;
     Real64 sumCO2 = 0.0;
+    Real64 sumGenContam = 0.0;
     Real64 sumPressure = 0.0;
     Real64 sumFractions = 0.0;
     auto &equipInletNode = state.dataLoopNodes->Node(this->zoneEquipInletNodeNum);
@@ -1809,13 +1810,23 @@ void ZoneEquipmentMixer::setOutletConditions(EnergyPlusData &state)
         auto &spaceOutletNode = state.dataLoopNodes->Node(mixerSpace.spaceNodeNum);
         sumEnthalpy += spaceOutletNode.Enthalpy * mixerSpace.fraction;
         sumHumRat += spaceOutletNode.HumRat * mixerSpace.fraction;
-        sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+            sumCO2 += spaceOutletNode.CO2 * mixerSpace.fraction;
+        }
+        if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+            sumGenContam += spaceOutletNode.GenContam * mixerSpace.fraction;
+        }
         sumPressure += spaceOutletNode.Press * mixerSpace.fraction;
         sumFractions += mixerSpace.fraction;
     }
     equipInletNode.Enthalpy = sumEnthalpy / sumFractions;
     equipInletNode.HumRat = sumHumRat / sumFractions;
-    equipInletNode.CO2 = sumCO2 / sumFractions;
+    if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
+        equipInletNode.CO2 = sumCO2 / sumFractions;
+    }
+    if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
+        equipInletNode.GenContam = sumGenContam / sumFractions;
+    }
     equipInletNode.Press = sumPressure / sumFractions;
 
     // Use Enthalpy and humidity ratio to get outlet temperature from psych chart

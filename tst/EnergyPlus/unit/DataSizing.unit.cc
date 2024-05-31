@@ -79,7 +79,7 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     state->dataSize->DataPltSizHeatNum = 1;
     state->dataSize->DataWaterLoopNum = 1;
     state->dataSize->DataCoilNum = 1;
-    state->dataSize->DataFanOpMode = 1;
+    state->dataSize->DataFanOp = HVAC::FanOp::Cycling;
     state->dataSize->DataCoilIsSuppHeater = true;
     state->dataSize->DataIsDXCoil = true;
     state->dataSize->DataAutosizable = false;
@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, DataSizingTest_resetHVACSizingGlobals)
     EXPECT_EQ(state->dataSize->DataPltSizHeatNum, 0);
     EXPECT_EQ(state->dataSize->DataWaterLoopNum, 0);
     EXPECT_EQ(state->dataSize->DataCoilNum, 0);
-    EXPECT_EQ(state->dataSize->DataFanOpMode, 0);
+    EXPECT_EQ((int)state->dataSize->DataFanOp, (int)HVAC::FanOp::Invalid);
     EXPECT_FALSE(state->dataSize->DataCoilIsSuppHeater);
     EXPECT_FALSE(state->dataSize->DataIsDXCoil);
     EXPECT_TRUE(state->dataSize->DataAutosizable);

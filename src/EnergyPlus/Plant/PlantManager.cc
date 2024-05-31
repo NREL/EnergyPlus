@@ -293,8 +293,6 @@ void GetPlantLoopData(EnergyPlusData &state)
     using DataSizing::AutoSize;
     using FluidProperties::CheckFluidPropertyName;
     using FluidProperties::FindGlycol;
-    ;
-    using SystemAvailabilityManager::GetPlantAvailabilityManager;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetPlant/CondenserLoopData: ");
@@ -328,8 +326,8 @@ void GetPlantLoopData(EnergyPlusData &state)
     if (state.dataPlnt->TotNumLoops > 0) {
         state.dataPlnt->PlantLoop.allocate(state.dataPlnt->TotNumLoops);
         state.dataConvergeParams->PlantConvergence.allocate(state.dataPlnt->TotNumLoops);
-        if (!allocated(state.dataPlnt->PlantAvailMgr)) {
-            state.dataPlnt->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
+        if (!allocated(state.dataAvail->PlantAvailMgr)) {
+            state.dataAvail->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
         }
     } else {
         return;
@@ -656,7 +654,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         ErrFound = false;
 
         if (this_loop.TypeOfLoop == LoopType::Plant) {
-            GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
+            Avail::GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
         }
 
         if (ErrFound) {
@@ -737,7 +735,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Plant System Cycle On Off Status",
                             Constant::Units::None,
-                            state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
+                            (int &)state.dataAvail->PlantAvailMgr(LoopNum).availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
