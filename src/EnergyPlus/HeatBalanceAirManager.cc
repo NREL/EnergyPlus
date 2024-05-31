@@ -4917,18 +4917,19 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                         thisZnAirRpt.ReportWBGT = true;
                     }
                 }
-            }
-            if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-                if (reqVar->key.empty()) {
-                    for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
-                        auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
-                        thisSpaceAirRpt.ReportWBGT = true;
-                    }
-                } else {
-                    int spaceNum = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->space);
-                    if (spaceNum > 0) {
-                        auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
-                        thisSpaceAirRpt.ReportWBGT = true;
+            } else if (reqVar->name == "SPACE WETBULB GLOBE TEMPERATURE") {
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                    if (reqVar->key.empty()) {
+                        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                            auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                            thisSpaceAirRpt.ReportWBGT = true;
+                        }
+                    } else {
+                        int spaceNum = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->space);
+                        if (spaceNum > 0) {
+                            auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                            thisSpaceAirRpt.ReportWBGT = true;
+                        }
                     }
                 }
             }
@@ -4942,9 +4943,8 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
                     auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
                     thisZnAirRpt.ReportWBGT = true;
                 }
-            }
-            if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
-                if (state.dataRuntimeLang->Sensor(loop).OutputVarName == "SPACE WETBULB GLOBE TEMPERATURE") {
+            } else if (state.dataRuntimeLang->Sensor(loop).OutputVarName == "SPACE WETBULB GLOBE TEMPERATURE") {
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
                     int spaceNum = Util::FindItemInList(state.dataRuntimeLang->Sensor(loop).UniqueKeyName, state.dataHeatBal->space);
                     if (spaceNum > 0) {
                         auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
