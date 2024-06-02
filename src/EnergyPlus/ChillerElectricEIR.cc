@@ -665,7 +665,7 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
         if (thisChiller.CondenserFlowControl == DataPlant::CondenserFlowControl::Invalid) {
             ShowSevereError(state,
                             format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-            ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(10), state.dataIPShortCut->cAlphaArgs(10)));
+            ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(17), state.dataIPShortCut->cAlphaArgs(17)));
             ShowContinueError(state, "Available choices are ConstantFlow, ModulatedChillerPLR, ModulatedLoopPLR, or ModulatedDeltaTemperature");
             ShowContinueError(state, "Flow mode ConstantFlow is assumed and the simulation continues.");
             thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ConstantFlow;
@@ -683,12 +683,6 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
                             format("{}{} \"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18)));
             ErrorsFound = true;
-        }
-
-        if (NumNums > 18) {
-            thisChiller.CondDT = state.dataIPShortCut->rNumericArgs(19);
-        } else {
-            thisChiller.CondDT = 0.0;
         }
 
         if (NumAlphas > 18) {
@@ -2418,15 +2412,6 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
         PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);
-
-        if (this->CondMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-            if (this->EvapMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance) {
-                // Use PlantUtilities::SetComponentFlowRate to decide actual flow
-                PlantUtilities::SetComponentFlowRate(
-                    state, this->EvapMassFlowRate, this->EvapInletNodeNum, this->EvapOutletNodeNum, this->CWPlantLoc);
-            }
-            return;
-        }
     }
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
