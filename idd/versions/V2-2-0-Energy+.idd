@@ -19474,7 +19474,7 @@ UNITARYSYSTEM:HEATPUMP:AIRTOAIR,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan’s maximum flow rate.
+        \note Must be less than or equal to the fan's maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -31478,7 +31478,7 @@ GENERATOR:MICROTURBINE,
       \default 0.0
       \minimum 0.0
       \note Electric power consumed by ancillary equipment (e.g., external fuel pressurization pump).
-      \note Set to zero if Reference Electrical Power Output is the ‘net’ value (ancillary power
+      \note Set to zero if Reference Electrical Power Output is the 'net' value (ancillary power
       \note already deducted). Input value is positive, but indicates negative electric generation.
   A6, \field Ancillary Power Modifier (function of fuel input) Curve Name
       \type object-list
@@ -31509,7 +31509,7 @@ GENERATOR:MICROTURBINE,
       \note Plant control means the heat recovery water flow rate is determined by the plant,
       \note but the user needs to supply a heat recovery water flow rate.
       \note Internal control means the heat recovery water flow rate is controlled by this generator.
-      \note If ‘Internal Control’ is selected, then the user needs to supply a reference heat
+      \note If 'Internal Control' is selected, then the user needs to supply a reference heat
       \note recovery water flow rate and optionally the name of a heat recovery flow rate modifier curve.
  N14, \field Reference Heat Recovery Water Flow Rate
       \type real
