@@ -300,9 +300,9 @@ namespace HeatBalFiniteDiffManager {
     );
 
     void CheckFDNodeTempLimits(EnergyPlusData &state,
-                               int surfNum,    // surface number
-                               int nodeNum,    // node number
-                               Real64 nodeTemp // calculated temperature, not reset
+                               int surfNum,     // surface number
+                               int nodeNum,     // node number
+                               Real64 &nodeTemp // calculated temperature, not reset
     );
 
     void adjustPropertiesForPhaseChange(EnergyPlusData &state,

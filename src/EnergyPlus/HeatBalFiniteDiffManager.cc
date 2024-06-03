@@ -2539,9 +2539,9 @@ namespace HeatBalFiniteDiffManager {
     }
 
     void CheckFDNodeTempLimits(EnergyPlusData &state,
-                               int surfNum,    // surface number
-                               int nodeNum,    // node number
-                               Real64 nodeTemp // calculated temperature, not reset
+                               int surfNum,     // surface number
+                               int nodeNum,     // node number
+                               Real64 &nodeTemp // calculated temperature, not reset
     )
     {
         auto &surfaceFD(state.dataHeatBalFiniteDiffMgr->SurfaceFD(surfNum));
@@ -2550,10 +2550,10 @@ namespace HeatBalFiniteDiffManager {
         auto &maxTempLimit = state.dataHeatBalSurf->MaxSurfaceTempLimit;
         if (nodeTemp < minTempLimit) {
             if (surfaceFD.indexNodeMinTempLimit == 0) {
-                ShowSevereMessage(
-                    state, format("Node temperature (low) out of bounds [{:.2R}] for surface=\"{}\", node=\"{}\"", nodeTemp, surfName, nodeNum));
+                ShowSevereMessage(state,
+                                  format("Node temperature (low) out of bounds [{:.2R}] for surface={}, node={}", nodeTemp, surfName, nodeNum));
                 ShowContinueErrorTimeStamp(state, "");
-                ShowContinueError(state, format("Value has been reset to the lower limit value of [{:.2R}].", minTempLimit));
+                ShowContinueError(state, format("Value has been reset to the lower limit value of {:.2R}.", minTempLimit));
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "Node temperature (low) out of bounds for surface=" + surfName,
@@ -2566,10 +2566,10 @@ namespace HeatBalFiniteDiffManager {
             nodeTemp = minTempLimit;
         } else if (nodeTemp > maxTempLimit) {
             if (surfaceFD.indexNodeMaxTempLimit == 0) {
-                ShowSevereMessage(
-                    state, format("Node temperature (high) out of bounds [{:.2R}] for surface=\"{}\", node=\"{}\"", nodeTemp, surfName, nodeNum));
+                ShowSevereMessage(state,
+                                  format("Node temperature (high) out of bounds [{:.2R}] for surface={}, node={}", nodeTemp, surfName, nodeNum));
                 ShowContinueErrorTimeStamp(state, "");
-                ShowContinueError(state, format("Value has been reset to the upper limit value of [{:.2R}].", maxTempLimit));
+                ShowContinueError(state, format("Value has been reset to the upper limit value of {:.2R}.", maxTempLimit));
             }
             ShowRecurringSevereErrorAtEnd(state,
                                           "Node temperature (high) out of bounds for surface=" + surfName,
