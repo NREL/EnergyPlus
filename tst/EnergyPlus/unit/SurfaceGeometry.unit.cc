@@ -8971,7 +8971,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
 
     int thisSurface = siteShadeShadeFlatShadeSurface;
     EXPECT_FALSE(std::find(HTSurfaces.begin(), HTSurfaces.end(), thisSurface) != HTSurfaces.end());
-    EXPECT_FALSE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
+    EXPECT_TRUE(std::find(ExtSolarSurfaces.begin(), ExtSolarSurfaces.end(), thisSurface) != ExtSolarSurfaces.end());
     EXPECT_TRUE(std::find(ExtSolAndShadingSurfaces.begin(), ExtSolAndShadingSurfaces.end(), thisSurface) != ExtSolAndShadingSurfaces.end());
     EXPECT_TRUE(std::find(ShadowPossObstrSurfaces.begin(), ShadowPossObstrSurfaces.end(), thisSurface) != ShadowPossObstrSurfaces.end());
     EXPECT_FALSE(std::find(IZSurfaces.begin(), IZSurfaces.end(), thisSurface) != IZSurfaces.end());
@@ -14412,4 +14412,109 @@ TEST_F(EnergyPlusFixture, Fix_checkSubSurfAzTiltNorm_Horizontal_Surf_Random)
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.z, SubSurface_Same.lcsz.z);
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.y, SubSurface_Same.lcsz.y);
     EXPECT_DOUBLE_EQ(BaseSurface.lcsz.x, SubSurface_Same.lcsz.x);
+}
+
+TEST_F(EnergyPlusFixture, ExtSolarForShadingTest)
+{
+    // Unit test added as part of the fix for Defect #5949 (certain output variables not being produced for shading elements
+    bool ErrorsFound = false;
+    std::string const idf_objects = delimited_string({
+        "Shading:Building:Detailed,",
+        "  ShadeTest1BuildingDetailed, !- Name",
+        "  ,                           !- Transmittance Schedule Name",
+        "  4,                          !- Number of Vertices",
+        "  -20.0,4.0,10.0,             !- X,Y,Z ==> Vertex 1 {m}",
+        "  -20.0,0.00,10.0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "  -55.0,0.00,0.0,             !- X,Y,Z ==> Vertex 3 {m}",
+        "  -55.0,4.0,0.0;              !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Site:Detailed,",
+        "  ShadeTest2SiteDetailed, !- Name",
+        "  ,                       !- Transmittance Schedule Name",
+        "  4,                      !- Number of Vertices",
+        "  20.0,14.0,23.0,         !- X,Y,Z ==> Vertex 1 {m}",
+        "  20.0,0.00,23.0,         !- X,Y,Z ==> Vertex 2 {m}",
+        "  55.0,0.00,23.0,         !- X,Y,Z ==> Vertex 3 {m}",
+        "  55.0,14.0,23.0;         !- X,Y,Z ==> Vertex 4 {m}",
+
+        "Shading:Building,",
+        "  ShadeTest3Building, !- Name",
+        "  123.4,              !- Azimuth Angle {deg}",
+        "  45,                 !- Tilt Angle {deg}",
+        "  0.1,                !- Starting X Coordinate {m}",
+        "  2.3,                !- Starting Y Coordinate {m}",
+        "  4.5,                !- Starting Z Coordinate {m}",
+        "  6.7,                !- Length {m}",
+        "  8.9;                !- Height {m}",
+
+        "Shading:Site,",
+        "  ShadeTest4Site, !- Name",
+        "  154.1,          !- Azimuth Angle {deg}",
+        "  45,             !- Tilt Angle {deg}",
+        "  -8.5,           !- Starting X Coordinate {m}",
+        "  2.5,            !- Starting Y Coordinate {m}",
+        "  6.3,            !- Starting Z Coordinate {m}",
+        "  3.6,            !- Length {m}",
+        "  1.5;            !- Height {m}",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    int TotSurfaces = 8;                                          // Need to double the number of surfaces because E+ will add mirrored surfaces
+    state->dataSurfaceGeometry->SurfaceTmp.allocate(TotSurfaces); // Allocate the Surface derived type appropriately
+    state->dataSurface->Corner = LowerLeftCorner;
+    state->dataSurface->WorldCoordSystem = true;
+
+    int NumSurfs = 0;
+    int TotDetachedFixed = 1;
+    int TotDetachedBldg = 1;
+    int TotRectDetachedFixed = 1;
+    int TotRectDetachedBldg = 1;
+    SurfaceGeometry::GetDetShdSurfaceData(*state, ErrorsFound, NumSurfs, TotDetachedFixed, TotDetachedBldg);
+    SurfaceGeometry::GetRectDetShdSurfaceData(*state, ErrorsFound, NumSurfs, TotRectDetachedFixed, TotRectDetachedBldg);
+    EXPECT_FALSE(ErrorsFound); // expect no errors
+
+    // Check set-up of select variables for all four detached shading types
+    auto &thisSG = state->dataSurfaceGeometry;
+
+    // First processed surface will be the detailed site shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(1).Name, "SHADETEST2SITEDETAILED");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(1).Class, SurfaceClass::Detached_F));
+    EXPECT_FALSE(thisSG->SurfaceTmp(1).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(1).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(2).Name, "Mir-SHADETEST2SITEDETAILED");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(2).Class, SurfaceClass::Detached_F));
+    EXPECT_FALSE(thisSG->SurfaceTmp(2).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(2).ExtSolar);
+
+    // Second processed surface will be the detailed building shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(3).Name, "SHADETEST1BUILDINGDETAILED");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(3).Class, SurfaceClass::Detached_B));
+    EXPECT_FALSE(thisSG->SurfaceTmp(3).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(3).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(4).Name, "Mir-SHADETEST1BUILDINGDETAILED");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(4).Class, SurfaceClass::Detached_B));
+    EXPECT_FALSE(thisSG->SurfaceTmp(4).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(4).ExtSolar);
+
+    // Third processed surface will be the site (simple) shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(5).Name, "SHADETEST4SITE");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(5).Class, SurfaceClass::Detached_F));
+    EXPECT_FALSE(thisSG->SurfaceTmp(5).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(5).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(6).Name, "Mir-SHADETEST4SITE");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(6).Class, SurfaceClass::Detached_F));
+    EXPECT_FALSE(thisSG->SurfaceTmp(6).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(6).ExtSolar);
+
+    // Fourth processed surface will be the building (simple) shading surface
+    EXPECT_EQ(thisSG->SurfaceTmp(7).Name, "SHADETEST3BUILDING");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(7).Class, SurfaceClass::Detached_B));
+    EXPECT_FALSE(thisSG->SurfaceTmp(7).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(7).ExtSolar);
+    EXPECT_EQ(thisSG->SurfaceTmp(8).Name, "Mir-SHADETEST3BUILDING");
+    EXPECT_TRUE(compare_enums(thisSG->SurfaceTmp(8).Class, SurfaceClass::Detached_B));
+    EXPECT_FALSE(thisSG->SurfaceTmp(8).HeatTransSurf);
+    EXPECT_TRUE(thisSG->SurfaceTmp(8).ExtSolar);
 }
