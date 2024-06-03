@@ -169,7 +169,7 @@ namespace SetPointManager {
     {
         int schedNum = 0;
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMScheduledDual : SPMBase // Derived type for Scheduled Dual Setpoint Manager
@@ -179,7 +179,7 @@ namespace SetPointManager {
         Real64 setPtHi = 0.0;
         Real64 setPtLo = 0.0;
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMOutsideAir : SPMBase // Derived type for Outside Air Setpoint Manager Data
@@ -197,7 +197,7 @@ namespace SetPointManager {
         Real64 highSetPt2 = 0.0;        // 2nd setpoint at outside high (optional)
         Real64 high2 = 0.0;             // 2nd Outside high (optional)
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMSingleZoneReheat : SPMBase // Derived type for the Single Zone Reheat Setpoint Manager data
@@ -214,7 +214,7 @@ namespace SetPointManager {
         int retNodeNum = 0;                 // return node inlet to OA mixer
         int loopInNodeNum = 0;              // Primary Air System inlet node
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     // The one can be used for both SZ Heating and SZCooling SPMs
@@ -226,7 +226,7 @@ namespace SetPointManager {
         int zoneNodeNum = 0;             // zone node number
         int zoneInletNodeNum = 0;        // inlet node number for the supply air
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     // Can be used for both SZMinHum and SZMaxHum SPMs
@@ -236,7 +236,7 @@ namespace SetPointManager {
         int zoneNodeNum = 0;   // zone node numbers of zones being controlled
         int ctrlZoneNum = 0; // index into ZoneEquipConfig
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMMixedAir : SPMBase
@@ -251,7 +251,7 @@ namespace SetPointManager {
         int coolCoilOutNodeNum = 0;         // Cooling coil outlet node number
         Real64 minCoolCoilOutTemp = 7.2; // The minimum temperature at cooling coil outlet node
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMOutsideAirPretreat : SPMBase
@@ -262,7 +262,7 @@ namespace SetPointManager {
         int returnInNodeNum = 0;           // return air inlet node number
         bool mySetPointCheckFlag = true; // used for DOAS SPM test for missing SP
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     // Works for both coldest and warmest SPMs
@@ -271,7 +271,7 @@ namespace SetPointManager {
         // Members
         SupplyFlowTempStrategy strategy = SupplyFlowTempStrategy::Invalid; // supply flow and temperature set strategy
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMWarmestTempFlow : SPMBase
@@ -283,7 +283,7 @@ namespace SetPointManager {
         int critZoneNum = 0;
         bool simReady = false;
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMReturnAirBypassFlow : SPMBase
@@ -297,17 +297,17 @@ namespace SetPointManager {
         int rabSplitOutNodeNum = 0;
         int sysOutNodeNum = 0;
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMMultiZoneTemp : SPMBase // derived type for SetpointManager:Multizone:Cooling:Average data
     {
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMMultiZoneHum : SPMBase // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
     {
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMFollowOutsideAirTemp : SPMBase
@@ -316,7 +316,7 @@ namespace SetPointManager {
         AirTempType refTempType = AirTempType::Invalid; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
         Real64 offset = 0.0;                 // Offset temperature difference
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMFollowSysNodeTemp : SPMBase
@@ -325,7 +325,7 @@ namespace SetPointManager {
         AirTempType refTempType = AirTempType::Invalid; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
         Real64 offset = 0.0;                 // Offset temperature difference
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMFollowGroundTemp : SPMBase
@@ -338,7 +338,7 @@ namespace SetPointManager {
         DataEnvironment::GroundTempType refTempType = DataEnvironment::GroundTempType::Invalid; 
         Real64 offset = 0.0;                             // Offset temperature difference
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMCondenserEnteringTemp : SPMBase // derived type for SetpointManager:CondenserEnteringReset data
@@ -355,7 +355,7 @@ namespace SetPointManager {
         PlantLocation demandPloc; 
         DataPlant::PlantEquipmentType chillerType; // chiller type number
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMVar
@@ -381,7 +381,7 @@ namespace SetPointManager {
         PlantLocation chilledWaterPumpPloc;                           // chilled water pump number
         bool setupIdealCondEntSetPtVars = true;                // flag for initialization of meters and such
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
 
         void SetupMeteredVarsForSetPt(EnergyPlusData &state);
 
@@ -404,7 +404,7 @@ namespace SetPointManager {
         Real64 coolingOnSetPt = 0.0;        // minimum supply air setpoint temperature
         Real64 coolingOffSetPt = 0.0;       // maximum supply air setpoint temperature
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMSingleZoneOneStageHeating : SPMBase // Derived type for the Single Zone One Stage Cooling Setpoint Manager data
@@ -415,7 +415,7 @@ namespace SetPointManager {
         Real64 heatingOnSetPt = 0.0;        // minimum supply air setpoint temperature
         Real64 heatingOffSetPt = 0.0;       // maximum supply air setpoint temperature
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
 
@@ -432,7 +432,7 @@ namespace SetPointManager {
         ReturnTempType returnTempType = ReturnTempType::Invalid;
 
         // Calculation method
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
         // void calculate(EnergyPlusData &state, DataLoopNode::NodeData &returnNode, DataLoopNode::NodeData &supplyNode);
     };
 
@@ -447,7 +447,7 @@ namespace SetPointManager {
         DataPlant::CtrlType compOpType = DataPlant::CtrlType::Invalid;
 
         // Calculation method
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     struct SPMSystemNode : SPMBase // Derived type for System Node Reset Setpoint Manager Data
@@ -458,7 +458,7 @@ namespace SetPointManager {
         Real64 lowRef = 0.0;      // Low Reference Temperature or Humidity Ratio
         Real64 highRef = 0.0;     // High Reference Temperature or Humidity Ratio
 
-        void calculate(EnergyPlusData &state);
+        void calculate(EnergyPlusData &state) override;
     };
 
     int GetSetPointManagerIndex(EnergyPlusData &state, std::string const &Name);
