@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University
 # of Illinois, The Regents of the University of California, through Lawrence
 # Berkeley National Laboratory (subject to receipt of any required approvals
@@ -54,88 +54,97 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import json
+import argparse
 import os
-import io  # For Python 2 compat
-import sys
+import subprocess
+from pathlib import Path
+from typing import List, Set
 
-DIRS_TO_SKIP = [
-    '.git', 'build', 'builds', 'cmake-build-debug',
-    'cmake-build-release', 'design', 'release',
-]
+import requests
+from packaging.version import Version
 
-# these CC files purposefully have bad characters
-# not sure what to do besides ignore them
-FILE_NAMES_TO_SKIP = [
-    # 'InputProcessor.unit.cc', 'EconomicTariff.cc',
-    # 'OutputReportTabular.cc'
-]
+ROOT_DIR = Path(__file__).parent.parent.parent
+WORKFLOW_DIR = ROOT_DIR / ".github/workflows"
 
-# tex files are included here, but the docs folder is ignored,
-# so it has no effect right now
-FILE_PATTERNS = [
-    '.cc', '.hh', '.tex', '.cpp', '.hpp', '.idd'
-]
 
-current_script_dir = os.path.dirname(os.path.realpath(__file__))
-repo_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
-full_path_dirs_to_skip = [os.path.join(repo_root, d) for d in DIRS_TO_SKIP]
+def get_github_token():
+    if "GITHUB_TOKEN" in os.environ:
+        return os.environ["GITHUB_TOKEN"]
 
-num_warnings = 0
-num_errors = 0
+    try:
+        return subprocess.check_output(["gh", "auth", "token"], universal_newlines=True, encoding="utf-8").strip()
+    except Exception:
+        print("GITHUB_TOKEN not in ENV variable, and `gh` CLI not available")
+        return None
 
-for root, dirs, filenames in os.walk(repo_root):
-    if any(root.startswith(f) for f in full_path_dirs_to_skip):
-        continue
-    for filename in filenames:
-        if not any(filename.endswith(f) for f in FILE_PATTERNS):
+
+def get_uses(workflows: List[Path]) -> Set[str]:
+    uses = []
+    for workflow_path in workflows:
+        content = workflow_path.read_text()
+        lines = content.splitlines()
+        for i, line in enumerate(lines):
+            if "uses" in line:
+                action = line.split("uses: ")[1].split("#")[0].strip()
+                uses.append(action)
+    return set(uses)
+
+
+def convert_to_version(tag_name):
+    try:
+        return Version(tag_name.replace("v", ""))
+    except:
+        return Version("0.0.0")
+
+
+def check_latest(uses: Set[str]) -> dict[str, Version]:
+    unique_actions = set([use.split("@")[0] for use in set(uses)])
+
+    headers = None
+    gha_token = get_github_token()
+    if gha_token is not None:
+        headers = {"Authorization": f"token {gha_token}"}
+    latests = {}
+    for action in unique_actions:
+        r = requests.get(f"https://api.github.com/repos/{action}/releases", headers=headers)
+        r.raise_for_status()
+        latests[action] = next(reversed(sorted([convert_to_version(x["tag_name"]) for x in r.json()])))
+    return latests
+
+
+def get_replacements(uses: Set[str], latests: dict[str, Version]) -> dict[str, str]:
+    replacements = {}
+    for use in uses:
+        action, version = use.split("@")
+        assert action in latests, f"{action} not found in latests: {latests}"
+        replacement_v = None
+        if "." in version:
+            replacement_v = latests[action]
+        else:
+            replacement_v = latests[action].major
+        replacement = f"{action}@v{replacement_v}"
+        if replacement == use:
+            print(f"No updates found for {use}")
             continue
-        if any(f in filename for f in FILE_NAMES_TO_SKIP):
-            continue
-        file_path = os.path.join(root, filename)
-        relative_file_path = os.path.relpath(file_path, repo_root)
+        replacements[use] = replacement
+    return replacements
 
-        # High level check: try to open the file as utf-8 in full
-        try:
-            with io.open(file_path, encoding='utf-8',
-                         errors='strict') as f_idf:
-                idf_text = f_idf.read()
-        except UnicodeDecodeError:
-            ci_msg = {'tool': 'verify_file_encodings',
-                      'filename': filename,
-                      'file': relative_file_path,
-                      'messagetype': 'error',
-                      'message': ("{} isn't UTF-8 encoded"
-                                  "".format(relative_file_path))
-                      }
-            print(json.dumps(ci_msg))
-            num_errors += 1
 
-            # Now you try to give a better error message by pointing at the
-            # lines that are guilty. To do so, you open as binary, and try to
-            # decode each line as utf-8
-            with io.open(file_path, 'rb') as f_idf:
-                binary_lines = f_idf.readlines()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Update GHA Actions.")
+    parser.add_argument("--safe", action="store_true", default=False, help="Only update official GHA actions/xxx")
+    args = parser.parse_args()
 
-            for line_num, line in enumerate(binary_lines):
-                try:
-                    line.decode(encoding='utf-8', errors='strict')
-                    # codecs.decode(line, encoding='utf-8', errors='strict')
-                except (UnicodeDecodeError, UnicodeEncodeError):
-                    _l = line.decode(encoding='utf-8', errors='replace')
+    workflows = list(WORKFLOW_DIR.glob("*.yml"))
+    uses = get_uses(workflows=workflows)
+    if args.safe:
+        print("Limiting to official GHA actions/xxx")
+        uses = set([x for x in uses if x.startswith("actions/")])
 
-                    # line contains non-utf8 character
-                    print(json.dumps({
-                        'tool': 'check_non_utf8',
-                        'filename': relative_file_path,
-                        'file': relative_file_path,
-                        'line': line_num,
-                        'messagetype': 'warning',
-                        # " {}".format(_l)) # only works python3
-                        'message': ("Line has invalid characters/encoding: " +
-                                    _l)
-                    }))
-                    num_warnings += 1
-
-if num_errors + num_warnings > 0:
-    sys.exit(1)
+    latests = check_latest(uses=uses)
+    replacements = get_replacements(uses=uses, latests=latests)
+    for workflow_path in workflows:
+        content = workflow_path.read_text()
+        for ori, new in replacements.items():
+            content = content.replace(ori, new)
+        workflow_path.write_text(content)
