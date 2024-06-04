@@ -521,6 +521,8 @@ set(SRC
     Pumps.hh
     PurchasedAirManager.cc
     PurchasedAirManager.hh
+    PythonEngine.cc
+    PythonEngine.hh
     RefrigeratedCase.cc
     RefrigeratedCase.hh
     ReportCoilSelection.cc
@@ -965,7 +967,10 @@ if(LINK_WITH_PYTHON)
   add_custom_command(
     TARGET energyplusapi
     POST_BUILD # TODO: I don't think we want to quote the generator expression
-    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib")
+    COMMAND ${Python_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplusapi>" "python_standard_lib"
+    COMMAND ${CMAKE_COMMAND} -E env --unset=PIP_REQUIRE_VIRTUALENV
+            ${Python_EXECUTABLE} -m pip install --target="$<TARGET_FILE_DIR:energyplusapi>/python_standard_lib" --upgrade energyplus-python-apps==24.1a1
+  )
 endif()
 
 if(BUILD_PACKAGE)

@@ -61,6 +61,10 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#if LINK_WITH_PYTHON
+#include <EnergyPlus/PythonEngine.hh>
+#endif
+
 namespace EnergyPlus {
 
 namespace CommandLineInterface {
@@ -210,6 +214,67 @@ Built on Platform: {}
 
         bool debugCLI = false;
         app.add_flag("--debug-cli", debugCLI, "Print the result of the CLI assignments to the console and exit")->group(""); // Empty group to hide it
+
+#if LINK_WITH_PYTHON
+        static constexpr std::array<std::string_view, 6> logLevelStrs = {"Trace", "Debug", "Info", "Warn", "Error", "Fatal"};
+
+        auto *auxiliaryToolsSubcommand = app.add_subcommand("auxiliary", "Run Auxiliary Python Tools");
+
+        enum class ValidAuxiliaryTools
+        {
+            energyplus_iddidf,
+            eplaunch
+
+        };
+
+        std::vector<std::string> python_fwd_args;
+        auto *transitionSubcommand = auxiliaryToolsSubcommand->add_subcommand("energyplus_iddidf", "EnergyPlus Python IDD/IDF Utilities");
+        transitionSubcommand->add_option("args", python_fwd_args, "Extra Arguments forwarded to the Python script")->option_text("ARG ...");
+        transitionSubcommand->positionals_at_end(true);
+        transitionSubcommand->footer("You can pass extra arguments after the Python file, they will be forwarded.");
+
+        transitionSubcommand->callback([&state, &python_fwd_args] {
+            EnergyPlus::Python::PythonEngine engine(state);
+            // There's probably better to be done, like instantiating the pythonEngine with the argc/argv then calling PyRun_SimpleFile but whatever
+            std::string cmd = R"python(import sys
+sys.argv.clear()
+sys.argv.append("energyplus")
+)python";
+            for (const auto &arg : python_fwd_args) {
+                cmd += fmt::format("sys.argv.append(\"{}\")\n", arg);
+            }
+
+            cmd += R"python(
+from energyplus_iddidf.cli import main_cli
+main_cli()
+)python";
+
+            engine.exec(cmd);
+            exit(0);
+        });
+
+        auto *epLaunchSubcommand = auxiliaryToolsSubcommand->add_subcommand("eplaunch", "EP-Launch");
+        epLaunchSubcommand->callback([&state, &python_fwd_args] {
+            EnergyPlus::Python::PythonEngine engine(state);
+            // There's probably better to be done, like instantiating the pythonEngine with the argc/argv then calling PyRun_SimpleFile but whatever
+            std::string cmd = R"python(import sys
+sys.argv.clear()
+sys.argv.append("energyplus")
+)python";
+            for (const auto &arg : python_fwd_args) {
+                cmd += fmt::format("sys.argv.append(\"{}\")\n", arg);
+            }
+
+            cmd += R"python(
+from eplaunch.tk_runner import main_gui
+main_gui()
+)python";
+
+            engine.exec(cmd);
+            exit(0);
+        });
+
+#endif
 
         app.footer("Example: energyplus -w weather.epw -r input.idf");
 
