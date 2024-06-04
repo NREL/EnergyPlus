@@ -382,8 +382,6 @@
 
   Output:Variable,*,Zone Operative Temperature,hourly; !- Zone Average [C]
 
-  Output:Variable,*,Zone Wetbulb Temperature,hourly; !- Zone Average [C]
-
   Output:Variable,ZONE ONE,Zone Wetbulb Globe Temperature,hourly;
 
   Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;

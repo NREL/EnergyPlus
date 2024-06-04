@@ -5005,7 +5005,6 @@ void calcMeanAirTemps(EnergyPlusData &state,
     }
     if (thisAirRpt.ReportWBGT) {
         // note that the WetBulbTemp here is for temporary verification, it will not be another added reporting variable
-        thisAirRpt.WetbulbTemp = Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress);
         thisAirRpt.WetbulbGlobeTemp =
             0.7 * Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress) + 0.3 * thisAirRpt.OperativeTemp;
     }
