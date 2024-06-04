@@ -436,10 +436,11 @@ namespace SurfaceGroundHeatExchanger {
         }
 
         if (state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning) {
-                if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Shallow]) {
+            if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Shallow]) {
                 ShowWarningError(state, "GetSurfaceGroundHeatExchanger: No \"Site:GroundTemperature:Shallow\" were input.");
                 ShowContinueError(state,
-                                  format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow]));
+                                  format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                         state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Shallow]));
             }
             state.dataSurfaceGroundHeatExchangers->NoSurfaceGroundTempObjWarning = false;
         }

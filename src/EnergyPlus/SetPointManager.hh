@@ -54,10 +54,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
@@ -75,7 +75,7 @@ namespace SetPointManager {
         MinTemp,
         Num
     };
-        
+
     enum class ControlStrategy
     {
         Invalid = -1,
@@ -100,7 +100,7 @@ namespace SetPointManager {
         Setpoint,
         Num
     };
-        
+
     enum class SPMType
     {
         Invalid = -1,
@@ -146,23 +146,22 @@ namespace SetPointManager {
 
         HVAC::CtrlVarType ctrlVar = HVAC::CtrlVarType::Invalid; // set to CtrlVarType::*
 
-        std::vector<int> ctrlNodeNums;       // index to control node
+        std::vector<int> ctrlNodeNums; // index to control node
 
-        std::string airLoopName;     // name of air loop
-        int airLoopNum = 0;          // index to air loop
-        int refNodeNum = 0;          // index to reference node
+        std::string airLoopName; // name of air loop
+        int airLoopNum = 0;      // index to air loop
+        int refNodeNum = 0;      // index to reference node
 
-        Real64 minSetTemp = 0.0;     // minimum supply air setpoint temperature
-        Real64 maxSetTemp = 0.0;     // maximum supply air setpoint temperature
+        Real64 minSetTemp = 0.0; // minimum supply air setpoint temperature
+        Real64 maxSetTemp = 0.0; // maximum supply air setpoint temperature
 
-        Real64 minSetHum = 0.0;      // minimum supply air setpoint humidity ratio [kg/kg]
-        Real64 maxSetHum = 0.0;      // maximum supply air setpoint humidity ratio [kg/kg]
-        Real64 setPt = 0.0;          // the setpoint
+        Real64 minSetHum = 0.0; // minimum supply air setpoint humidity ratio [kg/kg]
+        Real64 maxSetHum = 0.0; // maximum supply air setpoint humidity ratio [kg/kg]
+        Real64 setPt = 0.0;     // the setpoint
 
         virtual ~SPMBase() = default;
 
         virtual void calculate(EnergyPlusData &state) = 0;
-
     };
 
     struct SPMScheduled : SPMBase // Derived type for Scheduled Setpoint Manager data
@@ -185,17 +184,17 @@ namespace SetPointManager {
     struct SPMOutsideAir : SPMBase // Derived type for Outside Air Setpoint Manager Data
     {
         // Members
-        Real64 lowSetPt1 = 0.0;         // 1st setpoint at outside low
-        Real64 low1 = 0.0;              // 1st Outside low
-        Real64 highSetPt1 = 0.0;        // 1st setpoint at outside high
-        Real64 high1 = 0.0;             // 1st Outside high
+        Real64 lowSetPt1 = 0.0;            // 1st setpoint at outside low
+        Real64 low1 = 0.0;                 // 1st Outside low
+        Real64 highSetPt1 = 0.0;           // 1st setpoint at outside high
+        Real64 high1 = 0.0;                // 1st Outside high
         int schedNum = 0;                  // Schedule index
         int invalidSchedValErrorIndex = 0; // index for recurring error when schedule is not 1 or 2
         int setPtErrorCount = 0;           // countfor recurring error when schedule is not 1 or 2
-        Real64 lowSetPt2 = 0.0;         // 2nd setpoint at outside low (optional)
-        Real64 low2 = 0.0;              // 2nd Outside low (optional)
-        Real64 highSetPt2 = 0.0;        // 2nd setpoint at outside high (optional)
-        Real64 high2 = 0.0;             // 2nd Outside high (optional)
+        Real64 lowSetPt2 = 0.0;            // 2nd setpoint at outside low (optional)
+        Real64 low2 = 0.0;                 // 2nd Outside low (optional)
+        Real64 highSetPt2 = 0.0;           // 2nd setpoint at outside high (optional)
+        Real64 high2 = 0.0;                // 2nd Outside high (optional)
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -204,27 +203,27 @@ namespace SetPointManager {
     {
         // Members
         std::string ctrlZoneName; // name of the control zone (zone with main thermostat)
-        int ctrlZoneNum = 0;          // number (index into Zone array) of control zone
-        int zoneNodeNum = 0;             // zone node number
-        int zoneInletNodeNum = 0;        // inlet node number for the SZRH air
-        int mixedAirNodeNum = 0;            // mixed air node number
-        int fanInNodeNum = 0;               // fan inlet node number
-        int fanOutNodeNum = 0;              // fan outlet node number
-        int oaInNodeNum = 0;                // outside airstream inlet node to the OA mixer
-        int retNodeNum = 0;                 // return node inlet to OA mixer
-        int loopInNodeNum = 0;              // Primary Air System inlet node
+        int ctrlZoneNum = 0;      // number (index into Zone array) of control zone
+        int zoneNodeNum = 0;      // zone node number
+        int zoneInletNodeNum = 0; // inlet node number for the SZRH air
+        int mixedAirNodeNum = 0;  // mixed air node number
+        int fanInNodeNum = 0;     // fan inlet node number
+        int fanOutNodeNum = 0;    // fan outlet node number
+        int oaInNodeNum = 0;      // outside airstream inlet node to the OA mixer
+        int retNodeNum = 0;       // return node inlet to OA mixer
+        int loopInNodeNum = 0;    // Primary Air System inlet node
 
         void calculate(EnergyPlusData &state) override;
     };
 
     // The one can be used for both SZ Heating and SZCooling SPMs
-    struct SPMSingleZoneTemp : SPMBase 
+    struct SPMSingleZoneTemp : SPMBase
     {
         // Members
         std::string ctrlZoneName; // name of the control zone (zone with main thermostat)
-        int ctrlZoneNum = 0;          // number (index into Zone array) of control zone
-        int zoneNodeNum = 0;             // zone node number
-        int zoneInletNodeNum = 0;        // inlet node number for the supply air
+        int ctrlZoneNum = 0;      // number (index into Zone array) of control zone
+        int zoneNodeNum = 0;      // zone node number
+        int zoneInletNodeNum = 0; // inlet node number for the supply air
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -233,7 +232,7 @@ namespace SetPointManager {
     struct SPMSingleZoneHum : SPMBase // Derived Type for Single Zone Minimum Humidity Setpoint Manager data
     {
         // Members
-        int zoneNodeNum = 0;   // zone node numbers of zones being controlled
+        int zoneNodeNum = 0; // zone node numbers of zones being controlled
         int ctrlZoneNum = 0; // index into ZoneEquipConfig
 
         void calculate(EnergyPlusData &state) override;
@@ -243,12 +242,12 @@ namespace SetPointManager {
 
     {
         // Members
-        int fanInNodeNum = 0;               // supply fan inlet node number
-        int fanOutNodeNum = 0;              // Supplt fan outlet node number
+        int fanInNodeNum = 0;            // supply fan inlet node number
+        int fanOutNodeNum = 0;           // Supplt fan outlet node number
         bool mySetPointCheckFlag = true; // used for mixed air SPM test for missing SP
         bool freezeCheckEnable = true;   // Enable freezing check
-        int coolCoilInNodeNum = 0;          // Cooling coil inlet node number
-        int coolCoilOutNodeNum = 0;         // Cooling coil outlet node number
+        int coolCoilInNodeNum = 0;       // Cooling coil inlet node number
+        int coolCoilOutNodeNum = 0;      // Cooling coil outlet node number
         Real64 minCoolCoilOutTemp = 7.2; // The minimum temperature at cooling coil outlet node
 
         void calculate(EnergyPlusData &state) override;
@@ -257,9 +256,9 @@ namespace SetPointManager {
     struct SPMOutsideAirPretreat : SPMBase
     {
         // Members
-        int mixedOutNodeNum = 0;           // mixed air outlet node number
-        int oaInNodeNum = 0;               // outside air inlet node number
-        int returnInNodeNum = 0;           // return air inlet node number
+        int mixedOutNodeNum = 0;         // mixed air outlet node number
+        int oaInNodeNum = 0;             // outside air inlet node number
+        int returnInNodeNum = 0;         // return air inlet node number
         bool mySetPointCheckFlag = true; // used for DOAS SPM test for missing SP
 
         void calculate(EnergyPlusData &state) override;
@@ -278,8 +277,8 @@ namespace SetPointManager {
     {
         // Members
         ControlStrategy strategy = ControlStrategy::Invalid; // supply flow and temperature set strategy
-        Real64 minTurndown = 0.0;    // minimum fractional flow rate
-        Real64 turndown = 0.0;       // fractional flow rate
+        Real64 minTurndown = 0.0;                            // minimum fractional flow rate
+        Real64 turndown = 0.0;                               // fractional flow rate
         int critZoneNum = 0;
         bool simReady = false;
 
@@ -289,8 +288,8 @@ namespace SetPointManager {
     struct SPMReturnAirBypassFlow : SPMBase
     {
         // Members
-        int schedNum = 0;            // index of the above schedule
-        Real64 FlowSetPt = 0;        // mass flow rate setpoint (kg/s)
+        int schedNum = 0;     // index of the above schedule
+        Real64 FlowSetPt = 0; // mass flow rate setpoint (kg/s)
         int rabMixInNodeNum = 0;
         int supMixInNodeNum = 0;
         int mixOutNodeNum = 0;
@@ -314,7 +313,7 @@ namespace SetPointManager {
     {
         // Members
         AirTempType refTempType = AirTempType::Invalid; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-        Real64 offset = 0.0;                 // Offset temperature difference
+        Real64 offset = 0.0;                            // Offset temperature difference
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -323,7 +322,7 @@ namespace SetPointManager {
     {
         // Members
         AirTempType refTempType = AirTempType::Invalid; // set to iRefTempType_WetBulb or iRefTempType_DryBulb
-        Real64 offset = 0.0;                 // Offset temperature difference
+        Real64 offset = 0.0;                            // Offset temperature difference
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -335,8 +334,8 @@ namespace SetPointManager {
         // Site:GroundTemperature:Shallow
         // Site:GroundTemperature:Deep
         // Site:GroundTemperature:FCfactorMethod
-        DataEnvironment::GroundTempType refTempType = DataEnvironment::GroundTempType::Invalid; 
-        Real64 offset = 0.0;                             // Offset temperature difference
+        DataEnvironment::GroundTempType refTempType = DataEnvironment::GroundTempType::Invalid;
+        Real64 offset = 0.0; // Offset temperature difference
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -344,15 +343,15 @@ namespace SetPointManager {
     struct SPMCondenserEnteringTemp : SPMBase // derived type for SetpointManager:CondenserEnteringReset data
     {
         // Members
-        int condenserEnteringTempSchedNum = 0;        // default condenser entering water temperature schedule Index
+        int condenserEnteringTempSchedNum = 0;     // default condenser entering water temperature schedule Index
         Real64 towerDesignInletAirWetBulbTemp = 0; // cooling tower design inlet air wetbulb temperature
-        int minTowerDesignWetBulbCurveNum = 0;              // minimum design wetbulb temperature curve name
-        int minOAWetBulbCurveNum = 0;               // minimum outside air wetbulb temperature curve name
-        int optCondenserEnteringTempCurveNum = 0;            // optimized condenser entering water temperature curve name
-        Real64 minLift = 0.0;           // minimum lift
-        Real64 maxCondenserEnteringTemp = 0.0;          // maximum condenser entering water temp
-        PlantLocation plantPloc;          // plant side chiller index
-        PlantLocation demandPloc; 
+        int minTowerDesignWetBulbCurveNum = 0;     // minimum design wetbulb temperature curve name
+        int minOAWetBulbCurveNum = 0;              // minimum outside air wetbulb temperature curve name
+        int optCondenserEnteringTempCurveNum = 0;  // optimized condenser entering water temperature curve name
+        Real64 minLift = 0.0;                      // minimum lift
+        Real64 maxCondenserEnteringTemp = 0.0;     // maximum condenser entering water temp
+        PlantLocation plantPloc;                   // plant side chiller index
+        PlantLocation demandPloc;
         DataPlant::PlantEquipmentType chillerType; // chiller type number
 
         void calculate(EnergyPlusData &state) override;
@@ -363,23 +362,23 @@ namespace SetPointManager {
         OutputProcessor::VariableType Type = OutputProcessor::VariableType::Invalid;
         int Num = 0;
     };
-            
+
     struct SPMIdealCondenserEnteringTemp : SPMBase // derived type for SetpointManager:CondenserEnteringReset:Ideal data
     {
         // Members
-        Real64 minLift = 0.0;  // minimum lift
+        Real64 minLift = 0.0;                  // minimum lift
         Real64 maxCondenserEnteringTemp = 0.0; // maximum condenser entering water temp
-        PlantLocation chillerPloc;                           // plant side chiller index
+        PlantLocation chillerPloc;             // plant side chiller index
         SPMVar chillerVar;
         SPMVar chilledWaterPumpVar;
-        Array1D<SPMVar> towerVars; 
+        Array1D<SPMVar> towerVars;
         SPMVar condenserPumpVar;
-        DataPlant::PlantEquipmentType chillerType = DataPlant::PlantEquipmentType::Invalid;             // chiller type number
+        DataPlant::PlantEquipmentType chillerType = DataPlant::PlantEquipmentType::Invalid; // chiller type number
         Array1D<PlantLocation> towerPlocs;
-        int numTowers = 0;                                     // number of towers to query
-        PlantLocation condenserPumpPloc;                              // condenser pump number
-        PlantLocation chilledWaterPumpPloc;                           // chilled water pump number
-        bool setupIdealCondEntSetPtVars = true;                // flag for initialization of meters and such
+        int numTowers = 0;                      // number of towers to query
+        PlantLocation condenserPumpPloc;        // condenser pump number
+        PlantLocation chilledWaterPumpPloc;     // chilled water pump number
+        bool setupIdealCondEntSetPtVars = true; // flag for initialization of meters and such
 
         void calculate(EnergyPlusData &state) override;
 
@@ -400,9 +399,9 @@ namespace SetPointManager {
     {
         // Members
         int ctrlZoneNum = 0;          // number (index into Zone array) of control zone
-        int zoneNodeNum = 0;             // zone node number
-        Real64 coolingOnSetPt = 0.0;        // minimum supply air setpoint temperature
-        Real64 coolingOffSetPt = 0.0;       // maximum supply air setpoint temperature
+        int zoneNodeNum = 0;          // zone node number
+        Real64 coolingOnSetPt = 0.0;  // minimum supply air setpoint temperature
+        Real64 coolingOffSetPt = 0.0; // maximum supply air setpoint temperature
 
         void calculate(EnergyPlusData &state) override;
     };
@@ -411,23 +410,22 @@ namespace SetPointManager {
     {
         // Members
         int ctrlZoneNum = 0;          // number (index into Zone array) of control zone
-        int zoneNodeNum = 0;             // zone node number
-        Real64 heatingOnSetPt = 0.0;        // minimum supply air setpoint temperature
-        Real64 heatingOffSetPt = 0.0;       // maximum supply air setpoint temperature
+        int zoneNodeNum = 0;          // zone node number
+        Real64 heatingOnSetPt = 0.0;  // minimum supply air setpoint temperature
+        Real64 heatingOffSetPt = 0.0; // maximum supply air setpoint temperature
 
         void calculate(EnergyPlusData &state) override;
     };
 
-
     struct SPMReturnWaterTemp : SPMBase // derived type for SetpointManager:SupplyResetForReturnTemperature:ChilledWater data
     {
         // Members
-        int returnNodeNum = 0;                    // node ID for the plant supply-side return node
-        int supplyNodeNum = 0;                    // node ID for the plant supply-side supply node
-        int returnTempSchedNum = 0;     // the index in Schedules array for the scheduled return temperature; zero if not used
+        int returnNodeNum = 0;                 // node ID for the plant supply-side return node
+        int supplyNodeNum = 0;                 // node ID for the plant supply-side supply node
+        int returnTempSchedNum = 0;            // the index in Schedules array for the scheduled return temperature; zero if not used
         Real64 returnTempConstantTarget = 0.0; // the constant value used as the return temperature target; used if schedule index is zero
-        Real64 currentSupplySetPt = 0.0;              // the current supply setpoint temperature
-        int plantLoopNum = 0;                     // the index for the plant loop for this manager, zero if not initialized
+        Real64 currentSupplySetPt = 0.0;       // the current supply setpoint temperature
+        int plantLoopNum = 0;                  // the index for the plant loop for this manager, zero if not initialized
         int plantSetPtNodeNum = 0;             // the index for the node where the plant setpoint is set, need to look up after Plant is established
         ReturnTempType returnTempType = ReturnTempType::Invalid;
 
@@ -455,14 +453,14 @@ namespace SetPointManager {
         // Members
         Real64 lowRefSetPt = 0.0;  // Setpoint at Low Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
         Real64 highRefSetPt = 0.0; // Setpoint at High Reference Temperature or Humidity Ratio (i.e., Maximum Temperature/Humidity Ratio Setpoint)
-        Real64 lowRef = 0.0;      // Low Reference Temperature or Humidity Ratio
-        Real64 highRef = 0.0;     // High Reference Temperature or Humidity Ratio
+        Real64 lowRef = 0.0;       // Low Reference Temperature or Humidity Ratio
+        Real64 highRef = 0.0;      // High Reference Temperature or Humidity Ratio
 
         void calculate(EnergyPlusData &state) override;
     };
 
     int GetSetPointManagerIndex(EnergyPlusData &state, std::string const &Name);
-            
+
     void ManageSetPoints(EnergyPlusData &state);
 
     void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
@@ -517,7 +515,7 @@ struct SetPointManagerData : BaseGlobalStruct
     bool InitSetPointManagersOneTimeFlag2 = true;
     // This will cause a warning to be issued if no "surface" ground temperature object was input.
 
-    std::array<bool, (int)DataEnvironment::GroundTempType::Num> NoGroundTempObjWarning = {true, true, true, true}; 
+    std::array<bool, (int)DataEnvironment::GroundTempType::Num> NoGroundTempObjWarning = {true, true, true, true};
     bool InitSetPointManagersMyEnvrnFlag = true; // flag for init once at start of environment
 
     // Object Data
@@ -528,7 +526,7 @@ struct SetPointManagerData : BaseGlobalStruct
     bool ICET_RunSubOptCondEntTemp = false;
     bool ICET_RunFinalOptCondEntTemp = false;
     Real64 ICET_CondenserWaterSetPt = 0; // Condenser entering water temperature setpoint this timestep, C
-    Real64 ICET_TotEnergyPre = 0;      // Total energy consumptions at the previous time step
+    Real64 ICET_TotEnergyPre = 0;        // Total energy consumptions at the previous time step
 
     // Condenser Entering Temp::calculate() state variables
     Real64 CET_ActualLoadSum = 0.0;
@@ -542,7 +540,7 @@ struct SetPointManagerData : BaseGlobalStruct
     Real64 CET_MinActualWetBulbTemp = 0.0;
     Real64 CET_OptCondenserEnteringTemp = 0.0;
     Real64 CET_CurMinLift = 0.0;
-        
+
     void clear_state() override
     {
         ManagerOn = false;

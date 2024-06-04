@@ -223,7 +223,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 AirPowerCap = 0.0; // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
 
         virtual ~ZoneSpaceHeatBalanceData() = default;
-            
+
         void beginEnvironmentInit(EnergyPlusData &state);
 
         void setUpOutputVars(EnergyPlusData &state, std::string_view prefix, std::string const &key);

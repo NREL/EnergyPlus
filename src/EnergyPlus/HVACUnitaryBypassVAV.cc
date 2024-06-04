@@ -253,7 +253,7 @@ namespace HVACUnitaryBypassVAV {
         if (changeOverByPassVAV.modeChanged) {
             // set outlet node SP for mixed air SP manager
             state.dataLoopNodes->Node(changeOverByPassVAV.AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
-            if (changeOverByPassVAV.OutNodeSPMIndex > 0) { // update mixed air SPM if exists
+            if (changeOverByPassVAV.OutNodeSPMIndex > 0) {                                              // update mixed air SPM if exists
                 state.dataSetPointManager->spms(changeOverByPassVAV.OutNodeSPMIndex)->calculate(state); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
             }

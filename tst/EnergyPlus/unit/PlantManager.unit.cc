@@ -211,7 +211,7 @@ namespace PlantManager {
         GetPlantLoopData(*state);
         ASSERT_FALSE(ErrorsFound);
         // there two setpoint managers in the loop
-        EXPECT_EQ(2, state->dataSetPointManager->spms.size());    // SetpointManager:Scheduled
+        EXPECT_EQ(2, state->dataSetPointManager->spms.size()); // SetpointManager:Scheduled
 
         // Schedule Setpoint Manager assigned at a plant loop supply outlet node
         EXPECT_EQ((int)state->dataSetPointManager->spms(1)->ctrlVar, (int)HVAC::CtrlVarType::Temp);

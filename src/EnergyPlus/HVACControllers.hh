@@ -157,10 +157,10 @@ namespace HVACControllers {
         int SensedNode;             // The sensed node number from the grid
         bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
         // be used to compute DeltaSensed
-        Real64 SetPointValue;                         // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
-        Real64 SensedValue;                           // The sensed control variable of any type
-        Real64 DeltaSensed;                           // Difference of sensed to setpoint value for calculating proportional gain
-        Real64 Offset;                                // This is the tolerance or droop from the error
+        Real64 SetPointValue;              // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
+        Real64 SensedValue;                // The sensed control variable of any type
+        Real64 DeltaSensed;                // Difference of sensed to setpoint value for calculating proportional gain
+        Real64 Offset;                     // This is the tolerance or droop from the error
         HVAC::CtrlVarType HumRatCntrlType; // iCtrlVarType_HumRat=4,iCtrlVarType_MaxHumRat=5,iCtrlVarType_MinHumRat=6
         // --------------------
         // Other controller inputs, not yet used

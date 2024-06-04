@@ -550,8 +550,7 @@ void GetControllerInput(EnergyPlusData &state)
                     bool EMSSetPointErrorFlag = false;
                     switch (controllerProps.ControlVar) {
                     case HVACControllers::CtrlVarType::Temperature: {
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
                         state.dataLoopNodes->NodeSetpointCheck(controllerProps.SensedNode).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!SetPointManager::NodeHasSPMCtrlVarType(state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp)) {
@@ -576,8 +575,7 @@ void GetControllerInput(EnergyPlusData &state)
                         }
                     } break;
                     case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: {
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
                         state.dataLoopNodes->NodeSetpointCheck(controllerProps.SensedNode).needsSetpointChecking = false;
                         if (EMSSetPointErrorFlag) {
                             if (!SetPointManager::NodeHasSPMCtrlVarType(state, controllerProps.SensedNode, HVAC::CtrlVarType::Temp)) {
@@ -790,7 +788,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("HVACControllers: Missing temperature setpoint for controller type={} Name=\"{}\"",
@@ -837,7 +836,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                                           "setpoint at the controller sensed node.");
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensedNode, HVAC::CtrlVarType::HumRat, state.dataHVACGlobal->SetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, SensedNode, HVAC::CtrlVarType::HumRat, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("HVACControllers: Missing humidity ratio setpoint for controller type={} Name=\"{}\"",
@@ -877,7 +877,8 @@ void InitController(EnergyPlusData &state, int const ControlNum, bool &IsConverg
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // call to check node is actuated by EMS
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("HVACControllers: Missing temperature setpoint for controller type={} Name=\"{}\"",

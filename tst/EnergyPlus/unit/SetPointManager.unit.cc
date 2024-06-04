@@ -723,7 +723,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     int spmNum = SetPointManager::GetSetPointManagerIndex(*state, "SUPAIRTEMP MNGRKITCHEN");
     auto *spmSZR = dynamic_cast<SetPointManager::SPMSingleZoneReheat *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmSZR != nullptr);
-    
+
     EXPECT_EQ(spmSZR->ctrlZoneNum, 1);
     spmSZR->airLoopNum = 1;
 
@@ -1244,8 +1244,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     int spmCNum = SetPointManager::GetSetPointManagerIndex(*state, "SUPPLY AIR TEMPERATURE MANAGER 2");
     auto *spmC = dynamic_cast<SetPointManager::SPMTempest *>(state->dataSetPointManager->spms(spmCNum));
     ASSERT_TRUE(spmC != nullptr);
-                                                             
-    
+
     spmW->airLoopNum = 1;
     spmC->airLoopNum = 1;
 
@@ -1279,7 +1278,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     // check the value of ZoneSetPointTemp matches to the value calculated by ColdestSetPtMgr
     int HCOutletNodeNum = Util::FindItemInList("HCOIL OUTLET NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ(state->dataLoopNodes->NodeID(HCOutletNodeNum), "HCOIL OUTLET NODE");
-    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, spmC->setPt);     // 29.74 deg C
+    EXPECT_DOUBLE_EQ(ZoneSetPointTemp, spmC->setPt);                                              // 29.74 deg C
     EXPECT_DOUBLE_EQ(ZoneSetPointTemp, state->dataLoopNodes->Node(HCOutletNodeNum).TempSetPoint); // 29.74 deg C
 }
 
@@ -1305,7 +1304,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
     int spmNum = SetPointManager::GetSetPointManagerIndex(*state, "HOT WATER LOOP SETPOINT MANAGER");
-    
+
     auto *spmOA = dynamic_cast<SetPointManager::SPMOutsideAir *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmOA != nullptr);
     EXPECT_TRUE(compare_enums(spmOA->ctrlVar, HVAC::CtrlVarType::MaxTemp));
@@ -1367,8 +1366,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     int spmNum = SetPointManager::GetSetPointManagerIndex(*state, "HOT WATER LOOP SETPOINT MANAGER");
     auto *spmOA = dynamic_cast<SetPointManager::SPMOutsideAir *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmOA != nullptr);
-                                                                 
-    
+
     EXPECT_TRUE(compare_enums(spmOA->ctrlVar, HVAC::CtrlVarType::MinTemp));
     EXPECT_TRUE(compare_enums(spmOA->type, SetPointManager::SPMType::OutsideAir));
     EXPECT_EQ(80.0, spmOA->lowSetPt1);
@@ -1427,7 +1425,7 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     state->dataLoopNodes->Node.allocate(3);
 
     SetPointManager::GetSetPointManagerInputs(*state);
-    
+
     state->dataZoneEquip->ZoneEquipConfig.allocate(1);
     state->dataZoneEquip->ZoneEquipConfig(1).ZoneNode = Util::FindItemInList("KITCHEN AIR NODE", state->dataLoopNodes->NodeID);
     state->dataZoneEquip->ZoneEquipConfig(1).NumInletNodes = 1;
@@ -1658,7 +1656,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
     int spmNum = SetPointManager::GetSetPointManagerIndex(*state, "RETURN NODE RESET");
     auto *spmSN = dynamic_cast<SetPointManager::SPMSystemNode *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmSN != nullptr);
-    
+
     EXPECT_TRUE(compare_enums(spmSN->ctrlVar, HVAC::CtrlVarType::Temp));
     EXPECT_TRUE(compare_enums(spmSN->type, SetPointManager::SPMType::SystemNodeTemp));
     EXPECT_EQ(16.7, spmSN->lowRefSetPt);
@@ -1676,7 +1674,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
     // TODO: something strange is going on here with NodeID sizing. It's set to 3 even though there are only two elements in it.
     int refNodeNum = Util::FindItemInList("RETURN NODE", state->dataLoopNodes->NodeID);
     int ctrlNodeNum = Util::FindItemInList("SUPPLY NODE", state->dataLoopNodes->NodeID);
-    
+
     EXPECT_EQ(16.7, state->dataLoopNodes->Node(ctrlNodeNum).TempSetPoint);
 
     // case 2: calculate and check setpoint value when reference node temperature is above the high reference value
@@ -1720,7 +1718,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
     int spmNum = SetPointManager::GetSetPointManagerIndex(*state, "RETURN NODE RESET");
     auto *spmSN = dynamic_cast<SetPointManager::SPMSystemNode *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmSN != nullptr);
-    
+
     EXPECT_TRUE(compare_enums(spmSN->ctrlVar, HVAC::CtrlVarType::HumRat));
     EXPECT_TRUE(compare_enums(spmSN->type, SetPointManager::SPMType::SystemNodeHum));
     EXPECT_EQ(0.008, spmSN->lowRefSetPt);

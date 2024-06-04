@@ -630,18 +630,16 @@ std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const
     if (it != ep_object.end()) {
         auto const &val = it.value();
         assert(val.is_string());
-        if (!val.empty())
-            return uc ? Util::makeUPPER(val.get<std::string>()) : val.get<std::string>();
+        if (!val.empty()) return uc ? Util::makeUPPER(val.get<std::string>()) : val.get<std::string>();
     }
-    
 
     auto const it2 = fprops.find("default");
     return (it2 != fprops.end()) ? (uc ? Util::makeUPPER(it2.value().get<std::string>()) : it2.value().get<std::string>()) : std::string();
 
-#ifdef GET_OUT    
+#ifdef GET_OUT
     if (default_val.is_number_integer()) {
         i64toa(default_val.get<std::int64_t>(), s);
-    } else if (default_val.is_number()) { 
+    } else if (default_val.is_number()) {
         dtoa(default_val.get<double>(), s);
     }
 #endif // GET_OUT
@@ -656,7 +654,7 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
         if (field_value.is_number()) {
-            return  (field_value.is_number_integer()) ? field_value.get<std::int64_t>() : field_value.get<double>();
+            return (field_value.is_number_integer()) ? field_value.get<std::int64_t>() : field_value.get<double>();
         } else if (!field_value.get<std::string>().empty()) {
             return Constant::AutoCalculate; // autosize and autocalculate
         }
@@ -1347,7 +1345,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     const json *object;
 
     auto const &props = schema()["properties"];
-    
+
     if (auto found = props.find(std::string(ObjectWord)); found == props.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {

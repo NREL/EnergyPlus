@@ -356,11 +356,11 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
     // changing it to CtrlVarType::Temp
     int spmCCoilHumNum = SetPointManager::GetSetPointManagerIndex(*state, "CCOIL HUM SETPOINT MGR");
     auto *spmCCoilHum = state->dataSetPointManager->spms(spmCCoilHumNum);
-    
+
     int spmCCoilTempNum = SetPointManager::GetSetPointManagerIndex(*state, "CCOIL TEMP SETPOINT MGR");
     auto *spmCCoilTemp = state->dataSetPointManager->spms(spmCCoilTempNum);
-    
-    ASSERT_EQ((int)HVAC::CtrlVarType::Temp, (int)spmCCoilTemp->ctrlVar); // is "Temperature"
+
+    ASSERT_EQ((int)HVAC::CtrlVarType::Temp, (int)spmCCoilTemp->ctrlVar);     // is "Temperature"
     ASSERT_EQ((int)HVAC::CtrlVarType::MaxHumRat, (int)spmCCoilHum->ctrlVar); // is "MaximumHumidityRatio"
 
     GetControllerInput(*state);

@@ -112,7 +112,7 @@ struct EnvironmentData : BaseGlobalStruct
     Real64 GndSolarRad = 0.0;                  // Current ground reflected radiation
     Real64 GroundTempKelvin = 0.0;             // Current ground temperature {K}
     std::array<Real64, (int)DataEnvironment::GroundTempType::Num> GroundTemp = {0.0, 0.0, 0.0, 0.0};
-        
+
     int HolidayIndex = 0; // Indicates whether current day is a holiday and if so what type - HolidayIndex=(0-no holiday, 1-holiday type 1, ...)
     int HolidayIndexTomorrow = 0;                 // Tomorrow's Holiday Index
     bool IsRain = false;                          // Surfaces are wet for this time interval
@@ -192,7 +192,7 @@ struct EnvironmentData : BaseGlobalStruct
     Real64 SiteTempGradient = 0.0065;                           // Air temperature gradient coefficient (K/m)
 
     std::array<bool, (int)DataEnvironment::GroundTempType::Num> GroundTempInputs = {false, false, false, false}; // Ground temperature object input
-        
+
     bool DisplayWeatherMissingDataWarnings = false; // Display missing/out of range weather warnings
     bool IgnoreSolarRadiation = false;              // TRUE if all solar radiation is to be ignored
     bool IgnoreBeamRadiation = false;               // TRUE if beam (aka direct normal) radiation is to be ignored

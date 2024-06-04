@@ -2549,7 +2549,8 @@ void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool con
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // add call to check node in EMS
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, MixedAirNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(
+                            state, MixedAirNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             format("MixedAir: Missing temperature setpoint for economizer controller {}", thisOAController.Name));

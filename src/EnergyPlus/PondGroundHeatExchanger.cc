@@ -341,7 +341,9 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
     if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Deep]) {
         ShowWarningError(state, "GetPondGroundHeatExchanger:  No \"Site:GroundTemperature:Deep\" were input.");
-        ShowContinueError(state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]));
+        ShowContinueError(state,
+                          format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                 state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep]));
     }
 }
 

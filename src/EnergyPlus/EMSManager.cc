@@ -111,16 +111,15 @@ namespace EMSManager {
                                                                                                   "BEGINZONETIMESTEPAFTERINITHEATBALANCE",
                                                                                                   "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER"};
 
-    constexpr std::array<std::string_view, (int)HVAC::CtrlVarType::Num> controlTypeNames = {
-        "Temperature Setpoint",
-        "Temperature Minimum Setpoint",
-        "Temperature Maximum Setpoint",
-        "Humidity Ratio Setpoint",
-        "Humidity Ratio Minimum Setpoint",
-        "Humidity Ratio Maximum Setpoint",
-        "Mass Flow Rate Setpoint",
-        "Mass Flow Rate Minimum Available Setpoint",
-        "Mass Flow Rate Maximum Available Setpoint"};
+    constexpr std::array<std::string_view, (int)HVAC::CtrlVarType::Num> controlTypeNames = {"Temperature Setpoint",
+                                                                                            "Temperature Minimum Setpoint",
+                                                                                            "Temperature Maximum Setpoint",
+                                                                                            "Humidity Ratio Setpoint",
+                                                                                            "Humidity Ratio Minimum Setpoint",
+                                                                                            "Humidity Ratio Maximum Setpoint",
+                                                                                            "Mass Flow Rate Setpoint",
+                                                                                            "Mass Flow Rate Minimum Available Setpoint",
+                                                                                            "Mass Flow Rate Maximum Available Setpoint"};
 
     void CheckIfAnyEMS(EnergyPlusData &state)
     {
@@ -1531,7 +1530,8 @@ namespace EMSManager {
                 }
             }
             if (!FoundControl) {
-                ShowWarningError(state, format("Missing '{}' for node named named '{}'.", controlTypeNames[(int)ctrlVar], state.dataLoopNodes->NodeID(NodeNum)));
+                ShowWarningError(
+                    state, format("Missing '{}' for node named named '{}'.", controlTypeNames[(int)ctrlVar], state.dataLoopNodes->NodeID(NodeNum)));
             }
         } else {
             for (int Loop = 1; Loop <= state.dataRuntimeLang->numActuatorsUsed + state.dataRuntimeLang->NumExternalInterfaceActuatorsUsed; ++Loop) {

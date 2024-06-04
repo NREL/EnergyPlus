@@ -15211,7 +15211,8 @@ void WalkInData::CalculateWalkIn(EnergyPlusData &state) // Absolute pointer to  
     // Calculate floor load - using 'DataEnvironment::GroundTemp' assigned in weather manager (can be entered by user if desired)
     //    Default value is 18C.
     // Total floor energy rate (W)
-    Real64 FloorLoad = this->FloorArea * this->FloorUValue * (state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] - TWalkIn);
+    Real64 FloorLoad =
+        this->FloorArea * this->FloorUValue * (state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] - TWalkIn);
 
     Real64 DefrostLoad;
 

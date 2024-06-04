@@ -73,7 +73,7 @@ namespace DataZoneEnergyDemands {
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
         virtual ~ZoneSystemDemandData() = default;
-            
+
         virtual void beginEnvironmentInit() = 0;
 
         virtual void setUpOutputVars(
