@@ -101,10 +101,8 @@ namespace EnergyPlus::Pumps {
 // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 // Using/Aliasing
-using DataHVACGlobals::CycleOn;
-using DataHVACGlobals::ForceOff;
-using DataHVACGlobals::SmallWaterVolFlow;
 using DataLoopNode::ObjectIsNotParent;
+using HVAC::SmallWaterVolFlow;
 
 static constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {
     "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed"};
@@ -1718,8 +1716,8 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     }
 
     // Override pump operation based on System Availability Managers, should be done elsewhere?  I suppose this should be OK though
-    if (allocated(state.dataPlnt->PlantAvailMgr)) {
-        if (state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus == ForceOff) {
+    if (allocated(state.dataAvail->PlantAvailMgr)) {
+        if (state.dataAvail->PlantAvailMgr(LoopNum).availStatus == Avail::Status::ForceOff) {
             PumpMassFlowRateMax = 0.0;
             PumpMassFlowRateMin = 0.0;
         }
@@ -1771,7 +1769,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     int InletNode;
     int OutletNode;
     Real64 LoopDensity;
-    Real64 VolFlowRate;
+    Real64 VolFlowRate = 0.0;
     Real64 PartLoadRatio;
     Real64 FracFullLoadPower;
     Real64 FullLoadVolFlowRate;
@@ -1919,6 +1917,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
         FracFullLoadPower = thisPump.PartLoadCoef[0] + thisPump.PartLoadCoef[1] * PartLoadRatio + thisPump.PartLoadCoef[2] * pow_2(PartLoadRatio) +
                             thisPump.PartLoadCoef[3] * pow_3(PartLoadRatio);
         daPumps->Power = (FullLoadPowerRatio * daPumps->NumPumpsFullLoad + FracFullLoadPower) * FullLoadPower;
+        if (thisPump.EMSPressureOverrideOn) {
+            VolFlowRate = PartLoadVolFlowRate;
+        }
     } break;
     default: {
         assert(false);

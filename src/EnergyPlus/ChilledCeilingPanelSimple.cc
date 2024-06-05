@@ -945,7 +945,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     if (state.dataSize->CurZoneEqNum > 0) {
 
         auto &zoneEqSizing = state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum);
-        int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+        int SizingMethod = HVAC::CoolingCapacitySizing;
         bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
         bool errorsFound = false;
         int CapSizingMethod = thisCP.CoolingCapMethod;
@@ -1031,7 +1031,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                 int PltSizCoolNum =
                     PlantUtilities::MyPlantSizingIndex(state, CompType, thisCP.Name, thisCP.WaterInletNode, thisCP.WaterOutletNode, ErrorsFound);
                 if (PltSizCoolNum > 0) {
-                    if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
+                    if (DesCoilLoad >= HVAC::SmallLoad) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                                 5.,
@@ -1288,7 +1288,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
     if ((this->controlType == ClgPanelCtrlType::ZoneTotalLoad) || (this->controlType == ClgPanelCtrlType::ZoneConvectiveLoad)) {
 
-        if (QZnReq < -DataHVACGlobals::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
+        if (QZnReq < -HVAC::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,

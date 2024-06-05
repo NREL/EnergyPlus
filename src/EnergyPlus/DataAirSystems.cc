@@ -49,7 +49,6 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
 
@@ -92,29 +91,13 @@ namespace DataAirSystems {
     // MODULE VARIABLE DECLARATIONS
     // For each type of air path, define an array of DefineAirPaths
 
-    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const dataFanEnumType, int const dataFanIndex, Real64 const desVolFlow)
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const dataFanIndex, Real64 const desVolFlow)
     {
-        Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
-
-        if (dataFanEnumType < 0 || dataFanIndex < 0 || desVolFlow == 0.0) {
-            return fanDesHeatLoad;
+        if (dataFanIndex <= 0 || desVolFlow == 0.0) {
+            return 0.0;
         }
 
-        switch (dataFanEnumType) {
-        case DataAirSystems::StructArrayLegacyFanModels: {
-            fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
-            break;
-        }
-        case DataAirSystems::ObjectVectorOOFanSystemModel: {
-            fanDesHeatLoad = state.dataHVACFan->fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
-            break;
-        }
-        case DataAirSystems::Invalid: {
-            // do nothing
-            break;
-        }
-        } // end switch
-        return fanDesHeatLoad;
+        return state.dataFans->fans(dataFanIndex)->getDesignHeatGain(state, desVolFlow);
     }
 
 } // namespace DataAirSystems

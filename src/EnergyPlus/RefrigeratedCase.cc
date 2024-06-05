@@ -8634,8 +8634,9 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::StoreType::Sum,
                                         rack.Name);
 
+                    // If CoilFlag is true and Location is Zone, GetRefrigerationInput ensures you must have a Heat Rejection Zone provided already
                     SetupZoneInternalGain(state,
-                                          RefrigCase(rack.CaseNum(1)).ActualZoneNum,
+                                          rack.HeatRejectionZoneNum,
                                           rack.Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &rack.SensZoneCreditHeatRate,
@@ -8794,8 +8795,18 @@ void SetupReportInput(EnergyPlusData &state)
                                         OutputProcessor::TimeStepType::Zone,
                                         OutputProcessor::StoreType::Sum,
                                         rack.Name);
+
+                    // if Location is Zone, GetRefrigerationInputEither checks that you have at least one load and that either:
+                    // * You have only cases, and they must be all in the same zone
+                    // * Or you must have a Heat Rejection Zone provided
+                    int rackZoneNum = -1;
+                    if (rack.HeatRejectionZoneNum > 0) {
+                        rackZoneNum = rack.HeatRejectionZoneNum;
+                    } else {
+                        rackZoneNum = RefrigCase(rack.CaseNum(1)).ActualZoneNum;
+                    }
                     SetupZoneInternalGain(state,
-                                          RefrigCase(rack.CaseNum(1)).ActualZoneNum,
+                                          rackZoneNum,
                                           rack.Name,
                                           DataHeatBalance::IntGainType::RefrigerationCompressorRack,
                                           &rack.SensZoneCreditHeatRate,
@@ -15812,7 +15823,7 @@ void SimAirChillerSet(EnergyPlusData &state,
     RemainingOutputToCoolingSP = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
     // RemainingOutputToCoolingSP in Watts, < 0 for cooling demand
 
-    if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) {
+    if (RemainingOutputToCoolingSP < 0.0 && state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleHeating) {
         AirChillerSet(AirChillerSetPtr).QZnReqSens = RemainingOutputToCoolingSP;
     } else {
         AirChillerSet(AirChillerSetPtr).QZnReqSens = 0.0;

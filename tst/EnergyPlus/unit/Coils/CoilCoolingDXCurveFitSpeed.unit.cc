@@ -93,9 +93,9 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest)
     thisSpeed.RatedCBF = 0.09;
     thisSpeed.RatedEIR = 0.30;
     thisSpeed.AirMassFlow = 1.0;
-    int fanOpMode = 0;
+    HVAC::FanOp fanOp = HVAC::FanOp::Invalid;
     Real64 condInletTemp = 24;
-    thisSpeed.CalcSpeedOutput(*state, inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
+    thisSpeed.CalcSpeedOutput(*state, inletNode, outletNode, thisSpeed.PLR, fanOp, condInletTemp);
 
     EXPECT_NEAR(outletNode.Temp, 17.791, 0.001);
     EXPECT_NEAR(outletNode.HumRat, 0.00754, 0.0001);

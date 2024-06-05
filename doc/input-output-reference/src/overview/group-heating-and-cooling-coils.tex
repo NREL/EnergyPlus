@@ -3295,7 +3295,9 @@ This numeric field defines the nominal speed level, at which the rated capacity 
 
 \paragraph{Field: Gross Rated Total Cooling Capacity at Selected Nominal Speed Level}\label{field-gross-rated-total-cooling-capacity-at-selected-nominal-speed-level}
 
-This numeric field contains the gross rated total cooling capacity at the nominal speed level. This field is autosizable. The gross rated total cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
+This numeric field contains the gross rated total cooling capacity at the nominal speed level. This field is autosizable. Note that if this field is set to zero rather than a positive number or autosized, the coil will be ignored and will not run.
+
+The gross rated total cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
 
 \begin{equation}
 {\rm{CapacityScaleFactor}} = \frac{{{\rm{Gross RatedTotalCoolingCapacity}}}}{{{\rm{ReferenceUnitCapacity}}@{\rm{NominalSpeedLevel}}}}
@@ -7521,7 +7523,9 @@ This numeric field defines the nominal speed level, at which the rated capacity,
 
 \paragraph{Field: Gross Rated Total Cooling Capacity at Selected Nominal Speed Level}\label{field-gross-rated-total-cooling-capacity-at-selected-nominal-speed-level-1}
 
-This numeric field contains the gross rated total cooling capacity at the nominal speed level. This field is autosizable. The gross rated total cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
+This numeric field contains the gross rated total cooling capacity at the nominal speed level. This field is autosizable. Note that if this field is set to zero rather than a positive number or autosized, the coil will be ignored and will not run.
+
+The gross rated total cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit capacity at the nominal speed level.
 
 \begin{equation}
 CapacityScaleFactor = \frac{{GrossRatedTotalCoolingCapacity}}{{ReferenceUnitCapacity@NominalSpeedLevel}}

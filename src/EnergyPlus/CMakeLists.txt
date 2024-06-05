@@ -254,7 +254,7 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
-    EnergyPlusLogger.cc 
+    EnergyPlusLogger.cc
     EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
@@ -320,8 +320,6 @@ set(SRC
     HVACDXHeatPumpSystem.hh
     HVACDuct.cc
     HVACDuct.hh
-    HVACFan.cc
-    HVACFan.hh
     HVACFourPipeBeam.cc
     HVACFourPipeBeam.hh
     HVACHXAssistedCoolingCoil.cc
@@ -475,7 +473,6 @@ set(SRC
     Plant/LoopSidePumpInformation.hh
     Plant/MeterData.hh
     Plant/MixerData.hh
-    Plant/PlantAvailManager.hh
     Plant/PlantConvergencePoint.hh
     Plant/PlantLocation.hh
     Plant/PlantManager.cc
@@ -605,6 +602,8 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
+    Timer.cc
+    Timer.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc

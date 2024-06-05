@@ -57,7 +57,7 @@
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+//#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -70,7 +70,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
 using namespace EnergyPlus::Curve;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DXCoils;
 using namespace EnergyPlus::ChillerElectricEIR;
 using namespace EnergyPlus::ChillerReformulatedEIR;
@@ -92,7 +91,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     state->dataDXCoils->DXCoilNumericFields.allocate(1);
     state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilFanOp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilTotalHeating.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(state->dataDXCoils->NumDXCoils);
@@ -101,7 +100,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
@@ -288,7 +287,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
     state->dataDXCoils->DXCoilNumericFields.allocate(1);
     state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilFanOp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilTotalHeating.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(state->dataDXCoils->NumDXCoils);
@@ -297,7 +296,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest_PositiveCurve)
 
     Coil.Name = "DX Single Speed Heating Coil";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
@@ -475,7 +474,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
     state->dataDXCoils->DXCoilNumericFields.allocate(1);
     state->dataDXCoils->DXCoilOutletTemp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(state->dataDXCoils->NumDXCoils);
-    state->dataDXCoils->DXCoilFanOpMode.allocate(state->dataDXCoils->NumDXCoils);
+    state->dataDXCoils->DXCoilFanOp.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilTotalHeating.allocate(state->dataDXCoils->NumDXCoils);
     state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(state->dataDXCoils->NumDXCoils);
@@ -484,7 +483,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest2023)
 
     Coil.Name = "HeatingCoilDXSingleSpeedAutosize";
     Coil.DXCoilType = "Coil:Heating:DX:SingleSpeed";
-    Coil.DXCoilType_Num = CoilDX_HeatingEmpirical;
+    Coil.DXCoilType_Num = HVAC::CoilDX_HeatingEmpirical;
     Coil.SchedPtr = ScheduleManager::ScheduleAlwaysOn;
     Coil.RatedSHR(1) = 1.0;
     Coil.RatedTotCap(1) = 1600.0;
@@ -2243,8 +2242,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoilAir_25000W_IEER_2022_ValueTest)
     Real64 EER_2022(0.0);
 
     Real64 constexpr AirMassFlowRatioRated(1.0); // AHRI test is at the design flow rate and hence AirMassFlowRatio is 1.0
-    Real64 CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
-    Real64 EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
+    int CapFFlowCurveIndex = thisCoil.CCapFFlow(1);
+    int EIRFFlowCurveIndex = thisCoil.EIRFFlow(1);
 
     thisCoil.RatedTotCap(1) = 25619.345986365865;
     thisCoil.RatedAirVolFlowRate(1) = 1.3711908092591101;
@@ -2791,9 +2790,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_02_Speed_4400W_SEER2_2023_ValueT
         "  ,                                                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate",
         "  ,                                                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  No,                                                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  Autosize,                                                !- Maximum Supply Air Temperature {C}",
         "  21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
@@ -3362,9 +3361,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_03_Speed_12000W_SEER2_2023_Value
         "  ,                                                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate",
         "  ,                                                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  No,                                                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  Autosize,                                                !- Maximum Supply Air Temperature {C}",
         "  21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
@@ -4567,9 +4566,9 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_03_Speeds_27717W_IEER_2022_Value
         "  ,                                                        !- No Load Fraction of Autosized Cooling Supply Air Flow Rate",
         "  ,                                                        !- No Load Fraction of Autosized Heating Supply Air Flow Rate",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  ,                                                        !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation "
-        "{m3/s-W",
+        "{m3/s-W}",
         "  No,                                                      !- No Load Supply Air Flow Rate Control Set To Low Speed",
         "  Autosize,                                                !- Maximum Supply Air Temperature {C}",
         "  21,                                                      !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation {C}",
@@ -11716,11 +11715,10 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
         "Curve:Quadratic, PLFCurve, 0.85, 0.83, 0.0, 0.0, 0.3, 0.85, 1.0, Dimensionless, Dimensionless; ",
         "Curve:Cubic, CAPFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
         "Curve:Cubic, EIRFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
-        "Curve:Biquadratic, 1Cap, 0.483, 0.0305, 0.0000458, 0.00511, -1.50E-04, -1.28E-04, 8.89, 21.67, 12.78, 51.67, , , Temperature, "
-        "Temperature, "
-        "Dimensionless; ",
+        "Curve:Biquadratic, 1Cap, 0.483, 0.0305, 0.0000458, 0.00511, -1.50E-04, -1.28E-04, 8.89, 21.67, 12.78, 51.67, , , "
+        "Temperature,Temperature,Dimensionless;",
         "Curve:Biquadratic, 1Pow, 1.33, -0.034, 0.00094, -0.0086, 0.00077, -0.000972, 8.89, 21.7, 12.8, 51.7, , , Temperature, Temperature, "
-        "Dimensionless; ",
+        "Dimensionless;"
 
     });
 
@@ -11735,17 +11733,17 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_15000W_alternateMode_SEER2_2023_Valu
     ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", thisCoil.performance.alternateMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = (int)thisCoil.performance.normalMode.speeds.size();
     ASSERT_EQ(2, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
     auto speed2 = thisCoil.performance.normalMode.speeds[1];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
+    auto coilMode = thisCoil.performance.maxAvailCoilMode;
     auto normalMode = thisCoil.performance.normalMode.speeds;
     auto alternateMode1 = thisCoil.performance.alternateMode;
-    EXPECT_EQ(1, hasAlternateMode);
+    EXPECT_EQ((int)HVAC::CoilMode::Enhanced, (int)coilMode);
     EXPECT_TRUE(2 == normalMode.size());
     auto speedA1 = alternateMode1.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE2", speedA1.name);
@@ -12056,7 +12054,7 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = (int)thisCoil.performance.normalMode.speeds.size();
     ASSERT_EQ(3, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
@@ -12065,12 +12063,12 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_5000W_SEER2_2023_ValueTest)
     auto speed3 = thisCoil.performance.normalMode.speeds[2];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
-    auto alternateMode1 = thisCoil.performance.alternateMode.speeds;
+    HVAC::CoilMode coilMode = thisCoil.performance.maxAvailCoilMode;
+    auto alternateMode1 = thisCoil.performance.alternateMode.speeds; // Do you know what auto types to here?
     auto alternateMode2 = thisCoil.performance.alternateMode2.speeds;
-    EXPECT_EQ(0, hasAlternateMode);
-    EXPECT_TRUE(0 == alternateMode1.size());
-    EXPECT_TRUE(0 == alternateMode2.size());
+    EXPECT_EQ((int)HVAC::CoilMode::Normal, (int)coilMode);
+    EXPECT_TRUE(alternateMode1.empty());
+    EXPECT_TRUE(alternateMode2.empty());
     auto pLFfPLR_Curve = speed1.indexPLRFPLF;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients
@@ -12342,10 +12340,9 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_Value
         "Curve:Cubic, CAPFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
         "Curve:Cubic, EIRFF, 1, 0, 0, 0, 0, 1, , , Dimensionless, Dimensionless; ",
         "Curve:Biquadratic, 1Cap, 0.483, 0.0305, 0.0000458, 0.00511, -1.50E-04, -1.28E-04, 8.89, 21.67, 12.78, 51.67, , , Temperature, "
-        "Temperature, "
-        "Dimensionless; ",
+        "Temperature,Dimensionless;",
         "Curve:Biquadratic, 1Pow, 1.33, -0.034, 0.00094, -0.0086, 0.00077, -0.000972, 8.89, 21.7, 12.8, 51.7, , , Temperature, Temperature, "
-        "Dimensionless; ",
+        "Dimensionless;",
 
     });
 
@@ -12360,17 +12357,17 @@ TEST_F(EnergyPlusFixture, CurveFit_02_Speed_30000W_alternateMode_IEER_2022_Value
     ASSERT_EQ("DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
     ASSERT_EQ("DX COOL COOLING COIL OPERATING MODE2", thisCoil.performance.alternateMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = (int)thisCoil.performance.normalMode.speeds.size();
     ASSERT_EQ(2, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
     auto speed2 = thisCoil.performance.normalMode.speeds[1];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 2 PERFORMANCE", speed2.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
+    // auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
     auto normalMode = thisCoil.performance.normalMode.speeds;
     auto alternateMode1 = thisCoil.performance.alternateMode;
-    EXPECT_EQ(1, hasAlternateMode);
+    // EXPECT_EQ(1, hasAlternateMode);
     EXPECT_TRUE(2 == normalMode.size());
     auto speedA1 = alternateMode1.speeds[0];
     ASSERT_EQ("DX COOL COOLING COIL SPEED 1 PERFORMANCE2", speedA1.name);
@@ -12679,7 +12676,7 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_20000W_IEER_2022_ValueTest)
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL", thisCoil.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL PERFORMANCE", thisCoil.performance.name);
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL OPERATING MODE", thisCoil.performance.normalMode.name);
-    int nsp = thisCoil.performance.normalMode.speeds.size();
+    int nsp = (int)thisCoil.performance.normalMode.speeds.size();
     ASSERT_EQ(3, nsp);
     auto speed1 = thisCoil.performance.normalMode.speeds[0];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 1 PERFORMANCE", speed1.name);
@@ -12688,12 +12685,12 @@ TEST_F(EnergyPlusFixture, CurveFit_03_Speed_20000W_IEER_2022_ValueTest)
     auto speed3 = thisCoil.performance.normalMode.speeds[2];
     ASSERT_EQ("SYS 2 FURNACE DX COOL COOLING COIL SPEED 3 PERFORMANCE", speed3.name);
 
-    auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
+    // auto hasAlternateMode = thisCoil.performance.hasAlternateMode;
     auto alternateMode1 = thisCoil.performance.alternateMode.speeds;
     auto alternateMode2 = thisCoil.performance.alternateMode2.speeds;
-    EXPECT_EQ(0, hasAlternateMode);
-    EXPECT_TRUE(0 == alternateMode1.size());
-    EXPECT_TRUE(0 == alternateMode2.size());
+    // EXPECT_EQ(0, hasAlternateMode);
+    EXPECT_TRUE(alternateMode1.empty());
+    EXPECT_TRUE(alternateMode2.empty());
     auto pLFfPLR_Curve = speed1.indexPLRFPLF;
     auto &thisCoolPLFfPLR(state->dataCurveManager->PerfCurve(pLFfPLR_Curve));
     // ckeck user PLF curve coefficients

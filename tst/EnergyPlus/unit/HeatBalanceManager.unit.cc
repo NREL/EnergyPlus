@@ -96,7 +96,6 @@ using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
-using namespace EnergyPlus::DataHVACGlobals;
 
 namespace EnergyPlus {
 

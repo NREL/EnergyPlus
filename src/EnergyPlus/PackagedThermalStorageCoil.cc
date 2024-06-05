@@ -110,7 +110,7 @@ constexpr Real64 gigaJoulesToJoules = 1.e+09;
 void SimTESCoil(EnergyPlusData &state,
                 std::string_view CompName, // name of the fan coil unit
                 int &CompIndex,
-                int const FanOpMode, // allows parent object to control fan mode
+                HVAC::FanOp const fanOp, // allows parent object to control fan mode
                 PTSCOperatingMode &TESOpMode,
                 ObjexxFCL::Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
 )
@@ -167,13 +167,13 @@ void SimTESCoil(EnergyPlusData &state,
         CalcTESCoilOffMode(state, TESCoilNum);
         break;
     case PTSCOperatingMode::CoolingOnly:
-        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndCharge:
-        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndDischarge:
-        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::ChargeOnly:
         CalcTESCoilChargeOnlyMode(state, TESCoilNum);
@@ -2188,7 +2188,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                                       state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
         }
 
-        if (thisTESCoil.RatedEvapAirVolFlowRate < SmallAirVolFlow) {
+        if (thisTESCoil.RatedEvapAirVolFlowRate < HVAC::SmallAirVolFlow) {
             thisTESCoil.RatedEvapAirVolFlowRate = 0.0;
         }
         BaseSizer::reportSizerOutput(state,
@@ -2215,7 +2215,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
         if (state.dataSize->CurSysNum > 0) {
             CheckSysSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", thisTESCoil.Name);
             VolFlowRate = thisTESCoil.RatedEvapAirVolFlowRate;
-            if (VolFlowRate >= SmallAirVolFlow) {
+            if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                 if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                     MixTemp = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutTempAtCoolPeak;
                     MixHumRat = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).OutHumRatAtCoolPeak;
@@ -2262,7 +2262,7 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
         } else if (state.dataSize->CurZoneEqNum > 0) {
             CheckZoneSizing(state, "Coil:Cooling:DX:SingleSpeed:ThermalStorage", thisTESCoil.Name);
             VolFlowRate = thisTESCoil.RatedEvapAirVolFlowRate;
-            if (VolFlowRate >= SmallAirVolFlow) {
+            if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                 if (state.dataSize->ZoneEqDXCoil) {
                     if (state.dataSize->ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
                         MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
@@ -2494,7 +2494,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     }
 }
 
-void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] HVAC::FanOp const fanOp, Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2550,7 +2550,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
 
     Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
 
-    if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
+    if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
         Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
         Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
@@ -2757,7 +2757,10 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     }
 }
 
-void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
+                                     int const TESCoilNum,
+                                     [[maybe_unused]] HVAC::FanOp const fanOp,
+                                     Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2857,7 +2860,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
 
     Real64 TotChargeCap = 0.0;
 
-    if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
+    if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
         Real64 const EvapInletEnthalpy = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Enthalpy;
 
@@ -3164,7 +3167,10 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     }
 }
 
-void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
+                                        int const TESCoilNum,
+                                        [[maybe_unused]] HVAC::FanOp const fanOp,
+                                        Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3254,7 +3260,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoil
 
     Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
 
-    if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
+    if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
         Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
         Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
@@ -3737,7 +3743,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     // local for evaporator air mass flow [kg/s]
     Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
 
-    if ((EvapAirMassFlow > SmallMassFlow) && (PartLoadRatio > 0.0) && TESHasSomeCharge) { // coil is running
+    if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0) && TESHasSomeCharge) { // coil is running
 
         Real64 PLR = PartLoadRatio;
 

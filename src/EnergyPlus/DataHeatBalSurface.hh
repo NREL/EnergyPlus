@@ -203,8 +203,9 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfQAdditionalHeatSourceOutside; // Additional heat source term on boundary conditions at outside surface
     Array1D<Real64> SurfQAdditionalHeatSourceInside;  // Additional heat source term on boundary conditions at inside surface
 
-    Array1D<Real64> SurfOpaqInitialDifSolInAbs;  // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
-    Array1D<Real64> SurfWinInitialDifSolInTrans; // Initial diffuse solar transmitted out through window surface [W/m2]
+    Array1D<Real64> SurfOpaqInitialDifSolInAbs;   // Initial diffuse solar absorbed on inside of opaque surface [W/m2]
+    Array1D<Real64> SurfWinInitialDifSolInTrans;  // Initial diffuse solar transmitted out through window inside face [W/m2]
+    Array1D<Real64> SurfWinInitialBeamSolInTrans; // Interior beam solar transmitted out through window inside face [W]
 
     // REAL(r64) variables from BLDCTF.inc and only used in the Heat Balance
     // Hist Term (1 = Current Time, 2-MaxCTFTerms = previous times)
