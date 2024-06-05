@@ -167,13 +167,13 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestDefaultBehaviourOfSimulationControl
     EXPECT_TRUE(state->afn->control_defaulted);
 
     EXPECT_EQ(state->afn->simulation_control.name, "AFNDefaultControl");
-    EXPECT_TRUE(compare_enums(AirflowNetwork::ControlType::MultizoneWithoutDistribution, state->afn->simulation_control.type));
+    EXPECT_ENUM_EQ(AirflowNetwork::ControlType::MultizoneWithoutDistribution, state->afn->simulation_control.type);
     EXPECT_EQ(state->afn->simulation_control.WPCCntr, "SURFACEAVERAGECALCULATION");
     EXPECT_EQ(state->afn->simulation_control.HeightOption, "OPENINGHEIGHT");
     EXPECT_EQ(state->afn->simulation_control.BldgType, "LOWRISE");
     EXPECT_EQ(state->afn->simulation_control.InitType, "ZERONODEPRESSURES");
     EXPECT_FALSE(state->afn->simulation_control.temperature_height_dependence);
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
     //// Use default values for numerical fields
     EXPECT_EQ(state->afn->simulation_control.maximum_iterations, 500);
     EXPECT_NEAR(state->afn->simulation_control.relative_convergence_tolerance, 1.0E-4, 0.00001);
@@ -270,7 +270,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 
     state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
@@ -368,7 +368,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
 
     state->afn->get_input();
 
-    EXPECT_TRUE(compare_enums(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver));
+    EXPECT_ENUM_EQ(AirflowNetwork::SimulationControl::Solver::SkylineLU, state->afn->simulation_control.solver);
 
     state->dataHeatBal->Zone.deallocate();
     state->dataSurface->Surface.deallocate();
