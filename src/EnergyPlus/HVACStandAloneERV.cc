@@ -1694,14 +1694,14 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
         }
 
         int EqIndex = 0;
-        errFlag = true;
+        
         for (int StandAloneERVNum = 1; StandAloneERVNum <= state.dataHVACStandAloneERV->NumStandAloneERVs; StandAloneERVNum++) {
             if (Util::SameString(CompName, state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVNum).Name)) {
                 EqIndex = StandAloneERVNum;
-                errFlag = false;
                 break;
             }
         }
+        if (EqIndex == 0) errFlag = true;
         return EqIndex;
 }
 

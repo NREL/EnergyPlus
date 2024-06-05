@@ -10776,14 +10776,13 @@ int getEqIndex(EnergyPlusData &state, std::string_view VRFTUName, bool &errFlag)
     }
 
     int EqIndex = 0;
-    errFlag = true;
     for (int VRFTUNum = 1; VRFTUNum <= state.dataHVACVarRefFlow->NumVRFTU; VRFTUNum++) {
         if (Util::SameString(VRFTUName, state.dataHVACVarRefFlow->VRFTU(VRFTUNum).Name)) {
             EqIndex = VRFTUNum;
-            errFlag = false;
             break;
         }
     }
+    if (EqIndex == 0) errFlag = true;
     return EqIndex;
 }
 
