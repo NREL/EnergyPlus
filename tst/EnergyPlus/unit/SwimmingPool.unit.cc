@@ -541,3 +541,81 @@ TEST_F(EnergyPlusFixture, SwimmingPool_reportTest)
     EXPECT_NEAR(expectedMakeUpWaterVolFlowRate, myPool.MakeUpWaterVolFlowRate, closeEnough);
     EXPECT_NEAR(expectedMakeUpWaterVol, myPool.MakeUpWaterVol, closeEnough);
 }
+
+TEST_F(EnergyPlusFixture, SwimmingPool_calcMassFlowRateTest)
+{
+    // Test routine added as a solution to Defect #10317
+    Real64 constexpr closeEnough = 0.00001;
+    Real64 tPoolWater;
+    Real64 tInletWaterLoop;
+    Real64 calculatedFlowRate;
+    Real64 expectedAnswer;
+    SwimmingPoolData testPool;
+
+    state->dataHVACGlobal->TimeStepSysSec = 60.0;
+
+    // Test 1: Normal pass through the routine, no limits violated
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 11.111111;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 2: Flow rate larger than max--limit to max
+    calculatedFlowRate = 0.0; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 10.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 10.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 3: Current setpoint is lower than the pool temperature--flow rate set to zero
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 10.0;
+    tPoolWater = 32.0;
+    tInletWaterLoop = 30.0;
+    expectedAnswer = 0.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 4: Current setpoint and inlet temperature are equal--flow rate set to max when pool water temperature is lower
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 27.0;
+    expectedAnswer = 20.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 5: Current setpoint and inlet temperature are equal--flow rate set to zero when pool water temperature is higher
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 20.0;
+    tPoolWater = 32.0;
+    tInletWaterLoop = 27.0;
+    expectedAnswer = 0.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+
+    // Test 6: Water temp is below the setpoint but higher than the pool temp--flow rate set to max (this was the cause of the defect)
+    calculatedFlowRate = -9999.9; // reset
+    testPool.CurSetPtTemp = 27.0;
+    testPool.WaterMass = 1000.0;
+    testPool.WaterMassFlowRateMax = 17.0;
+    tPoolWater = 25.0;
+    tInletWaterLoop = 26.0;
+    expectedAnswer = 17.0;
+    testPool.calcMassFlowRate(*state, calculatedFlowRate, tPoolWater, tInletWaterLoop);
+    EXPECT_NEAR(calculatedFlowRate, expectedAnswer, closeEnough);
+}

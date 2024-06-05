@@ -949,14 +949,14 @@ void SwimmingPoolData::calcMassFlowRate(EnergyPlusData &state, Real64 &massFlowR
     // Calculate the mass flow rate to achieve the proper setpoint temperature
     if (TLoopInletTemp != this->CurSetPtTemp) {
         massFlowRate = this->WaterMass / state.dataHVACGlobal->TimeStepSysSec * (this->CurSetPtTemp - TH22) / (TLoopInletTemp - this->CurSetPtTemp);
-    } else {
+    } else { // avoid the divide by zero, reset later if necessary
         massFlowRate = 0.0;
     }
     if (massFlowRate > this->WaterMassFlowRateMax) {
         massFlowRate = this->WaterMassFlowRateMax;
-    } else if (massFlowRate < 0.0) {
+    } else if (massFlowRate <= 0.0) {
         // trap case where loop temperature is lower than the setpoint but could still do heating Defect 10317
-        if (TLoopInletTemp > TH22 && TLoopInletTemp < this->CurSetPtTemp) {
+        if (TLoopInletTemp > TH22 && TLoopInletTemp <= this->CurSetPtTemp) {
             massFlowRate = this->WaterMassFlowRateMax;
         } else {
             massFlowRate = 0.0;
