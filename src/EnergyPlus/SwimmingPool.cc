@@ -935,7 +935,11 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     if (MassFlowRate > this->WaterMassFlowRateMax) {
         MassFlowRate = this->WaterMassFlowRateMax;
     } else if (MassFlowRate < 0.0) {
-        MassFlowRate = 0.0;
+        if (TLoopInletTemp > TH22 && TLoopInletTemp < TInSurf) { // trap case where loop temp is low but could still do heating Defect 10317
+            MassFlowRate = this->WaterMassFlowRateMax;
+        } else {
+            MassFlowRate = 0.0;
+        }
     }
     PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
