@@ -3626,6 +3626,7 @@ ElectricStorage::ElectricStorage( // main constructor
                                                 ),
                                   nullptr));
                 ssc_lastBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
+                ssc_lastBatteryTimeStep_ = ssc_battery_->get_params().dt_hr;
                 ssc_initBatteryState_ = std::make_unique<battery_state>(ssc_battery_->get_state());
             }
 
@@ -3912,7 +3913,8 @@ void ElectricStorage::reinitAtBeginEnvironment()
     } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
-        ssc_battery_->set_state(*ssc_lastBatteryState_);
+        ssc_lastBatteryTimeStep_ = ssc_initBatteryTimeStep_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_, ssc_initBatteryTimeStep_);
     }
     myWarmUpFlag_ = true;
 }
@@ -3953,7 +3955,8 @@ void ElectricStorage::reinitAtEndWarmup()
     } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
         // Copy the initial battery state to the last battery state
         *ssc_lastBatteryState_ = *ssc_initBatteryState_;
-        ssc_battery_->set_state(*ssc_lastBatteryState_);
+        ssc_lastBatteryTimeStep_ = ssc_initBatteryTimeStep_;
+        ssc_battery_->set_state(*ssc_lastBatteryState_, ssc_lastBatteryTimeStep_);
     }
     myWarmUpFlag_ = false;
 }
@@ -4013,6 +4016,7 @@ void ElectricStorage::timeCheckAndUpdate(EnergyPlusData &state)
             }
         } else if (storageModelMode_ == StorageModelType::LiIonNmcBattery) {
             *ssc_lastBatteryState_ = ssc_battery_->get_state();
+            ssc_lastBatteryTimeStep_ = ssc_battery_->get_params().dt_hr;
         }
 
         lastTimeStepStateOfCharge_ = thisTimeStepStateOfCharge_;
@@ -4366,6 +4370,10 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
 
     // Copy the battery state from the end of last timestep
     battery_state battState = *ssc_lastBatteryState_;
+    ssc_battery_->set_state(battState, ssc_lastBatteryTimeStep_);
+    if (std::lround(ssc_battery_->get_params().dt_hr * 60.0) != std::lround(state.dataHVACGlobal->TimeStepSys * 60.0)) {
+        ssc_battery_->ChangeTimestep(state.dataHVACGlobal->TimeStepSys);
+    }
 
     // Set the temperature the battery sees
     if (zoneNum_ > 0) {
@@ -4381,9 +4389,7 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
     ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
 
     // Set the current timestep length
-    if (std::lround(ssc_battery_->get_params().dt_hr * 60.0) != std::lround(state.dataHVACGlobal->TimeStepSys * 60.0)) {
-        ssc_battery_->ChangeTimestep(state.dataHVACGlobal->TimeStepSys);
-    }
+
 
     // Run the battery
     // SAM uses negative values for charging, positive for discharging
