@@ -4383,7 +4383,6 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
         // If outside, use outdoor temperature
         battState.thermal->T_room = state.dataEnvrn->OutDryBulbTemp;
     }
-    ssc_battery_->set_state(battState);
 
     // Set the SOC limits
     ssc_battery_->changeSOCLimits(controlSOCMinFracLimit * 100.0, controlSOCMaxFracLimit * 100.0);
