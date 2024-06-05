@@ -9,6 +9,7 @@ endif()
 set(test_src
     TestHelpers/IdfParser.cc
     TestHelpers/IdfParser.hh
+    TestHelpers/CustomMatchers.hh
     Fixtures/EnergyPlusFixture.cc
     Fixtures/EnergyPlusFixture.hh
     Fixtures/IdfParserFixture.hh

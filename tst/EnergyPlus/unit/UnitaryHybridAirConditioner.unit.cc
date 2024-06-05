@@ -447,9 +447,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
                               Constant::eResource::NaturalGas)); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_TRUE(compare_enums(meteredVars(5).endUseCat, OutputProcessor::EndUseCat::Cooling));
     EXPECT_TRUE(compare_enums(meteredVars(5).group, OutputProcessor::Group::HVAC));
-    EXPECT_TRUE(
-        compare_enums(meteredVars(6).resource,
-                      Constant::eResource::DistrictCooling)); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_ENUM_EQ(meteredVars(6).resource,
+                   Constant::eResource::DistrictCooling); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_TRUE(compare_enums(meteredVars(6).endUseCat, OutputProcessor::EndUseCat::Cooling));
     EXPECT_TRUE(compare_enums(meteredVars(6).group, OutputProcessor::Group::HVAC));
     EXPECT_TRUE(compare_enums(meteredVars(7).resource, Constant::eResource::Water)); // WATER - Cooling Water Use
