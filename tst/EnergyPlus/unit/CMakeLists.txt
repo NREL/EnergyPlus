@@ -76,6 +76,7 @@ set(test_src
     CoolTower.unit.cc
     CrossVentMgr.unit.cc
     CurveManager.unit.cc
+    CustomMatchers.unit.cc
     DElightManager.unit.cc
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
