@@ -119,6 +119,7 @@
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/extendedHI.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
@@ -5621,6 +5622,8 @@ void CalcThermalResilience(EnergyPlusData &state)
             }
             HI = (HI - 32.0) * (5.0 / 9.0);
             state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex = HI;
+            // calculate extended heat index
+            state.dataHeatBal->Resilience(ZoneNum).ZoneExtendedHeatIndex = extendedHI::heatindex(state, ZoneTF, ZoneRH, false) - Constant::Kelvin;
         }
     }
     if (state.dataHeatBalSurfMgr->reportVarHumidex || state.dataOutRptTab->displayThermalResilienceSummary) {

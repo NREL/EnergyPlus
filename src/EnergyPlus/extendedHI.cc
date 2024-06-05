@@ -1,0 +1,312 @@
+// Adapted from the code Version 1.1 released by Yi-Chuan Lu on February 23, 2023.
+//
+// @article{20heatindex,
+//   Title   = {Extending the Heat Index},
+//   Author  = {Yi-Chuan Lu and David M. Romps},
+//   Journal = {Journal of Applied Meteorology and Climatology},
+//   Year    = {2022},
+//   Volume  = {61},
+//   Number  = {10},
+//   Pages   = {1367--1383},
+//   Year    = {2022},
+// }
+//
+// This headindex function returns the Heat Index in Kelvin. The inputs are:
+// - T, the temperature in Kelvin
+// - RH, the relative humidity, which is a value from 0 to 1
+// - show_info is an optional logical flag. If true, the function returns the physiological state.
+
+#include <cmath>
+
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/extendedHI.hh>
+
+namespace EnergyPlus {
+
+namespace extendedHI {
+    // Thermodynamic parameters
+    Real64 Ttrip = 273.16; // K
+    Real64 ptrip = 611.65; // Pa
+    Real64 E0v = 2.3740e6; // J/kg
+    Real64 E0s = 0.3337e6; // J/kg
+    Real64 rgasa = 287.04; // J/kg/K
+    Real64 rgasv = 461.;   // J/kg/K
+    Real64 cva = 719.;     // J/kg/K
+    Real64 cvv = 1418.;    // J/kg/K
+    Real64 cvl = 4119.;    // J/kg/K
+    Real64 cvs = 1861.;    // J/kg/K
+    Real64 cpa = cva + rgasa;
+    Real64 cpv = cvv + rgasv;
+
+    // The saturation vapor pressure
+    Real64 pvstar(Real64 T)
+    {
+        if (T == 0.0) {
+            return 0.0;
+        } else if (T < Ttrip) {
+            return ptrip * pow((T / Ttrip), ((cpv - cvs) / rgasv)) * exp((E0v + E0s - (cvv - cvs) * Ttrip) / rgasv * (1. / Ttrip - 1. / T));
+        } else {
+            return ptrip * pow((T / Ttrip), ((cpv - cvl) / rgasv)) * exp((E0v - (cvv - cvl) * Ttrip) / rgasv * (1. / Ttrip - 1. / T));
+        }
+        return 0.0;
+    }
+
+    // The latent heat of vaporization of water
+    Real64 Le(Real64 T)
+    {
+        return (E0v + (cvv - cvl) * (T - Ttrip) + rgasv * T);
+    }
+
+    // Thermoregulatory parameters
+    Real64 sigma = 5.67e-8;                           // W/m^2/K^4 , Stefan-Boltzmann constant
+    Real64 epsilon = 0.97;                            //           , emissivity of surface, steadman1979
+    Real64 M = 83.6;                                  // kg        , mass of average US adults, fryar2018
+    Real64 H = 1.69;                                  // m         , height of average US adults, fryar2018
+    Real64 A = 0.202 * pow(M, 0.425) * pow(H, 0.725); // m^2       , DuBois formula, parson2014
+    Real64 cpc = 3492.;                               // J/kg/K    , specific heat capacity of core, gagge1972
+    Real64 C = M * cpc / A;                           //           , heat capacity of core
+    Real64 r = 124.;                                  // Pa/K      , Zf/Rf, steadman1979
+    Real64 Q = 180.;                                  // W/m^2     , metabolic rate per skin area, steadman1979
+    Real64 phi_salt = 0.9;                            //           , vapor saturation pressure level of saline solution, steadman1979
+    Real64 Tc = 310.;                                 // K         , core temperature, steadman1979
+    Real64 Pc = phi_salt * pvstar(Tc);                //           , core vapor pressure
+    Real64 L = Le(310.);                              //           , latent heat of vaporization at 310 K
+    Real64 p = 1.013e5;                               // Pa        , atmospheric pressure
+    Real64 eta = 1.43e-6;                             // kg/J      , "inhaled mass" / "metabolic rate", steadman1979
+    Real64 Pa0 = 1.6e3;                               // Pa        , reference air vapor pressure in regions III, IV, V, VI, steadman1979
+
+    // Function to calculate respiratory heat loss, W/m^2
+    Real64 Qv(Real64 Ta, Real64 Pa)
+    {
+        return eta * Q * (cpa * (Tc - Ta) + L * rgasa / (p * rgasv) * (Pc - Pa));
+    }
+
+    // Function to calculate mass transfer resistance through skin, Pa m^2/W
+    Real64 Zs(Real64 Rs)
+    {
+        return (Rs == 0.0387) ? 52.1 : 6.0e8 * std::pow(Rs, 5);
+    }
+
+    // Function to calculate heat transfer resistance through air, exposed part of skin, K m^2/W
+    Real64 Ra(Real64 Ts, Real64 Ta)
+    {
+        Real64 hc = 17.4;
+        Real64 phi_rad = 0.85;
+        Real64 hr = epsilon * phi_rad * sigma * (std::pow(Ts, 2) + std::pow(Ta, 2)) * (Ts + Ta);
+        return 1.0 / (hc + hr);
+    }
+
+    // Function to calculate heat transfer resistance through air, clothed part of skin, K m^2/W
+    Real64 Ra_bar(Real64 Tf, Real64 Ta)
+    {
+        Real64 hc = 11.6;
+        Real64 phi_rad = 0.79;
+        Real64 hr = epsilon * phi_rad * sigma * (std::pow(Tf, 2) + std::pow(Ta, 2)) * (Tf + Ta);
+        return 1.0 / (hc + hr);
+    }
+
+    // Function to calculate heat transfer resistance through air, when being naked, K m^2/W
+    Real64 Ra_un(Real64 Ts, Real64 Ta)
+    {
+        Real64 hc = 12.3;
+        Real64 phi_rad = 0.80;
+        Real64 hr = epsilon * phi_rad * sigma * (std::pow(Ts, 2) + std::pow(Ta, 2)) * (Ts + Ta);
+        return 1.0 / (hc + hr);
+    }
+
+    Real64 Za = 60.6 / 17.4;     // Pa m^2/W, mass transfer resistance through air, exposed part of skin
+    Real64 Za_bar = 60.6 / 11.6; // Pa m^2/W, mass transfer resistance through air, clothed part of skin
+    Real64 Za_un = 60.6 / 12.3;  // Pa m^2/W, mass transfer resistance through air, when being naked
+
+    Real64 tol = 1e-8;
+    Real64 tolT = 1e-8;
+    Real64 maxIter = 100;
+
+    std::tuple<std::string, Real64, Real64, Real64, Real64> find_eqvar(EnergyPlusData &state, Real64 Ta, Real64 RH)
+    {
+        Real64 Pa = RH * pvstar(Ta);
+        Real64 Rs = 0.0387;
+        Real64 phi = 0.84;
+        Real64 dTcdt = 0.0;
+        Real64 m = (Pc - Pa) / (Zs(Rs) + Za);
+        Real64 m_bar = (Pc - Pa) / (Zs(Rs) + Za_bar);
+
+        int SolFla;
+        Real64 Ts;
+        General::SolveRoot(
+            state,
+            tol,
+            maxIter,
+            SolFla,
+            Ts,
+            [&](Real64 Ts) { return (Ts - Ta) / Ra(Ts, Ta) + (Pc - Pa) / (Zs(Rs) + Za) - (Tc - Ts) / Rs; },
+            std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m)),
+            std::max(Tc, Ta) + Rs * std::abs(m));
+
+        Real64 Tf;
+        General::SolveRoot(
+            state,
+            tol,
+            maxIter,
+            SolFla,
+            Tf,
+            [&](Real64 Tf) { return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) / (Zs(Rs) + Za_bar) - (Tc - Tf) / Rs; },
+            std::max(0.0, std::min(Tc, Ta) - Rs * std::abs(m_bar)),
+            std::max(Tc, Ta) + Rs * std::abs(m_bar));
+        Real64 flux1 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs;
+        Real64 flux2 = Q - Qv(Ta, Pa) - (1.0 - phi) * (Tc - Ts) / Rs - phi * (Tc - Tf) / Rs;
+        std::string eqvar_name;
+        Real64 Rf;
+
+        if (flux1 <= 0.0) {
+            eqvar_name = "phi";
+            phi = 1.0 - (Q - Qv(Ta, Pa)) * Rs / (Tc - Ts);
+            Rf = std::numeric_limits<Real64>::infinity();
+        } else if (flux2 <= 0.0) {
+            eqvar_name = "Rf";
+            Real64 Ts_bar = Tc - (Q - Qv(Ta, Pa)) * Rs / phi + (1.0 / phi - 1.0) * (Tc - Ts);
+            General::SolveRoot(
+                state,
+                tol,
+                maxIter,
+                SolFla,
+                Tf,
+                [&](Real64 Tf) {
+                    return (Tf - Ta) / Ra_bar(Tf, Ta) + (Pc - Pa) * (Tf - Ta) / ((Zs(Rs) + Za_bar) * (Tf - Ta) + r * Ra_bar(Tf, Ta) * (Ts_bar - Tf)) -
+                           (Tc - Ts_bar) / Rs;
+                },
+                Ta,
+                Ts_bar);
+            Rf = Ra_bar(Tf, Ta) * (Ts_bar - Tf) / (Tf - Ta);
+        } else {
+            Rf = 0.0;
+            Real64 flux3 = Q - Qv(Ta, Pa) - (Tc - Ta) / Ra_un(Tc, Ta) - (phi_salt * pvstar(Tc) - Pa) / Za_un;
+            if (flux3 < 0.0) {
+                General::SolveRoot(
+                    state,
+                    tol,
+                    maxIter,
+                    SolFla,
+                    Ts,
+                    [&](Real64 Ts) { return (Ts - Ta) / Ra_un(Ts, Ta) + (Pc - Pa) / (Zs((Tc - Ts) / (Q - Qv(Ta, Pa))) + Za_un) - (Q - Qv(Ta, Pa)); },
+                    0.0,
+                    Ts);
+                Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
+                eqvar_name = "Rs";
+                Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
+                if (Ps > phi_salt * pvstar(Ts)) {
+                    General::SolveRoot(
+                        state,
+                        tol,
+                        maxIter,
+                        SolFla,
+                        Ts,
+                        [&](Real64 Ts) { return (Ts - Ta) / Ra_un(Ts, Ta) + (phi_salt * pvstar(Ts) - Pa) / Za_un - (Q - Qv(Ta, Pa)); },
+                        0.0,
+                        Tc);
+                    Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
+                    eqvar_name = "Rs*";
+                }
+            } else {
+                Rs = 0.0;
+                eqvar_name = "dTcdt";
+                dTcdt = (1.0 / C) * flux3;
+            }
+        }
+        return {eqvar_name, phi, Rf, Rs, dTcdt};
+    }
+
+    // Convert the find_T function
+    std::pair<Real64, std::string> find_T(EnergyPlusData &state, std::string eqvar_name, Real64 eqvar)
+    {
+        Real64 T;
+        std::string region;
+        int SolFla;
+
+        if (eqvar_name == "phi") {
+            General::SolveRoot(
+                state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<1>(find_eqvar(state, T, 1.0)) - eqvar; }, 0.0, 240.0);
+            region = "I";
+        } else if (eqvar_name == "Rf") {
+            General::SolveRoot(
+                state,
+                tol,
+                maxIter,
+                SolFla,
+                T,
+                [&](Real64 T) { return std::get<2>(find_eqvar(state, T, std::min(1.0, Pa0 / pvstar(T)))) - eqvar; },
+                230.0,
+                300.0);
+            region = (Pa0 > pvstar(T)) ? "II" : "III";
+        } else if (eqvar_name == "Rs" || eqvar_name == "Rs*") {
+            General::SolveRoot(
+                state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<3>(find_eqvar(state, T, Pa0 / pvstar(T))) - eqvar; }, 295.0, 350.0);
+            region = (eqvar_name == "Rs") ? "IV" : "V";
+        } else {
+            General::SolveRoot(
+                state, tol, maxIter, SolFla, T, [&](Real64 T) { return std::get<4>(find_eqvar(state, T, Pa0 / pvstar(T))) - eqvar; }, 340.0, 1000.0);
+            region = "VI";
+        }
+
+        return std::make_pair(T, region);
+    }
+
+    Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH, bool show_info = false)
+    {
+        // Dictionary to map eqvar_name to tuple index
+        std::map<std::string, int> dic = {{"phi", 1}, {"Rf", 2}, {"Rs", 3}, {"Rs*", 3}, {"dTcdt", 4}};
+        auto eqvars = find_eqvar(state, Ta, RH);
+        std::string eqvar_name = std::get<0>(eqvars);
+        int eqvar_value = 1; // fixme: what to init to?
+        if (eqvar_name == "phi") {
+            eqvar_value = 1;
+        } else if (eqvar_name == "Rf") {
+            eqvar_value = 2;
+        } else if (eqvar_name == "Rs" || eqvar_name == "Rs*") {
+            eqvar_value = 3;
+        } else if (eqvar_name == "dTcdt") {
+            eqvar_value = 4;
+        }
+
+        auto result = find_T(state, eqvar_name, eqvar_value);
+        Real64 T = std::get<0>(result);
+        std::string region = std::get<1>(result);
+
+        if (Ta == 0.0) T = 0.0;
+
+        if (show_info) {
+            if (region == "I") {
+                std::cout << "Region I, covering (variable phi)\n";
+                std::cout << "Clothing fraction is " << std::round(std::get<1>(eqvars) * 1000.0) / 1000.0 << "\n";
+            } else if (region == "II") {
+                std::cout << "Region II, clothed (variable Rf, pa = pvstar)\n";
+                std::cout << "Clothing thickness is " << std::round((std::get<2>(eqvars) / 16.7) * 100.0 * 1000.0) / 1000.0 << " cm\n";
+            } else if (region == "III") {
+                std::cout << "Region III, clothed (variable Rf, pa = pref)\n";
+                std::cout << "Clothing thickness is " << std::round((std::get<2>(eqvars) / 16.7) * 100.0 * 1000.0) / 1000.0 << " cm\n";
+            } else if (region == "IV") {
+                Real64 kmin = 5.28; // W/K/m^2, conductance of tissue
+                Real64 rho = 1.0e3; // kg/m^3, density of blood
+                Real64 c = 4184.0;  // J/kg/K, specific heat of blood
+                std::cout << "Region IV, naked (variable Rs, ps < phisalt*pvstar)\n";
+                std::cout << "Blood flow is " << std::round(((1.0 / std::get<3>(eqvars) - kmin) * A / (rho * c)) * 1000.0 * 60.0 * 1000.0) / 1000.0
+                          << " l/min\n";
+            } else if (region == "V") {
+                Real64 kmin = 5.28; // W/K/m^2, conductance of tissue
+                Real64 rho = 1.0e3; // kg/m^3, density of blood
+                Real64 c = 4184.0;  // J/kg/K, specific heat of blood
+                std::cout << "Region V, naked dripping sweat (variable Rs, ps = phisalt*pvstar)\n";
+                std::cout << "Blood flow is " << std::round(((1.0 / std::get<3>(eqvars) - kmin) * A / (rho * c)) * 1000.0 * 60.0 * 1000.0) / 1000.0
+                          << " l/min\n";
+            } else {
+                std::cout << "Region VI, warming up (dTc/dt > 0)\n";
+                std::cout << "dTc/dt = " << std::round(std::get<4>(eqvars) * 3600.0 * 1000000.0) / 1000000.0 << " K/hour\n";
+            }
+        }
+
+        return T;
+    }
+
+} // namespace extendedHI
+} // namespace EnergyPlus
