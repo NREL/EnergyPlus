@@ -381,6 +381,8 @@ namespace PurchasedAirManager {
 
     int GetPurchasedAirZoneExhaustAirNode(EnergyPlusData &state, int PurchAirNum);
 
+    int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName, bool &errFlag);
+
     Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int PurchAirNum);
 
     Real64 GetPurchasedAirMixedAirHumRat(EnergyPlusData &state, int PurchAirNum);

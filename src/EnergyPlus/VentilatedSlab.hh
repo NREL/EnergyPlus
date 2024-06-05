@@ -387,6 +387,7 @@ namespace VentilatedSlab {
 
     int GetVentilatedSlabZoneAirInNode(EnergyPlusData &state, int const VentSlabNum);
 
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

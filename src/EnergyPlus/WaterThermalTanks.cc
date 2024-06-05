@@ -12495,4 +12495,22 @@ int GetHeatPumpWaterHeaterAirOutletNodeNum(EnergyPlusData &state, int HPNum)
     return HeatPumpWaterHeaterAirOutletNodeNum;
 }
 
+int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+{
+    if (state.dataWaterThermalTanks->getWaterThermalTankInputFlag) {
+        GetWaterThermalTankInput(state);
+        state.dataWaterThermalTanks->getWaterThermalTankInputFlag = false;
+    }
+
+    int EquipIndex = 0;
+    for (int HPNum = 1; HPNum <= state.dataWaterThermalTanks->numHeatPumpWaterHeater; ++HPNum) {
+        if (Util::SameString(state.dataWaterThermalTanks->HPWaterHeater(HPNum).Name, CompName)) {
+            EquipIndex = HPNum;
+        }
+    }
+
+    if (EquipIndex == 0) errFlag = true;
+    return EquipIndex;
+}
+
 } // namespace EnergyPlus::WaterThermalTanks

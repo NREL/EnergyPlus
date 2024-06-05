@@ -1619,6 +1619,24 @@ namespace WindowAC {
         return GetWindowACMixedAirNode;
     }
 
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    {
+        if (state.dataWindowAC->GetWindowACInputFlag) {
+            GetWindowAC(state);
+            state.dataWindowAC->GetWindowACInputFlag = false;
+        }
+
+        int EquipIndex = 0;
+        for (int WindACIndex = 1; WindACIndex <= state.dataWindowAC->NumWindAC; ++WindACIndex) {
+            if (Util::SameString(state.dataWindowAC->WindAC(WindACIndex).Name, CompName)) {
+                EquipIndex = WindACIndex;
+            }
+        }
+
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
+    }
+
 } // namespace WindowAC
 
 } // namespace EnergyPlus

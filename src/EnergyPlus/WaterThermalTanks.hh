@@ -992,6 +992,8 @@ namespace WaterThermalTanks {
 
     int GetHeatPumpWaterHeaterAirOutletNodeNum(EnergyPlusData &state, int HPNum);
 
+    int getHeatPumpWaterHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+
 } // namespace WaterThermalTanks
 
 struct WaterThermalTanksData : BaseGlobalStruct

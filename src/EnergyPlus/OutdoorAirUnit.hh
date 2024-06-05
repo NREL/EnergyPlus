@@ -309,6 +309,8 @@ namespace OutdoorAirUnit {
     int GetOutdoorAirUnitZoneInletNode(EnergyPlusData &state, int OAUnitNum);
 
     int GetOutdoorAirUnitReturnAirNode(EnergyPlusData &state, int OAUnitNum);
+
+    int getOutdoorAirUnitEqIndex(EnergyPlusData &state, std::string_view EquipName, bool &errFlag);
 } // namespace OutdoorAirUnit
 
 struct OutdoorAirUnitData : BaseGlobalStruct

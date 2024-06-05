@@ -1366,6 +1366,24 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
     return GetHybridUnitaryACReturnAirNode;
 }
 
+int getHybridUnitaryACIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+{
+    if (state.dataHybridUnitaryAC->GetInputZoneHybridEvap) {
+        GetInputZoneHybridUnitaryAirConditioners(state, errFlag);
+        state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
+    }
+
+    int EquipIndex = 0;
+    for (int UnitLoop = 1; UnitLoop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++UnitLoop) {
+        if (Util::SameString(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitLoop).Name, CompName)) {
+            EquipIndex = UnitLoop;
+        }
+    }
+
+    if (EquipIndex == 0) errFlag = true;
+    return EquipIndex;
+}
+
 //*****************************************************************************************
 
 } // namespace EnergyPlus::HybridUnitaryAirConditioners

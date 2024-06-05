@@ -4766,6 +4766,23 @@ namespace VentilatedSlab {
         return ZoneAirInNode;
     }
 
+    int getVentilatedSlabIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    {
+        if (state.dataVentilatedSlab->GetInputFlag) {
+            GetVentilatedSlabInput(state);
+            state.dataVentilatedSlab->GetInputFlag = false;
+        }
+
+        int EquipIndex = 0;
+        for (int VentSlabNum = 1; VentSlabNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++VentSlabNum) {
+            if (Util::SameString(state.dataVentilatedSlab->VentSlab(VentSlabNum).Name, CompName)) {
+                EquipIndex = VentSlabNum;
+            }
+        }
+
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
+    }
     //*****************************************************************************************
 
 } // namespace VentilatedSlab

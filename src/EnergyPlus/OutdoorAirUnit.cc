@@ -2471,6 +2471,24 @@ namespace OutdoorAirUnit {
         return GetOutdoorAirUnitReturnAirNode;
     }
 
+    int getOutdoorAirUnitEqIndex(EnergyPlusData &state, std::string_view EquipName, bool &errFlag)
+    {
+        if (state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag) {
+            OutdoorAirUnit::GetOutdoorAirUnitInputs(state);
+            state.dataOutdoorAirUnit->GetOutdoorAirUnitInputFlag = false;
+        }
+
+        int EquipIndex = 0;
+        for (int OAUnitNum = 1; OAUnitNum <= state.dataOutdoorAirUnit->NumOfOAUnits; ++OAUnitNum) {
+            if (Util::SameString(state.dataOutdoorAirUnit->OutAirUnit(OAUnitNum).Name, EquipName)) {
+                EquipIndex = OAUnitNum;
+            }
+        }
+
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
+    }
+
 } // namespace OutdoorAirUnit
 
 } // namespace EnergyPlus

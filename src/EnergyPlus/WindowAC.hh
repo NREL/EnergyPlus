@@ -205,6 +205,8 @@ namespace WindowAC {
 
     int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum);
 
+    int getWindowACIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+
 } // namespace WindowAC
 
 struct WindowACData : BaseGlobalStruct

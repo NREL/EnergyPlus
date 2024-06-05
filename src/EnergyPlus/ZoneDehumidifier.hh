@@ -157,6 +157,8 @@ namespace ZoneDehumidifier {
 
     int GetZoneDehumidifierAirInletNodeNum(EnergyPlusData &state, int ZoneDehumidNum);
 
+    int getZoneDehumidifierIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
+
 } // namespace ZoneDehumidifier
 
 struct ZoneDehumidifierData : BaseGlobalStruct

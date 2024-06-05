@@ -202,9 +202,11 @@ namespace UnitHeater {
 
     void ReportUnitHeater(EnergyPlusData &state, int const UnitHeatNum); // Unit index in unit heater array
 
-    int GetUnitHeaterAirOutletNode(EnergyPlusData &state, int OAUnitNum);
+    int GetUnitHeaterAirOutletNode(EnergyPlusData &state, int UnitHeatNum);
 
-    int GetUnitHeaterAirInletNode(EnergyPlusData &state, int OAUnitNum);
+    int GetUnitHeaterAirInletNode(EnergyPlusData &state, int UnitHeatNum);
+
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag);
 } // namespace UnitHeater
 
 struct UnitHeatersData : BaseGlobalStruct

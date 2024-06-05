@@ -1927,6 +1927,23 @@ namespace UnitHeater {
         return GetUnitHeaterAirInletNode;
     }
 
+    int getUnitHeaterIndex(EnergyPlusData &state, std::string_view CompName, bool &errFlag)
+    {
+        if (state.dataUnitHeaters->GetUnitHeaterInputFlag) {
+            GetUnitHeaterInput(state);
+            state.dataUnitHeaters->GetUnitHeaterInputFlag = false;
+        }
+        int EquipIndex = 0;
+        for (int UnitHeatNum = 1; UnitHeatNum <= state.dataUnitHeaters->NumOfUnitHeats; ++UnitHeatNum) {
+            if (Util::SameString(state.dataUnitHeaters->UnitHeat(UnitHeatNum).Name, CompName)) {
+                EquipIndex = UnitHeatNum;
+            }
+        }
+
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
+    }
+
 } // namespace UnitHeater
 
 } // namespace EnergyPlus

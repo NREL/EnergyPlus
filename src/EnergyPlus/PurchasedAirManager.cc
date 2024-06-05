@@ -3333,6 +3333,24 @@ int GetPurchasedAirZoneExhaustAirNode(EnergyPlusData &state, int PurchAirNum)
     return GetPurchasedAirZoneExhaustAirNode;
 }
 
+int getPurchasedAirIndex(EnergyPlusData &state, std::string_view PurchAirName, bool &errFlag)
+{
+        if (state.dataPurchasedAirMgr->GetPurchAirInputFlag) {
+            GetPurchasedAir(state);
+            state.dataPurchasedAirMgr->GetPurchAirInputFlag = false;
+        }
+
+        int EquipIndex = 0;
+        for (int PurchAirNum = 1; PurchAirNum <= state.dataPurchasedAirMgr->NumPurchAir; ++PurchAirNum) {
+            if (Util::SameString(state.dataPurchasedAirMgr->PurchAir(PurchAirNum).Name, PurchAirName)) {
+                EquipIndex = PurchAirNum;
+            }
+        }
+
+        if (EquipIndex == 0) errFlag = true;
+        return EquipIndex;
+}
+
 Real64 GetPurchasedAirMixedAirTemp(EnergyPlusData &state, int const PurchAirNum)
 {
 

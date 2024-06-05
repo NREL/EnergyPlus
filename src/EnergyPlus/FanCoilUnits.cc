@@ -4449,7 +4449,7 @@ namespace FanCoilUnits {
         }
 
         int EquipIndex = 0;
-        for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->Num4PipeFanCoils; ++FanCoilIndex) {
+        for (int FanCoilIndex = 1; FanCoilIndex <= state.dataFanCoilUnits->NumFanCoils; ++FanCoilIndex) {
             auto &fanCoil = state.dataFanCoilUnits->FanCoil(FanCoilIndex);
             if (Util::SameString(fanCoil.Name, CompName)) {
                 EquipIndex = FanCoilIndex;
