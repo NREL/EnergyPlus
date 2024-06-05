@@ -11178,7 +11178,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     Real64 SH_Comp;                  // Temperature difference between compressor inlet node and Tsuction [C]
     Real64 T_comp_in;                // temperature of refrigerant at compressor inlet, after piping loss (c) [C]
     Real64 TU_HeatingLoad;           // Heating load from terminal units, excluding heating loss [W]
-    Real64 TU_HeatingLoad_actual;    // TU_HeatingLoad trimed to maximum system capacity[W]
     Real64 TU_CoolingLoad;           // Cooling load from terminal units, excluding heating loss [W]
     Real64 Tdischarge;               // VRF Compressor discharge refrigerant temperature [C]
     Real64 Tsuction;                 // VRF compressor suction refrigerant temperature [C]
@@ -11247,7 +11246,6 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
     }
     this->TUCoolingLoad = TU_CoolingLoad; // this is cooling coil load, not terminal unit load
     this->TUHeatingLoad = TU_HeatingLoad; // this is heating coil load, not terminal unit load
-    TU_HeatingLoad_actual = TU_HeatingLoad;
 
     // loop through TU's and calculate average inlet conditions for active coils
     for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
@@ -11604,8 +11602,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                 RoutineName); // Quality=0
             h_IU_cond_out_ave = h_IU_cond_out;
             SC_IU_merged = 5;
-            TU_HeatingLoad_actual = min(TU_HeatingLoad, CompEvaporatingCAPSpdMax + CompEvaporatingPWRSpdMax);
-            m_ref_IU_cond = TU_HeatingLoad_actual / (h_IU_cond_in - h_IU_cond_out);
+            m_ref_IU_cond = TU_HeatingLoad / (h_IU_cond_in - h_IU_cond_out);
 
         } else {
             for (NumTU = 1; NumTU <= NumTUInList; NumTU++) {
@@ -11673,7 +11670,36 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                                    CapMinTe + 8,
                                                    this->IUCondensingTemp - 5);
 
-        if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
+        Real64 CompEvaporatingCAPSpdMaxCurrentTsuc = this->CoffEvapCap * this->RatedEvapCapacity *
+                                                     CurveValue(state, this->OUCoolingCAPFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        Real64 CompEvaporatingPWRSpdMaxCurrentTsuc =
+            this->RatedCompPower * CurveValue(state, this->OUCoolingPWRFT(NumOfCompSpdInput), Tdischarge, this->EvaporatingTemp);
+        if (CompEvaporatingCAPSpdMin > CompEvaporatingCAPSpdMaxCurrentTsuc) {
+            if (this->CondenserCapErrIdx == 0) {
+                ShowSevereMessage(state, format("{} \"{}\":", cVRFTypes(VRF_HeatPump), this->Name));
+                ShowContinueErrorTimeStamp(state,
+                                           format(" Evaporative Capacity at max speed is smaller than evaporative capacity at min speed, "
+                                                  "{:.3T} < {:.3T}",
+                                                  CompEvaporatingCAPSpdMaxCurrentTsuc,
+                                                  CompEvaporatingCAPSpdMin));
+            }
+            ShowRecurringSevereErrorAtEnd(
+                state,
+                format("\"{}\" - Evaporative Capacity at max speed is smaller than evaporative capacity at min speed ", this->Name),
+                this->CondenserCapErrIdx,
+                CompEvaporatingCAPSpdMaxCurrentTsuc - CompEvaporatingCAPSpdMin,
+                CompEvaporatingCAPSpdMaxCurrentTsuc - CompEvaporatingCAPSpdMin);
+        }
+        if ((Q_c_OU * C_cap_operation) > CompEvaporatingCAPSpdMaxCurrentTsuc) {
+            // this branch resolves the issue of supplemental heating coil turning on when compressor speed is not at the highest
+            Q_c_OU = CompEvaporatingCAPSpdMaxCurrentTsuc;
+            CompSpdActual = this->CompressorSpeed(NumOfCompSpdInput);
+            Ncomp = CompEvaporatingPWRSpdMaxCurrentTsuc;
+            m_air = this->OUAirFlowRate * RhoAir;
+            SH_OU = this->SH;
+            this->VRFOU_TeTc(
+                state, HXOpMode::EvapMode, Q_c_OU, SH_OU, m_air, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, Tfs, this->EvaporatingTemp);
+        } else if ((Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMin) {
             // Required heating load is smaller than the min heating capacity
 
             if (Q_c_OU == 0) {
@@ -11692,6 +11718,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
             CompSpdActual = this->CompressorSpeed(1);
 
         } else {
+            // CompEvaporatingCAPSpdMin < (Q_c_OU * C_cap_operation) <= CompEvaporatingCAPSpdMaxCurrentTsuc + CompEvaporatingPWRSpdMaxCurrentTsuc
             // Required heating load is greater than or equal to the min heating capacity
 
             // Iteration_Ncomp: Perform iterations to calculate Ncomp (Label20)
@@ -11761,7 +11788,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
                                               this->OUCoolingPWRFT(NumOfCompSpdInput),
                                               Tdischarge,
                                               Tsuction); // Include the piping loss, at the highest compressor speed
-        this->PipingCorrectionHeating = TU_HeatingLoad_actual / (TU_HeatingLoad_actual + Pipe_Q_h);
+        this->PipingCorrectionHeating = TU_HeatingLoad / (TU_HeatingLoad + Pipe_Q_h);
         state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) =
             this->HeatingCapacity; // for report, maximum condensing capacity the system can provide
 
@@ -12757,7 +12784,13 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->CompOffMassFlow = state.dataHVACVarRefFlow->OACompOffMassFlow;
     } else {
         // identify the air flow rate corresponding to the coil load
-        state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(state, VRFTUNum, PartLoadRatio, FirstHVACIteration);
+        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < MaxCap) {
+            // Only fix heating only mode for now
+            state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(
+                state, VRFTUNum, PartLoadRatio, FirstHVACIteration, state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));
+        } else {
+            state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(state, VRFTUNum, PartLoadRatio, FirstHVACIteration, _);
+        }
     }
     SetAverageAirFlow(state, VRFTUNum, PartLoadRatio, OnOffAirFlowRatio);
     AirMassFlow = state.dataLoopNodes->Node(VRFTUInletNodeNum).MassFlowRate;
@@ -12904,9 +12937,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
 }
 
 Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                                                int const VRFTUNum,                      // Index to VRF terminal unit
-                                                                Real64 PartLoadRatio,                    // part load ratio of the coil
-                                                                [[maybe_unused]] bool FirstHVACIteration // FirstHVACIteration flag
+                                                                int const VRFTUNum,                          // Index to VRF terminal unit
+                                                                Real64 PartLoadRatio,                        // part load ratio of the coil
+                                                                [[maybe_unused]] bool FirstHVACIteration,    // FirstHVACIteration flag
+                                                                ObjexxFCL::Optional<Real64 const> MaxHeatCap // maximum allowed heating capacity
 )
 {
     // SUBROUTINE INFORMATION:
@@ -12964,7 +12998,11 @@ Real64 VRFTerminalUnitEquipment::CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &
                 state.dataHVACVarRefFlow->TerminalUnitList(TUListIndex).HRHeatRequest(IndexToTUInTUList))) {
         // VRF terminal unit is on heating mode
         DXCoilNum = this->HeatCoilIndex;
-        QCoilReq = PartLoadRatio * state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
+        Real64 RatedCapacity = state.dataDXCoils->DXCoil(DXCoilNum).RatedTotCap(Mode);
+        if (present(MaxHeatCap)) {
+            RatedCapacity = min(MaxHeatCap, RatedCapacity);
+        }
+        QCoilReq = PartLoadRatio * RatedCapacity;
         TeTc = state.dataHVACVarRefFlow->VRF(VRFCond).IUCondensingTemp;
 
     } else {
