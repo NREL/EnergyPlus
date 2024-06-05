@@ -951,7 +951,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     }
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
@@ -1057,7 +1057,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     }
 
     if (PltSizNum > 0) {
-        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= state.dataHVACGlobal->TimeStepSys) {
+        if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
             tmpEvapVolFlowRate = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate * this->SizFac;
             if (!this->EvapVolFlowRateWasAutoSized) tmpEvapVolFlowRate = this->EvapVolFlowRate;
         } else {
@@ -1118,7 +1118,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     PlantUtilities::RegisterPlantCompDesignFlow(state, this->EvapInletNodeNum, tmpEvapVolFlowRate);
 
     if (PltSizCondNum > 0 && PltSizNum > 0) {
-        if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
+        if (this->EvapVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
             //       QCondenser = QEvaporator + QGenerator + PumpingPower
 
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -1197,7 +1197,7 @@ void BLASTAbsorberSpecs::sizeChiller(EnergyPlusData &state)
 
     if ((PltSizSteamNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Steam) ||
         (PltSizHeatingNum > 0 && this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water)) {
-        if (this->EvapVolFlowRate >= state.dataHVACGlobal->TimeStepSys && tmpNomCap > 0.0) {
+        if (this->EvapVolFlowRate >= HVAC::SmallWaterVolFlow && tmpNomCap > 0.0) {
             if (this->GenHeatSourceType == DataLoopNode::NodeFluidType::Water) {
                 Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                         state.dataPlnt->PlantLoop(this->GenPlantLoc.loopNum).FluidName,

@@ -197,6 +197,7 @@ set(test_src
     Psychrometrics.unit.cc
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
+    RefrigeratedCase.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirModelUserTempPattern.unit.cc
@@ -220,6 +221,7 @@ set(test_src
     SizeWaterHeatingCoil.unit.cc
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
+    SolarCollectors.unit.cc
     SolarShading.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
@@ -230,6 +232,7 @@ set(test_src
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc
+    Timer.unit.cc
     ThermalChimney.unit.cc
     ThermalComfort.unit.cc
     TranspiredCollector.unit.cc

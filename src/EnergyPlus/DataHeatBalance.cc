@@ -212,6 +212,13 @@ void AirReportVars::setUpOutputVars(EnergyPlusData &state, std::string_view pref
                         OutputProcessor::StoreType::Average,
                         name);
     SetupOutputVariable(state,
+                        format("{} Wetbulb Globe Temperature", prefix),
+                        Constant::Units::C,
+                        this->WetbulbGlobeTemp,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Average,
+                        name);
+    SetupOutputVariable(state,
                         format("{} Operative Temperature", prefix),
                         Constant::Units::C,
                         this->OperativeTemp,

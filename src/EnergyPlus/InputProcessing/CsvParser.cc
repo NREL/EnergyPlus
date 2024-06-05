@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/InputProcessing/CsvParser.hh>
+#include <cstddef>
 #include <fast_float/fast_float.h>
 #include <fmt/format.h>
 #include <milo/dtoa.h>
@@ -53,14 +54,9 @@
 
 using json = nlohmann::json;
 
-std::vector<std::string> const &CsvParser::errors()
+std::vector<std::pair<std::string, bool>> const &CsvParser::errors()
 {
     return errors_;
-}
-
-std::vector<std::string> const &CsvParser::warnings()
-{
-    return warnings_;
 }
 
 bool CsvParser::hasErrors()
@@ -68,26 +64,10 @@ bool CsvParser::hasErrors()
     return !errors_.empty();
 }
 
-json CsvParser::decode(std::string_view csv, char user_delimiter, int user_rows_to_skip)
-{
-    bool success = true;
-    return decode(csv, csv.size(), success, user_delimiter, user_rows_to_skip);
-}
-
-json CsvParser::decode(std::string_view csv, bool &success, char user_delimiter, int user_rows_to_skip)
-{
-    return decode(csv, csv.size(), success, user_delimiter, user_rows_to_skip);
-}
-
-json CsvParser::decode(std::string_view csv, size_t _csv_size, char user_delimiter, int user_rows_to_skip)
-{
-    bool success = true;
-    return decode(csv, _csv_size, success, user_delimiter, user_rows_to_skip);
-}
-
-json CsvParser::decode(std::string_view csv, size_t _csv_size, bool &success, char _delimiter, int _rows_to_skip)
+json CsvParser::decode(std::string_view csv, char t_delimiter, int t_rows_to_skip)
 {
     if (csv.empty()) {
+        errors_.emplace_back("CSV File is empty", false);
         success = false;
         return nullptr;
     }
@@ -96,24 +76,12 @@ json CsvParser::decode(std::string_view csv, size_t _csv_size, bool &success, ch
     cur_line_num = 1;
     index_into_cur_line = 0;
     beginning_of_line_index = 0;
-    delimiter = _delimiter;
-    rows_to_skip = _rows_to_skip;
-    csv_size = _csv_size;
+    delimiter = t_delimiter;
+    rows_to_skip = t_rows_to_skip;
+    csv_size = csv.size();
 
     size_t index = 0;
-    return parse_csv(csv, index, success);
-}
-
-std::string CsvParser::encode(json const &root)
-{
-    std::string encoded;
-    if (csv_size > 0) {
-        encoded.reserve(csv_size);
-    } else {
-        encoded.reserve(root["header"].size() * 8760 * 2 * 3);
-    }
-
-    return encoded;
+    return parse_csv(csv, index);
 }
 
 void CsvParser::skip_rows(std::string_view csv, size_t &index)
@@ -136,6 +104,7 @@ void CsvParser::skip_rows(std::string_view csv, size_t &index)
 int CsvParser::find_number_columns(std::string_view csv, size_t &index)
 {
     Token token;
+    Token prev_token;
     int num_columns = 0;
 
     size_t save_index = index;
@@ -150,9 +119,13 @@ int CsvParser::find_number_columns(std::string_view csv, size_t &index)
         } else if (token == Token::DELIMITER) {
             ++num_columns;
         } else if (token == Token::LINE_END) {
-            ++num_columns;
+            // Catch a trailing comma, such as Shading files from E+ 22.2.0 and below
+            if (prev_token != Token::DELIMITER) {
+                ++num_columns;
+            }
             break;
         }
+        prev_token = token;
     }
 
     cur_line_num = save_line_num;
@@ -162,11 +135,13 @@ int CsvParser::find_number_columns(std::string_view csv, size_t &index)
     return num_columns;
 }
 
-json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
+json CsvParser::parse_csv(std::string_view csv, size_t &index)
 {
     json root = {{"header", json::array()}, {"values", json::array()}};
     bool check_first_row = true;
     bool has_header = (rows_to_skip == 1);
+
+    constexpr size_t reservedSize = 8764 * 4;
 
     if (csv_size > 3) {
         // UTF-8 Byte Order Mark
@@ -187,32 +162,25 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
             break;
         } else {
             if (check_first_row) {
+                // Parse the header first, it could have an extra '()' for shading in 22.2.0 and below
+                if (has_header) {
+                    parse_header(csv, index, header);
+                }
                 int num_columns = find_number_columns(csv, index);
-                check_first_row = !check_first_row;
+                check_first_row = false;
 
                 for (int i = 0; i < num_columns; ++i) {
                     auto arr = std::vector<json>(); // (THIS_AUTO_OK)
-                    arr.reserve(8764 * 4);
+                    arr.reserve(reservedSize);
                     columns.push_back(std::move(arr));
                 }
 
-                if (has_header) {
-                    parse_header(csv, index, success, header);
-                }
                 continue;
             }
 
             parse_line(csv, index, columns);
             if (!success) {
-                size_t found_index = csv.find_first_of('\n', beginning_of_line_index);
-                std::string line;
-                if (found_index != std::string::npos) {
-                    line = csv.substr(beginning_of_line_index, found_index - beginning_of_line_index);
-                }
-                errors_.emplace_back(fmt::format("Line: {} Index: {} - Parsing Error. Error in following line.", cur_line_num, index_into_cur_line));
-                errors_.emplace_back(fmt::format("~~~ {}", line));
-                success = false;
-                continue;
+                break; // Bail early
             }
         }
     }
@@ -220,7 +188,7 @@ json CsvParser::parse_csv(std::string_view csv, size_t &index, bool &success)
     return root;
 }
 
-void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success, json &header)
+void CsvParser::parse_header(std::string_view csv, size_t &index, json &header)
 {
     Token token;
 
@@ -233,7 +201,6 @@ void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success,
             next_token(csv, index);
         } else {
             header.push_back(parse_value(csv, index));
-            if (!success) return;
         }
     }
 }
@@ -241,11 +208,30 @@ void CsvParser::parse_header(std::string_view csv, size_t &index, bool &success,
 void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
 {
     Token token;
-    int column_num = 0;
+    size_t column_num = 0;
+    size_t parsed_values = 0;
+    const size_t num_columns = columns.size(); // Csv isn't empty, so we know it's at least 1
+
+    size_t this_cur_line_num = cur_line_num;
+    size_t this_beginning_of_line_index = beginning_of_line_index;
 
     while (true) {
         token = look_ahead(csv, index);
         if (token == Token::LINE_END || token == Token::FILE_END) {
+            if (parsed_values != num_columns) {
+                success = false;
+
+                size_t found_index = csv.find_first_of("\r\n", this_beginning_of_line_index);
+                std::string line;
+                if (found_index != std::string::npos) {
+                    line = csv.substr(this_beginning_of_line_index, found_index - this_beginning_of_line_index);
+                }
+                errors_.emplace_back(
+                    fmt::format(
+                        "CsvParser - Line {} - Expected {} columns, got {}. Error in following line.", this_cur_line_num, num_columns, parsed_values),
+                    false);
+                errors_.emplace_back(line, true);
+            }
             next_token(csv, index);
             return;
         } else if (token == Token::DELIMITER) {
@@ -253,32 +239,10 @@ void CsvParser::parse_line(std::string_view csv, size_t &index, json &columns)
             ++column_num;
         } else {
             columns.at(column_num).push_back(parse_value(csv, index));
-            //            if (!success) return;
+            ++parsed_values;
         }
     }
 }
-
-// json CsvParser::parse_value(std::string_view csv, size_t &index, bool &success)
-//{
-//    Token token;
-//    token = look_ahead(csv, index);
-//
-//    switch (token) {
-//        case Token::STRING: {
-//            return parse_string(csv, index);
-//        }
-//        case Token::Num: {
-//            return parse_number(csv, index);
-//        }
-//        case Token::FILE_END:
-//        case Token::LINE_END:
-//        case Token::DELIMITER:
-//        default:
-//            break;
-//    }
-//    success = false;
-//    return nullptr;
-//}
 
 json CsvParser::parse_value(std::string_view csv, size_t &index)
 {
@@ -329,72 +293,9 @@ json CsvParser::parse_value(std::string_view csv, size_t &index)
         }
         return rtrim(value);
     }
-    //    double integral;
-    //    double fractional = std::modf(val, &integral);
-    //    if (fractional == 0) {
-    //        return static_cast<int>(fractional);
-    //    }
+
     return val;
-
-    //    auto const convert_double = [](std::string_view str) -> json {
-    //        double val;
-    //        auto result = fast_float::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
-    //        if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range || result.ptr != str.end()) {
-    //            return rtrim(str);
-    //        }
-    //        return val;
-    //    };
-    //
-    //    auto const convert_int = [&convert_double](std::string_view str) -> json {
-    //        int val;
-    //        auto result = std::from_chars(str.data(), str.data() + str.size(), val); // (AUTO_OK_OBJ)
-    //        if (result.ec == std::errc::result_out_of_range) {
-    //            return convert_double(str);
-    //        } else if (result.ec == std::errc::invalid_argument) {
-    //            if (*result.ptr == '.') {
-    //                return convert_double(str);
-    //            } else {
-    //                return rtrim(str);
-    //            }
-    //        } else if (result.ptr != str.end()) {
-    //            if (*result.ptr == '.' || *result.ptr == 'e' || *result.ptr == 'E') {
-    //                return convert_double(str);
-    //            } else {
-    //                return rtrim(str);
-    //            }
-    //        }
-    //        return val;
-    //    };
-    //
-    //    return convert_int(value);
 }
-
-// std::string CsvParser::parse_string(std::string_view csv, size_t &index)
-//{
-//    eat_whitespace(csv, index);
-//
-//    std::string str;
-//    char c;
-//
-//    while (true) {
-//        if (index == csv_size) {
-//            break;
-//        }
-//
-//        c = csv[index];
-//        increment_both_index(index, index_into_cur_line);
-//        if (c == delimiter || c == '\n') {
-//            decrement_both_index(index, index_into_cur_line);
-//            break;
-//        } else if (c == '\r') {
-//            continue;
-//        } else {
-//            str += c;
-//        }
-//    }
-//
-//    return rtrim(str);
-//}
 
 CsvParser::Token CsvParser::look_ahead(std::string_view csv, size_t index)
 {
