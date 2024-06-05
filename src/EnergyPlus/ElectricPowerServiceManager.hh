@@ -442,7 +442,7 @@ private: // data
     std::unique_ptr<battery_state> ssc_lastBatteryState_;
     Real64 ssc_lastBatteryTimeStep_;
     std::unique_ptr<battery_state> ssc_initBatteryState_;
-    Real64 ssc_initBatteryTimeStep_;
+    Real64 ssc_initBatteryTimeStep_ = 0.0;
     // battery life calculation variables
     int count0_;
     std::vector<Real64> b10_;

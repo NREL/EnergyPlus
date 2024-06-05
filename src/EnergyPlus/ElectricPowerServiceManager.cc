@@ -4389,7 +4389,6 @@ void ElectricStorage::simulateLiIonNmcBatteryModel(EnergyPlusData &state,
 
     // Set the current timestep length
 
-
     // Run the battery
     // SAM uses negative values for charging, positive for discharging
     // E+ power/energy outputs are positive
