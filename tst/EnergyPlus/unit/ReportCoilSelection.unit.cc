@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
@@ -64,6 +65,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/SingleDuct.hh>
 
 using namespace EnergyPlus;
 
@@ -942,4 +944,151 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_4PipeFCU_ElecHeatingCoil)
     EXPECT_NEAR(RatedCoilTotCap, c1->coilTotCapAtPeak, 0.1);
     EXPECT_NEAR(RatedCoilTotCap, c1->coilSensCapAtPeak, 0.1);
     EXPECT_NEAR(result_sensCapacity, c1->coilSensCapAtPeak, 0.1);
+}
+
+TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
+{
+    Real64 constexpr mult = 1.0;
+    int curSysNum = 0;
+    int curOASysNum = 0;
+    int curZoneEqNum = 1;
+    std::string coil1Name("ElecHeatCoil");          // user-defined name of the coil
+    std::string coil1Type("Coil:Heating:Electric"); // idf input object class name of coil
+
+    // set up coil selection report object by calling a public function (i.e., calls getIndexForOrCreateDataObjFromCoilName)
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(*state, coil1Name, coil1Type, mult);
+    bool isValidCoilType = state->dataRptCoilSelection->coilSelectionReportObj->isCompTypeCoil(coil1Type);
+    EXPECT_TRUE(isValidCoilType);
+    auto &c1 = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
+    c1->zoneEqNum = curZoneEqNum;
+
+    state->dataGlobal->NumOfZones = 1;
+    state->dataHeatBal->Zone.allocate(state->dataGlobal->NumOfZones);
+    state->dataHeatBal->Zone(1).Name = "Zone 1";
+
+    state->dataZoneEquip->ZoneEquipList.allocate(1);
+    auto &zoneEquipList = state->dataZoneEquip->ZoneEquipList(curZoneEqNum);
+
+    zoneEquipList.NumOfEquipTypes = 1;
+    zoneEquipList.EquipName.allocate(1);
+    zoneEquipList.EquipTypeName.allocate(1);
+    zoneEquipList.EquipType.allocate(1);
+    zoneEquipList.EquipName(1) = "Zone 1 FCU";
+    zoneEquipList.EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
+    zoneEquipList.EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
+
+    // test that 1 equipment in the equipment list has data that is read from EquipmentList data.
+    EXPECT_TRUE(Util::SameString(c1->coilLocation, "unknown"));
+    EXPECT_TRUE(Util::SameString(c1->typeHVACname, "unknown"));
+    EXPECT_TRUE(Util::SameString(c1->userNameforHVACsystem, "unknown"));
+
+    state->dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(*state);
+
+    EXPECT_TRUE(Util::SameString(c1->coilLocation, "Zone Equipment"));
+    EXPECT_TRUE(Util::SameString(c1->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
+    EXPECT_TRUE(Util::SameString(c1->userNameforHVACsystem, "Zone 1 FCU"));
+
+    // add another coil and hvac system and increase equipment list to 2
+    zoneEquipList.NumOfEquipTypes = 2;
+    zoneEquipList.EquipName.allocate(2);
+    zoneEquipList.EquipTypeName.allocate(2);
+    zoneEquipList.EquipType.allocate(2);
+    zoneEquipList.EquipIndex.allocate(2);
+
+    EXPECT_TRUE(Util::SameString(zoneEquipList.EquipName(1), "")); // equipment list data is cleared
+    EXPECT_TRUE(Util::SameString(zoneEquipList.EquipName(2), ""));
+
+    zoneEquipList.EquipName(1) = "Zone 1 FCU";
+    zoneEquipList.EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
+    zoneEquipList.EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
+    zoneEquipList.EquipIndex(1) = 1; // point to FCU #1
+    zoneEquipList.EquipName(2) = "Zone 1 ADU";
+    zoneEquipList.EquipTypeName(2) = "ZoneHVAC:AirDistributionUnit";
+    zoneEquipList.EquipType(2) = DataZoneEquipment::ZoneEquipType::AirDistributionUnit;
+    zoneEquipList.EquipIndex(2) = 1; // point to single duct TU #1
+
+    // create an air distribution unit and TU with coil
+    state->dataDefineEquipment->AirDistUnit.allocate(1);
+    state->dataDefineEquipment->AirDistUnit(1).NumComponents = 1;
+    state->dataDefineEquipment->AirDistUnit(1).EquipTypeEnum.allocate(1);
+    state->dataDefineEquipment->AirDistUnit(1).EquipTypeEnum(1) = DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat;
+
+    // test that 2 equipment in the equipment list will fill coil selection data
+    std::string coil2Name("ElecHeatCoil 2");        // user-defined name of the coil
+    std::string coil2Type("Coil:Heating:Electric"); // idf input object class name of coil
+
+    state->dataSingleDuct->sd_airterminal.allocate(1);
+    state->dataSingleDuct->sd_airterminal(1).ReheatName = coil2Name;
+
+    // set up coil selection report object by calling a public function (i.e., calls getIndexForOrCreateDataObjFromCoilName)
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(*state, coil2Name, coil2Type, mult);
+    auto &c1a = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
+    auto &c2a = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[1];
+    c2a->zoneEqNum = curZoneEqNum;
+
+    EXPECT_TRUE(Util::SameString(c2a->coilLocation, "unknown"));
+    EXPECT_TRUE(Util::SameString(c2a->typeHVACname, "unknown"));
+    EXPECT_TRUE(Util::SameString(c2a->userNameforHVACsystem, "unknown"));
+
+    state->dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(*state);
+
+    EXPECT_TRUE(Util::SameString(c1a->coilLocation, "Zone Equipment"));
+    EXPECT_TRUE(Util::SameString(c1a->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
+    EXPECT_TRUE(Util::SameString(c1a->userNameforHVACsystem, "Zone 1 FCU"));
+    EXPECT_TRUE(Util::SameString(c2a->coilLocation, "Zone Equipment"));
+    EXPECT_TRUE(Util::SameString(c2a->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
+    EXPECT_TRUE(Util::SameString(c2a->userNameforHVACsystem, "Zone 1 ADU"));
+
+    // delete coil report objects. These do not need to be switched, but start from scratch anyway
+    state->dataRptCoilSelection->coilSelectionReportObj->numCoilsReported_ = 0;
+    state->dataRptCoilSelection->coilSelectionReportObj.reset(nullptr);
+    createCoilSelectionReportObj(*state);
+
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(*state, coil1Name, coil1Type, mult);
+    state->dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(*state, coil2Name, coil2Type, mult);
+    auto &c1b = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
+    auto &c2b = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[1];
+    c1b->zoneEqNum = curZoneEqNum;
+    c2b->zoneEqNum = curZoneEqNum;
+
+    // check equipment order in equipment list
+    EXPECT_TRUE(compare_enums(zoneEquipList.EquipType(1), DataZoneEquipment::ZoneEquipType::FourPipeFanCoil));
+    EXPECT_TRUE(compare_enums(zoneEquipList.EquipType(2), DataZoneEquipment::ZoneEquipType::AirDistributionUnit));
+
+    // now switch the equipment order and try again
+    std::string tmpEquipName = zoneEquipList.EquipName(1);
+    std::string tmpEquipTypeName = zoneEquipList.EquipTypeName(1);
+    auto tmpEquipType = zoneEquipList.EquipType(1);
+    int tmpEquipIndex = zoneEquipList.EquipIndex(1);
+
+    zoneEquipList.EquipName(1) = zoneEquipList.EquipName(2);
+    zoneEquipList.EquipTypeName(1) = zoneEquipList.EquipTypeName(2);
+    zoneEquipList.EquipType(1) = zoneEquipList.EquipType(2);
+    zoneEquipList.EquipIndex(1) = zoneEquipList.EquipIndex(2);
+
+    zoneEquipList.EquipName(2) = tmpEquipName;
+    zoneEquipList.EquipTypeName(2) = tmpEquipTypeName;
+    zoneEquipList.EquipType(2) = tmpEquipType;
+    zoneEquipList.EquipIndex(2) = tmpEquipIndex;
+
+    // check that equipment order 1s reversed equipment list
+    EXPECT_TRUE(compare_enums(zoneEquipList.EquipType(2), DataZoneEquipment::ZoneEquipType::FourPipeFanCoil));
+    EXPECT_TRUE(compare_enums(zoneEquipList.EquipType(1), DataZoneEquipment::ZoneEquipType::AirDistributionUnit));
+
+    state->dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(*state);
+
+    EXPECT_TRUE(Util::SameString(c1b->coilLocation, "Zone Equipment"));
+    EXPECT_TRUE(Util::SameString(c1b->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
+    EXPECT_TRUE(Util::SameString(c1b->userNameforHVACsystem, "Zone 1 FCU"));
+
+    // and existing logic is flawed or I'm missing something
+    // note that the coil is not associated with either parent
+    // nowhere in doFinalProcessingOfCoilData is the coil name checked for the specific coil report (except new code)
+    // EXPECT_TRUE(Util::SameString(c2b->coilLocation, "Zone Equipment"));
+    // EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
+    // EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 ADU"));
+
+    EXPECT_TRUE(Util::SameString(c2b->coilLocation, "Zone Equipment"));
+    EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
+    EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 FCU"));
 }

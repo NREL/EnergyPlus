@@ -55,6 +55,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -66,8 +67,11 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -708,6 +712,54 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                         } else { // or may have found another
                             c->typeHVACname += " or " + zoneEquipList.EquipTypeName(equipLoop);
                             c->userNameforHVACsystem += " or " + zoneEquipList.EquipName(equipLoop);
+                        }
+                    } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop) ==
+                               DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
+                        bool foundItem = false;
+                        int aduIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
+                        for (int eqIndex = 1; eqIndex <= state.dataDefineEquipment->AirDistUnit(aduIndex).NumComponents; ++eqIndex) {
+                            switch (state.dataDefineEquipment->AirDistUnit(aduIndex).EquipTypeEnum(eqIndex)) {
+                            case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheat:
+                            case DataDefineEquip::ZnAirLoopEquipType::SingleDuctConstVolReheat:
+                            case DataDefineEquip::ZnAirLoopEquipType::SingleDuctVAVReheatVSFan:
+                                for (auto tu : state.dataSingleDuct->sd_airterminal) {
+                                    if (tu.ReheatName != c->coilName_) continue;
+                                    c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
+                                    c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                                    foundItem = true;
+                                    c->coilLocation = "Zone Equipment";
+                                    break;
+                                }
+                                break;
+                            case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_SeriesPIU_Reheat:
+                            case DataDefineEquip::ZnAirLoopEquipType::SingleDuct_ParallelPIU_Reheat:
+                                for (auto tu : state.dataPowerInductionUnits->PIU) {
+                                    if (tu.HCoil != c->coilName_) continue;
+                                    c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
+                                    c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                                    foundItem = true;
+                                    c->coilLocation = "Zone Equipment";
+                                    break;
+                                }
+                                break;
+                            default: {
+                                foundItem = true;
+                                break;
+                            }
+                            }
+                            if (foundItem) break;
+                        }
+                    } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop) ==
+                               DataZoneEquipment::ZoneEquipType::UnitarySystem) {
+                        for (auto unitSys : state.dataUnitarySystems->unitarySys) {
+                            if (unitSys.Name != state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop)) continue;
+                            if (unitSys.m_CoolingCoilName != c->coilName_ && unitSys.m_HeatingCoilName != c->coilName_ &&
+                                unitSys.m_SuppHeatCoilName != c->coilName_)
+                                continue;
+                            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
+                            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
+                            c->coilLocation = "Zone Equipment";
+                            break;
                         }
                     }
                 } // for (equipLoop)
