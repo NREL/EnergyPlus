@@ -743,7 +743,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                                 }
                                 break;
                             default: {
-                                foundItem = true;
                                 break;
                             }
                             }
