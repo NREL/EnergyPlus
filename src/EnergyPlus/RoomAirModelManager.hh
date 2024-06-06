@@ -89,7 +89,6 @@ namespace RoomAir {
                         std::string const &EquipName,                    // Equipment Name
                         std::string &SupplyNodeName,                     // Supply node name
                         std::string &ReturnNodeName,                     // Return node name
-                        int EquipIndex,                                  // Equipment index
                         DataZoneEquipment::ZoneEquipType zoneEquipType); // equipment type number
 
 } // namespace RoomAir

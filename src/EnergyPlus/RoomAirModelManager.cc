@@ -1658,12 +1658,8 @@ namespace RoomAir {
                             break;
                         }
                     }
-                    IntEquipFound = CheckEquipName(state,
-                                                   roomAFNNodeHVAC.Name,
-                                                   roomAFNNodeHVAC.SupplyNodeName,
-                                                   roomAFNNodeHVAC.ReturnNodeName,
-                                                   EquipIndex,
-                                                   roomAFNNodeHVAC.zoneEquipType);
+                    IntEquipFound = CheckEquipName(
+                        state, roomAFNNodeHVAC.Name, roomAFNNodeHVAC.SupplyNodeName, roomAFNNodeHVAC.ReturnNodeName, roomAFNNodeHVAC.zoneEquipType);
 
                     if (!IntEquipFound) {
                         ShowSevereError(state,
@@ -2699,7 +2695,6 @@ namespace RoomAir {
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
-                        int EquipIndex,               // Equipment index
                         DataZoneEquipment::ZoneEquipType zoneEquipType)
     {
 
@@ -2722,6 +2717,7 @@ namespace RoomAir {
         int ReturnNodeNum = 0;
 
         SupplyNodeName = "";
+        int EquipIndex;
 
         if (zoneEquipType == DataZoneEquipment::ZoneEquipType::Invalid) return EquipFind;
 
