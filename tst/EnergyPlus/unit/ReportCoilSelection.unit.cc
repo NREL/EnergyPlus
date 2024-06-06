@@ -1077,18 +1077,12 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
 
     state->dataRptCoilSelection->coilSelectionReportObj->finishCoilSummaryReportTable(*state);
 
+    // existing logic is flawed when multiple zone equipment are in the same zone (e.g., PTAC and FanCoil)
     EXPECT_TRUE(Util::SameString(c1b->coilLocation, "Zone Equipment"));
     EXPECT_TRUE(Util::SameString(c1b->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
     EXPECT_TRUE(Util::SameString(c1b->userNameforHVACsystem, "Zone 1 FCU"));
 
-    // and existing logic is flawed or I'm missing something
-    // note that the coil is not associated with either parent
-    // nowhere in doFinalProcessingOfCoilData is the coil name checked for the specific coil report (except new code)
-    // EXPECT_TRUE(Util::SameString(c2b->coilLocation, "Zone Equipment"));
-    // EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
-    // EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 ADU"));
-
     EXPECT_TRUE(Util::SameString(c2b->coilLocation, "Zone Equipment"));
-    EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
-    EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 FCU"));
+    EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
+    EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 ADU"));
 }

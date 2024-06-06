@@ -690,6 +690,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                 c->coilLocation = "Zone Equipment";
             } else if (zoneEquipList.NumOfEquipTypes > 1) {
                 bool foundOne(false);
+                bool foundItem = false;
                 for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
                     // go with the first ZoneHVAC device in the list
                     DataZoneEquipment::ZoneEquipType equipType = zoneEquipList.EquipType(equipLoop);
@@ -715,7 +716,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                         }
                     } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop) ==
                                DataZoneEquipment::ZoneEquipType::AirDistributionUnit) {
-                        bool foundItem = false;
                         int aduIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
                         for (int eqIndex = 1; eqIndex <= state.dataDefineEquipment->AirDistUnit(aduIndex).NumComponents; ++eqIndex) {
                             switch (state.dataDefineEquipment->AirDistUnit(aduIndex).EquipTypeEnum(eqIndex)) {
@@ -762,6 +762,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                             break;
                         }
                     }
+                    if (foundItem) break;
                 } // for (equipLoop)
             }     // if (zoneEquipList.numOfEquipTypes > 0)
         }         // if (c->ZoneEqNum > 0)
