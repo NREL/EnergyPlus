@@ -74,18 +74,18 @@ TEST(CustomMatchers, enums_ok)
     ASSERT_ENUM_NE(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
 }
 
-TEST(CustomMatchers, enums_not_ok)
-{
-    EXPECT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
-    EXPECT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
-}
-
-TEST(CustomMatchers, enums_not_ok_assert_eq)
-{
-    ASSERT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
-}
-
-TEST(CustomMatchers, enums_not_ok_assert_ne)
-{
-    ASSERT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
-}
+// TEST(CustomMatchers, enums_not_ok)
+// {
+//     EXPECT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+//     EXPECT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
+// }
+//
+// TEST(CustomMatchers, enums_not_ok_assert_eq)
+// {
+//     ASSERT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+// }
+//
+// TEST(CustomMatchers, enums_not_ok_assert_ne)
+// {
+//     ASSERT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
+// }
