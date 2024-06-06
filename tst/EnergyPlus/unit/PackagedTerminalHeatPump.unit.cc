@@ -5021,7 +5021,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     auto &sysAvailMgr = state->dataAvail->NightCycleData(1);
     // check the three cycling run time control types
     EXPECT_EQ(1, state->dataAvail->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl));
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl);
     // test for initialization and does not crash
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
 

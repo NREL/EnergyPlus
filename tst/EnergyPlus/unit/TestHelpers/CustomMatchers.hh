@@ -45,92 +45,63 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IdfParserFixture_hh_INCLUDED
-#define IdfParserFixture_hh_INCLUDED
+#ifndef EnergyPlusFixture_CustomMatchers_hh_INCLUDED
+#define EnergyPlusFixture_CustomMatchers_hh_INCLUDED
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// EnergyPlus Headers
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <type_traits>
 
-#include "../TestHelpers/CustomMatchers.hh"
-#include "../TestHelpers/IdfParser.hh"
-
-#include <ostream>
-
-namespace EnergyPlus {
-
-class IdfParserFixture : public testing::Test
+class EnumHelper
 {
-protected:
-    static void SetUpTestCase()
+public:
+    template <typename T1, typename T2, typename = typename std::enable_if_t<std::is_enum_v<T1>, T1>>
+    static ::testing::AssertionResult Compare(const char *lhs_expression, const char *rhs_expression, const T1 &lhs, const T2 &rhs)
     {
-    }
-    static void TearDownTestCase()
-    {
-    }
+        // Clarify compiler error when types differ
+        ::testing::StaticAssertTypeEq<T1, T2>();
 
-    virtual void SetUp()
-    {
-    }
+        auto underlying_lhs = static_cast<typename std::underlying_type_t<T1>>(lhs);
+        auto underlying_rhs = static_cast<typename std::underlying_type_t<T1>>(rhs);
 
-    virtual void TearDown()
-    {
-    }
-
-    // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
-    // delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
-    {
-        std::ostringstream compare_text;
-        for (std::string const &str : strings) {
-            compare_text << str << delimiter;
+        if (underlying_lhs == underlying_rhs) {
+            return ::testing::AssertionSuccess();
         }
-        return compare_text.str();
+
+        return ::testing::AssertionFailure() << "In comparing enums of type '" << ::testing::internal::GetTypeName<T1>()
+                                             << "', Expected equality of these values:"
+                                             << "\n  " << lhs_expression << "\n    Which is: "
+                                             << ::testing::internal::FormatForComparisonFailureMessage(underlying_lhs, underlying_rhs) << "\n  "
+                                             << rhs_expression << "\n    Which is: "
+                                             << ::testing::internal::FormatForComparisonFailureMessage(underlying_rhs, underlying_lhs);
     }
 
-    void eat_whitespace(std::string const &idf, size_t &index)
+    template <typename T1, typename T2, typename = typename std::enable_if_t<std::is_enum_v<T1>, T1>>
+    static ::testing::AssertionResult CompareNE(const char *lhs_expression, const char *rhs_expression, const T1 &lhs, const T2 &rhs)
     {
-        IdfParser::eat_whitespace(idf, index);
-    }
+        // Clarify compiler error when types differ
+        ::testing::StaticAssertTypeEq<T1, T2>();
 
-    void eat_comment(std::string const &idf, size_t &index)
-    {
-        IdfParser::eat_comment(idf, index);
-    }
+        auto underlying_lhs = static_cast<typename std::underlying_type_t<T1>>(lhs);
+        auto underlying_rhs = static_cast<typename std::underlying_type_t<T1>>(rhs);
 
-    std::string parse_string(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_string(idf, index, success);
-    }
+        if (underlying_lhs != underlying_rhs) {
+            return ::testing::AssertionSuccess();
+        }
 
-    std::string parse_value(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_value(idf, index, success);
-    }
-
-    IdfParser::Token look_ahead(std::string const &idf, size_t index)
-    {
-        return IdfParser::look_ahead(idf, index);
-    }
-
-    IdfParser::Token next_token(std::string const &idf, size_t &index)
-    {
-        return IdfParser::next_token(idf, index);
-    }
-
-    std::vector<std::vector<std::string>> parse_idf(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_idf(idf, index, success);
-    }
-
-    std::vector<std::string> parse_object(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_object(idf, index, success);
+        return ::testing::AssertionFailure() << "Expected: (" << lhs_expression << ") != (" << rhs_expression << "), actual: both are "
+                                             << ::testing::internal::GetTypeName<T1>() << "("
+                                             << ::testing::internal::FormatForComparisonFailureMessage(underlying_lhs, underlying_rhs) << ")";
     }
 };
 
-} // namespace EnergyPlus
+#define EXPECT_ENUM_EQ(val1, val2) EXPECT_PRED_FORMAT2(EnumHelper::Compare, val1, val2)
 
-#endif
+#define EXPECT_ENUM_NE(val1, val2) EXPECT_PRED_FORMAT2(EnumHelper::CompareNE, val1, val2)
+
+#define ASSERT_ENUM_EQ(val1, val2) ASSERT_PRED_FORMAT2(EnumHelper::Compare, val1, val2)
+
+#define ASSERT_ENUM_NE(val1, val2) ASSERT_PRED_FORMAT2(EnumHelper::CompareNE, val1, val2)
+
+#endif // EnergyPlusFixture_CustomMatchers_hh_INCLUDED
