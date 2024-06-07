@@ -641,7 +641,6 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
                             format("{}{}=\"{}\",", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(16), state.dataIPShortCut->cAlphaArgs(16)));
             ShowContinueError(state, "Available choices are ConstantFlow, ModulatedChillerPLR, ModulatedLoopPLR, or ModulatedDeltaTemperature");
-            ShowContinueError(state, "Flow mode ConstantFlow is assumed and the simulation continues.");
             thisChiller.CondenserFlowControl = DataPlant::CondenserFlowControl::ConstantFlow;
             ErrorsFound = true;
         };
@@ -662,18 +661,17 @@ void GetElecReformEIRChillerInput(EnergyPlusData &state)
         if (NumAlphas > 17) {
             if (!state.dataIPShortCut->lAlphaFieldBlanks(18)) {
                 thisChiller.CondDTScheduleNum = ScheduleManager::GetScheduleIndex(state, state.dataIPShortCut->cAlphaArgs(18));
-                if (thisChiller.CondDTScheduleNum == 0) {
-                    ShowSevereError(
-                        state, format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
-                    ShowContinueError(state,
-                                      format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18)));
-                    ErrorsFound = true;
-                }
             } else {
                 thisChiller.CondDTScheduleNum = 0;
             }
         } else {
             thisChiller.CondDTScheduleNum = 0;
+        }
+        if (thisChiller.CondDTScheduleNum == 0 && thisChiller.CondenserFlowControl == DataPlant::CondenserFlowControl::ModulatedDeltaTemperature) {
+            ShowSevereError(state,
+                            format("{}{}=\"{}\"", RoutineName, state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
+            ShowContinueError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(18), state.dataIPShortCut->cAlphaArgs(18)));
+            ErrorsFound = true;
         }
 
         if (NumNums > 16) {
@@ -2526,14 +2524,15 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
                 }
             } else {
                 ShowFatalError(state,
-                               "CalcElectricEIRChillerModel: The ModulatedLoopPLR condenser flow control requires a Sizing:Plant object for "
-                               "both loops connected to the condenser and evaporator of the chiller.");
+                               format("{}: The ModulatedLoopPLR condenser flow control requires a Sizing:Plant object for "
+                                      "both loops connected to the condenser and evaporator of the chiller.",
+                                      RoutineName));
             }
         } break;
         case DataPlant::CondenserFlowControl::ModulatedDeltaTemperature: {
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidName,
-                                                               Constant::CWInitConvTemp,
+                                                               this->CondInletTemp,
                                                                state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).FluidIndex,
                                                                RoutineName);
             Real64 condDT = 0.0;
