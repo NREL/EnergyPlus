@@ -432,6 +432,8 @@ private: // methods
                                                std::string const &coilType  // idf input object class name of coil
     );
 
+    void associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c);
+
 public: // data
     int numCoilsReported_;
     std::vector<std::unique_ptr<CoilSelectionData>> coilSelectionDataObjs;

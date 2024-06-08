@@ -629,60 +629,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     }
 
     if (c->zoneEqNum > 0) {
-        c->coilLocation = "Unknown";
-        c->typeHVACname = "Unknown";
-        c->userNameforHVACsystem = "Unknown";
-        // now search equipment
-        auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
-        bool keepLooking = true;
-        for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
-            for (auto eqName : zoneEquipList.EquipName) {
-                if (eqName == c->coilName_) {
-                    c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                    c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                    c->coilLocation = "Zone Equipment";
-                    keepLooking = false;
-                    break;
-                }
-                if (keepLooking) {
-                    for (auto eqSub : zoneEquipList.EquipData) {
-                        if (eqSub.Name == c->coilName_) {
-                            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                            c->coilLocation = "Zone Equipment";
-                            keepLooking = false;
-                            break;
-                        }
-                        if (keepLooking) {
-                            for (auto eqSubSub : eqSub.SubEquipData) {
-                                if (eqSubSub.Name == c->coilName_) {
-                                    c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                    c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                    c->coilLocation = "Zone Equipment";
-                                    keepLooking = false;
-                                    break;
-                                }
-                                if (keepLooking) {
-                                    for (auto eqSubSubSub : eqSubSub.SubSubEquipData) {
-                                        if (eqSubSubSub.Name == c->coilName_) {
-                                            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                            c->coilLocation = "Zone Equipment";
-                                            keepLooking = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!keepLooking) break;
-                            }
-                            if (!keepLooking) break;
-                        }
-                    }
-                    if (!keepLooking) break;
-                }
-            }
-            if (!keepLooking) break;
-        } // for (equipLoop)
+        associateZoneCoilWithParent(state, c);
     }
 }
 
@@ -694,61 +641,8 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         // mine final/hard values from coil models
 
         if (c->zoneEqNum > 0) {
-            c->coilLocation = "Unknown";
-            c->typeHVACname = "Unknown";
-            c->userNameforHVACsystem = "Unknown";
-            // now search equipment
-            auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
-            bool keepLooking = true;
-            for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
-                for (auto eqName : zoneEquipList.EquipName) {
-                    if (eqName == c->coilName_) {
-                        c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                        c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                        c->coilLocation = "Zone Equipment";
-                        keepLooking = false;
-                        break;
-                    }
-                    if (keepLooking) {
-                        for (auto eqSub : zoneEquipList.EquipData) {
-                            if (eqSub.Name == c->coilName_) {
-                                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                c->coilLocation = "Zone Equipment";
-                                keepLooking = false;
-                                break;
-                            }
-                            if (keepLooking) {
-                                for (auto eqSubSub : eqSub.SubEquipData) {
-                                    if (eqSubSub.Name == c->coilName_) {
-                                        c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                        c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                        c->coilLocation = "Zone Equipment";
-                                        keepLooking = false;
-                                        break;
-                                    }
-                                    if (keepLooking) {
-                                        for (auto eqSubSubSub : eqSubSub.SubSubEquipData) {
-                                            if (eqSubSubSub.Name == c->coilName_) {
-                                                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                                c->coilLocation = "Zone Equipment";
-                                                keepLooking = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (!keepLooking) break;
-                                }
-                                if (!keepLooking) break;
-                            }
-                        }
-                        if (!keepLooking) break;
-                    }
-                }
-                if (!keepLooking) break;
-            } // for (equipLoop)
-        }     // if (c->ZoneEqNum > 0)
+            associateZoneCoilWithParent(state, c);
+        }
 
         if (c->airloopNum > state.dataHVACGlobal->NumPrimaryAirSys && c->oASysNum > 0) {
             c->coilLocation = "DOAS AirLoop";
@@ -1013,6 +907,61 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
         ShowFatalError(state, format("getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: {} = {}", coilType, coilName));
     }
     return index;
+}
+
+void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c)
+{
+    c->coilLocation = "Unknown";
+    c->typeHVACname = "Unknown";
+    c->userNameforHVACsystem = "Unknown";
+    // now search equipment
+    auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
+    bool keepLooking = true;
+    for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
+        if (zoneEquipList.EquipName(equipLoop) == c->coilName_) {
+            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+            c->coilLocation = "Zone Equipment";
+            keepLooking = false;
+            break;
+        }
+        if (keepLooking) {
+            if (zoneEquipList.EquipData(equipLoop).Name == c->coilName_) {
+                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+                c->coilLocation = "Zone Equipment";
+                keepLooking = false;
+                break;
+            }
+            if (keepLooking) {
+                for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
+                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name == c->coilName_) {
+                        c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+                        c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+                        c->coilLocation = "Zone Equipment";
+                        keepLooking = false;
+                        break;
+                    }
+                    if (keepLooking) {
+                        for (int subsubEq = 1; subsubEq <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++subsubEq) {
+                            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name == c->coilName_) {
+                                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+                                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+                                c->coilLocation = "Zone Equipment";
+                                keepLooking = false;
+                                break;
+                            }
+                        }
+                        if (!keepLooking) break;
+                    }
+                    if (!keepLooking) break;
+                }
+                if (!keepLooking) break;
+            }
+            if (!keepLooking) break;
+        }
+        if (!keepLooking) break;
+    } // for (equipLoop)
 }
 
 void ReportCoilSelection::setRatedCoilConditions(EnergyPlusData &state,
