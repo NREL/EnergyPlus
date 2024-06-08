@@ -400,11 +400,11 @@ TEST_F(EnergyPlusFixture, GetZoneEquipmentData_epJSON)
     auto &thisZoneEquipList = state->dataZoneEquip->ZoneEquipList(1);
     EXPECT_EQ(3, thisZoneEquipList.NumOfEquipTypes);
 
-    EXPECT_TRUE(compare_enums(DataZoneEquipment::LoadDist::Sequential, thisZoneEquipList.LoadDistScheme));
+    EXPECT_ENUM_EQ(DataZoneEquipment::LoadDist::Sequential, thisZoneEquipList.LoadDistScheme);
 
     EXPECT_EQ("FAN ZONE EXHAUST 1", thisZoneEquipList.EquipName(1));
     EXPECT_EQ("FAN:ZONEEXHAUST", thisZoneEquipList.EquipTypeName(1));
-    EXPECT_TRUE(compare_enums(DataZoneEquipment::ZoneEquipType::ExhaustFan, thisZoneEquipList.EquipType(1)));
+    EXPECT_ENUM_EQ(DataZoneEquipment::ZoneEquipType::ExhaustFan, thisZoneEquipList.EquipType(1));
     EXPECT_EQ(1, thisZoneEquipList.CoolingPriority(1));
     EXPECT_EQ(1, thisZoneEquipList.HeatingPriority(1));
     EXPECT_EQ(-1, thisZoneEquipList.SequentialCoolingFractionSchedPtr(1));
@@ -412,7 +412,7 @@ TEST_F(EnergyPlusFixture, GetZoneEquipmentData_epJSON)
 
     EXPECT_EQ("ADU AIR TERMINAL SINGLE DUCT CONSTANT VOLUME NO REHEAT 1", thisZoneEquipList.EquipName(2));
     EXPECT_EQ("ZONEHVAC:AIRDISTRIBUTIONUNIT", thisZoneEquipList.EquipTypeName(2));
-    EXPECT_TRUE(compare_enums(DataZoneEquipment::ZoneEquipType::AirDistributionUnit, thisZoneEquipList.EquipType(2)));
+    EXPECT_ENUM_EQ(DataZoneEquipment::ZoneEquipType::AirDistributionUnit, thisZoneEquipList.EquipType(2));
     EXPECT_EQ(3, thisZoneEquipList.CoolingPriority(2));
     EXPECT_EQ(2, thisZoneEquipList.HeatingPriority(2));
     EXPECT_EQ(-1, thisZoneEquipList.SequentialCoolingFractionSchedPtr(2));
@@ -420,7 +420,7 @@ TEST_F(EnergyPlusFixture, GetZoneEquipmentData_epJSON)
 
     EXPECT_EQ("ADU AIR TERMINAL SINGLE DUCT VAV REHEAT 1", thisZoneEquipList.EquipName(3));
     EXPECT_EQ("ZONEHVAC:AIRDISTRIBUTIONUNIT", thisZoneEquipList.EquipTypeName(3));
-    EXPECT_TRUE(compare_enums(DataZoneEquipment::ZoneEquipType::AirDistributionUnit, thisZoneEquipList.EquipType(3)));
+    EXPECT_ENUM_EQ(DataZoneEquipment::ZoneEquipType::AirDistributionUnit, thisZoneEquipList.EquipType(3));
     EXPECT_EQ(2, thisZoneEquipList.CoolingPriority(3));
     EXPECT_EQ(3, thisZoneEquipList.HeatingPriority(3));
     EXPECT_EQ(-1, thisZoneEquipList.SequentialCoolingFractionSchedPtr(3));
