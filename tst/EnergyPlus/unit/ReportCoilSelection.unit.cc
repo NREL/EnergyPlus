@@ -1025,7 +1025,7 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     zoneEquipList.EquipData(2).SubEquipData(1).SubSubEquipData.allocate(1);
     zoneEquipList.EquipData(2).SubEquipData(1).SubSubEquipData(1).Name = coil2Name;
 
-    // set up coil selection report object by calling a public function (i.e., calls getIndexForOrCreateDataObjFromCoilName)
+    // set up coil selection report object by calling a public function that calls getIndexForOrCreateDataObjFromCoilName
     state->dataRptCoilSelection->coilSelectionReportObj->setCoilReheatMultiplier(*state, coil2Name, coil2Type, mult);
     auto &c1a = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
     auto &c2a = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[1];
