@@ -2597,7 +2597,7 @@ SQLite::SQLiteData::SQLiteData(std::shared_ptr<std::ostream> const &errorStream,
 }
 
 SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db)
-    : m_writeOutputToSQLite(true), m_errorStream(errorStream), m_connection(nullptr), m_db(db)
+    : m_writeOutputToSQLite(true), m_errorStream(errorStream), m_db(db)
 {
 }
 
@@ -2605,8 +2605,9 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                                    bool writeOutputToSQLite,
                                    fs::path const &dbName,
                                    fs::path const &errorFilePath)
-    : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream), m_connection(nullptr)
+    : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream)
 {
+    sqlite3 *m_connection = nullptr;
     if (m_writeOutputToSQLite) {
         int rc = -1;
         bool ok = true;
@@ -2803,7 +2804,7 @@ int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt *stmt)
 
 bool SQLiteProcedures::sqliteWithinTransaction()
 {
-    return (sqlite3_get_autocommit(m_connection) == 0);
+    return (sqlite3_get_autocommit(m_db.get()) == 0);
 }
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
