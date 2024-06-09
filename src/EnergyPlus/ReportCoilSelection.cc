@@ -961,7 +961,7 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
             if (!keepLooking) break;
         }
         if (!keepLooking) break;
-    } // for (equipLoop) 
+    } // for (equipLoop)
     if (c->typeHVACname == "Unknown") {
         ShowWarningError(state, format("Parent object not found for zone coil = {}", c->coilName_));
     }
