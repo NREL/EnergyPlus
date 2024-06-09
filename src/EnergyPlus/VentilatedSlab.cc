@@ -774,13 +774,13 @@ namespace VentilatedSlab {
                                                        DataLoopNode::NodeFluidType::Air,
                                                        DataLoopNode::ConnectionType::Inlet,
                                                        NodeInputManager::CompFluidStream::Primary,
-                                                       ObjectIsNotParent);
+                                                       ObjectIsParent);
 
                 ventSlab.OAMixerOutNode = GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                            ventSlab.Name + "-OA MIXER",
+                                                            ventSlab.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -791,7 +791,7 @@ namespace VentilatedSlab {
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name,
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Internal,
+                                                           DataLoopNode::ConnectionType::Outlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsParent);
 
@@ -814,13 +814,13 @@ namespace VentilatedSlab {
                                                        DataLoopNode::NodeFluidType::Air,
                                                        DataLoopNode::ConnectionType::Inlet,
                                                        NodeInputManager::CompFluidStream::Primary,
-                                                       ObjectIsNotParent);
+                                                       ObjectIsParent);
 
                 ventSlab.OAMixerOutNode = GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                            ventSlab.Name + "-OA MIXER",
+                                                            ventSlab.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -831,7 +831,7 @@ namespace VentilatedSlab {
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
                                                            ventSlab.Name,
                                                            DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Internal,
+                                                           DataLoopNode::ConnectionType::Outlet,
                                                            NodeInputManager::CompFluidStream::Primary,
                                                            ObjectIsParent);
 
@@ -841,7 +841,7 @@ namespace VentilatedSlab {
                                                            state.dataIPShortCut->cAlphaArgs(18),
                                                            ErrorsFound,
                                                            DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                           ventSlab.Name + "-SYSTEM",
+                                                           ventSlab.Name,
                                                            DataLoopNode::NodeFluidType::Air,
                                                            DataLoopNode::ConnectionType::Inlet,
                                                            NodeInputManager::CompFluidStream::Primary,
@@ -863,12 +863,12 @@ namespace VentilatedSlab {
                                                        DataLoopNode::NodeFluidType::Air,
                                                        DataLoopNode::ConnectionType::Inlet,
                                                        NodeInputManager::CompFluidStream::Primary,
-                                                       ObjectIsNotParent);
+                                                       ObjectIsParent);
                 ventSlab.OAMixerOutNode = GetOnlySingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(23),
                                                             ErrorsFound,
                                                             DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                            ventSlab.Name + "-OA MIXER",
+                                                            ventSlab.Name,
                                                             DataLoopNode::NodeFluidType::Air,
                                                             DataLoopNode::ConnectionType::Outlet,
                                                             NodeInputManager::CompFluidStream::Primary,
@@ -902,15 +902,15 @@ namespace VentilatedSlab {
                     ErrorsFound = true;
                 }
 
-                ventSlab.ZoneAirInNode = GetOnlySingleNode(state,
-                                                           state.dataIPShortCut->cAlphaArgs(20),
-                                                           ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                           ventSlab.Name + "-SYSTEM",
-                                                           DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Outlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           ObjectIsParent);
+                //ventSlab.ZoneAirInNode = GetOnlySingleNode(state,
+                //                                           state.dataIPShortCut->cAlphaArgs(20),
+                //                                           ErrorsFound,
+                //                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
+                //                                           ventSlab.Name + "-SYSTEM",
+                //                                           DataLoopNode::NodeFluidType::Air,
+                //                                           DataLoopNode::ConnectionType::Outlet,
+                //                                           NodeInputManager::CompFluidStream::Primary,
+                //                                           ObjectIsParent);
 
                 ventSlab.ZoneAirInNode = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(20),
@@ -928,7 +928,7 @@ namespace VentilatedSlab {
                                                         state.dataIPShortCut->cAlphaArgs(21),
                                                         ErrorsFound,
                                                         DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                        ventSlab.Name + "-OA MIXER",
+                                                        ventSlab.Name,
                                                         DataLoopNode::NodeFluidType::Air,
                                                         DataLoopNode::ConnectionType::Inlet,
                                                         NodeInputManager::CompFluidStream::Primary,
@@ -947,7 +947,7 @@ namespace VentilatedSlab {
                                                        state.dataIPShortCut->cAlphaArgs(22),
                                                        ErrorsFound,
                                                        DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                                                       ventSlab.Name + "-OA MIXER",
+                                                       ventSlab.Name,
                                                        DataLoopNode::NodeFluidType::Air,
                                                        DataLoopNode::ConnectionType::ReliefAir,
                                                        NodeInputManager::CompFluidStream::Primary,
@@ -978,7 +978,7 @@ namespace VentilatedSlab {
             // Add fan to component sets array
             SetUpCompSets(state,
                           CurrentModuleObject,
-                          ventSlab.Name + "-SYSTEM",
+                          ventSlab.Name,
                           "UNDEFINED",
                           state.dataIPShortCut->cAlphaArgs(25),
                           state.dataIPShortCut->cAlphaArgs(23),
@@ -1246,27 +1246,27 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
-                              state.dataIPShortCut->cAlphaArgs(24),
+                              "UNDEFINED",
                               "UNDEFINED");
 
                 // Add heating coil to component sets array when cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               "UNDEFINED",
-                              state.dataIPShortCut->cAlphaArgs(19));
+                              "UNDEFINED");
                 break;
             }
             case CoilType::Heating: { // 'Heating'
                 // Add heating coil to component sets array when no cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(27),
                               state.dataIPShortCut->cAlphaArgs(28),
                               state.dataIPShortCut->cAlphaArgs(24),
@@ -1277,7 +1277,7 @@ namespace VentilatedSlab {
                 // Add cooling coil to component sets array when no heating coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
-                              ventSlab.Name + "-SYSTEM",
+                              ventSlab.Name,
                               state.dataIPShortCut->cAlphaArgs(30),
                               state.dataIPShortCut->cAlphaArgs(31),
                               state.dataIPShortCut->cAlphaArgs(24),

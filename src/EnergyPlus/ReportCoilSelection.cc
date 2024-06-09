@@ -961,7 +961,7 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
             if (!keepLooking) break;
         }
         if (!keepLooking) break;
-    } // for (equipLoop) 
+    } // for (equipLoop)
     if (c->typeHVACname == "Unknown") {
         ShowWarningError(state, format("Parent object not found for zone coil = {}", c->coilName_));
     }
@@ -1961,6 +1961,15 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     c->supFanType = fanType;
     c->supFanNum = fanIndex;
     if (c->supFanNum == 0) c->supFanNum = Fans::GetFanIndex(state, fanName);
+}
+
+void ReportCoilSelection::setCoilEqNum(
+    EnergyPlusData &state, std::string const &coilName, std::string const &coilType, int const curSysNum, int const curZoneEqNum)
+{
+    int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
+    auto &c(coilSelectionDataObjs[index]);
+    c->airloopNum = curSysNum;
+    c->zoneEqNum = curZoneEqNum;
 }
 
 std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const timeStepAtPeak)
