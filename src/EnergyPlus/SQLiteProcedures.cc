@@ -2645,7 +2645,7 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
             rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
             sqlite3_close(m_connection);
             if (rc) {
-                *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << sqlite3_errmsg(m_connection) << std::endl;
+                *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << zErrMsg << std::endl;
                 ok = false;
             } else {
                 if (dbName != ":memory:") {
