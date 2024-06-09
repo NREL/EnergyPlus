@@ -2642,7 +2642,11 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         }
         if (ok) {
             char *zErrMsg = nullptr;
-            rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+            // Set journal_mode OFF to avoid creating the file dbName + "-journal" (when dbName is a regular file)
+            rc = sqlite3_exec(m_connection, "PRAGMA journal_mode = OFF;", nullptr, 0, &zErrMsg);
+            if (!rc) {
+                rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+            }
             sqlite3_close(m_connection);
             if (rc) {
                 *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << zErrMsg << std::endl;
