@@ -1794,7 +1794,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
     // check chiller inputs
     auto &thisChiller = state->dataChillerAbsorber->absorptionChillers(AbsChillNum);
     EXPECT_EQ(thisChiller.NomCap, 100000.0);
-    EXPECT_TRUE(compare_enums(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated));
+    EXPECT_ENUM_EQ(thisChiller.FlowMode, DataPlant::FlowMode::LeavingSetpointModulated);
     // define local var
     int EvapInletNode = thisChiller.EvapInletNodeNum;
     int EvapOutletNode = thisChiller.EvapOutletNodeNum;
@@ -1930,11 +1930,11 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Autosize)
 
     EXPECT_DOUBLE_EQ(5.0, thisChiller.TempLowLimitEvapOut);
 
-    EXPECT_TRUE(compare_enums(thisChiller.FlowMode, DataPlant::FlowMode::Constant));
+    EXPECT_ENUM_EQ(thisChiller.FlowMode, DataPlant::FlowMode::Constant);
     EXPECT_TRUE(thisChiller.GenInputOutputNodesUsed);
     EXPECT_GT(thisChiller.GeneratorInletNodeNum, 0);
     EXPECT_GT(thisChiller.GeneratorOutletNodeNum, 0);
-    EXPECT_TRUE(compare_enums(thisChiller.GenHeatSourceType, DataLoopNode::NodeFluidType::Water));
+    EXPECT_ENUM_EQ(thisChiller.GenHeatSourceType, DataLoopNode::NodeFluidType::Water);
     EXPECT_TRUE(thisChiller.GeneratorVolFlowRateWasAutoSized);
 
     EXPECT_DOUBLE_EQ(2.0, thisChiller.GeneratorSubcool);

@@ -384,6 +384,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 SCHigh;                    // VRF outdoor unit subcooling degrees uppler limit [C]
         Real64 VRFOperationSimPath;       // simulation path indicating the VRF operation mode [--]
         bool checkPlantCondTypeOneTime;
+        int CondenserCapErrIdx; // recurring condenser capacity error index
 
         // Default Constructor
         VRFCondenserEquipment()
@@ -424,7 +425,7 @@ namespace HVACVariableRefrigerantFlow {
               RatedHeatCapacity(0.0), RatedCompPower(14000.0), RatedCompPowerPerCapcity(0.35), RatedOUFanPower(0.0), RatedOUFanPowerPerCapcity(0.0),
               RateBFOUEvap(0.45581), RateBFOUCond(0.21900), RefPipDiaSuc(0.0), RefPipDiaDis(0.0), RefPipLen(0.0), RefPipEquLen(0.0), RefPipHei(0.0),
               RefPipInsThi(0.0), RefPipInsCon(0.0), SH(0.0), SC(0.0), SCHE(0.0), SHLow(0.0), SCLow(0.0), SHHigh(0.0), SCHigh(0.0),
-              VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true)
+              VRFOperationSimPath(0.0), checkPlantCondTypeOneTime(true), CondenserCapErrIdx(0)
         {
         }
 
@@ -809,9 +810,10 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         Real64 CalVRFTUAirFlowRate_FluidTCtrl(EnergyPlusData &state,
-                                              int VRFTUNum,           // Index to VRF terminal unit
-                                              Real64 PartLoadRatio,   // part load ratio of the coil
-                                              bool FirstHVACIteration // FirstHVACIteration flag
+                                              int VRFTUNum,                            // Index to VRF terminal unit
+                                              Real64 PartLoadRatio,                    // part load ratio of the coil
+                                              bool FirstHVACIteration,                 // FirstHVACIteration flag
+                                              ObjexxFCL::Optional<Real64 const> MaxCap // maximum allowed heating capacity
         );
 
         // Methods for cruve based VRF Model

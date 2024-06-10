@@ -1307,8 +1307,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
 
     auto *spmOA = dynamic_cast<SetPointManager::SPMOutsideAir *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmOA != nullptr);
-    EXPECT_TRUE(compare_enums(spmOA->ctrlVar, HVAC::CtrlVarType::MaxTemp));
-    EXPECT_TRUE(compare_enums(spmOA->type, SetPointManager::SPMType::OutsideAir));
+    EXPECT_ENUM_EQ(spmOA->ctrlVar, HVAC::CtrlVarType::MaxTemp);
+    EXPECT_ENUM_EQ(spmOA->type, SetPointManager::SPMType::OutsideAir);
     EXPECT_EQ(80.0, spmOA->lowSetPt1);
     EXPECT_EQ(-17.778, spmOA->low1);
     EXPECT_EQ(40.0, spmOA->highSetPt1);
@@ -1367,8 +1367,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     auto *spmOA = dynamic_cast<SetPointManager::SPMOutsideAir *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmOA != nullptr);
 
-    EXPECT_TRUE(compare_enums(spmOA->ctrlVar, HVAC::CtrlVarType::MinTemp));
-    EXPECT_TRUE(compare_enums(spmOA->type, SetPointManager::SPMType::OutsideAir));
+    EXPECT_ENUM_EQ(spmOA->ctrlVar, HVAC::CtrlVarType::MinTemp);
+    EXPECT_ENUM_EQ(spmOA->type, SetPointManager::SPMType::OutsideAir);
     EXPECT_EQ(80.0, spmOA->lowSetPt1);
     EXPECT_EQ(-17.778, spmOA->low1);
     EXPECT_EQ(40.0, spmOA->highSetPt1);
@@ -1657,8 +1657,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
     auto *spmSN = dynamic_cast<SetPointManager::SPMSystemNode *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmSN != nullptr);
 
-    EXPECT_TRUE(compare_enums(spmSN->ctrlVar, HVAC::CtrlVarType::Temp));
-    EXPECT_TRUE(compare_enums(spmSN->type, SetPointManager::SPMType::SystemNodeTemp));
+    EXPECT_ENUM_EQ(spmSN->ctrlVar, HVAC::CtrlVarType::Temp);
+    EXPECT_ENUM_EQ(spmSN->type, SetPointManager::SPMType::SystemNodeTemp);
     EXPECT_EQ(16.7, spmSN->lowRefSetPt);
     EXPECT_EQ(12.8, spmSN->highRefSetPt);
     EXPECT_EQ(20.0, spmSN->lowRef);
@@ -1719,8 +1719,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
     auto *spmSN = dynamic_cast<SetPointManager::SPMSystemNode *>(state->dataSetPointManager->spms(spmNum));
     ASSERT_TRUE(spmSN != nullptr);
 
-    EXPECT_TRUE(compare_enums(spmSN->ctrlVar, HVAC::CtrlVarType::HumRat));
-    EXPECT_TRUE(compare_enums(spmSN->type, SetPointManager::SPMType::SystemNodeHum));
+    EXPECT_ENUM_EQ(spmSN->ctrlVar, HVAC::CtrlVarType::HumRat);
+    EXPECT_ENUM_EQ(spmSN->type, SetPointManager::SPMType::SystemNodeHum);
     EXPECT_EQ(0.008, spmSN->lowRefSetPt);
     EXPECT_EQ(0.004, spmSN->highRefSetPt);
     EXPECT_EQ(0.003, spmSN->lowRef);
