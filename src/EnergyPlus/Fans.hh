@@ -457,7 +457,7 @@ struct FansData : BaseGlobalStruct
 
     void clear_state() override
     {
-        for (int i = 1; i <= fans.size(); ++i)
+        for (int i = 1; i <= (int)fans.size(); ++i)
             delete fans(i);
 
         fans.clear();

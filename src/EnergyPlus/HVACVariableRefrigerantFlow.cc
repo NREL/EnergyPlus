@@ -4393,7 +4393,6 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
                 auto *fanSystem = dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(vrfTU.FanIndex));
                 assert(fanSystem != nullptr);
 
-                int FanIndex = vrfTU.FanIndex;
                 if (fanSystem->speedControl == Fans::SpeedControl::Discrete) {
                     if (fanSystem->numSpeeds > 1) {
                         if (vrfTU.DXCoolCoilType_Num == HVAC::CoilVRF_Cooling) {
@@ -6077,20 +6076,14 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
                             ErrorsFound = true;
                         } else if (state.dataGlobal->AnyEnergyManagementSystemInModel) {
                             bool SPNotFound = false;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
-                                                                        SetPointErrorFlag);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                state, state.dataHVACVarRefFlow->VRFTU(TUIndex).VRFTUOutletNodeNum, HVAC::CtrlVarType::Temp, SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
-                                                                        SetPointErrorFlag);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                state, state.dataHVACVarRefFlow->VRFTU(TUIndex).coolCoilAirOutNode, HVAC::CtrlVarType::Temp, SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(state,
-                                                                        state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
-                                                                        SetPointErrorFlag);
+                            EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                state, state.dataHVACVarRefFlow->VRFTU(TUIndex).heatCoilAirOutNode, HVAC::CtrlVarType::Temp, SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
 
                             // We disable the check at end (if API), because one of the nodes is enough, so there's an almost certainty

@@ -253,9 +253,8 @@ namespace HVACUnitaryBypassVAV {
         if (changeOverByPassVAV.modeChanged) {
             // set outlet node SP for mixed air SP manager
             state.dataLoopNodes->Node(changeOverByPassVAV.AirOutNode).TempSetPoint = CalcSetPointTempTarget(state, CBVAVNum);
-            if (changeOverByPassVAV.OutNodeSPMIndex > 0) { // update mixed air SPM if exists
-                state.dataSetPointManager->MixedAirSetPtMgr(changeOverByPassVAV.OutNodeSPMIndex)
-                    .calculate(state);                           // update mixed air SP based on new mode
+            if (changeOverByPassVAV.OutNodeSPMIndex > 0) {                                              // update mixed air SPM if exists
+                state.dataSetPointManager->spms(changeOverByPassVAV.OutNodeSPMIndex)->calculate(state); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(state); // need to know control node to fire off just one of these, do this later
             }
         }
@@ -330,7 +329,6 @@ namespace HVACUnitaryBypassVAV {
         std::string CompSetFanOutlet; // Used in SetUpCompSets call
         bool ErrorsFound(false);      // Set to true if errors in input, fatal at end of routine
         bool DXErrorsFound(false);    // Set to true if errors in get coil input
-        bool FanErrFlag(false);       // Error flag returned during CALL to GetFanType
         Array1D_int OANodeNums(4);    // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName; // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         bool DXCoilErrFlag;           // used in warning messages
@@ -1435,11 +1433,11 @@ namespace HVACUnitaryBypassVAV {
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = false;
             state.dataAirLoop->AirLoopControlInfo(AirLoopNum).fanOp = cBVAV.fanOp;
             // check for set point manager on outlet node of CBVAV
-            cBVAV.OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(state,
-                                                                       OutNode,
-                                                                       SetPointManager::CtrlVarType::Temp,
-                                                                       SetPointManager::SetPointManagerType::MixedAir,
-                                                                       SetPointManager::CtrlNodeType::Reference);
+            cBVAV.OutNodeSPMIndex = SetPointManager::GetSetPointManagerIndexByNode(state,
+                                                                                   OutNode,
+                                                                                   HVAC::CtrlVarType::Temp,
+                                                                                   SetPointManager::SPMType::MixedAir,
+                                                                                   true); // isRefNode
             state.dataHVACUnitaryBypassVAV->MySizeFlag(CBVAVNum) = false;
         }
 
@@ -1722,8 +1720,7 @@ namespace HVACUnitaryBypassVAV {
                     } else {
                         // need call to EMS to check node
                         bool EMSSetPointCheck = false;
-                        EMSManager::CheckIfNodeSetPointManagedByEMS(
-                            state, OutNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointCheck);
+                        EMSManager::CheckIfNodeSetPointManagedByEMS(state, OutNode, HVAC::CtrlVarType::MaxHumRat, EMSSetPointCheck);
                         state.dataLoopNodes->NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
                             // There is no plugin anyways, so we now we have a bad condition.

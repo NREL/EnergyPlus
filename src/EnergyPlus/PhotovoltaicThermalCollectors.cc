@@ -644,7 +644,7 @@ namespace PhotovoltaicThermalCollectors {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPhotovoltaicThermalCollector->PVT(PVTindex).HVACOutletNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");

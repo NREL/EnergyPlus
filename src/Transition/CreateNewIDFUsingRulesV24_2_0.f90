@@ -125,24 +125,42 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-  ! TODO: Move to V10_0_0.f90 when available
-  ! For Defaulting now-required RunPeriod Name
-  INTEGER :: TotRunPeriods = 0
-  INTEGER :: runPeriodNum = 0
-  INTEGER :: iterateRunPeriod = 0
-  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: CurrentRunPeriodNames
-  CHARACTER(len=20) :: PotentialRunPeriodName
-  ! END OF TODO
+  INTEGER :: TotSPMs = 0
+  INTEGER :: spmNum = 0
+  INTEGER :: spmIndex = 0
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: SPMNames
 
-  ! used in transition code for HeatExchanger:AirToAir:SensibleAndLatent
-  CHARACTER(20), DIMENSION(4) :: HxEffectAt75Airflow
-  CHARACTER(20), DIMENSION(4) :: HxEffectAt100Airflow
-  CHARACTER(MaxNameLength + 2), DIMENSION(4) :: HxTableName
-  LOGICAL :: tableAdded
-  LOGICAL :: tableIndependentVarAdded = .false.
-  CHARACTER(10) :: tableID
-  REAL :: effect75
-  REAL :: effect100
+  INTEGER, PARAMETER :: NumSPMTypes = 29
+  CHARACTER(len=MaxNameLength), DIMENSION(NumSPMTypes) :: SPMTypes
+  SPMTypes(1) = "SETPOINTMANAGER:SCHEDULED"
+  SPMTypes(2) = "SETPOINTMANAGER:SCHEDULED:DUALSETPOINT"
+  SPMTypes(3) = "SETPOINTMANAGER:OUTDOORAIRRESET"
+  SPMTypes(4) = "SETPOINTMANAGER:SINGLEZONE:REHEAT"
+  SPMTypes(5) = "SETPOINTMANAGER:SINGLEZONE:HEATING"
+  SPMTypes(6) = "SETPOINTMANAGER:SINGLEZONE:COOLING"
+  SPMTypes(7) = "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MINIMUM"
+  SPMTypes(8) = "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MAXIMUM"
+  SPMTypes(9) = "SETPOINTMANAGER:MIXEDAIR"
+  SPMTypes(10) = "SETPOINTMANAGER:OUTDOORAIRPRETREAT"
+  SPMTypes(11) = "SETPOINTMANAGER:WARMEST"
+  SPMTypes(12) = "SETPOINTMANAGER:COLDEST"
+  SPMTypes(13) = "SETPOINTMANAGER:RETURNAIRBYPASSFLOW"
+  SPMTypes(14) = "SETPOINTMANAGER:WARMESTTEMPERATUREFLOW"
+  SPMTypes(15) = "SETPOINTMANAGER:MULTIZONE:HEATING:AVERAGE"
+  SPMTypes(16) = "SETPOINTMANAGER:MULTIZONE:COOLING:AVERAGE"
+  SPMTypes(17) = "SETPOINTMANAGER:MULTIZONE:MINIMUMHUMIDITY:AVERAGE"
+  SPMTypes(18) = "SETPOINTMANAGER:MULTIZONE:MAXIMUMHUMIDITY:AVERAGE"
+  SPMTypes(19) = "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MINIMUM"
+  SPMTypes(20) = "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MAXIMUM"
+  SPMTypes(21) = "SETPOINTMANAGER:FOLLOWOUTDOORAIRTEMPERATURE"
+  SPMTypes(22) = "SETPOINTMANAGER:FOLLOWSYSTEMNODETEMPERATURE"
+  SPMTypes(23) = "SETPOINTMANAGER:FOLLOWGROUNDTEMPERATURE"
+  SPMTypes(24) = "SETPOINTMANAGER:CONDENSERENTERINGRESET"
+  SPMTypes(25) = "SETPOINTMANAGER:CONDENSERENTERINGRESET:IDEAL"
+  SPMTypes(26) = "SETPOINTMANAGER:SINGLEZONE:ONESTAGECOOLING"
+  SPMTypes(27) = "SETPOINTMANAGER:SINGLEZONE:ONESTAGEHEATING"
+  SPMTypes(28) = "SETPOINTMANAGER:RETURNTEMPERATURE:CHILLEDWATER"
+  SPMTypes(29) = "SETPOINTMANAGER:RETURNTEMPERATURE:HOTWATER"
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -280,7 +298,24 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
 ! Do any kind of Preprocessing that is needed here (eg: a first pass on objects to store some attributes etc)
 
+          DO i = 1, size(SPMTypes)
+              TotSPMs = TotSPMs + GetNumObjectsFound(SPMTypes(i))
+          ENDDO
+          print *, "Found ", TotSPMs, " SPMs"
+          IF(ALLOCATED(SPMNames)) DEALLOCATE(SPMNames)
+          ALLOCATE(SPMNames(TotSPMs))
+          DO i = 1, size(SPMTypes)
+              DO spmNum=1,GetNumObjectsFound(SPMTypes(i))
+                  CALL GetObjectItem(SPMTypes(i),spmNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                  ! VerifyName(TRIM(Alphas(1)), SPMNames, spmIndex, SPMErrorFound, IsBlank, "SetpointManager Unicity");
+                  IF (FindItemInList(TRIM(Alphas(1)), SPMNames, spmIndex) /= 0) THEN
+                      CALL ShowFatalError('SetpointManager Unicity of Names: SPM of type '//TRIM(SPMTypes(i))//' has a name already found='//TRIM(Alphas(1)),Auditf)
+                  ENDIF
+                  spmIndex = spmIndex + 1
 
+                  SPMNames(spmIndex) = TRIM(Alphas(1))
+              ENDDO
+          ENDDO
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !

@@ -20218,7 +20218,7 @@
     PACKAGED VAV WITH REHEAT Supply Equipment Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
-    PACKAGED VAV WITH REHEAT_HeatC SAT Manager,  !- Name
+    PACKAGED VAV WITH REHEAT_HeatC SAT Manager MA,  !- Name
     Temperature,             !- Control Variable
     PACKAGED VAV WITH REHEAT Supply Equipment Outlet Node,  !- Reference Setpoint Node Name
     PACKAGED VAV WITH REHEAT_HeatC-PACKAGED VAV WITH REHEAT FanNode,  !- Fan Inlet Node Name
