@@ -153,11 +153,11 @@ jobs:
         include:
           - macos_dev_target: 12.1
             os: macos-12
-            arch: x86_64
+            python-arch: x64
             test_key: mac12
           - macos_dev_target: 13.0
             os: macos-14
-            arch: arm64
+            python-arch: arm64
             test_key: mac13-arm64
 
     steps:
@@ -170,7 +170,7 @@ jobs:
         id: setup-python
         with:
           python-version: ${{ env.Python_REQUIRED_VERSION }}
-          architecture: ${{ matrix.arch }}
+          architecture: ${{ matrix.python-arch }}
 
       - name: Gather Test Package from Artifacts
         uses: actions/download-artifact@v4
