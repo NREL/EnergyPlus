@@ -205,6 +205,8 @@ namespace HeatBalFiniteDiffManager {
 
     void GetCondFDInput(EnergyPlusData &state);
 
+    int setSizeMaxProperties(EnergyPlusData &state);
+
     void InitHeatBalFiniteDiff(EnergyPlusData &state);
 
     void InitialInitHeatBalFiniteDiff(EnergyPlusData &state);

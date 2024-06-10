@@ -185,6 +185,8 @@ extension_renaming = {
     'PythonPlugin:Variables': 'global_py_vars',
     'PythonPlugin:SearchPaths': 'py_search_paths',
     'Output:Diagnostics': 'diagnostics',
+    'MaterialProperty:PhaseChange': 'values',
+    'MaterialProperty:VariableThermalConductivity': 'values',
 }
 remaining_objects = [
     'Site:SpectrumData',
