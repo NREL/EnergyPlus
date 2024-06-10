@@ -5359,7 +5359,7 @@ namespace CondenserLoopTowers {
                 } // IF(OutletWaterTempMIN .LT. TempSetPoint)THEN
 
             } // IF(OutletWaterTempOFF .GT. TempSetPoint)THEN
-        }     // IF(OutletWaterTempON .LT. TempSetPoint) ie if tower should not run at full capacity
+        } // IF(OutletWaterTempON .LT. TempSetPoint) ie if tower should not run at full capacity
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
