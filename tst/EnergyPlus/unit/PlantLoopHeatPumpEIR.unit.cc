@@ -133,7 +133,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -293,7 +293,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -344,7 +344,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
 }
 
@@ -388,7 +388,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -696,11 +696,11 @@ TEST_F(EnergyPlusFixture, Initialization)
 
     // validate that location work got done correctly
     EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSidePlantLoc.loopSideNum));
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Supply, thisCoolingPLHP->loadSidePlantLoc.loopSideNum);
     EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->loadSidePlantLoc.compNum);
     EXPECT_EQ(2, thisCoolingPLHP->sourceSidePlantLoc.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSidePlantLoc.loopSideNum));
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Demand, thisCoolingPLHP->sourceSidePlantLoc.loopSideNum);
     EXPECT_EQ(1, thisCoolingPLHP->sourceSidePlantLoc.branchNum);
     EXPECT_EQ(1, thisCoolingPLHP->sourceSidePlantLoc.compNum);
 
@@ -2150,7 +2150,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the heating side
     EXPECT_EQ("HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRHeating, thisHeatingPLHP->EIRHPType);
     EXPECT_EQ(thisCoolingPLHP, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -2158,7 +2158,7 @@ TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_EQ(thisHeatingPLHP, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -2467,7 +2467,7 @@ TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
 
     // validate the cooling side
     EXPECT_EQ("HP COOLING SIDE", thisCoolingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpEIRCooling, thisCoolingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisCoolingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisCoolingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(1, thisCoolingPLHP->powerRatioFuncTempCurveIndex);
@@ -3288,12 +3288,12 @@ TEST_F(EnergyPlusFixture, CoolingMetering)
     NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_TRUE(compare_enums(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid));
-    EXPECT_TRUE(compare_enums(meteredVars(1).group, OutputProcessor::Group::Plant));
-    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_TRUE(compare_enums(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Cooling));
-    EXPECT_TRUE(compare_enums(meteredVars(2).group, OutputProcessor::Group::Plant));
+    EXPECT_ENUM_EQ(meteredVars(1).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_ENUM_EQ(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid);
+    EXPECT_ENUM_EQ(meteredVars(1).group, OutputProcessor::Group::Plant);
+    EXPECT_ENUM_EQ(meteredVars(2).resource, Constant::eResource::Electricity); // Electric
+    EXPECT_ENUM_EQ(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Cooling);
+    EXPECT_ENUM_EQ(meteredVars(2).group, OutputProcessor::Group::Plant);
 }
 
 TEST_F(EnergyPlusFixture, HeatingMetering)
@@ -3382,12 +3382,12 @@ TEST_F(EnergyPlusFixture, HeatingMetering)
     NumFound = GetMeteredVariables(*state, NameOfComp, meteredVars);
 
     EXPECT_EQ(2, NumFound);
-    EXPECT_TRUE(compare_enums(meteredVars(1).resource, Constant::eResource::EnergyTransfer)); // ENERGYTRANSFER
-    EXPECT_TRUE(compare_enums(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid));
-    EXPECT_TRUE(compare_enums(meteredVars(1).group, OutputProcessor::Group::Plant));
-    EXPECT_TRUE(compare_enums(meteredVars(2).resource, Constant::eResource::Electricity)); // Electric
-    EXPECT_TRUE(compare_enums(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Heating));
-    EXPECT_TRUE(compare_enums(meteredVars(2).group, OutputProcessor::Group::Plant));
+    EXPECT_ENUM_EQ(meteredVars(1).resource, Constant::eResource::EnergyTransfer); // ENERGYTRANSFER
+    EXPECT_ENUM_EQ(meteredVars(1).endUseCat, OutputProcessor::EndUseCat::Invalid);
+    EXPECT_ENUM_EQ(meteredVars(1).group, OutputProcessor::Group::Plant);
+    EXPECT_ENUM_EQ(meteredVars(2).resource, Constant::eResource::Electricity); // Electric
+    EXPECT_ENUM_EQ(meteredVars(2).endUseCat, OutputProcessor::EndUseCat::Heating);
+    EXPECT_ENUM_EQ(meteredVars(2).group, OutputProcessor::Group::Plant);
 }
 
 TEST_F(EnergyPlusFixture, TestOperatingFlowRates_FullyAutosized_AirSource)
@@ -3767,7 +3767,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion)
 
     // validate the heating side
     EXPECT_EQ("FUEL FIRED HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, thisHeatingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(2, thisHeatingPLHP->powerRatioFuncTempCurveIndex);
@@ -3894,7 +3894,7 @@ TEST_F(EnergyPlusFixture, GAHP_HeatingConstructionFullObjectsNoCompanion_with_De
 
     // validate the heating side
     EXPECT_EQ("FUEL FIRED HP HEATING SIDE", thisHeatingPLHP->name);
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, thisHeatingPLHP->EIRHPType));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::HeatPumpFuelFiredHeating, thisHeatingPLHP->EIRHPType);
     EXPECT_EQ(nullptr, thisHeatingPLHP->companionHeatPumpCoil);
     EXPECT_EQ(1, thisHeatingPLHP->capFuncTempCurveIndex);
     EXPECT_EQ(2, thisHeatingPLHP->powerRatioFuncTempCurveIndex);

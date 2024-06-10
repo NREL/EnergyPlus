@@ -2316,8 +2316,8 @@ namespace OutputProcessor {
             std::string stdEndUseSub = standardizeEndUseSub(endUseCat, meter[3]);
             Group group = static_cast<Group>(getEnumValue(groupNamesUC, meter[4]));
 
-            EXPECT_FALSE(compare_enums(EndUseCat::Invalid, endUseCat, false));
-            EXPECT_FALSE(compare_enums(Group::Invalid, group, false));
+            EXPECT_ENUM_NE(EndUseCat::Invalid, endUseCat);
+            EXPECT_ENUM_NE(Group::Invalid, group);
 
             AttachMeters(*state,
                          Constant::Units::J,
