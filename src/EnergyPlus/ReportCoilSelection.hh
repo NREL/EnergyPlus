@@ -404,7 +404,12 @@ public: // methods
                               HVAC::FanType fanType,
                               int fanIndex);
 
-    void setCoilEqNum(EnergyPlusData &state, std::string const &coilName, std::string const &coilType, int const curSysNum, int const curZoneEqNum);
+    void setCoilEqNum(EnergyPlusData &state,
+                      std::string const &coilName,
+                      std::string const &coilType,
+                      int const curSysNum,
+                      int const curOASysNum,
+                      int const curZoneEqNum);
 
     static std::string getTimeText(EnergyPlusData &state, int const timeStepAtPeak);
 

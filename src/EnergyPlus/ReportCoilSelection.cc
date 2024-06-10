@@ -1963,12 +1963,17 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     if (c->supFanNum == 0) c->supFanNum = Fans::GetFanIndex(state, fanName);
 }
 
-void ReportCoilSelection::setCoilEqNum(
-    EnergyPlusData &state, std::string const &coilName, std::string const &coilType, int const curSysNum, int const curZoneEqNum)
+void ReportCoilSelection::setCoilEqNum(EnergyPlusData &state,
+                                       std::string const &coilName,
+                                       std::string const &coilType,
+                                       int const curSysNum,
+                                       int const curOASysNum,
+                                       int const curZoneEqNum)
 {
     int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
     auto &c(coilSelectionDataObjs[index]);
     c->airloopNum = curSysNum;
+    c->oASysNum = curOASysNum;
     c->zoneEqNum = curZoneEqNum;
 }
 

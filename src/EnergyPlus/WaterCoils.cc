@@ -1764,7 +1764,7 @@ void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVA
                 coilTypeName = "Coil:Heating:Water";
             }
             state.dataRptCoilSelection->coilSelectionReportObj->setCoilEqNum(
-                state, waterCoil.Name, coilTypeName, state.dataSize->CurSysNum, state.dataSize->CurZoneEqNum);
+                state, waterCoil.Name, coilTypeName, state.dataSize->CurSysNum, state.dataSize->CurOASysNum, state.dataSize->CurZoneEqNum);
 
             // coil outlets
             Real64 RatedOutletWetBulb(0.0);
