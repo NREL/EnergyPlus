@@ -699,9 +699,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int k;
         int k1;
@@ -3269,9 +3266,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         using HVAC::VerySmallMassFlow;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
         Real64 Ctl;
@@ -3386,9 +3380,6 @@ namespace AirflowNetwork {
 
         // Using/Aliasing
         using HVAC::VerySmallMassFlow;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;

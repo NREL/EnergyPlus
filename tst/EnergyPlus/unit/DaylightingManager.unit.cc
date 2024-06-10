@@ -158,8 +158,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Test)
 
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
@@ -269,8 +269,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_3RefPt_
     auto const &thisDaylightControl = dl->daylightControl(1);
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
@@ -2018,8 +2018,8 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputDaylightingControls_Roundin
     auto const &thisDaylightControl = dl->daylightControl(1);
     EXPECT_EQ("WEST ZONE_DAYLCTRL", thisDaylightControl.Name);
     EXPECT_EQ("WEST ZONE", thisDaylightControl.ZoneName);
-    EXPECT_TRUE(compare_enums(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod));
-    EXPECT_TRUE(compare_enums(LtgCtrlType::Continuous, thisDaylightControl.LightControlType));
+    EXPECT_ENUM_EQ(DaylightingMethod::SplitFlux, thisDaylightControl.DaylightMethod);
+    EXPECT_ENUM_EQ(LtgCtrlType::Continuous, thisDaylightControl.LightControlType);
 
     EXPECT_EQ(0.3, thisDaylightControl.MinPowerFraction);
     EXPECT_EQ(0.2, thisDaylightControl.MinLightFraction);
