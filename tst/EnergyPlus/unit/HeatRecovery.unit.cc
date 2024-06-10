@@ -507,8 +507,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnManinBranch_GetInputTest)
 
     GetReturnAirPathInput(*state);
     GetAirPathData(*state);
-    ASSERT_TRUE(
-        compare_enums(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num));
+    ASSERT_ENUM_EQ(SimAirServingZones::CompType::HeatXchngr, state->dataAirSystemsData->PrimaryAirSystems(1).Branch(1).Comp(4).CompType_Num);
 }
 
 TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
@@ -4170,8 +4169,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     state->dataSize->CurSysNum = 1;
     state->dataSize->CurOASysNum = 1;
     // check user-inputs
-    EXPECT_TRUE(compare_enums(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer));
-    EXPECT_TRUE(compare_enums(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible)); // no lockout
+    EXPECT_ENUM_EQ(thisOAController.Econo, MixedAir::EconoOp::NoEconomizer);
+    EXPECT_ENUM_EQ(thisOAController.Lockout, MixedAir::LockoutType::NoLockoutPossible); // no lockout
     EXPECT_EQ(thisOAController.HeatRecoveryBypassControlType, HVAC::BypassWhenOAFlowGreaterThanMinimum);
     EXPECT_FALSE(thisOAController.EconBypass); // no bypass
 
