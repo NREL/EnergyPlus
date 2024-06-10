@@ -45,92 +45,47 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef IdfParserFixture_hh_INCLUDED
-#define IdfParserFixture_hh_INCLUDED
+// EnergyPlus::BoilerSteam Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 
-#include "../TestHelpers/CustomMatchers.hh"
-#include "../TestHelpers/IdfParser.hh"
+#include "TestHelpers/CustomMatchers.hh"
 
-#include <ostream>
+using namespace EnergyPlus;
 
-namespace EnergyPlus {
+// TEST(CustomMatchers, enums_enforce_type)
+// {
+//     // Compile time error
+//     // third_party/gtest/googletest/include/gtest/gtest.h:2317:3: error: static assertion failed due to requirement
+//     // 'std::is_same<EnergyPlus::Constant::eResource, EnergyPlus::Constant::eFuel>::value': T1 and T2 are not the same type
+//     EXPECT_ENUM_EQ(Constant::eResource::NaturalGas, Constant::eFuel::NaturalGas);
+// }
 
-class IdfParserFixture : public testing::Test
+TEST(CustomMatchers, enums_ok)
 {
-protected:
-    static void SetUpTestCase()
-    {
-    }
-    static void TearDownTestCase()
-    {
-    }
+    EXPECT_ENUM_EQ(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
+    ASSERT_ENUM_EQ(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
 
-    virtual void SetUp()
-    {
-    }
+    EXPECT_ENUM_NE(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+    ASSERT_ENUM_NE(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+}
 
-    virtual void TearDown()
-    {
-    }
-
-    // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
-    // delimiter can be passed in to this funciton. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n")
-    {
-        std::ostringstream compare_text;
-        for (std::string const &str : strings) {
-            compare_text << str << delimiter;
-        }
-        return compare_text.str();
-    }
-
-    void eat_whitespace(std::string const &idf, size_t &index)
-    {
-        IdfParser::eat_whitespace(idf, index);
-    }
-
-    void eat_comment(std::string const &idf, size_t &index)
-    {
-        IdfParser::eat_comment(idf, index);
-    }
-
-    std::string parse_string(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_string(idf, index, success);
-    }
-
-    std::string parse_value(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_value(idf, index, success);
-    }
-
-    IdfParser::Token look_ahead(std::string const &idf, size_t index)
-    {
-        return IdfParser::look_ahead(idf, index);
-    }
-
-    IdfParser::Token next_token(std::string const &idf, size_t &index)
-    {
-        return IdfParser::next_token(idf, index);
-    }
-
-    std::vector<std::vector<std::string>> parse_idf(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_idf(idf, index, success);
-    }
-
-    std::vector<std::string> parse_object(std::string const &idf, size_t &index, bool &success)
-    {
-        return IdfParser::parse_object(idf, index, success);
-    }
-};
-
-} // namespace EnergyPlus
-
-#endif
+// TEST(CustomMatchers, enums_not_ok)
+// {
+//     EXPECT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+//     EXPECT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
+// }
+//
+// TEST(CustomMatchers, enums_not_ok_assert_eq)
+// {
+//     ASSERT_ENUM_EQ(Constant::eResource::Electricity, Constant::eResource::NaturalGas);
+// }
+//
+// TEST(CustomMatchers, enums_not_ok_assert_ne)
+// {
+//     ASSERT_ENUM_NE(Constant::eResource::NaturalGas, Constant::eResource::NaturalGas);
+// }

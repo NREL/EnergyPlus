@@ -1293,8 +1293,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
     EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "MAXIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MaxTemp));
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
+    EXPECT_ENUM_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MaxTemp);
+    EXPECT_ENUM_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
     EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
@@ -1349,8 +1349,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     SetPointManager::GetSetPointManagerInputs(*state);
     // check Set Point Manager get inputs
     EXPECT_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).ctrlVarType, "MINIMUMTEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MinTemp));
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir));
+    EXPECT_ENUM_EQ(state->dataSetPointManager->OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::MinTemp);
+    EXPECT_ENUM_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::OutsideAir);
     EXPECT_EQ(80.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutLowSetPt1);
     EXPECT_EQ(-17.778, state->dataSetPointManager->OutAirSetPtMgr(1).OutLow1);
     EXPECT_EQ(40.0, state->dataSetPointManager->OutAirSetPtMgr(1).OutHighSetPt1);
@@ -1636,8 +1636,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetTempTest)
     // check Setpoint Manager inputs
     SetPointManager::GetSetPointManagerInputs(*state);
     EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "TEMPERATURE");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::Temp));
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetTemp));
+    EXPECT_ENUM_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::Temp);
+    EXPECT_ENUM_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetTemp);
     Real64 SpAtLowRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRef;
     Real64 SpAtHighRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRef;
     Real64 LowRefTemp = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).LowRef;
@@ -1693,8 +1693,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_SystemNodeResetHumRatTest)
     // check Setpoint Manager inputs
     SetPointManager::GetSetPointManagerInputs(*state);
     EXPECT_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).ctrlVarType, "HUMIDITYRATIO");
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::HumRat));
-    EXPECT_TRUE(compare_enums(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetHum));
+    EXPECT_ENUM_EQ(state->dataSetPointManager->SystemNodeResetSetPtMgr(1).CtrlTypeMode, SetPointManager::CtrlVarType::HumRat);
+    EXPECT_ENUM_EQ(state->dataSetPointManager->AllSetPtMgr(1).SPMType, SetPointManager::SetPointManagerType::SystemNodeResetHum);
     Real64 SpAtLowRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtLowRef;
     Real64 SpAtHighRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).SpAtHighRef;
     Real64 LowRefHumRat = state->dataSetPointManager->SystemNodeResetSetPtMgr(1).LowRef;
