@@ -437,6 +437,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
+             CASE('HEATPUMP:PLANTLOOP:EIR:COOLING')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:6)=InArgs(1:6)
+                 OutArgs(7) = ''  ! Heat Recovery Inlet Node Name
+                 OutArgs(8) = ''  ! Heat Recovery Outlet Node Name
+                 OutArgs(9:11)=InArgs(7:9)
+                 OutArgs(12)=''  ! Heat Recovery Reference Flow Rate
+                 OutArgs(13:CurArgs+3)=InArgs(10:CurArgs)
+                 CurArgs = CurArgs + 3
+
+              CASE('HEATPUMP:PLANTLOOP:EIR:HEATING')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                nodiff=.false.
+                OutArgs(1:6)=InArgs(1:6)
+                OutArgs(7) = ''  ! Heat Recovery Inlet Node Name
+                OutArgs(8) = ''  ! Heat Recovery Outlet Node Name
+                OutArgs(9:11)=InArgs(7:9)
+                OutArgs(12)=''  ! Heat Recovery Reference Flow Rate
+                OutArgs(13:CurArgs+3)=InArgs(10:CurArgs)
+                CurArgs = CurArgs + 3
+
               ! If your original object starts with I, insert the rules here
 
               ! If your original object starts with L, insert the rules here
