@@ -51,6 +51,10 @@ jobs:
         echo "Using Apt to install dependencies"
         sudo apt-get update
         sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+        if [[ "${{ matrix.os }}" == "ubuntu-24.04" ]]; then
+          # https://github.com/actions/runner-images/issues/10025
+          echo "FC=gfortran-13" >> $GITHUB_ENV
+        fi
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
