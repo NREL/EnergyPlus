@@ -5356,10 +5356,9 @@ namespace CondenserLoopTowers {
                     }
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
                     this->OutletWaterTemp = Twb + Ta;
-                } // IF(OutletWaterTempMIN .LT. TempSetPoint)THEN
-
-            } // IF(OutletWaterTempOFF .GT. TempSetPoint)THEN
-        } // IF(OutletWaterTempON .LT. TempSetPoint) ie if tower should not run at full capacity
+                }
+            }
+        }
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
