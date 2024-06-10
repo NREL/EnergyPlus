@@ -979,6 +979,7 @@ void FluidCoolerspecs::size(EnergyPlusData &state)
                                                  this->DesignWaterFlowRate);
                 }
             }
+            this->DesignLeavingWaterTemp = state.dataSize->PlantSizData(PltSizCondNum).ExitTemp;
         } else {
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                 ShowSevereError(state, format("Autosizing error for fluid cooler object = {}", this->Name));
