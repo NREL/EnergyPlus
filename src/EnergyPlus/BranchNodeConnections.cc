@@ -1593,8 +1593,7 @@ void GetComponentData(EnergyPlusData &state,
         if (state.dataBranchNodeConnections->NodeConnections(Which).ObjectIsParent) IsParent = true;
         if (state.dataBranchNodeConnections->NodeConnections(Which).ConnectionType == DataLoopNode::ConnectionType::Inlet) {
             ++NumInlets;
-        }
-        if (state.dataBranchNodeConnections->NodeConnections(Which).ConnectionType == DataLoopNode::ConnectionType::Outlet) {
+        } else if (state.dataBranchNodeConnections->NodeConnections(Which).ConnectionType == DataLoopNode::ConnectionType::Outlet) {
             ++NumOutlets;
         }
     }
