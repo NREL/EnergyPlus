@@ -902,16 +902,6 @@ namespace VentilatedSlab {
                     ErrorsFound = true;
                 }
 
-                // ventSlab.ZoneAirInNode = GetOnlySingleNode(state,
-                //                                           state.dataIPShortCut->cAlphaArgs(20),
-                //                                           ErrorsFound,
-                //                                           DataLoopNode::ConnectionObjectType::ZoneHVACVentilatedSlab,
-                //                                           ventSlab.Name + "-SYSTEM",
-                //                                           DataLoopNode::NodeFluidType::Air,
-                //                                           DataLoopNode::ConnectionType::Outlet,
-                //                                           NodeInputManager::CompFluidStream::Primary,
-                //                                           ObjectIsParent);
-
                 ventSlab.ZoneAirInNode = GetOnlySingleNode(state,
                                                            state.dataIPShortCut->cAlphaArgs(20),
                                                            ErrorsFound,
