@@ -19,7 +19,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
 
     permissions:
       # Needed permission to upload the release asset
@@ -119,7 +119,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [20, 22]
+        name: [20, 22, 24]
         include:
           - name: 20
             os: ubuntu-20.04
@@ -127,6 +127,9 @@ jobs:
           - name: 22
             os: ubuntu-22.04
             test_key: ubuntu2204
+          - name: 24
+            os: ubuntu-24.04
+            test_key: ubuntu2404
 
     steps:
       - uses: actions/checkout@v4  # Still need E+ checked out to get testing scripts
