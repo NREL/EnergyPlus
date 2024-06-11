@@ -3856,14 +3856,12 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
     // we need to know the plant to get the fluid ID in case it is glycol
     // but we have to wait in case plant isn't initialized yet
     // if plant isn't initialized, assume index=1 (water)
-    int fluidIndex = 1;
     if (this->plantLoopNum == 0) {
         for (int LoopNum = 1; LoopNum <= state.dataPlnt->TotNumLoops; ++LoopNum) {
             auto &plantLoop = state.dataPlnt->PlantLoop(LoopNum);
             if (this->supplyNodeNum == plantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut) {
                 this->plantLoopNum = LoopNum;
                 this->plantSetPtNodeNum = plantLoop.TempSetPointNodeNum;
-                fluidIndex = plantLoop.FluidIndex;
                 // now that we've found the plant populated, let's verify that the nodes match
                 if (!PlantUtilities::verifyTwoNodeNumsOnSamePlantLoop(state, this->supplyNodeNum, this->returnNodeNum)) {
                     ShowSevereError(state, "Node problem for SetpointManager:ReturnTemperature:ChilledWater.");
@@ -3872,23 +3870,21 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
                 }
             }
         }
-    } else {
-        fluidIndex = state.dataPlnt->PlantLoop(this->plantLoopNum).FluidIndex;
     }
 
-    // we don't need fluid names since we have a real index, so just pass in the temperature and get properties
-    Real64 avgTemp = (returnNode.Temp + supplyNode.Temp) / 2;
-    Real64 cp = FluidProperties::GetSpecificHeatGlycol(state, "", avgTemp, fluidIndex, "ReturnWaterChWSetPointManager::calculate");
-
     // get the operating flow rate
-    Real64 mdot = supplyNode.MassFlowRate;
+    Real64 const mdot = supplyNode.MassFlowRate;
+    Real64 const deltaT = (this->type == SPMType::ChilledWaterReturnTemp) ? (returnNode.Temp - supplyNode.Temp) : (supplyNode.Temp - returnNode.Temp);
 
-    // calculate the current demand
-    Real64 Qdemand =
-        mdot * cp * ((this->type == SPMType::ChilledWaterReturnTemp) ? (returnNode.Temp - supplyNode.Temp) : (supplyNode.Temp - returnNode.Temp));
+    // // calculate the current demand
+    // fluidIndex = state.dataPlnt->PlantLoop(this->plantLoopNum).FluidIndex;
+    // // we don't need fluid names since we have a real index, so just pass in the temperature and get properties
+    // Real64 const avgTemp = (returnNode.Temp + supplyNode.Temp) / 2;
+    // Real64 const cp = FluidProperties::GetSpecificHeatGlycol(state, "", avgTemp, fluidIndex, "ReturnWaterChWSetPointManager::calculate");
+    // Real64 const Qdemand = mdot * cp * deltaT;
 
     // check for strange conditions
-    if (Qdemand < 0) {
+    if (deltaT < 0) {
         this->currentSupplySetPt = (this->type == SPMType::ChilledWaterReturnTemp) ? this->minSetTemp : this->maxSetTemp;
         return;
     }
@@ -3919,7 +3915,7 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
     // calculate the supply setpoint to use, default to the design value if flow is zero
     Real64 T_supply_setpoint = (this->type == SPMType::ChilledWaterReturnTemp) ? this->minSetTemp : this->maxSetTemp;
     if (mdot > DataConvergParams::PlantFlowRateToler) {
-        T_supply_setpoint = T_return_target + ((this->type == SPMType::ChilledWaterReturnTemp) ? -Qdemand : Qdemand) / (mdot * cp);
+        T_supply_setpoint = T_return_target + ((this->type == SPMType::ChilledWaterReturnTemp) ? -deltaT : deltaT);
     }
 
     this->currentSupplySetPt = std::clamp(T_supply_setpoint, this->minSetTemp, this->maxSetTemp);
