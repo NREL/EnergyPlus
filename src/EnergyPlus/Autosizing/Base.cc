@@ -153,7 +153,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
 
     this->dataNomCapInpMeth = state.dataSize->DataNomCapInpMeth;
     this->dataCoilNum = state.dataSize->DataCoilNum;
-    this->dataFanOpMode = state.dataSize->DataFanOpMode;
+    this->dataFanOp = state.dataSize->DataFanOp;
     this->dataDesignCoilCapacity = state.dataSize->DataDesignCoilCapacity;
     this->dataErrorsFound = state.dataSize->DataErrorsFound;
     this->dataBypassFrac = state.dataSize->DataBypassFrac;
@@ -799,7 +799,7 @@ void BaseSizer::clearState()
     dataDesicDehumNum = 0;
     dataNomCapInpMeth = false;
     dataCoilNum = 0;
-    dataFanOpMode = 0;
+    dataFanOp = HVAC::FanOp::Invalid;
     dataDesignCoilCapacity = 0.0;
     dataErrorsFound = false;
     dataBypassFrac = 0.0;
