@@ -14341,7 +14341,6 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     int Iter;
     Real64 ExternalStatic;
     Real64 FanStaticPressureRise;
-    bool ErrorsFound(false);
     Real64 FanHeatCorrection;
     Real64 FanPowerCorrection;
     Real64 FanPowerPerEvapAirFlowRate = 0.0;
@@ -14935,7 +14934,6 @@ void GetFanIndexForTwoSpeedCoil(
     int AirSysNum;
     int BranchNum;
     int CompNum;
-    bool ErrorsFound(false);
 
     FoundBranch = 0;
     FoundAirSysNum = 0;
@@ -17197,7 +17195,7 @@ void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
         thisDXCoil.CompressorPartLoadRatio = PartLoadRatio;
         thisDXCoil.ActualSH = ActualSH;
         thisDXCoil.ActualSC = ActualSC;
-        thisDXCoil.TotalHeatingEnergyRate = AirMassFlow * (OutletAirEnthalpy - InletAirEnthalpy);
+        thisDXCoil.TotalHeatingEnergyRate = AirMassFlow * (OutletAirEnthalpy - InletAirEnthalpy) * PartLoadRatio;
         thisDXCoil.DefrostPower = thisDXCoil.DefrostPower * thisDXCoil.HeatingCoilRuntimeFraction;
 
     } else {
@@ -17489,7 +17487,6 @@ void ControlVRFIUCoil(EnergyPlusData &state,
                 // outlet air temperature is time-weighted
                 Tout = CoilOnOffRatio * To_2 + (1 - CoilOnOffRatio) * Tin;
             }
-
             Wout = Win;
             Hout = PsyHFnTdbW(Tout, Wout);
             SHact = 999.0;

@@ -18577,7 +18577,7 @@ COOLING TOWER:TWO SPEED,
 
 COOLING TOWER:VARIABLE SPEED,
    \min-fields 15
-       \memo This tower model is based on purely empirical algorithms derived from manufacturer’s
+       \memo This tower model is based on purely empirical algorithms derived from manufacturer's
        \memo performance data or field measurements. The user can select from two existing
        \memo algorithms (CoolTools or YorkCalc), or they can enter their own correlation for
        \memo approach temperature by using a variable speed tower model coefficient object.

@@ -1174,8 +1174,7 @@ void ElectricEIRChillerSpecs::oneTimeInit(EnergyPlusData &state)
             } else {
                 // need call to EMS to check node
                 bool fatalError = false; // but not really fatal yet, but should be.
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, fatalError);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, fatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (fatalError) {
                     if (!this->ModulatedFlowErrDone) {
@@ -1280,8 +1279,7 @@ void ElectricEIRChillerSpecs::initEachEnvironment(EnergyPlusData &state)
                 } else {
                     // need call to EMS to check node
                     bool fatalError = false; // but not really fatal yet, but should be.
-                    EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, fatalError);
+                    EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, fatalError);
                     state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                     if (fatalError) {
                         if (!this->HRSPErrDone) {

@@ -4916,7 +4916,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     EXPECT_EQ(0, state->dataHVACVarRefFlow->VRFTU(VRFTUNum).IndexToTUInTUList);
 
     // Additional tests for fuel type input
-    EXPECT_TRUE(compare_enums(state->dataHVACVarRefFlow->VRF(VRFTUNum).fuel, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(state->dataHVACVarRefFlow->VRF(VRFTUNum).fuel, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
@@ -14526,7 +14526,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_EQ(1.00, thisHeatEIRFPLR->inputLimits[0].max);
     EXPECT_EQ(1.00, maxEIRfLowPLRXInput);                           // getinput checks this
     EXPECT_GT(thisHeatEIRFPLR->inputLimits[0].min, thisVRF.MinPLR); // expect warning message
-    EXPECT_TRUE(compare_enums(thisVRF.fuel, Constant::eFuel::Electricity));
+    EXPECT_ENUM_EQ(thisVRF.fuel, Constant::eFuel::Electricity);
 }
 
 TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
@@ -22746,15 +22746,15 @@ TEST_F(EnergyPlusFixture, VRF_MixedTypes)
     EXPECT_EQ(1, state->dataHVACVarRefFlow->VRFTU(3).VRFSysNum);
 
     EXPECT_EQ("VRF HEAT PUMP SYS", state->dataHVACVarRefFlow->VRF(1).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::SysCurve, state->dataHVACVarRefFlow->VRF(1).VRFAlgorithmType);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(1).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL", state->dataHVACVarRefFlow->VRF(2).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(2).VRFAlgorithmType);
     EXPECT_FALSE(state->dataHVACVarRefFlow->VRF(2).HeatRecoveryUsed);
 
     EXPECT_EQ("VRF HEAT PUMP FLUIDCTRL_HR", state->dataHVACVarRefFlow->VRF(3).Name);
-    EXPECT_TRUE(compare_enums(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmType));
+    EXPECT_ENUM_EQ(AlgorithmType::FluidTCtrl, state->dataHVACVarRefFlow->VRF(3).VRFAlgorithmType);
     EXPECT_TRUE(state->dataHVACVarRefFlow->VRF(3).HeatRecoveryUsed);
 }
 

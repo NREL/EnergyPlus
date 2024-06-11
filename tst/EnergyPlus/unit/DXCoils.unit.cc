@@ -2325,9 +2325,15 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Case 1 test
+    state->dataEnvrn->OutDryBulbTemp = 35;
+    state->dataEnvrn->OutHumRat = 0.0128;
+    state->dataEnvrn->OutBaroPress = 101325;
+    state->dataEnvrn->OutWetBulbTemp =
+        PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
+
     GetDXCoils(*state);
 
-    EXPECT_TRUE(compare_enums(Constant::eFuel::Electricity, state->dataDXCoils->DXCoil(1).FuelType));
+    EXPECT_ENUM_EQ(Constant::eFuel::Electricity, state->dataDXCoils->DXCoil(1).FuelType);
     EXPECT_EQ(0, state->dataDXCoils->DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
@@ -2335,12 +2341,6 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
     state->dataDXCoils->DXCoil(1).FuelType = Constant::eFuel::NaturalGas;
     state->dataDXCoils->DXCoil(1).MSHPHeatRecActive = false;
-
-    state->dataEnvrn->OutDryBulbTemp = 35;
-    state->dataEnvrn->OutHumRat = 0.0128;
-    state->dataEnvrn->OutBaroPress = 101325;
-    state->dataEnvrn->OutWetBulbTemp =
-        PsyTwbFnTdbWPb(*state, state->dataEnvrn->OutDryBulbTemp, state->dataEnvrn->OutHumRat, state->dataEnvrn->OutBaroPress);
 
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(1) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(1) * 1.2;
     state->dataDXCoils->DXCoil(1).MSRatedAirMassFlowRate(2) = state->dataDXCoils->DXCoil(1).MSRatedAirVolFlowRate(2) * 1.2;
@@ -2817,8 +2817,8 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
     GetDXCoils(*state);
 
     ASSERT_EQ(1, state->dataDXCoils->NumDXCoils);
-    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostStrategy, StandardRatings::DefrostStrat::ReverseCycle));
-    ASSERT_TRUE(compare_enums(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed));
+    ASSERT_ENUM_EQ(state->dataDXCoils->DXCoil(1).DefrostStrategy, StandardRatings::DefrostStrat::ReverseCycle);
+    ASSERT_ENUM_EQ(state->dataDXCoils->DXCoil(1).DefrostControl, StandardRatings::HPdefrostControl::Timed);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostEIRFT, 1);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).MaxOATDefrost, 5.0);
     ASSERT_EQ(state->dataDXCoils->DXCoil(1).DefrostTime, 0.058333);
