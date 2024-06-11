@@ -17014,10 +17014,8 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
             }
         }
 
-        // Coil total cooling
-        Real64 AirMassFlowRate = thisDXCoil.InletAirMassFlowRate;
         // Coil total/sensible/latent cooling rates
-        CalcComponentSensibleLatentOutput(AirMassFlowRate,
+        CalcComponentSensibleLatentOutput(AirMassFlow,
                                           InletAirDryBulbTemp,
                                           InletAirHumRat,
                                           OutletAirTemp,

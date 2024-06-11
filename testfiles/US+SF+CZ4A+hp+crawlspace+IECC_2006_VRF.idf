@@ -30,7 +30,7 @@
 !    dhw_type =
 !    TEMPLATE_PATH = template/v9.5
 
-  Version,23.1;
+  Version,23.2;
 
 ! added VRF system
 
@@ -477,8 +477,8 @@
     0,                       !- No Cooling Supply Air Flow Rate {m3/s}
     0.595,                   !- Heating Supply Air Flow Rate {m3/s}
     0,                       !- No Heating Supply Air Flow Rate {m3/s}
-    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    0,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    0,                !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanModeSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
