@@ -143,6 +143,10 @@ struct DXFEarClippingData : BaseGlobalStruct
     bool trackit = false;
     int errcount = 0;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->trackit = false;

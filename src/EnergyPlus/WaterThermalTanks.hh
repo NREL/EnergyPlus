@@ -420,7 +420,8 @@ namespace WaterThermalTanks {
         bool myOneTimeInitFlag;
 
         // end of variables for variable-speed HPWH
-
+        ~HeatPumpWaterHeaterData() = default;
+            
         // Default Constructor
         HeatPumpWaterHeaterData()
             : HPWHType(DataPlant::PlantEquipmentType::Invalid), HPWHTankType(DataPlant::PlantEquipmentType::Invalid), StandAlone(false),
@@ -671,6 +672,8 @@ namespace WaterThermalTanks {
         int callerLoopNum;
         int waterIndex;
 
+        ~WaterThermalTankData() = default;
+            
         // Default Constructor
         WaterThermalTankData()
             : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
@@ -1013,9 +1016,13 @@ struct WaterThermalTanksData : BaseGlobalStruct
     bool getWaterThermalTankInputFlag = true; // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = WaterThermalTanksData();
+        new (this) WaterThermalTanksData();
     }
 };
 

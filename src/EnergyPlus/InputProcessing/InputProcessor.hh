@@ -322,6 +322,10 @@ struct DataInputProcessing : BaseGlobalStruct
 {
     std::unique_ptr<InputProcessor> inputProcessor = InputProcessor::factory();
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         inputProcessor.reset();

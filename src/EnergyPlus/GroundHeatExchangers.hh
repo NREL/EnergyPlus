@@ -530,6 +530,10 @@ struct GroundHeatExchangerData : BaseGlobalStruct
     std::vector<std::shared_ptr<GroundHeatExchangers::GLHEResponseFactors>> responseFactorsVector;
     std::vector<std::shared_ptr<GroundHeatExchangers::GLHEVertSingle>> singleBoreholesVector;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->numVerticalGLHEs = 0;

@@ -120,6 +120,10 @@ struct TARCOGCommonData : BaseGlobalStruct
 {
     Array1D<Real64> vv = Array1D<Real64>(TARCOGCommon::NMAX);
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->vv = Array1D<Real64>(TARCOGCommon::NMAX);

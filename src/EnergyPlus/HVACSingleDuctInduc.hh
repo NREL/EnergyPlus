@@ -192,6 +192,10 @@ struct HVACSingleDuctInducData : BaseGlobalStruct
     Array1D<HVACSingleDuctInduc::IndUnitData> IndUnit;
     bool ZoneEquipmentListChecked = false;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumIndUnits = 0;

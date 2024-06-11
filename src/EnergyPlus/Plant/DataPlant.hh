@@ -407,6 +407,10 @@ struct DataPlantData : BaseGlobalStruct
     std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->TotNumLoops = 0;

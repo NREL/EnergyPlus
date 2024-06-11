@@ -73,6 +73,10 @@ struct SystemAirFlowSizer : BaseSizerWithScalableInputs
 struct SystemAirFlowSizerData : BaseGlobalStruct
 {
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
     }

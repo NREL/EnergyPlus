@@ -313,6 +313,10 @@ struct SurfaceGroundHeatExchangersData : BaseGlobalStruct
     Real64 TempBtm; // bottom surface temp
     Real64 TempTop; // top surface temp
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NoSurfaceGroundTempObjWarning = true;

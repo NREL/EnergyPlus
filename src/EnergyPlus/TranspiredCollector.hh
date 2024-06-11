@@ -225,6 +225,10 @@ struct TranspiredCollectorData : BaseGlobalStruct
 
     Array1D_bool MyEnvrnFlag;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumUTSC = 0;

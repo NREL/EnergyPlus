@@ -165,6 +165,11 @@ namespace WindowManager {
 struct WindowManagerExteriorData : BaseGlobalStruct
 {
     std::unique_ptr<WindowManager::CWindowConstructionsSimplified> p_inst;
+
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) WindowManagerExteriorData();

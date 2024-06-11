@@ -206,6 +206,10 @@ struct HVACStandAloneERVData : BaseGlobalStruct
     Array1D_bool MyZoneEqFlag;             // used to set up zone equipment availability managers
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumStandAloneERVs = 0;

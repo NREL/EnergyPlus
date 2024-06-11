@@ -713,6 +713,10 @@ struct UtilityRoutinesData : BaseGlobalStruct
     std::string appendPerfLog_valuesRow;
     bool GetMatrixInputFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         outputErrorHeader = true;

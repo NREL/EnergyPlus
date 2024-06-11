@@ -236,6 +236,10 @@ struct HeatBalanceMgrData : BaseGlobalStruct
     Array1D<HeatBalanceManager::WarmupConvergence> WarmupConvergenceValues;
     SurfaceOctreeCube surfaceOctree;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
 

@@ -166,9 +166,13 @@ struct WindTurbineData : BaseGlobalStruct
     bool MyOneTimeFlag = true;
     EPVector<WindTurbine::WindTurbineParams> WindTurbineSys;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = WindTurbineData();
+        new (this) WindTurbineData();
     }
 };
 

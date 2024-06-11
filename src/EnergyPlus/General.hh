@@ -289,6 +289,10 @@ struct GeneralData : BaseGlobalStruct
     std::string VarDictOption1;
     std::string VarDictOption2;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) GeneralData();

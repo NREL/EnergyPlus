@@ -171,6 +171,10 @@ struct HeatPumpWaterToWaterHEATINGData : BaseGlobalStruct
     bool GetWWHPHeatingInput = true;
     Array1D<HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs> GSHP;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->GSHPRefrigIndex = 0;

@@ -201,6 +201,10 @@ struct EMSManagerData : BaseGlobalStruct
     bool lDummy = false;                   // dummy pointer location
     bool lDummy2 = false;                  // dummy pointer location
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         GetEMSUserInput = true;

@@ -409,6 +409,10 @@ struct ScheduleManagerData : BaseGlobalStruct
     Array1D<ScheduleManager::WeekScheduleData> WeekSchedule; // Week Schedule Storage
     Array1D<ScheduleManager::ScheduleData> Schedule;         // Schedule Storage
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         CheckScheduleValueMinMaxRunOnceOnly = true;

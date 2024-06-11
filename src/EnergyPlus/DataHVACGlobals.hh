@@ -527,6 +527,10 @@ struct HVACGlobalsData : BaseGlobalStruct
     bool StandardRatingsMyCoolOneTimeFlag2 = true;
     bool StandardRatingsMyHeatOneTimeFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) HVACGlobalsData();

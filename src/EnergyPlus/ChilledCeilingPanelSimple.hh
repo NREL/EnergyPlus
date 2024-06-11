@@ -187,9 +187,14 @@ struct ChilledCeilingPanelSimpleData : BaseGlobalStruct
 {
     bool GetInputFlag = true;
     Array1D<CoolingPanelSimple::CoolingPanelParams> CoolingPanel;
+
+    void init_state() override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ChilledCeilingPanelSimpleData();
+        new (this) ChilledCeilingPanelSimpleData();
     }
 };
 

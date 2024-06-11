@@ -1458,9 +1458,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
     Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = OutputReportPredefinedData();
+        new (this) OutputReportPredefinedData();
     }
 };
 

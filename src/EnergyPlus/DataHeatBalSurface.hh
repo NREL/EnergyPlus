@@ -244,9 +244,14 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfAbsThermalInt;                    // Thermal absorptivity of surface inside face or exterior movable insulation if present
     std::vector<int> SurfMovInsulIndexList;
     std::vector<int> SurfMovSlatsIndexList;
+
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = HeatBalSurfData();
+            new (this) HeatBalSurfData();
     }
 };
 

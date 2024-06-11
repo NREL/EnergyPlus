@@ -149,6 +149,12 @@ struct ExhaustAirSystemMgr : BaseGlobalStruct
     bool GetInputFlag = true;
     std::map<int, int> mixerIndexMap;
     bool mappingDone = false;
+
+
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) ExhaustAirSystemMgr();
@@ -160,6 +166,10 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 
     bool GetInputFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) ExhaustControlSystemMgr();

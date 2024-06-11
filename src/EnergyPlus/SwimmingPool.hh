@@ -212,6 +212,10 @@ struct SwimmingPoolsData : BaseGlobalStruct
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPool::SwimmingPoolData> Pool;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumSwimmingPools = 0;

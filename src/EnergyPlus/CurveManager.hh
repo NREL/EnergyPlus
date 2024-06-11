@@ -469,6 +469,10 @@ struct CurveManagerData : BaseGlobalStruct
             this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
     }
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         for (Curve::Curve *p : PerfCurve) {

@@ -541,6 +541,10 @@ struct SetPointManagerData : BaseGlobalStruct
     Real64 CET_OptCondenserEnteringTemp = 0.0;
     Real64 CET_CurMinLift = 0.0;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         ManagerOn = false;

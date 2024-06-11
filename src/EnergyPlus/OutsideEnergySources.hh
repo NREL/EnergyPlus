@@ -130,6 +130,10 @@ struct OutsideEnergySourcesData : BaseGlobalStruct
     Array1D<OutsideEnergySources::OutsideEnergySourceSpecs> EnergySource;
     std::unordered_map<std::string, std::string> EnergySourceUniqueNames;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumDistrictUnits = 0;

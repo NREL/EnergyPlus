@@ -1331,6 +1331,10 @@ struct OutputReportTabularData : BaseGlobalStruct
     std::string curColHeadWithSI;
     std::string curColHead;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->unitsStyle = OutputReportTabular::UnitsStyle::None;

@@ -308,6 +308,10 @@ struct WaterToAirHeatPumpSimpleData : BaseGlobalStruct
     Real64 LoadSideInletEnth_Init = 0;   // rated conditions
     Real64 CpAir_Init = 0;               // rated conditions
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumWatertoAirHPs = 0;

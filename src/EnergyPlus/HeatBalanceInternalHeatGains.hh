@@ -86,6 +86,10 @@ void SetupSpaceInternalGain(EnergyPlusData &state,
 struct HeatBalInternalHeatGainsData : BaseGlobalStruct
 {
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
     }

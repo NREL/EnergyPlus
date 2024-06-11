@@ -197,6 +197,10 @@ struct HVACDXHeatPumpSystemData : BaseGlobalStruct
     Real64 AirFlowOnOffRatio = 1.0;    // ratio of compressor on flow to average flow over time step
     Real64 SpeedPartLoadRatio = 1.0;   // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->GetInputFlag = true;

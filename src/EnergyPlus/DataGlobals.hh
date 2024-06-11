@@ -177,9 +177,13 @@ struct DataGlobal : BaseGlobalStruct
     int numThread = 1;
     bool AirLoopHVACDOASUsedInSim = false;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = DataGlobal();
+        new (this) DataGlobal();
     }
 };
 

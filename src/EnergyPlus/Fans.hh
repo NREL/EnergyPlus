@@ -455,6 +455,10 @@ struct FansData : BaseGlobalStruct
     Array1D<Fans::FanBase *> fans;
     std::map<std::string, int> fanMap;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         for (int i = 1; i <= (int)fans.size(); ++i)

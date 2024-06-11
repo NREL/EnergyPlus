@@ -581,6 +581,10 @@ struct VariableSpeedCoilsData : BaseGlobalStruct
     Real64 CrankcaseHeatingPower_CalcVarSpeedCoilCooling = 0.0; // power due to crankcase heater
     Real64 CompAmbTemp_CalcVarSpeedCoilCooling = 0.0;           // Ambient temperature at compressor
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumVarSpeedCoils = 0;

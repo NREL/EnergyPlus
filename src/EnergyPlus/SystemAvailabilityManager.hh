@@ -626,6 +626,10 @@ struct SystemAvailabilityManagerData : BaseGlobalStruct
     Real64 TimeStepSysLast = 0.0;    // last system time step
 
     // Hybrid ventilation control part
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumSchedSysAvailMgrs = 0;

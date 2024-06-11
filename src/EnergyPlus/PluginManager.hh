@@ -256,6 +256,10 @@ struct PluginManagerData : BaseGlobalStruct
 
     bool eplusRunningViaPythonAPI = false;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         callbacks.clear();

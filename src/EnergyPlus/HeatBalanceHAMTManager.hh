@@ -194,6 +194,10 @@ struct HeatBalHAMTMgrData : BaseGlobalStruct
     int qvpErrCount = 0;
     int qvpErrReport = 0;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->OneTimeFlag = true;

@@ -2069,9 +2069,13 @@ struct HeatBalanceData : BaseGlobalStruct
     EPVector<std::string> spaceTypes;
     EPVector<DataHeatBalance::ExtVentedCavityStruct> ExtVentedCavity;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = HeatBalanceData();
+        new (this) HeatBalanceData();
     }
 };
 

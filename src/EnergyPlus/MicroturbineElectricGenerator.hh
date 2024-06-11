@@ -235,6 +235,10 @@ struct MicroturbineElectricGeneratorData : BaseGlobalStruct
     bool GetMTInput = true;
     EPVector<MicroturbineElectricGenerator::MTGeneratorSpecs> MTGenerator;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->NumMTGenerators = 0;

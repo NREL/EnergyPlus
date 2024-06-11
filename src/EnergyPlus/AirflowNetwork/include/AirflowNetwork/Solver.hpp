@@ -541,6 +541,10 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
+        void init_state() override
+        {
+        }
+            
         void clear_state() override
         {
             OccupantVentilationControl.deallocate();

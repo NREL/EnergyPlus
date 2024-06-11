@@ -375,6 +375,10 @@ struct WindowComplexManagerData : BaseGlobalStruct
     Array1D_int iMinDT = Array1D_int(1, 0);
     Array1D_int IDConst = Array1D_int(100, 0);
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() // override
     {
         this->NumComplexWind = 0;

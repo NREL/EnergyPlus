@@ -108,9 +108,13 @@ struct ZoneContaminantPredictorCorrectorData : BaseGlobalStruct
     bool MyEnvrnFlag = true;
     bool MyConfigOneTimeFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = ZoneContaminantPredictorCorrectorData();
+        new (this) ZoneContaminantPredictorCorrectorData();
     }
 };
 

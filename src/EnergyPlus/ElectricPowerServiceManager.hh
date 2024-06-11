@@ -841,6 +841,10 @@ struct ElectPwrSvcMgrData : BaseGlobalStruct
 
     std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->facilityElectricServiceObj.release();

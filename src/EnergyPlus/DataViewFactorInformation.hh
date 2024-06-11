@@ -106,6 +106,10 @@ struct ViewFactorInfoData : BaseGlobalStruct
     EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
     EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumOfRadiantEnclosures = 0;

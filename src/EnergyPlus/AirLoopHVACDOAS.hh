@@ -183,9 +183,14 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     std::vector<AirLoopHVACDOAS::AirLoopDOAS> airloopDOAS;
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
+
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = AirLoopHVACDOASData();
+        new (this) AirLoopHVACDOASData();
     }
 };
 

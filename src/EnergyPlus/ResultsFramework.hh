@@ -574,6 +574,10 @@ struct ResultsFrameworkData : BaseGlobalStruct
 
     std::unique_ptr<ResultsFramework::ResultsFramework> resultsFramework = std::make_unique<ResultsFramework::ResultsFramework>();
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         using OutputProcessor::ReportFreq;

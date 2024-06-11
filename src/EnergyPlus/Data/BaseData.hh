@@ -52,6 +52,7 @@ namespace EnergyPlus {
 
 struct BaseGlobalStruct
 {
+    virtual void init_state() = 0;
     virtual void clear_state() = 0;
 };
 

@@ -248,6 +248,10 @@ struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct
     int ErrCount = 0;
     int ErrCount2 = 0;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->TotalNumHXAssistedCoils = 0;

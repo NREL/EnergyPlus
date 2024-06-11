@@ -184,6 +184,10 @@ struct SizingManagerData : BaseGlobalStruct
     bool ReportSysSizingMyOneTimeFlag = true;
     bool runZeroingOnce = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumAirLoops = 0;

@@ -397,6 +397,10 @@ struct SystemReportsData : BaseGlobalStruct
     Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
     Array1D<SystemReports::IdentifyLoop> LoopStack;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->AnyZoneTimeBelowVozDyn = 0.0;

@@ -240,6 +240,10 @@ struct InternalHeatGainsData : BaseGlobalStruct
     EPVector<InternalHeatGains::GlobalInternalGainMiscObject> lightsObjects;
     EPVector<InternalHeatGains::GlobalInternalGainMiscObject> zoneElectricObjects;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
 

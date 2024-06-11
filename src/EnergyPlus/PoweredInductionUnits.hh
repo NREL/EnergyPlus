@@ -222,6 +222,10 @@ struct PoweredInductionUnitsData : BaseGlobalStruct
     Array1D_bool MySizeFlag;
     Array1D_bool MyPlantScanFlag;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->CheckEquipName.deallocate();

@@ -76,6 +76,10 @@ struct ReturnAirPathMgr : BaseGlobalStruct
 
     bool GetInputFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->GetInputFlag = true;

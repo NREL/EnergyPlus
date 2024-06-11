@@ -143,6 +143,10 @@ struct HVACManagerData : BaseGlobalStruct
     Array1D<Real64> MixSenLoad; // Mixing sensible loss or gain
     Array1D<Real64> MixLatLoad; // Mixing latent loss or gain
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) HVACManagerData();

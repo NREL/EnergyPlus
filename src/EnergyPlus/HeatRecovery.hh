@@ -502,9 +502,13 @@ struct HeatRecoveryData : BaseGlobalStruct
     Array1D<HeatRecovery::HeatExchCond> ExchCond;
     Array1D<HeatRecovery::BalancedDesDehumPerfData> BalDesDehumPerfData;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = HeatRecoveryData();
+        new (this) HeatRecoveryData();
     }
 };
 

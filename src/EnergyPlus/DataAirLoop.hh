@@ -247,9 +247,13 @@ struct DataAirLoopData : BaseGlobalStruct
     EPVector<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
     EPVector<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = DataAirLoopData();
+        new (this) DataAirLoopData();
     }
 };
 

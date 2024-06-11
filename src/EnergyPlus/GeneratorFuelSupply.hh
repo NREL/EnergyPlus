@@ -70,6 +70,10 @@ struct GeneratorFuelSupplyData : BaseGlobalStruct
 
     bool MyOneTimeFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->MyOneTimeFlag = true;

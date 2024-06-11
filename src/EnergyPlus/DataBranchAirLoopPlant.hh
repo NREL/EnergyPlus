@@ -111,9 +111,13 @@ struct DataBranchAirLoopPlantData : BaseGlobalStruct
 {
     Array1D<DataBranchAirLoopPlant::PlantPressureCurveData> PressureCurve;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = DataBranchAirLoopPlantData();
+        new (this) DataBranchAirLoopPlantData();
     }
 };
 

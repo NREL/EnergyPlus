@@ -818,6 +818,10 @@ struct WindowEquivalentLayerData : BaseGlobalStruct
     Real64 X1MRDiff = -1.0;
     Real64 XTAUDiff = -1.0;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state()
     {
         this->CFSDiffAbsTrans.deallocate();

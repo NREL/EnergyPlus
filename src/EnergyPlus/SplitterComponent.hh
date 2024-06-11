@@ -135,6 +135,10 @@ struct SplitterComponentData : BaseGlobalStruct
 
     Array1D<SplitterComponent::SplitterConditions> SplitterCond;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         GetSplitterInputFlag = true;

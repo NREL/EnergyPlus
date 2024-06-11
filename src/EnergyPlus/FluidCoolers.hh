@@ -223,7 +223,11 @@ struct FluidCoolersData : BaseGlobalStruct
     int NumSimpleFluidCoolers = 0;
     Array1D<FluidCoolers::FluidCoolerspecs> SimpleFluidCooler;
     std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
-
+ 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         this->GetFluidCoolerInputFlag = true;

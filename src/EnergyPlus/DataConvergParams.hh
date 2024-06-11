@@ -183,9 +183,13 @@ struct ConvergParamsData : BaseGlobalStruct
     Array1D<DataConvergParams::HVACAirLoopIterationConvergenceStruct> AirLoopConvergence;
     Array1D<DataConvergParams::PlantIterationConvergenceStruct> PlantConvergence;
 
+    void init_state()
+    {
+    }
+        
     void clear_state() override
     {
-        *this = ConvergParamsData();
+        new (this) ConvergParamsData();
     }
 };
 

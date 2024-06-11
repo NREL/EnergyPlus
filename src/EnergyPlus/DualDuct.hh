@@ -187,9 +187,13 @@ struct DualDuctData : BaseGlobalStruct
     Array1D_bool RecircIsUsedARR;
     Array1D_string DamperNamesARR;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
-        *this = DualDuctData();
+        new (this) DualDuctData();
     }
 };
 

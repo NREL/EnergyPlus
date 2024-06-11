@@ -503,6 +503,10 @@ struct PlantChillersData : BaseGlobalStruct
     EPVector<PlantChillers::GTChillerSpecs> GTChiller;
     EPVector<PlantChillers::ConstCOPChillerSpecs> ConstCOPChiller;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         NumElectricChillers = 0;

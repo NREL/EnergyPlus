@@ -211,6 +211,10 @@ struct EnvironmentData : BaseGlobalStruct
     bool forceBeginEnvResetSuppress = false; // for PerformancePrecisionTradeoffs
     bool oneTimeCompRptHeaderFlag = true;
 
+    void init_state() override
+    {
+    }
+        
     void clear_state() override
     {
         new (this) EnvironmentData();
