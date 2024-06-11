@@ -574,6 +574,8 @@ namespace Constant {
     Real64 constexpr OneThousandth = 1.0e-3; // Used as a tolerance in various places
     Real64 constexpr OneMillionth = 1.0e-6;  // Used as a tolerance in various places
 
+    Real64 constexpr OneCentimeter = 0.01;     // Geometric tolerance in meters
+    Real64 constexpr TwoCentimeters = 0.02;     // Geometric tolerance in meters
     Real64 constexpr SmallDistance = 1.0e-4;   // Geometric tolerance in meters
     Real64 constexpr MaxEXPArg = 709.78;       // maximum exponent in EXP() function
     Real64 constexpr Pi = 3.14159265358979324; // Pi 3.1415926535897932384626435

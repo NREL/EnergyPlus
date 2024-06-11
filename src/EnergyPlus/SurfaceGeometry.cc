@@ -9245,7 +9245,6 @@ namespace SurfaceGeometry {
 
     PopCoincidentVertexReturn checkPopCoincidentVertex(const Array1D<Vector> &vertices)
     {
-        constexpr double tolerance = 0.01;
 
         size_t const nSides = vertices.size();
 
@@ -9265,7 +9264,7 @@ namespace SurfaceGeometry {
             perimeter += dist;
         }
         // Return early if nothing to be popped
-        if (min_distance >= tolerance) {
+        if (min_distance >= Constant::OneCentimeter) {
             return {perimeter};
         }
 
@@ -9279,7 +9278,7 @@ namespace SurfaceGeometry {
             size_t const prevIndex = (index == 0) ? nSides - 1 : index - 1;
             Real64 &distanceThisToNext = distances[index];
             Real64 &distanceThisToPrev = distances[prevIndex];
-            if ((distanceThisToNext >= tolerance) && (distanceThisToPrev >= tolerance)) {
+            if ((distanceThisToNext >= Constant::OneCentimeter) && (distanceThisToPrev >= Constant::OneCentimeter)) {
                 continue;
             }
             Real64 const weight = distanceThisToNext + distanceThisToPrev;
@@ -12869,12 +12868,12 @@ namespace SurfaceGeometry {
         // test if all the wall heights are the same (all walls have the same maximum z-coordinate
 
         bool areWlHgtSame = true;
-        Real64 wallHeightZ = -1.0E50;
+        Real64 wallHeightZ = -Constant::BigNumber;
         bool foundWallHeight = false;
         for (int iFace = 1; iFace <= zonePoly.NumSurfaceFaces; ++iFace) {
             int curSurfNum = zonePoly.SurfaceFace(iFace).SurfNum;
             if (state.dataSurface->Surface(curSurfNum).Class == SurfaceClass::Wall) {
-                Real64 maxZ = -1.0E50;
+                Real64 maxZ = -Constant::BigNumber;
                 for (int jVertex = 1; jVertex <= zonePoly.SurfaceFace(iFace).NSides; ++jVertex) {
                     Vector curVertex = zonePoly.SurfaceFace(iFace).FacePoints(jVertex);
                     if (maxZ < curVertex.z) {
@@ -12882,7 +12881,7 @@ namespace SurfaceGeometry {
                     }
                 }
                 if (foundWallHeight) {
-                    if (std::abs(maxZ - wallHeightZ) > 0.0254) { //  2.54 cm = 1 inch
+                    if (std::abs(maxZ - wallHeightZ) > Constant::TwoCentimeters) {
                         areWlHgtSame = false;
                         break;
                     }
@@ -13011,7 +13010,6 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
         bool allAreEquidistant = true;
         Real64 firstDistance = -99.;
         if (zonePoly.SurfaceFace(faceIndex).NSides == zonePoly.SurfaceFace(opFaceIndex).NSides) { // double check that the number of sides match
@@ -13022,7 +13020,7 @@ namespace SurfaceGeometry {
                 if (iVertex == 1) {
                     firstDistance = curDistBetwCorners;
                 } else {
-                    if (std::abs(curDistBetwCorners - firstDistance) > tol) {
+                    if (std::abs(curDistBetwCorners - firstDistance) > Constant::OneCentimeter) {
                         allAreEquidistant = false;
                         break;
                     }
@@ -13040,8 +13038,8 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol) && (std::abs(v1.z - v2.z) < tol));
+        return ((std::abs(v1.x - v2.x) < Constant::OneCentimeter) && (std::abs(v1.y - v2.y) < Constant::OneCentimeter) &&
+                (std::abs(v1.z - v2.z) < Constant::OneCentimeter));
     }
 
     // test if two points on a plane are in the same position based on a small tolerance
@@ -13049,8 +13047,7 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
+        return ((std::abs(v1.x - v2.x) < Constant::OneCentimeter) && (std::abs(v1.y - v2.y) < Constant::OneCentimeter));
     }
 
     // test if two points on a plane are in the same position based on a small tolerance (based on Vector2dCount comparison)
@@ -13058,8 +13055,7 @@ namespace SurfaceGeometry {
     {
         // J. Glazer - March 2017
 
-        Real64 tol = 0.0127; //  1.27 cm = 1/2 inch
-        return ((std::abs(v1.x - v2.x) < tol) && (std::abs(v1.y - v2.y) < tol));
+        return ((std::abs(v1.x - v2.x) < Constant::OneCentimeter) && (std::abs(v1.y - v2.y) < Constant::OneCentimeter));
     }
 
     // returns the index of vertex in a list that is in the same position in space as the given vertex
@@ -13101,9 +13097,9 @@ namespace SurfaceGeometry {
         // J. Glazer - March 2017
         // The tolerance has to be low enough. Take for eg a plenum that has an edge that's 30meters long, you risk adding point from the
         // floor to the roof, cf #7383 compute the shortest distance from the point to the line first to avoid false positive
-        Real64 tol = 0.0127;
-        if (distanceFromPointToLine(start, end, test) < tol) { // distanceFromPointToLine always positive, it's calculated as norml_L2
-            return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
+        if (distanceFromPointToLine(start, end, test) <
+            Constant::OneCentimeter) { // distanceFromPointToLine always positive, it's calculated as norml_L2
+            return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < Constant::OneCentimeter);
         }
         return false;
     }
