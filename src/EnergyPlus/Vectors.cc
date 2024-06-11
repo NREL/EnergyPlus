@@ -486,7 +486,7 @@ void CalcCoPlanarNess(Array1D<Vector> &Surf, int const NSides, bool &IsCoPlanar,
         }
     }
 
-    if (std::abs(MaxDist) > Constant::DistTooSmall) IsCoPlanar = false;
+    if (std::abs(MaxDist) > Constant::SmallDistance) IsCoPlanar = false;
 }
 
 std::vector<int> PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, Array1D<Vector> &QuerySurf, int const QuerySides, bool &ErrorFound)
@@ -498,7 +498,7 @@ std::vector<int> PointsInPlane(Array1D<Vector> &BaseSurf, int const BaseSides, A
 
     for (int vert = 1; vert <= QuerySides; ++vert) {
         Real64 dist = Pt2Plane(QuerySurf(vert), NewellPlane);
-        if (std::abs(dist) < Constant::DistTooSmall) { // point on query surface is co-planar with base surface
+        if (std::abs(dist) < Constant::SmallDistance) { // point on query surface is co-planar with base surface
             pointIndices.push_back(vert);
         }
     }

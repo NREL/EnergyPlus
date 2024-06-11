@@ -5746,7 +5746,7 @@ void SHADOW(EnergyPlusData &state,
                      state.dataSurface->Surface(NGRS).lcsz.y * state.dataSolarShading->SUNCOS(2) +
                      state.dataSurface->Surface(NGRS).lcsz.z * state.dataSolarShading->SUNCOS(3);
 
-                if (std::abs(ZS) > Constant::DistTooSmall) {
+                if (std::abs(ZS) > Constant::SmallDistance) {
                     state.dataSolarShading->XShadowProjection = XS / ZS;
                     state.dataSolarShading->YShadowProjection = YS / ZS;
                     if (std::abs(state.dataSolarShading->XShadowProjection) < 1.e-8) state.dataSolarShading->XShadowProjection = 0.0;
@@ -12751,7 +12751,7 @@ void CalcComplexWindowOverlap(EnergyPlusData &state,
         ZSp = -SdotZ;
 
         // Projection of shadows for current basis direciton
-        if (std::abs(ZSp) > Constant::DistTooSmall) {
+        if (std::abs(ZSp) > Constant::SmallDistance) {
             XShadowProjection = XSp / ZSp;
             YShadowProjection = YSp / ZSp;
             if (std::abs(XShadowProjection) < 1.e-8) XShadowProjection = 0.0;

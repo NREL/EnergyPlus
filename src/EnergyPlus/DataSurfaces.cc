@@ -460,7 +460,7 @@ Surface2D SurfaceData::computed_surface2d() const
 
 Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
 {
-    if (std::abs(SinTilt) < Constant::DistTooSmall) {
+    if (std::abs(SinTilt) < Constant::SmallDistance) {
         return 0.0;
     }
     using Vertex2D = ObjexxFCL::Vector2<Real64>;

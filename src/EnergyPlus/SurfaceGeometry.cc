@@ -15609,7 +15609,7 @@ namespace SurfaceGeometry {
         for (int n = 1; n <= NSides; ++n) {
             Det += X(n) * Y(n + 1) - X(n + 1) * Y(n);
         }
-        if (std::abs(Det) > Constant::DistTooSmall) {
+        if (std::abs(Det) > Constant::SmallDistance) {
             A = X;
             B = Y;
         } else {
@@ -15617,7 +15617,7 @@ namespace SurfaceGeometry {
             for (int n = 1; n <= NSides; ++n) {
                 Det += X(n) * Z(n + 1) - X(n + 1) * Z(n);
             }
-            if (std::abs(Det) > Constant::DistTooSmall) {
+            if (std::abs(Det) > Constant::SmallDistance) {
                 A = X;
                 B = Z;
             } else {
@@ -15625,7 +15625,7 @@ namespace SurfaceGeometry {
                 for (int n = 1; n <= NSides; ++n) {
                     Det += Y(n) * Z(n + 1) - Y(n + 1) * Z(n);
                 }
-                if (std::abs(Det) > Constant::DistTooSmall) {
+                if (std::abs(Det) > Constant::SmallDistance) {
                     A = Y;
                     B = Z;
                 } else {
