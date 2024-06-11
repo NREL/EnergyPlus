@@ -700,8 +700,8 @@ void GetElectricEIRChillerInput(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        if (NumNums > 19) {
-            thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(20);
+        if (NumNums > 18) {
+            thisChiller.MinCondFlowRatio = state.dataIPShortCut->rNumericArgs(19);
         } else {
             thisChiller.MinCondFlowRatio = 0.2;
         }
@@ -1523,7 +1523,7 @@ void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
 
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidName,
-                                                           Constant::CWInitConvTemp,
+                                                           this->TempRefCondIn,
                                                            state.dataPlnt->PlantLoop(this->CDPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
@@ -2398,8 +2398,6 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             Real64 condDT = 0.0;
             if (this->CondDTScheduleNum > 0) {
                 condDT = ScheduleManager::GetCurrentScheduleValue(state, this->CondDTScheduleNum);
-            } else {
-                condDT = this->CondDT;
             }
             this->CondMassFlowRate = this->QCondenser / (Cp * condDT);
         } break;

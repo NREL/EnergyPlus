@@ -61,6 +61,7 @@ set(test_src
     ChillerConstantCOP.unit.cc
     ChillerElectric.unit.cc
     ChillerElectricEIR.unit.cc
+    ChillerReformulatedEIR.unit.cc
     ChillerExhaustAbsorption.unit.cc
     ChillerGasAbsorption.unit.cc
     ChillerIndirectAbsorption.unit.cc
