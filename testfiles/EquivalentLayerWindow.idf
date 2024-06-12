@@ -563,9 +563,9 @@
 
   Output:Variable,*,Surface Outside Face Temperature,Hourly;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Hourly;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
 
   Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
 
