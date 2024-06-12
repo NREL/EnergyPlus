@@ -395,7 +395,7 @@ struct ExternalInterfaceData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         this->tComm = 0.0;

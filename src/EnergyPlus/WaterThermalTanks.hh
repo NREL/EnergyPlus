@@ -421,7 +421,7 @@ namespace WaterThermalTanks {
 
         // end of variables for variable-speed HPWH
         ~HeatPumpWaterHeaterData() = default;
-            
+
         // Default Constructor
         HeatPumpWaterHeaterData()
             : HPWHType(DataPlant::PlantEquipmentType::Invalid), HPWHTankType(DataPlant::PlantEquipmentType::Invalid), StandAlone(false),
@@ -673,7 +673,7 @@ namespace WaterThermalTanks {
         int waterIndex;
 
         ~WaterThermalTankData() = default;
-            
+
         // Default Constructor
         WaterThermalTankData()
             : WaterThermalTankType(DataPlant::PlantEquipmentType::Invalid), IsChilledWaterTank(false), Init(true), StandAlone(false), Volume(0.0),
@@ -1019,7 +1019,7 @@ struct WaterThermalTanksData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         new (this) WaterThermalTanksData();

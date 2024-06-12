@@ -282,7 +282,7 @@ struct WaterToAirHeatPumpData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         this->NumWatertoAirHPs = 0;

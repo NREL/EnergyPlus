@@ -667,7 +667,7 @@ struct FluidPropertiesData : BaseGlobalStruct
         FluidProperties::GetFluidPropertiesData(state);
         this->GetInput = false;
     }
-        
+
     void clear_state() override
     {
         new (this) FluidPropertiesData();

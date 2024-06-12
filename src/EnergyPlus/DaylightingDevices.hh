@@ -115,7 +115,7 @@ struct DaylightingDevicesData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         this->COSAngle = Array1D<Real64>(Dayltg::NumOfAngles);

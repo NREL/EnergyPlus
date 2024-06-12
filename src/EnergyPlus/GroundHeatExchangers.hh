@@ -533,7 +533,7 @@ struct GroundHeatExchangerData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         this->numVerticalGLHEs = 0;

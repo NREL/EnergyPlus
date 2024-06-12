@@ -217,7 +217,7 @@ struct ChillerIndirectAbsoprtionData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state)
     {
     }
-        
+
     void clear_state() override
     {
         new (this) ChillerIndirectAbsoprtionData();

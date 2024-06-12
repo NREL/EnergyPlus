@@ -223,7 +223,7 @@ struct TarcogShadingData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         frct1 = Array1D<Real64>(TARCOGGassesParams::maxgas);
