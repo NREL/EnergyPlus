@@ -156,8 +156,7 @@ namespace Window {
                     EffGlEmiss = state.dataSurface->SurfaceWindow(SurfNum).EffGlassEmiss[1];
                 }
                 state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                    (EffShBlEmiss * SurfInsideTemp +
-                     EffGlEmiss * (state.dataWindowManager->thetas[2 * totSolidLayers - 3] - Constant::Kelvin)) /
+                    (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (state.dataWindowManager->thetas[2 * totSolidLayers - 3] - Constant::Kelvin)) /
                     (EffShBlEmiss + EffGlEmiss);
             }
         }
@@ -231,7 +230,7 @@ namespace Window {
                 surface.Area * backSurface->getEmissivity() * (Constant::StefanBoltzmann * pow(backSurface->getTemperature(), 4) - rmir);
 
             state.dataSurface->SurfWinEffInsSurfTemp(SurfNum) =
-                    aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - Constant::Kelvin;
+                aLayers[totLayers - 1]->getTemperature(FenestrationCommon::Side::Back) - Constant::Kelvin;
             std::fill(window.EffGlassEmiss.begin(),
                       window.EffGlassEmiss.end(),
                       aLayers[totLayers - 1]->getSurface(FenestrationCommon::Side::Back)->getEmissivity());

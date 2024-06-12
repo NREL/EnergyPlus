@@ -363,18 +363,18 @@ namespace HeatBalanceHAMTManager {
             assert(matReg != nullptr);
 
             if (matReg->niso == 0) continue;
-            
+
             // - First sort
             for (jj = 1; jj <= matReg->niso - 1; ++jj) {
                 for (ii = jj + 1; ii <= matReg->niso; ++ii) {
                     if (matReg->isorh(jj) > matReg->isorh(ii)) {
-                              
+
                         dumrh = matReg->isorh(jj);
                         dumdata = matReg->isodata(jj);
-                        
+
                         matReg->isorh(jj) = matReg->isorh(ii);
                         matReg->isodata(jj) = matReg->isodata(ii);
-                        
+
                         matReg->isorh(ii) = dumrh;
                         matReg->isodata(ii) = dumdata;
                     }

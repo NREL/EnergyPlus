@@ -2601,7 +2601,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         EXPECT_NEAR(sum, 1.0, 0.0001);
     }
 #endif // GET_OUT
-    
+
     state->dataSurfaceGeometry->CosZoneRelNorth.deallocate();
     state->dataSurfaceGeometry->SinZoneRelNorth.deallocate();
 }

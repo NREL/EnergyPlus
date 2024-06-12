@@ -327,10 +327,10 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
         value = Constant::StefanBoltzmann * pow_4(tout);
-        value = ViewFactorSkyIR *
-               (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * Constant::StefanBoltzmann * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                     (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
-                ViewFactorGroundIR * value;
+        value =
+            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * Constant::StefanBoltzmann * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
+            ViewFactorGroundIR * value;
     }
     return value;
 }

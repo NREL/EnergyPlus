@@ -70,20 +70,20 @@ constexpr std::array<std::string_view, (int)GasType::Num> gasTypeNames = {"Custo
 constexpr std::array<std::string_view, (int)GasType::Num> gasTypeNamesUC = {"CUSTOM", "AIR", "ARGON", "KRYPTON", "XENON"};
 constexpr std::array<std::string_view, (int)SurfaceRoughness::Num> surfaceRoughnessNames = {
     "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth"};
-        
+
 constexpr std::array<Material::Gas, 10> gases = {
-    Gas(), // Empty
+    Gas(),                                                                                                        // Empty
     {GasType::Air, {2.873e-3, 7.760e-5, 0.0}, {3.723e-6, 4.940e-8, 0.0}, {1002.737, 1.2324e-2, 0.0}, 28.97, 1.4}, // Air
-    {GasType::Argon, {2.285e-3, 5.149e-5, 0.0}, {3.379e-6, 6.451e-8, 0.0}, {521.929, 0.0, 0.0}, 39.948, 1.67}, // Argon
-    {GasType::Krypton, {9.443e-4, 2.826e-5, 0.0}, {2.213e-6, 7.777e-8, 0.0}, {248.091, 0.0, 0.0}, 83.8, 1.68}, // Krypton
-    {GasType::Xenon, {4.538e-4, 1.723e-5, 0.0}, {1.069e-6, 7.414e-8, 0.0}, {158.340, 0.0, 0.0}, 131.3, 1.66}, // Xenon
-    Gas(), // Empty
-    Gas(), // Empty
-    Gas(), // Empty
-    Gas(), // Empty
-    Gas() // Empty
+    {GasType::Argon, {2.285e-3, 5.149e-5, 0.0}, {3.379e-6, 6.451e-8, 0.0}, {521.929, 0.0, 0.0}, 39.948, 1.67},    // Argon
+    {GasType::Krypton, {9.443e-4, 2.826e-5, 0.0}, {2.213e-6, 7.777e-8, 0.0}, {248.091, 0.0, 0.0}, 83.8, 1.68},    // Krypton
+    {GasType::Xenon, {4.538e-4, 1.723e-5, 0.0}, {1.069e-6, 7.414e-8, 0.0}, {158.340, 0.0, 0.0}, 131.3, 1.66},     // Xenon
+    Gas(),                                                                                                        // Empty
+    Gas(),                                                                                                        // Empty
+    Gas(),                                                                                                        // Empty
+    Gas(),                                                                                                        // Empty
+    Gas()                                                                                                         // Empty
 };
-        
+
 void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if errors found in input
 {
 
@@ -164,7 +164,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto &ipsc = state.dataIPShortCut;
-    
+
     RegMat = ip->getNumObjectsFound(state, "Material");
     RegRMat = ip->getNumObjectsFound(state, "Material:NoMass");
     IRTMat = ip->getNumObjectsFound(state, "Material:InfraredTransparent");
@@ -562,10 +562,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             !Util::SameString(MaterialNames(2), "BSDF") && !Util::SameString(MaterialNames(2), "SpectralAndAngle")) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", invalid specification.", state.dataHeatBalMgr->CurrentModuleObject, thisMaterial->Name));
-            ShowContinueError(state,
-                              format("{} must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value={}",
-                                     ipsc->cAlphaFieldNames(2),
-                                     MaterialNames(2)));
+            ShowContinueError(
+                state,
+                format("{} must be SpectralAverage, Spectral, BSDF or SpectralAndAngle, value={}", ipsc->cAlphaFieldNames(2), MaterialNames(2)));
         }
 
         // TH 8/24/2011, allow glazing properties MaterialProps(2 to 10) to equal 0 or 1: 0.0 =< Prop <= 1.0
@@ -575,43 +574,37 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             if (MaterialProps(2) + MaterialProps(3) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(2), ipsc->cNumericFieldNames(3)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(2), ipsc->cNumericFieldNames(3)));
             }
 
             if (MaterialProps(2) + MaterialProps(4) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(2), ipsc->cNumericFieldNames(4)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(2), ipsc->cNumericFieldNames(4)));
             }
 
             if (MaterialProps(5) + MaterialProps(6) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(6)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(6)));
             }
 
             if (MaterialProps(5) + MaterialProps(7) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(7)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(7)));
             }
 
             if (MaterialProps(8) + MaterialProps(9) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(8), ipsc->cNumericFieldNames(9)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(8), ipsc->cNumericFieldNames(9)));
             }
 
             if (MaterialProps(8) + MaterialProps(10) > 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(
-                    state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(8), ipsc->cNumericFieldNames(10)));
+                ShowContinueError(state, format("{} + {} not <= 1.0", ipsc->cNumericFieldNames(8), ipsc->cNumericFieldNames(10)));
             }
 
             if (MaterialProps(2) < 0.0) {
@@ -705,8 +698,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             if (answer == BooleanSwitch::Invalid) {
                 ErrorsFound = true;
                 ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-                ShowContinueError(state,
-                                  format("{} must be Yes or No, entered value={}", ipsc->cNumericFieldNames(4), MaterialNames(4)));
+                ShowContinueError(state, format("{} must be Yes or No, entered value={}", ipsc->cNumericFieldNames(4), MaterialNames(4)));
             } else {
                 thisMaterial->SolarDiffusing = (answer == BooleanSwitch::Yes);
             }
@@ -723,17 +715,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     ErrorsFound = true;
                     ShowSevereError(state, format("{}=\"{}\", Invalid name.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
                     ShowContinueError(state,
-                                      format("{} requires a valid table object name, entered input={}",
-                                             ipsc->cAlphaFieldNames(5),
-                                             MaterialNames(5)));
+                                      format("{} requires a valid table object name, entered input={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterial->GlassSpecAngTransDataPtr,     // Curve index
-                                                         {2},                                        // Valid dimensions
-                                                         RoutineName,                                // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                         thisMaterial->Name,                         // Object Name
-                                                         ipsc->cAlphaFieldNames(5)); // Field Name
+                                                         thisMaterial->GlassSpecAngTransDataPtr,    // Curve index
+                                                         {2},                                       // Valid dimensions
+                                                         RoutineName,                               // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject, // Object Type
+                                                         thisMaterial->Name,                        // Object Name
+                                                         ipsc->cAlphaFieldNames(5));                // Field Name
 
                     GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
@@ -743,10 +733,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                minAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the minumum value = 0.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the minumum value = 0.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                         ErrorsFound = true;
@@ -755,10 +744,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                maxAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the maximum value = 90.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the maximum value = 90.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (minLamValue < 0.1) {
                         ErrorsFound = true;
@@ -796,17 +784,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     ErrorsFound = true;
                     ShowSevereError(state, format("{}=\"{}\", Invalid name.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
                     ShowContinueError(state,
-                                      format("{} requires a valid table object name, entered input={}",
-                                             ipsc->cAlphaFieldNames(6),
-                                             MaterialNames(6)));
+                                      format("{} requires a valid table object name, entered input={}", ipsc->cAlphaFieldNames(6), MaterialNames(6)));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterial->GlassSpecAngFRefleDataPtr,    // Curve index
-                                                         {2},                                        // Valid dimensions
-                                                         RoutineName,                                // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                         thisMaterial->Name,                         // Object Name
-                                                         ipsc->cAlphaFieldNames(6)); // Field Name
+                                                         thisMaterial->GlassSpecAngFRefleDataPtr,   // Curve index
+                                                         {2},                                       // Valid dimensions
+                                                         RoutineName,                               // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject, // Object Type
+                                                         thisMaterial->Name,                        // Object Name
+                                                         ipsc->cAlphaFieldNames(6));                // Field Name
 
                     GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
@@ -816,10 +802,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                minAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the minumum value = 0.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the minumum value = 0.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                         ErrorsFound = true;
@@ -828,10 +813,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                maxAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the maximum value = 90.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the maximum value = 90.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (minLamValue < 0.1) {
                         ErrorsFound = true;
@@ -869,17 +853,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     ErrorsFound = true;
                     ShowSevereError(state, format("{}=\"{}\", Invalid name.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
                     ShowContinueError(state,
-                                      format("{} requires a valid table object name, entered input={}",
-                                             ipsc->cAlphaFieldNames(7),
-                                             MaterialNames(7)));
+                                      format("{} requires a valid table object name, entered input={}", ipsc->cAlphaFieldNames(7), MaterialNames(7)));
                 } else {
                     ErrorsFound |= Curve::CheckCurveDims(state,
-                                                         thisMaterial->GlassSpecAngBRefleDataPtr,    // Curve index
-                                                         {2},                                        // Valid dimensions
-                                                         RoutineName,                                // Routine name
-                                                         state.dataHeatBalMgr->CurrentModuleObject,  // Object Type
-                                                         thisMaterial->Name,                         // Object Name
-                                                         ipsc->cAlphaFieldNames(7)); // Field Name
+                                                         thisMaterial->GlassSpecAngBRefleDataPtr,   // Curve index
+                                                         {2},                                       // Valid dimensions
+                                                         RoutineName,                               // Routine name
+                                                         state.dataHeatBalMgr->CurrentModuleObject, // Object Type
+                                                         thisMaterial->Name,                        // Object Name
+                                                         ipsc->cAlphaFieldNames(7));                // Field Name
 
                     GetCurveMinMaxValues(state, thisMaterial->GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                     if (minAngValue > 1.0e-6) {
@@ -889,10 +871,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                minAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the minumum value = 0.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the minumum value = 0.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
                         ErrorsFound = true;
@@ -901,10 +882,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                                                state.dataHeatBalMgr->CurrentModuleObject,
                                                MaterialNames(1),
                                                maxAngValue));
-                        ShowContinueError(state,
-                                          format("{} requires the maximum value = 90.0 in the entered table name={}",
-                                                 ipsc->cAlphaFieldNames(5),
-                                                 MaterialNames(5)));
+                        ShowContinueError(
+                            state,
+                            format("{} requires the maximum value = 90.0 in the entered table name={}", ipsc->cAlphaFieldNames(5), MaterialNames(5)));
                     }
                     if (minLamValue < 0.1) {
                         ErrorsFound = true;
@@ -1010,8 +990,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (MaterialProps(6) + MaterialProps(7) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} + {} not < 1.0", ipsc->cNumericFieldNames(6), ipsc->cNumericFieldNames(7)));
+            ShowContinueError(state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(6), ipsc->cNumericFieldNames(7)));
         }
 
         if (MaterialNames(2) == "") {
@@ -1319,7 +1298,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                 ErrorsFound = true;
             }
         }
-    } // for (Loop : W5MatEQL) 
+    } // for (Loop : W5MatEQL)
 
     // Window gas mixtures (for gaps with two or more gases)
 
@@ -1361,13 +1340,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         NumGases = MaterialProps(2);
         matGas->numGases = NumGases;
         for (NumGas = 0; NumGas < NumGases; ++NumGas) {
-             auto &gas = matGas->gases[NumGas];
-             gas.type = static_cast<GasType>(getEnumValue(gasTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2 + NumGas))));
-             if (gas.type == GasType::Invalid) {
-                 ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1 + NumGas)));
-                     // Error check?
-                 ErrorsFound = true;
-             }
+            auto &gas = matGas->gases[NumGas];
+            gas.type = static_cast<GasType>(getEnumValue(gasTypeNamesUC, Util::makeUPPER(ipsc->cAlphaArgs(2 + NumGas))));
+            if (gas.type == GasType::Invalid) {
+                ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1 + NumGas)));
+                // Error check?
+                ErrorsFound = true;
+            }
         }
 
         matGas->Roughness = SurfaceRoughness::MediumRough; // Unused
@@ -1457,22 +1436,19 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (MaterialProps(1) + MaterialProps(2) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " not < 1.0");
         }
 
         if (MaterialProps(3) + MaterialProps(4) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(3) + " + " + ipsc->cNumericFieldNames(4) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(3) + " + " + ipsc->cNumericFieldNames(4) + " not < 1.0");
         }
 
         if (MaterialProps(5) + MaterialProps(6) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(5) + " + " + ipsc->cNumericFieldNames(6) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(5) + " + " + ipsc->cNumericFieldNames(6) + " not < 1.0");
         }
     }
 
@@ -1537,34 +1513,29 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
-                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " + " +
-                                  ipsc->cNumericFieldNames(4) + "not < 1.0");
+                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " + " + ipsc->cNumericFieldNames(4) + "not < 1.0");
         }
         if (MaterialProps(1) + MaterialProps(3) + MaterialProps(5) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
-                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(3) + " + " +
-                                  ipsc->cNumericFieldNames(5) + "not < 1.0");
+                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(3) + " + " + ipsc->cNumericFieldNames(5) + "not < 1.0");
         }
         if (MaterialProps(6) + MaterialProps(7) + MaterialProps(8) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
-                              ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(7) + " + " +
-                                  ipsc->cNumericFieldNames(8) + "not < 1.0");
+                              ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(7) + " + " + ipsc->cNumericFieldNames(8) + "not < 1.0");
         }
         if (MaterialProps(9) + MaterialProps(10) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
         }
         if (MaterialProps(9) + MaterialProps(11) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(11) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(11) + " not < 1.0");
         }
 
     } // TotShadesEQL loop
@@ -1641,21 +1612,18 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
-                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " + " +
-                                  ipsc->cNumericFieldNames(4) + "not < 1.0");
+                              ipsc->cNumericFieldNames(1) + " + " + ipsc->cNumericFieldNames(2) + " + " + ipsc->cNumericFieldNames(4) + "not < 1.0");
         }
         if (MaterialProps(6) + MaterialProps(7) + MaterialProps(8) >= 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
             ShowContinueError(state,
-                              ipsc->cNumericFieldNames(4) + " + " + ipsc->cNumericFieldNames(5) + " + " +
-                                  ipsc->cNumericFieldNames(6) + "not < 1.0");
+                              ipsc->cNumericFieldNames(4) + " + " + ipsc->cNumericFieldNames(5) + " + " + ipsc->cNumericFieldNames(6) + "not < 1.0");
         }
         if (MaterialProps(9) + MaterialProps(10) > 1.0) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
         }
 
     } // TotDrapesEQL loop
@@ -1695,11 +1663,13 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         // Load the material derived type from the input data.
 
         matScreen->Name = MaterialNames(1);
-        matScreen->bmRefModel = static_cast<ScreenBeamReflectanceModel>(getEnumValue(screenBeamReflectanceModelNamesUC, Util::makeUPPER(MaterialNames(2))));
+        matScreen->bmRefModel =
+            static_cast<ScreenBeamReflectanceModel>(getEnumValue(screenBeamReflectanceModelNamesUC, Util::makeUPPER(MaterialNames(2))));
         if (matScreen->bmRefModel == ScreenBeamReflectanceModel::Invalid) {
             ShowSevereError(state, format("{}=\"{}\", Illegal value.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state, format("{}=\"{}\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.",
-                                            ipsc->cAlphaFieldNames(2), MaterialNames(2)));
+            ShowContinueError(
+                state,
+                format("{}=\"{}\", must be one of DoNotModel, ModelAsDirectBeam or ModelAsDiffuse.", ipsc->cAlphaFieldNames(2), MaterialNames(2)));
             ErrorsFound = true;
         }
         matScreen->Roughness = SurfaceRoughness::MediumRough;
@@ -1731,8 +1701,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             if (MaterialProps(6) / MaterialProps(5) >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-                ShowContinueError(state,
-                                  ipsc->cNumericFieldNames(6) + " must be less than " + ipsc->cNumericFieldNames(5));
+                ShowContinueError(state, ipsc->cNumericFieldNames(6) + " must be less than " + ipsc->cNumericFieldNames(5));
             } else {
                 //       Calculate direct normal transmittance (open area fraction)
                 matScreen->Trans = pow_2(1.0 - MaterialProps(6) / MaterialProps(5));
@@ -1757,36 +1726,31 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         matScreen->toGlassDist = MaterialProps(7);
         if (matScreen->toGlassDist < 0.001 || matScreen->toGlassDist > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
+            ShowContinueError(state, ipsc->cNumericFieldNames(7) + " must be greater than or equal to 0.001 and less than or equal to 1.");
         }
 
         matScreen->topOpeningMult = MaterialProps(8);
         if (matScreen->topOpeningMult < 0.0 || matScreen->topOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
+            ShowContinueError(state, ipsc->cNumericFieldNames(8) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
         matScreen->bottomOpeningMult = MaterialProps(9);
         if (matScreen->bottomOpeningMult < 0.0 || matScreen->bottomOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
         matScreen->leftOpeningMult = MaterialProps(10);
         if (matScreen->leftOpeningMult < 0.0 || matScreen->leftOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
+            ShowContinueError(state, ipsc->cNumericFieldNames(10) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
         matScreen->rightOpeningMult = MaterialProps(11);
         if (matScreen->rightOpeningMult < 0.0 || matScreen->rightOpeningMult > 1.0) {
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
+            ShowContinueError(state, ipsc->cNumericFieldNames(11) + " must be greater than or equal to 0 and less than or equal to 1.");
         }
 
         matScreen->mapDegResolution = MaterialProps(12);
@@ -1936,8 +1900,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             if (matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing >= 1.0) {
                 ErrorsFound = true;
                 ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-                ShowContinueError(state,
-                                  ipsc->cNumericFieldNames(10) + " must be less than " + ipsc->cNumericFieldNames(9));
+                ShowContinueError(state, ipsc->cNumericFieldNames(10) + " must be less than " + ipsc->cNumericFieldNames(9));
             } else {
                 //  Calculate direct normal transmittance (open area fraction)
                 Openness = pow_2(1.0 - matScreen->ScreenWireDiameter / matScreen->ScreenWireSpacing);
@@ -1949,9 +1912,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
                     ShowContinueError(state, " ...the screen diameter is recalculated from the material openness specified ");
                     ShowContinueError(state, " ...and wire spacing using the formula = wire spacing * (1.0 - SQRT(Opennes))");
                     matScreen->ScreenWireDiameter = matScreen->ScreenWireSpacing * (1.0 - std::sqrt(matScreen->TausFrontBeamBeam));
-                    ShowContinueError(
-                        state,
-                        format(" ...Recalculated {}={:.4R} m", ipsc->cNumericFieldNames(10), matScreen->ScreenWireDiameter));
+                    ShowContinueError(state, format(" ...Recalculated {}={:.4R} m", ipsc->cNumericFieldNames(10), matScreen->ScreenWireDiameter));
                 }
             }
         }
@@ -2084,62 +2045,52 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if ((MaterialProps(6) + MaterialProps(7) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(7) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(7) + " not < 1.0");
         }
         if ((MaterialProps(6) + MaterialProps(8) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(8) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(6) + " + " + ipsc->cNumericFieldNames(8) + " not < 1.0");
         }
 
         if ((MaterialProps(9) + MaterialProps(10) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(10) + " not < 1.0");
         }
         if ((MaterialProps(9) + MaterialProps(11) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(11) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(9) + " + " + ipsc->cNumericFieldNames(11) + " not < 1.0");
         }
 
         if ((MaterialProps(12) + MaterialProps(13) >= 1.0) || (MaterialProps(12) + MaterialProps(14) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(13) + " not < 1.0 OR");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(14) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(13) + " not < 1.0 OR");
+            ShowContinueError(state, ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(14) + " not < 1.0");
         }
 
         if ((MaterialProps(12) + MaterialProps(13) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(13) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(13) + " not < 1.0");
         }
         if ((MaterialProps(12) + MaterialProps(14) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(14) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(12) + " + " + ipsc->cNumericFieldNames(14) + " not < 1.0");
         }
 
         if ((MaterialProps(15) + MaterialProps(16) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(15) + " + " + ipsc->cNumericFieldNames(16) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(15) + " + " + ipsc->cNumericFieldNames(16) + " not < 1.0");
         }
         if ((MaterialProps(15) + MaterialProps(17) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(15) + " + " + ipsc->cNumericFieldNames(17) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(15) + " + " + ipsc->cNumericFieldNames(17) + " not < 1.0");
         }
 
         // Require that beam and diffuse properties be the same
@@ -2182,21 +2133,18 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if ((MaterialProps(18) + MaterialProps(19) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(18) + " + " + ipsc->cNumericFieldNames(19) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(18) + " + " + ipsc->cNumericFieldNames(19) + " not < 1.0");
         }
         if ((MaterialProps(18) + MaterialProps(20) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(state,
-                              ipsc->cNumericFieldNames(18) + " + " + ipsc->cNumericFieldNames(20) + " not < 1.0");
+            ShowContinueError(state, ipsc->cNumericFieldNames(18) + " + " + ipsc->cNumericFieldNames(20) + " not < 1.0");
         }
 
         if (state.dataMaterial->Blind(Loop).BlindToGlassDist < 0.5 * state.dataMaterial->Blind(Loop).SlatWidth) {
             ErrorsFound = true;
             ShowSevereError(state, state.dataHeatBalMgr->CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Illegal value combination.");
-            ShowContinueError(
-                state, ipsc->cNumericFieldNames(21) + " is less than half of the " + ipsc->cNumericFieldNames(1));
+            ShowContinueError(state, ipsc->cNumericFieldNames(21) + " is less than half of the " + ipsc->cNumericFieldNames(1));
         }
 
         // Minimum and maximum slat angles allowed by slat geometry
@@ -2329,21 +2277,18 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         thisMaterial->ReflFrontBeamDiff = MaterialProps(7);
         thisMaterial->ReflBackBeamDiff = MaterialProps(8);
 
-        if (!ipsc->lNumericFieldBlanks(9) && !ipsc->lNumericFieldBlanks(10) &&
-            !ipsc->lNumericFieldBlanks(11) && !ipsc->lNumericFieldBlanks(12)) {
+        if (!ipsc->lNumericFieldBlanks(9) && !ipsc->lNumericFieldBlanks(10) && !ipsc->lNumericFieldBlanks(11) && !ipsc->lNumericFieldBlanks(12)) {
             thisMaterial->TausFrontBeamDiffVis = MaterialProps(9);
             thisMaterial->TausBackBeamDiffVis = MaterialProps(10);
             thisMaterial->ReflFrontBeamDiffVis = MaterialProps(11);
             thisMaterial->ReflBackBeamDiffVis = MaterialProps(12);
         }
-        if (!ipsc->lNumericFieldBlanks(13) && !ipsc->lNumericFieldBlanks(14) &&
-            !ipsc->lNumericFieldBlanks(15)) {
+        if (!ipsc->lNumericFieldBlanks(13) && !ipsc->lNumericFieldBlanks(14) && !ipsc->lNumericFieldBlanks(15)) {
             thisMaterial->TausDiffDiff = MaterialProps(13);
             thisMaterial->ReflFrontDiffDiff = MaterialProps(14);
             thisMaterial->ReflBackDiffDiff = MaterialProps(15);
         }
-        if (!ipsc->lNumericFieldBlanks(16) && !ipsc->lNumericFieldBlanks(17) &&
-            !ipsc->lNumericFieldBlanks(18)) {
+        if (!ipsc->lNumericFieldBlanks(16) && !ipsc->lNumericFieldBlanks(17) && !ipsc->lNumericFieldBlanks(18)) {
             thisMaterial->TausDiffDiffVis = MaterialProps(13);
             thisMaterial->ReflFrontDiffDiffVis = MaterialProps(14);
             thisMaterial->ReflBackDiffDiffVis = MaterialProps(15);
@@ -2381,8 +2326,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
         if (thisMaterial->SlatSeparation < 0.001) {
             ShowWarningError(state, format("{}=\"{}\", Slat Seperation", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(
-                state, format("{} [{:.2R}]. Slate spacing must be > 0.0", ipsc->cNumericFieldNames(2), thisMaterial->SlatSeparation));
+            ShowContinueError(state, format("{} [{:.2R}]. Slate spacing must be > 0.0", ipsc->cNumericFieldNames(2), thisMaterial->SlatSeparation));
             ShowContinueError(state,
                               "...Setting slate spacing to default value of 0.025 m and "
                               "simulation continues.");
@@ -2390,28 +2334,22 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         }
         if (thisMaterial->SlatWidth < 0.001 || thisMaterial->SlatWidth >= 2.0 * thisMaterial->SlatSeparation) {
             ShowWarningError(state, format("{}=\"{}\", Slat Width", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing",
-                                     ipsc->cNumericFieldNames(1),
-                                     thisMaterial->SlatWidth));
+            ShowContinueError(
+                state, format("{} [{:.2R}]. Slat width range is 0 < Width <= 2*Spacing", ipsc->cNumericFieldNames(1), thisMaterial->SlatWidth));
             ShowContinueError(state, "...Setting slate width equal to slate spacing and simulation continues.");
             thisMaterial->SlatWidth = thisMaterial->SlatSeparation;
         }
         if (thisMaterial->SlatCrown < 0.0 || thisMaterial->SlatCrown >= 0.5 * thisMaterial->SlatWidth) {
             ShowWarningError(state, format("{}=\"{}\", Slat Crown", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width",
-                                     ipsc->cNumericFieldNames(3),
-                                     thisMaterial->SlatCrown));
+            ShowContinueError(
+                state, format("{} [{:.2R}]. Slat crwon range is 0 <= crown < 0.5*Width", ipsc->cNumericFieldNames(3), thisMaterial->SlatCrown));
             ShowContinueError(state, "...Setting slate crown to 0.0 and simulation continues.");
             thisMaterial->SlatCrown = 0.0;
         }
         if (thisMaterial->SlatAngle < -90.0 || thisMaterial->SlatAngle > 90.0) {
             ShowWarningError(state, format("{}=\"{}\", Slat Angle", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
             ShowContinueError(state,
-                              format("{} [{:.2R}]. Slat angle range is -90.0 <= Angle < 90.0",
-                                     ipsc->cNumericFieldNames(4),
-                                     thisMaterial->SlatAngle));
+                              format("{} [{:.2R}]. Slat angle range is -90.0 <= Angle < 90.0", ipsc->cNumericFieldNames(4), thisMaterial->SlatAngle));
             ShowContinueError(state, "...Setting slate angle to 0.0 and simulation continues.");
             thisMaterial->SlatAngle = 0.0;
         }
@@ -2419,33 +2357,28 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (!Util::SameString(MaterialNames(2), "Horizontal") && !Util::SameString(MaterialNames(2), "Vertical")) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{}=\"{}\", must be Horizontal or Vertical.", ipsc->cAlphaFieldNames(2), MaterialNames(2)));
+            ShowContinueError(state, format("{}=\"{}\", must be Horizontal or Vertical.", ipsc->cAlphaFieldNames(2), MaterialNames(2)));
         }
 
         if ((MaterialProps(5) + MaterialProps(7) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} + {} not < 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(7)));
+            ShowContinueError(state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(5), ipsc->cNumericFieldNames(7)));
         }
         if ((MaterialProps(6) + MaterialProps(8) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} + {} not < 1.0", ipsc->cNumericFieldNames(6), ipsc->cNumericFieldNames(8)));
+            ShowContinueError(state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(6), ipsc->cNumericFieldNames(8)));
         }
         if ((MaterialProps(9) + MaterialProps(11) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(state,
-                              format("{} + {} not < 1.0", ipsc->cNumericFieldNames(9), ipsc->cNumericFieldNames(11)));
+            ShowContinueError(state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(9), ipsc->cNumericFieldNames(11)));
         }
         if ((MaterialProps(10) + MaterialProps(12) >= 1.0)) {
             ErrorsFound = true;
             ShowSevereError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
-            ShowContinueError(
-                state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(10), ipsc->cNumericFieldNames(12)));
+            ShowContinueError(state, format("{} + {} not < 1.0", ipsc->cNumericFieldNames(10), ipsc->cNumericFieldNames(12)));
         }
 
     } // TotBlindsEQL loop
@@ -2523,8 +2456,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             state.dataHeatBal->NominalR(MaterNum) = thisMaterial->Thickness / thisMaterial->Conductivity;
             thisMaterial->Resistance = state.dataHeatBal->NominalR(MaterNum);
         } else {
-            ShowSevereError(
-                state, format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
+            ShowSevereError(state, format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
             ShowContinueError(state, format("{} is <=0.", ipsc->cNumericFieldNames(7)));
             ErrorsFound = true;
         }
@@ -2532,15 +2464,11 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
         if (thisMaterial->InitMoisture > thisMaterial->Porosity) {
             ShowWarningError(state, format("{}=\"{}\", Illegal value combination.", state.dataHeatBalMgr->CurrentModuleObject, MaterialNames(1)));
             ShowContinueError(state,
-                              format("{} is greater than {}. It must be less or equal.",
-                                     ipsc->cNumericFieldNames(15),
-                                     ipsc->cNumericFieldNames(13)));
+                              format("{} is greater than {}. It must be less or equal.", ipsc->cNumericFieldNames(15), ipsc->cNumericFieldNames(13)));
             ShowContinueError(state, format("{} = {:.3T}.", ipsc->cNumericFieldNames(13), thisMaterial->Porosity));
             ShowContinueError(state, format("{} = {:.3T}.", ipsc->cNumericFieldNames(15), thisMaterial->InitMoisture));
-            ShowContinueError(state,
-                              format("{} is reset to the maximum (saturation) value = {:.3T}.",
-                                     ipsc->cNumericFieldNames(15),
-                                     thisMaterial->Porosity));
+            ShowContinueError(
+                state, format("{} is reset to the maximum (saturation) value = {:.3T}.", ipsc->cNumericFieldNames(15), thisMaterial->Porosity));
             ShowContinueError(state, "Simulation continues.");
             thisMaterial->InitMoisture = thisMaterial->Porosity;
         }
@@ -2549,8 +2477,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
     // Thermochromic glazing group
     // get the number of WindowMaterial:GlazingGroup:Thermochromic objects in the idf file
     state.dataHeatBalMgr->CurrentModuleObject = "WindowMaterial:GlazingGroup:Thermochromic";
-    state.dataHeatBal->TotTCGlazings =
-        ip->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
+    state.dataHeatBal->TotTCGlazings = ip->getNumObjectsFound(state, state.dataHeatBalMgr->CurrentModuleObject);
     if (state.dataHeatBal->TotTCGlazings >= 1) {
         // Read TC glazings
         state.dataHeatBal->TCGlazings.allocate(state.dataHeatBal->TotTCGlazings);
@@ -2576,13 +2503,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             }
 
             if (MaterialNumProp + 1 != MaterialNumAlpha) {
-                ShowSevereError(
-                    state,
-                    format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
+                ShowSevereError(state, format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ShowContinueError(state,
-                                  format("Check number of {} compared to number of {}",
-                                         ipsc->cAlphaFieldNames(2),
-                                         ipsc->cNumericFieldNames(1)));
+                                  format("Check number of {} compared to number of {}", ipsc->cAlphaFieldNames(2), ipsc->cNumericFieldNames(1)));
                 ErrorsFound = true;
                 continue;
             }
@@ -2614,19 +2537,15 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
                     // test that named material is of the right type
                     if (thisMaterial->group != Group::WindowGlass) {
-                        ShowSevereError(state,
-                                        format("{}=\"{}\" is not defined correctly.",
-                                               state.dataHeatBalMgr->CurrentModuleObject,
-                                               ipsc->cAlphaArgs(1)));
+                        ShowSevereError(
+                            state, format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
                         ShowContinueError(state, format("Material named: {} is not a window glazing ", ipsc->cAlphaArgs(1 + iTC)));
                         ErrorsFound = true;
                     }
 
                 } else { // thow error because not found
                     ShowSevereError(state,
-                                    format("{}=\"{}\" is not defined correctly.",
-                                           state.dataHeatBalMgr->CurrentModuleObject,
-                                           ipsc->cAlphaArgs(1)));
+                                    format("{}=\"{}\" is not defined correctly.", state.dataHeatBalMgr->CurrentModuleObject, ipsc->cAlphaArgs(1)));
                     ShowContinueError(state, format("Material named: {} was not found ", ipsc->cAlphaArgs(1 + iTC)));
                     ErrorsFound = true;
                 }
@@ -2658,7 +2577,7 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
             ShowContinueError(state, "...All Material names must be unique regardless of subtype.");
             continue;
         }
-        
+
         ++MaterNum;
         auto *thisMaterial = new MaterialChild;
         state.dataMaterial->Material(MaterNum) = thisMaterial;
@@ -2724,9 +2643,9 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     if (state.dataGlobal->AnyEnergyManagementSystemInModel) { // setup surface property EMS actuators
 
-        for (auto *mat : state.dataMaterial->Material) { 
+        for (auto *mat : state.dataMaterial->Material) {
             if (mat->group != Group::Regular) continue;
-                
+
             auto *matReg = dynamic_cast<MaterialChild *>(mat);
             assert(matReg != nullptr);
             SetupEMSActuator(state,
@@ -2755,11 +2674,10 @@ void GetMaterialData(EnergyPlusData &state, bool &ErrorsFound) // set to true if
 
     // try assigning phase change material properties for each material, won't do anything for non pcm surfaces
     for (auto *mBase : state.dataMaterial->Material) {
-        if (mBase->group == Material::Group::Screen ||
-            mBase->group == Material::Group::WindowGas || 
-            mBase->group == Material::Group::WindowGasMixture ||
-            mBase->group == Material::Group::GapEquivalentLayer) continue;
-            
+        if (mBase->group == Material::Group::Screen || mBase->group == Material::Group::WindowGas ||
+            mBase->group == Material::Group::WindowGasMixture || mBase->group == Material::Group::GapEquivalentLayer)
+            continue;
+
         auto *m = dynamic_cast<MaterialChild *>(mBase);
         assert(m != nullptr);
         m->phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory(state, m->Name);
@@ -2779,7 +2697,7 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 
     auto &ip = state.dataInputProcessing->inputProcessor;
     auto &ipsc = state.dataIPShortCut;
-    
+
     int numVariAbs = ip->getNumObjectsFound(state, cCurrentModuleObject);
     state.dataHeatBal->AnyVariableAbsorptance = (numVariAbs > 0);
     for (int i = 1; i <= numVariAbs; ++i) {
@@ -2800,11 +2718,10 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
         // Load the material derived type from the input data.
         int MaterNum = Util::FindItemInPtrList(alphas(2), state.dataMaterial->Material);
         if (MaterNum == 0) {
-            ShowSevereError(state,
-                            format("{}: invalid {} entered={}, must match to a valid Material name.",
-                                   cCurrentModuleObject,
-                                   ipsc->cAlphaFieldNames(2),
-                                   alphas(2)));
+            ShowSevereError(
+                state,
+                format(
+                    "{}: invalid {} entered={}, must match to a valid Material name.", cCurrentModuleObject, ipsc->cAlphaFieldNames(2), alphas(2)));
             errorsFound = true;
             return;
         }
@@ -2823,7 +2740,8 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
         }
 
         thisMaterial->absorpVarCtrlSignal = VariableAbsCtrlSignal::SurfaceTemperature; // default value
-        thisMaterial->absorpVarCtrlSignal = static_cast<VariableAbsCtrlSignal>(getEnumValue(variableAbsCtrlSignalNamesUC, Util::makeUPPER(alphas(3))));
+        thisMaterial->absorpVarCtrlSignal =
+            static_cast<VariableAbsCtrlSignal>(getEnumValue(variableAbsCtrlSignalNamesUC, Util::makeUPPER(alphas(3))));
         //    init to 0 as GetScheduleIndex returns 0 for not-found schedule
         thisMaterial->absorpThermalVarFuncIdx = Curve::GetCurveIndex(state, alphas(4));
         thisMaterial->absorpThermalVarSchedIdx = ScheduleManager::GetScheduleIndex(state, alphas(5));
@@ -2873,10 +2791,9 @@ void GetVariableAbsorptanceInput(EnergyPlusData &state, bool &errorsFound)
 
 void CalcScreenTransmittance(EnergyPlusData &state,
                              MaterialScreen const *screen,
-                             Real64 phi,     // Sun altitude relative to surface outward normal (radians, 0 to Pi)
-                             Real64 theta,   // Optional sun azimuth relative to surface outward normal (radians, 0 to Pi)
-                             ScreenBmTransAbsRef &tar
-)
+                             Real64 phi,   // Sun altitude relative to surface outward normal (radians, 0 to Pi)
+                             Real64 theta, // Optional sun azimuth relative to surface outward normal (radians, 0 to Pi)
+                             ScreenBmTransAbsRef &tar)
 {
 
     // FUNCTION INFORMATION:
@@ -2898,26 +2815,26 @@ void CalcScreenTransmittance(EnergyPlusData &state,
 
     Real64 constexpr Small(1.E-9); // Small Number used to approximate zero
 
-    Real64 Tdirect;                   // Beam solar transmitted through screen (dependent on sun angle)
-    Real64 Tscattered;                // Beam solar reflected through screen (dependent on sun angle)
-    Real64 TscatteredVis;             // Visible beam solar reflected through screen (dependent on sun angle)
-    Real64 Tscattermax;               // Maximum solar beam  scattered transmittance
-    Real64 TscattermaxVis;            // Maximum visible beam scattered transmittance
-    Real64 ExponentInterior;          // Exponent used in scattered transmittance calculation
+    Real64 Tdirect;          // Beam solar transmitted through screen (dependent on sun angle)
+    Real64 Tscattered;       // Beam solar reflected through screen (dependent on sun angle)
+    Real64 TscatteredVis;    // Visible beam solar reflected through screen (dependent on sun angle)
+    Real64 Tscattermax;      // Maximum solar beam  scattered transmittance
+    Real64 TscattermaxVis;   // Maximum visible beam scattered transmittance
+    Real64 ExponentInterior; // Exponent used in scattered transmittance calculation
     // when Delta < DeltaMax (0,0 to peak)
     Real64 ExponentExterior; // Exponent used in scattered transmittance calculation
     // when Delta > DeltaMax (peak to max)
 
     assert(phi >= 0.0 && phi <= Constant::Pi);
     assert(theta >= 0.0 && theta <= Constant::Pi);
-    
+
     Real64 sinPhi = std::sin(phi);
     Real64 cosPhi = std::cos(phi);
     Real64 tanPhi = sinPhi / cosPhi;
     Real64 sinTheta = std::sin(theta);
     Real64 cosTheta = std::cos(theta);
     Real64 tanTheta = sinTheta / cosTheta;
-    
+
     bool sunInFront = (phi < Constant::PiOvr2) && (theta < Constant::PiOvr2); // Sun is in front of screen
 
     // ratio of screen material diameter to screen material spacing
@@ -2930,7 +2847,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     // Now we need to normalize phi and theta to the 0 to Pi/2 range using reflection.
     if (phi > Constant::PiOvr2) phi = Constant::Pi - phi;
     if (theta > Constant::PiOvr2) theta = Constant::Pi - theta;
-    
+
     // calculate compliment of relative solar azimuth
     Real64 Beta = Constant::PiOvr2 - theta;
 
@@ -2948,12 +2865,13 @@ void CalcScreenTransmittance(EnergyPlusData &state,
     Real64 COSMu = std::sqrt(pow_2(cosPhi) * pow_2(cosTheta) + pow_2(sinPhi));
     if (COSMu <= Small) {
         TransXDir = 1.0 - Gamma;
-    } else {            
+    } else {
         Real64 Epsilon = std::acos(cosPhi * cosTheta / COSMu);
         Real64 Eta = Constant::PiOvr2 - Epsilon;
         if (std::cos(Epsilon) != 0.0 && Eta != 0.0) {
             Real64 MuPrime = std::atan(std::tan(std::acos(COSMu)) / std::cos(Epsilon));
-            TransXDir = 1.0 - Gamma * (std::cos(MuPrime) + std::sin(MuPrime) * std::tan(std::acos(COSMu)) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Eta))));
+            TransXDir =
+                1.0 - Gamma * (std::cos(MuPrime) + std::sin(MuPrime) * std::tan(std::acos(COSMu)) * std::sqrt(1.0 + pow_2(1.0 / std::tan(Eta))));
             TransXDir = max(0.0, TransXDir);
         } else {
             TransXDir = 0.0;
@@ -2978,7 +2896,8 @@ void CalcScreenTransmittance(EnergyPlusData &state,
 
         //   Use empirical model to determine maximum (peak) scattering
         Real64 Tscattermax = 0.0229 * Gamma + 0.2971 * ReflCyl - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCyl) - 0.44416 * Gamma * ReflCyl;
-        Real64 TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflCylVis - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCylVis) - 0.44416 * Gamma * ReflCylVis;
+        Real64 TscattermaxVis =
+            0.0229 * Gamma + 0.2971 * ReflCylVis - 0.03624 * pow_2(Gamma) + 0.04763 * pow_2(ReflCylVis) - 0.44416 * Gamma * ReflCylVis;
 
         //   Vary slope of interior and exterior surface of scattering model
         Real64 ExponentInterior = -pow_2(Delta - DeltaMax) / 600.0;
@@ -3061,7 +2980,7 @@ void CalcScreenTransmittance(EnergyPlusData &state,
         tar.AbsSolBack = max(0.0, (1.0 - Tdirect) * (1.0 - ReflCyl));
     }
 } // CalcScreenTransmittance()
-        
+
 void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &solcos, Real64 &phi, Real64 &theta)
 {
     phi = std::abs(std::acos(solcos.z) - phiWin);
@@ -3070,13 +2989,16 @@ void GetRelativePhiTheta(Real64 phiWin, Real64 thetaWin, Vector3<Real64> const &
     NormalizePhiTheta(phi, theta);
 } // GetRelativePhiTheta()
 
-// Use reflection around Pi to normalize to the range 0 to Pi        
-void NormalizePhiTheta(Real64 &phi, Real64 &theta) {
+// Use reflection around Pi to normalize to the range 0 to Pi
+void NormalizePhiTheta(Real64 &phi, Real64 &theta)
+{
 
-    while (phi > 2 * Constant::Pi) phi -= 2 * Constant::Pi;
+    while (phi > 2 * Constant::Pi)
+        phi -= 2 * Constant::Pi;
     if (phi > Constant::Pi) phi = 2 * Constant::Pi - phi;
-    
-    while (theta > 2 * Constant::Pi) theta -= 2 * Constant::Pi;
+
+    while (theta > 2 * Constant::Pi)
+        theta -= 2 * Constant::Pi;
     if (theta > Constant::Pi) theta = 2 * Constant::Pi - theta;
 } // NormalizePhiTheta()
 
@@ -3087,5 +3009,5 @@ void GetPhiThetaIndices(Real64 phi, Real64 theta, Real64 dPhi, Real64 dTheta, in
     iTheta1 = int(theta / dTheta);
     iTheta2 = (iTheta1 == maxITheta - 1) ? iTheta1 : iTheta1 + 1;
 } // GetPhiThetaIndices()
-                        
+
 } // namespace EnergyPlus::Material

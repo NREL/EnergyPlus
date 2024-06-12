@@ -312,7 +312,7 @@ void SetEquivalentLayerWindowProperties(EnergyPlusData &state, int const ConstrN
         } else if (mat->group == Material::Group::GapEquivalentLayer) {
             auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(mat);
             assert(matGas != nullptr);
-            
+
             // This layer is a gap.  Fill in the parameters
             CFS(EQLNum).G(gLayer).Name = matGas->Name;
             // previously the values of the levels are 1-3, now it's 0-2

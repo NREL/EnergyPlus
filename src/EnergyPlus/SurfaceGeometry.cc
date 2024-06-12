@@ -2464,9 +2464,9 @@ namespace SurfaceGeometry {
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
                             auto *mat = state.dataMaterial->Material(iTmp2);
-                            
+
                             if (mat->group != Material::Group::WindowBlind) continue;
-                            
+
                             auto *matBlind = dynamic_cast<Material::MaterialChild *>(mat);
                             assert(matBlind != nullptr);
 
@@ -11047,7 +11047,8 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(MatGapFlow))->gases[0].type != Material::GasType::Air) {
+                    if (dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(MatGapFlow))->gases[0].type !=
+                        Material::GasType::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", Gas type not air in airflow gap of construction {}",

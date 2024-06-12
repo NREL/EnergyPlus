@@ -70,8 +70,8 @@ struct EnergyPlusData;
 
 namespace Window {
 
-    int constexpr nume = 107;                    // Number of wavelength values in solar spectrum
-    int constexpr numt3 = 81;                    // Number of wavelength values in the photopic response
+    int constexpr nume = 107; // Number of wavelength values in solar spectrum
+    int constexpr numt3 = 81; // Number of wavelength values in the photopic response
 
     int constexpr maxGlassLayers = 5;
     int constexpr maxGapLayers = 5;
@@ -98,10 +98,10 @@ namespace Window {
                                        Real64 wlbot, // Lowest and highest wavelength considered
                                        Real64 wltop,
                                        std::array<int, maxGlassLayers> const &numpt,
-                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &wlt,  
-                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &tPhi,  
-                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rfPhi,  
-                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rbPhi, 
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &wlt,
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &tPhi,
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rfPhi,
+                                       std::array<std::array<Real64, maxSpectralDataElements>, maxGlassLayers> const &rbPhi,
                                        std::array<Real64, nume> &stPhi,
                                        std::array<Real64, nume> &srfPhi,
                                        std::array<Real64, nume> &srbPhi,
@@ -121,8 +121,8 @@ namespace Window {
 
     Real64 Interpolate(gsl::span<Real64 const> x, // Array of data points for independent variable
                        gsl::span<Real64 const> y, // Array of data points for dependent variable
-                       int npts,            // Number of data pairs
-                       Real64 xin           // Given value of x
+                       int npts,                  // Number of data pairs
+                       Real64 xin                 // Given value of x
     );
 
     void CalcWindowHeatBalance(EnergyPlusData &state,
@@ -217,7 +217,7 @@ namespace Window {
                          Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int n,                // Dimension of matrix
                          Array1D_int &indx,    // Vector of row permutations
-                         int &d             // +1 if even number of row interchange is even, -1
+                         int &d                // +1 if even number of row interchange is even, -1
     );
 
     void LUsolution(EnergyPlusData &state,
@@ -426,18 +426,18 @@ namespace Window {
 
     void initWindowModel(EnergyPlusData &state);
 
-    struct WindowGap {
+    struct WindowGap
+    {
         int numGases = 0;
         std::array<Material::Gas, Material::maxMixGases> gases = {Material::Gas()};
         std::array<Real64, Material::maxMixGases> gasFracts = {0.0};
         Real64 width = 0.0;
     };
-        
+
 } // namespace Window
 
 struct WindowManagerData : BaseGlobalStruct
 {
-
 
     //                                      Dens  dDens/dT  Con    dCon/dT   Vis    dVis/dT Prandtl dPrandtl/dT
     std::array<Real64, 8> const AirProps = {1.29, -0.4e-2, 2.41e-2, 7.6e-5, 1.73e-5, 1.0e-7, 0.72, 1.8e-3};
@@ -449,73 +449,70 @@ struct WindowManagerData : BaseGlobalStruct
 
     // Solar spectrum wavelength values (microns)
     std::array<Real64, Window::nume> wle = {
-        0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
-        0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
-        0.5300, 0.5400, 0.5500, 0.5700, 0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400,
-        0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000, 0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150,
-        0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400, 1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610,
-        1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770, 1.4970, 1.5200, 1.5390, 1.5580,
-        1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850, 2.0050, 2.0350,
-        2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
+        0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800, 0.3900, 0.4000,
+        0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200, 0.5300, 0.5400, 0.5500, 0.5700,
+        0.5900, 0.6100, 0.6300, 0.6500, 0.6700, 0.6900, 0.7100, 0.7180, 0.7244, 0.7400, 0.7525, 0.7575, 0.7625, 0.7675, 0.7800, 0.8000,
+        0.8160, 0.8237, 0.8315, 0.8400, 0.8600, 0.8800, 0.9050, 0.9150, 0.9250, 0.9300, 0.9370, 0.9480, 0.9650, 0.9800, 0.9935, 1.0400,
+        1.0700, 1.1000, 1.1200, 1.1300, 1.1370, 1.1610, 1.1800, 1.2000, 1.2350, 1.2900, 1.3200, 1.3500, 1.3950, 1.4425, 1.4625, 1.4770,
+        1.4970, 1.5200, 1.5390, 1.5580, 1.5780, 1.5920, 1.6100, 1.6300, 1.6460, 1.6780, 1.7400, 1.8000, 1.8600, 1.9200, 1.9600, 1.9850,
+        2.0050, 2.0350, 2.0650, 2.1000, 2.1480, 2.1980, 2.2700, 2.3600, 2.4500, 2.4940, 2.5370};
 
     // Solar spectrum values corresponding to wle
     std::array<Real64, Window::nume> e = {
-        0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,
-        720.7,  1013.1, 1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9,
-        1572.4, 1550.7, 1561.5, 1501.5, 1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2,
-        1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6, 849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,
-        690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,  637.5,  412.6,  108.9,  189.1,  132.2,  339.0,
-        460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,  182.1,  262.2,  274.2,  275.0,
-        244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,   26.8,   99.5,
-        60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
-        
+        0.0,    9.5,    42.3,   107.8,  181.0,  246.0,  395.3,  390.1,  435.3,  438.9,  483.7,  520.3,  666.2,  712.5,  720.7,  1013.1,
+        1158.2, 1184.0, 1071.9, 1302.0, 1526.0, 1599.6, 1581.0, 1628.3, 1539.2, 1548.7, 1586.5, 1484.9, 1572.4, 1550.7, 1561.5, 1501.5,
+        1395.5, 1485.3, 1434.1, 1419.9, 1392.3, 1130.0, 1316.7, 1010.3, 1043.2, 1211.2, 1193.9, 1175.5, 643.1,  1030.7, 1131.1, 1081.6,
+        849.2,  785.0,  916.4,  959.9,  978.9,  933.2,  748.5,  667.5,  690.3,  403.6,  258.3,  313.6,  526.8,  646.4,  746.8,  690.5,
+        637.5,  412.6,  108.9,  189.1,  132.2,  339.0,  460.0,  423.6,  480.5,  413.1,  250.2,  32.5,   1.6,    55.7,   105.1,  105.5,
+        182.1,  262.2,  274.2,  275.0,  244.6,  247.4,  228.7,  244.5,  234.8,  220.5,  171.5,  30.7,   2.0,    1.2,    21.2,   91.1,
+        26.8,   99.5,   60.4,   89.1,   82.2,   71.5,   70.2,   62.0,   21.2,   18.5,   3.2};
+
     // Phototopic response function and corresponding wavelengths (microns)
     // (CIE 1931 observer; ISO/CIE 10527, CIE Standard Calorimetric Observers;
     // derived from Optics5 data file "CIE 1931 Color Match from E308.txt", which is
     // the same as WINDOW4 file Cie31t.dat)
     // Wavelength values for photopic response
-    std::array<Real64, Window::numt3> wlt3 = {
-        0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
-        0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
-        0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
-        0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
-        0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
-        0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
-        
+    std::array<Real64, Window::numt3> wlt3 = {0.380, 0.385, 0.390, 0.395, 0.400, 0.405, 0.410, 0.415, 0.420, 0.425, 0.430, 0.435, 0.440, 0.445,
+                                              0.450, 0.455, 0.460, 0.465, 0.470, 0.475, 0.480, 0.485, 0.490, 0.495, 0.500, 0.505, 0.510, 0.515,
+                                              0.520, 0.525, 0.530, 0.535, 0.540, 0.545, 0.550, 0.555, 0.560, 0.565, 0.570, 0.575, 0.580, 0.585,
+                                              0.590, 0.595, 0.600, 0.605, 0.610, 0.615, 0.620, 0.625, 0.630, 0.635, 0.640, 0.645, 0.650, 0.655,
+                                              0.660, 0.665, 0.670, 0.675, 0.680, 0.685, 0.690, 0.695, 0.700, 0.705, 0.710, 0.715, 0.720, 0.725,
+                                              0.730, 0.735, 0.740, 0.745, 0.750, 0.755, 0.760, 0.765, 0.770, 0.775, 0.780};
+
     // Photopic response corresponding to wavelengths in wlt3
     std::array<Real64, Window::numt3> y30 = {
-        0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298,
-        0.0380, 0.0480, 0.0600, 0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082,
-        0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803, 0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163,
-        0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650, 0.2170, 0.1750, 0.1382, 0.1070, 0.0816,
-        0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015, 0.0010, 0.0007,
-        0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
-        
-    int ngllayer = 0;                                                 // Number of glass layers
-    int nglface = 0;                                                  // Number of glass faces
-    int nglfacep = 0;                                                 // Number of glass faces, + 2 if shade layer present
-    Real64 tout = 0.0;                                                // Outside air temperature (K)
-    Real64 tin = 0.0;                                                 // Inside air temperature (previous timestep) (K)
-    Real64 tilt = 0.0;                                                // Window tilt (deg)
-    Real64 tiltr = 0.0;                                               // Window tilt (radians)
-    Real64 hcin = 0.0;                                                // Convective inside air film conductance (W/m2-K)
-    Real64 hcout = 0.0;                                               // Convective outside air film conductance (W/m2-K)
-    Real64 Ebout = 0.0;                                               // Sigma*(outside air temp)**4 (W/m2)
-    Real64 Outir = 0.0;                                               // IR radiance of window's exterior surround (W/m2)
-    Real64 Rmir = 0.0;                                                // IR radiance of window's interior surround (W/m2)
-    Real64 Rtot = 0.0;                                                // Total thermal resistance of window (m2-K/W)
-    std::array<Window::WindowGap, Window::maxGlassLayers> gaps = {Window::WindowGap()}; // Gas thermal conductivity coefficients for each gap
-    std::array<Real64, Window::maxGlassLayers> thick = {0.0};                              // Glass layer thickness (m)
-    std::array<Real64, Window::maxGlassLayers> scon = {0.0};                               // Glass layer conductance--conductivity/thickness (W/m2-K)
+        0.0000, 0.0001, 0.0001, 0.0002, 0.0004, 0.0006, 0.0012, 0.0022, 0.0040, 0.0073, 0.0116, 0.0168, 0.0230, 0.0298, 0.0380, 0.0480, 0.0600,
+        0.0739, 0.0910, 0.1126, 0.1390, 0.1693, 0.2080, 0.2586, 0.3230, 0.4073, 0.5030, 0.6082, 0.7100, 0.7932, 0.8620, 0.9149, 0.9540, 0.9803,
+        0.9950, 1.0000, 0.9950, 0.9786, 0.9520, 0.9154, 0.8700, 0.8163, 0.7570, 0.6949, 0.6310, 0.5668, 0.5030, 0.4412, 0.3810, 0.3210, 0.2650,
+        0.2170, 0.1750, 0.1382, 0.1070, 0.0816, 0.0610, 0.0446, 0.0320, 0.0232, 0.0170, 0.0119, 0.0082, 0.0158, 0.0041, 0.0029, 0.0021, 0.0015,
+        0.0010, 0.0007, 0.0005, 0.0004, 0.0002, 0.0002, 0.0001, 0.0001, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000};
 
-    std::array<Real64, 2 * Window::maxGlassLayers> tir = {0.0};             // Front and back IR transmittance for each glass layer
-    std::array<Real64, 2 * Window::maxGlassLayers> emis = {0.0};            // Front and back IR emissivity for each glass layer
-    std::array<Real64, 2 * Window::maxGlassLayers> rir = {0.0};             // Front and back IR reflectance for each glass layer
-                                                    //  (program calculates from tir and emis)
-    std::array<Real64, 2 * Window::maxGlassLayers> AbsRadGlassFace = {0.0}; // Solar radiation and IR radiation from internal gains absorbed by glass face
-    std::array<Real64, 2 * Window::maxGlassLayers> thetas = {0.0};          // Glass surface temperatures (K)
-    std::array<Real64, 2 * Window::maxGlassLayers> thetasPrev = {0.0};      // Previous-iteration glass surface temperatures (K)
-    std::array<Real64, 2 * Window::maxGlassLayers> fvec = {0.0};            // Glass face heat balance function
+    int ngllayer = 0;                                                                   // Number of glass layers
+    int nglface = 0;                                                                    // Number of glass faces
+    int nglfacep = 0;                                                                   // Number of glass faces, + 2 if shade layer present
+    Real64 tout = 0.0;                                                                  // Outside air temperature (K)
+    Real64 tin = 0.0;                                                                   // Inside air temperature (previous timestep) (K)
+    Real64 tilt = 0.0;                                                                  // Window tilt (deg)
+    Real64 tiltr = 0.0;                                                                 // Window tilt (radians)
+    Real64 hcin = 0.0;                                                                  // Convective inside air film conductance (W/m2-K)
+    Real64 hcout = 0.0;                                                                 // Convective outside air film conductance (W/m2-K)
+    Real64 Ebout = 0.0;                                                                 // Sigma*(outside air temp)**4 (W/m2)
+    Real64 Outir = 0.0;                                                                 // IR radiance of window's exterior surround (W/m2)
+    Real64 Rmir = 0.0;                                                                  // IR radiance of window's interior surround (W/m2)
+    Real64 Rtot = 0.0;                                                                  // Total thermal resistance of window (m2-K/W)
+    std::array<Window::WindowGap, Window::maxGlassLayers> gaps = {Window::WindowGap()}; // Gas thermal conductivity coefficients for each gap
+    std::array<Real64, Window::maxGlassLayers> thick = {0.0};                           // Glass layer thickness (m)
+    std::array<Real64, Window::maxGlassLayers> scon = {0.0};                            // Glass layer conductance--conductivity/thickness (W/m2-K)
+
+    std::array<Real64, 2 *Window::maxGlassLayers> tir = {0.0};  // Front and back IR transmittance for each glass layer
+    std::array<Real64, 2 *Window::maxGlassLayers> emis = {0.0}; // Front and back IR emissivity for each glass layer
+    std::array<Real64, 2 *Window::maxGlassLayers> rir = {0.0};  // Front and back IR reflectance for each glass layer
+                                                                //  (program calculates from tir and emis)
+    std::array<Real64, 2 *Window::maxGlassLayers> AbsRadGlassFace = {
+        0.0};                                                         // Solar radiation and IR radiation from internal gains absorbed by glass face
+    std::array<Real64, 2 *Window::maxGlassLayers> thetas = {0.0};     // Glass surface temperatures (K)
+    std::array<Real64, 2 *Window::maxGlassLayers> thetasPrev = {0.0}; // Previous-iteration glass surface temperatures (K)
+    std::array<Real64, 2 *Window::maxGlassLayers> fvec = {0.0};       // Glass face heat balance function
 
     std::array<Real64, Window::maxGlassLayers> hrgap = {0.0}; // Radiative gap conductance
 
@@ -531,7 +528,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     // TEMP MOVED FROM DataHeatBalance.hh -BLB
 
-                                                       // for each wavelenth in wle
+    // for each wavelenth in wle
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> top = {0.0};  // Transmittance matrix for subr. op
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rfop = {0.0}; // Front reflectance matrix for subr. op
     std::array<std::array<Real64, Window::maxGlassLayers>, Window::maxGlassLayers> rbop = {0.0}; // Back transmittance matrix for subr. op

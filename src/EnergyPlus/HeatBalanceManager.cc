@@ -4267,12 +4267,18 @@ namespace HeatBalanceManager {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
                         readList(NextLine.data.substr(19),
-                                 GasName(IGas+1),
+                                 GasName(IGas + 1),
                                  matGas->gasFracts[IGas],
                                  gas.wght,
-                                 gas.con.c0, gas.con.c1, gas.con.c2,
-                                 gas.vis.c0, gas.vis.c1, gas.vis.c2, 
-                                 gas.cp.c0, gas.cp.c1, gas.cp.c2);
+                                 gas.con.c0,
+                                 gas.con.c1,
+                                 gas.con.c2,
+                                 gas.vis.c0,
+                                 gas.vis.c1,
+                                 gas.vis.c2,
+                                 gas.cp.c0,
+                                 gas.cp.c1,
+                                 gas.cp.c2);
                     }
                     // Nominal resistance of gap at room temperature (based on first gas in mixture)
                     auto const &gas0 = matGas->gases[0];
@@ -4536,9 +4542,9 @@ namespace HeatBalanceManager {
                     if (matBase->group == Material::Group::WindowGlass) {
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) += matBase->Thickness / matBase->Conductivity;
                     } else if (matBase->group == Material::Group::WindowGas || matBase->group == Material::Group::WindowGasMixture) {
-                        auto const *matGas = dynamic_cast<Material::MaterialGasMix const*>(matBase);
+                        auto const *matGas = dynamic_cast<Material::MaterialGasMix const *>(matBase);
                         assert(matGas != nullptr);
-                            
+
                         // If mixture, use conductivity of first gas in mixture
                         state.dataHeatBal->NominalRforNominalUCalculation(ConstrNum) +=
                             matGas->Thickness / (matGas->gases[0].con.c0 + matGas->gases[0].con.c1 * 300.0 + matGas->gases[0].con.c2 * 90000.0);

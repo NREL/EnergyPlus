@@ -512,7 +512,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
             if (mat->group != Material::Group::WindowGlass && mat->group != Material::Group::WindowSimpleGlazing &&
                 mat->group != Material::Group::GlassEquivalentLayer)
                 continue;
-            
+
             auto const *matGlass = dynamic_cast<Material::MaterialChild const *>(mat);
             assert(matGlass != nullptr);
             if (matGlass->SolarDiffusing && TotShadeLayers > 0) {
@@ -531,7 +531,7 @@ void CheckAndSetConstructionProperties(EnergyPlusData &state,
                 if (MatNum == 0) continue; // error -- has been caught will stop program later
                 auto const *mat = state.dataMaterial->Material(MatNum);
                 if (mat->group != Material::Group::WindowGlass) continue;
-                
+
                 auto const *matGlass = dynamic_cast<Material::MaterialChild const *>(mat);
                 assert(matGlass != nullptr);
                 ++GlassLayNum;
@@ -950,7 +950,7 @@ void AddVariableSlatBlind(EnergyPlusData &state,
         outBlindNumber = Found;
     }
 }
-        
+
 Real64 ComputeNominalUwithConvCoeffs(EnergyPlusData &state,
                                      int const numSurf, // index for Surface array.
                                      bool &isValid      // returns true if result is valid

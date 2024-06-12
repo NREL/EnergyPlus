@@ -2850,9 +2850,9 @@ namespace WindowComplexManager {
         wght(iprop(1, 1)) = gasAir.wght;
         gama(iprop(1, 1)) = gasAir.specHeatRatio;
 
-        gcon(1, iprop(1, 1)) = gasAir.con.c0; 
-        gcon(2, iprop(1, 1)) = gasAir.con.c1; 
-        gcon(3, iprop(1, 1)) = gasAir.con.c2; 
+        gcon(1, iprop(1, 1)) = gasAir.con.c0;
+        gcon(2, iprop(1, 1)) = gasAir.con.c1;
+        gcon(3, iprop(1, 1)) = gasAir.con.c2;
         gvis(1, iprop(1, 1)) = gasAir.vis.c0;
         gvis(2, iprop(1, 1)) = gasAir.vis.c1;
         gvis(3, iprop(1, 1)) = gasAir.vis.c2;
@@ -2930,8 +2930,8 @@ namespace WindowComplexManager {
                 assert(thisMaterialGas != nullptr);
                 nmix(IGap + 1) = thisMaterialGas->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    auto const &gas = thisMaterialGas->gases[IMix-1];
-                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix-1];
+                    auto const &gas = thisMaterialGas->gases[IMix - 1];
+                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix - 1];
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
@@ -2946,11 +2946,11 @@ namespace WindowComplexManager {
                         gcon(1, iprop(IMix, IGap + 1)) = gas.con.c0;
                         gcon(2, iprop(IMix, IGap + 1)) = gas.con.c1;
                         gcon(3, iprop(IMix, IGap + 1)) = gas.con.c2;
-                        
+
                         gvis(1, iprop(IMix, IGap + 1)) = gas.vis.c0;
                         gvis(2, iprop(IMix, IGap + 1)) = gas.vis.c1;
                         gvis(3, iprop(IMix, IGap + 1)) = gas.vis.c2;
-                        
+
                         gcp(1, iprop(IMix, IGap + 1)) = gas.cp.c0;
                         gcp(2, iprop(IMix, IGap + 1)) = gas.cp.c1;
                         gcp(3, iprop(IMix, IGap + 1)) = gas.cp.c2;
