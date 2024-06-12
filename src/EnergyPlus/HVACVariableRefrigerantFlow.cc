@@ -12838,6 +12838,11 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->LoopDXHeatCoilRTF = 0.0;
     }
 
+    Real64 OnOffFanPartLoadFraction = 1.0;
+    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling &&
+        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::VAV) {
+        OnOffFanPartLoadFraction = state.dataHVACGlobal->OnOffFanPartLoadFraction;
+    }
     // if draw through, simulate coils then fan
     if (this->fanPlace == HVAC::FanPlace::DrawThru) {
         auto *fan = state.dataFans->fans(state.dataHVACVarRefFlow->VRFTU(VRFTUNum).FanIndex);
@@ -12848,14 +12853,10 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
                 fan->simulate(state, FirstHVACIteration, _, _, PartLoadRatio);
             }
         } else {
-            fan->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio);
+            fan->simulate(state, FirstHVACIteration, state.dataHVACVarRefFlow->FanSpeedRatio, _, _, OnOffFanPartLoadFraction);
         }
     }
 
-    if (state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanOp == HVAC::FanOp::Cycling &&
-        state.dataHVACVarRefFlow->VRFTU(VRFTUNum).fanType == HVAC::FanType::VAV) {
-        state.dataFans->fans(this->FanIndex)->totalPower *= state.dataHVACGlobal->OnOffFanPartLoadFraction;
-    }
     // track fan power per terminal unit for calculating COP
     this->FanPower = state.dataFans->fans(this->FanIndex)->totalPower;
 
