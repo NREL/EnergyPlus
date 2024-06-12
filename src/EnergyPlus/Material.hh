@@ -617,11 +617,11 @@ struct MaterialData : BaseGlobalStruct
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
     EPVector<Material::ScreenProperties> Screens;
     EPVector<Material::ScreenTransData> ScreenTrans;
-        
+
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {

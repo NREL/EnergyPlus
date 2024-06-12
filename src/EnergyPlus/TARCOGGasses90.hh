@@ -101,7 +101,7 @@ struct TARCOGGasses90Data : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         fvis = Array1D<Real64>(TARCOGGassesParams::maxgas);

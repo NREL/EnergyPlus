@@ -200,7 +200,7 @@ struct HumidifiersData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         this->NumHumidifiers = 0;

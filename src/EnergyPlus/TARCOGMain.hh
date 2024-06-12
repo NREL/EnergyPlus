@@ -189,7 +189,7 @@ struct TARCOGMainData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         sconTemp = Array1D<Real64>(TARCOGParams::maxlay);

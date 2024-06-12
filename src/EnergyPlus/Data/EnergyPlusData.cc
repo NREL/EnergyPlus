@@ -575,7 +575,7 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     // objects that do not reference any other objects, like fluids,
     // schedules, curves, etc.
     this->dataFluidProps->init_state(state);
-        
+
     this->dataAirLoop->init_state(state);
     this->dataAirLoopHVACDOAS->init_state(state);
     this->dataAirSystemsData->init_state(state);
@@ -824,5 +824,5 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataZonePlenum->init_state(state);
     this->dataZoneTempPredictorCorrector->init_state(state);
 }
-        
+
 } // namespace EnergyPlus

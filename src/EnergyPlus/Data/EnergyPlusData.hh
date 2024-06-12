@@ -577,7 +577,7 @@ struct EnergyPlusData : BaseGlobalStruct
     EnergyPlusData(EnergyPlusData &&) = delete;
 
     void init_state([[maybe_unused]] EnergyPlusData &state) override;
-        
+
     void clear_state() override;
 };
 

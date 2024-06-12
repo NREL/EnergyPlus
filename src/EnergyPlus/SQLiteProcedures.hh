@@ -1015,7 +1015,7 @@ struct SQLiteProceduresData : BaseGlobalStruct
     void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
-        
+
     void clear_state() override
     {
         sqlite.reset(); // probably not necessary, as it is recreated in ManageSimulation, but it should be fine to delete it here
