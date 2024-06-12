@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -175,9 +176,83 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager)
     state->dataPlnt->PlantLoop.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
+TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterChWSetPointManager_FluidIndex)
 {
 
+    std::string const idf_objects = delimited_string({
+        "FluidProperties:GlycolConcentration,",
+        "  EthyleneGlycol40Percent, !- Name",
+        "  EthyleneGlycol,          !- Glycol Type",
+        "  ,                        !- User Defined Glycol Name",
+        "  0.4;                     !- Glycol Concentration",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    EXPECT_EQ(2, state->dataFluidProps->NumOfGlycols);
+    const auto &thisGlycol = state->dataFluidProps->GlycolData(2);
+    EXPECT_EQ("ETHYLENEGLYCOL40PERCENT", thisGlycol.Name);
+    EXPECT_EQ("ETHYLENEGLYCOL", thisGlycol.GlycolName);
+
+    // Set up the required plant loop data
+    state->dataPlnt->TotNumLoops = 1;
+    state->dataPlnt->PlantLoop.allocate(1);
+    state->dataPlnt->PlantLoop(1).FluidIndex = 2;
+
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn = 1;  // Supply inlet, return
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut = 2; // Supply outlet, supply
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp.allocate(1);
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumIn = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Demand).Branch(1).Comp(1).NodeNumOut = 0;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumIn = 1;
+    state->dataPlnt->PlantLoop(1).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).Comp(1).NodeNumOut = 2;
+
+    // Set up the required node data
+    state->dataLoopNodes->Node.allocate(2);
+    state->dataLoopNodes->Node(2).MassFlowRate = 1.0;
+
+    // Set up a cooling setpoint manager
+    SetPointManager::SPMReturnWaterTemp mySPM;
+    mySPM.type = SetPointManager::SPMType::ChilledWaterReturnTemp;
+    mySPM.returnTempType = SetPointManager::ReturnTempType::Constant;
+    mySPM.returnNodeNum = 1;
+    mySPM.supplyNodeNum = 2;
+    mySPM.plantLoopNum = 0;
+    mySPM.minSetTemp = 7;
+    mySPM.maxSetTemp = 10;
+    mySPM.returnTempConstantTarget = 12;
+
+    // test 1: normal, in range
+    state->dataLoopNodes->Node(1).Temp = 11;
+    state->dataLoopNodes->Node(2).Temp = 7;
+    mySPM.calculate(*state);
+    // on the first pass through it should detect the plant loop it manages
+    EXPECT_EQ(1, mySPM.plantLoopNum);
+    // with a delta T of 4, and a target return of 12, it should produce 8
+    EXPECT_EQ(8, mySPM.currentSupplySetPt);
+
+    compare_err_stream("");
+
+    // Avg temp will be < 0, and before fix it throws this error
+    //   ** Warning ** GetSpecificHeatGlycol: Temperature is out of range (too low) for fluid [WATER] specific heat supplied values **
+    //   **   ~~~   ** ..Called From:ReturnWaterChWSetPointManager::calculate,Temperature=[-1.00], supplied data range=[0.00,125.00]
+    //   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00
+    state->dataLoopNodes->Node(1).Temp = 1;
+    state->dataLoopNodes->Node(2).Temp = -3;
+    // Calling it a second time, ensure #10524 is fixed
+    mySPM.calculate(*state);
+    // on the first pass through it should detect the plant loop it manages
+    EXPECT_EQ(1, mySPM.plantLoopNum);
+    // with a delta T of 4, and a target return of 12, it should produce 8
+    EXPECT_EQ(8, mySPM.currentSupplySetPt);
+    compare_err_stream("");
+}
+
+TEST_F(EnergyPlusFixture, SetPointManager_DefineReturnWaterHWSetPointManager)
+{
     // Set up the required plant loop data
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
@@ -427,7 +502,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
 
 TEST_F(EnergyPlusFixture, SetPointManager_setupSetPointAndFlags)
 {
-
     Real64 totEnergy = 0.0;
     Real64 totEnergyPrevious = 0.0;
     Real64 condenserWaterSetPoint = 0.0;
@@ -516,7 +590,8 @@ TEST_F(EnergyPlusFixture, SetPointManager_setupSetPointAndFlags)
     EXPECT_FALSE(statusRunSubOptimalCondenserEnteringTemp);
     EXPECT_TRUE(statusRunFinalOptimalCondenserEnteringTemp);
 
-    // and finally, the sixth pass through when it is set to run final; totEnergy doesn't matter when that flag is true, and the sp shouldn't change
+    // and finally, the sixth pass through when it is set to run final; totEnergy doesn't matter when that flag is true, and the sp shouldn't
+    // change
     thisSPM.setupSetPointAndFlags(totEnergy,
                                   totEnergyPrevious,
                                   condenserWaterSetPoint,
@@ -834,7 +909,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_CalcSetPointLinInt)
 
 TEST_F(EnergyPlusFixture, DefineMixedAirSetPointManager)
 {
-
     // Set up the required node data
     state->dataLoopNodes->Node.allocate(5);
     state->dataLoopNodes->Node(1).MassFlowRate = 1.0;
@@ -886,7 +960,6 @@ TEST_F(EnergyPlusFixture, DefineMixedAirSetPointManager)
 
 TEST_F(EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName)
 {
-
     std::string const idf_objects = delimited_string({
         "SetpointManager:MixedAir,",
         "  Mixed Air Temp,          !- Name",
@@ -1517,7 +1590,8 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
         "   **  Fatal  ** InitSetPointManagers: Errors found in getting SetPointManager input.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=2",
-        "   ..... Last severe error=SetpointManager:SingleZone:Cooling=\"COOLING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET NODE",
+        "   ..... Last severe error=SetpointManager:SingleZone:Cooling=\"COOLING SUPPLY AIR TEMP MANAGER 1\", The zone inlet node of ZNF1 INLET "
+        "NODE",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
