@@ -78,20 +78,13 @@ A18, \field Condenser Loop Flow Rate Fraction Function of Loop Part Load Ratio C
      \note option is used.
      \type object-list
      \object-list UnivariateFunctions
-N19, \field Temperature Difference Across Condenser
-     \type real
-     \units C
-     \minimum 2.0
-     \default 15.0
-     \note The temperature difference across the condenser. This input is used to calculate the condenser flow
-     \note request.This input is only used when "Condenser Flow Control" is set to "ModulatedDeltaTemperature".
 A20, \field Temperature Difference Across Condenser Schedule Name
      \note A schedule that defines the temperature difference across the condenser. This input is used to 
      \note calculate the condenser flow. This input is only used when "Condenser Flow Control" is set to
      \note "ModulatedDeltaTemperature".
      \type object-list
      \object-list ScheduleNames
-N20; \field Condenser Minimum Flow Fraction
+N19; \field Condenser Minimum Flow Fraction
      \note This input corresponds to the minimum flow fraction to be simulated. The minimum condenser flow
      \note corresponds to this fraction multiplied by the maximum condenser flow rate. This input is only used
      \note when the "Condenser Flow Control" input is set to "ModulatedChillerPLR", "ModulatedLoopPLR" or
