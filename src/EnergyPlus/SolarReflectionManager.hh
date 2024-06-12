@@ -176,7 +176,7 @@ struct SolarReflectionManagerData : BaseGlobalStruct
     Vector3<Real64> SurfVertToGndPt; // Vector from a vertex of possible obstructing surface to ground hit point (m)
     Vector3<Real64> SurfVert;        // Surface vertex (m)
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

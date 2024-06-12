@@ -160,7 +160,7 @@ struct ElectricBaseboardRadiatorData : BaseGlobalStruct
     Array1D<ElectricBaseboardRadiator::ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
     bool GetInputFlag = true; // One time get input flag
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

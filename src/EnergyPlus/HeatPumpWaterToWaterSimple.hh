@@ -210,7 +210,7 @@ struct HeatPumpWaterToWaterSimpleData : BaseGlobalStruct
     Array1D<HeatPumpWaterToWaterSimple::GshpSpecs> GSHP;
     std::unordered_map<std::string, std::string> HeatPumpWaterUniqueNames;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -1808,7 +1808,7 @@ struct SurfacesData : BaseGlobalStruct
 
     int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

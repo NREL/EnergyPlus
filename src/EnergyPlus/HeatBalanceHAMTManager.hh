@@ -194,7 +194,7 @@ struct HeatBalHAMTMgrData : BaseGlobalStruct
     int qvpErrCount = 0;
     int qvpErrReport = 0;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

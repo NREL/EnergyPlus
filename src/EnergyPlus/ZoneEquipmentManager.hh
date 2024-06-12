@@ -270,7 +270,7 @@ struct ZoneEquipmentManagerData : BaseGlobalStruct
     bool InitZoneEquipmentEnvrnFlag = true;
     bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

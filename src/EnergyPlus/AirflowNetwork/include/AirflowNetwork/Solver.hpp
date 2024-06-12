@@ -541,7 +541,7 @@ namespace AirflowNetwork {
         Array1D<AirflowNetwork::ReliefFlow> DisSysCompReliefAirData;
         Array1D<AirflowNetwork::AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
-        void init_state() override
+        void init_state([[maybe_unused]] EnergyPlusData &state) override
         {
         }
             

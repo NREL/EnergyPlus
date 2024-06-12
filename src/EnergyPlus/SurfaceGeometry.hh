@@ -498,7 +498,7 @@ struct SurfaceGeometryData : BaseGlobalStruct
     Array1D<Real64> B;
     int VertSize = 0; // size of X,Y,Z,A,B arrays
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

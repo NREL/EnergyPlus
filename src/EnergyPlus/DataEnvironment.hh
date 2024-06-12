@@ -211,7 +211,7 @@ struct EnvironmentData : BaseGlobalStruct
     bool forceBeginEnvResetSuppress = false; // for PerformancePrecisionTradeoffs
     bool oneTimeCompRptHeaderFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

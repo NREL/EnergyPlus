@@ -130,7 +130,7 @@ struct MatrixDataManagerData : BaseGlobalStruct
     Array1D<MatrixDataManager::MatrixDataStruct> MatData;
     int NumMats; // number of matracies in input file
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -114,7 +114,7 @@ struct HybridUnitaryAirConditionersData : BaseGlobalStruct
     Array1D_bool MyFanFlag;
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

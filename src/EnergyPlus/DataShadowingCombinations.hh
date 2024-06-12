@@ -83,7 +83,7 @@ struct ShadowCombData : BaseGlobalStruct
 
     Array1D<DataShadowingCombinations::ShadowingCombinations> ShadowComb;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

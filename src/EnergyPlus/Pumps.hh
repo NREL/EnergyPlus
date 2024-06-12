@@ -249,7 +249,7 @@ struct PumpsData : BaseGlobalStruct
     EPVector<Pumps::ReportVars> PumpEquipReport;
     std::unordered_map<std::string, std::string> PumpUniqueNames;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

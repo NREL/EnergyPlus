@@ -258,7 +258,7 @@ struct ChillerReformulatedEIRData : BaseGlobalStruct
     bool GetInputREIR = true;
     Array1D<ChillerReformulatedEIR::ReformulatedEIRChillerSpecs> ElecReformEIRChiller;
 
-    void init_state()
+    void init_state([[maybe_unused]] EnergyPlusData &state)
     {
     }
         

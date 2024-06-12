@@ -343,7 +343,7 @@ struct HVACUnitaryBypassVAVData : BaseGlobalStruct
     Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
     Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

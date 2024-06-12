@@ -341,7 +341,7 @@ struct HeatBalFiniteDiffMgr : BaseGlobalStruct
     Array1D<HeatBalFiniteDiffManager::MaterialDataFD> MaterialFD;
     bool MyEnvrnFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

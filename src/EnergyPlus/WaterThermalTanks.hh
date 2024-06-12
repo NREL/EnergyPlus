@@ -1016,7 +1016,7 @@ struct WaterThermalTanksData : BaseGlobalStruct
     bool getWaterThermalTankInputFlag = true; // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

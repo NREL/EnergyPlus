@@ -118,7 +118,7 @@ struct HVACDuctData : BaseGlobalStruct
     Array1D<HVACDuct::DuctData> Duct;
     bool GetInputFlag = true; // First time, input is "gotten"
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -224,7 +224,7 @@ struct FluidCoolersData : BaseGlobalStruct
     Array1D<FluidCoolers::FluidCoolerspecs> SimpleFluidCooler;
     std::unordered_map<std::string, std::string> UniqueSimpleFluidCoolerNames;
  
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

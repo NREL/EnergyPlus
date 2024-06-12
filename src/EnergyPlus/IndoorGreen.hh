@@ -128,7 +128,7 @@ struct IndoorGreenData : BaseGlobalStruct
     bool getInputFlag = true;
     Array1D<IndoorGreen::IndoorGreenParams> indoorGreens;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

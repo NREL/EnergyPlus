@@ -219,7 +219,7 @@ struct HWBaseboardRadiatorData : BaseGlobalStruct
     bool MyEnvrnFlag2 = true;
     Array1D_bool MyEnvrnFlag;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

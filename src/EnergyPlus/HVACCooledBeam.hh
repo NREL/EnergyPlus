@@ -193,7 +193,7 @@ struct HVACCooledBeamData : BaseGlobalStruct
     bool GetInputFlag = true;              // First time, input is "gotten"
     bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

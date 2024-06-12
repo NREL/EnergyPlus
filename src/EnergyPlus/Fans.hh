@@ -455,7 +455,7 @@ struct FansData : BaseGlobalStruct
     Array1D<Fans::FanBase *> fans;
     std::map<std::string, int> fanMap;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

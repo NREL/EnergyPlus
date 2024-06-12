@@ -184,7 +184,7 @@ struct AirLoopHVACDOASData : BaseGlobalStruct
     std::vector<AirLoopHVACDOAS::AirLoopMixer> airloopMixer;
     std::vector<AirLoopHVACDOAS::AirLoopSplitter> airloopSplitter;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

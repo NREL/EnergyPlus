@@ -617,7 +617,7 @@ struct WindowManagerData : BaseGlobalStruct
 
     std::array<int, 5> LayerNum = {0}; // Glass layer number
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

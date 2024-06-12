@@ -174,7 +174,7 @@ struct HeatPumpWaterToWaterCOOLINGData : BaseGlobalStruct
     bool GetWWHPCoolingInput = true;
     Array1D<HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs> GSHP;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

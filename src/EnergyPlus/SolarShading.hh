@@ -507,7 +507,7 @@ struct SolarShadingData : BaseGlobalStruct
     std::vector<Real64> cos_Theta;
     std::unique_ptr<std::iostream> shd_stream; // Shading file stream
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

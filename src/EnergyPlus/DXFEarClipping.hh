@@ -143,7 +143,7 @@ struct DXFEarClippingData : BaseGlobalStruct
     bool trackit = false;
     int errcount = 0;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -652,7 +652,7 @@ struct FuelCellElectricGeneratorData : BaseGlobalStruct
     bool MyEnvrnFlag = true;
     Array1D<FuelCellElectricGenerator::FCDataStruct> FuelCell;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

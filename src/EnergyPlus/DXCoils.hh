@@ -991,7 +991,7 @@ struct DXCoilsData : BaseGlobalStruct
     Real64 EIRFlowModFac = 0.0;      // EIR modifier (function of actual supply air flow vs rated flow) [-]
     Real64 TempDryBulb_Leaving_Apoint = 0.0;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -80,7 +80,7 @@ struct GroundTemperatureManagerData : BaseGlobalStruct
 {
     std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

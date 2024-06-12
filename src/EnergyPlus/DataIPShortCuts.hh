@@ -67,7 +67,7 @@ struct IPShortCutsData : BaseGlobalStruct
     Array1D<Real64> rNumericArgs;
     std::string cCurrentModuleObject;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

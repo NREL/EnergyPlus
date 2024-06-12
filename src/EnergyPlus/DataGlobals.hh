@@ -177,7 +177,7 @@ struct DataGlobal : BaseGlobalStruct
     int numThread = 1;
     bool AirLoopHVACDOASUsedInSim = false;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

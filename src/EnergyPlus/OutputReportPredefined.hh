@@ -1458,7 +1458,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
     Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

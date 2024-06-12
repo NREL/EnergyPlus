@@ -469,7 +469,7 @@ struct CurveManagerData : BaseGlobalStruct
             this->PerfCurve.push_back(new EnergyPlus::Curve::Curve);
     }
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

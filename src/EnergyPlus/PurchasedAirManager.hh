@@ -406,7 +406,7 @@ struct PurchasedAirManagerData : BaseGlobalStruct
     Array1D<PurchasedAirManager::PurchAirPlenumArrayData>
         TempPurchAirPlenumArrays; // Used to save the indices of scalable sizing object for zone HVAC
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

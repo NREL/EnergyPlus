@@ -186,7 +186,7 @@ struct TARCOGMainData : BaseGlobalStruct
     Array1D<Real64> CurGap = Array1D<Real64>(TARCOGParams::MaxGap);
     Array1D<Real64> GapDefMean = Array1D<Real64>(TARCOGParams::MaxGap);
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

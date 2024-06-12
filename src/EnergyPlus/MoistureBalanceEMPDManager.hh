@@ -116,7 +116,7 @@ struct MoistureBalanceEMPDManagerData : BaseGlobalStruct
     int ErrCount = 0;
     bool OneTimeFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

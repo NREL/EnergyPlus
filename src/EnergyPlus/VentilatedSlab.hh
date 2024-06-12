@@ -421,7 +421,7 @@ struct VentilatedSlabData : BaseGlobalStruct
     int EnergyImbalanceErrorCount = 0; // Counts for # times a temperature mismatch is found in the energy balance check
     bool FirstTimeFlag = true;         // for setting size of AirTempOut array
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

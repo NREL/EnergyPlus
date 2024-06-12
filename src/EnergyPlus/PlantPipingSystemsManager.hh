@@ -1082,7 +1082,7 @@ struct PlantPipingSysMgrData : BaseGlobalStruct
     std::vector<PlantPipingSystemsManager::Segment> segments;
     std::unordered_map<std::string, std::string> GroundDomainUniqueNames;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

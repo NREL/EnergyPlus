@@ -108,7 +108,7 @@ struct PipesData : BaseGlobalStruct
     EPVector<Pipes::LocalPipeData> LocalPipe;
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

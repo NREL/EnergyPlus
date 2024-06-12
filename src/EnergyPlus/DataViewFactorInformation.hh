@@ -106,7 +106,7 @@ struct ViewFactorInfoData : BaseGlobalStruct
     EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclRadInfo;
     EPVector<DataViewFactorInformation::EnclosureViewFactorInformation> EnclSolInfo;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

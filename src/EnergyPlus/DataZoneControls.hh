@@ -293,7 +293,7 @@ struct DataZoneControlsData : BaseGlobalStruct
     Array1D<DataZoneControls::TStatObject> StagedTStatObjects;
     Array1D<DataZoneControls::ZoneStagedControls> StageControlledZone;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

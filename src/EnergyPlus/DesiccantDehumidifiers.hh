@@ -307,7 +307,7 @@ struct DesiccantDehumidifiersData : BaseGlobalStruct
     Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
     Real64 QRegen = 0.0;          // required coil load passed to sim heating coil routine (W)
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

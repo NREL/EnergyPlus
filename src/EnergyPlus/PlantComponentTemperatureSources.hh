@@ -153,7 +153,7 @@ struct PlantCompTempSrcData : BaseGlobalStruct
     bool getWaterSourceInput = true;
     EPVector<PlantComponentTemperatureSources::WaterSourceSpecs> WaterSource;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

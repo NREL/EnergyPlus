@@ -804,7 +804,7 @@ struct RuntimeLanguageData : BaseGlobalStruct
     std::unordered_set<std::tuple<std::string, std::string, std::string>, DataRuntimeLanguage::EMSActuatorKey_hash>
         EMSActuator_lookup; // Fast duplicate lookup structure
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

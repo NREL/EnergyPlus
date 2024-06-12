@@ -129,7 +129,7 @@ struct DataStringGlobalsData : BaseGlobalStruct
     std::string CurrentDateTime; // For printing current date and time at start of run
     std::string VerStringVar;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

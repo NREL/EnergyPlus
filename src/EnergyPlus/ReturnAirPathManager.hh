@@ -76,7 +76,7 @@ struct ReturnAirPathMgr : BaseGlobalStruct
 
     bool GetInputFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

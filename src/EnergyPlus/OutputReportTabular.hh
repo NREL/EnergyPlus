@@ -1331,7 +1331,7 @@ struct OutputReportTabularData : BaseGlobalStruct
     std::string curColHeadWithSI;
     std::string curColHead;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

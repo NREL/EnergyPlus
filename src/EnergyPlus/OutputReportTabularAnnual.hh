@@ -181,7 +181,7 @@ struct OutputReportTabularAnnualData : BaseGlobalStruct
 
     std::vector<OutputReportTabularAnnual::AnnualTable> annualTables;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

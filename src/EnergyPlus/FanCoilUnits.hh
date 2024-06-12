@@ -418,7 +418,7 @@ struct FanCoilUnitsData : BaseGlobalStruct
     int ATMixOutNode = 0; // outlet node of ATM Mixer
     int ZoneNode = 0;     // zone node
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

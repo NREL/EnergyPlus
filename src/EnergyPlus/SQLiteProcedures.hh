@@ -1012,7 +1012,7 @@ void CreateSQLiteZoneExtendedOutput(EnergyPlusData &state);
 struct SQLiteProceduresData : BaseGlobalStruct
 {
     std::unique_ptr<SQLite> sqlite;
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

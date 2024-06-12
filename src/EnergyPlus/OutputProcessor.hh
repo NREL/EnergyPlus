@@ -942,7 +942,7 @@ struct OutputProcessorData : BaseGlobalStruct
     int maxNumEndUseSpaceTypes = 1;
     EPVector<OutputProcessor::EndUseCategoryType> EndUseCategory;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

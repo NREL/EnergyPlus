@@ -808,7 +808,7 @@ struct ConvectionCoefficientsData : BaseGlobalStruct
     Array1D<Convect::HcIntUserCurve> hcIntUserCurve;
     Array1D<Convect::HcExtUserCurve> hcExtUserCurve;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

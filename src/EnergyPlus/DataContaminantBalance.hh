@@ -291,7 +291,7 @@ struct ContaminantBalanceData : BaseGlobalStruct
     Array1D<DataContaminantBalance::ZoneContamGenericDataDVS> ZoneContamGenericDVS;
     Array1D<DataContaminantBalance::ZoneContamGenericDataDRS> ZoneContamGenericDRS;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

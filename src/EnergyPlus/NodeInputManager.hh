@@ -185,7 +185,7 @@ struct NodeInputManagerData : BaseGlobalStruct
     std::vector<std::string> nodeReportingStrings;
     std::vector<std::string> nodeFluidNames;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

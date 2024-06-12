@@ -293,7 +293,7 @@ struct IceThermalStorageData : BaseGlobalStruct
     EPVector<IceThermalStorage::SimpleIceStorageData> SimpleIceStorage;
     EPVector<IceThermalStorage::DetailedIceStorageData> DetailedIceStorage;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

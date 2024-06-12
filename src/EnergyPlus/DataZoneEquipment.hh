@@ -624,7 +624,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
     std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

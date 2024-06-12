@@ -150,7 +150,7 @@ struct PlantLoadProfileData : BaseGlobalStruct
     int NumOfPlantProfile = 0;
     Array1D<PlantLoadProfile::PlantProfileData> PlantProfile;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -248,7 +248,7 @@ struct HVACHXAssistedCoolingCoilData : BaseGlobalStruct
     int ErrCount = 0;
     int ErrCount2 = 0;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

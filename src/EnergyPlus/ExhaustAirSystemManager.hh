@@ -151,7 +151,7 @@ struct ExhaustAirSystemMgr : BaseGlobalStruct
     bool mappingDone = false;
 
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         
@@ -166,7 +166,7 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 
     bool GetInputFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

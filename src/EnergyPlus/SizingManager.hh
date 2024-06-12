@@ -184,7 +184,7 @@ struct SizingManagerData : BaseGlobalStruct
     bool ReportSysSizingMyOneTimeFlag = true;
     bool runZeroingOnce = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

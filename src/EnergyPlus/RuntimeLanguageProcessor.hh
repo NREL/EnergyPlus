@@ -225,7 +225,7 @@ struct RuntimeLanguageProcessorData : BaseGlobalStruct
     Array1D<RuntimeLanguageProcessor::TokenType> Token;
     Array1D<RuntimeLanguageProcessor::TokenType> PEToken;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

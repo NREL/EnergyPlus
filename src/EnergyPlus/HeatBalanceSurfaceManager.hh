@@ -267,7 +267,7 @@ struct HeatBalSurfMgr : BaseGlobalStruct
     Array1D<Real64> AbsDiffWinSky =
         Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

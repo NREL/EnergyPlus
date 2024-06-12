@@ -181,7 +181,7 @@ struct PsychrometricCacheData : BaseGlobalStruct
     std::array<int, static_cast<int>(PsychrometricFunction::Num)> NumIterations;
 #endif
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

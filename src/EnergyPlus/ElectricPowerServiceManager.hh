@@ -841,7 +841,7 @@ struct ElectPwrSvcMgrData : BaseGlobalStruct
 
     std::unique_ptr<ElectricPowerServiceManager> facilityElectricServiceObj;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

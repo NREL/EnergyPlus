@@ -439,7 +439,7 @@ struct PlantCentralGSHPData : BaseGlobalStruct
     EPVector<PlantCentralGSHP::WrapperSpecs> Wrapper;
     EPVector<PlantCentralGSHP::ChillerHeaterSpecs> ChillerHeater;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

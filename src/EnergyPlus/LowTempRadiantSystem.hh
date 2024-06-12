@@ -600,7 +600,7 @@ struct LowTempRadiantSystemData : BaseGlobalStruct
     Array1D<LowTempRadiantSystem::ConstantFlowRadDesignData> CflowRadiantSysDesign;
     Array1D<LowTempRadiantSystem::VarFlowRadDesignData> HydronicRadiantSysDesign;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

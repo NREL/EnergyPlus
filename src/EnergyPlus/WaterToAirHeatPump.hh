@@ -279,7 +279,7 @@ struct WaterToAirHeatPumpData : BaseGlobalStruct
     Real64 LoadSideInletHumRat_Init = 0.0;  // rated conditions
     Real64 LoadSideAirInletEnth_Init = 0.0; // rated conditions
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

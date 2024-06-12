@@ -350,7 +350,7 @@ struct IntegratedHeatPumpGlobalData : BaseGlobalStruct
     bool GetCoilsInputFlag = true;
     EPVector<IntegratedHeatPump::IntegratedHeatPumpData> IntegratedHeatPumps;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

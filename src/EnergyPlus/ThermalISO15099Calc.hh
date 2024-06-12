@@ -544,7 +544,7 @@ struct ThermalISO15099CalcData : BaseGlobalStruct
     int kFP = 0;
     std::string dynFormat;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

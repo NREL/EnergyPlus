@@ -101,7 +101,7 @@ struct HeatBalanceAirMgrData : BaseGlobalStruct
     bool ManageAirHeatBalanceGetInputFlag = true;
     bool CalcExtraReportVarMyOneTimeFlag = true;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

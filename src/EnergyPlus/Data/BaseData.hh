@@ -50,9 +50,11 @@
 
 namespace EnergyPlus {
 
+struct EnergyPlusData;         // Forward declaration
+        
 struct BaseGlobalStruct
 {
-    virtual void init_state() = 0;
+    virtual void init_state([[maybe_unused]] EnergyPlusData &state) = 0;
     virtual void clear_state() = 0;
 };
 

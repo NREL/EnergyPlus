@@ -316,7 +316,7 @@ struct HeatingCoilsData : BaseGlobalStruct
     Array1D_bool ShowSingleWarning;     // Used for single warning message for desuperheater coil
     Array1D_bool MyEnvrnFlag;           // one time environment flag
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

@@ -618,7 +618,7 @@ struct MaterialData : BaseGlobalStruct
     EPVector<Material::ScreenProperties> Screens;
     EPVector<Material::ScreenTransData> ScreenTrans;
         
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

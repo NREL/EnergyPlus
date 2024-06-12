@@ -595,7 +595,7 @@ struct WaterCoilsData : BaseGlobalStruct
     Array2D<Real64> OrdPairSum = Array2D<Real64>(10, 2);
     Array2D<Real64> OrdPairSumMatrix = Array2D<Real64>(10, 10);
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

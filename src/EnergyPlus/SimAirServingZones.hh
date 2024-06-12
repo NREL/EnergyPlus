@@ -278,7 +278,7 @@ struct SimAirServingZonesData : BaseGlobalStruct
     std::string ErrEnvironmentName;
     std::string ErrEnvironmentNameSolveWaterCoilController;
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         

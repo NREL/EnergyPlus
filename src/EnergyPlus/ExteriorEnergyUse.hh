@@ -136,7 +136,7 @@ struct ExteriorEnergyUseData : BaseGlobalStruct
     bool GetExteriorEnergyInputFlag = true; // First time, input is "gotten"
     Real64 sumDesignLevel = 0.0;            // for predefined report of design level total
 
-    void init_state() override
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
     {
     }
         
