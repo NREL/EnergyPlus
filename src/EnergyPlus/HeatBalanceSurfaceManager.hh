@@ -114,7 +114,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ComputeIntSWAbsorpFactors(EnergyPlusData &state);
 
-    void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int NumberOfEnclosures); // Number of solar enclosures
+    void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state);
 
     void InitEMSControlledSurfaceProperties(EnergyPlusData &state);
 

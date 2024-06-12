@@ -409,7 +409,7 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
         if (state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime) {
             DisplayString(state, "Computing Interior Diffuse Solar Exchange through Interzone Windows");
         }
-        ComputeDifSolExcZonesWIZWindows(state, state.dataViewFactor->NumOfSolarEnclosures);
+        ComputeDifSolExcZonesWIZWindows(state);
     }
 
     Dayltg::initDaylighting(state, state.dataHeatBalSurfMgr->InitSurfaceHeatBalancefirstTime);
@@ -4397,7 +4397,7 @@ void ComputeIntSWAbsorpFactors(EnergyPlusData &state)
     } // End of enclosure loop
 }
 
-void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEnclosures) // Number of solar enclosures
+void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4405,13 +4405,14 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
     //       RE-ENGINEERED  Winkelmann, Lawrie
 
     // PURPOSE OF THIS SUBROUTINE:
-    // This subroutine computes the diffuse solar exchange factors between zones with
+    // This subroutine computes the diffuse solar exchange factors between enclosures with
     // interzone windows.
 
+    int const numEnclosures = state.dataViewFactor->NumOfSolarEnclosures;
     if (!allocated(state.dataHeatBalSurf->ZoneFractDifShortZtoZ)) {
-        state.dataHeatBalSurf->ZoneFractDifShortZtoZ.allocate(NumberOfEnclosures, NumberOfEnclosures);
-        state.dataHeatBalSurf->EnclSolRecDifShortFromZ.allocate(NumberOfEnclosures);
-        state.dataHeatBalSurfMgr->DiffuseArray.allocate(NumberOfEnclosures, NumberOfEnclosures);
+        state.dataHeatBalSurf->ZoneFractDifShortZtoZ.allocate(numEnclosures, numEnclosures);
+        state.dataHeatBalSurf->EnclSolRecDifShortFromZ.allocate(numEnclosures);
+        state.dataHeatBalSurfMgr->DiffuseArray.allocate(numEnclosures, numEnclosures);
     }
 
     state.dataHeatBalSurf->EnclSolRecDifShortFromZ = false;
@@ -4438,10 +4439,10 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
     //          Compute fractions for multiple passes.
 
     Array2D<Real64>::size_type l(0u), m(0u), d(0u);
-    for (int NZ = 1; NZ <= NumberOfEnclosures; ++NZ, d += NumberOfEnclosures + 1) {
+    for (int NZ = 1; NZ <= numEnclosures; ++NZ, d += numEnclosures + 1) {
         m = NZ - 1;
         Real64 D_d(0.0); // Local accumulator
-        for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ, ++l, m += NumberOfEnclosures) {
+        for (int MZ = 1; MZ <= numEnclosures; ++MZ, ++l, m += numEnclosures) {
             if (MZ == NZ) continue;
             state.dataHeatBalSurfMgr->DiffuseArray[l] =
                 state.dataHeatBalSurf->ZoneFractDifShortZtoZ[l] /
@@ -4454,13 +4455,12 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
 
     state.dataHeatBalSurf->ZoneFractDifShortZtoZ = state.dataHeatBalSurfMgr->DiffuseArray;
     // added for CR 7999 & 7869
-    assert(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.isize1() == NumberOfEnclosures);
-    assert(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.isize2() == NumberOfEnclosures);
-    l = 0u;
-    for (int NZ = 1; NZ <= NumberOfEnclosures; ++NZ) {
-        for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ, ++l) {
+    assert(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.isize1() == numEnclosures);
+    assert(state.dataHeatBalSurf->ZoneFractDifShortZtoZ.isize2() == numEnclosures);
+    for (int NZ = 1; NZ <= numEnclosures; ++NZ) {
+        for (int MZ = 1; MZ <= numEnclosures; ++MZ) {
             if (MZ == NZ) continue;
-            if (state.dataHeatBalSurf->ZoneFractDifShortZtoZ[l] > 0.0) { // [ l ] == ( MZ, NZ )
+            if (state.dataHeatBalSurf->ZoneFractDifShortZtoZ(MZ, NZ) > 0.0) {
                 state.dataHeatBalSurf->EnclSolRecDifShortFromZ(NZ) = true;
                 break;
             }
@@ -4469,15 +4469,15 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
 
     //           Compute fractions for multiple zones.
 
-    for (int IZ = 1; IZ <= NumberOfEnclosures; ++IZ) {
+    for (int IZ = 1; IZ <= numEnclosures; ++IZ) {
         if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(IZ)) continue;
 
-        for (int JZ = 1; JZ <= NumberOfEnclosures; ++JZ) {
+        for (int JZ = 1; JZ <= numEnclosures; ++JZ) {
             if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(JZ)) continue;
             if (IZ == JZ) continue;
             if (state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ) == 0.0) continue;
 
-            for (int KZ = 1; KZ <= NumberOfEnclosures; ++KZ) {
+            for (int KZ = 1; KZ <= numEnclosures; ++KZ) {
                 if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(KZ)) continue;
                 if (IZ == KZ) continue;
                 if (JZ == KZ) continue;
@@ -4485,7 +4485,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
                 state.dataHeatBalSurf->ZoneFractDifShortZtoZ(IZ, KZ) +=
                     state.dataHeatBalSurfMgr->DiffuseArray(JZ, KZ) * state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ);
 
-                for (int LZ = 1; LZ <= NumberOfEnclosures; ++LZ) {
+                for (int LZ = 1; LZ <= numEnclosures; ++LZ) {
                     if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(LZ)) continue;
                     if (IZ == LZ) continue;
                     if (JZ == LZ) continue;
@@ -4495,7 +4495,7 @@ void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int const NumberOfEn
                                                                             state.dataHeatBalSurfMgr->DiffuseArray(JZ, KZ) *
                                                                             state.dataHeatBalSurfMgr->DiffuseArray(IZ, JZ);
 
-                    for (int MZ = 1; MZ <= NumberOfEnclosures; ++MZ) {
+                    for (int MZ = 1; MZ <= numEnclosures; ++MZ) {
                         if (!state.dataHeatBalSurf->EnclSolRecDifShortFromZ(MZ)) continue;
                         if (IZ == MZ) continue;
                         if (JZ == MZ) continue;
