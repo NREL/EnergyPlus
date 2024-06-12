@@ -2741,10 +2741,10 @@ TEST_F(EnergyPlusFixture, WindowShadingManager_Lum_Test)
     SolarShading::WindowShadingManager(*state);
 
     // solar below setpoint, shading expected to be conditionally off
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfWinShadingFlag(1), WinShadingType::IntShadeConditionallyOff));
+    EXPECT_ENUM_EQ(state->dataSurface->SurfWinShadingFlag(1), WinShadingType::IntShadeConditionallyOff);
 
     // solar above setpoint, shading expcted to be on
-    EXPECT_TRUE(compare_enums(state->dataSurface->SurfWinShadingFlag(2), WinShadingType::ExtShade));
+    EXPECT_ENUM_EQ(state->dataSurface->SurfWinShadingFlag(2), WinShadingType::ExtShade);
 }
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ShadingFlagTest)

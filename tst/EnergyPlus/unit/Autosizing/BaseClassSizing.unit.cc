@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, BaseSizer_selectSizerOutput)
     Real64 autoSizedValue = thisSizer.size(*state, TempSize, errorsFound);
 
     EXPECT_EQ(-1.0, autoSizedValue);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, thisSizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, thisSizer.errorType);
 }
 
 TEST_F(EnergyPlusFixture, BaseSizer_GetCoilDesFlowT)

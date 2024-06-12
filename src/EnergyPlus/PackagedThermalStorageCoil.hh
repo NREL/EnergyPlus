@@ -437,7 +437,7 @@ namespace PackagedThermalStorageCoil {
     void SimTESCoil(EnergyPlusData &state,
                     std::string_view CompName, // name of the fan coil unit
                     int &CompIndex,
-                    int const FanOpMode, // allows parent object to control fan mode
+                    HVAC::FanOp const fanOp, // allows parent object to control fan mode
                     PTSCOperatingMode &TESOpMode,
                     ObjexxFCL::Optional<Real64 const> PartLoadRatio = _ // part load ratio (for single speed cycling unit)
     );
@@ -450,11 +450,11 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum);
 
-    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, HVAC::FanOp const fanOp, Real64 const PartLoadRatio);
 
     void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum);
 
