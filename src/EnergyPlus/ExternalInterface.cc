@@ -1955,7 +1955,7 @@ void CalcExternalInterfaceFMUImport(EnergyPlusData &state)
     if (state.dataGlobal->WarmupFlag && (state.dataGlobal->KindOfSim == Constant::KindOfSim::RunPeriodWeather)) { // Data exchange after design days
         if (state.dataExternalInterface->FirstCallWUp) {
             // set the report during warmup to true so that variables are also updated during the warmup
-            // UpdateDataDuringWarmupExternalInterface = true;
+            state.dataSysVars->UpdateDataDuringWarmupExternalInterface = true;
             state.dataExternalInterface->hStep = (60.0 * state.dataGlobal->TimeStepZone) * 60.0;
             state.dataExternalInterface->tStart = GetCurSimStartTimeSeconds(state);
             state.dataExternalInterface->tStop = state.dataExternalInterface->tStart + 24.0 * 3600.0;
@@ -2403,7 +2403,7 @@ void GetReportVariableKey(
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     OutputProcessor::VariableType varType(OutputProcessor::VariableType::Invalid);  // 0=not found, 1=integer, 2=real, 3=meter
     int numKeys(0);                                                                 // Number of keys found
-    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged);     // Variable  is Averaged=1 or Summed=2
+    OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Average);      // Variable  is Averaged=1 or Summed=2
     OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::Zone); // Variable time step is Zone=1 or HVAC=2
     Constant::Units varUnits(Constant::Units::None);                                // Units sting, may be blank
     Array1D_string keyNames;

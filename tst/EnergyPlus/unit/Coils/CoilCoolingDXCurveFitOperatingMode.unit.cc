@@ -118,7 +118,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
     EXPECT_TRUE(process_idf(idf_objects, false));
     CoilCoolingDXCurveFitOperatingMode thisMode(*state, "Coil Cooling DX Curve Fit Operating Mode 1");
-    EXPECT_TRUE(compare_enums(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType));
+    EXPECT_ENUM_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
@@ -137,7 +137,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing)
     state->dataSize->ZoneSizingRunDone = true;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).DesignSizeFromParent = false;
     state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod.allocate(25);
-    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+    state->dataSize->ZoneEqSizing(state->dataSize->CurZoneEqNum).SizingMethod(HVAC::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
 
     Real64 ratedEvapAirFlowRate = 1.005;
 
@@ -266,11 +266,11 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     EXPECT_EQ("COIL COOLING DX CURVE FIT PERFORMANCE 1", thisCoil.performance.name);
     EXPECT_EQ("HEATERCAPCURVE", Curve::GetCurveName(*state, thisCoil.performance.crankcaseHeaterCapacityCurveIndex));
 
-    int useAlternateMode = DataHVACGlobals::coilNormalMode;
+    HVAC::CoilMode coilMode = HVAC::CoilMode::Normal;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
-    int fanOpMode = 1;
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     bool singleMode = false;
     state->dataEnvrn->OutDryBulbTemp = 1.0;
     // thisCoil.simulate(*state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
@@ -279,17 +279,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitCrankcaseHeaterCurve)
     auto &condInletNode = state->dataLoopNodes->Node(thisCoil.condInletNodeIndex);
     auto &condOutletNode = state->dataLoopNodes->Node(thisCoil.condOutletNodeIndex);
     Real64 LoadSHR = 0.0;
-    thisCoil.performance.simulate(*state,
-                                  evapInletNode,
-                                  evapOutletNode,
-                                  useAlternateMode,
-                                  PLR,
-                                  speedNum,
-                                  speedRatio,
-                                  fanOpMode,
-                                  condInletNode,
-                                  condOutletNode,
-                                  singleMode,
-                                  LoadSHR);
+    thisCoil.performance.simulate(
+        *state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
     EXPECT_EQ(thisCoil.performance.crankcaseHeaterPower, 120.0);
 }

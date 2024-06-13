@@ -128,12 +128,12 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     state->dataCurveManager->GetCurvesInputFlag = false;
     bool errors_found(false);
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    EXPECT_TRUE(compare_enums(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature));
+    EXPECT_ENUM_EQ(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature);
     EXPECT_EQ(thisMaterial_1->absorpThermalVarFuncIdx, 1);
     EXPECT_EQ(thisMaterial_1->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation));
+    EXPECT_ENUM_EQ(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation);
     EXPECT_EQ(thisMaterial_2->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled));
+    EXPECT_ENUM_EQ(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled);
     EXPECT_EQ(thisMaterial_3->absorpThermalVarSchedIdx, 1);
     EXPECT_EQ(thisMaterial_3->absorpSolarVarSchedIdx, 1);
 

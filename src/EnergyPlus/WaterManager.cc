@@ -757,85 +757,85 @@ namespace WaterManager {
                                     "Water System Storage Tank Volume",
                                     Constant::Units::m3,
                                     state.dataWaterData->WaterStorage(Item).ThisTimeStepVolume,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Net Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->WaterStorage(Item).NetVdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Inlet Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->WaterStorage(Item).VdotToTank,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Outlet Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->WaterStorage(Item).VdotFromTank,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Mains Water Volume",
                                     Constant::Units::m3,
                                     state.dataWaterData->WaterStorage(Item).MainsDrawVol,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     state.dataWaterData->WaterStorage(Item).Name,
                                     Constant::eResource::MainsWater,
-                                    OutputProcessor::SOVEndUseCat::WaterSystem,
-                                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName,
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::WaterSystem,
+                                    state.dataWaterData->WaterStorage(Item).QualitySubCategoryName);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Mains Water Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->WaterStorage(Item).MainsDrawVdot,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Water Temperature",
                                     Constant::Units::C,
                                     state.dataWaterData->WaterStorage(Item).Twater,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Overflow Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->WaterStorage(Item).VdotOverflow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
                 if (state.dataWaterData->WaterStorage(Item).OverflowMode == DataWater::Overflow::Discarded) {
                     SetupOutputVariable(state,
                                         "Water System Storage Tank Overflow Water Volume",
                                         Constant::Units::m3,
                                         state.dataWaterData->WaterStorage(Item).VolOverflow,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Sum,
                                         state.dataWaterData->WaterStorage(Item).Name);
                 } else {
                     SetupOutputVariable(state,
                                         "Water System Storage Tank Overflow Water Volume",
                                         Constant::Units::m3,
                                         state.dataWaterData->WaterStorage(Item).VolOverflow,
-                                        OutputProcessor::SOVTimeStepType::System,
-                                        OutputProcessor::SOVStoreType::Summed,
+                                        OutputProcessor::TimeStepType::System,
+                                        OutputProcessor::StoreType::Sum,
                                         state.dataWaterData->WaterStorage(Item).Name);
                 }
                 SetupOutputVariable(state,
                                     "Water System Storage Tank Overflow Temperature",
                                     Constant::Units::C,
                                     state.dataWaterData->WaterStorage(Item).TwaterOverflow,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->WaterStorage(Item).Name);
             }
 
@@ -844,15 +844,15 @@ namespace WaterManager {
                                     "Water System Roof Irrigation Scheduled Depth",
                                     Constant::Units::m,
                                     state.dataWaterData->Irrigation.ScheduledAmount,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     "RoofIrrigation");
                 SetupOutputVariable(state,
                                     "Water System Roof Irrigation Actual Depth",
                                     Constant::Units::m,
                                     state.dataWaterData->Irrigation.ActualAmount,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     "RoofIrrigation");
             }
 
@@ -861,20 +861,19 @@ namespace WaterManager {
                                     "Water System Rainwater Collector Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->RainCollector(Item).VdotAvail,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->RainCollector(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Rainwater Collector Volume",
                                     Constant::Units::m3,
                                     state.dataWaterData->RainCollector(Item).VolCollected,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     state.dataWaterData->RainCollector(Item).Name,
                                     Constant::eResource::OnSiteWater,
-                                    OutputProcessor::SOVEndUseCat::RainWater,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::RainWater);
             }
 
             for (Item = 1; Item <= state.dataWaterData->NumGroundWaterWells; ++Item) { // CurrentModuleObject='WaterUse:Well'
@@ -882,45 +881,43 @@ namespace WaterManager {
                                     "Water System Groundwater Well Requested Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->GroundwaterWell(Item).VdotRequest,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Volume Flow Rate",
                                     Constant::Units::m3_s,
                                     state.dataWaterData->GroundwaterWell(Item).VdotDelivered,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Volume",
                                     Constant::Units::m3,
                                     state.dataWaterData->GroundwaterWell(Item).VolDelivered,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
                                     Constant::eResource::OnSiteWater,
-                                    OutputProcessor::SOVEndUseCat::WellWater,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::WellWater);
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Rate",
                                     Constant::Units::W,
                                     state.dataWaterData->GroundwaterWell(Item).PumpPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     state.dataWaterData->GroundwaterWell(Item).Name);
                 SetupOutputVariable(state,
                                     "Water System Groundwater Well Pump Electricity Energy",
                                     Constant::Units::J,
                                     state.dataWaterData->GroundwaterWell(Item).PumpEnergy,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     state.dataWaterData->GroundwaterWell(Item).Name,
                                     Constant::eResource::Electricity,
-                                    OutputProcessor::SOVEndUseCat::WaterSystem,
-                                    {},
-                                    OutputProcessor::SOVGroup::HVAC);
+                                    OutputProcessor::Group::HVAC,
+                                    OutputProcessor::EndUseCat::WaterSystem);
             }
 
         } // my one time flag block
@@ -1520,7 +1517,8 @@ namespace WaterManager {
                     .VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
-                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
+                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep];
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).PumpNomVolFlowRate;
                 PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse;
             }
@@ -1531,7 +1529,8 @@ namespace WaterManager {
                     .VdotAvailSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
                     state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 state.dataWaterData->WaterStorage(state.dataWaterData->GroundwaterWell(WellNum).StorageTankID)
-                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) = state.dataEnvrn->GroundTemp_Deep;
+                    .TwaterSupply(state.dataWaterData->GroundwaterWell(WellNum).StorageTankSupplyARRID) =
+                    state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::Deep];
 
                 VdotDelivered = state.dataWaterData->GroundwaterWell(WellNum).VdotRequest;
                 PumpPower = state.dataWaterData->GroundwaterWell(WellNum).PumpNomPowerUse *

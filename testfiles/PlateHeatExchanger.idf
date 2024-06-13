@@ -110,7 +110,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,24.1;
+  Version,24.2;
 
   Timestep,4;
 
@@ -2077,7 +2077,7 @@
     SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
-    MyCondenserControl,      !- Name
+    MyTowerCondenserControl, !- Name
     Temperature,             !- Control Variable
     OutdoorAirWetBulb,       !- Reference Temperature Type
     0,                       !- Offset Temperature Difference {deltaC}

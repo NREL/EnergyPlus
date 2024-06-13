@@ -75,7 +75,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -109,11 +108,9 @@ namespace EnergyPlus::SingleDuct {
 using namespace DataLoopNode;
 using BranchNodeConnections::SetUpCompSets;
 using BranchNodeConnections::TestCompSet;
-using DataHVACGlobals::ATMixer_InletSide;
-using DataHVACGlobals::ATMixer_SupplySide;
-using DataHVACGlobals::SmallAirVolFlow;
-using DataHVACGlobals::SmallLoad;
-using DataHVACGlobals::SmallMassFlow;
+using HVAC::SmallAirVolFlow;
+using HVAC::SmallLoad;
+using HVAC::SmallMassFlow;
 using namespace DataSizing;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -243,12 +240,11 @@ void GetSysInput(EnergyPlusData &state)
     using WaterCoils::GetCoilWaterInletNode;
     auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
     auto &GetHeatingCoilOutletNode(HeatingCoils::GetCoilOutletNode);
-    using Fans::GetFanInletNode;
-    using Fans::GetFanOutletNode;
     using namespace DataHeatBalance;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetSysInput: "); // include trailing blank
+    static constexpr std::string_view routineName = "GetSysInput";
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -757,15 +753,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -1066,8 +1062,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool Sys Loop
@@ -1779,15 +1775,15 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
         SetupOutputVariable(state,
                             "Zone Air Terminal Minimum Air Flow Fraction",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).ZoneMinAirFracReport,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of Sys Loop
@@ -1977,8 +1973,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
 
     } // end Number of VAVHeatandCool:NoReheat Sys Loop
@@ -2001,6 +1997,8 @@ void GetSysInput(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
+
+        ErrorObjectHeader eoh{routineName, CurrentModuleObject, Alphas(1)};
 
         state.dataSingleDuct->SysNumGSI = state.dataSingleDuct->SysIndexGSI + state.dataSingleDuct->NumVAVSysGSI +
                                           state.dataSingleDuct->NumCBVAVSysGSI + state.dataSingleDuct->NumConstVolSys +
@@ -2078,74 +2076,28 @@ void GetSysInput(EnergyPlusData &state)
                                      state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
             ErrorsFound = true;
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType = Alphas(5);
-        if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType, "Fan:VariableVolume")) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num = DataHVACGlobals::FanType_SimpleVAV;
-        } else if (Util::SameString(state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType, "Fan:SystemModel")) {
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num = DataHVACGlobals::FanType_SystemModelObject;
-        } else if (!state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType.empty()) {
-            ShowSevereError(
-                state, format("Illegal {} = {}.", cAlphaFields(5), state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType));
-            ShowContinueError(state,
-                              format("Occurs in {} = {}",
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
+
+        auto &airTerm = state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI);
+        airTerm.fanType = static_cast<HVAC::FanType>(getEnumValue(HVAC::fanTypeNamesUC, Alphas(5)));
+
+        if (airTerm.fanType != HVAC::FanType::VAV && airTerm.fanType != HVAC::FanType::SystemModel) {
+            ShowSevereInvalidKey(state, eoh, cAlphaFields(5), Alphas(5), "Support fan types are Fan:VAV and Fan:SystemModel");
+
             ErrorsFound = true;
         }
-        state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName = Alphas(6);
-        ValidateComponent(state,
-                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType,
-                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName,
-                          IsNotOK,
-                          state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType);
-        if (IsNotOK) {
-            ShowContinueError(state,
-                              format("In {} = {}",
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
-                                     state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
+
+        airTerm.FanName = Alphas(6);
+
+        airTerm.Fan_Index = Fans::GetFanIndex(state, airTerm.FanName);
+        if (airTerm.Fan_Index == 0) {
+            ShowSevereItemNotFound(state, eoh, cAlphaFields(6), airTerm.FanName);
             ErrorsFound = true;
         }
-        if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs.emplace_back(
-                new HVACFan::FanSystem(state,
-                                       state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI)
-                                           .FanName)); // call constructor, safe here because get input is not using DataIPShortCuts.
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index =
-                HVACFan::getFanObjectVectorIndex(state, state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName);
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
-                state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->outletNodeNum;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
-                state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->inletNodeNum;
-            state.dataHVACFan->fanObjs[state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Index]->fanIsSecondaryDriver = true;
-        } else if (state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Fan_Num == DataHVACGlobals::FanType_SimpleVAV) {
-            IsNotOK = false;
+        airTerm.OutletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->outletNodeNum;
+        airTerm.InletNodeNum = state.dataFans->fans(airTerm.Fan_Index)->inletNodeNum;
 
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).OutletNodeNum =
-                GetFanOutletNode(state,
-                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType,
-                                 state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName,
-                                 IsNotOK);
-            if (IsNotOK) {
-                ShowContinueError(state,
-                                  format("..Occurs in {} = {}",
-                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
-                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
-                ErrorsFound = true;
-            }
-
-            IsNotOK = false;
-            state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).InletNodeNum =
-                GetFanInletNode(state,
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanType,
-                                state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).FanName,
-                                IsNotOK);
-            if (IsNotOK) {
-                ShowContinueError(state,
-                                  format("..Occurs in {} = {}",
-                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).sysType,
-                                         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName));
-                ErrorsFound = true;
-            }
+        if (airTerm.fanType == HVAC::FanType::SystemModel) {
+            dynamic_cast<Fans::FanSystem *>(state.dataFans->fans(airTerm.Fan_Index))->isSecondaryDriver = true;
         }
 
         state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).Schedule = Alphas(2);
@@ -2414,8 +2366,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal VAV Damper Position",
                             Constant::Units::None,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).DamperPosition,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(state.dataSingleDuct->SysNumGSI).SysName);
     }
 
@@ -2425,8 +2377,8 @@ void GetSysInput(EnergyPlusData &state)
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             Constant::Units::m3_s,
                             state.dataSingleDuct->sd_airterminal(sdIndex).OutdoorAirFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             state.dataSingleDuct->sd_airterminal(sdIndex).SysName);
     }
 
@@ -3820,8 +3772,8 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
     // unused   USE DataHeatBalFanSys, ONLY: Mat
-    using DataHVACGlobals::SmallLoad;
     using HeatingCoils::SimulateHeatingCoilComponents;
+    using HVAC::SmallLoad;
     using PlantUtilities::SetActuatedBranchFlowRate;
     using SteamCoils::SimulateSteamCoilComponents;
     using WaterCoils::SimulateWaterCoilComponents;
@@ -3882,7 +3834,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // if the massflow is below the minimum or greater than the Max it is set to either the Min
     // or the Max as specified for the VAV model.
     if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleHeating) &&
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleHeating) &&
         (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         // Calculate the flow required for cooling
 
@@ -3922,7 +3874,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
         }
 
     } else if ((this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) &&
-               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == DataHVACGlobals::ThermostatType::SingleHeating) &&
+               (QTotLoad >= 0.0 || state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleHeating) &&
                (GetCurrentScheduleValue(state, this->SchedPtr) > 0.0)) {
         //     IF (sd_airterminal(SysNum)%DamperHeatingAction .EQ. ReverseAction .AND. this->sd_airterminalInlet%AirMassFlowRateMinAvail <=
         //     SmallMassFlow) THEN
@@ -4011,7 +3963,7 @@ void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, bool const FirstHVACIt
     // there's a heating requirement, and there's a thermostat with a heating setpoint
     // Reverse damper option is working only for water coils for now.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleCooling)) {
         // At this point we know that there is a heating requirement: i.e., the heating coil needs to
         // be activated (there's a zone heating load or there's a reheat requirement). There are 3 possible
         // situations: 1) the coil load can be met by variable temperature air (below the max heat temp) at
@@ -4366,7 +4318,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    using DataHVACGlobals::SmallLoad;
+    using HVAC::SmallLoad;
     // unused   USE DataHeatBalFanSys,    ONLY: Mat
     using HeatingCoils::SimulateHeatingCoilComponents;
     using SteamCoils::SimulateSteamCoilComponents;
@@ -4470,7 +4422,7 @@ void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, bool const FirstHVAC
     QActualHeating = QToHeatSetPt - MassFlow * CpAirZn * (this->sd_airterminalInlet.AirTemp - state.dataSingleDuct->ZoneTempSCBVAV);
 
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleCooling)) {
         //   VAVHeatandCool boxes operate at varying mass flow rates when reheating, VAV boxes operate at min flow
         //      (MassFlow <= this->sd_airterminalInlet%AirMassFlowRateMinAvail) .AND. &
         //   Per Fred Buhl, don't use DeadBandOrSetback to determine if heaters operate
@@ -4757,7 +4709,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     Real64 QHeatFanOffMax;  // max heating - fan off, hot water flow at max [W]
     Real64 QNoHeatFanOff;   // min heating - fan off, hot water at min flow [W]
     HeatingCoilType HCType; // heating coil type
-    int FanType;            // fan type (as a number)
+    HVAC::FanType fanType;  // fan type (as a number)
     Real64 HCLoad;          // load passed to a gas or electric heating coil [W]
     int FanOp;              // 1 if fan is on; 0 if off.
     Real64 MaxCoolMassFlow; // air flow at max cooling [kg/s]
@@ -4777,7 +4729,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     SysInletNode = this->InletNodeNum;
     CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNodeNum).HumRat);
     HCType = this->ReheatComp_Num;
-    FanType = this->Fan_Num;
+    fanType = this->fanType;
     MaxCoolMassFlow = this->sd_airterminalInlet.AirMassFlowRateMaxAvail;
     MaxHeatMassFlow = min(this->HeatAirMassFlowRateMax, this->sd_airterminalInlet.AirMassFlowRateMaxAvail);
     MinMassFlow = MaxCoolMassFlow * this->ZoneMinAirFrac;
@@ -4787,7 +4739,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     if (this->sd_airterminalInlet.AirMassFlowRateMaxAvail <= 0.0 || state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum)) {
         MassFlow = 0.0;
         FanOp = 0;
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, fanType, MassFlow, FanOp, QDelivered);
         return;
     }
 
@@ -4830,26 +4782,26 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
     // region 1: active cooling with fan on
     FanOp = 1;
     if (HCType == HeatingCoilType::SteamAirHeating) {
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MinMassFlow, FanOp, QCoolFanOnMin);
         // region 2: active heating with fan on
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, fanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
         MaxSteamCap = GetCoilCapacity(state, this->ReheatComp, this->ReheatName, ErrorsFound);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, 0.0, fanType, MinMassFlow, FanOp, QHeatFanOnMin);
         // region 3: active heating with fan off
         FanOp = 0;
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, BigLoad, fanType, MinMassFlow, FanOp, QHeatFanOffMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MinMassFlow, FanOp, QNoHeatFanOff);
     } else {
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QCoolFanOnMin);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, fanType, MaxCoolMassFlow, FanOp, QCoolFanOnMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, fanType, MinMassFlow, FanOp, QCoolFanOnMin);
         // region 2: active heating with fan on
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, FanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MinMassFlow, FanOp, QHeatFanOnMin);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, fanType, MaxHeatMassFlow, FanOp, QHeatFanOnMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, fanType, MinMassFlow, FanOp, QHeatFanOnMin);
         // region 3: active heating with fan off
         FanOp = 0;
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, FanType, MinMassFlow, FanOp, QHeatFanOffMax);
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MinMassFlow, FanOp, QNoHeatFanOff);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, BigLoad, fanType, MinMassFlow, FanOp, QHeatFanOffMax);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, fanType, MinMassFlow, FanOp, QNoHeatFanOff);
     }
 
     // Active cooling with fix for issue #5592
@@ -4860,11 +4812,11 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         if (QCoolFanOnMax < QTotLoad - SmallLoad) {
             Real64 MinHWFlow = (HCType == HeatingCoilType::SteamAirHeating) ? MinFlowSteam : MinFlowWater;
 
-            auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MinHWFlow, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+            auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MinHWFlow, fanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
                 Real64 UnitOutput = 0.0; // cooling output [W] (cooling is negative)
 
                 state.dataSingleDuct->sd_airterminal(this->SysNum)
-                    .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinHWFlow, 0.0, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                    .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinHWFlow, 0.0, fanType, SupplyAirMassFlow, FanOp, UnitOutput);
                 return (QTotLoad - UnitOutput) / QTotLoad;
             };
 
@@ -4890,9 +4842,9 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             MassFlow = MaxCoolMassFlow;
 
             if (HCType == HeatingCoilType::SteamAirHeating) {
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, 0.0, fanType, MassFlow, FanOp, QDelivered);
             } else {
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, fanType, MassFlow, FanOp, QDelivered);
             }
         }
 
@@ -4903,9 +4855,9 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
         MassFlow = MinMassFlow;
         FanOp = 0;
         if (HCType == HeatingCoilType::SteamAirHeating) {
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, QTotLoad, FanType, MassFlow, FanOp, QNoHeatFanOff);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowSteam, QTotLoad, fanType, MassFlow, FanOp, QNoHeatFanOff);
         } else {
-            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, FanType, MassFlow, FanOp, QNoHeatFanOff);
+            this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MinFlowWater, 0.0, fanType, MassFlow, FanOp, QNoHeatFanOff);
         }
 
         // active heating
@@ -4919,12 +4871,12 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 MassFlow = MinMassFlow;
                 FanOp = 0;
 
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, FanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, fanType, FanOp, QTotLoad](Real64 const HWMassFlow) {
                     Real64 UnitOutput = 0.0; // heating output [W]
                     Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
 
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, fanType, MassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
@@ -4934,7 +4886,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                     ShowRecurringWarningErrorAtEnd(state, "Hot Water flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
                         state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, fanType, MassFlow, FanOp, QDelivered);
                 } else if (SolFlag == -2) {
                     ShowRecurringWarningErrorAtEnd(
                         state, "Hot Water flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName, this->ErrCount2);
@@ -4942,14 +4894,14 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, fanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 // set hot water flow to max and vary the supply air flow rate
                 FanOp = 1;
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, fanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
                     Real64 UnitOutput = 0.0; // heating output [W]
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, QTotLoad, fanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
@@ -4972,7 +4924,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else {
                 MassFlow = MaxHeatMassFlow;
                 FanOp = 1;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, fanType, MassFlow, FanOp, QDelivered);
             }
         } else if (HCType == HeatingCoilType::SteamAirHeating) {
             //      IF (QTotLoad > QNoHeatFanOff + SmallLoad .AND. QTotLoad < QHeatFanOffMax - SmallLoad) THEN
@@ -4980,7 +4932,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                 ErrTolerance = this->ControllerOffset;
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, FanType, FanOp, QTotLoad, MinFlowSteam, MaxFlowSteam, MaxSteamCap](
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MassFlow, fanType, FanOp, QTotLoad, MinFlowSteam, MaxFlowSteam, MaxSteamCap](
                              Real64 const HWMassFlow) {
                     Real64 UnitOutput = 0.0; // heating output [W]
                     Real64 QSteamLoad = 0.0; // proportional load to calculate steam flow [W]
@@ -4993,7 +4945,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                         QSteamLoad = MaxSteamCap * HWMassFlow / (MaxFlowSteam - MinFlowSteam);
                     }
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, FanType, MassFlow, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWMassFlow, QSteamLoad, fanType, MassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
@@ -5002,7 +4954,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                     ShowRecurringWarningErrorAtEnd(state, "Steam flow control failed in VS VAV terminal unit " + this->SysName, this->ErrCount1);
                     ShowRecurringContinueErrorAtEnd(
                         state, "...Iteration limit (500) exceeded in calculating the hot water flow rate", this->ErrCount1c);
-                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                    this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, HWFlow, 0.0, fanType, MassFlow, FanOp, QDelivered);
                 } else if (SolFlag == -2) {
                     ShowRecurringWarningErrorAtEnd(
                         state, "Steam flow control failed (bad air flow limits) in VS VAV terminal unit " + this->SysName, this->ErrCount2);
@@ -5010,15 +4962,15 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else if (QTotLoad >= QHeatFanOffMax - SmallLoad && QTotLoad <= QHeatFanOnMin + SmallLoad) {
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowWater, 0.0, fanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 FanOp = 1;
 
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, FanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, fanType, FanOp, QTotLoad](Real64 const SupplyAirMassFlow) {
                     Real64 UnitOutput = 0.0; // heating output [W]
 
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, FanType, SupplyAirMassFlow, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, MaxFlowSteam, QTotLoad, fanType, SupplyAirMassFlow, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
@@ -5042,18 +4994,18 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else {
                 MassFlow = MaxHeatMassFlow;
                 FanOp = 1;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, QTotLoad, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, QTotLoad, QTotLoad, fanType, MassFlow, FanOp, QDelivered);
             }
         } else if (HCType == HeatingCoilType::Gas || HCType == HeatingCoilType::Electric) {
             if (QTotLoad <= QHeatFanOnMin + SmallLoad) {
                 // vary heating coil power, leave mass flow at minimum
                 MassFlow = MinMassFlow;
                 FanOp = 0;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, fanType, MassFlow, FanOp, QDelivered);
             } else if (QTotLoad > QHeatFanOnMin + SmallLoad && QTotLoad < QHeatFanOnMax - SmallLoad) {
                 FanOp = 1;
 
-                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, FanType, FanOp, QTotLoad](Real64 const HeatingFrac) {
+                auto f = [&state, this, FirstHVACIteration, ZoneNodeNum, fanType, FanOp, QTotLoad](Real64 const HeatingFrac) {
                     Real64 MaxHeatOut{this->ReheatCoilMaxCapacity}; // maximum heating output [W]
                     Real64 UnitOutput;                              // heating output [W]
                     Real64 AirMassFlowRate;                         // [kg/s]
@@ -5065,7 +5017,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
                                               state.dataSingleDuct->sd_airterminal(this->SysNum).ZoneMinAirFrac);
 
                     state.dataSingleDuct->sd_airterminal(this->SysNum)
-                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, HeatOut, FanType, AirMassFlowRate, FanOp, UnitOutput);
+                        .CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, HeatOut, fanType, AirMassFlowRate, FanOp, UnitOutput);
 
                     return (QTotLoad - UnitOutput) / QTotLoad;
                 };
@@ -5090,7 +5042,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
             } else {
                 MassFlow = MaxHeatMassFlow;
                 FanOp = 1;
-                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, FanType, MassFlow, FanOp, QDelivered);
+                this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, QTotLoad, fanType, MassFlow, FanOp, QDelivered);
             }
         } else {
             ShowFatalError(state, format("Invalid Reheat Component={}", this->ReheatComp));
@@ -5100,7 +5052,7 @@ void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, bool const FirstHVAC
 
         MassFlow = 0.0;
         FanOp = 0;
-        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
+        this->CalcVAVVS(state, FirstHVACIteration, ZoneNodeNum, 0.0, 0.0, fanType, MassFlow, FanOp, QDelivered);
     }
 
     // Move mass flow rates to the damper outlet node
@@ -5200,7 +5152,7 @@ void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, bool const FirstH
     // Now the massflow for reheating has been determined. If it is zero, or in SetBack, or the
     // system scheduled OFF then not operational and shut the system down.
     if ((MassFlow > SmallMassFlow) && (QActualHeating > 0.0) &&
-        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != DataHVACGlobals::ThermostatType::SingleCooling)) {
+        (state.dataHeatBalFanSys->TempControlType(ZoneNum) != HVAC::ThermostatType::SingleCooling)) {
 
         switch (this->ReheatComp_Num) {
         case HeatingCoilType::SimpleHeating: { // COIL:WATER:SIMPLEHEATING
@@ -5324,7 +5276,7 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
                                       int const ZoneNode,            // zone node number
                                       Real64 const HWFlow,           // hot water flow (kg/s)
                                       Real64 const HCoilReq,         // gas or elec coil demand requested
-                                      int const FanType,             // type of fan
+                                      HVAC::FanType fanType,         // type of fan
                                       Real64 const AirFlow,          // air flow rate (kg/s)
                                       int const FanOn,               // 1 means fan is on
                                       Real64 &LoadMet                // load met by unit (watts)
@@ -5382,18 +5334,12 @@ void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state,
     AirMassFlow = AirFlow;
     state.dataLoopNodes->Node(FanInNode).MassFlowRate = AirMassFlow;
     CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);
-    if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
-        Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
-    } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-        state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
+    if (FanOn == 1) {
+        state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
     } else { // pass through conditions
         state.dataHVACGlobal->TurnFansOff = true;
-        if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
-            Fans::SimulateFanComponents(state, this->FanName, FirstHVACIteration, this->Fan_Index);
-        } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[this->Fan_Index]->simulate(state, _, _);
-        }
+        state.dataFans->fans(this->Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         state.dataHVACGlobal->TurnFansOff = TurnFansOffSav;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRate = state.dataLoopNodes->Node(FanInNode).MassFlowRate;
         state.dataLoopNodes->Node(FanOutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(FanInNode).MassFlowRateMaxAvail;
@@ -5637,8 +5583,6 @@ void GetATMixers(EnergyPlusData &state)
     using NodeInputManager::GetOnlySingleNode;
     using namespace DataLoopNode;
     using BranchNodeConnections::TestCompSet;
-    using DataHVACGlobals::ATMixer_InletSide;
-    using DataHVACGlobals::ATMixer_SupplySide;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int NumNums;    // Number of REAL(r64) numbers returned by GetObjectItem
@@ -5656,6 +5600,9 @@ void GetATMixers(EnergyPlusData &state)
         return;
     }
     state.dataSingleDuct->GetATMixerFlag = false;
+
+    auto &ipsc = state.dataIPShortCut;
+
     auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
     cCurrentModuleObject = "AirTerminal:SingleDuct:Mixer";
     state.dataSingleDuct->NumATMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -5681,13 +5628,13 @@ void GetATMixers(EnergyPlusData &state)
                                                                  state.dataIPShortCut->lAlphaFieldBlanks,
                                                                  state.dataIPShortCut->cAlphaFieldNames,
                                                                  state.dataIPShortCut->cNumericFieldNames);
+
+        auto &atMixer = state.dataSingleDuct->SysATMixer(ATMixerNum);
         Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
         state.dataSingleDuct->SysATMixer(ATMixerNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-        if (state.dataIPShortCut->cAlphaArgs(7) == "INLETSIDE") {
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_InletSide; // inlet side mixer
-        } else if (state.dataIPShortCut->cAlphaArgs(7) == "SUPPLYSIDE") {
-            state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType = ATMixer_SupplySide; // supply side mixer
-        }
+
+        atMixer.type = static_cast<HVAC::MixerType>(getEnumValue(HVAC::mixerTypeLocNamesUC, ipsc->cAlphaArgs(7)));
+
         if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:WATERTOAIRHEATPUMP") {
             state.dataSingleDuct->SysATMixer(ATMixerNum).ZoneHVACUnitType = 1;
         } else if (state.dataIPShortCut->cAlphaArgs(2) == "ZONEHVAC:FOURPIPEFANCOIL") {
@@ -5826,7 +5773,7 @@ void GetATMixers(EnergyPlusData &state)
             ErrorsFound = true;
         } else {
 
-            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType == ATMixer_InletSide) {
+            if (state.dataSingleDuct->SysATMixer(ATMixerNum).type == HVAC::MixerType::InletSide) {
                 // Air Terminal inlet node must be the same as a zone exhaust node
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
@@ -5897,7 +5844,7 @@ void GetATMixers(EnergyPlusData &state)
                 }
             }
 
-            if (state.dataSingleDuct->SysATMixer(ATMixerNum).MixerType == ATMixer_SupplySide) {
+            if (state.dataSingleDuct->SysATMixer(ATMixerNum).type == HVAC::MixerType::SupplySide) {
                 ZoneNodeNotFound = true;
                 for (CtrlZone = 1; CtrlZone <= state.dataGlobal->NumOfZones; ++CtrlZone) {
                     if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) continue;
@@ -6066,7 +6013,7 @@ void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHV
                 max(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->PriInNode).MassFlowRateMin);
         }
     }
-    if (this->MixerType == ATMixer_InletSide) {
+    if (this->type == HVAC::MixerType::InletSide) {
         state.dataLoopNodes->Node(this->PriInNode).MassFlowRate =
             min(state.dataLoopNodes->Node(this->PriInNode).MassFlowRate, state.dataLoopNodes->Node(this->MixedAirOutNode).MassFlowRate);
     }
@@ -6114,7 +6061,7 @@ void CalcATMixer(EnergyPlusData &state, int const SysNum)
     state.dataSingleDuct->SecAirHumRatCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).HumRat;
     state.dataSingleDuct->SecAirTempCATM = state.dataLoopNodes->Node(state.dataSingleDuct->SysATMixer(SysNum).SecInNode).Temp;
 
-    if (state.dataSingleDuct->SysATMixer(SysNum).MixerType == ATMixer_SupplySide) {
+    if (state.dataSingleDuct->SysATMixer(SysNum).type == HVAC::MixerType::SupplySide) {
         state.dataSingleDuct->MixedAirMassFlowRateCATM = state.dataSingleDuct->SecAirMassFlowRateCATM + state.dataSingleDuct->PriMassFlowRateCATM;
     } else {
         // for inlet side mixer, the mixed air flow has been set, but we don't know the secondary flow
@@ -6186,7 +6133,7 @@ void UpdateATMixer(EnergyPlusData &state, int const SysNum)
     state.dataLoopNodes->Node(MixedAirOutNode).MassFlowRate = state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
+        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= HVAC::VerySmallMassFlow) {
             state.dataLoopNodes->Node(MixedAirOutNode).CO2 = state.dataLoopNodes->Node(PriInNode).CO2;
         } else {
             state.dataLoopNodes->Node(MixedAirOutNode).CO2 =
@@ -6197,7 +6144,7 @@ void UpdateATMixer(EnergyPlusData &state, int const SysNum)
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= DataHVACGlobals::VerySmallMassFlow) {
+        if (state.dataSingleDuct->SysATMixer(SysNum).MixedAirMassFlowRate <= HVAC::VerySmallMassFlow) {
             state.dataLoopNodes->Node(MixedAirOutNode).GenContam = state.dataLoopNodes->Node(PriInNode).GenContam;
         } else {
             state.dataLoopNodes->Node(MixedAirOutNode).GenContam =
@@ -6218,7 +6165,7 @@ void GetATMixer(EnergyPlusData &state,
                 std::string const &ZoneEquipName, // zone unit name name
                 std::string &ATMixerName,         // air terminal mixer name
                 int &ATMixerNum,                  // air terminal mixer index
-                int &ATMixerType,                 // air teminal mixer type
+                HVAC::MixerType &ATMixerType,     // air teminal mixer type
                 int &ATMixerPriNode,              // air terminal mixer primary air node number
                 int &ATMixerSecNode,              // air terminal mixer secondary air node number
                 int &ATMixerOutNode,              // air terminal mixer outlet air node number
@@ -6250,7 +6197,7 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = 0;
         ATMixerSecNode = 0;
         ATMixerOutNode = 0;
-        ATMixerType = 0;
+        ATMixerType = HVAC::MixerType::Invalid;
         return;
     }
 
@@ -6261,8 +6208,8 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).PriInNode;
         ATMixerSecNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).SecInNode;
         ATMixerOutNode = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixedAirOutNode;
-        ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).MixerType;
-        if (ATMixerType == ATMixer_InletSide) {
+        ATMixerType = state.dataSingleDuct->SysATMixer(ATMixerIndex).type;
+        if (ATMixerType == HVAC::MixerType::InletSide) {
             state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ZoneEquipOutletNode;
         } else {
             state.dataSingleDuct->SysATMixer(ATMixerIndex).ZoneInletNode = ATMixerOutNode;
@@ -6274,7 +6221,7 @@ void GetATMixer(EnergyPlusData &state,
         ATMixerPriNode = 0;
         ATMixerSecNode = 0;
         ATMixerOutNode = 0;
-        ATMixerType = 0;
+        ATMixerType = HVAC::MixerType::Invalid;
     }
 }
 
@@ -6324,10 +6271,10 @@ void setATMixerSizingProperties(EnergyPlusData &state,
     if (inletATMixerIndex == 0) return; // protect this function from bad inputs
     if (controlledZoneNum == 0) return;
     if (curZoneEqNum == 0) return;
-    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == DataHVACGlobals::No_ATMixer) return;
+    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).type == HVAC::MixerType::Invalid) return;
 
     // ATMixer properties only affect coil sizing when the mixer is on the inlet side of zone equipment
-    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).MixerType == DataHVACGlobals::ATMixer_SupplySide) {
+    if (state.dataSingleDuct->SysATMixer(inletATMixerIndex).type == HVAC::MixerType::SupplySide) {
         // check if user has selected No to account for DOAS system
         if (FinalZoneSizing.allocated() && state.dataSingleDuct->SysATMixer(inletATMixerIndex).printWarning) {
             if (!FinalZoneSizing(curZoneEqNum).AccountForDOAS && FinalZoneSizing(curZoneEqNum).DOASControlStrategy != DOASControl::NeutralSup) {
