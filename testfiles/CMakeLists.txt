@@ -686,6 +686,7 @@ add_simulation_test(IDF_FILE VentilatedSlab.idf EPW_FILE USA_IL_Chicago-OHare.In
 add_simulation_test(IDF_FILE VentilatedSlab_SeriesSlabs.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VentilationSimpleTest.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE VRFMultispeedFan.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+add_simulation_test(IDF_FILE WaterCooledChillerWithVSCondenserControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterDHWPlantLoop.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterHeatPumpStratifiedTank.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 add_simulation_test(IDF_FILE WaterHeaterHeatPumpWrappedCondenser.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
