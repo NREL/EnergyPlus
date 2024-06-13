@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, FileSystemGetFileType)
 {
     fs::path filePath0("/eplus/myfile.idf");
     auto ext = EnergyPlus::FileSystem::getFileType(filePath0);
-    EXPECT_TRUE(compare_enums(EnergyPlus::FileSystem::FileTypes::IDF, ext));
+    EXPECT_ENUM_EQ(EnergyPlus::FileSystem::FileTypes::IDF, ext);
 
     fs::path filePath1("./schedulefileA.CSV");
     ext = EnergyPlus::FileSystem::getFileType(filePath1);
