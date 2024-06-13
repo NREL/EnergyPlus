@@ -125,7 +125,7 @@ TEST_F(EnergyPlusFixture, ExerciseHVACDXHeatPumpSystem)
     state->dataDXCoils->DXCoil(1).RegionNum = 1;
     state->dataDXCoils->DXCoilOutletTemp.allocate(1);
     state->dataDXCoils->DXCoilOutletHumRat.allocate(1);
-    state->dataDXCoils->DXCoilFanOpMode.allocate(1);
+    state->dataDXCoils->DXCoilFanOp.allocate(1);
     state->dataDXCoils->DXCoilPartLoadRatio.allocate(1);
     state->dataDXCoils->DXCoilTotalHeating.allocate(1);
     state->dataDXCoils->DXCoilHeatInletAirDBTemp.allocate(1);

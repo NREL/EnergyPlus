@@ -21798,7 +21798,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan’s maximum flow rate.
+        \note Must be less than or equal to the fanâ€™s maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -31023,7 +31023,7 @@ Pipe:Outdoor,
 Pipe:Underground,
         \memo Buried Pipe model: For pipes buried at a depth less
         \memo than one meter, this is an alternative object to:
-        \memo ‘HeatExchanger:Surface’
+        \memo â€˜HeatExchanger:Surfaceâ€™
         \memo Heat transfer pipes only allowed on loop supply sides
    A1,  \field Name
         \required-field

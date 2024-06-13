@@ -416,7 +416,7 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
     SetupOutputVariable(state,
                         "Cooling Coil Dehumidification Mode",
                         Constant::Units::None,
-                        this->dehumidificationMode,
+                        (int &)this->dehumidificationMode,
                         OutputProcessor::TimeStepType::System,
                         OutputProcessor::StoreType::Average,
                         this->name);
@@ -574,16 +574,18 @@ void CoilCoolingDX::oneTimeInit(EnergyPlusData &state)
 
 int CoilCoolingDX::getNumModes()
 {
+    // TODO: should this support all 3 modes?
     int numModes = 1;
-    if (this->performance.hasAlternateMode) {
+    if (this->performance.maxAvailCoilMode != HVAC::CoilMode::Normal) {
         numModes++;
     }
     return numModes;
 }
 
-int CoilCoolingDX::getOpModeCapFTIndex(bool const useAlternateMode)
+int CoilCoolingDX::getOpModeCapFTIndex(HVAC::CoilMode const mode)
 {
-    if (useAlternateMode) {
+    // TODO: should this support all 3 modes?
+    if (mode != HVAC::CoilMode::Normal) {
         return this->altModeNomSpeed().indexCapFT;
     } else {
         return this->normModeNomSpeed().indexCapFT;
@@ -638,9 +640,10 @@ CoilCoolingDXCurveFitSpeed &CoilCoolingDX::altModeNomSpeed()
     return this->performance.alternateMode.speeds[this->performance.alternateMode.nominalSpeedIndex];
 }
 
-Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
+Real64 CoilCoolingDX::condMassFlowRate(HVAC::CoilMode const mode)
 {
-    if (useAlternateMode) {
+    // TODO: should this support all 3 modes?
+    if (mode != HVAC::CoilMode::Normal) {
         return this->altModeNomSpeed().RatedCondAirMassFlowRate;
     } else {
         return this->normModeNomSpeed().RatedCondAirMassFlowRate;
@@ -654,11 +657,11 @@ void CoilCoolingDX::size(EnergyPlusData &state)
 }
 
 void CoilCoolingDX::simulate(EnergyPlusData &state,
-                             int useAlternateMode,
+                             HVAC::CoilMode coilMode,
                              Real64 PLR,
                              int speedNum,
                              Real64 speedRatio,
-                             int const fanOpMode,
+                             HVAC::FanOp const fanOp,
                              bool const singleMode,
                              Real64 LoadSHR)
 {
@@ -677,11 +680,11 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
 
     // set some reporting variables
     this->condenserInletTemperature = condInletNode.Temp;
-    this->dehumidificationMode = useAlternateMode;
+    this->dehumidificationMode = coilMode;
 
     // set condenser inlet/outlet nodes
     // once condenser inlet is connected to upstream components, will need to revisit
-    condInletNode.MassFlowRate = this->condMassFlowRate(useAlternateMode);
+    condInletNode.MassFlowRate = this->condMassFlowRate(coilMode);
     condOutletNode.MassFlowRate = condInletNode.MassFlowRate;
 
     // call the simulation, which returns useful data
@@ -689,18 +692,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(state,
-                               evapInletNode,
-                               evapOutletNode,
-                               useAlternateMode,
-                               PLR,
-                               speedNum,
-                               speedRatio,
-                               fanOpMode,
-                               condInletNode,
-                               condOutletNode,
-                               singleMode,
-                               LoadSHR);
+    this->performance.simulate(
+        state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
     CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -740,7 +733,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             Real64 waterDensity = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
-            if (useAlternateMode == HVAC::coilNormalMode) {
+            if (coilMode == HVAC::CoilMode::Normal) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             state.dataWaterData->WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -781,7 +774,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
-    if (useAlternateMode == HVAC::coilSubcoolReheatMode) {
+    if (coilMode == HVAC::CoilMode::SubcoolReheat) {
         this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
         this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
     }
@@ -837,7 +830,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
-            int dummyFanOpMode = 1.0;
+            HVAC::FanOp dummyFanOp = HVAC::FanOp::Cycling;
             bool dummySingleMode = false;
 
             Real64 constexpr RatedInletAirTemp(26.6667);   // 26.6667C or 80F
@@ -875,11 +868,11 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             this->performance.simulate(state,
                                        dummyEvapInlet,
                                        dummyEvapOutlet,
-                                       false,
+                                       HVAC::CoilMode::Normal,
                                        dummyPLR,
                                        dummySpeedNum,
                                        dummySpeedRatio,
-                                       dummyFanOpMode,
+                                       dummyFanOp,
                                        dummyCondInlet,
                                        dummyCondOutlet,
                                        dummySingleMode);
@@ -939,7 +932,8 @@ void CoilCoolingDX::setToHundredPercentDOAS()
         speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
         speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;
     }
-    if (this->performance.hasAlternateMode) {
+    // TODO: should this support all 3 modes?
+    if (this->performance.maxAvailCoilMode != HVAC::CoilMode::Normal) {
         for (auto &speed : this->performance.alternateMode.speeds) {
             speed.minRatedVolFlowPerRatedTotCap = HVAC::MinRatedVolFlowPerRatedTotCap2;
             speed.maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap2;

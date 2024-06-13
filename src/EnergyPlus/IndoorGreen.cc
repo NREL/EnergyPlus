@@ -498,7 +498,6 @@ namespace IndoorGreen {
         Real64 OutPb;       // outdoor pressure (kPa)
         Real64 vp;          // actual vapor pressure of the air (kpa)
         Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
-        std::string_view cCurrentModuleObject = "IndoorLivingWall";
         Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
@@ -597,7 +596,6 @@ namespace IndoorGreen {
         // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
         // Wageningen, The Netherlands
 
-        static constexpr std::string_view RoutineName("ETBaseFunction: ");
         Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
         Real64 slopepat =
             0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)

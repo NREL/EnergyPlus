@@ -488,7 +488,7 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                 if (this->autoSizedValue > 0.0) {
                     RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
                 }
-                if (RatedVolFlowPerRatedTotCap < state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                if (RatedVolFlowPerRatedTotCap < HVAC::MinRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
                         ShowContinueError(
@@ -498,17 +498,17 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         ShowContinueError(state, format("...Requested flow/capacity ratio (m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
                         ShowContinueError(state,
                                           format("...Minimum flow/capacity ratio (m3/s/W ) = {:.3T}",
-                                                 state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)));
+                                                 HVAC::MinRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]));
                     }
 
-                    DXFlowPerCapMinRatio = (DesVolFlow / state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) /
+                    DXFlowPerCapMinRatio = (DesVolFlow / HVAC::MinRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]) /
                                            this->autoSizedValue; // set DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
-                    this->autoSizedValue = DesVolFlow / state.dataHVACGlobal->MinRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
+                    this->autoSizedValue = DesVolFlow / HVAC::MinRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT];
 
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowContinueError(state, format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));
                     }
-                } else if (RatedVolFlowPerRatedTotCap > state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)) {
+                } else if (RatedVolFlowPerRatedTotCap > HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]) {
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowWarningError(state, this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
                         ShowContinueError(
@@ -518,12 +518,12 @@ Real64 CoolingCapacitySizer::size(EnergyPlusData &state, Real64 _originalValue, 
                         ShowContinueError(state, format("...Requested flow/capacity ratio ( m3/s/W ) = {:.3T}", RatedVolFlowPerRatedTotCap));
                         ShowContinueError(state,
                                           format("...Maximum flow/capacity ratio ( m3/s/W ) = {:.3T}",
-                                                 state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT)));
+                                                 HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT]));
                     }
 
-                    DXFlowPerCapMaxRatio = DesVolFlow / state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT) /
+                    DXFlowPerCapMaxRatio = DesVolFlow / HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT] /
                                            this->autoSizedValue; // set DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
-                    this->autoSizedValue = DesVolFlow / state.dataHVACGlobal->MaxRatedVolFlowPerRatedTotCap(state.dataHVACGlobal->DXCT);
+                    this->autoSizedValue = DesVolFlow / HVAC::MaxRatedVolFlowPerRatedTotCap[(int)state.dataHVACGlobal->DXCT];
 
                     if (!this->dataEMSOverride && state.dataGlobal->DisplayExtraWarnings && this->printWarningFlag) {
                         ShowContinueError(state, format("...Adjusted capacity ( W ) = {:.3T}", this->autoSizedValue));

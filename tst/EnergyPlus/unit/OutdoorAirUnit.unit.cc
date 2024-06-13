@@ -585,8 +585,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).extFanType);
 
     EXPECT_EQ(1, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).NumComponents);
-    EXPECT_TRUE(compare_enums(OutdoorAirUnit::CompType::WaterCoil_Cooling, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).Type));
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).CoilType));
+    EXPECT_ENUM_EQ(OutdoorAirUnit::CompType::WaterCoil_Cooling, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).Type);
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::CoilWaterCooling, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).CoilType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);
@@ -898,9 +898,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).extFanType);
 
     EXPECT_EQ(1, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).NumComponents);
-    EXPECT_TRUE(compare_enums(OutdoorAirUnit::CompType::SteamCoil_AirHeat, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).Type));
-    EXPECT_TRUE(
-        compare_enums(DataPlant::PlantEquipmentType::CoilSteamAirHeating, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).CoilType));
+    EXPECT_ENUM_EQ(OutdoorAirUnit::CompType::SteamCoil_AirHeat, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).Type);
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::CoilSteamAirHeating, state->dataOutdoorAirUnit->OutAirUnit(OAUnitNum).OAEquip(1).CoilType);
 
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(state->dataPlnt->TotNumLoops);

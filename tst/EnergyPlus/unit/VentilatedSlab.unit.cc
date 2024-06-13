@@ -60,6 +60,7 @@
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"

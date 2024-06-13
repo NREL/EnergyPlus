@@ -63,7 +63,6 @@
 #include <EnergyPlus/Plant/CallingOrder.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/Loop.hh>
-#include <EnergyPlus/Plant/PlantAvailManager.hh>
 #include <EnergyPlus/Plant/ReportLoopData.hh>
 
 namespace EnergyPlus {
@@ -404,7 +403,6 @@ struct DataPlantData : BaseGlobalStruct
     int PlantManageSubIterations = 0; // tracks plant iterations to characterize solver
     int PlantManageHalfLoopCalls = 0; // tracks number of half loop calls
     Array1D<DataPlant::PlantLoopData> PlantLoop;
-    Array1D<DataPlant::PlantAvailMgrData> PlantAvailMgr;
     std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepPlant;
     std::array<Array1D<DataPlant::ReportLoopData>, static_cast<int>(DataPlant::LoopSideLocation::Num)> VentRepCond;
     Array1D<DataPlant::PlantCallingOrderInfoStruct> PlantCallingOrderInfo;
@@ -422,7 +420,6 @@ struct DataPlantData : BaseGlobalStruct
         this->PlantManageSubIterations = 0;
         this->PlantManageHalfLoopCalls = 0;
         this->PlantLoop.deallocate();
-        this->PlantAvailMgr.deallocate();
         this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
         this->VentRepPlant[static_cast<int>(DataPlant::LoopSideLocation::Supply)].deallocate();
         this->VentRepCond[static_cast<int>(DataPlant::LoopSideLocation::Demand)].deallocate();
