@@ -1348,6 +1348,9 @@ void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFl
 
     if (this->CondenserType == DataPlant::CondenserType::WaterCooled) {
         PlantUtilities::SetComponentFlowRate(state, mdotCond, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
+        // get minimum condenser plant loop pump mass flow rate
+        this->VSBranchPumpMinLimitMassFlowCond =
+            PlantUtilities::MinFlowIfBranchHasVSPump(state, this->CDPlantLoc, this->VSBranchPumpFoundCond, this->VSLoopPumpFoundCond, false);
     }
     // Initialize heat recovery flow rates at node
     if (this->HeatRecActive) {
@@ -2403,7 +2406,9 @@ void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, b
             this->CondMassFlowRate = this->CondMassFlowRateMax;
         } break;
         }
-        this->CondMassFlowRate = max(min(this->CondMassFlowRate, this->CondMassFlowRateMax), this->MinCondFlowRatio * this->CondMassFlowRateMax);
+        this->CondMassFlowRate = max(min(this->CondMassFlowRate, this->CondMassFlowRateMax),
+                                     this->MinCondFlowRatio * this->CondMassFlowRateMax,
+                                     this->VSBranchPumpMinLimitMassFlowCond);
         PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);

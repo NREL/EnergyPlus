@@ -1061,6 +1061,9 @@ void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const R
             this->CondMassFlowRateMax = rho * this->CondVolFlowRate;
             PlantUtilities::InitComponentNodes(state, 0.0, this->CondMassFlowRateMax, this->CondInletNodeNum, this->CondOutletNodeNum);
             state.dataLoopNodes->Node(this->CondInletNodeNum).Temp = this->TempRefCondIn;
+            // get minimum condenser plant loop pump mass flow rate
+            this->VSBranchPumpMinLimitMassFlowCond =
+                PlantUtilities::MinFlowIfBranchHasVSPump(state, this->CDPlantLoc, this->VSBranchPumpFoundCond, this->VSLoopPumpFoundCond, false);
         } else { // air or evap air condenser
             // Initialize maximum available condenser flow rate
             state.dataLoopNodes->Node(this->CondInletNodeNum).MassFlowRate =
@@ -2544,7 +2547,9 @@ void ReformulatedEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoa
             this->CondMassFlowRate = this->CondMassFlowRateMax;
         } break;
         }
-        this->CondMassFlowRate = max(min(this->CondMassFlowRate, this->CondMassFlowRateMax), this->MinCondFlowRatio * this->CondMassFlowRateMax);
+        this->CondMassFlowRate = max(min(this->CondMassFlowRate, this->CondMassFlowRateMax),
+                                     this->MinCondFlowRatio * this->CondMassFlowRateMax,
+                                     this->VSBranchPumpMinLimitMassFlowCond);
         PlantUtilities::SetComponentFlowRate(state, this->CondMassFlowRate, this->CondInletNodeNum, this->CondOutletNodeNum, this->CDPlantLoc);
         PlantUtilities::PullCompInterconnectTrigger(
             state, this->CWPlantLoc, this->CondMassFlowIndex, this->CDPlantLoc, DataPlant::CriteriaType::MassFlowRate, this->CondMassFlowRate);

@@ -193,6 +193,9 @@ namespace ChillerElectricEIR {
         int CondDTScheduleNum = 0;                // Temperature difference across condenser schedule index
         Real64 MinCondFlowRatio = 0.0;            // Minimum condenser flow fraction
         DataBranchAirLoopPlant::ControlType EquipFlowCtrl = DataBranchAirLoopPlant::ControlType::Invalid;
+        Real64 VSBranchPumpMinLimitMassFlowCond = 0.0;
+        bool VSBranchPumpFoundCond = false;
+        bool VSLoopPumpFoundCond = false;
 
         static ElectricEIRChillerSpecs *factory(EnergyPlusData &state, std::string const &objectName);
 
