@@ -1869,7 +1869,9 @@ void FanComponent::simulateVAV(EnergyPlusData &state,
         massFlowRateMaxAvail = 0.0;
         massFlowRateMinAvail = 0.0;
     }
-    totalPower *= _onOffFanPartLoadFraction;
+    if (present(_onOffFanPartLoadFraction)) {
+        totalPower *= _onOffFanPartLoadFraction;
+    }
 } // FanComponent::SimVAV()
 
 void FanComponent::simulateOnOff(EnergyPlusData &state, ObjexxFCL::Optional<Real64 const> _speedRatio)
