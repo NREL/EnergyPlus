@@ -550,6 +550,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataZoneTempPredictorCorrector->spaceHeatBalance(1).airHumRat = 0.011;
 
     state->dataHeatBalSurf->SurfQdotRadHVACInPerArea.allocate(3);
+    state->dataHeatBalSurf->SurfWinInitialDifSolInTrans.allocate(3);
     state->dataHeatBal->SurfWinQRadSWwinAbs.allocate(3, 1);
     state->dataHeatBal->SurfQdotRadIntGainsInPerArea.allocate(3);
     state->dataHeatBal->SurfQRadSWOutIncident.allocate(3);
@@ -588,6 +589,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     state->dataHeatBalSurf->SurfQRadLWOutSrdSurfs.allocate(3);
     state->dataHeatBalSurf->SurfQAirExtReport.allocate(3);
     state->dataHeatBalSurf->SurfQHeatEmiReport.allocate(3);
+    state->dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(3, 0.0);
 
     state->dataHeatBal->SurfQRadSWOutIncident = 0.0;
     state->dataHeatBal->SurfWinQRadSWwinAbs = 0.0;
@@ -3103,7 +3105,7 @@ TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
     Material::GetMaterialData(*state, errors_found);
     EXPECT_FALSE(errors_found);
     EXPECT_EQ(state->dataMaterial->ComplexShade(1).Name, "SHADE_14_LAYER");
-    EXPECT_TRUE(compare_enums(state->dataMaterial->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ));
+    EXPECT_ENUM_EQ(state->dataMaterial->ComplexShade(1).LayerType, TARCOGParams::TARCOGLayerType::VENETBLIND_HORIZ);
     EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
     EXPECT_NEAR(state->dataMaterial->ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
     EXPECT_NEAR(state->dataMaterial->ComplexShade(1).IRTransmittance, 0, 1e-5);

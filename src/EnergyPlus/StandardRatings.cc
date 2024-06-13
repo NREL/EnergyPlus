@@ -1031,11 +1031,11 @@ namespace StandardRatings {
         // Using/Aliasing
         using Curve::CurveValue;
         using Curve::GetCurveMinMaxValues;
-        using DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::Coil_CoolingAirToAirVariableSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Argument array dimensioning
         RatedTotalCapacity.dim(ns);
@@ -1481,23 +1481,23 @@ namespace StandardRatings {
     void CalcTwoSpeedDXCoilRating(EnergyPlusData &state,
                                   std::string const &DXCoilName,
                                   std::string const &DXCoilType,
-                                  int const &DXCoilType_Num,
+                                  int const DXCoilType_Num,
                                   Array1A<Real64> const &RatedTotalCapacity,
-                                  Real64 const &RatedTotCap2,
+                                  Real64 const RatedTotCap2,
                                   Array1A<Real64> const &RatedCOP,
-                                  Real64 const &RatedCOP2,
+                                  Real64 const RatedCOP2,
                                   Array1A_int const &CapFFlowCurveIndex, // only hs
                                   Array1A_int const &CapFTempCurveIndex,
-                                  int const &CCapFTemp2,
+                                  int const CCapFTemp2,
                                   Array1A_int const &EIRFFlowCurveIndex, // only hs
                                   Array1A_int const &EIRFTempCurveIndex,
-                                  int const &EIRFTemp2,
+                                  int const EIRFTemp2,
                                   Array1A<Real64> const &RatedAirVolFlowRate,
-                                  Real64 const &RatedAirVolFlowRate2,
+                                  Real64 const RatedAirVolFlowRate2,
                                   Array1A<Real64> const &FanPowerPerEvapAirFlowRate_2023,
                                   Array1A<Real64> const &FanPowerPerEvapAirFlowRate_2023_LowSpeed,
                                   Array1D<DataHeatBalance::RefrigCondenserType> const &CondenserType,
-                                  int const &PLFFPLRCurveIndex)
+                                  int const PLFFPLRCurveIndex)
     {
         // Intermediate values calculated from the inputs in the idf file
         // SEER2 ANSI/AHRI 210/240 Standard 2023 Ratings
@@ -2178,12 +2178,12 @@ namespace StandardRatings {
         return std::make_tuple(IEER, NetCoolingCapRated);
     }
 
-    Real64 GetIEEREquationResult(const Real64 &A, const Real64 &B, const Real64 &C, const Real64 &D)
+    Real64 GetIEEREquationResult(const Real64 A, const Real64 B, const Real64 C, const Real64 D)
     {
         return (0.020 * A) + (0.617 * B) + (0.238 * C) + (0.125 * D);
     }
 
-    Real64 GetOutdoorUnitInletAirDryBulbTempReduced(Real64 const &ReducedPLR, DataHeatBalance::RefrigCondenserType const &CondenserType)
+    Real64 GetOutdoorUnitInletAirDryBulbTempReduced(Real64 const ReducedPLR, DataHeatBalance::RefrigCondenserType const CondenserType)
     {
         Real64 OutdoorUnitInletAirDryBulbTempReduced(0.0);
         // As per Table 9. IEER Part-Load Rating Conditions | AHRI Std.340/360-2022(IP)
@@ -2346,7 +2346,7 @@ namespace StandardRatings {
     std::tuple<Real64, Real64, Real64> IEERCalculationVariableSpeed(
         EnergyPlusData &state,
         std::string const &VSCoilType, // Type of DX coil
-        int const &nsp,
+        int const nsp,
         Array1A_int const &CapFTempCurveIndex,
         Array1A<Real64> const &RatedTotalCapacity,
         Array1A_int const &CapFFlowCurveIndex,
@@ -2355,7 +2355,7 @@ namespace StandardRatings {
         Array1A_int const &EIRFTempCurveIndex,
         Array1A<Real64> const &RatedCOP, // Reference coefficient of performance [W/W]
         Array1A_int const &EIRFFlowCurveIndex,
-        DataHeatBalance::RefrigCondenserType const &_CondenserType) // Type of condenser user by the DX Cooling Coil
+        DataHeatBalance::RefrigCondenserType const _CondenserType) // Type of condenser user by the DX Cooling Coil
     {
         Real64 IEER_2022(0.0);
         Real64 EER_2022(0.0);
@@ -2710,7 +2710,7 @@ namespace StandardRatings {
     std::tuple<Real64, Real64, Real64> IEERCalculationMultiSpeed(
         EnergyPlus::EnergyPlusData &state,
         std::string const &DXCoilType, // Type of DX coil
-        int const &nsp,
+        int const nsp,
         Array1A_int const &CapFTempCurveIndex,
         Array1A<Real64> const &RatedTotalCapacity,
         Array1A_int const &CapFFlowCurveIndex,
@@ -3157,15 +3157,15 @@ namespace StandardRatings {
 
     std::tuple<Real64, Real64, Real64> IEERCalculationSingleSpeed(EnergyPlus::EnergyPlusData &state,
                                                                   std::string const &DXCoilType, // Type of DX coil for which HSPF is calculated
-                                                                  const int &CapFTempCurveIndex,
-                                                                  const Real64 &RatedTotalCapacity,
-                                                                  const Real64 &TotCapFlowModFac,
-                                                                  const Real64 &FanPowerPerEvapAirFlowRate,
-                                                                  const Real64 &RatedAirVolFlowRate,
-                                                                  const int &EIRFTempCurveIndex,
-                                                                  const Real64 &RatedCOP,
-                                                                  const Real64 &EIRFlowModFac,
-                                                                  DataHeatBalance::RefrigCondenserType const &CondenserType)
+                                                                  const int CapFTempCurveIndex,
+                                                                  const Real64 RatedTotalCapacity,
+                                                                  const Real64 TotCapFlowModFac,
+                                                                  const Real64 FanPowerPerEvapAirFlowRate,
+                                                                  const Real64 RatedAirVolFlowRate,
+                                                                  const int EIRFTempCurveIndex,
+                                                                  const Real64 RatedCOP,
+                                                                  const Real64 EIRFlowModFac,
+                                                                  DataHeatBalance::RefrigCondenserType const CondenserType)
     {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int constexpr NumOfReducedCap(4);                  // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
@@ -5313,12 +5313,12 @@ namespace StandardRatings {
         // Using/Aliasing
 
         using namespace OutputReportPredefined;
-        using DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_CoolingTwoSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::Coil_CoolingAirToAirVariableSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_CoolingTwoSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5576,7 +5576,7 @@ namespace StandardRatings {
         // Using/Aliasing
 
         using namespace OutputReportPredefined;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_CoolingSingleSpeed;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5683,10 +5683,10 @@ namespace StandardRatings {
         using Curve::GetCurveIndex;
         using Curve::GetCurveMinMaxValues;
         using Curve::GetCurveName;
-        using DataHVACGlobals::CoilDX_CoolingSingleSpeed;
-        using DataHVACGlobals::CoilDX_HeatingEmpirical;
-        using DataHVACGlobals::CoilDX_MultiSpeedCooling;
-        using DataHVACGlobals::CoilDX_MultiSpeedHeating;
+        using HVAC::CoilDX_CoolingSingleSpeed;
+        using HVAC::CoilDX_HeatingEmpirical;
+        using HVAC::CoilDX_MultiSpeedCooling;
+        using HVAC::CoilDX_MultiSpeedHeating;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

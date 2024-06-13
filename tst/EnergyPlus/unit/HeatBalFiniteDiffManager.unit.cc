@@ -478,4 +478,146 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_findAnySurfacesUsingConstruct
     EXPECT_FALSE(EnergyPlus::HeatBalFiniteDiffManager::findAnySurfacesUsingConstructionAndCondFD(*state, 2));
 }
 
+TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_CheckFDNodeTempLimitsTest)
+{
+    int surfNum;
+    int nodeNum;
+    Real64 nodeTemp;
+    Real64 expectedAnswer;
+
+    auto &thisData = state->dataSurface;
+    auto &thisSurf = thisData->Surface;
+    auto &thisSurfFD = state->dataHeatBalFiniteDiffMgr->SurfaceFD;
+    thisData->TotSurfaces = 2;
+    thisSurf.allocate(thisData->TotSurfaces);
+    thisSurfFD.allocate(thisData->TotSurfaces);
+
+    thisSurf(1).Name = "CONDFD SURFACE 1";
+    thisSurf(2).Name = "CONDFD SURFACE 2";
+    thisSurfFD(1).indexNodeMinTempLimit = 0;
+    thisSurfFD(1).indexNodeMaxTempLimit = 0;
+    thisSurfFD(2).indexNodeMinTempLimit = 0;
+    thisSurfFD(2).indexNodeMaxTempLimit = 0;
+
+    // Test 1-Surface 1: Temperature is within the max and min limits.  Don't do anything to the temperature.  No error messages
+    surfNum = 1;
+    nodeNum = 1;
+    nodeTemp = 1.23;
+    expectedAnswer = nodeTemp;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMinTempLimit, 0);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMaxTempLimit, 0);
+
+    // Test 1-Surface 2: Temperature is within the max and min limits.  Don't do anything to the temperature.  No error messages
+    surfNum = 2;
+    nodeNum = 2;
+    nodeTemp = 4.56;
+    expectedAnswer = nodeTemp;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMinTempLimit, 0);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMaxTempLimit, 0);
+
+    // Test 2-Surface 1: Temperature is below the minmum value.  Gets reset, error messages
+    surfNum = 1;
+    nodeNum = 3;
+    nodeTemp = -3000.0;
+    expectedAnswer = DataHeatBalSurface::MinSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMinTempLimit, 1);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMaxTempLimit, 0);
+    std::string const error_string_21 = delimited_string({"   ** Severe  ** Node temperature (low) out of bounds [-3000.00] for "
+                                                          "surface=CONDFD SURFACE 1, node=3",
+                                                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                                                          "   **   ~~~   ** Value has been reset to the lower limit value of -100.00."});
+    compare_err_stream(error_string_21, true);
+
+    // Test 2-Surface 2: Temperature is below the minmum value.  Gets reset, error messages
+    surfNum = 2;
+    nodeNum = 4;
+    nodeTemp = -4000.0;
+    expectedAnswer = DataHeatBalSurface::MinSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMinTempLimit, 2);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMaxTempLimit, 0);
+    std::string const error_string_22 = delimited_string({"   ** Severe  ** Node temperature (low) out of bounds [-4000.00] for "
+                                                          "surface=CONDFD SURFACE 2, node=4",
+                                                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                                                          "   **   ~~~   ** Value has been reset to the lower limit value of -100.00."});
+    compare_err_stream(error_string_22, true);
+
+    // Test 3-Surface 1: Temperature is below the minmum value for a second time.  Gets reset, but NO error messages
+    surfNum = 1;
+    nodeNum = 5;
+    nodeTemp = -3000.0;
+    expectedAnswer = DataHeatBalSurface::MinSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMinTempLimit, 1);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMaxTempLimit, 0);
+
+    // Test 3-Surface 2: Temperature is below the minmum value for a second time.  Gets reset, but NO error messages
+    surfNum = 2;
+    nodeNum = 6;
+    nodeTemp = -4000.0;
+    expectedAnswer = DataHeatBalSurface::MinSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMinTempLimit, 2);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMaxTempLimit, 0);
+
+    // Test 4-Surface 1: Temperature is above the maximum value.  Gets reset, error message.
+    surfNum = 1;
+    nodeNum = 7;
+    nodeTemp = 3000.0;
+    expectedAnswer = state->dataHeatBalSurf->MaxSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMinTempLimit, 1);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMaxTempLimit, 3);
+    std::string const error_string_41 = delimited_string({"   ** Severe  ** Node temperature (high) out of bounds [3000.00] for "
+                                                          "surface=CONDFD SURFACE 1, node=7",
+                                                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                                                          "   **   ~~~   ** Value has been reset to the upper limit value of 200.00."});
+    compare_err_stream(error_string_41, true);
+
+    // Test 4-Surface 2: Temperature is above the maximum value.  Gets reset, error message.
+    surfNum = 2;
+    nodeNum = 8;
+    nodeTemp = 4000.0;
+    expectedAnswer = state->dataHeatBalSurf->MaxSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMinTempLimit, 2);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMaxTempLimit, 4);
+    std::string const error_string_42 = delimited_string({"   ** Severe  ** Node temperature (high) out of bounds [4000.00] for "
+                                                          "surface=CONDFD SURFACE 2, node=8",
+                                                          "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+                                                          "   **   ~~~   ** Value has been reset to the upper limit value of 200.00."});
+    compare_err_stream(error_string_42, true);
+
+    // Test 5-Surface 1: Temperature is above the maximum value for a second time.  Gets reset, NO error message.
+    surfNum = 1;
+    nodeNum = 9;
+    nodeTemp = 3000.0;
+    expectedAnswer = state->dataHeatBalSurf->MaxSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMinTempLimit, 1);
+    EXPECT_EQ(thisSurfFD(1).indexNodeMaxTempLimit, 3);
+
+    // Test 5-Surface 2: Temperature is above the maximum value for a second time.  Gets reset, NO error message.
+    surfNum = 2;
+    nodeNum = 10;
+    nodeTemp = 4000.0;
+    expectedAnswer = state->dataHeatBalSurf->MaxSurfaceTempLimit;
+    EnergyPlus::HeatBalFiniteDiffManager::CheckFDNodeTempLimits(*state, surfNum, nodeNum, nodeTemp);
+    EXPECT_EQ(nodeTemp, expectedAnswer);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMinTempLimit, 2);
+    EXPECT_EQ(thisSurfFD(2).indexNodeMaxTempLimit, 4);
+}
+
 } // namespace EnergyPlus

@@ -2077,7 +2077,7 @@
     SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
-    MyCondenserControl,      !- Name
+    MyTowerCondenserControl, !- Name
     Temperature,             !- Control Variable
     OutdoorAirWetBulb,       !- Reference Temperature Type
     0,                       !- Offset Temperature Difference {deltaC}

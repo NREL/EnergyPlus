@@ -102,8 +102,8 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
 // Using/Aliasing
 using namespace DataPlant;
-using DataHVACGlobals::SmallLoad;
 using FluidProperties::GetSpecificHeatGlycol;
+using HVAC::SmallLoad;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
                                  PlantLocation const &plantLoc, // PlantLoop data structure Location struct
@@ -1629,7 +1629,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                 CheckIfNodeSetPointManagedByEMS(
                                     state,
                                     state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                    EMSManager::SPControlType::TemperatureSetPoint,
+                                    HVAC::CtrlVarType::Temp,
                                     NodeEMSSetPointMissing);
                                 if (NodeEMSSetPointMissing) {
                                     ShowSevereError(state,
@@ -1684,7 +1684,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                        HVAC::CtrlVarType::Temp,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1738,12 +1738,12 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                        HVAC::CtrlVarType::Temp,
                                         NodeEMSSetPointMissing);
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                        HVAC::CtrlVarType::Temp,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,
@@ -1799,7 +1799,7 @@ void FindCompSPInput(EnergyPlusData &state,
                                     CheckIfNodeSetPointManagedByEMS(
                                         state,
                                         state.dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointNodeNum,
-                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                        HVAC::CtrlVarType::Temp,
                                         NodeEMSSetPointMissing);
                                     if (NodeEMSSetPointMissing) {
                                         ShowSevereError(state,

@@ -644,7 +644,7 @@ namespace PhotovoltaicThermalCollectors {
                             // need call to EMS to check node
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPhotovoltaicThermalCollector->PVT(PVTindex).HVACOutletNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing temperature setpoint for PVT outlet node  ");
@@ -785,7 +785,7 @@ namespace PhotovoltaicThermalCollectors {
             }
             if (this->WPlantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply) {
                 if (PltSizNum > 0) {
-                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         DesignVolFlowRateDes = state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate;
                     } else {
                         DesignVolFlowRateDes = 0.0;
@@ -872,13 +872,13 @@ namespace PhotovoltaicThermalCollectors {
                         DesignVolFlowRateDes = thisFinalSysSizing.DesOutAirVolFlow;
                     } else {
                         switch (state.dataSize->CurDuctType) {
-                        case DataHVACGlobals::AirDuctType::Main: {
+                        case HVAC::AirDuctType::Main: {
                             DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesMainVolFlow;
                         } break;
-                        case DataHVACGlobals::AirDuctType::Cooling: {
+                        case HVAC::AirDuctType::Cooling: {
                             DesignVolFlowRateDes = thisFinalSysSizing.SysAirMinFlowRat * thisFinalSysSizing.DesCoolVolFlow;
                         } break;
-                        case DataHVACGlobals::AirDuctType::Heating: {
+                        case HVAC::AirDuctType::Heating: {
                             DesignVolFlowRateDes = thisFinalSysSizing.DesHeatVolFlow;
                         } break;
                         default: {

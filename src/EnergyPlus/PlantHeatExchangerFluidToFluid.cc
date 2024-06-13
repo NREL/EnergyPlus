@@ -384,7 +384,7 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, format("{} Missing temperature setpoint for node = {}", RoutineName, cAlphaArgs(9)));
@@ -410,11 +410,11 @@ void GetFluidHeatExchangerInput(EnergyPlusData &state)
                             bool NodeEMSSetPointMissing = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             EMSManager::CheckIfNodeSetPointManagedByEMS(state,
                                                                         state.dataPlantHXFluidToFluid->FluidHX(CompLoop).SetPointNodeNum,
-                                                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                                                        HVAC::CtrlVarType::Temp,
                                                                         NodeEMSSetPointMissing);
                             if (NodeEMSSetPointMissing) {
                                 ShowSevereError(state, format("{} Missing temperature setpoint for node = {}", RoutineName, cAlphaArgs(9)));
@@ -718,7 +718,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     Real64 tmpSupSideDesignVolFlowRate = this->SupplySideLoop.DesignVolumeFlowRate;
     if (this->SupplySideLoop.DesignVolumeFlowRateWasAutoSized) {
         if (PltSizNumSupSide > 0) {
-            if (state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                 tmpSupSideDesignVolFlowRate = state.dataSize->PlantSizData(PltSizNumSupSide).DesVolFlowRate * this->SizingFactor;
                 if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
             } else {
@@ -751,7 +751,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
     // second deal with Loop Demand Side
     Real64 tmpDmdSideDesignVolFlowRate = this->DemandSideLoop.DesignVolumeFlowRate;
     if (this->DemandSideLoop.DesignVolumeFlowRateWasAutoSized) {
-        if (tmpSupSideDesignVolFlowRate > DataHVACGlobals::SmallWaterVolFlow) {
+        if (tmpSupSideDesignVolFlowRate > HVAC::SmallWaterVolFlow) {
             tmpDmdSideDesignVolFlowRate = tmpSupSideDesignVolFlowRate;
             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
         } else {
@@ -805,7 +805,7 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
 
             tmpDeltaTloopToLoop = max(2.0, tmpDeltaTloopToLoop);
             Real64 tmpDeltaTSupLoop = state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT;
-            if (tmpSupSideDesignVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (tmpSupSideDesignVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
                 Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
@@ -987,8 +987,8 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
         }
         case ControlType::OperationSchemeModulated: {
 
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
-                if (MyLoad < -1.0 * DataHVACGlobals::SmallLoad) { // requesting cooling
+            if (std::abs(MyLoad) > HVAC::SmallLoad) {
+                if (MyLoad < -1.0 * HVAC::SmallLoad) { // requesting cooling
                     Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                     if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1072,8 +1072,8 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
             break;
         }
         case ControlType::OperationSchemeOnOff: {
-            if (std::abs(MyLoad) > DataHVACGlobals::SmallLoad) {
-                if (MyLoad < DataHVACGlobals::SmallLoad) { // requesting cooling
+            if (std::abs(MyLoad) > HVAC::SmallLoad) {
+                if (MyLoad < HVAC::SmallLoad) { // requesting cooling
                     Real64 DeltaTCooling = this->SupplySideLoop.InletTemp - this->DemandSideLoop.InletTemp;
                     if (DeltaTCooling > this->TempControlTol) { // can do cooling so turn on
                         mdotSupSide = this->SupplySideLoop.MassFlowRateMax;
@@ -1710,7 +1710,7 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
 
     this->HeatTransferEnergy = this->HeatTransferRate * state.dataHVACGlobal->TimeStepSysSec;
 
-    if ((std::abs(this->HeatTransferRate) > DataHVACGlobals::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
+    if ((std::abs(this->HeatTransferRate) > HVAC::SmallLoad) && (this->DemandSideLoop.InletMassFlowRate > 0.0) &&
         (this->SupplySideLoop.InletMassFlowRate > 0.0)) {
         this->OperationStatus = 1.0;
     } else {

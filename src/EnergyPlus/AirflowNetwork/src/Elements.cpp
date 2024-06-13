@@ -699,9 +699,6 @@ namespace AirflowNetwork {
         // Using/Aliasing
         auto &NumPrimaryAirSys = state.dataHVACGlobal->NumPrimaryAirSys;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int k;
         int k1;
@@ -714,11 +711,11 @@ namespace AirflowNetwork {
 
         int AirLoopNum = state.afn->AirflowNetworkLinkageData(i).AirLoopNum;
 
-        if (fanType == DataHVACGlobals::FanType::OnOff) {
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+        if (fanType == HVAC::FanType::OnOff) {
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 state.dataLoopNodes->Node(InletNode).MassFlowRate == 0.0) {
                 NF = GenericDuct(0.1, 0.001, LFLAG, PDROP, propN, propM, F, DF);
-            } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            } else if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                        state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate > 0.0) {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             } else {
@@ -730,7 +727,7 @@ namespace AirflowNetwork {
                                (1.0 - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopCompCycRatio);
                 }
             }
-        } else if (fanType == DataHVACGlobals::FanType::Constant) {
+        } else if (fanType == HVAC::FanType::Constant) {
             if (state.dataLoopNodes->Node(InletNode).MassFlowRate > 0.0) {
                 F[0] = FlowRate * Ctrl;
             } else if (NumPrimaryAirSys > 1 && state.dataLoopNodes->Node(InletNode).MassFlowRate <= 0.0) {
@@ -740,7 +737,7 @@ namespace AirflowNetwork {
             if (state.afn->MultiSpeedHPIndicator == 2) {
                 F[0] = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate;
             }
-        } else if (fanType == DataHVACGlobals::FanType::VAV) {
+        } else if (fanType == HVAC::FanType::VAV) {
             // Check VAV termals with a damper
             SumTermFlow = 0.0;
             SumFracSuppLeak = 0.0;
@@ -2846,7 +2843,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a surface crack component
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -2967,7 +2964,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a surface crack component
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CDM;
@@ -3267,10 +3264,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -3293,7 +3287,7 @@ namespace AirflowNetwork {
             // Treat the component as an exhaust fan
             F[0] = state.dataLoopNodes->Node(InletNode).MassFlowRate;
             DF[0] = 0.0;
-            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                 state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                 F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
@@ -3385,10 +3379,7 @@ namespace AirflowNetwork {
         // This subroutine solves airflow for a constant flow rate airflow component -- using standard interface.
 
         // Using/Aliasing
-        using DataHVACGlobals::VerySmallMassFlow;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int constexpr CycFanCycComp(1); // fan cycles with compressor operation
+        using HVAC::VerySmallMassFlow;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 expn;
@@ -3413,7 +3404,7 @@ namespace AirflowNetwork {
                 F[0] = state.afn->ReliefMassFlowRate;
             } else {
                 F[0] = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp &&
+                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == HVAC::FanOp::Cycling &&
                     state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
                     F[0] = F[0] / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
                 }
