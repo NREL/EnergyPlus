@@ -8,7 +8,7 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
-  Python_REQUIRED_VERSION: 3.8
+  Python_REQUIRED_VERSION: 3.12.2
 
 jobs:
   build_installer_artifact:
@@ -19,7 +19,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
 
     permissions:
       # Needed permission to upload the release asset
@@ -30,7 +30,7 @@ jobs:
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
       id: setup-python
-      uses: actions/setup-python@v5
+      uses: jmarrec/setup-python@v5
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}
 
@@ -51,6 +51,10 @@ jobs:
         echo "Using Apt to install dependencies"
         sudo apt-get update
         sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+        if [[ "${{ matrix.os }}" == "ubuntu-24.04" ]]; then
+          # https://github.com/actions/runner-images/issues/10025
+          echo "FC=gfortran-13" >> $GITHUB_ENV
+        fi
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
@@ -119,7 +123,7 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [20, 22]
+        name: [20, 22, 24]
         include:
           - name: 20
             os: ubuntu-20.04
@@ -127,6 +131,9 @@ jobs:
           - name: 22
             os: ubuntu-22.04
             test_key: ubuntu2204
+          - name: 24
+            os: ubuntu-24.04
+            test_key: ubuntu2404
 
     steps:
       - uses: actions/checkout@v4  # Still need E+ checked out to get testing scripts
@@ -134,7 +141,7 @@ jobs:
           path: checkout
 
       - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
-        uses: actions/setup-python@v5
+        uses: jmarrec/setup-python@v5
         id: setup-python
         with:
           python-version: ${{ env.Python_REQUIRED_VERSION }}
