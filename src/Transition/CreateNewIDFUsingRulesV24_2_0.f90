@@ -431,6 +431,50 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with E, insert the rules here
 
+             CASE('ENERGYMANAGEMENTSYSTEM:SENSOR')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:4)=InArgs(1:4)
+                 IF (OutArgs(4) == 'ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE') THEN
+                   OutArgs(4)='ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE') THEN
+                   OutArgs(4)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE') THEN
+                   OutArgs(4)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE') THEN
+                   OutArgs(4)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE') THEN
+                   OutArgs(4)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY') THEN
+                   OutArgs(4)='ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY') THEN
+                   OutArgs(4)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY') THEN
+                   OutArgs(4)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY') THEN
+                   OutArgs(4)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY'
+                   nodiff=.false.
+                 ENDIF
+                 IF (OutArgs(4) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY') THEN
+                   OutArgs(4)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY'
+                   nodiff=.false.
+                 ENDIF
+
               ! If your original object starts with F, insert the rules here
 
               ! If your original object starts with G, insert the rules here
@@ -498,6 +542,46 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 nodiff=.true.
                 IF (OutArgs(1) == Blank) THEN
                   OutArgs(1)='*'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE') THEN
+                  OutArgs(3)='ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE') THEN
+                  OutArgs(3)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE') THEN
+                  OutArgs(3)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE') THEN
+                  OutArgs(3)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE') THEN
+                  OutArgs(3)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY') THEN
+                  OutArgs(3)='ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY') THEN
+                  OutArgs(3)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY') THEN
+                  OutArgs(3)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY') THEN
+                  OutArgs(3)='ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY'
+                  nodiff=.false.
+                ENDIF
+                IF (OutArgs(3) == 'ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY') THEN
+                  OutArgs(3)='ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY'
                   nodiff=.false.
                 ENDIF
 
