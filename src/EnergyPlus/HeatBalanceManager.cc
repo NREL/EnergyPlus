@@ -1142,8 +1142,6 @@ namespace HeatBalanceManager {
                     if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Add ||
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Adjust) {
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
-                        if (!state.dataContaminantBalance->Contaminant.CO2Simulation)
-                            state.dataContaminantBalance->Contaminant.SimulateContaminants = true;
                     } else if (state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment == DataHeatBalance::InfiltrationFlow::Invalid) {
                         state.dataHeatBal->ZoneAirMassFlow.InfiltrationTreatment = DataHeatBalance::InfiltrationFlow::Add;
                         state.dataHeatBal->ZoneAirMassFlow.EnforceZoneMassBalance = true;
@@ -2436,9 +2434,9 @@ namespace HeatBalanceManager {
                          std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
                          Array1D_string const &cAlphaArgs,
-                         int const &NumAlphas,
+                         int const NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
-                         int const &NumNumbers,
+                         int const NumNumbers,
                          [[maybe_unused]] Array1D_bool const &lNumericFieldBlanks, // Unused
                          Array1D_bool const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,

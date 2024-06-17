@@ -1723,12 +1723,7 @@ namespace HeatBalFiniteDiffManager {
 
                 } // R layer or Regular layer
 
-                // Limit clipping
-                if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-                    TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-                } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                    TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-                }
+                CheckFDNodeTempLimits(state, Surf, i, TDT_i);
 
                 TDT(i) = TDT_i;
 
@@ -1860,12 +1855,7 @@ namespace HeatBalFiniteDiffManager {
             assert(false); // Illegal CondFDSchemeType
         }
 
-        // Limit clipping
-        if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-            TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-        } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-            TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-        }
+        CheckFDNodeTempLimits(state, Surf, i, TDT_i);
 
         TDT(i) = TDT_i;
         state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) = state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) =
@@ -2073,12 +2063,8 @@ namespace HeatBalFiniteDiffManager {
                                 (Two_Delt_Delx2 + Two_Delt_kt2_Rlayer + Cp2_fac);
                     }
 
-                    // Limit clipping
-                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-                    }
+                    CheckFDNodeTempLimits(state, Surf, i, TDT_i);
+
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) = 0.0; //  - rlayer has no capacitance, so this is zero
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) =
                         (Cp2 * Delx2 * RhoS2) / 2.0; // Save this for computing node flux values
@@ -2127,12 +2113,8 @@ namespace HeatBalFiniteDiffManager {
                                 (Two_Delt_Delx1 + Two_Delt_kt1_Rlayer2 + Cp1_fac);
                     }
 
-                    // Limit clipping
-                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-                    }
+                    CheckFDNodeTempLimits(state, Surf, i, TDT_i);
+
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) =
                         (Cp1 * Delx1 * RhoS1) / 2.0;                                      // Save this for computing node flux values
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; //  - rlayer has no capacitance, so this is zero
@@ -2224,7 +2206,7 @@ namespace HeatBalFiniteDiffManager {
                     Real64 const Cp_fac(Cp1_fac + Cp2_fac);
                     if (state.dataHeatBalFiniteDiffMgr->CondFDSchemeType ==
                         CondFDScheme::CrankNicholsonSecondOrder) { // Regular Internal Interface Node with Source/sink using Adams Moulton second
-                                                                   // order
+                        // order
                         TDT_i = (2.0 * Delt_Delx1 * Delx2 * QSSFlux + (Cp_fac - Delt_sum) * TD_i + Delt_Delx1_kt2 * (TD(i + 1) + TDT_p) +
                                  Delt_Delx2_kt1 * (TD(i - 1) + TDT_m)) /
                                 (Delt_sum + Cp_fac);
@@ -2234,12 +2216,8 @@ namespace HeatBalFiniteDiffManager {
                                 (2.0 * (Delt_Delx2_kt1 + Delt_Delx1_kt2) + Cp_fac);
                     }
 
-                    // Limit clipping
-                    if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-                        TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-                    } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                        TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-                    }
+                    CheckFDNodeTempLimits(state, Surf, i, TDT_i);
+
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS1(i) =
                         (Cp1 * Delx1 * RhoS1) / 2.0; // Save this for computing node flux values
                     state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) =
@@ -2416,12 +2394,8 @@ namespace HeatBalFiniteDiffManager {
                 state.dataHeatBalFiniteDiffMgr->SurfaceFD(Surf).CpDelXRhoS2(i) = 0.0; // Inside face  does not have an inner half node
 
             } // Regular or R layer
-              // Limit clipping
-            if (TDT_i < DataHeatBalSurface::MinSurfaceTempLimit) {
-                TDT_i = DataHeatBalSurface::MinSurfaceTempLimit;
-            } else if (TDT_i > state.dataHeatBalSurf->MaxSurfaceTempLimit) {
-                TDT_i = state.dataHeatBalSurf->MaxSurfaceTempLimit;
-            }
+
+            CheckFDNodeTempLimits(state, Surf, i, TDT_i);
 
             TDT(i) = TDT_i;
 
@@ -2561,6 +2535,51 @@ namespace HeatBalFiniteDiffManager {
                                                   "C");
                 }
             }
+        }
+    }
+
+    void CheckFDNodeTempLimits(EnergyPlusData &state,
+                               int surfNum,     // surface number
+                               int nodeNum,     // node number
+                               Real64 &nodeTemp // calculated temperature, not reset
+    )
+    {
+        auto &surfaceFD(state.dataHeatBalFiniteDiffMgr->SurfaceFD(surfNum));
+        auto &surfName = state.dataSurface->Surface(surfNum).Name;
+        auto &minTempLimit = DataHeatBalSurface::MinSurfaceTempLimit;
+        auto &maxTempLimit = state.dataHeatBalSurf->MaxSurfaceTempLimit;
+        if (nodeTemp < minTempLimit) {
+            if (surfaceFD.indexNodeMinTempLimit == 0) {
+                ShowSevereMessage(state,
+                                  format("Node temperature (low) out of bounds [{:.2R}] for surface={}, node={}", nodeTemp, surfName, nodeNum));
+                ShowContinueErrorTimeStamp(state, "");
+                ShowContinueError(state, format("Value has been reset to the lower limit value of {:.2R}.", minTempLimit));
+            }
+            ShowRecurringSevereErrorAtEnd(state,
+                                          "Node temperature (low) out of bounds for surface=" + surfName,
+                                          surfaceFD.indexNodeMinTempLimit,
+                                          nodeTemp,
+                                          nodeTemp,
+                                          _,
+                                          "C",
+                                          "C");
+            nodeTemp = minTempLimit;
+        } else if (nodeTemp > maxTempLimit) {
+            if (surfaceFD.indexNodeMaxTempLimit == 0) {
+                ShowSevereMessage(state,
+                                  format("Node temperature (high) out of bounds [{:.2R}] for surface={}, node={}", nodeTemp, surfName, nodeNum));
+                ShowContinueErrorTimeStamp(state, "");
+                ShowContinueError(state, format("Value has been reset to the upper limit value of {:.2R}.", maxTempLimit));
+            }
+            ShowRecurringSevereErrorAtEnd(state,
+                                          "Node temperature (high) out of bounds for surface=" + surfName,
+                                          surfaceFD.indexNodeMaxTempLimit,
+                                          nodeTemp,
+                                          nodeTemp,
+                                          _,
+                                          "C",
+                                          "C");
+            nodeTemp = maxTempLimit;
         }
     }
 

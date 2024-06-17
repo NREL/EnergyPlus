@@ -920,23 +920,14 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
         FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
     Real64 TH22 = state.dataHeatBalSurf->SurfInsideTempHist(2)(
-        SurfNum); // inside surface temperature at the previous time step equals the old pool water temperature
-    Real64 TInSurf =
-        this->CurSetPtTemp; // Setpoint temperature for pool which is also the goal temperature and also the inside surface face temperature
-    Real64 Tmuw = this->CurMakeupWaterTemp;                                       // Inlet makeup water temperature
+        SurfNum);                           // inside surface temperature at the previous time step equals the old pool water temperature
+    Real64 Tmuw = this->CurMakeupWaterTemp; // Inlet makeup water temperature
     Real64 TLoopInletTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp; // Inlet water temperature from the plant loop
     this->WaterInletTemp = TLoopInletTemp;
 
-    // Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
-    // old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain +
-    // PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-    Real64 MassFlowRate = (this->WaterMass / (state.dataHVACGlobal->TimeStepSysSec)) *
-                          ((TInSurf - TH22) / (TLoopInletTemp - TInSurf)); // Target mass flow rate to achieve the proper setpoint temperature
-    if (MassFlowRate > this->WaterMassFlowRateMax) {
-        MassFlowRate = this->WaterMassFlowRateMax;
-    } else if (MassFlowRate < 0.0) {
-        MassFlowRate = 0.0;
-    }
+    Real64 MassFlowRate;
+    this->calcMassFlowRate(state, MassFlowRate, TH22, TLoopInletTemp);
+
     PlantUtilities::SetComponentFlowRate(state, MassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->HWplantLoc);
     this->WaterMassFlowRate = MassFlowRate;
 
@@ -951,6 +942,26 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
     // Finally take care of the latent and convective gains resulting from the pool
     state.dataHeatBalFanSys->SumConvPool(ZoneNum) += this->RadConvertToConvect;
     state.dataHeatBalFanSys->SumLatentPool(ZoneNum) += EvapRate * Psychrometrics::PsyHfgAirFnWTdb(thisZoneHB.airHumRat, thisZoneHB.MAT);
+}
+
+void SwimmingPoolData::calcMassFlowRate(EnergyPlusData &state, Real64 &massFlowRate, Real64 TH22, Real64 TLoopInletTemp)
+{
+    // Calculate the mass flow rate to achieve the proper setpoint temperature
+    if (TLoopInletTemp != this->CurSetPtTemp) {
+        massFlowRate = this->WaterMass / state.dataHVACGlobal->TimeStepSysSec * (this->CurSetPtTemp - TH22) / (TLoopInletTemp - this->CurSetPtTemp);
+    } else { // avoid the divide by zero, reset later if necessary
+        massFlowRate = 0.0;
+    }
+    if (massFlowRate > this->WaterMassFlowRateMax) {
+        massFlowRate = this->WaterMassFlowRateMax;
+    } else if (massFlowRate <= 0.0) {
+        // trap case where loop temperature is lower than the setpoint but could still do heating Defect 10317
+        if (TLoopInletTemp > TH22 && TLoopInletTemp <= this->CurSetPtTemp) {
+            massFlowRate = this->WaterMassFlowRateMax;
+        } else {
+            massFlowRate = 0.0;
+        }
+    }
 }
 
 void SwimmingPoolData::calcSwimmingPoolEvap(EnergyPlusData &state,

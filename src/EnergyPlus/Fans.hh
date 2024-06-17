@@ -65,6 +65,15 @@ struct EnergyPlusData;
 
 namespace Fans {
 
+    // Fan Minimum Flow Fraction Input Method
+    enum class MinFlowFracMethod
+    {
+        Invalid = -1,
+        MinFrac,
+        FixedMin,
+        Num
+    };
+
     enum class AvailManagerMode
     {
         Invalid = -1,
@@ -227,7 +236,7 @@ namespace Fans {
 
         Real64 runtimeFrac = 0.0;
 
-        int minAirFracMethod = HVAC::MinFrac; // parameter for what method is used for min flow fraction
+        MinFlowFracMethod minAirFracMethod = MinFlowFracMethod::MinFrac; // parameter for what method is used for min flow fraction
 
         Real64 minFrac = 0.0;                                  // Minimum fan air flow fraction
         Real64 fixedMin = 0.0;                                 // Absolute minimum fan air flow [m3/s]
@@ -448,7 +457,7 @@ struct FansData : BaseGlobalStruct
 
     void clear_state() override
     {
-        for (int i = 1; i <= fans.size(); ++i)
+        for (int i = 1; i <= (int)fans.size(); ++i)
             delete fans(i);
 
         fans.clear();
