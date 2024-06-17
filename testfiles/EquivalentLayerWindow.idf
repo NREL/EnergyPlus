@@ -567,7 +567,7 @@
 
   Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,Hourly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
+  Output:Variable,*,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,Hourly;
 
   Output:Variable,*,Zone Windows Total Heat Gain Rate,Hourly;
 

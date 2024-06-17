@@ -1312,7 +1312,7 @@
 
   Output:Variable,WEST ZONE,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,timestep,ReportSch;
 
-  Output:Variable,WEST ZONE,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,timestep,ReportSch;
+  Output:Variable,WEST ZONE,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,timestep,ReportSch;
 
   Output:Variable,WEST ZONE,Zone Air System Sensible Cooling Rate,timestep,ReportSch;
 
