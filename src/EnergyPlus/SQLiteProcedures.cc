@@ -2597,7 +2597,7 @@ SQLite::SQLiteData::SQLiteData(std::shared_ptr<std::ostream> const &errorStream,
 }
 
 SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStream, std::shared_ptr<sqlite3> const &db)
-    : m_writeOutputToSQLite(true), m_errorStream(errorStream), m_connection(nullptr), m_db(db)
+    : m_writeOutputToSQLite(true), m_errorStream(errorStream), m_db(db)
 {
 }
 
@@ -2605,8 +2605,9 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
                                    bool writeOutputToSQLite,
                                    fs::path const &dbName,
                                    fs::path const &errorFilePath)
-    : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream), m_connection(nullptr)
+    : m_writeOutputToSQLite(writeOutputToSQLite), m_errorStream(errorStream)
 {
+    sqlite3 *m_connection = nullptr;
     if (m_writeOutputToSQLite) {
         int rc = -1;
         bool ok = true;
@@ -2641,10 +2642,14 @@ SQLiteProcedures::SQLiteProcedures(std::shared_ptr<std::ostream> const &errorStr
         }
         if (ok) {
             char *zErrMsg = nullptr;
-            rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+            // Set journal_mode OFF to avoid creating the file dbName + "-journal" (when dbName is a regular file)
+            rc = sqlite3_exec(m_connection, "PRAGMA journal_mode = OFF;", nullptr, 0, &zErrMsg);
+            if (!rc) {
+                rc = sqlite3_exec(m_connection, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
+            }
             sqlite3_close(m_connection);
             if (rc) {
-                *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << sqlite3_errmsg(m_connection) << std::endl;
+                *m_errorStream << "SQLite3 message, can't get exclusive lock to edit database: " << zErrMsg << std::endl;
                 ok = false;
             } else {
                 if (dbName != ":memory:") {
@@ -2803,7 +2808,7 @@ int SQLiteProcedures::sqliteResetCommand(sqlite3_stmt *stmt)
 
 bool SQLiteProcedures::sqliteWithinTransaction()
 {
-    return (sqlite3_get_autocommit(m_connection) == 0);
+    return (sqlite3_get_autocommit(m_db.get()) == 0);
 }
 
 // int SQLiteProcedures::sqliteClearBindings(sqlite3_stmt * stmt)
