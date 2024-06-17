@@ -130,11 +130,11 @@ namespace FanCoilUnits {
         Real64 SpeedFanRatSel = 0.0;  // Speed fan ratio determined by fan speed selection at each timestep
         Real64 OutAirVolFlow = 0.0;   // m3/s
         Real64 OutAirMassFlow = 0.0;  // kg/s
-        int AirInNode = 0;            // inlet air node number
-        int AirOutNode = 0;           // outlet air node number
-        int OutsideAirNode = 0;       // outside air node number
-        int AirReliefNode = 0;        // relief air node number
-        int MixedAirNode = 0;         // Mixed Air Node number
+        int AirInNodeNum = 0;            // inlet air node number
+        int AirOutNodeNum = 0;           // outlet air node number
+        int OutsideAirNodeNum = 0;       // outside air node number
+        int AirReliefNodeNum = 0;        // relief air node number
+        int MixedAirNodeNum = 0;         // Mixed Air Node number
         std::string OAMixName;        // name of outside air mixer
         std::string OAMixType;        // type of outside air mixer
         int OAMixIndex = 0;
@@ -172,8 +172,8 @@ namespace FanCoilUnits {
         std::string ATMixerName;                                // name of air terminal mixer
         int ATMixerIndex = 0;                                   // index to the air terminal mixer
         HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;                                 // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the air terminal mixer
+        int ATMixerPriNodeNum = 0;                                 // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNodeNum = 0;                                 // secondary air inlet node number for the air terminal mixer
         int HVACSizingIndex = 0;                                // index of a HVACSizing object for a fancoil unit
         Real64 SpeedRatio = 0.0;                                // speed ratio when the fan is cycling between stages
         int FanOpModeSchedPtr = 0;                              // pointer to supply air fan operating mode schedule
@@ -215,20 +215,20 @@ namespace FanCoilUnits {
         Real64 MaxHeatAirMassFlow = 0.0;       // used in ASHRAE90.1 model, same as MaxAirMassFlow
         Real64 LowSpeedCoolFanRatio = 0.0;     // ratio of min air flow to max air flow
         Real64 LowSpeedHeatFanRatio = 0.0;     // ratio of min air flow to max air flow
-        int CoolCoilFluidInletNode = 0;        // chilled water control node
-        int CoolCoilFluidOutletNodeNum = 0;    // chilled water coil outlet plant node
-        int HeatCoilFluidInletNode = 0;        // hot water control node
-        int HeatCoilFluidOutletNodeNum = 0;    // hot water coil outlet plant node
+        int CoolCoilFluidInNodeNum = 0;        // chilled water control node
+        int CoolCoilFluidOutNodeNum = 0;    // chilled water coil outlet plant node
+        int HeatCoilFluidInNodeNum = 0;        // hot water control node
+        int HeatCoilFluidOutNodeNum = 0;    // hot water coil outlet plant node
         PlantLocation CoolCoilPlantLoc{};      // index for plant location for chilled water coil
         PlantLocation HeatCoilPlantLoc{};      // index for plant location for hot water coil
-        int CoolCoilInletNodeNum = 0;          // index of cooling coil inlet node number
-        int CoolCoilOutletNodeNum = 0;         // index of cooling coil outlet node number
-        int HeatCoilInletNodeNum = 0;          // index of heating coil inlet node number
-        int HeatCoilOutletNodeNum = 0;         // index of heating coil outlet node number
+        int CoolCoilAirInNodeNum = 0;          // index of cooling coil inlet node number
+        int CoolCoilAirOutNodeNum = 0;         // index of cooling coil outlet node number
+        int HeatCoilAirInNodeNum = 0;          // index of heating coil inlet node number
+        int HeatCoilAirOutNodeNum = 0;         // index of heating coil outlet node number
         int ControlZoneNum = 0;                // pointer to a zone served by a fancoil unit
-        int NodeNumOfControlledZone = 0;       // node number of controlled zone
+        int ControlledZoneNodeNum = 0;       // node number of controlled zone
         bool ATMixerExists = false;            // True if there is an ATMixer
-        int ATMixerOutNode = 0;                // outlet air node number for the air terminal mixer
+        int ATMixerOutNodeNum = 0;                // outlet air node number for the air terminal mixer
         Real64 FanPartLoadRatio = 0.0;         // ratio of air flow to max air flow to simulation modulating fan
         Real64 HeatCoilWaterFlowRatio = 0.0;   // ratio of water flow rate to max water flow rate
         Real64 ControlZoneMassFlowFrac = 1.0;  // flow fraction of control zone (always 1 for zone equipment)
@@ -260,7 +260,7 @@ namespace FanCoilUnits {
                          int ControlledZoneNum); // index into ZoneEquipConfig array
 
     void Sim4PipeFanCoil(EnergyPlusData &state,
-                         int &FanCoilNum,          // number of the current fan coil unit being simulated
+                         int FanCoilNum,          // number of the current fan coil unit being simulated
                          int ControlledZoneNum,    // index into ZoneEqupConfig
                          bool FirstHVACIteration,  // TRUE if 1st HVAC simulation of system timestep
                          Real64 &PowerMet,         // Sensible power supplied (W)
@@ -301,14 +301,14 @@ namespace FanCoilUnits {
     );
 
     void SimMultiStage4PipeFanCoil(EnergyPlusData &state,
-                                   int &FanCoilNum,         // number of the current fan coil unit being simulated
+                                   int FanCoilNum,         // number of the current fan coil unit being simulated
                                    int ControlledZoneNum,   // index into ZoneEqupConfig
                                    bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    Real64 &PowerMet         // Sensible power supplied (W)
     );
 
     void CalcMultiStage4PipeFanCoil(EnergyPlusData &state,
-                                    int &FanCoilNum,         // number of the current fan coil unit being simulated
+                                    int FanCoilNum,         // number of the current fan coil unit being simulated
                                     int ZoneNum,             // number of zone being served
                                     bool FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                     Real64 QZnReq,           // current zone cooling or heating load
@@ -407,16 +407,16 @@ struct FanCoilUnitsData : BaseGlobalStruct
     bool ZoneInNodeNotFound = false;                        // used in error checking
     int ATMixerNum = 0;                                     // index of air terminal mixer in the air terminal mixer data array
     HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // type of air terminal mixer (1=inlet side; 2=supply side)
-    int ATMixerPriNode = 0;                                 // node number of the air terminal mixer primary air inlet
-    int ATMixerSecNode = 0;                                 // node number of the air terminal mixer secondary air inlet
-    int ATMixerOutNode = 0;                                 // node number of the air terminal mixer secondary air inlet
+    int ATMixerPriNodeNum = 0;                                 // node number of the air terminal mixer primary air inlet
+    int ATMixerSecNodeNum = 0;                                 // node number of the air terminal mixer secondary air inlet
+    int ATMixerOutNodeNum = 0;                                 // node number of the air terminal mixer secondary air inlet
     Array1D_bool MyEnvrnFlag;
     Array1D_bool MyPlantScanFlag;
     Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
-    int CoilWaterInletNode = 0;
-    int CoilWaterOutletNode = 0;
-    int ATMixOutNode = 0; // outlet node of ATM Mixer
-    int ZoneNode = 0;     // zone node
+    int CoilWaterInletNodeNum = 0;
+    int CoilWaterOutletNodeNum = 0;
+    int ATMixOutNodeNum = 0; // outlet node of ATM Mixer
+    int ZoneNodeNum = 0;     // zone node
 
     void clear_state() override
     {

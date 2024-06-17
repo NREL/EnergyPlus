@@ -138,26 +138,26 @@ GLHESlinky::GLHESlinky(EnergyPlusData &state, std::string const &objName, nlohma
     std::string outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
 
     // get inlet node num
-    this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+    this->inletNodeNum = Node::GetSingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
+                                                             Node::ConnObjType::GroundHeatExchangerSlinky,
                                                              this->name,
-                                                             DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::ConnectionType::Inlet,
-                                                             NodeInputManager::CompFluidStream::Primary,
-                                                             DataLoopNode::ObjectIsNotParent);
+                                                             Node::FluidType::Water,
+                                                             Node::ConnType::Inlet,
+                                                             Node::CompFluidStream::Primary,
+                                                             Node::ObjectIsNotParent);
 
     // get outlet node num
-    this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+    this->outletNodeNum = Node::GetSingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSlinky,
+                                                              Node::ConnObjType::GroundHeatExchangerSlinky,
                                                               this->name,
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Outlet,
-                                                              NodeInputManager::CompFluidStream::Primary,
-                                                              DataLoopNode::ObjectIsNotParent);
+                                                              Node::FluidType::Water,
+                                                              Node::ConnType::Outlet,
+                                                              Node::CompFluidStream::Primary,
+                                                              Node::ObjectIsNotParent);
 
     this->available = true;
     this->on = true;
@@ -274,28 +274,28 @@ GLHEVert::GLHEVert(EnergyPlusData &state, std::string const &objName, nlohmann::
     // get inlet node num
     std::string const inletNodeName = Util::makeUPPER(j["inlet_node_name"].get<std::string>());
 
-    this->inletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+    this->inletNodeNum = Node::GetSingleNode(state,
                                                              inletNodeName,
                                                              errorsFound,
-                                                             DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
+                                                             Node::ConnObjType::GroundHeatExchangerSystem,
                                                              objName,
-                                                             DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::ConnectionType::Inlet,
-                                                             NodeInputManager::CompFluidStream::Primary,
-                                                             DataLoopNode::ObjectIsNotParent);
+                                                             Node::FluidType::Water,
+                                                             Node::ConnType::Inlet,
+                                                             Node::CompFluidStream::Primary,
+                                                             Node::ObjectIsNotParent);
 
     // get outlet node num
     std::string const outletNodeName = Util::makeUPPER(j["outlet_node_name"].get<std::string>());
 
-    this->outletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+    this->outletNodeNum = Node::GetSingleNode(state,
                                                               outletNodeName,
                                                               errorsFound,
-                                                              DataLoopNode::ConnectionObjectType::GroundHeatExchangerSystem,
+                                                              Node::ConnObjType::GroundHeatExchangerSystem,
                                                               objName,
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Outlet,
-                                                              NodeInputManager::CompFluidStream::Primary,
-                                                              DataLoopNode::ObjectIsNotParent);
+                                                              Node::FluidType::Water,
+                                                              Node::ConnType::Outlet,
+                                                              Node::CompFluidStream::Primary,
+                                                              Node::ObjectIsNotParent);
     this->available = true;
     this->on = true;
 
@@ -2002,7 +2002,7 @@ void GLHEBase::calcGroundHeatExchanger(EnergyPlusData &state)
         this->firstTime = false;
     }
 
-    this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
+    this->inletTemp = state.dataLoopNodes->nodes(this->inletNodeNum)->Temp;
 
     Real64 cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2271,10 +2271,13 @@ void GLHEBase::updateGHX(EnergyPlusData &state)
     std::string_view const RoutineName = "UpdateGroundHeatExchanger";
     constexpr Real64 deltaTempLimit = 100.0; // temp limit for warnings
 
+    auto &dln = state.dataLoopNodes;
+    
     PlantUtilities::SafeCopyPlantNode(state, this->inletNodeNum, this->outletNodeNum);
 
-    state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->outletTemp;
-    state.dataLoopNodes->Node(this->outletNodeNum).Enthalpy =
+    auto *outletNode = dln->nodes(this->outletNodeNum);
+    outletNode->Temp = this->outletTemp;
+    outletNode->Enthalpy =
         this->outletTemp * FluidProperties::GetSpecificHeatGlycol(state,
                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                   this->outletTemp,
@@ -2667,9 +2670,10 @@ Real64 GLHEVert::calcPipeConvectionResistance(EnergyPlusData &state)
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr const char *RoutineName("calcPipeConvectionResistance");
-
+    auto &dln = state.dataLoopNodes;
+    
     // Get fluid props
-    this->inletTemp = state.dataLoopNodes->Node(this->inletNodeNum).Temp;
+    this->inletTemp = dln->nodes(this->inletNodeNum)->Temp;
 
     Real64 const cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
                                                                   state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2951,6 +2955,8 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
     std::string_view const RoutineName = "initEnvironment";
     this->myEnvrnFlag = false;
 
+    auto &dln = state.dataLoopNodes;
+    
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             20.0,
@@ -2960,8 +2966,8 @@ void GLHEVert::initEnvironment(EnergyPlusData &state, [[maybe_unused]] Real64 co
     PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
-    state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->tempGround;
-    state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->tempGround;
+    dln->nodes(this->inletNodeNum)->Temp = this->tempGround;
+    dln->nodes(this->outletNodeNum)->Temp = this->tempGround;
 
     // zero out all history arrays
     this->QnHr = 0.0;
@@ -3026,6 +3032,8 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
     std::string_view const RoutineName = "initEnvironment";
     this->myEnvrnFlag = false;
 
+    auto &dln = state.dataLoopNodes;
+    
     Real64 fluidDensity = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             20.0,
@@ -3035,8 +3043,8 @@ void GLHESlinky::initEnvironment(EnergyPlusData &state, Real64 const CurTime)
     PlantUtilities::InitComponentNodes(state, 0.0, this->designMassFlow, this->inletNodeNum, this->outletNodeNum);
 
     this->lastQnSubHr = 0.0;
-    state.dataLoopNodes->Node(this->inletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
-    state.dataLoopNodes->Node(this->outletNodeNum).Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+    dln->nodes(this->inletNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
+    dln->nodes(this->outletNodeNum)->Temp = this->groundTempModel->getGroundTempAtTimeInSeconds(state, this->coilDepth, CurTime);
 
     // zero out all history arrays
     this->QnHr = 0.0;

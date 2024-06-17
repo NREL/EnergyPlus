@@ -318,24 +318,24 @@ void GetBoilerInput(EnergyPlusData &state)
         thisBoiler.SizFac = state.dataIPShortCut->rNumericArgs(9);
         if (thisBoiler.SizFac == 0.0) thisBoiler.SizFac = 1.0;
 
-        thisBoiler.BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+        thisBoiler.BoilerInNodeNum = Node::GetSingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(5),
                                                                             ErrorsFound,
-                                                                            DataLoopNode::ConnectionObjectType::BoilerHotWater,
+                                                                            Node::ConnObjType::BoilerHotWater,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            DataLoopNode::ObjectIsNotParent);
-        thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            Node::FluidType::Water,
+                                                                            Node::ConnType::Inlet,
+                                                                            Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
+        thisBoiler.BoilerOutNodeNum = Node::GetSingleNode(state,
                                                                              state.dataIPShortCut->cAlphaArgs(6),
                                                                              ErrorsFound,
-                                                                             DataLoopNode::ConnectionObjectType::BoilerHotWater,
+                                                                             Node::ConnObjType::BoilerHotWater,
                                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                             DataLoopNode::ObjectIsNotParent);
+                                                                             Node::FluidType::Water,
+                                                                             Node::ConnType::Outlet,
+                                                                             Node::CompFluidStream::Primary,
+                                                                             Node::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -507,6 +507,10 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
+
+    auto &dln = state.dataLoopNodes;
+    auto *boilerOutletNode = dln->nodes(this->BoilerOutNodeNum);
+    
     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                          Constant::HWInitConvTemp,
@@ -514,11 +518,11 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                                                          RoutineName);
     this->DesMassFlowRate = this->VolFlowRate * rho;
 
-    PlantUtilities::InitComponentNodes(state, 0.0, this->DesMassFlowRate, this->BoilerInletNodeNum, this->BoilerOutletNodeNum);
+    PlantUtilities::InitComponentNodes(state, 0.0, this->DesMassFlowRate, this->BoilerInNodeNum, this->BoilerOutNodeNum);
 
     if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) { // check if setpoint on outlet node
-        if ((state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-            (state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo == DataLoopNode::SensedNodeFlagValue)) {
+        if ((boilerOutletNode->TempSetPoint == Node::SensedNodeFlagValue) &&
+            (boilerOutletNode->TempSetPointLo == Node::SensedNodeFlagValue)) {
             if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                 if (!this->ModulatedFlowErrDone) {
                     ShowWarningError(state, format("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named {}", this->Name));
@@ -531,8 +535,8 @@ void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->BoilerOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
-                state.dataLoopNodes->NodeSetpointCheck(this->BoilerOutletNodeNum).needsSetpointChecking = false;
+                    state, this->BoilerOutNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                dln->nodes(this->BoilerOutNodeNum)->needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {
                         ShowWarningError(state, format("Missing temperature setpoint for LeavingSetpointModulated mode Boiler named {}", this->Name));
@@ -562,7 +566,9 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
 
     // METHODOLOGY EMPLOYED:
     // Uses the status flags to trigger initializations.
-
+    auto &dln = state.dataLoopNodes;
+    auto *boilerOutletNode = dln->nodes(this->BoilerOutNodeNum);
+        
     // Init more variables
     if (this->MyFlag) {
         this->SetupOutputVars(state);
@@ -585,11 +591,11 @@ void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boi
         // fix for clumsy old input that worked because loop setpoint was spread.
         //  could be removed with transition, testing , model change, period of being obsolete.
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-            state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPoint =
-                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+            boilerOutletNode->TempSetPoint =
+                dln->nodes(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum)->TempSetPoint;
         } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-            state.dataLoopNodes->Node(this->BoilerOutletNodeNum).TempSetPointLo =
-                state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum).TempSetPointLo;
+            boilerOutletNode->TempSetPointLo =
+                dln->nodes(state.dataPlnt->PlantLoop(this->plantLoc.loopNum).TempSetPointNodeNum)->TempSetPointLo;
         }
     }
 }
@@ -739,7 +745,7 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
         }
     }
 
-    PlantUtilities::RegisterPlantCompDesignFlow(state, this->BoilerInletNodeNum, tmpBoilerVolFlowRate);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, this->BoilerInNodeNum, tmpBoilerVolFlowRate);
 
     if (state.dataPlnt->PlantFinalSizesOkayToReport) {
         // create predefined report
@@ -807,8 +813,6 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     this->ParasiticElecPower = 0.0;
     this->BoilerMassFlowRate = 0.0;
 
-    int const BoilerInletNode = this->BoilerInletNodeNum;
-    int const BoilerOutletNode = this->BoilerOutletNodeNum;
     Real64 BoilerNomCap = this->NomCap;                         // W - boiler nominal capacity
     Real64 const BoilerMaxPLR = this->MaxPartLoadRat;           // boiler maximum part load ratio
     Real64 const BoilerMinPLR = this->MinPartLoadRat;           // boiler minimum part load ratio
@@ -816,9 +820,13 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     Real64 const TempUpLimitBout = this->TempUpLimitBoilerOut;  // C - boiler high temperature limit
     Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 
+    auto &dln = state.dataLoopNodes;
+    auto const *boilerInNode = dln->nodes(this->BoilerInNodeNum);
+    auto const *boilerOutNode = dln->nodes(this->BoilerOutNodeNum);
+    
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                       state.dataLoopNodes->Node(BoilerInletNode).Temp,
+                                                       boilerInNode->Temp,
                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                        RoutineName);
 
@@ -827,7 +835,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     // will not shut down the branch
     if (MyLoad <= 0.0 || !RunFlag) {
         if (EquipFlowCtrl == DataBranchAirLoopPlant::ControlType::SeriesActive)
-            this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerInletNode).MassFlowRate;
+            this->BoilerMassFlowRate = boilerInNode->MassFlowRate;
         return;
     }
 
@@ -857,26 +865,26 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
         if ((this->FlowMode == DataPlant::FlowMode::Constant) || (this->FlowMode == DataPlant::FlowMode::NotModulated)) {
             // Then find the flow rate and outlet temp
             this->BoilerMassFlowRate = BoilerMassFlowRateMax;
-            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, this->BoilerInNodeNum, this->BoilerOutNodeNum, this->plantLoc);
 
             if ((this->BoilerMassFlowRate != 0.0) && (MyLoad > 0.0)) {
                 BoilerDeltaTemp = this->BoilerLoad / this->BoilerMassFlowRate / Cp;
             } else {
                 BoilerDeltaTemp = 0.0;
             }
-            this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(BoilerInletNode).Temp;
+            this->BoilerOutletTemp = BoilerDeltaTemp + boilerInNode->Temp;
 
         } else if (this->FlowMode == DataPlant::FlowMode::LeavingSetpointModulated) {
             // Calculate the Delta Temp from the inlet temp to the boiler outlet setpoint
             // Then find the flow rate and outlet temp
 
             if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme == DataPlant::LoopDemandCalcScheme::SingleSetPoint) {
-                BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPoint - state.dataLoopNodes->Node(BoilerInletNode).Temp;
+                BoilerDeltaTemp = boilerOutNode->TempSetPoint - boilerInNode->Temp;
             } else { // DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand
-                BoilerDeltaTemp = state.dataLoopNodes->Node(BoilerOutletNode).TempSetPointLo - state.dataLoopNodes->Node(BoilerInletNode).Temp;
+                BoilerDeltaTemp = boilerOutNode->TempSetPointLo - boilerInNode->Temp;
             }
 
-            this->BoilerOutletTemp = BoilerDeltaTemp + state.dataLoopNodes->Node(BoilerInletNode).Temp;
+            this->BoilerOutletTemp = BoilerDeltaTemp + boilerInNode->Temp;
 
             if ((BoilerDeltaTemp > 0.0) && (this->BoilerLoad > 0.0)) {
                 this->BoilerMassFlowRate = this->BoilerLoad / Cp / BoilerDeltaTemp;
@@ -884,29 +892,29 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
             } else {
                 this->BoilerMassFlowRate = 0.0;
             }
-            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, BoilerInletNode, BoilerOutletNode, this->plantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->BoilerMassFlowRate, this->BoilerInNodeNum, this->BoilerOutNodeNum, this->plantLoc);
 
         } // End of Constant/Variable Flow If Block
 
     } else { // If FlowLock is True
         // Set the boiler flow rate from inlet node and then check performance
-        this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerInletNode).MassFlowRate;
+        this->BoilerMassFlowRate = boilerInNode->MassFlowRate;
 
         if ((MyLoad > 0.0) && (this->BoilerMassFlowRate > 0.0)) { // this boiler has a heat load
             this->BoilerLoad = MyLoad;
             if (this->BoilerLoad > BoilerNomCap * BoilerMaxPLR) this->BoilerLoad = BoilerNomCap * BoilerMaxPLR;
             if (this->BoilerLoad < BoilerNomCap * BoilerMinPLR) this->BoilerLoad = BoilerNomCap * BoilerMinPLR;
-            this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp + this->BoilerLoad / (this->BoilerMassFlowRate * Cp);
+            this->BoilerOutletTemp = boilerInNode->Temp + this->BoilerLoad / (this->BoilerMassFlowRate * Cp);
         } else {
             this->BoilerLoad = 0.0;
-            this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
+            this->BoilerOutletTemp = boilerInNode->Temp;
         }
     }
 
     // Limit BoilerOutletTemp.  If > max temp, trip boiler off
     if (this->BoilerOutletTemp > TempUpLimitBout) {
         this->BoilerLoad = 0.0;
-        this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
+        this->BoilerOutletTemp = boilerInNode->Temp;
     }
     this->BoilerPLR = this->BoilerLoad / BoilerNomCap; // operating part load ratio
     this->BoilerPLR = min(this->BoilerPLR, BoilerMaxPLR);
@@ -920,7 +928,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     if (this->EfficiencyCurvePtr > 0) {
         if (state.dataCurveManager->PerfCurve(this->EfficiencyCurvePtr)->numDims == 2) {
             if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
-                EffCurveOutput = Curve::CurveValue(state, this->EfficiencyCurvePtr, this->BoilerPLR, state.dataLoopNodes->Node(BoilerInletNode).Temp);
+                EffCurveOutput = Curve::CurveValue(state, this->EfficiencyCurvePtr, this->BoilerPLR, boilerInNode->Temp);
             } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                 EffCurveOutput = Curve::CurveValue(state, this->EfficiencyCurvePtr, this->BoilerPLR, this->BoilerOutletTemp);
             }
@@ -940,7 +948,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
                 ShowContinueError(state, format("...Curve input x value (PLR)     = {:.5T}", this->BoilerPLR));
                 if (state.dataCurveManager->PerfCurve(this->EfficiencyCurvePtr)->numDims == 2) {
                     if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
-                        ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", state.dataLoopNodes->Node(BoilerInletNode).Temp));
+                        ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", boilerInNode->Temp));
                     } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                         ShowContinueError(state, format("...Curve input y value (Toutlet) = {:.2T}", this->BoilerOutletTemp));
                     }
@@ -975,7 +983,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
                 ShowContinueError(state, format("...Curve input x value (PLR)     = {:.5T}", this->BoilerPLR));
                 if (state.dataCurveManager->PerfCurve(this->EfficiencyCurvePtr)->numDims == 2) {
                     if (this->CurveTempMode == TempMode::ENTERINGBOILERTEMP) {
-                        ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", state.dataLoopNodes->Node(BoilerInletNode).Temp));
+                        ShowContinueError(state, format("...Curve input y value (Tinlet) = {:.2T}", boilerInNode->Temp));
                     } else if (this->CurveTempMode == TempMode::LEAVINGBOILERTEMP) {
                         ShowContinueError(state, format("...Curve input y value (Toutlet) = {:.2T}", this->BoilerOutletTemp));
                     }
@@ -1017,25 +1025,26 @@ void BoilerSpecs::UpdateBoilerRecords(EnergyPlusData &state,
     // boiler simulation reporting
 
     Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
-    int const BoilerInletNode = this->BoilerInletNodeNum;
-    int const BoilerOutletNode = this->BoilerOutletNodeNum;
+    auto &dln = state.dataLoopNodes;
+    auto *boilerInletNode = dln->nodes(this->BoilerInNodeNum);
+    auto *boilerOutletNode = dln->nodes(this->BoilerOutNodeNum);
 
     if (MyLoad <= 0 || !RunFlag) {
-        PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
-        state.dataLoopNodes->Node(BoilerOutletNode).Temp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
-        this->BoilerOutletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
+        PlantUtilities::SafeCopyPlantNode(state, this->BoilerInNodeNum, this->BoilerOutNodeNum);
+        boilerOutletNode->Temp = boilerInletNode->Temp;
+        this->BoilerOutletTemp = boilerInletNode->Temp;
         this->BoilerLoad = 0.0;
         this->FuelUsed = 0.0;
         this->ParasiticElecPower = 0.0;
         this->BoilerPLR = 0.0;
         this->BoilerEff = 0.0;
     } else {
-        PlantUtilities::SafeCopyPlantNode(state, BoilerInletNode, BoilerOutletNode);
-        state.dataLoopNodes->Node(BoilerOutletNode).Temp = this->BoilerOutletTemp;
+        PlantUtilities::SafeCopyPlantNode(state, this->BoilerInNodeNum, this->BoilerOutNodeNum);
+        boilerOutletNode->Temp = this->BoilerOutletTemp;
     }
 
-    this->BoilerInletTemp = state.dataLoopNodes->Node(BoilerInletNode).Temp;
-    this->BoilerMassFlowRate = state.dataLoopNodes->Node(BoilerOutletNode).MassFlowRate;
+    this->BoilerInletTemp = boilerInletNode->Temp;
+    this->BoilerMassFlowRate = boilerOutletNode->MassFlowRate;
     this->BoilerEnergy = this->BoilerLoad * ReportingConstant;
     this->FuelConsumed = this->FuelUsed * ReportingConstant;
     this->ParasiticElecConsumption = this->ParasiticElecPower * ReportingConstant;

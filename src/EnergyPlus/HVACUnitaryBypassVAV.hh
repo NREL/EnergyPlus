@@ -123,15 +123,16 @@ namespace HVACUnitaryBypassVAV {
         Real64 HeatOutAirMassFlow = 0.0;       // OA mass flow rate during heating operation [kg/s]
         Real64 NoCoolHeatOutAirMassFlow = 0.0; // OA mass flow rate when no cooling or heating [kg/s]
         int OutAirSchPtr = 0;                  // Index number to outside air multiplier schedule
-        int AirInNode = 0;                     // Inlet air node number for CBVAV unit
-        int AirOutNode = 0;                    // Outlet air node number for CBVAV unit
+        int AirInNodeNum = 0;                     // Inlet air node number for CBVAV unit
+        int AirOutNodeNum = 0;                    // Outlet air node number for CBVAV unit
         int CondenserNodeNum = 0;              // DX Coil condenser air inlet node number
-        int MixerOutsideAirNode = 0;           // Outside air node number for OA mixer
-        int MixerMixedAirNode = 0;             // Mixed air node number for OA mixer
-        int MixerReliefAirNode = 0;            // Relief air node number for OA mixer
-        int MixerInletAirNode = 0;             // Return air node number for OA mixer
-        int SplitterOutletAirNode = 0;         // Air node number for splitter (last component outlet node)
-        int PlenumMixerInletAirNode = 0;       // only used when bypass is connected to plenum or mixer
+        int MixerOutsideAirInNodeNum = 0;           // Outside air node number for OA mixer
+        int MixerMixedAirOutNodeNum = 0;             // Mixed air node number for OA mixer
+        int MixerReliefAirOutNodeNum = 0;            // Relief air node number for OA mixer
+        int MixerReturnAirInNodeNum = 0;             // Return air node number for OA mixer
+        int MixerAirInNodeNum = 0;               
+        int SplitterAirOutNodeNum = 0;         // Air node number for splitter (last component outlet node)
+        int PlenumMixerAirInNodeNum = 0;       // only used when bypass is connected to plenum or mixer
         std::string OAMixType;                 // type of outside air mixer
         std::string OAMixName;                 // Name of OA mixer
         int OAMixIndex = 0;                    // Index to OA mixer
@@ -154,8 +155,8 @@ namespace HVACUnitaryBypassVAV {
         HVAC::CoilType HeatCoilType = HVAC::CoilType::Invalid;
         int HeatCoilIndex = 0;                    // DX heating coil index number
         HVAC::FanOp fanOp = HVAC::FanOp::Invalid; // mode of operation
-        int CoilControlNode = 0;                  // heating coil hot water or steam inlet node
-        int CoilOutletNode = 0;                   // outlet node for hot water and steam coil
+        int HeatCoilFluidControlNodeNum = 0;                  // heating coil hot water or steam inlet node
+        int HeatCoilFluidOutNodeNum = 0;                   // outlet node for hot water and steam coil
         PlantLocation plantLoc;                   // plant loop component location object for water heating coil
         int HotWaterCoilMaxIterIndex = 0;         // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2 = 0;        // Index to recurring warning message
@@ -185,23 +186,24 @@ namespace HVACUnitaryBypassVAV {
         int LastMode = 0;                                          // Last mode of operation, coolingmode or heatingmode
         AirFlowCtrlMode AirFlowControl = AirFlowCtrlMode::Invalid; // Fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         Real64 CompPartLoadFrac = 0.0;                             // Compressor part load ratio
-        int AirLoopNumber = 0;                                     // Air loop served by the CBVAV system
+        int AirLoopNum = 0;                                     // Air loop served by the CBVAV system
         int NumControlledZones = 0;
         Array1D_int ControlledZoneNum;                                // Index to controlled zones
-        Array1D_int ControlledZoneNodeNum;                            // Zone node num of controlled zone
-        Array1D_int CBVAVBoxOutletNode;                               // Outlet node of CBVAV Box in controlled zone
-        Array1D_int ZoneSequenceCoolingNum;                           // Index to cooling sequence/priority for this zone
-        Array1D_int ZoneSequenceHeatingNum;                           // Index to heating sequence/priority for this zone
+        Array1D_int ControlledZoneNodeNums;                            // Zone node num of controlled zone
+        Array1D_int CBVAVBoxOutNodeNums;                               // Outlet node of CBVAV Box in controlled zone
+        Array1D_int ZoneSequenceCoolingNums;                           // Index to cooling sequence/priority for this zone
+        Array1D_int ZoneSequenceHeatingNums;                           // Index to heating sequence/priority for this zone
         PriorityCtrlMode PriorityControl = PriorityCtrlMode::Invalid; // Control mode - CoolingPriority, HeatingPriority, ZonePriority or LoadPriority
         int NumZonesCooled = 0;                                       // Number of zones requesting cooling
         int NumZonesHeated = 0;                                       // Number of zones requesting heating
         int PLRMaxIter = 0;                                           // Counter for recurring warning message
         int PLRMaxIterIndex = 0;                                      // Index to recurring warning message
-        int DXCoilInletNode = 0;                                      // Inlet node number of DX cooling coil
-        int DXCoilOutletNode = 0;                                     // Outlet node number of DX cooling coil
-        int HeatingCoilInletNode = 0;                                 // Inlet node of heating coil
-        int HeatingCoilOutletNode = 0;                                // Outlet node of heating coil
-        int FanInletNodeNum = 0;                                      // fan inlet node number
+        int DXCoilAirInNodeNum = 0;                                      // Inlet node number of DX cooling coil
+        int DXCoilAirOutNodeNum = 0;                                     // Outlet node number of DX cooling coil
+        int HeatCoilAirInNodeNum = 0;                                 // Inlet node of heating coil
+        int HeatCoilAirOutNodeNum = 0;                                // Outlet node of heating coil
+        int FanInNodeNum = 0;                                      // fan inlet node number
+        int FanOutNodeNum = 0;                                      // fan inlet node number
         Real64 OutletTempSetPoint = 0.0;                              // Oulet node temperature setpoint [C]
         Real64 CoilTempSetPoint = 0.0;                                // Coil oulet node temperature setpoint (inc. fan heat) [C]
         int HeatCoolMode = 0;                                         // System operating mode (0 = floating, 1 = cooling, 2 = heating)

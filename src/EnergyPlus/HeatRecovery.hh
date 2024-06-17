@@ -128,10 +128,10 @@ namespace HeatRecovery {
         Real64 NomSupAirMassFlow = 0.0; // nominal supply air mass flow rate (kg/s)
         Real64 NomSecAirMassFlow = 0.0; // nominal secondary air mass flow rate (kg/s)
         // Nodes
-        int SupInletNode = 0;  // supply air inlet node number
-        int SupOutletNode = 0; // supply air outlet node number
-        int SecInletNode = 0;  // secondary air inlet node number
-        int SecOutletNode = 0; // secondary air outlet node number
+        int SupAirInNodeNum = 0;  // supply air inlet node number
+        int SupAirOutNodeNum = 0; // supply air outlet node number
+        int SecAirInNodeNum = 0;  // secondary air inlet node number
+        int SecAirOutNodeNum = 0; // secondary air outlet node number
         // inlet conditions
         Real64 SupInTemp = 0.0;     // supply air inlet temperature (C)
         Real64 SupInHumRat = 0.0;   // supply air inlet humidity ratio (kg water/kg dry air)

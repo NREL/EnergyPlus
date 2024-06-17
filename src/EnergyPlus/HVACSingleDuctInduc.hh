@@ -84,11 +84,11 @@ namespace HVACSingleDuctInduc {
         Real64 MaxTotAirVolFlow;    // m3/s (autosizable)
         Real64 MaxTotAirMassFlow;   // kg/s
         Real64 InducRatio;          // ratio of induced air flow to primary air flow
-        int PriAirInNode;           // unit primary air inlet node number
-        int SecAirInNode;           // unit induced air inlet node number
-        int OutAirNode;             // unit air outlet node number
-        int HWControlNode;          // hot water control node
-        int CWControlNode;          // cold water control node
+        int PriAirInNodeNum = 0;           // unit primary air inlet node number
+        int SecAirInNodeNum = 0;           // unit induced air inlet node number
+        int AirOutNodeNum = 0;             // unit air outlet node number
+        int HWControlNodeNum = 0;          // hot water control node
+        int CWControlNodeNum = 0;          // cold water control node
         std::string HCoilType;      // type of heating coil component
         std::string HCoil;          // name of heating coil component
         int HCoil_Num;              // index to this coil
@@ -121,19 +121,19 @@ namespace HVACSingleDuctInduc {
         Real64 DesCoolingLoad;      // used for reporting during coil sizing
         Real64 DesHeatingLoad;      // used for reporting during coil sizing
         int CtrlZoneNum;            // Pointer to CtrlZone data structure
-        int CtrlZoneInNodeIndex;    // which controlled zone inlet node number corresponds with this unit
+        int CtrlZoneInNodeNum = 0;    // which controlled zone inlet node number corresponds with this unit
         int AirLoopNum;             // index to airloop that this terminal unit is connected to
         Real64 OutdoorAirFlowRate;  // zone outdoor air volume flow rate
 
         // Default Constructor
         IndUnitData()
-            : UnitType_Num(SingleDuct_CV::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), PriAirInNode(0),
-              SecAirInNode(0), OutAirNode(0), HWControlNode(0), CWControlNode(0), HCoil_Num(0),
+            : UnitType_Num(SingleDuct_CV::Invalid), SchedPtr(0), MaxTotAirVolFlow(0.0), MaxTotAirMassFlow(0.0), InducRatio(2.5), 
+              HCoil_Num(0),
               HeatingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolHotWaterFlow(0.0), MaxHotWaterFlow(0.0), MinVolHotWaterFlow(0.0),
               MinHotWaterFlow(0.0), HotControlOffset(0.0), HWPlantLoc{}, HWCoilFailNum1(0), HWCoilFailNum2(0), CCoil_Num(0),
               CoolingCoilType(DataPlant::PlantEquipmentType::Invalid), MaxVolColdWaterFlow(0.0), MaxColdWaterFlow(0.0), MinVolColdWaterFlow(0.0),
               MinColdWaterFlow(0.0), ColdControlOffset(0.0), CWPlantLoc{}, CWCoilFailNum1(0), CWCoilFailNum2(0), Mixer_Num(0), MaxPriAirMassFlow(0.0),
-              MaxSecAirMassFlow(0.0), ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0),
+              MaxSecAirMassFlow(0.0), ADUNum(0), DesCoolingLoad(0.0), DesHeatingLoad(0.0), CtrlZoneNum(0), AirLoopNum(0),
               OutdoorAirFlowRate(0.0)
         {
         }

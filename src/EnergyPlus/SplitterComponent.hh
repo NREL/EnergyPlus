@@ -71,12 +71,12 @@ namespace SplitterComponent {
         Real64 InletHumRat;
         Real64 InletEnthalpy;
         Real64 InletPressure;
-        int InletNode;
+        int InNodeNum = 0;
         Real64 InletMassFlowRate;         // MassFlow through the Splitter being Simulated [kg/Sec]
         Real64 InletMassFlowRateMaxAvail; // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
         Real64 InletMassFlowRateMinAvail; // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
-        int NumOutletNodes;
-        Array1D_int OutletNode;
+        int NumOutNodes;
+        Array1D_int OutNodeNums;
         Array1D<Real64> OutletMassFlowRate;
         Array1D<Real64> OutletMassFlowRateMaxAvail;
         Array1D<Real64> OutletMassFlowRateMinAvail;
@@ -87,8 +87,8 @@ namespace SplitterComponent {
 
         // Default Constructor
         SplitterConditions()
-            : InletTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletNode(0), InletMassFlowRate(0.0),
-              InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0), NumOutletNodes(0)
+            : InletTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletMassFlowRate(0.0),
+              InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0), NumOutNodes(0)
         {
         }
     };

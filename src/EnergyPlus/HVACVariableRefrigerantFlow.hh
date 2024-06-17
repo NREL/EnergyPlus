@@ -233,9 +233,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 MaxOATDefrost;                             // maximum outdoor air dry-bulb temp for defrost operation (C)
         // end variables used for Defrost
         DataHeatBalance::RefrigCondenserType CondenserType; // condenser type, evap- or air-cooled
-        int CondenserNodeNum;                               // condenser inlet node number
+        int CondenserInNodeNum = 0;                               // condenser inlet node number
         bool SkipCondenserNodeNumCheck;                     // used to check for duplicate node names
-        int CondenserOutletNodeNum;                         // condenser outlet node number
+        int CondenserOutNodeNum = 0;                         // condenser outlet node number
         Real64 WaterCondVolFlowRate;                        // water condenser volume flow rate (m3/s)
         Real64 EvapCondEffectiveness;                       // evaporative condenser effectiveness
         Real64 EvapCondAirVolFlowRate;                      // air volume flow rate through condenser (m3/s)
@@ -402,8 +402,8 @@ namespace HVACVariableRefrigerantFlow {
               CCHeaterPower(0.0), CompressorSizeRatio(0.0), NumCompressors(0), MaxOATCCHeater(0.0), DefrostEIRPtr(0), DefrostFraction(0.0),
               DefrostStrategy(StandardRatings::DefrostStrat::Invalid), DefrostControl(StandardRatings::HPdefrostControl::Invalid),
               DefrostCapacity(0.0), DefrostPower(0.0), DefrostConsumption(0.0), MaxOATDefrost(0.0),
-              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), CondenserNodeNum(0), SkipCondenserNodeNumCheck(false),
-              CondenserOutletNodeNum(0), WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
+              CondenserType(DataHeatBalance::RefrigCondenserType::Invalid), SkipCondenserNodeNumCheck(false),
+              WaterCondVolFlowRate(0.0), EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0),
               CoolCombRatioPTR(0), HeatCombRatioPTR(0), OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0),
               CoolElecConsumption(0.0), HeatElecConsumption(0.0), CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0),
               EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0), SUMultiplier(0.0), TUCoolingLoad(0.0),
@@ -646,13 +646,13 @@ namespace HVACVariableRefrigerantFlow {
         int TUListIndex = 0;                               // index to VRF Terminal Unit List
         int IndexToTUInTUList = 0;                         // index to TU in VRF Terminal Unit List
         int ZoneNum = 0;                                   // index to zone where VRF Terminal Unit resides
-        int ZoneAirNode = 0;                               // zone air node number
-        int VRFTUInletNodeNum = 0;                         // VRF Terminal Unit inlet node number
-        int VRFTUOutletNodeNum = 0;                        // VRF Terminal Unit outlet node number
-        int VRFTUOAMixerOANodeNum = 0;                     // OA node number for this TU's OA mixer
-        int VRFTUOAMixerRelNodeNum = 0;                    // Relief node number for this TU's OA mixer
-        int VRFTUOAMixerRetNodeNum = 0;                    // Return node number for this TU's OA mixer
-        int VRFTUOAMixerMixedNodeNum = 0;                  // Mixed node number for this TU's OA mixer
+        int ZoneAirNodeNum = 0;                            // zone air node number
+        int AirInNodeNum = 0;                         // VRF Terminal Unit inlet node number
+        int AirOutNodeNum = 0;                        // VRF Terminal Unit outlet node number
+        int OAMixerOutsideAirInNodeNum = 0;                     // OA node number for this TU's OA mixer
+        int OAMixerReliefAirOutNodeNum = 0;                    // Relief node number for this TU's OA mixer
+        int OAMixerReturnAirInNodeNum = 0;                    // Return node number for this TU's OA mixer
+        int OAMixerMixedAirOutNodeNum = 0;                  // Mixed node number for this TU's OA mixer
         Real64 MaxCoolAirVolFlow = 0.0;                    // supply air volumetric flow rate during cooling operation [m3/s]
         Real64 MaxHeatAirVolFlow = 0.0;                    // supply air volumetric flow rate during heating operation [m3/s]
         Real64 MaxNoCoolAirVolFlow = 0.0;                  // supply air volumetric flow rate when no cooling [m3/s]
@@ -732,19 +732,19 @@ namespace HVACVariableRefrigerantFlow {
         std::string ATMixerName;                                // name of air terminal mixer
         int ATMixerIndex = 0;                                   // index to the air terminal mixer
         HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // 1 = inlet side mixer, 2 = supply side mixer
-        int ATMixerPriNode = 0;                                 // primary inlet air node number for the air terminal mixer
-        int ATMixerSecNode = 0;                                 // secondary air inlet node number for the air terminal mixer
-        int ATMixerOutNode = 0;                                 // outlet air node number for the air terminal mixer
-        int SuppHeatCoilAirInletNode = 0;                       // supplemental heating coil air inlet node
-        int SuppHeatCoilAirOutletNode = 0;                      // supplemental heating coil air outlet node
-        int SuppHeatCoilFluidInletNode = 0;                     // supplemental heating coil fluid inlet node
-        int SuppHeatCoilFluidOutletNode = 0;                    // supplemental heating coil fluid outlet node
+        int ATMixerPriNodeNum = 0;                                 // primary inlet air node number for the air terminal mixer
+        int ATMixerSecNodeNum = 0;                                 // secondary air inlet node number for the air terminal mixer
+        int ATMixerMixedAirOutNodeNum = 0;                         // outlet air node number for the air terminal mixer
+        int SuppCoilAirInNodeNum = 0;                       // supplemental heating coil air inlet node
+        int SuppCoilAirOutNodeNum = 0;                      // supplemental heating coil air outlet node
+        int SuppCoilFluidInNodeNum = 0;                     // supplemental heating coil fluid inlet node
+        int SuppCoilFluidOutNodeNum = 0;                    // supplemental heating coil fluid outlet node
         bool firstPass = true;                                  // used to reset global sizing data
         PlantLocation SuppHeatCoilPlantLoc{};                   // supplemental heating coil plant component index
         Real64 coilInNodeT = 0.0;                               // coil inlet node temp at full flow (C)
         Real64 coilInNodeW = 0.0;                               // coil inlet node humidity ratio at full flow (kg/kg)
-        int fanInletNode = 0;                                   // fan inlet node index
-        int fanOutletNode = 0;                                  // fan outlet node index
+        int fanInNodeNum = 0;                                   // fan inlet node index
+        int fanOutNodeNum = 0;                                  // fan outlet node index
         bool MySuppCoilPlantScanFlag = true;                    // flag used to initialize plant comp for water and steam heating coils
         int airLoopNum = 0;                                     // index to air loop
         bool isInOASys = false;                                 // true if TU is configured in outside air system
@@ -760,10 +760,10 @@ namespace HVACVariableRefrigerantFlow {
         Real64 controlZoneMassFlowFrac = 1.0;                   // ratio of control zone air mass flow rate to total zone air mass flow rate
         int zoneSequenceCoolingNum = 0;                         // zone equipment cooling sequence
         int zoneSequenceHeatingNum = 0;                         // zone equipment heating sequence
-        int coolCoilAirInNode = 0;                              // cooling coil air inlet node number
-        int coolCoilAirOutNode = 0;                             // cooling coil air outlet node number
-        int heatCoilAirInNode = 0;                              // heating coil air inlet node number
-        int heatCoilAirOutNode = 0;                             // heating coil air outlet node number
+        int coolCoilAirInNodeNum = 0;                              // cooling coil air inlet node number
+        int coolCoilAirOutNodeNum = 0;                             // cooling coil air outlet node number
+        int heatCoilAirInNodeNum = 0;                              // heating coil air inlet node number
+        int heatCoilAirOutNodeNum = 0;                             // heating coil air outlet node number
         std::string DesignSpecMultispeedHPType;                 // Multiuple performance object type
         std::string DesignSpecMultispeedHPName;                 // Multiuple performance object name
         int DesignSpecMSHPIndex = -1;                           //  Multiuple performance index
@@ -860,7 +860,7 @@ namespace HVACVariableRefrigerantFlow {
 
         static Real64
         HeatingCoilCapacityLimit(EnergyPlusData &state,
-                                 Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
+                                 int const HeatCoilAirInNodeNum, // supplemental heating coil air inlet node
                                  Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
         );
     };
@@ -1021,8 +1021,8 @@ struct HVACVarRefFlowData : BaseGlobalStruct
     Array1D<Real64> SumHeatingLoads;         // sum of heating loads
     Array1D_bool CheckVRFCombinationRatio;
     bool MyOneTimeEIOFlag = true; // eio header flag reporting
-    int ATMixOutNode = 0;         // terminal unit mixer outlet node
-    int ATMixOutNode2 = 0;        // terminal unit mixer outlet node
+    int ATMixerMixedAirOutNodeNum = 0;         // terminal unit mixer outlet node
+    int ATMixerMixedAirOutNodeNum2 = 0;        // terminal unit mixer outlet node
 
     // Object Data
     EPVector<HVACVariableRefrigerantFlow::VRFCondenserEquipment> VRF; // AirConditioner:VariableRefrigerantFlow object
@@ -1082,8 +1082,8 @@ struct HVACVarRefFlowData : BaseGlobalStruct
         this->VRFTUNumericFields.deallocate();
         this->CheckVRFCombinationRatio.clear();
         this->MyOneTimeEIOFlag = true;
-        this->ATMixOutNode = 0;
-        this->ATMixOutNode2 = 0;
+        this->ATMixerMixedAirOutNodeNum = 0;
+        this->ATMixerMixedAirOutNodeNum2 = 0;
     }
 };
 

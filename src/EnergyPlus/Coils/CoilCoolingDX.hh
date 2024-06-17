@@ -103,7 +103,7 @@ struct CoilCoolingDX
                             Real64 &normalModeRatedCapacity,
                             std::vector<Real64> &normalModeFlowRates,
                             std::vector<Real64> &normalModeRatedCapacities);
-    static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
+    static void inline passThroughNodeData(Node::NodeData &in, Node::NodeData &out);
     void size(EnergyPlusData &state);
 
     int getNumModes();
@@ -113,11 +113,11 @@ struct CoilCoolingDX
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
     bool myOneTimeInitFlag = true;
-    int evapInletNodeIndex = 0;
-    int evapOutletNodeIndex = 0;
-    int availScheduleIndex = 0;
-    int condInletNodeIndex = 0;
-    int condOutletNodeIndex = 0;
+    int evapInNodeNum = 0;
+    int evapOutNodeNum = 0;
+    int availScheduleNum = 0;
+    int condInNodeNum = 0;
+    int condOutNodeNum = 0;
     CoilCoolingDXCurveFitPerformance performance;
     int condensateTankIndex = 0;
     int condensateTankSupplyARRID = 0;

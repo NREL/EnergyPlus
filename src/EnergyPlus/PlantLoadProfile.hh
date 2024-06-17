@@ -84,9 +84,9 @@ namespace PlantLoadProfile {
         PlantLoopFluidType FluidType = PlantLoopFluidType::Invalid; // plant loop fluid type: water or steam
         bool Init;                                                  // Flag for initialization:  TRUE means do the init
         bool InitSizing;                                            // Flag for initialization of plant sizing
-        int InletNode;
+        int InNodeNum = 0;
         Real64 InletTemp; // Inlet temperature (C)
-        int OutletNode;
+        int OutNodeNum = 0;
         Real64 OutletTemp;              // Outlet temperature (C)
         int LoadSchedule;               // Pointer to schedule object
         bool EMSOverridePower;          // if true, then EMS is calling to override power level
@@ -107,7 +107,7 @@ namespace PlantLoadProfile {
 
         // Default Constructor
         PlantProfileData()
-            : Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, Init(true), InitSizing(true), InletNode(0), InletTemp(0.0), OutletNode(0),
+            : Type(DataPlant::PlantEquipmentType::Invalid), plantLoc{}, Init(true), InitSizing(true), InletTemp(0.0), 
               OutletTemp(0.0), LoadSchedule(0), EMSOverridePower(false), EMSPowerValue(0.0), PeakVolFlowRate(0.0), FlowRateFracSchedule(0),
               VolFlowRate(0.0), MassFlowRate(0.0), EMSOverrideMassFlow(false), EMSMassFlowValue(0.0), Power(0.0), Energy(0.0), HeatingEnergy(0.0),
               CoolingEnergy(0.0)

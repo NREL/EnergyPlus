@@ -91,8 +91,8 @@ namespace BoilerSteam {
         Real64 BoilerMaxOperPress = 0.0;                     // Max Boiler Pressure
         Real64 BoilerPressCheck = 0.0;                       // Boiler Operating Pressure at Saturation Temperature
         Real64 SizFac = 0.0;                                 // sizing factor
-        int BoilerInletNodeNum = 0;                          // Node number at the boiler inlet
-        int BoilerOutletNodeNum = 0;                         // Node number at the boiler outlet
+        int BoilerInNodeNum = 0;                          // Node number at the boiler inlet
+        int BoilerOutNodeNum = 0;                         // Node number at the boiler outlet
         std::array<Real64, 3> FullLoadCoef = {0.0};          // Coefficients of the fuel consumption/part load ratio curve
         int TypeNum = 0;                                     // Plant loop type identifier
         PlantLocation plantLoc;

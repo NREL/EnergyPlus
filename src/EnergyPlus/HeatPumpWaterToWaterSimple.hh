@@ -102,10 +102,10 @@ namespace HeatPumpWaterToWaterSimple {
         bool ratedPowerHeatWasAutoSized;         // true if RatedPowerHeat was autosize on input
         int HeatCapCurveIndex;                   // Index of the Heating capacity performance curve
         int HeatPowCurveIndex;                   // Index of the Heating power consumption curve
-        int LoadSideInletNodeNum;                // Load Side Inlet Node
-        int LoadSideOutletNodeNum;               // Load Side Outlet Node
-        int SourceSideInletNodeNum;              // Source Side Inlet Node
-        int SourceSideOutletNodeNum;             // Source Side Outlet Node
+        int LoadSideInNodeNum = 0;                // Load Side Inlet Node
+        int LoadSideOutNodeNum = 0;               // Load Side Outlet Node
+        int SourceSideInNodeNum = 0;              // Source Side Inlet Node
+        int SourceSideOutNodeNum = 0;             // Source Side Outlet Node
         int HeatCapNegativeCounter;              // Counter for number of times heating capacity curve is <= 0.0
         int HeatCapNegativeIndex;                // Index for recurring warning message regarding heating capacity curve is <= 0.0
         int HeatPowerNegativeCounter;            // Counter for number of times heating power curve is <= 0.0
@@ -150,7 +150,7 @@ namespace HeatPumpWaterToWaterSimple {
               CoolCapNegativeIndex(0), CoolPowerNegativeCounter(0), CoolPowerNegativeIndex(0), RatedLoadVolFlowHeat(0.0),
               ratedLoadVolFlowHeatWasAutoSized(false), RatedSourceVolFlowHeat(0.0), ratedSourceVolFlowHeatWasAutoSized(false), RatedCapHeat(0.0),
               ratedCapHeatWasAutoSized(false), RatedPowerHeat(0.0), ratedPowerHeatWasAutoSized(false), HeatCapCurveIndex(0), HeatPowCurveIndex(0),
-              LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), HeatCapNegativeCounter(0),
+              HeatCapNegativeCounter(0),
               HeatCapNegativeIndex(0), HeatPowerNegativeCounter(0), HeatPowerNegativeIndex(0), SourcePlantLoc{}, LoadPlantLoc{}, CondMassFlowIndex(0),
               refCOP(0.0), sizFac(0.0), companionIndex(0), companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0),
               reportQLoadEnergy(0.0), reportQSource(0.0), reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0),

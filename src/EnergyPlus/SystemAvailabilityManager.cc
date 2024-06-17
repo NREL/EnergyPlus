@@ -314,8 +314,8 @@ namespace Avail {
         // Uses InputProcessor "Get" routines to obtain data.
 
         // Using/Aliasing
-        using NodeInputManager::GetOnlySingleNode;
-        using NodeInputManager::MarkNode;
+        using Node::GetSingleNode;
+        using Node::MarkNode;
         using namespace DataLoopNode;
         using DataZoneEquipment::cValidSysAvailManagerCompTypes;
         using DataZoneEquipment::NumValidSysAvailZoneComponents;
@@ -847,32 +847,32 @@ namespace Avail {
                 diffThermoMgr.Name = cAlphaArgs(1);
                 diffThermoMgr.type = ManagerType::DiffThermo;
 
-                diffThermoMgr.HotNode = GetOnlySingleNode(state,
+                diffThermoMgr.HotNode = GetSingleNode(state,
                                                           cAlphaArgs(2),
                                                           ErrorsFound,
-                                                          DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
+                                                          Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                                                           cAlphaArgs(1),
-                                                          DataLoopNode::NodeFluidType::Blank,
-                                                          DataLoopNode::ConnectionType::Sensor,
-                                                          NodeInputManager::CompFluidStream::Primary,
+                                                          Node::FluidType::Blank,
+                                                          Node::ConnType::Sensor,
+                                                          Node::CompFluidStream::Primary,
                                                           ObjectIsNotParent);
                 MarkNode(state,
                          diffThermoMgr.HotNode,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
+                         Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Hot Node");
-                diffThermoMgr.ColdNode = GetOnlySingleNode(state,
+                diffThermoMgr.ColdNode = GetSingleNode(state,
                                                            cAlphaArgs(3),
                                                            ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
+                                                           Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                                                            cAlphaArgs(1),
-                                                           DataLoopNode::NodeFluidType::Blank,
-                                                           DataLoopNode::ConnectionType::Sensor,
-                                                           NodeInputManager::CompFluidStream::Primary,
+                                                           Node::FluidType::Blank,
+                                                           Node::ConnType::Sensor,
+                                                           Node::CompFluidStream::Primary,
                                                            ObjectIsNotParent);
                 MarkNode(state,
                          diffThermoMgr.ColdNode,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerDifferentialThermostat,
+                         Node::ConnObjType::AvailabilityManagerDifferentialThermostat,
                          cAlphaArgs(1),
                          "Cold Node");
 
@@ -927,18 +927,18 @@ namespace Avail {
                 hiTurnOffMgr.Name = cAlphaArgs(1);
                 hiTurnOffMgr.type = ManagerType::HiTempTOff;
 
-                hiTurnOffMgr.Node = GetOnlySingleNode(state,
+                hiTurnOffMgr.Node = GetSingleNode(state,
                                                       cAlphaArgs(2),
                                                       ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::AvailabilityManagerHighTemperatureTurnOff,
+                                                      Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOff,
                                                       cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Blank,
-                                                      DataLoopNode::ConnectionType::Sensor,
-                                                      NodeInputManager::CompFluidStream::Primary,
+                                                      Node::FluidType::Blank,
+                                                      Node::ConnType::Sensor,
+                                                      Node::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
                 MarkNode(state,
                          hiTurnOffMgr.Node,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerHighTemperatureTurnOff,
+                         Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
 
@@ -981,18 +981,18 @@ namespace Avail {
                 hiTurnOnMgr.Name = cAlphaArgs(1);
                 hiTurnOnMgr.type = ManagerType::HiTempTOn;
 
-                hiTurnOnMgr.Node = GetOnlySingleNode(state,
+                hiTurnOnMgr.Node = GetSingleNode(state,
                                                      cAlphaArgs(2),
                                                      ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::AvailabilityManagerHighTemperatureTurnOn,
+                                                     Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOn,
                                                      cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Blank,
-                                                     DataLoopNode::ConnectionType::Sensor,
-                                                     NodeInputManager::CompFluidStream::Primary,
+                                                     Node::FluidType::Blank,
+                                                     Node::ConnType::Sensor,
+                                                     Node::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
                 MarkNode(state,
                          hiTurnOnMgr.Node,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerHighTemperatureTurnOn,
+                         Node::ConnObjType::AvailabilityManagerHighTemperatureTurnOn,
                          cAlphaArgs(1),
                          "Sensor Node");
 
@@ -1035,18 +1035,18 @@ namespace Avail {
                 loTurnOffMgr.Name = cAlphaArgs(1);
                 loTurnOffMgr.type = ManagerType::LoTempTOff;
 
-                loTurnOffMgr.Node = GetOnlySingleNode(state,
+                loTurnOffMgr.Node = GetSingleNode(state,
                                                       cAlphaArgs(2),
                                                       ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOff,
+                                                      Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOff,
                                                       cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Blank,
-                                                      DataLoopNode::ConnectionType::Sensor,
-                                                      NodeInputManager::CompFluidStream::Primary,
+                                                      Node::FluidType::Blank,
+                                                      Node::ConnType::Sensor,
+                                                      Node::CompFluidStream::Primary,
                                                       ObjectIsNotParent);
                 MarkNode(state,
                          loTurnOffMgr.Node,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOff,
+                         Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOff,
                          cAlphaArgs(1),
                          "Sensor Node");
 
@@ -1100,18 +1100,18 @@ namespace Avail {
                 loTurnOnMgr.Name = cAlphaArgs(1);
                 loTurnOnMgr.type = ManagerType::LoTempTOn;
 
-                loTurnOnMgr.Node = GetOnlySingleNode(state,
+                loTurnOnMgr.Node = GetSingleNode(state,
                                                      cAlphaArgs(2),
                                                      ErrorsFound,
-                                                     DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOn,
+                                                     Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOn,
                                                      cAlphaArgs(1),
-                                                     DataLoopNode::NodeFluidType::Blank,
-                                                     DataLoopNode::ConnectionType::Sensor,
-                                                     NodeInputManager::CompFluidStream::Primary,
+                                                     Node::FluidType::Blank,
+                                                     Node::ConnType::Sensor,
+                                                     Node::CompFluidStream::Primary,
                                                      ObjectIsNotParent);
                 MarkNode(state,
                          loTurnOnMgr.Node,
-                         DataLoopNode::ConnectionObjectType::AvailabilityManagerLowTemperatureTurnOn,
+                         Node::ConnObjType::AvailabilityManagerLowTemperatureTurnOn,
                          cAlphaArgs(1),
                          "Sensor Node");
 
@@ -3619,8 +3619,8 @@ namespace Avail {
         // Uses InputProcessor "Get" routines to obtain data.
 
         // Using/Aliasing
-        using NodeInputManager::GetOnlySingleNode;
-        using NodeInputManager::MarkNode;
+        using Node::GetSingleNode;
+        using Node::MarkNode;
         using namespace DataLoopNode;
 
         using Curve::CurveValue;

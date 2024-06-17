@@ -53,14 +53,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-namespace DataLoopNode {
+namespace Node {
 
-    enum class NodeFluidType
+    // Valid Fluid Types for Nodes
+    enum class FluidType
     {
         Invalid = -1,
         Blank, // TODO: remove, should be same as Invalid
@@ -71,7 +73,10 @@ namespace DataLoopNode {
         Num
     };
 
-    enum class ConnectionType
+    extern const std::array<std::string_view, (int)FluidType::Num> fluidTypeNames;
+    extern const std::array<std::string_view, (int)FluidType::Num> fluidTypeNamesUC;
+
+    enum class ConnType
     {
         Invalid = -1,
         Blank, // TODO: remove, should be same as Invalid
@@ -93,6 +98,9 @@ namespace DataLoopNode {
         Num
     };
 
+    extern const std::array<std::string_view, (int)ConnType::Num> connTypeNames;
+    extern const std::array<std::string_view, (int)ConnType::Num> connTypeNamesUC;
+
     constexpr Real64 SensedLoadFlagValue(-999.0);
     constexpr Real64 SensedNodeFlagValue(-999.0);
 
@@ -101,48 +109,7 @@ namespace DataLoopNode {
     constexpr bool ObjectIsNotParent(false);
     constexpr bool IncrementFluidStreamYes(true);
 
-    // Valid Fluid Types for Nodes
-    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> NodeFluidTypeNames = {
-        "blank", "Air", "Water", "Steam", "Electric"};
-
-    constexpr static std::array<std::string_view, static_cast<int>(NodeFluidType::Num)> NodeFluidTypeNamesUC = {
-        "BLANK", "AIR", "WATER", "STEAM", "ELECTRIC"};
-
-    constexpr static std::array<std::string_view, static_cast<int>(ConnectionType::Num)> ConnectionTypeNames = {"blank",
-                                                                                                                "Inlet",
-                                                                                                                "Outlet",
-                                                                                                                "Internal",
-                                                                                                                "ZoneNode",
-                                                                                                                "Sensor",
-                                                                                                                "Actuator",
-                                                                                                                "OutdoorAir",
-                                                                                                                "ReliefAir",
-                                                                                                                "ZoneInlet",
-                                                                                                                "ZoneReturn",
-                                                                                                                "ZoneExhaust",
-                                                                                                                "Setpoint",
-                                                                                                                "Electric",
-                                                                                                                "OutsideAirReference",
-                                                                                                                "InducedAir"};
-
-    constexpr static std::array<std::string_view, static_cast<int>(ConnectionType::Num)> ConnectionTypeNamesUC = {"BLANK",
-                                                                                                                  "INLET",
-                                                                                                                  "OUTLET",
-                                                                                                                  "INTERNAL",
-                                                                                                                  "ZONENODE",
-                                                                                                                  "SENSOR",
-                                                                                                                  "ACTUATOR",
-                                                                                                                  "OUTDOORAIR",
-                                                                                                                  "RELIEFAIR",
-                                                                                                                  "ZONEINLET",
-                                                                                                                  "ZONERETURN",
-                                                                                                                  "ZONEEXHAUST",
-                                                                                                                  "SETPOINT",
-                                                                                                                  "ELECTRIC",
-                                                                                                                  "OUTSIDEAIRREFERENCE",
-                                                                                                                  "INDUCEDAIR"};
-
-    enum class ConnectionObjectType
+    enum class ConnObjType
     {
         Invalid = -1,
         Undefined,
@@ -428,11 +395,14 @@ namespace DataLoopNode {
         Num,
     };
 
-    // Types
+    extern const std::array<std::string_view, (int)ConnObjType::Num> connObjTypeNames;
+    extern const std::array<std::string_view, (int)ConnObjType::Num> connObjTypeNamesUC;
+
     struct NodeData
     {
-        // Members
-        NodeFluidType FluidType = NodeFluidType::Blank; // must be one of the valid parameters
+        std::string Name;
+            
+        FluidType fluidType = FluidType::Blank; // must be one of the valid parameters
         int FluidIndex = 0;                             // For Fluid Properties
         Real64 Temp = 0.0;                              // {C}
         Real64 TempMin = 0.0;                           // {C}
@@ -447,7 +417,7 @@ namespace DataLoopNode {
         Real64 MassFlowRateMaxAvail = 0.0;              // {kg/s}
         Real64 MassFlowRateSetPoint = 0.0;              // {kg/s}
         Real64 Quality = 0.0;                           // {0.0-1.0 vapor fraction/percent}
-        Real64 Press = 0.0;                             // {Pa}
+        Real64 Press = DataEnvironment::StdPressureSeaLevel;                             // {Pa}
         Real64 Enthalpy = 0.0;                          // {J/kg}
         Real64 EnthalpyLastTimestep = 0.0;              // {J/kg}
         Real64 HumRat = 0.0;                            // {}
@@ -488,9 +458,38 @@ namespace DataLoopNode {
         // error message flag
         bool plantNodeErrorMsgIssued = false;
 
+        // Used to be in MoreNodeData
+        Real64 RelHumidity = 0.0;        // {%}
+        Real64 ReportEnthalpy = SensedNodeFlagValue;     // specific enthalpy calculated at the HVAC timestep [J/kg]
+        Real64 VolFlowRateStdRho = 0.0;  // volume flow rate at standard density [m3/s]
+        Real64 VolFlowRateCrntRho = 0.0; // volume flow rate at current density, only used for air nodes [m3/s]
+        Real64 WetBulbTemp = SensedNodeFlagValue;        // wetbulb temperature [C]
+        Real64 Density = 0.0;            // reported density at current temperature [kg/m3]
+        Real64 AirDewPointTemp = 0.0;    // reported system node dewpoint temperature [C]
+        Real64 SpecificHeat = 0.0;       // reported node specific heat [J/kg-C]
+
+        // Members
+        bool IsMarked = false;                                           // true if this is a marked node
+        ConnObjType connObjType = ConnObjType::Invalid; // Object Type that needs it "marked"
+        std::string ObjectName;                                          // Object Name that needs it "marked"
+        std::string FieldName;                                           // FieldName that needs it "marked"
+
+        // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
+        bool needsSetpointChecking = false;
+        bool checkTemperatureSetPoint = false;
+        bool checkTemperatureMinSetPoint = false;
+        bool checkTemperatureMaxSetPoint = false;
+        bool checkHumidityRatioSetPoint = false;
+        bool checkHumidityRatioMinSetPoint = false;
+        bool checkHumidityRatioMaxSetPoint = false;
+        bool checkMassFlowRateSetPoint = false;
+        bool checkMassFlowRateMinSetPoint = false;
+        bool checkMassFlowRateMaxSetPoint = false;
+
         // Default Constructor
         NodeData() = default;
 
+#ifdef GET_OUT            
         // Member Constructor
         NodeData(NodeFluidType const FluidType,     // must be one of the valid parameters
                  int const FluidIndex,              // For Fluid Properties
@@ -557,61 +556,27 @@ namespace DataLoopNode {
               plantNodeErrorMsgIssued(plantNodeErrorMsgIssued)
         {
         }
+#endif // GET_OUT            
     };
 
-    struct MoreNodeData
-    {
-        // Members
-        Real64 RelHumidity = 0.0;        // {%}
-        Real64 ReportEnthalpy = 0.0;     // specific enthalpy calculated at the HVAC timestep [J/kg]
-        Real64 VolFlowRateStdRho = 0.0;  // volume flow rate at standard density [m3/s]
-        Real64 VolFlowRateCrntRho = 0.0; // volume flow rate at current density, only used for air nodes [m3/s]
-        Real64 WetBulbTemp = 0.0;        // wetbulb temperature [C]
-        Real64 Density = 0.0;            // reported density at current temperature [kg/m3]
-        Real64 AirDewPointTemp = 0.0;    // reported system node dewpoint temperature [C]
-        Real64 SpecificHeat = 0.0;       // reported node specific heat [J/kg-C]
-    };
-
-    struct MarkedNodeData
-    {
-        // Members
-        bool IsMarked = false;                                           // true if this is a marked node
-        ConnectionObjectType ObjectType = ConnectionObjectType::Invalid; // Object Type that needs it "marked"
-        std::string ObjectName;                                          // Object Name that needs it "marked"
-        std::string FieldName;                                           // FieldName that needs it "marked"
-    };
-
-    // A struct to defer checking whether a node did correctly get a setpoint via the API / PythonPlugin
-    struct NodeSetpointCheckData
-    {
-        bool needsSetpointChecking = false;
-        bool checkTemperatureSetPoint = false;
-        bool checkTemperatureMinSetPoint = false;
-        bool checkTemperatureMaxSetPoint = false;
-        bool checkHumidityRatioSetPoint = false;
-        bool checkHumidityRatioMinSetPoint = false;
-        bool checkHumidityRatioMaxSetPoint = false;
-        bool checkMassFlowRateSetPoint = false;
-        bool checkMassFlowRateMinSetPoint = false;
-        bool checkMassFlowRateMaxSetPoint = false;
-    };
 } // namespace DataLoopNode
 
 struct LoopNodeData : BaseGlobalStruct
 {
-
-    int NumOfNodes = 0;
     int NumofSplitters = 0;
     int NumofMixers = 0;
-    Array1D_string NodeID;
-    Array1D<DataLoopNode::NodeData> Node; // dim to num nodes in SimHVAC
-    DataLoopNode::NodeData DefaultNodeValues = {
-        DataLoopNode::NodeFluidType::Blank,
+    Array1D<Node::NodeData*> nodes; // dim to num nodes in SimHVAC
+    std::map<std::string, int> nodeMap;
+
+        
+#ifdef GET_OUT
+        Node::NodeData DefaultNodeValues = {
+        Node::FluidType::Blank,
         0,
         0.0,
         0.0,
         0.0,
-        DataLoopNode::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
         0.0,
         0.0,
         0.0,
@@ -625,11 +590,11 @@ struct LoopNodeData : BaseGlobalStruct
         0.0,
         0.0,
         0.0,
-        DataLoopNode::SensedNodeFlagValue,
-        DataLoopNode::SensedNodeFlagValue,
-        DataLoopNode::SensedNodeFlagValue,
-        DataLoopNode::SensedNodeFlagValue,
-        DataLoopNode::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
+        Node::SensedNodeFlagValue,
         -1.0,
         false,
         0,
@@ -663,13 +628,10 @@ struct LoopNodeData : BaseGlobalStruct
                 // | EMSOverrideOutAirDryBulb | EMSValueForOutAirDryBulb {C} | OutAirWetBulb {C} | EMSOverrideOutAirWetBulb |
                 // EMSValueForOutAirWetBulb {C} | CO2 {ppm} | CO2 setpoint {ppm} | Generic contaminant {ppm} | Generic
                 // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
-    Array1D<DataLoopNode::MoreNodeData> MoreNodeInfo;
-    Array1D<DataLoopNode::MarkedNodeData> MarkedNode;
-    Array1D<DataLoopNode::NodeSetpointCheckData> NodeSetpointCheck;
-
+#endif // GET_OUT        
     void clear_state() override
     {
-        *this = LoopNodeData();
+        new (this) LoopNodeData();
     }
 };
 

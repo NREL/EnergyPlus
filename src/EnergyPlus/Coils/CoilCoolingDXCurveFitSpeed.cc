@@ -425,8 +425,8 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlus::EnergyPlusData &state)
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &state,
-                                                 const DataLoopNode::NodeData &inletNode,
-                                                 DataLoopNode::NodeData &outletNode,
+                                                 const Node::NodeData &inletNode,
+                                                 Node::NodeData &outletNode,
                                                  Real64 &_PLR,
                                                  HVAC::FanOp const fanOp,
                                                  const Real64 condInletTemp)
@@ -738,7 +738,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(EnergyPlus::EnergyPlusData &
     return calcCBF;
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
+Real64 CoilCoolingDXCurveFitSpeed::calcEffectiveSHR(const Node::NodeData &inletNode,
                                                     Real64 const inletWetBulb,
                                                     Real64 const SHRss,      // Steady-state sensible heat ratio
                                                     Real64 const RTF,        // Compressor run-time fraction

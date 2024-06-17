@@ -88,11 +88,11 @@ namespace ChillerElectricEIR {
         Real64 CondMassFlowRateMax = 0.0;         // Reference water mass flow rate through condenser [kg/s]
         Real64 CondenserFanPowerRatio = 0.0;      // Reference power of condenser fan to capacity ratio, W/W
         Real64 CompPowerToCondenserFrac = 0.0;    // Fraction of compressor electric power rejected by condenser [0 to 1]
-        int EvapInletNodeNum = 0;                 // Node number on the inlet side of the plant (evaporator side)
-        int EvapOutletNodeNum = 0;                // Node number on the outlet side of the plant (evaporator side)
+        int EvapInNodeNum = 0;                 // Node number on the inlet side of the plant (evaporator side)
+        int EvapOutNodeNum = 0;                // Node number on the outlet side of the plant (evaporator side)
         Real64 EvapOutletTemp = 0.0;              // Evaporator outlet temperature [C]
-        int CondInletNodeNum = 0;                 // Node number on the inlet side of the condenser
-        int CondOutletNodeNum = 0;                // Node number on the outlet side of the condenser
+        int CondInNodeNum = 0;                 // Node number on the inlet side of the condenser
+        int CondOutNodeNum = 0;                // Node number on the outlet side of the condenser
         Real64 CondOutletTemp = 0.0;              // Condenser outlet temperature [C]
         Real64 CondOutletHumRat = 0.0;            // Condenser outlet humidity ratio [kg/kg]
         Real64 MinPartLoadRat = 0.0;              // Minimum allowed operating fraction of full load
@@ -111,8 +111,8 @@ namespace ChillerElectricEIR {
         Real64 BasinHeaterPowerFTempDiff = 0.0;            // Basin heater capacity per degree C below setpoint (W/C)
         Real64 BasinHeaterSetPointTemp = 0.0;              // setpoint temperature for basin heater operation (C)
         bool HeatRecActive = false;                        // True when entered Heat Rec Vol Flow Rate > 0
-        int HeatRecInletNodeNum = 0;                       // Node number for the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum = 0;                      // Node number for the heat recovery outlet side of the condenser
+        int HeatRecInNodeNum = 0;                       // Node number for the heat recovery inlet side of the condenser
+        int HeatRecOutNodeNum = 0;                      // Node number for the heat recovery outlet side of the condenser
         Real64 HeatRecCapacityFraction = 0.0;              // user input for heat recovery capacity fraction []
         Real64 HeatRecMaxCapacityLimit = 0.0;              // Capacity limit for Heat recovery, one time calc [W]
         int HeatRecSetPointNodeNum = 0;                    // index for system node with the heat recover leaving setpoint

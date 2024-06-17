@@ -165,10 +165,10 @@ namespace PhotovoltaicThermalCollectors {
         SimplePVTModelStruct Simple;                                                 // Simple performance data structure.
         BIPVTModelStruct BIPVT;                                                      // BIPVT performance data structure.
         WorkingFluidEnum WorkingFluidType = WorkingFluidEnum::LIQUID;
-        int PlantInletNodeNum = 0;
-        int PlantOutletNodeNum = 0;
-        int HVACInletNodeNum = 0;
-        int HVACOutletNodeNum = 0;
+        int PlantInNodeNum = 0;
+        int PlantOutNodeNum = 0;
+        int HVACInNodeNum = 0;
+        int HVACOutNodeNum = 0;
         Real64 DesignVolFlowRate = 0.0;
         bool DesignVolFlowRateWasAutoSized = false; // true if design volume flow rate was autosize on input
         Real64 MaxMassFlowRate = 0.0;

@@ -57,10 +57,10 @@ namespace DataPlant {
     {
         // Members
         std::string Name;        // Name of the component list
-        int NodeNumIn;           // Node number for the inlet to this loop
-        std::string NodeNameIn;  // Node name for the inlet to this loop
-        int NodeNumOut;          // Node number for the outlet to this loop
-        std::string NodeNameOut; // Node name for the outlet to this loop
+        int InNodeNum = 0;           // Node number for the inlet to this loop
+        std::string InNodeName;  // Node name for the inlet to this loop
+        int OutNodeNum = 0;          // Node number for the outlet to this loop
+        std::string OutNodeName; // Node name for the outlet to this loop
         Real64 Electric;
         Real64 Gas;
         Real64 Purchased;
@@ -72,7 +72,7 @@ namespace DataPlant {
 
         // Default Constructor
         ReportLoopData()
-            : NodeNumIn(0), NodeNumOut(0), Electric(0.0), Gas(0.0), Purchased(0.0), OtherEnergy(0.0), TotalBranches(0), LoopVentLoad(0.0),
+            : Electric(0.0), Gas(0.0), Purchased(0.0), OtherEnergy(0.0), TotalBranches(0), LoopVentLoad(0.0),
               VentLoadFrac(0.0)
         {
         }

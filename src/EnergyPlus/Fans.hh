@@ -131,8 +131,8 @@ namespace Fans {
         std::string endUseSubcategoryName;
 
         int availSchedNum = 0; // Pointer to the availability schedule
-        int inletNodeNum = 0;
-        int outletNodeNum = 0;
+        int inNodeNum = 0;
+        int outNodeNum = 0;
         int airLoopNum = 0;
         bool airPathFlag = false; // Yes, this fan is a part of airpath
 
@@ -457,7 +457,7 @@ struct FansData : BaseGlobalStruct
 
     void clear_state() override
     {
-        for (int i = 1; i <= fans.size(); ++i)
+        for (int i = 1; i <= (int)fans.size(); ++i)
             delete fans(i);
 
         fans.clear();

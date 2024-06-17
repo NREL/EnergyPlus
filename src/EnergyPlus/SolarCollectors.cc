@@ -382,25 +382,25 @@ namespace SolarCollectors {
                 }
 
                 state.dataSolarCollectors->Collector(CollectorNum).InletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(4),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
+                                                        Node::ConnObjType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(5),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::SolarCollectorFlatPlateWater,
+                                                        Node::ConnObjType::SolarCollectorFlatPlateWater,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
                     state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =
@@ -687,25 +687,25 @@ namespace SolarCollectors {
                 }
 
                 state.dataSolarCollectors->Collector(CollectorNum).InletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(6),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
+                                                        Node::ConnObjType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
                 state.dataSolarCollectors->Collector(CollectorNum).OutletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(7),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::SolarCollectorIntegralCollectorStorage,
+                                                        Node::ConnObjType::SolarCollectorIntegralCollectorStorage,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
 
                 if (NumNumbers > 0) {
                     state.dataSolarCollectors->Collector(CollectorNum).VolFlowRateMax =

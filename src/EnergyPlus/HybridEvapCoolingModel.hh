@@ -305,10 +305,10 @@ namespace HybridEvapCoolingModel {
         Real64 averageOSAF;
         int ErrorCode;
         bool StandBy;
-        int InletNode;
-        int OutletNode;
-        int SecondaryInletNode;         // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNode;        // This outlet node of the secondary side and inlet to the secondary fan
+        int AirInNodeNum = 0;
+        int AirOutNodeNum = 0;
+        int SecAirInNodeNum = 0;         // This is usually OA node feeding into the purge/secondary side
+        int SecAirOutNodeNum = 0;        // This outlet node of the secondary side and inlet to the secondary fan
         Real64 FinalElectricalPower;    // Output fuel use in W
         Real64 FinalElectricalEnergy;   // Output fuel energy use in J
         Real64 InletMassFlowRate;       // Inlet is primary process air node at inlet to cooler

@@ -179,14 +179,18 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     // na
 
     // Using/Aliasing
-    using namespace DataLoopNode;
     using namespace Psychrometrics;
     using DataZoneEquipment::CheckZoneEquipmentList;
 
     // Locals
     int Loop;
-    int InletNode;
 
+    auto &huAC = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum);
+    
+    auto &dln = state.dataLoopNodes;
+    auto const *airInNode = dln->nodes(huAC.AirInNodeNum);
+    auto const *secAirInNode = dln->nodes(huAC.SecAirInNodeNum);
+    
     if (state.dataHybridUnitaryAC->HybridCoolOneTimeFlag) {
         // These three look like they are not used anywhere
         state.dataHybridUnitaryAC->MySizeFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
@@ -196,36 +200,36 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
         state.dataHybridUnitaryAC->MyZoneEqFlag.dimension(state.dataHybridUnitaryAC->NumZoneHybridEvap, true);
         state.dataHybridUnitaryAC->HybridCoolOneTimeFlag = false;
     }
-    if (!state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).Initialized) {
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).Initialize(ZoneNum);
+    if (!huAC.Initialized) {
+        huAC.Initialize(ZoneNum);
     }
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToHeatingSetpoint = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedLoadToCoolingSetpoint = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationMass = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationLoad = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedHumdificationEnergy = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationMass = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationLoad = 0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).RequestedDeHumdificationEnergy = 0;
+    huAC.RequestedLoadToHeatingSetpoint = 0;
+    huAC.RequestedLoadToCoolingSetpoint = 0;
+    huAC.RequestedHumdificationMass = 0;
+    huAC.RequestedHumdificationLoad = 0;
+    huAC.RequestedHumdificationEnergy = 0;
+    huAC.RequestedDeHumdificationMass = 0;
+    huAC.RequestedDeHumdificationLoad = 0;
+    huAC.RequestedDeHumdificationEnergy = 0;
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingRate = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitTotalCoolingEnergy = 0.0;
+    huAC.UnitTotalCoolingRate = 0.0;
+    huAC.UnitTotalCoolingEnergy = 0.0;
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingRate = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitSensibleCoolingEnergy = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingRate = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = Avail::Status::NoAction;
+    huAC.UnitSensibleCoolingRate = 0.0;
+    huAC.UnitSensibleCoolingEnergy = 0.0;
+    huAC.UnitLatentCoolingRate = 0.0;
+    huAC.UnitLatentCoolingEnergy = 0.0;
+    huAC.availStatus = Avail::Status::NoAction;
 
     // set the availability status based on the availability manager list name
     if (allocated(state.dataAvail->ZoneComp)) {
         auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::HybridEvaporativeCooler).ZoneCompAvailMgrs(UnitNum);
         if (state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
-            availMgr.AvailManagerListName = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).AvailManagerListName;
+            availMgr.AvailManagerListName = huAC.AvailManagerListName;
             availMgr.ZoneNum = ZoneNum;
             state.dataHybridUnitaryAC->MyZoneEqFlag(UnitNum) = false;
         }
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).availStatus = availMgr.availStatus;
+        huAC.availStatus = availMgr.availStatus;
     }
 
     // need to check all zone outdoor air control units to see if they are on Zone Equipment List or issue warning
@@ -233,7 +237,7 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
         state.dataHybridUnitaryAC->ZoneEquipmentListChecked = true;
         for (Loop = 1; Loop <= state.dataHybridUnitaryAC->NumZoneHybridEvap; ++Loop) {
             if (CheckZoneEquipmentList(state, "ZoneHVAC:HybridUnitaryHVAC", state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).Name)) {
-                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNode;
+                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(Loop).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ZoneNodeNum;
             } else {
                 ShowSevereError(state,
                                 format("InitZoneHybridUnitaryAirConditioners: ZoneHVAC:HybridUnitaryHVAC = {}, is not on any ZoneHVAC:EquipmentList. "
@@ -243,84 +247,49 @@ void InitZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
         }
     }
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InitializeModelParams();
+    huAC.InitializeModelParams();
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
 
     // Transfer the node data to EvapCond data structure
-    InletNode = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletNode;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = state.dataLoopNodes->Node(InletNode).MassFlowRate;
+    huAC.InletMassFlowRate = dln->nodes(huAC.AirInNodeNum)->MassFlowRate;
 
     // Set the inlet volumetric flow rate from the mass flow rate
     if (state.dataEnvrn->StdRhoAir > 1) {
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate =
-            state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / state.dataEnvrn->StdRhoAir;
+        huAC.InletVolumetricFlowRate = huAC.InletMassFlowRate / state.dataEnvrn->StdRhoAir;
     } else {
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate =
-            state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / 1.225;
+        huAC.InletVolumetricFlowRate = huAC.InletMassFlowRate / 1.225;
     }
 
+    
     // Set all of the inlet state variables from the inlet nodes
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat = state.dataLoopNodes->Node(InletNode).HumRat;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy = state.dataLoopNodes->Node(InletNode).Enthalpy;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure = state.dataLoopNodes->Node(InletNode).Press;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletRH =
-        PsyRhFnTdbWPb(state,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure,
-                      "InitZoneHybridUnitaryAirConditioners");
+    huAC.InletTemp = airInNode->Temp;
+    huAC.InletHumRat = airInNode->HumRat;
+    huAC.InletEnthalpy = airInNode->Enthalpy;
+    huAC.InletPressure = airInNode->Press;
+    huAC.InletRH = PsyRhFnTdbWPb(state, huAC.InletTemp, huAC.InletHumRat, huAC.InletPressure, "InitZoneHybridUnitaryAirConditioners");
 
     // Set default outlet state to inlet states, just to be safe
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletRH =
-        PsyRhFnTdbWPb(state,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure,
-                      "InitZoneHybridUnitaryAirConditioners");
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
+    huAC.OutletTemp = huAC.InletTemp;
+    huAC.OutletHumRat = huAC.InletHumRat;
+    huAC.OutletEnthalpy = huAC.InletEnthalpy;
+    huAC.OutletPressure = huAC.InletPressure;
+    huAC.OutletRH = PsyRhFnTdbWPb(state, huAC.OutletTemp, huAC.OutletHumRat, huAC.OutletPressure, "InitZoneHybridUnitaryAirConditioners");
+    huAC.OutletMassFlowRate = huAC.InletMassFlowRate;
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH =
-        PsyRhFnTdbWPb(state,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
-                      "InitZoneHybridUnitaryAirConditioners");
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SupplyVentilationAir;
+    
+    huAC.SecInletTemp = secAirInNode->Temp;
+    huAC.SecInletHumRat = secAirInNode->HumRat;
+    huAC.SecInletEnthalpy = secAirInNode->Enthalpy;
+    huAC.SecInletPressure = secAirInNode->Press;
+    huAC.SecInletRH = PsyRhFnTdbWPb(state, huAC.SecInletTemp, huAC.SecInletHumRat, huAC.SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
+    huAC.SecInletMassFlowRate = huAC.SupplyVentilationAir;
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletHumRat =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletPressure =
-        state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletRH =
-        PsyRhFnTdbWPb(state,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat,
-                      state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
-                      "InitZoneHybridUnitaryAirConditioners");
+    huAC.SecOutletTemp = secAirInNode->Temp;
+    huAC.SecOutletHumRat = secAirInNode->HumRat;
+    huAC.SecOutletEnthalpy = secAirInNode->Enthalpy;
+    huAC.SecOutletPressure = secAirInNode->Press;
+    huAC.SecOutletRH = PsyRhFnTdbWPb(state, huAC.SecInletTemp, huAC.SecInletHumRat, huAC.SecInletPressure, "InitZoneHybridUnitaryAirConditioners");
 }
 
 void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
@@ -336,8 +305,9 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     //       MODIFIED
     //       RE-ENGINEERED  na
 
-    using namespace DataLoopNode;
     using namespace Psychrometrics;
+
+    auto &huAC =  state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum);
 
     Real64 EnvDryBulbT, AirTempRoom, EnvRelHumm, RoomRelHum, DesignMinVR;
 
@@ -356,16 +326,16 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     SensibleOutputProvided = 0;
     LatentOutputProvided = 0;
     // taking class members out of the object and then using them in the calcualtion is odd but its for clarity with unit testing.
-    EnvDryBulbT = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp; // degrees C
-    AirTempRoom = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;    // degrees C
-    EnvRelHumm = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletRH;    // RH
-    RoomRelHum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletRH;       // RH
+    EnvDryBulbT = huAC.SecInletTemp; // degrees C
+    AirTempRoom = huAC.InletTemp;    // degrees C
+    EnvRelHumm = huAC.SecInletRH;    // RH
+    RoomRelHum = huAC.InletRH;       // RH
 
     bool UseOccSchFlag = true;
     bool UseMinOASchFlag = true;
 
     DesignMinVR = DataSizing::calcDesignSpecificationOutdoorAir(state,
-                                                                state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OARequirementsPtr,
+                                                                huAC.OARequirementsPtr,
                                                                 ZoneNum,
                                                                 UseOccSchFlag,
                                                                 UseMinOASchFlag); //[m3/s]
@@ -375,11 +345,11 @@ void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
     } else {
         DesignMinVRMassFlow = DesignMinVR * 1.225;
     }
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).doStep(
+    huAC.doStep(
         state, ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
-    SensibleOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
+    SensibleOutputProvided = -huAC.QSensZoneOut; // cooling negative
 
-    LatentOutputProvided = -state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).QLatentZoneOutMass; // dehumidification negative kg/s
+    LatentOutputProvided = -huAC.QLatentZoneOutMass; // dehumidification negative kg/s
 }
 
 void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int const UnitNum)
@@ -391,51 +361,37 @@ void ReportZoneHybridUnitaryAirConditioners(EnergyPlusData &state, int const Uni
     //       RE-ENGINEERED  na
 
     // Using/Aliasing
-    using namespace DataLoopNode;
     using namespace Psychrometrics;
 
-    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int ZoneNodeNum;
-    ZoneNodeNum = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).ZoneNodeNum;
+    auto &huAC =  state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum);
 
-    state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
+    auto &dln = state.dataLoopNodes;
+    auto *airInNode = dln->nodes(huAC.AirInNodeNum);
+    auto *airOutNode = dln->nodes(huAC.AirOutNodeNum);
+    auto *secAirInNode = dln->nodes(huAC.SecAirInNodeNum);
+    auto *secAirOutNode = dln->nodes(huAC.SecAirOutNodeNum);
+    
+    huAC.PrimaryMode = huAC.PrimaryMode;
 
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).Temp =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).HumRat =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).Enthalpy =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
+    airInNode->Temp = huAC.InletTemp;
+    airInNode->HumRat = huAC.InletHumRat;
+    airInNode->MassFlowRate = huAC.InletMassFlowRate;
+    airInNode->Enthalpy = huAC.InletEnthalpy;
 
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Temp =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).HumRat =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).MassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Enthalpy =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy;
+    airOutNode->Temp = huAC.OutletTemp;
+    airOutNode->HumRat = huAC.OutletHumRat;
+    airOutNode->MassFlowRate = huAC.OutletMassFlowRate;
+    airOutNode->Enthalpy = huAC.OutletEnthalpy;
 
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).MassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate;
+    secAirInNode->Temp = huAC.SecInletTemp;
+    secAirInNode->HumRat = huAC.SecInletHumRat;
+    secAirInNode->Enthalpy = huAC.SecInletEnthalpy;
+    secAirInNode->MassFlowRate = huAC.SecInletMassFlowRate;
 
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).Temp =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).HumRat =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletHumRat;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).Enthalpy =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy;
-    state.dataLoopNodes->Node(state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).MassFlowRate =
-        state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletMassFlowRate;
+    secAirOutNode->Temp = huAC.SecOutletTemp;
+    secAirOutNode->HumRat = huAC.SecOutletHumRat;
+    secAirOutNode->Enthalpy = huAC.SecOutletEnthalpy;
+    secAirOutNode->MassFlowRate = huAC.SecOutletMassFlowRate;
 }
 
 void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors)
@@ -450,8 +406,7 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
     using BranchNodeConnections::TestCompSet;
     using namespace ScheduleManager;
     using BranchNodeConnections::SetUpCompSets;
-    using NodeInputManager::GetOnlySingleNode;
-    using namespace DataLoopNode;
+    using Node::GetSingleNode;
     std::string cCurrentModuleObject; // Object type for getting and error messages
     Array1D_string Alphas;            // Alpha items for object
     Array1D<Real64> Numbers;          // Numeric items for object
@@ -470,6 +425,8 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view routineName = "GetInputZoneHybridUnitaryAirConditioners";
+
+    auto &dln = state.dataLoopNodes;
 
     cCurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
     state.dataHybridUnitaryAC->NumZoneHybridEvap = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, cCurrentModuleObject);
@@ -578,42 +535,42 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
             // A10, \field Outdoor Air Node Name
             // A11, \field Supply Air Node Name
             // A12, \field Relief Node Name
-            hybridUnitaryAC.InletNode = GetOnlySingleNode(state,
+            hybridUnitaryAC.AirInNodeNum = GetSingleNode(state,
                                                           Alphas(9),
                                                           ErrorsFound,
-                                                          DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                          Node::ConnObjType::ZoneHVACHybridUnitaryHVAC,
                                                           Alphas(1),
-                                                          DataLoopNode::NodeFluidType::Air,
-                                                          DataLoopNode::ConnectionType::Inlet,
-                                                          NodeInputManager::CompFluidStream::Primary,
-                                                          ObjectIsNotParent);
-            hybridUnitaryAC.SecondaryInletNode = GetOnlySingleNode(state,
+                                                          Node::FluidType::Air,
+                                                          Node::ConnType::Inlet,
+                                                          Node::CompFluidStream::Primary,
+                                                         Node::ObjectIsNotParent);
+            hybridUnitaryAC.SecAirInNodeNum = GetSingleNode(state,
                                                                    Alphas(10),
                                                                    ErrorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                                   Node::ConnObjType::ZoneHVACHybridUnitaryHVAC,
                                                                    Alphas(1),
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::OutsideAir,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   ObjectIsNotParent);
-            hybridUnitaryAC.OutletNode = GetOnlySingleNode(state,
+                                                                   Node::FluidType::Air,
+                                                                   Node::ConnType::OutsideAir,
+                                                                   Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsNotParent);
+            hybridUnitaryAC.AirOutNodeNum = GetSingleNode(state,
                                                            Alphas(11),
                                                            ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                           Node::ConnObjType::ZoneHVACHybridUnitaryHVAC,
                                                            Alphas(1),
-                                                           DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Outlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           ObjectIsNotParent);
-            hybridUnitaryAC.SecondaryOutletNode = GetOnlySingleNode(state,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Outlet,
+                                                           Node::CompFluidStream::Primary,
+                                                          Node::ObjectIsNotParent);
+            hybridUnitaryAC.SecAirOutNodeNum = GetSingleNode(state,
                                                                     Alphas(12),
                                                                     ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACHybridUnitaryHVAC,
+                                                                    Node::ConnObjType::ZoneHVACHybridUnitaryHVAC,
                                                                     Alphas(1),
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::ReliefAir,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    ObjectIsNotParent);
+                                                                    Node::FluidType::Air,
+                                                                    Node::ConnType::ReliefAir,
+                                                                    Node::CompFluidStream::Primary,
+                                                             Node::ObjectIsNotParent);
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(9), Alphas(11), "Hybrid Evap Air Zone Nodes");
             TestCompSet(state, cCurrentModuleObject, Alphas(1), Alphas(10), Alphas(12), "Hybrid Evap Air Zone Secondary Nodes");
 
@@ -735,16 +692,16 @@ void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Error
                       hybridUnitaryAC.Name,
                       cCurrentModuleObject,
                       hybridUnitaryAC.Name,
-                      state.dataLoopNodes->NodeID(hybridUnitaryAC.InletNode),
-                      state.dataLoopNodes->NodeID(hybridUnitaryAC.OutletNode));
+                      dln->nodes(hybridUnitaryAC.AirInNodeNum)->Name,
+                      dln->nodes(hybridUnitaryAC.AirOutNodeNum)->Name);
 
         SetUpCompSets(state,
                       cCurrentModuleObject,
                       hybridUnitaryAC.Name,
                       cCurrentModuleObject,
                       hybridUnitaryAC.Name,
-                      state.dataLoopNodes->NodeID(hybridUnitaryAC.SecondaryInletNode),
-                      state.dataLoopNodes->NodeID(hybridUnitaryAC.SecondaryOutletNode));
+                      dln->nodes(hybridUnitaryAC.SecAirInNodeNum)->Name,
+                      dln->nodes(hybridUnitaryAC.SecAirOutNodeNum)->Name);
 
         SetupOutputVariable(state,
                             "Zone Hybrid Unitary HVAC System Total Cooling Rate",
@@ -1326,7 +1283,7 @@ int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
     int GetHybridUnitaryACOutAirNode;
     GetHybridUnitaryACOutAirNode = 0;
     if (CompNum > 0 && CompNum <= state.dataHybridUnitaryAC->NumZoneHybridEvap) {
-        GetHybridUnitaryACOutAirNode = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).SecondaryInletNode;
+        GetHybridUnitaryACOutAirNode = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).SecAirInNodeNum;
     }
 
     return GetHybridUnitaryACOutAirNode;
@@ -1340,13 +1297,11 @@ int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
 
-    int GetHybridUnitaryACZoneInletNode;
-    GetHybridUnitaryACZoneInletNode = 0;
     if (CompNum > 0 && CompNum <= state.dataHybridUnitaryAC->NumZoneHybridEvap) {
-        GetHybridUnitaryACZoneInletNode = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).OutletNode;
+        return state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).AirOutNodeNum;
     }
 
-    return GetHybridUnitaryACZoneInletNode;
+    return 0;
 }
 
 int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
@@ -1357,13 +1312,11 @@ int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
         state.dataHybridUnitaryAC->GetInputZoneHybridEvap = false;
     }
 
-    int GetHybridUnitaryACReturnAirNode;
-    GetHybridUnitaryACReturnAirNode = 0;
     if (CompNum > 0 && CompNum <= state.dataHybridUnitaryAC->NumZoneHybridEvap) {
-        GetHybridUnitaryACReturnAirNode = state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).InletNode;
+       return state.dataHybridUnitaryAC->ZoneHybridUnitaryAirConditioner(CompNum).AirInNodeNum;
     }
 
-    return GetHybridUnitaryACReturnAirNode;
+    return 0;
 }
 
 //*****************************************************************************************

@@ -8137,8 +8137,8 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataErrorTracking;
-        using DataLoopNode::ObjectIsParent;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::ObjectIsParent;
+        using Node::GetSingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
 
@@ -8250,14 +8250,14 @@ namespace SurfaceGeometry {
 
                 // Assign outdoor air node number;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                    int NodeNum = GetOnlySingleNode(state,
+                    int NodeNum = GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(5),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::SurfacePropertyLocalEnvironment,
+                                                    Node::ConnObjType::SurfacePropertyLocalEnvironment,
                                                     SurfLocalEnv.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
                                                     ObjectIsParent);
                     if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                         ShowSevereError(state,
@@ -8344,8 +8344,8 @@ namespace SurfaceGeometry {
 
         // Using/Aliasing
         using namespace DataErrorTracking;
-        using DataLoopNode::ObjectIsParent;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::ObjectIsParent;
+        using Node::GetSingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
         using ScheduleManager::GetScheduleIndex;
 

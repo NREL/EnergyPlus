@@ -87,8 +87,8 @@ namespace EnergyPlus::HVACInterfaceManager {
 void UpdateHVACInterface(EnergyPlusData &state,
                          int const AirLoopNum, // airloop number for which air loop this is
                          DataConvergParams::CalledFrom const CalledFrom,
-                         int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
-                         int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
+                         int const OutletNodeNum,    // Node number for the outlet of the side of the loop just simulated
+                         int const InletNodeNum,     // Node number for the inlet of the side that needs the outlet node data
                          bool &OutOfToleranceFlag // True when the other side of the loop need to be (re)simulated
 )
 {
@@ -107,9 +107,12 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
     auto &TmpRealARR = state.dataHVACInterfaceMgr->TmpRealARR;
     auto &airLoopConv = state.dataConvergeParams->AirLoopConvergence(AirLoopNum);
-    auto &thisInletNode = state.dataLoopNodes->Node(InletNode);
 
-    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode == 0)) {
+    auto &dln = state.dataLoopNodes;
+    auto *inletNode = dln->nodes(InletNodeNum);
+    auto *outletNode = dln->nodes(OutletNodeNum);
+
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNodeNum == 0)) {
         // Air loop has no return path - only check mass flow and then set return inlet node mass flow to sum of demand side inlet nodes
 
         airLoopConv.HVACMassFlowNotConverged[0] = false;
@@ -121,13 +124,13 @@ void UpdateHVACInterface(EnergyPlusData &state,
         Real64 totDemandSideMinAvail = 0.0;
         Real64 totDemandSideMaxAvail = 0.0;
         for (int demIn = 1; demIn <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
-            int demInNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
-            totDemandSideMassFlow += state.dataLoopNodes->Node(demInNode).MassFlowRate;
-            totDemandSideMinAvail += state.dataLoopNodes->Node(demInNode).MassFlowRateMinAvail;
-            totDemandSideMaxAvail += state.dataLoopNodes->Node(demInNode).MassFlowRateMaxAvail;
+            auto *demInNode = dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNums(demIn));
+            totDemandSideMassFlow += demInNode->MassFlowRate;
+            totDemandSideMinAvail += demInNode->MassFlowRateMinAvail;
+            totDemandSideMaxAvail += demInNode->MassFlowRateMaxAvail;
         }
         TmpRealARR = airLoopConv.HVACFlowDemandToSupplyTolValue;
-        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(totDemandSideMassFlow - thisInletNode.MassFlowRate);
+        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(totDemandSideMassFlow - inletNode->MassFlowRate);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -136,18 +139,17 @@ void UpdateHVACInterface(EnergyPlusData &state,
             OutOfToleranceFlag = true; // Something has changed--resimulate the other side of the loop
         }
 
-        thisInletNode.MassFlowRate = totDemandSideMassFlow;
-        thisInletNode.MassFlowRateMinAvail = totDemandSideMinAvail;
-        thisInletNode.MassFlowRateMaxAvail = totDemandSideMaxAvail;
+        inletNode->MassFlowRate = totDemandSideMassFlow;
+        inletNode->MassFlowRateMinAvail = totDemandSideMinAvail;
+        inletNode->MassFlowRateMaxAvail = totDemandSideMaxAvail;
         return;
     }
 
     // Calculate the approximate energy difference across interface for comparison
     Real64 DeltaEnergy =
-        DataConvergParams::HVACCpApprox * ((state.dataLoopNodes->Node(OutletNode).MassFlowRate * state.dataLoopNodes->Node(OutletNode).Temp) -
-                                           (thisInletNode.MassFlowRate * thisInletNode.Temp));
+        DataConvergParams::HVACCpApprox * ((outletNode->MassFlowRate * outletNode->Temp) - (inletNode->MassFlowRate * inletNode->Temp));
 
-    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNode > 0)) {
+    if ((CalledFrom == DataConvergParams::CalledFrom::AirSystemDemandSide) && (OutletNodeNum > 0)) {
 
         airLoopConv.HVACMassFlowNotConverged[0] = false;
         airLoopConv.HVACHumRatNotConverged[0] = false;
@@ -155,7 +157,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         airLoopConv.HVACEnergyNotConverged[0] = false;
 
         TmpRealARR = airLoopConv.HVACFlowDemandToSupplyTolValue;
-        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+        airLoopConv.HVACFlowDemandToSupplyTolValue[0] = std::abs(outletNode->MassFlowRate - inletNode->MassFlowRate);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACFlowDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -165,7 +167,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACHumDemandToSupplyTolValue;
-        airLoopConv.HVACHumDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        airLoopConv.HVACHumDemandToSupplyTolValue[0] = std::abs(outletNode->HumRat - inletNode->HumRat);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACHumDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -175,7 +177,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACTempDemandToSupplyTolValue;
-        airLoopConv.HVACTempDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        airLoopConv.HVACTempDemandToSupplyTolValue[0] = std::abs(outletNode->Temp - inletNode->Temp);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACTempDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -195,7 +197,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACEnthalpyDemandToSupplyTolValue;
-        airLoopConv.HVACEnthalpyDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        airLoopConv.HVACEnthalpyDemandToSupplyTolValue[0] = std::abs(outletNode->Enthalpy - inletNode->Enthalpy);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACEnthalpyDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -204,7 +206,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACPressureDemandToSupplyTolValue;
-        airLoopConv.HVACPressureDemandToSupplyTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        airLoopConv.HVACPressureDemandToSupplyTolValue[0] = std::abs(outletNode->Press - inletNode->Press);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACPressureDemandToSupplyTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -221,7 +223,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
         TmpRealARR = airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue;
         airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[0] =
-            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+            std::abs(outletNode->MassFlowRate - inletNode->MassFlowRate);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACFlowSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -231,7 +233,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACHumSupplyDeck1ToDemandTolValue;
-        airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[0] = std::abs(outletNode->HumRat - inletNode->HumRat);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACHumSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -241,7 +243,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACTempSupplyDeck1ToDemandTolValue;
-        airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[0] = std::abs(outletNode->Temp - inletNode->Temp);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACTempSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -261,7 +263,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue;
-        airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[0] = std::abs(outletNode->Enthalpy - inletNode->Enthalpy);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACEnthalpySupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -270,7 +272,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue;
-        airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[0] = std::abs(outletNode->Press - inletNode->Press);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACPressureSupplyDeck1ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -287,7 +289,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
 
         TmpRealARR = airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue;
         airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[0] =
-            std::abs(state.dataLoopNodes->Node(OutletNode).MassFlowRate - thisInletNode.MassFlowRate);
+            std::abs(outletNode->MassFlowRate - inletNode->MassFlowRate);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACFlowSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -297,7 +299,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACHumSupplyDeck2ToDemandTolValue;
-        airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).HumRat - thisInletNode.HumRat);
+        airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[0] = std::abs(outletNode->HumRat - inletNode->HumRat);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACHumSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -307,7 +309,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACTempSupplyDeck2ToDemandTolValue;
-        airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Temp - thisInletNode.Temp);
+        airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[0] = std::abs(outletNode->Temp - inletNode->Temp);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACTempSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -327,7 +329,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue;
-        airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Enthalpy - thisInletNode.Enthalpy);
+        airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[0] = std::abs(outletNode->Enthalpy - inletNode->Enthalpy);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACEnthalpySupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -336,7 +338,7 @@ void UpdateHVACInterface(EnergyPlusData &state,
         }
 
         TmpRealARR = airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue;
-        airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[0] = std::abs(state.dataLoopNodes->Node(OutletNode).Press - thisInletNode.Press);
+        airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[0] = std::abs(outletNode->Press - inletNode->Press);
         for (int logIndex = 1; logIndex < DataConvergParams::ConvergLogStackDepth; logIndex++) {
             airLoopConv.HVACPressueSupplyDeck2ToDemandTolValue[logIndex] = TmpRealARR[logIndex - 1];
         }
@@ -346,28 +348,28 @@ void UpdateHVACInterface(EnergyPlusData &state,
     }
 
     // Always update the new inlet conditions
-    thisInletNode.Temp = state.dataLoopNodes->Node(OutletNode).Temp;
-    thisInletNode.MassFlowRate = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-    thisInletNode.MassFlowRateMinAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail;
-    thisInletNode.MassFlowRateMaxAvail = state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail;
-    thisInletNode.Quality = state.dataLoopNodes->Node(OutletNode).Quality;
-    thisInletNode.Press = state.dataLoopNodes->Node(OutletNode).Press;
-    thisInletNode.Enthalpy = state.dataLoopNodes->Node(OutletNode).Enthalpy;
-    thisInletNode.HumRat = state.dataLoopNodes->Node(OutletNode).HumRat;
+    inletNode->Temp = outletNode->Temp;
+    inletNode->MassFlowRate = outletNode->MassFlowRate;
+    inletNode->MassFlowRateMinAvail = outletNode->MassFlowRateMinAvail;
+    inletNode->MassFlowRateMaxAvail = outletNode->MassFlowRateMaxAvail;
+    inletNode->Quality = outletNode->Quality;
+    inletNode->Press = outletNode->Press;
+    inletNode->Enthalpy = outletNode->Enthalpy;
+    inletNode->HumRat = outletNode->HumRat;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        thisInletNode.CO2 = state.dataLoopNodes->Node(OutletNode).CO2;
+        inletNode->CO2 = outletNode->CO2;
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        thisInletNode.GenContam = state.dataLoopNodes->Node(OutletNode).GenContam;
+        inletNode->GenContam = outletNode->GenContam;
     }
 }
 
 void UpdatePlantLoopInterface(EnergyPlusData &state,
                               PlantLocation const &plantLoc,    // The 'outlet node' Location
-                              int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
-                              int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
+                              int const ThisLoopSideOutletNodeNum, // Node number for the inlet of the side that needs the outlet node data
+                              int const OtherLoopSideInletNodeNum, // Node number for the outlet of the side of the loop just simulated
                               bool &OutOfToleranceFlag,         // True when the other side of the loop need to be (re)simulated
                               DataPlant::CommonPipeType const CommonPipeType)
 {
@@ -406,18 +408,22 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     convergence.PlantTempNotConverged = false;
 
     // set the LoopSide inlet node
-    int ThisLoopSideInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSideNum).NodeNumIn;
+    int ThisLoopSideInletNodeNum = state.dataPlnt->PlantLoop(LoopNum).LoopSide(ThisLoopSideNum).InNodeNum;
 
     // save the inlet node temp for DeltaEnergy check
-    Real64 OldOtherLoopSideInletMdot = state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate;
-    Real64 OldTankOutletTemp = state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp;
+    auto &dln = state.dataLoopNodes;
+    auto *otherLoopSideInletNode = dln->nodes(OtherLoopSideInletNodeNum);
+    auto *thisLoopSideOutletNode = dln->nodes(ThisLoopSideOutletNodeNum);
+    auto *thisLoopSideInletNode = dln->nodes(ThisLoopSideInletNodeNum);
+    Real64 OldOtherLoopSideInletMdot = otherLoopSideInletNode->MassFlowRate;
+    Real64 OldTankOutletTemp = otherLoopSideInletNode->Temp;
 
     // calculate the specific heat
     Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, OldTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     // update the enthalpy
-    state.dataLoopNodes->Node(OtherLoopSideInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp;
+    otherLoopSideInletNode->Enthalpy = Cp * otherLoopSideInletNode->Temp;
 
     // update the temperatures and flow rates
     auto &flow_demand_to_supply_tol(convergence.PlantFlowDemandToSupplyTolValue);
@@ -427,65 +433,59 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     if (CommonPipeType == DataPlant::CommonPipeType::Single || CommonPipeType == DataPlant::CommonPipeType::TwoWay) {
         // update the temperature
         UpdateCommonPipe(state, plantLoc, CommonPipeType, MixedOutletTemp);
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = MixedOutletTemp;
+        otherLoopSideInletNode->Temp = MixedOutletTemp;
         TankOutletTemp = MixedOutletTemp;
         if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
-            flow_demand_to_supply_tol[0] = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            flow_demand_to_supply_tol[0] = std::abs(OldOtherLoopSideInletMdot - otherLoopSideInletNode->MassFlowRate);
             if (flow_demand_to_supply_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         } else {
             rshift1(flow_supply_to_demand_tol);
-            flow_supply_to_demand_tol[0] = std::abs(OldOtherLoopSideInletMdot - state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            flow_supply_to_demand_tol[0] = std::abs(OldOtherLoopSideInletMdot - otherLoopSideInletNode->MassFlowRate);
             if (flow_supply_to_demand_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         }
         // Set the flow rate.  Continuity requires that the flow rates at the half loop inlet and outlet match
-        state.dataLoopNodes->Node(ThisLoopSideInletNode).MassFlowRate = state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate;
+        thisLoopSideInletNode->MassFlowRate = thisLoopSideOutletNode->MassFlowRate;
         // Update this LoopSide inlet node Min/MaxAvail to this LoopSide outlet node Min/MaxAvail
-        state.dataLoopNodes->Node(ThisLoopSideInletNode).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(ThisLoopSideInletNode).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
+        thisLoopSideInletNode->MassFlowRateMinAvail = thisLoopSideOutletNode->MassFlowRateMinAvail;
+        thisLoopSideInletNode->MassFlowRateMaxAvail = thisLoopSideOutletNode->MassFlowRateMaxAvail;
 
     } else { // no common pipe
         UpdateHalfLoopInletTemp(state, LoopNum, ThisLoopSideNum, TankOutletTemp);
         // update the temperature
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp = TankOutletTemp;
+        otherLoopSideInletNode->Temp = TankOutletTemp;
         // Set the flow tolerance array
         if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
             rshift1(flow_demand_to_supply_tol);
-            flow_demand_to_supply_tol[0] = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
-                                                    state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            flow_demand_to_supply_tol[0] = std::abs(thisLoopSideOutletNode->MassFlowRate - otherLoopSideInletNode->MassFlowRate);
             if (flow_demand_to_supply_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         } else {
             rshift1(flow_supply_to_demand_tol);
-            flow_supply_to_demand_tol[0] = std::abs(state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate -
-                                                    state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate);
+            flow_supply_to_demand_tol[0] = std::abs(thisLoopSideOutletNode->MassFlowRate - otherLoopSideInletNode->MassFlowRate);
             if (flow_supply_to_demand_tol[0] > DataConvergParams::PlantFlowRateToler) {
                 convergence.PlantMassFlowNotConverged = true;
             }
         }
         //    PlantFlowTolValue(PlantQuePtr)  = ABS(Node(ThisLoopSideOutletNode)%MassFlowRate-Node(OtherLoopSideInletNode)%MassFlowRate)
         // Set the flow rate
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRate = state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRate;
+        otherLoopSideInletNode->MassFlowRate = thisLoopSideOutletNode->MassFlowRate;
         // update the MIN/MAX available flow rates
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(ThisLoopSideOutletNode).MassFlowRateMaxAvail;
+        otherLoopSideInletNode->MassFlowRateMinAvail = thisLoopSideOutletNode->MassFlowRateMinAvail;
+        otherLoopSideInletNode->MassFlowRateMaxAvail = thisLoopSideOutletNode->MassFlowRateMaxAvail;
         // update Quality.  Note: This update assumes that STEAM cannot be used with common pipes.
-        state.dataLoopNodes->Node(OtherLoopSideInletNode).Quality = state.dataLoopNodes->Node(ThisLoopSideOutletNode).Quality;
+        otherLoopSideInletNode->Quality = thisLoopSideOutletNode->Quality;
         // pressure update  Note: This update assumes that PRESSURE SIMULATION cannot be used with common pipes.
         if (state.dataPlnt->PlantLoop(LoopNum).HasPressureComponents) {
             // Don't update pressure, let the pressure simulation handle pressures
         } else {
             // Do update pressure!
-            state.dataLoopNodes->Node(OtherLoopSideInletNode).Press = state.dataLoopNodes->Node(ThisLoopSideOutletNode).Press;
+            otherLoopSideInletNode->Press = thisLoopSideOutletNode->Press;
         }
     }
 
@@ -493,14 +493,14 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     if (ThisLoopSideNum == DataPlant::LoopSideLocation::Demand) {
         auto &temp_demand_to_supply_tol(convergence.PlantTempDemandToSupplyTolValue);
         rshift1(temp_demand_to_supply_tol);
-        temp_demand_to_supply_tol[0] = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
+        temp_demand_to_supply_tol[0] = std::abs(OldTankOutletTemp - otherLoopSideInletNode->Temp);
         if (temp_demand_to_supply_tol[0] > DataConvergParams::PlantTemperatureToler) {
             convergence.PlantTempNotConverged = true;
         }
     } else {
         auto &temp_supply_to_demand_tol(convergence.PlantTempSupplyToDemandTolValue);
         rshift1(temp_supply_to_demand_tol);
-        temp_supply_to_demand_tol[0] = std::abs(OldTankOutletTemp - state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp);
+        temp_supply_to_demand_tol[0] = std::abs(OldTankOutletTemp - otherLoopSideInletNode->Temp);
         if (temp_supply_to_demand_tol[0] > DataConvergParams::PlantTemperatureToler) {
             convergence.PlantTempNotConverged = true;
         }
@@ -553,8 +553,10 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
 
     // find tank inlet and outlet nodes
     DataPlant::LoopSideLocation TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletLoopSide)];
-    int TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
-    Real64 TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
+
+    auto &dln = state.dataLoopNodes;
+    auto *tankInletNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).OutNodeNum);
+    Real64 TankInletTemp = tankInletNode->Temp;
 
     // This needs to be based on time to deal with system downstepping and repeated timesteps
     Real64 TimeElapsed = (state.dataGlobal->HourOfDay - 1) + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + SysTimeElapsed;
@@ -580,7 +582,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     // Analytical solution for ODE, formulated for both final tank temp and average tank temp.
 
     Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
-    Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
+    Real64 MassFlowRate = tankInletNode->MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
     Real64 TankFinalTemp;
@@ -674,10 +676,13 @@ void UpdateCommonPipe(EnergyPlusData &state,
     int LoopNum = TankInletPlantLoc.loopNum;
     DataPlant::LoopSideLocation TankInletLoopSide = TankInletPlantLoc.loopSideNum;
     DataPlant::LoopSideLocation TankOutletLoopSide = DataPlant::LoopSideOther[static_cast<int>(TankInletPlantLoc.loopSideNum)]; // Outlet loopside
-    int TankInletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).NodeNumOut;
-    int TankOutletNode = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).NodeNumIn;
 
-    Real64 TankInletTemp = state.dataLoopNodes->Node(TankInletNode).Temp;
+    auto &dln = state.dataLoopNodes;
+
+    auto *tankInletNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).OutNodeNum);
+    auto *tankOutletNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).InNodeNum);
+
+    Real64 TankInletTemp = tankInletNode->Temp;
 
     Real64 FracTotLoopMass; // Fraction of total loop mass assigned to the half loop
     if (TankInletLoopSide == DataPlant::LoopSideLocation::Demand) {
@@ -714,7 +719,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     // calculation is separated because for common pipe, a different split for mass fraction is applied
     // The pump heat source is swapped around here compared to no common pipe (so pump heat sort stays on its own side).
     Real64 TimeStepSeconds = state.dataHVACGlobal->TimeStepSysSec;
-    Real64 MassFlowRate = state.dataLoopNodes->Node(TankInletNode).MassFlowRate;
+    Real64 MassFlowRate = tankInletNode->MassFlowRate;
     Real64 PumpHeat = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankInletLoopSide).TotalPumpHeat;
     Real64 ThisTankMass = FracTotLoopMass * state.dataPlnt->PlantLoop(LoopNum).Mass;
 
@@ -752,7 +757,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
         PlantLocation TankOutletPlantLoc = {LoopNum, TankOutletLoopSide, 0, 0};
 
         ManageTwoWayCommonPipe(state, TankOutletPlantLoc, TankAverageTemp);
-        MixedOutletTemp = state.dataLoopNodes->Node(TankOutletNode).Temp;
+        MixedOutletTemp = tankOutletNode->Temp;
     }
 
     state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).TempInterfaceTankOutlet = TankFinalTemp;
@@ -791,10 +796,12 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     auto &plantCommonPipe = state.dataHVACInterfaceMgr->PlantCommonPipe(LoopNum);
 
     // fill local node indexes
-    int NodeNumPriIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
-    int NodeNumPriOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
-    int NodeNumSecIn = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
-    int NodeNumSecOut = state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
+    auto &dln = state.dataLoopNodes;
+    
+    auto *priInNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).InNodeNum);
+    auto *priOutNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeNum);
+    auto *secInNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).InNodeNum);
+    auto *secOutNode = dln->nodes(state.dataPlnt->PlantLoop(LoopNum).LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeNum);
 
     if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
         plantCommonPipe.Flow = 0.0;
@@ -807,8 +814,9 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     }
 
     // every time inits
-    Real64 MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate;
-    Real64 MdotPri = state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate;
+    
+    Real64 MdotSec = secOutNode->MassFlowRate;
+    Real64 MdotPri = priOutNode->MassFlowRate;
 
     Real64 TempSecOutTankOut;
     Real64 TempPriOutTankOut;
@@ -871,8 +879,8 @@ void ManageSingleCommonPipe(EnergyPlusData &state,
     plantCommonPipe.Flow = max(MdotPriRCLeg, MdotSecRCLeg);
     plantCommonPipe.Temp = CommonPipeTemp;
     plantCommonPipe.FlowDir = CPFlowDir;
-    state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
-    state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
+    secInNode->Temp = TempSecInlet;
+    priInNode->Temp = TempPriInlet;
 
     if (LoopSide == DataPlant::LoopSideLocation::Supply) {
         MixedOutletTemp = TempPriInlet;
@@ -918,10 +926,10 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     auto &thisPlantLoop = state.dataPlnt->PlantLoop(plantLoc.loopNum);
 
     // fill local node indexes
-    int const NodeNumPriIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn;
-    int const NodeNumPriOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut;
-    int const NodeNumSecIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumIn;
-    int const NodeNumSecOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).NodeNumOut;
+    int const NodeNumPriIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).InNodeNum;
+    int const NodeNumPriOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeNum;
+    int const NodeNumSecIn = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).InNodeNum;
+    int const NodeNumSecOut = thisPlantLoop.LoopSide(DataPlant::LoopSideLocation::Demand).OutNodeNum;
 
     // begin environment inits
     if (plantCommonPipe.MyEnvrnFlag && state.dataGlobal->BeginEnvrnFlag) {
@@ -936,19 +944,24 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
         plantCommonPipe.MyEnvrnFlag = true;
     }
 
+    auto &dln = state.dataLoopNodes;
+    auto *secOutNode = dln->nodes(NodeNumSecOut);
+    auto *secInNode = dln->nodes(NodeNumSecIn);
+    auto *priInNode = dln->nodes(NodeNumPriIn);
+    auto *priOutNode = dln->nodes(NodeNumPriOut);
+    
     // every time inits
-    Real64 MdotSec = state.dataLoopNodes->Node(NodeNumSecOut).MassFlowRate; // assume known and fixed by demand side operation
-    Real64 TempCPPrimaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumPriIn).TempSetPoint;
-    Real64 TempCPSecondaryCntrlSetPoint = state.dataLoopNodes->Node(NodeNumSecIn).TempSetPoint;
+    Real64 MdotSec = secOutNode->MassFlowRate; // assume known and fixed by demand side operation
+    Real64 TempCPPrimaryCntrlSetPoint = priInNode->TempSetPoint;
+    Real64 TempCPSecondaryCntrlSetPoint = secInNode->TempSetPoint;
 
     // 6 unknowns follow, fill with current values
     Real64 MdotPriToSec = plantCommonPipe.PriToSecFlow;
     Real64 MdotPriRCLeg = plantCommonPipe.PriCPLegFlow;
     Real64 MdotSecRCLeg = plantCommonPipe.SecCPLegFlow;
-    Real64 TempSecInlet = state.dataLoopNodes->Node(NodeNumSecIn).Temp;
-    Real64 TempPriInlet = state.dataLoopNodes->Node(NodeNumPriIn).Temp;
-    Real64 MdotPri =
-        state.dataLoopNodes->Node(NodeNumPriOut).MassFlowRate; // may or may not be an unknown, If variable speed primary side, then unknown
+    Real64 TempSecInlet = secInNode->Temp;
+    Real64 TempPriInlet = priInNode->Temp;
+    Real64 MdotPri = priOutNode->MassFlowRate; // may or may not be an unknown, If variable speed primary side, then unknown
 
     Real64 TempPriOutTankOut;
     Real64 TempSecOutTankOut;
@@ -1093,8 +1106,8 @@ void ManageTwoWayCommonPipe(EnergyPlusData &state, PlantLocation const &plantLoc
     plantCommonPipe.SecToPriFlow = MdotPriToSec;
     plantCommonPipe.PriCPLegFlow = MdotPriRCLeg;
     plantCommonPipe.SecCPLegFlow = MdotSecRCLeg;
-    state.dataLoopNodes->Node(NodeNumSecIn).Temp = TempSecInlet;
-    state.dataLoopNodes->Node(NodeNumPriIn).Temp = TempPriInlet;
+    secInNode->Temp = TempSecInlet;
+    priInNode->Temp = TempPriInlet;
 }
 
 void SetupCommonPipes(EnergyPlusData &state)

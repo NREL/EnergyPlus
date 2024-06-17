@@ -134,8 +134,8 @@ namespace Pumps {
         PlantLocation plantLoc = {0, DataPlant::LoopSideLocation::Invalid, 0, 0};
         PumpControlType PumpControl = PumpControlType::Invalid;            // Integer equivalent of PumpControlType
         int PumpScheduleIndex = 0;                                         // Schedule Pointer
-        int InletNodeNum = 0;                                              // Node number on the inlet side of the plant
-        int OutletNodeNum = 0;                                             // Node number on the outlet side of the plant
+        int InNodeNum = 0;                                              // Node number on the inlet side of the plant
+        int OutNodeNum = 0;                                             // Node number on the outlet side of the plant
         PumpBankControlSeq SequencingScheme = PumpBankControlSeq::Invalid; // Optimal, Sequential, User-Defined
         int FluidIndex = 0;                                                // Index for Fluid Properties
         int NumPumpsInBank = 0;                                            // Node number on the inlet side of the plant

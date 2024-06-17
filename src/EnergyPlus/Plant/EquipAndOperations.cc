@@ -346,12 +346,12 @@ namespace DataPlant {
                                         .LoopSide(this_equip.LoopSideNumPtr)
                                         .Branch(this_equip.BranchNumPtr)
                                         .Comp(this_equip.CompNumPtr)
-                                        .NodeNumIn;
+                                        .InNodeNum;
                     int outletNode = state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                          .LoopSide(this_equip.LoopSideNumPtr)
                                          .Branch(this_equip.BranchNumPtr)
                                          .Comp(this_equip.CompNumPtr)
-                                         .NodeNumOut;
+                                         .OutNodeNum;
                     this_equip.DemandNodeNum = inletNode;
                     this_equip.SetPointNodeNum = outletNode;
                     state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -434,12 +434,12 @@ namespace DataPlant {
                                         .LoopSide(this_equip.LoopSideNumPtr)
                                         .Branch(this_equip.BranchNumPtr)
                                         .Comp(this_equip.CompNumPtr)
-                                        .NodeNumIn;
+                                        .InNodeNum;
                     int outletNode = state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                          .LoopSide(this_equip.LoopSideNumPtr)
                                          .Branch(this_equip.BranchNumPtr)
                                          .Comp(this_equip.CompNumPtr)
-                                         .NodeNumOut;
+                                         .OutNodeNum;
                     this_equip.DemandNodeNum = inletNode;
                     this_equip.SetPointNodeNum = outletNode;
                     state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -522,12 +522,12 @@ namespace DataPlant {
                                         .LoopSide(this_equip.LoopSideNumPtr)
                                         .Branch(this_equip.BranchNumPtr)
                                         .Comp(this_equip.CompNumPtr)
-                                        .NodeNumIn;
+                                        .InNodeNum;
                     int outletNode = state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                          .LoopSide(this_equip.LoopSideNumPtr)
                                          .Branch(this_equip.BranchNumPtr)
                                          .Comp(this_equip.CompNumPtr)
-                                         .NodeNumOut;
+                                         .OutNodeNum;
                     this_equip.DemandNodeNum = inletNode;
                     this_equip.SetPointNodeNum = outletNode;
                     state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -610,12 +610,12 @@ namespace DataPlant {
                                         .LoopSide(this_equip.LoopSideNumPtr)
                                         .Branch(this_equip.BranchNumPtr)
                                         .Comp(this_equip.CompNumPtr)
-                                        .NodeNumIn;
+                                        .InNodeNum;
                     int outletNode = state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                          .LoopSide(this_equip.LoopSideNumPtr)
                                          .Branch(this_equip.BranchNumPtr)
                                          .Comp(this_equip.CompNumPtr)
-                                         .NodeNumOut;
+                                         .OutNodeNum;
                     this_equip.DemandNodeNum = inletNode;
                     this_equip.SetPointNodeNum = outletNode;
                     state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
@@ -644,8 +644,8 @@ namespace DataPlant {
 
         if (this->PlantOps.PrimaryChWLoopIndex > 0) {
 
-            this->PlantOps.PrimaryChWLoopSupInletNode =
-                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+            this->PlantOps.PrimaryChWLoopSupInNodeNum =
+                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).InNodeNum;
             for (int numComps = 1; numComps <= state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex)
                                                    .LoopSide(DataPlant::LoopSideLocation::Supply)
                                                    .Branch(1)
@@ -659,14 +659,14 @@ namespace DataPlant {
                     this_Comp.Type == DataPlant::PlantEquipmentType::ChilledWaterTankStratified) {
                     // assume tank is on chilled water return for use as a buffer tank, use the outlet of the tank instead of the inlet when
                     // calculating the current load on the primary chilled water plant
-                    this->PlantOps.PrimaryChWLoopSupInletNode = this_Comp.NodeNumOut;
+                    this->PlantOps.PrimaryChWLoopSupInNodeNum = this_Comp.OutNodeNum;
                 }
             }
         }
 
         if (this->PlantOps.PrimaryHWLoopIndex > 0) {
-            this->PlantOps.PrimaryHWLoopSupInletNode =
-                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
+            this->PlantOps.PrimaryHWLoopSupInNodeNum =
+                state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).InNodeNum;
         }
         // process dedicated heat recovery water to water heatpumps to control
         if (this->PlantOps.DedicatedHR_ChWRetControl_Input && this->PlantOps.DedicatedHR_HWRetControl_Input) {
@@ -845,12 +845,15 @@ namespace DataPlant {
         Real64 sumAirSysVentHeatingLoad(0.0);
         Real64 sumAirSysVentCoolingLoad(0.0);
 
+        auto &dln = state.dataLoopNodes;
+
         for (int airLoopsServedIndex = 1; airLoopsServedIndex <= this->PlantOps.NumOfAirLoops; ++airLoopsServedIndex) {
             int AirLoopNum = this->AirLoopPtrs(airLoopsServedIndex);
+            auto const *airLoopReturnNode1 = dln->nodes(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNums(1));
             Real64 outAir_H = state.dataEnvrn->OutEnthalpy;
             Real64 outAirMdot = state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFlow;
-            Real64 retAir_Tdb = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).Temp;
-            Real64 retAir_w = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).HumRat;
+            Real64 retAir_Tdb = airLoopReturnNode1->Temp;
+            Real64 retAir_w = airLoopReturnNode1->HumRat;
             Real64 ventLoad = outAirMdot * (Psychrometrics::PsyHFnTdbW(retAir_Tdb, retAir_w) - outAir_H); // negative is cooling
             if (ventLoad > HVAC::SmallLoad) {                                                             // add to heating
                 sumAirSysVentHeatingLoad += ventLoad;
@@ -881,35 +884,32 @@ namespace DataPlant {
     {
 
         // Calculate load on primary chilled water loop and store in PrimaryPlantCoolingLoad
-
-        Real64 CW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).MassFlowRate;
+        auto &dln = state.dataLoopNodes;
+        auto const *primaryCWLoopSupInNode = dln->nodes(this->PlantOps.PrimaryChWLoopSupInNodeNum);
+            
+        Real64 CW_RetMdot = primaryCWLoopSupInNode->MassFlowRate;
         Real64 const CpCW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidName,
-                                                                   state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).Temp,
+                                                                   primaryCWLoopSupInNode->Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryChWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
-        Real64 CW_Qdot =
-            min(0.0,
-                CW_RetMdot * CpCW *
-                    (this->Setpoint.PrimCW -
-                     state.dataLoopNodes->Node(this->PlantOps.PrimaryChWLoopSupInletNode).Temp)); // power = Mdot Cp Delta T, cooling load is negative
+        // power = Mdot Cp Delta T, cooling load is negative
+        Real64 CW_Qdot = min(0.0, CW_RetMdot * CpCW * (this->Setpoint.PrimCW - primaryCWLoopSupInNode->Temp)); 
         this->Report.PrimaryPlantCoolingLoad = CW_Qdot;
 
         // Calculate load on primary hot water loop and store in PrimaryPlantHeatingLoad
         // int HWSupInletNode = this->PlantOps.PrimaryHWLoopSupInletNode;
         //      state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).LoopSide(DataPlant::LoopSideLocation::Supply).Branch(1).NodeNumIn;
-        Real64 HW_RetMdot = state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).MassFlowRate;
+        auto const *primaryHWLoopSupInNode = dln->nodes(this->PlantOps.PrimaryHWLoopSupInNodeNum);
+        Real64 HW_RetMdot = primaryHWLoopSupInNode->MassFlowRate;
         Real64 const CpHW = FluidProperties::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidName,
-                                                                   state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp,
+                                                                   primaryHWLoopSupInNode->Temp,
                                                                    state.dataPlnt->PlantLoop(this->PlantOps.PrimaryHWLoopIndex).FluidIndex,
                                                                    "DetermineCurrentPlantLoads");
 
-        Real64 HW_Qdot =
-            max(0.0,
-                HW_RetMdot * CpHW *
-                    (this->DetermineHWSetpointOARest(state) -
-                     state.dataLoopNodes->Node(this->PlantOps.PrimaryHWLoopSupInletNode).Temp)); // power = Mdot Cp Delta T, heating load is positive
+        // power = Mdot Cp Delta T, heating load is positive
+        Real64 HW_Qdot = max(0.0, HW_RetMdot * CpHW * (this->DetermineHWSetpointOARest(state) - primaryHWLoopSupInNode->Temp)); 
         this->Report.PrimaryPlantHeatingLoad = HW_Qdot;
     }
 
@@ -1123,6 +1123,8 @@ namespace DataPlant {
 
     void ChillerHeaterSupervisoryOperationData::ProcessAndSetAirSourcePlantEquipLists(EnergyPlusData &state)
     {
+        auto &dln = state.dataLoopNodes;
+            
         // TODO this routine is currently code to compare real current plant loads, polled building loads have also been studied.
         Real64 CoolingLoadSignal = this->Report.PrimaryPlantCoolingLoad;
         Real64 HeatingLoadSignal = this->Report.PrimaryPlantHeatingLoad;
@@ -1143,10 +1145,10 @@ namespace DataPlant {
 
                         // todo, oa reset ?
 
-                        state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = this->Setpoint.PrimCW;
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
+                        dln->nodes(this_equip.SetPointNodeNum)->TempSetPoint = this->Setpoint.PrimCW;
+                        dln->nodes(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum)->TempSetPoint =
                             this->Setpoint.PrimCW;
-                        if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp > this->Setpoint.PrimCW) {
+                        if (dln->nodes(this_equip.DemandNodeNum)->Temp > this->Setpoint.PrimCW) {
 
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                 .LoopSide(this_equip.LoopSideNumPtr)
@@ -1185,10 +1187,10 @@ namespace DataPlant {
                         auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
                         // set heating setpoint at outlet
 
-                        state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = HWsetpt;
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
+                        dln->nodes(this_equip.SetPointNodeNum)->TempSetPoint = HWsetpt;
+                        dln->nodes(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum)->TempSetPoint = HWsetpt;
 
-                        if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp < HWsetpt) {
+                        if (dln->nodes(this_equip.DemandNodeNum)->Temp < HWsetpt) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                 .LoopSide(this_equip.LoopSideNumPtr)
                                 .Branch(this_equip.BranchNumPtr)
@@ -1227,10 +1229,10 @@ namespace DataPlant {
                         auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
                         // set cooling setpoint at outlet
 
-                        state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = this->Setpoint.PrimCW;
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint =
+                        dln->nodes(this_equip.SetPointNodeNum)->TempSetPoint = this->Setpoint.PrimCW;
+                        dln->nodes(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum)->TempSetPoint =
                             this->Setpoint.PrimCW;
-                        if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp > this->Setpoint.PrimCW) {
+                        if (dln->nodes(this_equip.DemandNodeNum)->Temp > this->Setpoint.PrimCW) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                 .LoopSide(this_equip.LoopSideNumPtr)
                                 .Branch(this_equip.BranchNumPtr)
@@ -1264,10 +1266,10 @@ namespace DataPlant {
                         auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
                         // set heating setpoint at outlet
 
-                        state.dataLoopNodes->Node(this_equip.SetPointNodeNum).TempSetPoint = HWsetpt;
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum).TempSetPoint = HWsetpt;
+                        dln->nodes(this_equip.SetPointNodeNum)->TempSetPoint = HWsetpt;
+                        dln->nodes(state.dataPlnt->PlantLoop(this_equip.LoopNumPtr).TempSetPointNodeNum)->TempSetPoint = HWsetpt;
 
-                        if (state.dataLoopNodes->Node(this_equip.DemandNodeNum).Temp < HWsetpt) {
+                        if (dln->nodes(this_equip.DemandNodeNum)->Temp < HWsetpt) {
                             state.dataPlnt->PlantLoop(this_equip.LoopNumPtr)
                                 .LoopSide(this_equip.LoopSideNumPtr)
                                 .Branch(this_equip.BranchNumPtr)
@@ -1294,6 +1296,7 @@ namespace DataPlant {
     void ChillerHeaterSupervisoryOperationData::ProcessAndSetDedicatedHeatRecovWWHP(EnergyPlusData &state)
     {
         // evaluate if and how dedicated heat recovery WWHP should run
+        auto &dln = state.dataLoopNodes;
 
         if (!this->PlantOps.DedicatedHR_Present) {
             return;
@@ -1348,18 +1351,22 @@ namespace DataPlant {
         // are on the secondary loops.  Need to decide if it runs and which of cooling or heating companion coils gets to lead.
         //
         // Step 1. get the mass flow rates of the returns.  both must be non-zero for the WWHP to run
-        int inletChWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
+        int cwReturnInNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum)
                                         .LoopSide(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopSideNum)
                                         .Branch(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.branchNum)
                                         .Comp(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.compNum)
-                                        .NodeNumIn;
-        int inletHWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
+                                        .InNodeNum;
+        int hwReturnInNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum)
                                        .LoopSide(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopSideNum)
                                        .Branch(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.branchNum)
                                        .Comp(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.compNum)
-                                       .NodeNumIn;
-        Real64 CW_RetMdot = state.dataLoopNodes->Node(inletChWReturnNodeNum).MassFlowRate;
-        Real64 HW_RetMdot = state.dataLoopNodes->Node(inletHWReturnNodeNum).MassFlowRate;
+                                       .OutNodeNum;
+
+
+        auto *cwReturnInNode = dln->nodes(cwReturnInNodeNum);
+        auto *hwReturnInNode = dln->nodes(hwReturnInNodeNum);
+        Real64 CW_RetMdot = cwReturnInNode->MassFlowRate;
+        Real64 HW_RetMdot = hwReturnInNode->MassFlowRate;
 
         bool flowInEach = false;
         // need flow in both returns.
@@ -1374,19 +1381,17 @@ namespace DataPlant {
         Real64 const CpCW =
             FluidProperties::GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum).FluidName,
-                                                   state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp,
+                                                   cwReturnInNode->Temp,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.sourceSidePlantLoc.loopNum).FluidIndex,
                                                    "EvaluateChillerHeaterChangeoverOpScheme");
-        Real64 CW_Qdot =
-            CW_RetMdot * CpCW *
-            (this->Setpoint.SecCW - state.dataLoopNodes->Node(inletChWReturnNodeNum).Temp); // power = Mdot Cp Delta T, cooling load is negative
+        Real64 CW_Qdot = CW_RetMdot * CpCW * (this->Setpoint.SecCW - cwReturnInNode->Temp); // power = Mdot Cp Delta T, cooling load is negative
         Real64 const CpHW =
             FluidProperties::GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum).FluidName,
-                                                   state.dataLoopNodes->Node(inletHWReturnNodeNum).Temp,
+                                                   hwReturnInNode->Temp,
                                                    state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.sourceSidePlantLoc.loopNum).FluidIndex,
                                                    "EvaluateChillerHeaterChangeoverOpScheme");
-        Real64 HW_Qdot = HW_RetMdot * CpHW * (this->Setpoint.SecHW - state.dataLoopNodes->Node(inletHWReturnNodeNum).Temp); // power = Mdot Cp Delta T
+        Real64 HW_Qdot = HW_RetMdot * CpHW * (this->Setpoint.SecHW - hwReturnInNode->Temp); // power = Mdot Cp Delta T
 
         // store for reporting
         this->Report.SecondaryPlantCoolingLoad = CW_Qdot;
@@ -1471,14 +1476,15 @@ namespace DataPlant {
                 .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
                 .MyLoad = CW_Qdot; // cooling load is negative
 
-            int OutletChWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
+            int cwReturnOutNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)
                                              .LoopSide(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopSideNum)
                                              .Branch(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.branchNum)
                                              .Comp(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.compNum)
-                                             .NodeNumOut;
-            state.dataLoopNodes->Node(OutletChWReturnNodeNum).TempSetPoint = this->Setpoint.SecCW;
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum).TempSetPointNodeNum)
-                .TempSetPoint = this->Setpoint.SecCW;
+                                             .OutNodeNum;
+            auto *cwReturnOutNode = dln->nodes(cwReturnOutNodeNum);
+            cwReturnOutNode->TempSetPoint = this->Setpoint.SecCW;
+            dln->nodes(state.dataPlnt->PlantLoop(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum).TempSetPointNodeNum)
+                    ->TempSetPoint = this->Setpoint.SecCW;
 
             if (this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum ==
                 SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_CoolingPLHP.loadSidePlantLoc.loopNum)) {
@@ -1489,8 +1495,8 @@ namespace DataPlant {
                                              .LoopSide(this->PlantHXComps(HXnum).loopSideNum)
                                              .Branch(this->PlantHXComps(HXnum).branchNum)
                                              .Comp(this->PlantHXComps(HXnum).compNum)
-                                             .NodeNumOut;
-                        state.dataLoopNodes->Node(outletnode).TempSetPoint = this->Setpoint.SecCW;
+                                             .OutNodeNum;
+                        dln->nodes(outletnode)->TempSetPoint = this->Setpoint.SecCW;
                     }
                 }
             }
@@ -1519,27 +1525,28 @@ namespace DataPlant {
                 .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
                 .MyLoad = HW_Qdot;
 
-            int OutletHWReturnNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
+            int hwReturnOutNodeNum = state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)
                                             .LoopSide(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopSideNum)
                                             .Branch(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.branchNum)
                                             .Comp(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.compNum)
-                                            .NodeNumOut;
+                                            .OutNodeNum;
 
-            state.dataLoopNodes->Node(OutletHWReturnNodeNum).TempSetPoint = this->Setpoint.SecHW;
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum).TempSetPointNodeNum)
-                .TempSetPoint = this->Setpoint.SecHW;
+            auto *hwReturnOutNode = dln->nodes(hwReturnOutNodeNum);
+            hwReturnOutNode->TempSetPoint = this->Setpoint.SecHW;
+            dln->nodes(state.dataPlnt->PlantLoop(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum).TempSetPointNodeNum)->
+                TempSetPoint = this->Setpoint.SecHW;
 
             if (this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum ==
                 SecondaryPlantLoopIndicesBeingSupervised(this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum)) {
                 // search for HX on this loop and place setpoint on outlet
                 for (int HXnum = 1; HXnum <= this->PlantOps.numPlantHXs; ++HXnum) {
                     if (this->PlantHXComps(HXnum).loopNum == this->DedicatedHR_HeatingPLHP.loadSidePlantLoc.loopNum) {
-                        int outletnode = state.dataPlnt->PlantLoop(this->PlantHXComps(HXnum).loopNum)
+                        int outNodeNum = state.dataPlnt->PlantLoop(this->PlantHXComps(HXnum).loopNum)
                                              .LoopSide(this->PlantHXComps(HXnum).loopSideNum)
                                              .Branch(this->PlantHXComps(HXnum).branchNum)
                                              .Comp(this->PlantHXComps(HXnum).compNum)
-                                             .NodeNumOut;
-                        state.dataLoopNodes->Node(outletnode).TempSetPoint = min(this->Setpoint.SecHW, this->DetermineHWSetpointOARest(state));
+                                             .OutNodeNum;
+                        dln->nodes(outNodeNum)->TempSetPoint = min(this->Setpoint.SecHW, this->DetermineHWSetpointOARest(state));
                     }
                 }
             }
@@ -1548,6 +1555,8 @@ namespace DataPlant {
 
     void ChillerHeaterSupervisoryOperationData::ProcessAndSetAuxilBoiler(EnergyPlusData &state)
     {
+        auto &dln = state.dataLoopNodes;
+            
         // Check for boiler used as auxiliary or supplemental
         // Assume boilers are in-line on supply side outlet branch, typically on secodary loop but may be on primary loop
         this->Report.BoilerAux_OpMode = 0;
@@ -1596,13 +1605,14 @@ namespace DataPlant {
                 HWsetpt = HWsetpt - this->TempReset.BoilerTemperatureOffset;
 
                 // check inlet temperature
-                int inletBoilerNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                int boilerInNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
                                              .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
                                              .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
                                              .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                                             .NodeNumIn;
-                Real64 Tin = state.dataLoopNodes->Node(inletBoilerNodeNum).Temp;
-                Real64 Mdot = state.dataLoopNodes->Node(inletBoilerNodeNum).MassFlowRate;
+                                             .InNodeNum;
+                auto const *boilerInNode = dln->nodes(boilerInNodeNum);
+                Real64 Tin = boilerInNode->Temp;
+                Real64 Mdot = boilerInNode->MassFlowRate;
 
                 Real64 const CpHW =
                     FluidProperties::GetSpecificHeatGlycol(state,
@@ -1644,23 +1654,25 @@ namespace DataPlant {
                         .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
                         .Comp(this->PlantBoilerComps(BoilerNum).compNum)
                         .MyLoad = LoadToSetpoint;
-                    int OutletBoilerNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                    int boilerOutNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
                                                   .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
                                                   .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
                                                   .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                                                  .NodeNumOut;
-                    state.dataLoopNodes->Node(OutletBoilerNodeNum).TempSetPoint = HWsetpt;
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum).TempSetPoint =
+                                                  .OutNodeNum;
+                    auto *boilerOutNode = dln->nodes(boilerOutNodeNum);
+                    boilerOutNode->TempSetPoint = HWsetpt;
+                    dln->nodes(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum)->TempSetPoint =
                         HWsetpt;
                     this->Report.BoilerAux_OpMode = 1;
                 } else { // still apply the setpoint, but don't turn on
-                    int OutletBoilerNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
+                    int boilerOutNodeNum = state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum)
                                                   .LoopSide(this->PlantBoilerComps(BoilerNum).loopSideNum)
                                                   .Branch(this->PlantBoilerComps(BoilerNum).branchNum)
                                                   .Comp(this->PlantBoilerComps(BoilerNum).compNum)
-                                                  .NodeNumOut;
-                    state.dataLoopNodes->Node(OutletBoilerNodeNum).TempSetPoint = HWsetpt;
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum).TempSetPoint =
+                                                  .OutNodeNum;
+                    auto *boilerOutNode = dln->nodes(boilerOutNodeNum);
+                    boilerOutNode->TempSetPoint = HWsetpt;
+                    dln->nodes(state.dataPlnt->PlantLoop(this->PlantBoilerComps(BoilerNum).loopNum).TempSetPointNodeNum)->TempSetPoint =
                         HWsetpt;
                 }
             }

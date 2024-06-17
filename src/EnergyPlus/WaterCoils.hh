@@ -186,10 +186,10 @@ namespace WaterCoils {
         Real64 AirSideNominalConvect;          // nominal rating point air side convection term (fin_effic*(hc*A))
         Real64 LiquidSideNominalConvect;       // nominal rating point water side convection term (hc*A)
         int Control;                           // Const Vol =1;  Variable Vol = 2
-        int AirInletNodeNum;
-        int AirOutletNodeNum;
-        int WaterInletNodeNum;
-        int WaterOutletNodeNum;
+        int AirInNodeNum = 0;
+        int AirOutNodeNum = 0;
+        int WaterInNodeNum = 0;
+        int WaterOutNodeNum = 0;
         PlantLocation WaterPlantLoc; // Plant location struct
         // begin variables for Water System interactions
         int CondensateCollectMode;         // where does water come from
@@ -239,8 +239,8 @@ namespace WaterCoils {
               UACoilTotal(0.0), UACoilInternal(0.0), UACoilExternal(0.0), UACoilInternalDes(0.0), UACoilExternalDes(0.0), DesOutletAirTemp(0.0),
               DesOutletAirHumRat(0.0), DesOutletWaterTemp(0.0), HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0),
               UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0), SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0),
-              RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), WaterPlantLoc{}, CondensateCollectMode(1001), CondensateTankID(0),
+              RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0), LiquidSideNominalConvect(0.0), Control(0),
+              WaterPlantLoc{}, CondensateCollectMode(1001), CondensateTankID(0),
               CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FaultyCoilFoulingFlag(false),
               FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0), OriginalUACoilVariable(0.0), OriginalUACoilExternal(0.0),
               OriginalUACoilInternal(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0),

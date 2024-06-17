@@ -287,7 +287,7 @@ namespace SimulationManager {
 
             ReportSurfaces(state);
 
-            NodeInputManager::SetupNodeVarsForReporting(state);
+            Node::SetupNodeVarsForReporting(state);
             state.dataGlobal->MetersHaveBeenInitialized = true;
             Pollution::SetupPollutionMeterReporting(state);
             SystemReports::AllocateAndSetUpVentReports(state);
@@ -303,7 +303,7 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
-            NodeInputManager::CheckMarkedNodes(state, ErrFound);
+            Node::CheckMarkedNodes(state, ErrFound);
             if (ErrFound) TerminalError = true;
             BranchNodeConnections::CheckNodeConnections(state, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -1970,11 +1970,11 @@ namespace SimulationManager {
                   BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                       state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  Node::ConnTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
-            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::ConnectionType::Inlet) ||
-                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == DataLoopNode::ConnectionType::Outlet)) {
+            if ((state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == Node::ConnType::Inlet) ||
+                (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType == Node::ConnType::Outlet)) {
                 bool ParentComponentFound = false;
                 for (int Loop1 = 1; Loop1 <= state.dataBranchNodeConnections->NumOfActualParents; ++Loop1) {
                     if (state.dataBranchNodeConnections->ParentNodeList(Loop1).ComponentType !=
@@ -1985,11 +1985,11 @@ namespace SimulationManager {
                     ParentComponentFound = true;
 
                     switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
-                    case DataLoopNode::ConnectionType::Inlet:
+                    case Node::ConnType::Inlet:
                         state.dataBranchNodeConnections->ParentNodeList(Loop1).InletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
-                    case DataLoopNode::ConnectionType::Outlet:
+                    case Node::ConnType::Outlet:
                         state.dataBranchNodeConnections->ParentNodeList(Loop1).OutletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                     default:
@@ -2004,11 +2004,11 @@ namespace SimulationManager {
                         state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName;
 
                     switch (state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType) {
-                    case DataLoopNode::ConnectionType::Inlet:
+                    case Node::ConnType::Inlet:
                         state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).InletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
-                    case DataLoopNode::ConnectionType::Outlet:
+                    case Node::ConnType::Outlet:
                         state.dataBranchNodeConnections->ParentNodeList(state.dataBranchNodeConnections->NumOfActualParents).OutletNodeName =
                             state.dataBranchNodeConnections->NodeConnections(Loop).NodeName;
                         break;
@@ -2034,7 +2034,7 @@ namespace SimulationManager {
                   BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                       state.dataBranchNodeConnections->NodeConnections(Loop).ObjectType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).ObjectName,
-                  DataLoopNode::ConnectionTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
+                  Node::ConnTypeNames[static_cast<int>(state.dataBranchNodeConnections->NodeConnections(Loop).ConnectionType)],
                   state.dataBranchNodeConnections->NodeConnections(Loop).FluidStream);
         }
 
@@ -2120,7 +2120,7 @@ namespace SimulationManager {
 
             std::string_view const CType = BranchNodeConnections::ConnectionObjectTypeNamesUC[static_cast<int>(
                 state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType)];
-            if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == DataLoopNode::ConnectionObjectType::Undefined ||
+            if (state.dataBranchNodeConnections->CompSets(Count).ParentObjectType == Node::ConnObjType::Undefined ||
                 state.dataBranchNodeConnections->CompSets(Count).InletNodeName == "UNDEFINED" ||
                 state.dataBranchNodeConnections->CompSets(Count).OutletNodeName == "UNDEFINED") {
                 if (state.dataErrTracking->AbortProcessing && state.dataSimulationManager->WarningOut) {
@@ -2137,7 +2137,7 @@ namespace SimulationManager {
                 ShowContinueError(state, format("  Outlet Node: {}", state.dataBranchNodeConnections->CompSets(Count).OutletNodeName));
                 ++state.dataBranchNodeConnections->NumNodeConnectionErrors;
                 if (state.dataBranchNodeConnections->CompSets(Count).ComponentObjectType ==
-                    DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired) {
+                    Node::ConnObjType::SolarCollectorUnglazedTranspired) {
                     ShowContinueError(state, "This report does not necessarily indicate a problem for a MultiSystem Transpired Collector");
                 }
             }

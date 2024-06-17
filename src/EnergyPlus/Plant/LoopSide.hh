@@ -88,10 +88,10 @@ namespace DataPlant {
         std::string BranchList;  // Branch list name for the half loop
         std::string ConnectList; // Connector list name for the half loop
         int TotalBranches;       // Total number of branches on the half loop
-        int NodeNumIn;           // Node number for the inlet to this loop
-        std::string NodeNameIn;  // Node name for the inlet to this loop
-        int NodeNumOut;          // Node number for the outlet to this loop
-        std::string NodeNameOut; // Node name for the outlet to this loop
+        int InNodeNum = 0;           // Node number for the inlet to this loop
+        std::string InNodeName;  // Node name for the inlet to this loop
+        int OutNodeNum = 0;          // Node number for the outlet to this loop
+        std::string OutNodeName; // Node name for the outlet to this loop
         int TotalPumps;          // total number of pumps on the half loop
         bool BranchPumpsExist;   // logical flag indication branch pumps exist on half loop
         Array1D<LoopSidePumpInformation> Pumps;
@@ -145,9 +145,9 @@ namespace DataPlant {
         HalfLoopData()
             : SimLoopSideNeeded(true), SimZoneEquipNeeded(true), SimAirLoopsNeeded(true), SimNonZoneEquipNeeded(true), SimElectLoadCentrNeeded(true),
               OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
-              TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
-              TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
-              NodeNumIn(0), NodeNumOut(0), TotalPumps(0), BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false),
+              TempSetPoint(Node::SensedNodeFlagValue), TempSetPointHi(Node::SensedNodeFlagValue),
+              TempSetPointLo(Node::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
+              TotalPumps(0), BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false),
               OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0), FlowRestrictionFlag(false), FlowLock(DataPlant::FlowLock::Unlocked),
               TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false), PressureDrop(0.0), PressureEffectiveK(0.0),
               errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0), errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0),

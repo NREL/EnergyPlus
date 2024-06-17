@@ -458,7 +458,7 @@ namespace DataHeatBalance {
         Real64 Volume = Constant::AutoCalculate;        // Volume entered by user [m3] or calculated
         Real64 ExtGrossWallArea = 0.0;                  // Exterior Wall Area for Zone (Gross)
         Real64 ExteriorTotalSurfArea = 0.0;             // Total surface area of all exterior surfaces for Zone
-        int SystemZoneNodeNumber = 0;                   // This is the zone or space node number for the system for a controlled zone
+        int SystemZoneNodeNum = 0;                   // This is the zone or space node number for the system for a controlled zone
         Real64 FloorArea = 0.0;                         // Floor area used for this space
         Real64 TotOccupants = 0.0;                      // total design occupancy (sum of NumberOfPeople for the space People objects, not multiplied)
         bool IsControlled = false;                      // True when this is a controlled zone or space.
@@ -643,7 +643,7 @@ namespace DataHeatBalance {
         bool WindDirEMSOverrideOn = false;           // if true, EMS is calling to override the surface's outside wind direction
         Real64 WindDirEMSOverrideValue = 0.0;        // value to use for EMS override of the surface's outside wind speed
 
-        int LinkedOutAirNode = 0; // Index of the an OutdoorAir:Node,, zero if none
+        int OutdoorAirInNodeNum = 0; // Index of the an OutdoorAir:Node,, zero if none
 
         bool isPartOfTotalArea = true;           // Count the zone area when determining the building total floor area
         bool isNominalOccupied = false;          // has occupancy nominally specified

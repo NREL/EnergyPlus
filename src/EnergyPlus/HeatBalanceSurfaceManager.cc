@@ -296,14 +296,17 @@ void InitSurfaceHeatBalance(EnergyPlusData &state)
 
     DataSurfaces::SetSurfaceWindSpeedAt(state);
     DataSurfaces::SetSurfaceWindDirAt(state);
+
+    auto &dln = state.dataLoopNodes;
+    
     if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
         for (int SurfNum = 1; SurfNum <= state.dataSurface->TotSurfaces; ++SurfNum) {
-            if (state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode > 0) {
-                auto const &linkedNode = state.dataLoopNodes->Node(state.dataSurface->Surface(SurfNum).SurfLinkedOutAirNode);
-                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = linkedNode.OutAirDryBulb;
-                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = linkedNode.OutAirWetBulb;
-                state.dataSurface->SurfOutWindSpeed(SurfNum) = linkedNode.OutAirWindSpeed;
-                state.dataSurface->SurfOutWindDir(SurfNum) = linkedNode.OutAirWindDir;
+            if (state.dataSurface->Surface(SurfNum).OutdoorAirNodeNum > 0) {
+                auto const *oaNode = dln->nodes(state.dataSurface->Surface(SurfNum).OutdoorAirNodeNum);
+                state.dataSurface->SurfOutDryBulbTemp(SurfNum) = oaNode->OutAirDryBulb;
+                state.dataSurface->SurfOutWetBulbTemp(SurfNum) = oaNode->OutAirWetBulb;
+                state.dataSurface->SurfOutWindSpeed(SurfNum) = oaNode->OutAirWindSpeed;
+                state.dataSurface->SurfOutWindDir(SurfNum) = oaNode->OutAirWindDir;
             }
         }
     }

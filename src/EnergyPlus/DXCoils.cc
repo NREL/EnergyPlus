@@ -120,7 +120,6 @@ namespace EnergyPlus::DXCoils {
 // USE STATEMENTS:
 // Use statements for data only modules
 // Using/Aliasing
-using namespace DataLoopNode;
 using namespace Psychrometrics;
 
 // Use statements for access to subroutines in other modules
@@ -434,6 +433,8 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
     Real64 TSat;      // calculation to avoid calling psych routines twice
     Real64 NodePress; // Pressure at condenser inlet node (Pa)
 
+    auto &dln = state.dataLoopNodes;
+    
     // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
     if (state.dataDXCoils->GetCoilsInputFlag) {
         GetDXCoils(state);
@@ -603,10 +604,10 @@ void SimDXCoilMultiMode(EnergyPlusData &state,
             thisDXCoil.OutletAirHumRat = (1.0 - S2PLR) * S1OutletAirHumRat + S2PLR * S12OutletAirHumRat;
             thisDXCoil.OutletAirTemp = PsyTdbFnHW(thisDXCoil.OutletAirEnthalpy, thisDXCoil.OutletAirHumRat);
             // Check for saturation error and modify temperature at constant enthalpy
-            if (thisDXCoil.CondenserInletNodeNum(PerfMode) != 0) {
-                NodePress = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(PerfMode)).Press;
+            if (thisDXCoil.CondenserInNodeNums(PerfMode) != 0) {
+                NodePress = dln->nodes(thisDXCoil.CondenserInNodeNums(PerfMode))->Press;
                 // If node is not connected to anything, pressure = default, use weather data
-                if (NodePress == state.dataLoopNodes->DefaultNodeValues.Press) NodePress = state.dataEnvrn->OutBaroPress;
+                if (NodePress == 0.0) NodePress = state.dataEnvrn->OutBaroPress;
                 TSat = PsyTsatFnHPb(state, thisDXCoil.OutletAirEnthalpy, NodePress, RoutineName);
                 if (thisDXCoil.OutletAirTemp < TSat) {
                     thisDXCoil.OutletAirTemp = TSat;
@@ -719,7 +720,6 @@ void GetDXCoils(EnergyPlusData &state)
     using EMSManager::ManageEMS;
 
     using GlobalNames::VerifyUniqueCoilName;
-    using NodeInputManager::GetOnlySingleNode;
     using OutAirNodeManager::CheckOutAirNodeNumber;
     using ScheduleManager::GetScheduleIndex;
     using WaterManager::SetupTankDemandComponent;
@@ -951,25 +951,25 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.FanPowerPerEvapAirFlowRate(1) = Numbers(5);
         thisDXCoil.FanPowerPerEvapAirFlowRate_2023(1) = Numbers(6);
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(3),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                             Alphas(3),
+                                             ErrorsFound,
+                                             Node::ConnObjType::CoilCoolingDXSingleSpeed,
+                                             Alphas(1),
+                                             Node::FluidType::Air,
+                                             Node::ConnType::Inlet,
+                                             Node::CompFluidStream::Primary,
+                                             Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(4),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                              Alphas(4),
+                                              ErrorsFound,
+                                              Node::ConnObjType::CoilCoolingDXSingleSpeed,
+                                              Alphas(1),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -1166,19 +1166,19 @@ void GetDXCoils(EnergyPlusData &state)
 
         // outdoor condenser node
         if (lAlphaBlanks(10)) {
-            thisDXCoil.CondenserInletNodeNum(1) = 0;
+            thisDXCoil.CondenserInNodeNums(1) = 0;
         } else {
-            thisDXCoil.CondenserInletNodeNum(1) = GetOnlySingleNode(state,
-                                                                    Alphas(10),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed,
-                                                                    thisDXCoil.Name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    ObjectIsNotParent);
+            thisDXCoil.CondenserInNodeNums(1) = GetSingleNode(state,
+                                                                Alphas(10),
+                                                                ErrorsFound,
+                                                                Node::ConnObjType::CoilCoolingDXSingleSpeed,
+                                                                thisDXCoil.Name,
+                                                                Node::FluidType::Air,
+                                                                Node::ConnType::OutsideAirReference,
+                                                                Node::CompFluidStream::Primary,
+                                                                Node::ObjectIsNotParent);
 
-            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(1))) {
+            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInNodeNums(1))) {
                 ShowWarningError(state, format("{}{}=\"{}\", may be invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                 ShowContinueError(
                     state,
@@ -1424,26 +1424,26 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(3),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoStageWithHumidityControlMode,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                             Alphas(3),
+                                             ErrorsFound,
+                                             Node::ConnObjType::CoilCoolingDXTwoStageWithHumidityControlMode,
+                                             Alphas(1),
+                                             Node::FluidType::Air,
+                                             Node::ConnType::Inlet,
+                                             Node::CompFluidStream::Primary,
+                                             Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(4),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoStageWithHumidityControlMode,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
-
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                              Alphas(4),
+                                              ErrorsFound,
+                                              Node::ConnObjType::CoilCoolingDXTwoStageWithHumidityControlMode,
+                                              Alphas(1),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
+        
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
         // A5; \field Crankcase Heater Capacity Function of Outdoor Temperature Curve Name
@@ -1751,20 +1751,19 @@ void GetDXCoils(EnergyPlusData &state)
 
                         // outdoor condenser node
                         if (lAlphaBlanks2(7)) {
-                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) = 0;
+                            thisDXCoil.CondenserInNodeNums(PerfModeNum) = 0;
                         } else {
-                            thisDXCoil.CondenserInletNodeNum(PerfModeNum) =
-                                GetOnlySingleNode(state,
+                            thisDXCoil.CondenserInNodeNums(PerfModeNum) =
+                                GetSingleNode(state,
                                                   Alphas2(7),
                                                   ErrorsFound,
-                                                  (DataLoopNode::ConnectionObjectType)getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC,
-                                                                                                   Util::makeUPPER(PerfObjectType)),
+                                                  (Node::ConnObjType)getEnumValue(Node::connObjTypeNamesUC, Util::makeUPPER(PerfObjectType)),
                                                   PerfObjectName,
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::OutsideAirReference,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
-                            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(PerfModeNum))) {
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::OutsideAirReference,
+                                                  Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
+                            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInNodeNums(PerfModeNum))) {
                                 ShowWarningError(state, format("{}{}=\"{}\":", RoutineName, PerfObjectType, PerfObjectName));
                                 ShowContinueError(state, format("may not be valid {}=\"{}\".", cAlphaFields2(7), Alphas2(7)));
                                 ShowContinueError(state, "node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.");
@@ -1985,25 +1984,25 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(3),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                             Alphas(3),
+                                             ErrorsFound,
+                                             Node::ConnObjType::CoilHeatingDXSingleSpeed,
+                                             Alphas(1),
+                                             Node::FluidType::Air,
+                                             Node::ConnType::Inlet,
+                                             Node::CompFluidStream::Primary,
+                                             Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(4),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                              Alphas(4),
+                                              ErrorsFound,
+                                              Node::ConnObjType::CoilHeatingDXSingleSpeed,
+                                              Alphas(1),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -2328,19 +2327,19 @@ void GetDXCoils(EnergyPlusData &state)
 
         // A14 is optional evaporator node name
         if (lAlphaBlanks(14)) {
-            thisDXCoil.CondenserInletNodeNum(1) = 0;
+            thisDXCoil.CondenserInNodeNums(1) = 0;
         } else {
-            thisDXCoil.CondenserInletNodeNum(1) = GetOnlySingleNode(state,
-                                                                    Alphas(14),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilHeatingDXSingleSpeed,
-                                                                    thisDXCoil.Name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    ObjectIsNotParent);
+            thisDXCoil.CondenserInNodeNums(1) = GetSingleNode(state,
+                                                                Alphas(14),
+                                                                ErrorsFound,
+                                                                Node::ConnObjType::CoilHeatingDXSingleSpeed,
+                                                                thisDXCoil.Name,
+                                                                Node::FluidType::Air,
+                                                                Node::ConnType::OutsideAirReference,
+                                                                Node::CompFluidStream::Primary,
+                                                                Node::ObjectIsNotParent);
             // warn if not an outdoor node, but allow
-            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(1))) {
+            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInNodeNums(1))) {
                 ShowWarningError(state, format("{}{}=\"{}\", may be invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                 ShowContinueError(
                     state,
@@ -2467,25 +2466,25 @@ void GetDXCoils(EnergyPlusData &state)
             thisDXCoil.RateWithInternalStaticAndFanObject = false;
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(3),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoSpeed,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                             Alphas(3),
+                                             ErrorsFound,
+                                             Node::ConnObjType::CoilCoolingDXTwoSpeed,
+                                             Alphas(1),
+                                             Node::FluidType::Air,
+                                             Node::ConnType::Inlet,
+                                             Node::CompFluidStream::Primary,
+                                             Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(4),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoSpeed,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                              Alphas(4),
+                                              ErrorsFound,
+                                              Node::ConnObjType::CoilCoolingDXTwoSpeed,
+                                              Alphas(1),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -2744,18 +2743,18 @@ void GetDXCoils(EnergyPlusData &state)
 
         // outdoor condenser node
         if (lAlphaBlanks(12)) {
-            thisDXCoil.CondenserInletNodeNum(1) = 0;
+            thisDXCoil.CondenserInNodeNums(1) = 0;
         } else {
-            thisDXCoil.CondenserInletNodeNum(1) = GetOnlySingleNode(state,
-                                                                    Alphas(12),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDXTwoSpeed,
-                                                                    thisDXCoil.Name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    ObjectIsNotParent);
-            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(1))) {
+            thisDXCoil.CondenserInNodeNums(1) = GetSingleNode(state,
+                                                                Alphas(12),
+                                                                ErrorsFound,
+                                                                Node::ConnObjType::CoilCoolingDXTwoSpeed,
+                                                                thisDXCoil.Name,
+                                                                Node::FluidType::Air,
+                                                                Node::ConnType::OutsideAirReference,
+                                                                Node::CompFluidStream::Primary,
+                                                                Node::ObjectIsNotParent);
+            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInNodeNums(1))) {
                 ShowWarningError(state, format("{}{}=\"{}\", may be invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                 ShowContinueError(
                     state,
@@ -3137,51 +3136,51 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // Air nodes
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(5),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpPumped,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                             Alphas(5),
+                                             ErrorsFound,
+                                             Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpPumped,
+                                             Alphas(1),
+                                             Node::FluidType::Air,
+                                             Node::ConnType::Inlet,
+                                             Node::CompFluidStream::Primary,
+                                             Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(6),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpPumped,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                              Alphas(6),
+                                              ErrorsFound,
+                                              Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpPumped,
+                                              Alphas(1),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              Node::CompFluidStream::Primary,
+                                              Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
         // Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
-        thisDXCoil.IsDXCoilInZone = !CheckOutAirNodeNumber(state, thisDXCoil.AirInNode);
+        thisDXCoil.IsDXCoilInZone = !CheckOutAirNodeNumber(state, thisDXCoil.AirInNodeNum);
 
         // Water nodes
-        thisDXCoil.WaterInNode = GetOnlySingleNode(state,
-                                                   Alphas(7),
-                                                   ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpPumped,
-                                                   Alphas(1),
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Inlet,
-                                                   NodeInputManager::CompFluidStream::Secondary,
-                                                   ObjectIsNotParent);
+        thisDXCoil.WaterInNodeNum = GetSingleNode(state,
+                                               Alphas(7),
+                                               ErrorsFound,
+                                               Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpPumped,
+                                               Alphas(1),
+                                               Node::FluidType::Water,
+                                               Node::ConnType::Inlet,
+                                               Node::CompFluidStream::Secondary,
+                                               Node::ObjectIsNotParent);
 
-        thisDXCoil.WaterOutNode = GetOnlySingleNode(state,
-                                                    Alphas(8),
-                                                    ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpPumped,
-                                                    Alphas(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                    ObjectIsNotParent);
+        thisDXCoil.WaterOutNodeNum = GetSingleNode(state,
+                                                Alphas(8),
+                                                ErrorsFound,
+                                                Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpPumped,
+                                                Alphas(1),
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Outlet,
+                                                Node::CompFluidStream::Secondary,
+                                                Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(7), Alphas(8), "Water Nodes");
 
@@ -3466,7 +3465,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // assume compressor resides at the inlet to the DX Coil
-        thisDXCoil.CondenserInletNodeNum(1) = thisDXCoil.AirInNode;
+        thisDXCoil.CondenserInNodeNums(1) = thisDXCoil.AirInNodeNum;
 
         // set condenser type as HPWH
         thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::WaterHeater;
@@ -3574,52 +3573,52 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // Air nodes
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
-                                                 Alphas(3),
-                                                 ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
-                                                 Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
+                                                Alphas(3),
+                                                ErrorsFound,
+                                                Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
+                                                Alphas(1),
+                                                Node::FluidType::Air,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
-                                                  Alphas(4),
-                                                  ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
-                                                  Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
+                                                 Alphas(4),
+                                                 ErrorsFound,
+                                                 Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
+                                                 Alphas(1),
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Outlet,
+                                                 Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
         // Check if the air inlet node is OA node, to justify whether the coil is placed in zone or not
-        thisDXCoil.IsDXCoilInZone = !CheckOutAirNodeNumber(state, thisDXCoil.AirInNode);
+        thisDXCoil.IsDXCoilInZone = !CheckOutAirNodeNumber(state, thisDXCoil.AirInNodeNum);
 
         std::string const DummyCondenserInletName("DUMMY CONDENSER INLET " + thisDXCoil.Name);
         std::string const DummyCondenserOutletName("DUMMY CONDENSER OUTLET " + thisDXCoil.Name);
-        thisDXCoil.WaterInNode = GetOnlySingleNode(state,
+        thisDXCoil.WaterInNodeNum = GetSingleNode(state,
                                                    DummyCondenserInletName,
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
+                                                   Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
                                                    Alphas(1),
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Inlet,
-                                                   NodeInputManager::CompFluidStream::Secondary,
-                                                   ObjectIsNotParent);
+                                                   Node::FluidType::Water,
+                                                   Node::ConnType::Inlet,
+                                                   Node::CompFluidStream::Secondary,
+                                                  Node::ObjectIsNotParent);
 
-        thisDXCoil.WaterOutNode = GetOnlySingleNode(state,
+        thisDXCoil.WaterOutNodeNum = GetSingleNode(state,
                                                     DummyCondenserOutletName,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
+                                                    Node::ConnObjType::CoilWaterHeatingAirToWaterHeatPumpWrapped,
                                                     Alphas(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                    ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Secondary,
+                                                   Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), DummyCondenserInletName, DummyCondenserOutletName, "Water Nodes");
 
@@ -3859,7 +3858,7 @@ void GetDXCoils(EnergyPlusData &state)
         }
 
         // assume compressor resides at the inlet to the DX Coil
-        thisDXCoil.CondenserInletNodeNum(1) = thisDXCoil.AirInNode;
+        thisDXCoil.CondenserInNodeNums(1) = thisDXCoil.AirInNodeNum;
 
         // set condenser type as HPWH
         thisDXCoil.CondenserType(1) = DataHeatBalance::RefrigCondenserType::WaterHeater;
@@ -3916,42 +3915,42 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed,
+                                                 Node::ConnObjType::CoilCoolingDXMultiSpeed,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(4),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed,
+                                                  Node::ConnObjType::CoilCoolingDXMultiSpeed,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
         // outdoor condenser node
         if (lAlphaBlanks(5)) {
-            thisDXCoil.CondenserInletNodeNum(1) = 0;
+            thisDXCoil.CondenserInNodeNums(1) = 0;
         } else {
-            thisDXCoil.CondenserInletNodeNum(1) = GetOnlySingleNode(state,
+            thisDXCoil.CondenserInNodeNums(1) = GetSingleNode(state,
                                                                     Alphas(5),
                                                                     ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed,
+                                                                    Node::ConnObjType::CoilCoolingDXMultiSpeed,
                                                                     thisDXCoil.Name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    ObjectIsNotParent);
-            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInletNodeNum(1))) {
+                                                                    Node::FluidType::Air,
+                                                                    Node::ConnType::OutsideAirReference,
+                                                                    Node::CompFluidStream::Primary,
+                                                                Node::ObjectIsNotParent);
+            if (!CheckOutAirNodeNumber(state, thisDXCoil.CondenserInNodeNums(1))) {
                 ShowWarningError(state, format("{}{}=\"{}\", may be invalid", RoutineName, CurrentModuleObject, thisDXCoil.Name));
                 ShowContinueError(
                     state, format("{}=\"{}\", node does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node.", cAlphaFields(5), Alphas(5)));
@@ -4465,25 +4464,25 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilHeatingDXMultiSpeed,
+                                                 Node::ConnObjType::CoilHeatingDXMultiSpeed,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(4),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilHeatingDXMultiSpeed,
+                                                  Node::ConnObjType::CoilHeatingDXMultiSpeed,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -5014,25 +5013,25 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(5),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableRefrigerantFlow,
+                                                 Node::ConnObjType::CoilCoolingDXVariableRefrigerantFlow,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(6),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableRefrigerantFlow,
+                                                  Node::ConnObjType::CoilCoolingDXVariableRefrigerantFlow,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(5), Alphas(6), "Air Nodes");
 
@@ -5100,25 +5099,25 @@ void GetDXCoils(EnergyPlusData &state)
         thisDXCoil.RatedTotCap(1) = Numbers(1);
         thisDXCoil.RatedAirVolFlowRate(1) = Numbers(2);
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableRefrigerantFlow,
+                                                 Node::ConnObjType::CoilHeatingDXVariableRefrigerantFlow,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
 
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(4),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableRefrigerantFlow,
+                                                  Node::ConnObjType::CoilHeatingDXVariableRefrigerantFlow,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
 
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
@@ -5231,24 +5230,24 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableRefrigerantFlowFluidTemperatureControl,
+                                                 Node::ConnObjType::CoilCoolingDXVariableRefrigerantFlowFluidTemperatureControl,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(4),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXVariableRefrigerantFlowFluidTemperatureControl,
+                                                  Node::ConnObjType::CoilCoolingDXVariableRefrigerantFlowFluidTemperatureControl,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
         thisDXCoil.RatedTotCap(1) = Numbers(1);
@@ -5349,24 +5348,24 @@ void GetDXCoils(EnergyPlusData &state)
             }
         }
 
-        thisDXCoil.AirInNode = GetOnlySingleNode(state,
+        thisDXCoil.AirInNodeNum = GetSingleNode(state,
                                                  Alphas(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableRefrigerantFlowFluidTemperatureControl,
+                                                 Node::ConnObjType::CoilHeatingDXVariableRefrigerantFlowFluidTemperatureControl,
                                                  Alphas(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsNotParent);
-        thisDXCoil.AirOutNode = GetOnlySingleNode(state,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
+        thisDXCoil.AirOutNodeNum = GetSingleNode(state,
                                                   Alphas(4),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::CoilHeatingDXVariableRefrigerantFlowFluidTemperatureControl,
+                                                  Node::ConnObjType::CoilHeatingDXVariableRefrigerantFlowFluidTemperatureControl,
                                                   Alphas(1),
-                                                  DataLoopNode::NodeFluidType::Air,
-                                                  DataLoopNode::ConnectionType::Outlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
-                                                  ObjectIsNotParent);
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
         TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
         thisDXCoil.RatedTotCap(1) = Numbers(1);
@@ -6647,9 +6646,10 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
     int DehumidModeNum;                // Loop index for 1,Number of enhanced dehumidification modes
     int Mode;                          // Performance mode for MultiMode DX coil; Always 1 for other coil types
     int DXCoilNumTemp;                 // Counter for crankcase heater report variable DO loop
-    int AirInletNode;                  // Air inlet node number
     int SpeedNum;                      // Speed number for multispeed coils
 
+    auto &dln = state.dataLoopNodes;
+    
     if (state.dataDXCoils->MyOneTimeFlag) {
         // initialize the environment and sizing flags
         state.dataDXCoils->MyEnvrnFlag.dimension(state.dataDXCoils->NumDXCoils, true);
@@ -6737,8 +6737,8 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
                 thisDXCoil.FindCompanionUpStreamCoil = false;
                 //       Copy condenser node number from DX cooling coil when used with a companion DX heating coil
                 for (Mode = 1; Mode <= MaxModes; ++Mode) {
-                    thisDXCoil.CondenserInletNodeNum(Mode) =
-                        state.dataDXCoils->DXCoil(thisDXCoil.CompanionUpstreamDXCoil).CondenserInletNodeNum(Mode);
+                    thisDXCoil.CondenserInNodeNums(Mode) =
+                        state.dataDXCoils->DXCoil(thisDXCoil.CompanionUpstreamDXCoil).CondenserInNodeNums(Mode);
                 }
             }
         } else {
@@ -6857,10 +6857,11 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             state.dataEnvrn->OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
             state.dataEnvrn->OutHumRat =
                 Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
-            if (thisDXCoil.CondenserInletNodeNum(1) > 0) { // set condenser inlet node values
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTemp;
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
+            if (thisDXCoil.CondenserInNodeNums(1) > 0) { // set condenser inlet node values
+                auto *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(1));
+                condenserInNode->Temp = RatedOutdoorAirTemp;
+                condenserInNode->HumRat = state.dataEnvrn->OutHumRat;
+                condenserInNode->OutAirWetBulb = ratedOutdoorAirWetBulb;
             }
 
             // calculate coil model at rating point
@@ -7019,10 +7020,11 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             state.dataEnvrn->OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(
                 state, RatedOutdoorAirTempHeat, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
 
-            if (thisDXCoil.CondenserInletNodeNum(1) > 0) { // set condenser inlet node values
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp = RatedOutdoorAirTempHeat;
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).HumRat = state.dataEnvrn->OutHumRat;
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).OutAirWetBulb = ratedOutdoorAirWetBulb;
+            if (thisDXCoil.CondenserInNodeNums(1) > 0) { // set condenser inlet node values
+                auto *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(1));
+                condenserInNode->Temp = RatedOutdoorAirTempHeat;
+                condenserInNode->HumRat = state.dataEnvrn->OutHumRat;
+                condenserInNode->OutAirWetBulb = ratedOutdoorAirWetBulb;
             }
 
             // calculate coil model at rating point
@@ -7181,16 +7183,15 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             state, thisDXCoil.Name, thisDXCoil.DXCoilType, thisDXCoil.SupplyFanName, thisDXCoil.supplyFanType, thisDXCoil.SupplyFanIndex);
     }
 
-    AirInletNode = thisDXCoil.AirInNode;
+    auto const *airInletNode = dln->nodes(thisDXCoil.AirInNodeNum);
 
     // Each iteration, load the coil data structure with the inlet conditions
 
-    thisDXCoil.InletAirMassFlowRate = state.dataLoopNodes->Node(AirInletNode).MassFlowRate;
-    thisDXCoil.InletAirMassFlowRateMax =
-        max(state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax, state.dataLoopNodes->Node(AirInletNode).MassFlowRate);
-    thisDXCoil.InletAirTemp = state.dataLoopNodes->Node(AirInletNode).Temp;
-    thisDXCoil.InletAirHumRat = state.dataLoopNodes->Node(AirInletNode).HumRat;
-    thisDXCoil.InletAirEnthalpy = state.dataLoopNodes->Node(AirInletNode).Enthalpy;
+    thisDXCoil.InletAirMassFlowRate = airInletNode->MassFlowRate;
+    thisDXCoil.InletAirMassFlowRateMax = max(airInletNode->MassFlowRateMax, airInletNode->MassFlowRate);
+    thisDXCoil.InletAirTemp = airInletNode->Temp;
+    thisDXCoil.InletAirHumRat = airInletNode->HumRat;
+    thisDXCoil.InletAirEnthalpy = airInletNode->Enthalpy;
     //  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
     //  DXCoil(DXCoilNum)%InletAirPressure        = Node(AirInletNode)%Press
 
@@ -7212,9 +7213,10 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
 
         //   HPWH's that use an inlet air temperature schedule also need to have a valid barometric pressure
         //   The DX Coil used in HPWH's does not know if it is using a scheduled inlet temperature so check the node pressure
-        if (thisDXCoil.CondenserInletNodeNum(1) > 0) {
-            if (state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Press == 0.0) {
-                state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Press = state.dataEnvrn->StdBaroPress;
+        if (thisDXCoil.CondenserInNodeNums(1) > 0) {
+            auto *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(1));                
+            if (condenserInNode->Press == 0.0) {
+                condenserInNode->Press = state.dataEnvrn->StdBaroPress;
             }
         }
     }
@@ -7322,6 +7324,8 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
     bool SizeSecDXCoil;                     // if true do sizing calculation for secondary coil
     Real64 SecCoilAirFlowDes;               // Design secondary DX coil air flow for reporting
     Real64 SecCoilAirFlowUser;              // Hard-sized secondary DX coil air flow for reporting
+
+    auto &dln = state.dataLoopNodes;
 
     // Initiate all reporting variables
     if (state.dataSize->SysSizingRunDone || state.dataSize->ZoneSizingRunDone) {
@@ -7568,7 +7572,7 @@ void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
                 TempSize = thisDXCoil.RatedTotCap(Mode);
                 SizingString = state.dataDXCoils->DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
                 PrintFlag = false;
-                state.dataLoopNodes->Node(thisDXCoil.WaterInNode).Temp =
+                dln->nodes(thisDXCoil.WaterInNodeNum)->Temp =
                     thisDXCoil.RatedInletWaterTemp; // set the rated water inlet node for HPWHs for use in CalcHPWHDXCoil
             } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilVRF_FluidTCtrl_Cooling) {
                 SizingMethod = HVAC::CoolingCapacitySizing;
@@ -8753,23 +8757,25 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
     Real64 HPRTF;                 // Heat pump run time fraction
 
     // References to Coil and Node struct
+    auto &dln = state.dataLoopNodes;
+    
     DXCoilData &Coil = state.dataDXCoils->DXCoil(DXCoilNum);
-    NodeData &AirInletNode = state.dataLoopNodes->Node(Coil.AirInNode);
-    NodeData &WaterInletNode = state.dataLoopNodes->Node(Coil.WaterInNode);
-    NodeData &WaterOutletNode = state.dataLoopNodes->Node(Coil.WaterOutNode);
+    auto *airInletNode = dln->nodes(Coil.AirInNodeNum);
+    auto *waterInletNode = dln->nodes(Coil.WaterInNodeNum);
+    auto *waterOutletNode = dln->nodes(Coil.WaterOutNodeNum);
 
     // If heat pump water heater is OFF, set outlet to inlet and RETURN
     // Also set the heating energy rate to zero
-    if (PartLoadRatio == 0.0) {
-        WaterOutletNode = WaterInletNode;
+    if (PartLoadRatio == 0.80) {
+        *waterOutletNode = *waterInletNode; // Is this supposed to be a copy?
         Coil.TotalHeatingEnergyRate = 0.0;
         return;
     } else {
         RatedHeatingCapacity = Coil.RatedTotCap2;
         RatedHeatingCOP = Coil.RatedCOP(1);
-        InletWaterTemp = WaterInletNode.Temp;
-        CondInletMassFlowRate = WaterInletNode.MassFlowRate / PartLoadRatio;
-        EvapInletMassFlowRate = AirInletNode.MassFlowRate / PartLoadRatio;
+        InletWaterTemp = waterInletNode->Temp;
+        CondInletMassFlowRate = waterInletNode->MassFlowRate / PartLoadRatio;
+        EvapInletMassFlowRate = airInletNode->MassFlowRate / PartLoadRatio;
         CpWater = CPHW(InletWaterTemp);
         CompressorPower = 0.0;
         OperatingHeatingPower = 0.0;
@@ -9034,9 +9040,9 @@ void CalcHPWHDXCoil(EnergyPlusData &state,
         OutletWaterTemp = InletWaterTemp + TotalTankHeatingCapacity / (CpWater * CondInletMassFlowRate);
     }
 
-    WaterOutletNode.Temp = OutletWaterTemp;
+    waterOutletNode->Temp = OutletWaterTemp;
 
-    WaterOutletNode.MassFlowRate = WaterInletNode.MassFlowRate;
+    waterOutletNode->MassFlowRate = waterInletNode->MassFlowRate;
 
     // send heating capacity and COP to water heater module for standards rating calculation
     // total heating capacity including condenser pump
@@ -9185,8 +9191,8 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     Real64 HeatRTF;              // heating coil part-load ratio, used for cycling fan RH control
     Real64 HeatingCoilPLF;       // heating coil PLF (function of PLR), used for cycling fan RH control
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
+    auto &dln = state.dataLoopNodes;
+    
     // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
     if (present(PerfMode)) {
         Mode = PerfMode;
@@ -9232,19 +9238,20 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     thisDXCoil.BasinHeaterPower = 0.0;
 
     if (thisDXCoil.CondenserType(Mode) != DataHeatBalance::RefrigCondenserType::WaterHeater) {
-        if (thisDXCoil.CondenserInletNodeNum(Mode) != 0) {
-            OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Press;
+        if (thisDXCoil.CondenserInNodeNums(Mode) != 0) {
+            auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(Mode));
+            OutdoorPressure = condenserInNode->Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+            if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Temp;
-                OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).HumRat;
+                OutdoorDryBulb = condenserInNode->Temp;
+                OutdoorHumRat = condenserInNode->HumRat;
                 // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                OutdoorWetBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                OutdoorWetBulb = condenserInNode->OutAirWetBulb;
             }
         } else {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
@@ -9260,10 +9267,11 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         }
     } else {
-        if (thisDXCoil.CondenserInletNodeNum(Mode) != 0) {
-            OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Press;
+        if (thisDXCoil.CondenserInNodeNums(Mode) != 0) {
+            auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(Mode));                
+            OutdoorPressure = condenserInNode->Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press)
+            if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel)
                 OutdoorPressure = state.dataEnvrn->OutBaroPress; // node not connected
         } else {
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
@@ -10075,9 +10083,9 @@ void CalcDoe2DXCoil(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp;
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -10203,6 +10211,8 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     Real64 OutletAirEnthalpy; // Supply air enthalpy (average value if constant fan, full output if cycling fan)
     Real64 ADiff;             // Used for exponential
 
+    auto &dln = state.dataLoopNodes;
+    
     // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
     if (present(PerfMode)) {
         Mode = PerfMode;
@@ -10217,8 +10227,6 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     } else {
         AirFlowRatio = 1.0;
     }
-
-    auto &DXCT = state.dataHVACGlobal->DXCT;
 
     MaxIter = 30;
     RF = 0.4;
@@ -10240,24 +10248,25 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     thisDXCoil.PartLoadRatio = 0.0;
     thisDXCoil.BasinHeaterPower = 0.0;
 
-    if (thisDXCoil.CondenserInletNodeNum(Mode) != 0) {
-        OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Temp;
+    if (thisDXCoil.CondenserInNodeNums(Mode) != 0) {
+        auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(Mode));
+        OutdoorDryBulb = condenserInNode->Temp;
         if (thisDXCoil.CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::Water) {
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Press;
+            OutdoorPressure = condenserInNode->Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+            if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).HumRat;
+                OutdoorHumRat = condenserInNode->HumRat;
                 // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                OutdoorWetBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                OutdoorWetBulb = condenserInNode->OutAirWetBulb;
             }
         }
     } else {
@@ -10772,9 +10781,9 @@ void CalcVRFCoolingCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoilCoolInletAirWBTemp(DXCoilNum) = PsyTwbFnTdbWPb(state, InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 }
 
 void CalcDXHeatingCoil(EnergyPlusData &state,
@@ -10875,19 +10884,20 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     Real64 OutletAirEnthalpy;         // Supply air enthalpy (average value if constant fan, full output if cycling fan)
     Real64 CompAmbTemp(0.0);          // Ambient temperature at compressor
 
+    auto &dln = state.dataLoopNodes;
+    
     if (present(OnOffAirFlowRatio)) {
         AirFlowRatio = OnOffAirFlowRatio;
     } else {
         AirFlowRatio = 1.0;
     }
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
     // Get condenser outdoor node info from DX Heating Coil
-    if (thisDXCoil.CondenserInletNodeNum(1) != 0) {
-        OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp;
+    if (thisDXCoil.CondenserInNodeNums(1) != 0) {
+        auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(1));
+        OutdoorDryBulb = condenserInNode->Temp;
         CompAmbTemp = OutdoorDryBulb;
         if (thisDXCoil.CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::Water) {
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
@@ -10895,17 +10905,17 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             CompAmbTemp = state.dataEnvrn->OutDryBulbTemp;
         } else {
-            OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Press;
+            OutdoorPressure = condenserInNode->Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+            if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).HumRat;
+                OutdoorHumRat = condenserInNode->HumRat;
                 // this should use Node%WetBulbTemp or a PSYC function, not OAWB
-                OutdoorWetBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).OutAirWetBulb;
+                OutdoorWetBulb = condenserInNode->OutAirWetBulb;
             }
             if (thisDXCoil.IsSecondaryDXCoilInZone) {
                 auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
@@ -11263,9 +11273,9 @@ void CalcDXHeatingCoil(EnergyPlusData &state,
     state.dataDXCoils->DXCoilHeatInletAirWBTemp(DXCoilNum) = InletAirWetBulbC;
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -11367,6 +11377,8 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     Real64 AirMassFlowRatio2; // Ratio of low speed air mass flow to rated air mass flow
     Real64 CompAmbTemp(0.0);  // Ambient temperature at compressor
 
+    auto &dln = state.dataLoopNodes;
+    
     if (present(ForceOn)) {
         LocalForceOn = true;
     } else {
@@ -11375,17 +11387,18 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
 
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
-    if (thisDXCoil.CondenserInletNodeNum(Mode) != 0) {
-        OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Press;
+    if (thisDXCoil.CondenserInNodeNums(Mode) != 0) {
+        auto *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(Mode));
+        OutdoorPressure = condenserInNode->Press;
         // If node is not connected to anything, pressure = default, use weather data
-        if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Temp;
-            OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).HumRat;
+            OutdoorDryBulb = condenserInNode->Temp;
+            OutdoorHumRat = condenserInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure);
         }
         CompAmbTemp = OutdoorDryBulb;
@@ -11776,9 +11789,9 @@ void CalcMultiSpeedDXCoil(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -11934,8 +11947,6 @@ Real64 CalcCBF(EnergyPlusData &state,
     Real64 AirMassFlowRate;                 // the standard air mass flow rate at the given capacity [kg/s]
     Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
     bool CBFErrors(false);                  // Set to true if errors in CBF calculation, fatal at end of routine
-
-    auto &DXCT = state.dataHVACGlobal->DXCT;
 
     if (AirVolFlowRate <= 0.0 || TotCap <= 0.0) { // Coil not running or has no capacity, don't calculate CBF
         return CBF;
@@ -12608,21 +12619,22 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     Real64 AirVolumeFlowRate;     // Air volume flow rate across the heating coil
     Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
-
+    auto &dln = state.dataLoopNodes;
+    
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
-    if (thisDXCoil.CondenserInletNodeNum(DXMode) != 0) {
-        OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(DXMode)).Press;
+    if (thisDXCoil.CondenserInNodeNums(DXMode) != 0) {
+        auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(DXMode));            
+        OutdoorPressure = condenserInNode->Press;
         // If node is not connected to anything, pressure = default, use weather data
-        if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(DXMode)).Temp;
-            OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(DXMode)).HumRat;
+            OutdoorDryBulb = condenserInNode->Temp;
+            OutdoorHumRat = condenserInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, OutdoorPressure, RoutineName);
         }
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -13344,9 +13356,9 @@ void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
     thisDXCoil.CondInletTemp = CondInletTemp; // Save condenser inlet temp in the data structure
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -13451,10 +13463,11 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     Real64 DefrostPowerLS;            // Defrost power at low speed [W]
     Real64 DefrostPowerHS;            // Defrost power at high speed [W]
 
+    auto &dln = state.dataLoopNodes;
+    
     // Autodesk:Uninit Initialize variables used uninitialized
     FullLoadOutAirEnth = 0.0; // Autodesk:Uninit Force default initialization
 
-    auto &DXCT = state.dataHVACGlobal->DXCT;
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
     if (SpeedNum > 1) {
@@ -13510,16 +13523,17 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     if (thisDXCoil.CompanionUpstreamDXCoil == 0) MSHPWasteHeat = 0.0;
 
     // Get condenser outdoor node info from DX Heating Coil
-    if (thisDXCoil.CondenserInletNodeNum(1) != 0) {
-        OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Press;
+    if (thisDXCoil.CondenserInNodeNums(1) != 0) {
+        auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(1));
+        OutdoorPressure = condenserInNode->Press;
         // If node is not connected to anything, pressure = default, use weather data
-        if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp;
-            OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).HumRat;
+            OutdoorDryBulb = condenserInNode->Temp;
+            OutdoorHumRat = condenserInNode->HumRat;
         }
         if (thisDXCoil.IsSecondaryDXCoilInZone) {
             auto &secZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(thisDXCoil.SecZonePtr);
@@ -14095,9 +14109,9 @@ void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
     thisDXCoil.MSCycRatio = CycRatio;
 
     // set outlet node conditions
-    int airOutletNode = thisDXCoil.AirOutNode;
-    state.dataLoopNodes->Node(airOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(airOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
 
     // calc secondary coil if specified
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -14116,31 +14130,31 @@ void UpdateDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the c
     // This subroutine is for passing results to the outlet air node.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int AirOutletNode; // air outlet node number
-    int AirInletNode;  // air inlet node number
 
+    auto &dln = state.dataLoopNodes;
+    
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
-    AirOutletNode = thisDXCoil.AirOutNode;
-    AirInletNode = thisDXCoil.AirInNode;
+    auto *airOutletNode = dln->nodes(thisDXCoil.AirOutNodeNum);
+    auto const *airInletNode = dln->nodes(thisDXCoil.AirInNodeNum);
     // changed outputs
-    state.dataLoopNodes->Node(AirOutletNode).Enthalpy = thisDXCoil.OutletAirEnthalpy;
-    state.dataLoopNodes->Node(AirOutletNode).Temp = thisDXCoil.OutletAirTemp;
-    state.dataLoopNodes->Node(AirOutletNode).HumRat = thisDXCoil.OutletAirHumRat;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRate = thisDXCoil.InletAirMassFlowRate;
+    airOutletNode->Enthalpy = thisDXCoil.OutletAirEnthalpy;
+    airOutletNode->Temp = thisDXCoil.OutletAirTemp;
+    airOutletNode->HumRat = thisDXCoil.OutletAirHumRat;
+    airOutletNode->MassFlowRate = thisDXCoil.InletAirMassFlowRate;
     // pass through outputs
-    state.dataLoopNodes->Node(AirOutletNode).Quality = state.dataLoopNodes->Node(AirInletNode).Quality;
-    state.dataLoopNodes->Node(AirOutletNode).Press = state.dataLoopNodes->Node(AirInletNode).Press;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMin = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMin;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMax = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMax;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMinAvail;
-    state.dataLoopNodes->Node(AirOutletNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(AirInletNode).MassFlowRateMaxAvail;
+    airOutletNode->Quality = airInletNode->Quality;
+    airOutletNode->Press = airInletNode->Press;
+    airOutletNode->MassFlowRateMin = airInletNode->MassFlowRateMin;
+    airOutletNode->MassFlowRateMax = airInletNode->MassFlowRateMax;
+    airOutletNode->MassFlowRateMinAvail = airInletNode->MassFlowRateMinAvail;
+    airOutletNode->MassFlowRateMaxAvail = airInletNode->MassFlowRateMaxAvail;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-        state.dataLoopNodes->Node(AirOutletNode).CO2 = state.dataLoopNodes->Node(AirInletNode).CO2;
+        airOutletNode->CO2 = airInletNode->CO2;
     }
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-        state.dataLoopNodes->Node(AirOutletNode).GenContam = state.dataLoopNodes->Node(AirInletNode).GenContam;
+        airOutletNode->GenContam = airInletNode->GenContam;
     }
 }
 
@@ -14336,12 +14350,9 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     int SolverFlag;
     Real64 EIR_HighSpeed;
     Real64 EIR_LowSpeed;
-    int FanInletNode;
-    int FanOutletNode;
     int Iter;
     Real64 ExternalStatic;
     Real64 FanStaticPressureRise;
-    bool ErrorsFound(false);
     Real64 FanHeatCorrection;
     Real64 FanPowerCorrection;
     Real64 FanPowerPerEvapAirFlowRate = 0.0;
@@ -14362,7 +14373,11 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     int PartLoadTestPoint;
     int countStaticInputs;
     int index;
+    int FanInletNodeNum;
+    int FanOutletNodeNum;
 
+    auto &dln = state.dataLoopNodes;
+    
     // Formats
     static constexpr std::string_view Header(
         "! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, Standard Net Cooling Capacity "
@@ -14421,22 +14436,22 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 ExternalStatic = 190.0;
             }
             FanStaticPressureRise = ExternalStatic + thisDXCoil.InternalStaticPressureDrop;
-            FanInletNode = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->inletNodeNum;
-            FanOutletNode = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->outletNodeNum;
+            FanInletNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->inNodeNum;
+            FanOutletNodeNum = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->outNodeNum;
 
             // set node state variables in preparation for fan model.
-            state.dataLoopNodes->Node(FanInletNode).MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
-            state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
-            state.dataLoopNodes->Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-            state.dataLoopNodes->Node(FanInletNode).HumRat = PsyWFnTdbTwbPb(
+            auto *fanInletNode = dln->nodes(FanInletNodeNum);
+            auto *fanOutletNode = dln->nodes(FanOutletNodeNum);
+            fanInletNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
+            fanOutletNode->MassFlowRate = thisDXCoil.RatedAirMassFlowRate(1);
+            fanInletNode->Temp = CoolingCoilInletAirDryBulbTempRated;
+            fanInletNode->HumRat = PsyWFnTdbTwbPb(
                 state, CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, state.dataEnvrn->OutBaroPress, RoutineName);
-            state.dataLoopNodes->Node(FanInletNode).Enthalpy =
-                PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, state.dataLoopNodes->Node(FanInletNode).HumRat);
+            fanInletNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, fanInletNode->HumRat);
             state.dataFans->fans(thisDXCoil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
             FanPowerCorrection = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->totalPower;
 
-            FanHeatCorrection = state.dataLoopNodes->Node(FanInletNode).MassFlowRate *
-                                (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
+            FanHeatCorrection = fanInletNode->MassFlowRate * (fanOutletNode->Enthalpy - fanInletNode->Enthalpy);
 
             NetCoolingCapRated = thisDXCoil.RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
         }
@@ -14483,8 +14498,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     thisDXCoil.InletAirEnthalpy = PsyHFnTdbW(26.7, thisDXCoil.InletAirHumRat);
 
     Real64 const heldOutDryBulb = state.dataEnvrn->OutDryBulbTemp;
-    if (thisDXCoil.CondenserInletNodeNum(1) != 0) {
-        state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp = OutdoorUnitInletAirDryBulbTempRated;
+    if (thisDXCoil.CondenserInNodeNums(1) != 0) {
+        dln->nodes(thisDXCoil.CondenserInNodeNums(1))->Temp = OutdoorUnitInletAirDryBulbTempRated;
     } else {
         state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempRated;
     }
@@ -14496,8 +14511,8 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
     // IEER - part load test points ***************************************************
     for (PartLoadTestPoint = 1; PartLoadTestPoint <= 3; ++PartLoadTestPoint) {
         // determine minimum unloading capacity fraction at point B conditions.
-        if (thisDXCoil.CondenserInletNodeNum(1) != 0) {
-            state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(1)).Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
+        if (thisDXCoil.CondenserInNodeNums(1) != 0) {
+            dln->nodes(thisDXCoil.CondenserInNodeNums(1))->Temp = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
         } else {
             state.dataEnvrn->OutDryBulbTemp = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
         }
@@ -14507,14 +14522,14 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         // set up parameters for the solver here
         Real64 const par3 = OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint);
         Real64 par7 = FanPowerPerEvapAirFlowRate;
-        int fanInNode = 0;
-        int fanOutNode = 0;
+        int fanInNodeNum = 0;
+        int fanOutNodeNum = 0;
         Real64 externalStatic = 0.0;
         int fanIndex = 0;
         if (thisDXCoil.RateWithInternalStaticAndFanObject) {
             par7 = 0.0;
-            fanInNode = FanInletNode;
-            fanOutNode = FanOutletNode;
+            fanInNodeNum = FanInletNodeNum;
+            fanOutNodeNum = FanOutletNodeNum;
             externalStatic = ExternalStatic;
             fanIndex = thisDXCoil.SupplyFanIndex;
         }
@@ -14532,7 +14547,7 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
         Real64 dbRated = CoolingCoilInletAirDryBulbTempRated;
         Real64 wbRated = CoolingCoilInletAirWetBulbTempRated;
         auto f = // (AUTO_OK_LAMBDA)
-            [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNode, fanOutNode, externalStatic, dbRated, wbRated](
+            [&state, DXCoilNum, TempDryBulb_Leaving_Apoint, TargetNetCapacity, par3, par7, fanInNodeNum, fanOutNodeNum, externalStatic, dbRated, wbRated](
                 Real64 SupplyAirMassFlowRate) {
                 static constexpr std::string_view RoutineName("CalcTwoSpeedDXCoilIEERResidual");
                 auto &coil = state.dataDXCoils->DXCoil(DXCoilNum);
@@ -14548,15 +14563,15 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
                 if (coil.RateWithInternalStaticAndFanObject) {
                     // modify external static per AHRI 340/360, Table 6, note 1.
                     Real64 FanStaticPressureRise = coil.InternalStaticPressureDrop + (externalStatic * pow_2(AirMassFlowRatio));
-                    auto &inletNode = state.dataLoopNodes->Node(fanInNode);
-                    auto &outletNode = state.dataLoopNodes->Node(fanOutNode);
-                    inletNode.MassFlowRate = SupplyAirMassFlowRate;
-                    outletNode.MassFlowRate = SupplyAirMassFlowRate;
-                    inletNode.Temp = dbRated;
-                    inletNode.HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
-                    inletNode.Enthalpy = PsyHFnTdbW(dbRated, inletNode.HumRat);
+                    auto *inletNode = state.dataLoopNodes->nodes(fanInNodeNum);
+                    auto *outletNode = state.dataLoopNodes->nodes(fanOutNodeNum);
+                    inletNode->MassFlowRate = SupplyAirMassFlowRate;
+                    outletNode->MassFlowRate = SupplyAirMassFlowRate;
+                    inletNode->Temp = dbRated;
+                    inletNode->HumRat = PsyWFnTdbTwbPb(state, dbRated, wbRated, state.dataEnvrn->OutBaroPress, RoutineName);
+                    inletNode->Enthalpy = PsyHFnTdbW(dbRated, inletNode->HumRat);
                     state.dataFans->fans(coil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
-                    FanHeatCorrection = SupplyAirMassFlowRate * (outletNode.Enthalpy - inletNode.Enthalpy);
+                    FanHeatCorrection = SupplyAirMassFlowRate * (outletNode->Enthalpy - inletNode->Enthalpy);
                 } else {
                     FanHeatCorrection = par7 * SupplyAirVolFlowRate;
                 }
@@ -14621,17 +14636,18 @@ void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum
             SupplyAirVolFlowRate = PartLoadAirMassFlowRate / SupplyAirRho;
 
             if (thisDXCoil.RateWithInternalStaticAndFanObject) {
+                auto *fanInletNode = dln->nodes(FanInletNodeNum);
+                auto *fanOutletNode = dln->nodes(FanOutletNodeNum);
                 FanStaticPressureRise = thisDXCoil.InternalStaticPressureDrop + (ExternalStatic * pow_2(AirMassFlowRatio));
-                state.dataLoopNodes->Node(FanInletNode).MassFlowRate = PartLoadAirMassFlowRate;
-                state.dataLoopNodes->Node(FanInletNode).Temp = CoolingCoilInletAirDryBulbTempRated;
-                state.dataLoopNodes->Node(FanInletNode).HumRat = SupplyAirHumRat;
-                state.dataLoopNodes->Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
+                fanInletNode->MassFlowRate = PartLoadAirMassFlowRate;
+                fanInletNode->Temp = CoolingCoilInletAirDryBulbTempRated;
+                fanInletNode->HumRat = SupplyAirHumRat;
+                fanInletNode->Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 state.dataFans->fans(thisDXCoil.SupplyFanIndex)->simulate(state, true, _, FanStaticPressureRise);
                 FanPowerCorrection = state.dataFans->fans(thisDXCoil.SupplyFanIndex)->totalPower;
 
-                FanHeatCorrection =
-                    PartLoadAirMassFlowRate * (state.dataLoopNodes->Node(FanOutletNode).Enthalpy - state.dataLoopNodes->Node(FanInletNode).Enthalpy);
+                FanHeatCorrection = PartLoadAirMassFlowRate * (fanOutletNode->Enthalpy - fanInletNode->Enthalpy);
 
             } else {
                 FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
@@ -14935,7 +14951,6 @@ void GetFanIndexForTwoSpeedCoil(
     int AirSysNum;
     int BranchNum;
     int CompNum;
-    bool ErrorsFound(false);
 
     FoundBranch = 0;
     FoundAirSysNum = 0;
@@ -15283,7 +15298,7 @@ int GetCoilInletNode(EnergyPlusData &state,
 
     WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
-        NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirInNode;
+        NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirInNodeNum;
     } else {
         ShowSevereError(state, format("GetCoilInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
@@ -15308,7 +15323,7 @@ int getCoilInNodeIndex(EnergyPlusData &state,
     }
 
     if (CoilIndex != 0) {
-        NodeNumber = state.dataDXCoils->DXCoil(CoilIndex).AirInNode;
+        NodeNumber = state.dataDXCoils->DXCoil(CoilIndex).AirInNodeNum;
     } else {
         ShowSevereError(state, "GetCoilInletNode: Could not find Coil Type");
         ErrorsFound = true;
@@ -15348,7 +15363,7 @@ int GetCoilOutletNode(EnergyPlusData &state,
 
     WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
-        NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirOutNode;
+        NodeNumber = state.dataDXCoils->DXCoil(WhichCoil).AirOutNodeNum;
     } else {
         ShowSevereError(
             state,
@@ -15375,7 +15390,7 @@ int getCoilOutNodeIndex(EnergyPlusData &state,
     }
 
     if (CoilIndex != 0) {
-        NodeNumber = state.dataDXCoils->DXCoil(CoilIndex).AirOutNode;
+        NodeNumber = state.dataDXCoils->DXCoil(CoilIndex).AirOutNodeNum;
     } else {
         ShowSevereError(state, "GetCoilOutletNode: Could not find Coil Type");
         ErrorsFound = true;
@@ -15385,7 +15400,7 @@ int getCoilOutNodeIndex(EnergyPlusData &state,
     return NodeNumber;
 }
 
-int GetCoilCondenserInletNode(EnergyPlusData &state,
+int GetCoilCondenserInNode(EnergyPlusData &state,
                               std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
@@ -15414,9 +15429,9 @@ int GetCoilCondenserInletNode(EnergyPlusData &state,
 
     WhichCoil = Util::FindItemInList(CoilName, state.dataDXCoils->DXCoil);
     if (WhichCoil != 0) {
-        CondNode = state.dataDXCoils->DXCoil(WhichCoil).CondenserInletNodeNum(1);
+        CondNode = state.dataDXCoils->DXCoil(WhichCoil).CondenserInNodeNums(1);
     } else {
-        ShowSevereError(state, format("GetCoilCondenserInletNode: Invalid DX Coil, Type= \"{}\" Name=\"{}\"", CoilType, CoilName));
+        ShowSevereError(state, format("GetCoilCondenserInNode: Invalid DX Coil, Type= \"{}\" Name=\"{}\"", CoilType, CoilName));
         ErrorsFound = true;
         CondNode = 0;
     }
@@ -15488,10 +15503,10 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
 
     DXCoolingCoilIndex = 0;
 
-    DataLoopNode::ConnectionObjectType HeatingCoilTypeNum = static_cast<DataLoopNode::ConnectionObjectType>(
-        getEnumValue(BranchNodeConnections::ConnectionObjectTypeNamesUC, Util::makeUPPER(HeatingCoilType)));
+    Node::ConnObjType HeatingCoilTypeNum = static_cast<Node::ConnObjType>(
+        getEnumValue(Node::connObjTypeNamesUC, Util::makeUPPER(HeatingCoilType)));
 
-    DataLoopNode::ConnectionObjectType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
+    Node::ConnObjType CompSetsParentType; // Parent object type which uses DX heating coil pass into this function
     std::string CompSetsParentName;
     for (WhichComp = 1; WhichComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichComp) {
 
@@ -15500,16 +15515,16 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             continue;
         CompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichComp).ParentObjectType;
         CompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichComp).ParentCName;
-        if ((CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAir) ||
-            (CompSetsParentType == DataLoopNode::ConnectionObjectType::ZoneHVACPackagedTerminalHeatPump) ||
-            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatPumpAirToAirMultiSpeed) ||
-            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass) ||
-            (CompSetsParentType == DataLoopNode::ConnectionObjectType::AirLoopHVACUnitarySystem)) {
+        if ((CompSetsParentType == Node::ConnObjType::AirLoopHVACUnitaryHeatPumpAirToAir) ||
+            (CompSetsParentType == Node::ConnObjType::ZoneHVACPackagedTerminalHeatPump) ||
+            (CompSetsParentType == Node::ConnObjType::AirLoopHVACUnitaryHeatPumpAirToAirMultiSpeed) ||
+            (CompSetsParentType == Node::ConnObjType::AirLoopHVACUnitaryHeatCoolVAVChangeoverBypass) ||
+            (CompSetsParentType == Node::ConnObjType::AirLoopHVACUnitarySystem)) {
             //       Search for DX cooling coils
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                 if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
                     (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
-                     DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
+                     Node::ConnObjType::CoilCoolingDXSingleSpeed))
                     continue;
                 DXCoolingCoilIndex =
                     Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
@@ -15518,7 +15533,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                 if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, CompSetsParentName) ||
                     (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
-                     DataLoopNode::ConnectionObjectType::CoilCoolingDXMultiSpeed))
+                     Node::ConnObjType::CoilCoolingDXMultiSpeed))
                     continue;
                 DXCoolingCoilIndex =
                     Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
@@ -15529,15 +15544,15 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                 for (WhichHXAssistedComp = 1; WhichHXAssistedComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichHXAssistedComp) {
                     if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ParentCName, CompSetsParentName) ||
                         (state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType !=
-                         DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted))
+                         Node::ConnObjType::CoilSystemCoolingDXHeatExchangerAssisted))
                         continue;
-                    DataLoopNode::ConnectionObjectType HXCompSetsParentType; // Used when DX cooling coil is a child of a HX assisted cooling coil
+                    Node::ConnObjType HXCompSetsParentType; // Used when DX cooling coil is a child of a HX assisted cooling coil
                     HXCompSetsParentType = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).ComponentObjectType;
                     std::string const &HXCompSetsParentName = state.dataBranchNodeConnections->CompSets(WhichHXAssistedComp).CName;
                     for (WhichCompanionComp = 1; WhichCompanionComp <= state.dataBranchNodeConnections->NumCompSets; ++WhichCompanionComp) {
                         if (!Util::SameString(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ParentCName, HXCompSetsParentName) ||
                             (state.dataBranchNodeConnections->CompSets(WhichCompanionComp).ComponentObjectType !=
-                             DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeed))
+                             Node::ConnObjType::CoilCoolingDXSingleSpeed))
                             continue;
                         DXCoolingCoilIndex =
                             Util::FindItemInList(state.dataBranchNodeConnections->CompSets(WhichCompanionComp).CName, state.dataDXCoils->DXCoil);
@@ -15548,10 +15563,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
             }
         } else {
             //     ErrorFound, Coil:Heating:DX:SingleSpeed is used in wrong type of parent object (should never get here)
-            ShowSevereError(state,
-                            format("Configuration error in {}\"{}\"",
-                                   BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(CompSetsParentType)],
-                                   CompSetsParentName));
+            ShowSevereError(state, format("Configuration error in {}\"{}\"", Node::connObjTypeNames[(int)CompSetsParentType], CompSetsParentName));
             ShowContinueError(state, "DX heating coil not allowed in this configuration.");
             ShowFatalError(state, "Preceding condition(s) causes termination.");
         }
@@ -15569,9 +15581,7 @@ int GetHPCoolingCoilIndex(EnergyPlusData &state,
                 ShowContinueError(state, format("Coil:Cooling:DX:SingleSpeed = {}", state.dataDXCoils->DXCoil(DXCoolingCoilIndex).Name));
                 ShowContinueError(state, format("is different than that specified in Coil:Heating:DX:SingleSpeed = {}.", HeatingCoilName));
                 ShowContinueError(state,
-                                  format("Both of these DX coils are part of {}={}.",
-                                         BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(CompSetsParentType)],
-                                         CompSetsParentName));
+                                  format("Both of these DX coils are part of {}={}.", Node::connObjTypeNames[(int)CompSetsParentType], CompSetsParentName));
                 ShowContinueError(state, "The value specified in the DX heating coil will be used and the simulation continues...");
             }
         }
@@ -15799,7 +15809,7 @@ void SetDXCoolingCoilData(
     bool &ErrorsFound,                                                       // Set to true if certain errors found
     ObjexxFCL::Optional_int HeatingCoilPLFCurvePTR,                          // Parameter equivalent of heating coil PLR curve index
     ObjexxFCL::Optional<DataHeatBalance::RefrigCondenserType> CondenserType, // Parameter equivalent of condenser type parameter
-    ObjexxFCL::Optional_int CondenserInletNodeNum,                           // Parameter equivalent of condenser inlet node number
+    ObjexxFCL::Optional_int CondenserInNodeNum,                           // Parameter equivalent of condenser inlet node number
     ObjexxFCL::Optional<Real64> MaxOATCrankcaseHeater,                       // Parameter equivalent of condenser Max OAT for Crank Case Heater temp
     ObjexxFCL::Optional<Real64> MinOATCooling,                    // Parameter equivalent of condenser Min OAT for compressor cooling operation
     ObjexxFCL::Optional<Real64> MaxOATCooling,                    // Parameter equivalent of condenser Max OAT for compressor cooling operation
@@ -15856,8 +15866,8 @@ void SetDXCoolingCoilData(
         thisDXCoil.CondenserType = CondenserType;
     }
 
-    if (present(CondenserInletNodeNum)) {
-        thisDXCoil.CondenserInletNodeNum(1) = CondenserInletNodeNum;
+    if (present(CondenserInNodeNum)) {
+        thisDXCoil.CondenserInNodeNums(1) = CondenserInNodeNum;
     }
 
     if (present(MaxOATCrankcaseHeater)) {
@@ -16151,6 +16161,8 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
 
     EvapAirMassFlow = 0.0;
 
+    auto &dln = state.dataLoopNodes;
+    
     auto &thisDXCoil = state.dataDXCoils->DXCoil(DXCoilNum);
 
     if (thisDXCoil.IsSecondaryDXCoilInZone) {
@@ -16189,7 +16201,7 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
             if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0) &&
                 (EvapInletDryBulb > thisDXCoil.MinOATCompressor)) { // coil is running
                 SecCoilFlowFraction = 1.0;                          // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
-                CondInletDryBulb = state.dataLoopNodes->Node(thisDXCoil.AirInNode).Temp;
+                CondInletDryBulb = dln->nodes(thisDXCoil.AirInNodeNum)->Temp;
                 EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                 EvapInletEnthalpy = PsyHFnTdbW(EvapInletDryBulb, EvapInletHumRat);
                 SecCoilSHRFT = thisDXCoil.SecCoilSHRFT;
@@ -16259,7 +16271,7 @@ void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
             if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (MSSpeedRatio > 0.0 || MSCycRatio > 0.0) &&
                 (EvapInletDryBulb > thisDXCoil.MinOATCompressor)) { // coil is running
                 SecCoilFlowFraction = 1.0;                          // for single speed DX coil the secondary coil (condenser) flow fraction is 1.0
-                CondInletDryBulb = state.dataLoopNodes->Node(thisDXCoil.AirInNode).Temp;
+                CondInletDryBulb = dln->nodes(thisDXCoil.AirInNodeNum)->Temp;
                 EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
                 EvapInletEnthalpy = PsyHFnTdbW(EvapInletDryBulb, EvapInletHumRat);
                 // determine the current SHR
@@ -16547,6 +16559,8 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     Real64 ActualSH;       // Super heating degrees (C)
     Real64 ActualSC;       // Sub cooling degrees (C)
 
+    auto &dln = state.dataLoopNodes;
+    
     // If Performance mode not present, then set to 1.  Used only by Multimode/Multispeed DX coil (otherwise mode = 1)
     if (present(PerfMode)) {
         Mode = PerfMode;
@@ -16577,23 +16591,24 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
     thisDXCoil.BasinHeaterPower = 0.0;
     thisDXCoil.EvaporatingTemp = state.dataHVACVarRefFlow->VRF(thisDXCoil.VRFOUPtr).IUEvaporatingTemp;
 
-    if (thisDXCoil.CondenserInletNodeNum(Mode) != 0) {
-        OutdoorDryBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Temp;
+    if (thisDXCoil.CondenserInNodeNums(Mode) != 0) {
+        auto const *condenserInNode = dln->nodes(thisDXCoil.CondenserInNodeNums(Mode));
+        OutdoorDryBulb = condenserInNode->Temp;
         if (thisDXCoil.CondenserType(Mode) == DataHeatBalance::RefrigCondenserType::Water) {
             OutdoorHumRat = state.dataEnvrn->OutHumRat;
             OutdoorPressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorPressure = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).Press;
+            OutdoorPressure = condenserInNode->Press;
             // If node is not connected to anything, pressure = default, use weather data
-            if (OutdoorPressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+            if (OutdoorPressure == DataEnvironment::StdPressureSeaLevel) {
                 OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
                 OutdoorHumRat = state.dataEnvrn->OutHumRat;
                 OutdoorPressure = state.dataEnvrn->OutBaroPress;
                 OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
             } else {
-                OutdoorHumRat = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).HumRat;
-                OutdoorWetBulb = state.dataLoopNodes->Node(thisDXCoil.CondenserInletNodeNum(Mode)).OutAirWetBulb;
+                OutdoorHumRat = condenserInNode->HumRat;
+                OutdoorWetBulb = condenserInNode->OutAirWetBulb;
             }
         }
     } else {

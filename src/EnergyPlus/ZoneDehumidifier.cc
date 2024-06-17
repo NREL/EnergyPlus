@@ -200,7 +200,7 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using Curve::CurveValue;
         using Curve::GetCurveIndex;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
         using WaterManager::SetupTankSupplyComponent;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -273,26 +273,26 @@ namespace ZoneDehumidifier {
 
             // A3 , \field Air Inlet Node Name
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirInletNodeNum =
-                GetOnlySingleNode(state,
+                GetSingleNode(state,
                                   Alphas(3),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACDehumidifierDX,
+                                  Node::ConnObjType::ZoneHVACDehumidifierDX,
                                   Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
+                                  Node::FluidType::Air,
+                                  Node::ConnType::Inlet,
+                                  Node::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // A4 , \field Air Outlet Node Name
             state.dataZoneDehumidifier->ZoneDehumid(ZoneDehumidIndex).AirOutletNodeNum =
-                GetOnlySingleNode(state,
+                GetSingleNode(state,
                                   Alphas(4),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACDehumidifierDX,
+                                  Node::ConnObjType::ZoneHVACDehumidifierDX,
                                   Alphas(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Primary,
+                                  Node::FluidType::Air,
+                                  Node::ConnType::Outlet,
+                                  Node::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // N1,  \field Rated Water Removal

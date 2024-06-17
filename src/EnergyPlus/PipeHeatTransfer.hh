@@ -114,8 +114,8 @@ namespace PipeHeatTransfer {
         Real64 PipeID;                      // pipe inside diameter [m]
         std::string InletNode;              // inlet node name
         std::string OutletNode;             // outlet node name
-        int InletNodeNum;                   // inlet node number
-        int OutletNodeNum;                  // outlet node number
+        int InNodeNum = 0;                   // inlet node number
+        int OutNodeNum = 0;                  // outlet node number
         DataPlant::PlantEquipmentType Type; // Type of pipe
         // derived data
         int ConstructionNum; // construction ref number
@@ -199,7 +199,7 @@ namespace PipeHeatTransfer {
 
         // Default Constructor
         PipeHTData()
-            : Length(0.0), PipeID(0.0), InletNodeNum(0), OutletNodeNum(0), Type(DataPlant::PlantEquipmentType::Invalid), ConstructionNum(0),
+            : Length(0.0), PipeID(0.0), Type(DataPlant::PlantEquipmentType::Invalid), ConstructionNum(0),
               EnvironmentPtr(EnvrnPtr::None), EnvrSchedPtr(0), EnvrVelSchedPtr(0), EnvrZonePtr(0), EnvrAirNodeNum(0), NumSections(0),
               FluidSpecHeat(0.0), FluidDensity(0.0), MaxFlowRate(0.0), InsideArea(0.0), OutsideArea(0.0), SectionArea(0.0), PipeHeatCapacity(0.0),
               PipeOD(0.0), PipeCp(0.0), PipeDensity(0.0), PipeConductivity(0.0), InsulationOD(0.0), InsulationCp(0.0), InsulationDensity(0.0),
@@ -270,8 +270,8 @@ struct PipeHeatTransferData : BaseGlobalStruct
 {
 
     int nsvNumOfPipeHT = 0;            // Number of Pipe Heat Transfer objects
-    int nsvInletNodeNum = 0;           // module variable for inlet node number
-    int nsvOutletNodeNum = 0;          // module variable for outlet node number
+    int nsvInNodeNum = 0;           // module variable for inlet node number
+    int nsvOutNodeNum = 0;          // module variable for outlet node number
     Real64 nsvMassFlowRate = 0.0;      // pipe mass flow rate
     Real64 nsvVolumeFlowRate = 0.0;    // pipe volumetric flow rate
     Real64 nsvDeltaTime = 0.0;         // time change from last update
@@ -289,8 +289,8 @@ struct PipeHeatTransferData : BaseGlobalStruct
     void clear_state() override
     {
         this->nsvNumOfPipeHT = 0;
-        this->nsvInletNodeNum = 0;
-        this->nsvOutletNodeNum = 0;
+        this->nsvInNodeNum = 0;
+        this->nsvOutNodeNum = 0;
         this->nsvMassFlowRate = 0.0;
         this->nsvVolumeFlowRate = 0.0;
         this->nsvDeltaTime = 0.0;

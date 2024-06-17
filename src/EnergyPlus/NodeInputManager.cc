@@ -67,7 +67,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-namespace EnergyPlus::NodeInputManager {
+namespace EnergyPlus::Node {
 
 // MODULE INFORMATION:
 //       AUTHOR         Linda K. Lawrie
@@ -77,20 +77,637 @@ namespace EnergyPlus::NodeInputManager {
 // To provide utilities for reading and assigning indices for the
 // nodes in the HVAC loops.
 
-using namespace DataLoopNode;
 using namespace BranchNodeConnections;
 
-constexpr const char *fluidNameSteam("STEAM");
+constexpr std::string_view fluidNameSteam = "STEAM";
 
+constexpr std::array<std::string_view, (int)FluidType::Num> fluidTypeNames = {
+    "blank", "Air", "Water", "Steam", "Electric"
+};
+
+constexpr std::array<std::string_view, (int)FluidType::Num> fluidTypeNamesUC = {
+    "BLANK", "AIR", "WATER", "STEAM", "ELECTRIC"
+};
+
+constexpr std::array<std::string_view, (int)ConnType::Num> connTypeNames = {
+    "blank",
+    "Inlet",
+    "Outlet",
+    "Internal",
+    "ZoneNode",
+    "Sensor",
+    "Actuator",
+    "OutdoorAir",
+    "ReliefAir",
+    "ZoneInlet",
+    "ZoneReturn",
+    "ZoneExhaust",
+    "Setpoint",
+    "Electric",
+    "OutsideAirReference",
+    "InducedAir"
+};
+        
+constexpr std::array<std::string_view, (int)ConnType::Num> connTypeNamesUC = {
+    "BLANK",
+    "INLET",
+    "OUTLET",
+    "INTERNAL",
+    "ZONENODE",
+    "SENSOR",
+    "ACTUATOR",
+    "OUTDOORAIR",
+    "RELIEFAIR",
+    "ZONEINLET",
+    "ZONERETURN",
+    "ZONEEXHAUST",
+    "SETPOINT",
+    "ELECTRIC",
+    "OUTSIDEAIRREFERENCE",
+    "INDUCEDAIR"
+};
+        
+constexpr std::array<std::string_view, (int)Node::ConnObjType::Num> connObjTypeNames = {
+    "Undefined",
+    "AirConditioner:VariableRefrigerantFlow",
+    "AirLoopHVAC",
+    "AirLoopHVAC:DedicatedOutdoorAirSystem",
+    "AirLoopHVAC:ExhaustSystem",
+    "AirLoopHVAC:Mixer",
+    "AirLoopHVAC:OutdoorAirSystem",
+    "AirLoopHVAC:ReturnPath",
+    "AirLoopHVAC:ReturnPlenum",
+    "AirLoopHVAC:Splitter",
+    "AirLoopHVAC:SupplyPath",
+    "AirLoopHVAC:SupplyPlenum",
+    "AirLoopHVAC:Unitary:Furnace:HeatCool",
+    "AirLoopHVAC:Unitary:Furnace:HeatOnly",
+    "AirLoopHVAC:UnitaryHeatCool",
+    "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass",
+    "AirLoopHVAC:UnitaryHeatOnly",
+    "AirLoopHVAC:UnitaryHeatPump:AirToAir",
+    "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed",
+    "AirLoopHVAC:UnitaryHeatPump:WaterToAir",
+    "AirLoopHVAC:UnitarySystem",
+    "AirLoopHVAC:ZoneMixer",
+    "AirLoopHVAC:ZoneSplitter",
+    "AirTerminal:DualDuct:ConstantVolume",
+    "AirTerminal:DualDuct:ConstantVolume:Cool",
+    "AirTerminal:DualDuct:ConstantVolume:Heat",
+    "AirTerminal:DualDuct:VAV",
+    "AirTerminal:DualDuct:VAV:Cool",
+    "AirTerminal:DualDuct:VAV:Heat",
+    "AirTerminal:DualDuct:VAV:OutdoorAir",
+    "AirTerminal:DualDuct:VAV:OutdoorAir:OutdoorAir",
+    "AirTerminal:DualDuct:VAV:OutdoorAir:RecirculatedAir",
+    "AirTerminal:SingleDuct:ConstantVolume:CooledBeam",
+    "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
+    "AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction",
+    "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
+    "AirTerminal:SingleDuct:ConstantVolume:Reheat",
+    "AirTerminal:SingleDuct:Mixer",
+    "AirTerminal:SingleDuct:ParallelPIU:Reheat",
+    "AirTerminal:SingleDuct:SeriesPIU:Reheat",
+    "AirTerminal:SingleDuct:UserDefined",
+    "AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat",
+    "AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat",
+    "AirTerminal:SingleDuct:VAV:NoReheat",
+    "AirTerminal:SingleDuct:VAV:Reheat",
+    "AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan",
+    "AvailabilityManager:DifferentialThermostat",
+    "AvailabilityManager:HighTemperatureTurnOff",
+    "AvailabilityManager:HighTemperatureTurnOn",
+    "AvailabilityManager:LowTemperatureTurnOff",
+    "AvailabilityManager:LowTemperatureTurnOn",
+    "Boiler:HotWater",
+    "Boiler:Steam",
+    "Branch",
+    "CentralHeatPumpSystem",
+    "Chiller:Absorption",
+    "Chiller:Absorption:Indirect",
+    "Chiller:CombustionTurbine",
+    "Chiller:ConstantCOP",
+    "Chiller:Electric",
+    "Chiller:Electric:EIR",
+    "Chiller:Electric:ReformulatedEIR",
+    "Chiller:Electric:ASHRAE205",
+    "Chiller:EngineDriven",
+    "ChillerHeater:Absorption:DirectFired",
+    "ChillerHeater:Absorption:DoubleEffect",
+    "Coil:Cooling:DX",
+    "Coil:Cooling:DX:CurveFit:Speed",
+    "Coil:Cooling:DX:MultiSpeed",
+    "Coil:Cooling:DX:SingleSpeed",
+    "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
+    "Coil:Cooling:DX:SubcoolReheat",
+    "Coil:Cooling:DX:TwoSpeed",
+    "Coil:Cooling:DX:TwoStageWithHumidityControlMode",
+    "Coil:Cooling:DX:VariableRefrigerantFlow",
+    "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+    "Coil:Cooling:DX:VariableSpeed",
+    "Coil:Cooling:Water",
+    "Coil:Cooling:Water:DetailedGeometry",
+    "Coil:Cooling:WaterToAirHeatPump:EquationFit",
+    "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation",
+    "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit",
+    "Coil:Heating:DX:MultiSpeed",
+    "Coil:Heating:DX:SingleSpeed",
+    "Coil:Heating:DX:VariableRefrigerantFlow",
+    "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+    "Coil:Heating:DX:VariableSpeed",
+    "Coil:Heating:Desuperheater",
+    "Coil:Heating:Electric",
+    "Coil:Heating:Electric:MultiStage",
+    "Coil:Heating:Fuel",
+    "Coil:Heating:Gas:MultiStage",
+    "Coil:Heating:Steam",
+    "Coil:Heating:Water",
+    "Coil:Heating:WaterToAirHeatPump:EquationFit",
+    "Coil:Heating:WaterToAirHeatPump:ParameterEstimation",
+    "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit",
+    "Coil:UserDefined",
+    "Coil:WaterHeating:AirToWaterHeatPump:Pumped",
+    "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
+    "Coil:WaterHeating:AirToWaterHeatPump:Wrapped",
+    "Coil:WaterHeating:Desuperheater",
+    "CoilSystem:Cooling:DX",
+    "CoilSystem:Cooling:DX:HeatExchangerAssisted",
+    "CoilSystem:Cooling:Water",
+    "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+    "CoilSystem:Heating:DX",
+    "CoilSystem:IntegratedHeatPump:AirSource",
+    "Condenser",
+    "CondenserLoop",
+    "Connector:Mixer",
+    "Connector:Splitter",
+    "Controller:OutdoorAir",
+    "Controller:WaterCoil",
+    "CoolingTower:SingleSpeed",
+    "CoolingTower:TwoSpeed",
+    "CoolingTower:VariableSpeed",
+    "CoolingTower:VariableSpeed:Merkel",
+    "Dehumidifier:Desiccant:NoFans",
+    "Dehumidifier:Desiccant:System",
+    "DistrictCooling",
+    "DistrictHeating:Water",
+    "DistrictHeating:Steam",
+    "Duct",
+    "ElectricEquipment:ITE:AirCooled",
+    "EvaporativeCooler:Direct:CelDekPad",
+    "EvaporativeCooler:Direct:ResearchSpecial",
+    "EvaporativeCooler:Indirect:CelDekPad",
+    "EvaporativeCooler:Indirect:ResearchSpecial",
+    "EvaporativeCooler:Indirect:WetCoil",
+    "EvaporativeFluidCooler:SingleSpeed",
+    "EvaporativeFluidCooler:TwoSpeed",
+    "Fan:ComponentModel",
+    "Fan:ConstantVolume",
+    "Fan:OnOff",
+    "Fan:SystemModel",
+    "Fan:VariableVolume",
+    "Fan:ZoneExhaust",
+    "FluidCooler:SingleSpeed",
+    "FluidCooler:TwoSpeed",
+    "Generator:CombustionTurbine",
+    "Generator:FuelCell:AirSupply",
+    "Generator:FuelCell:ExhaustGasToWaterHeatExchanger",
+    "Generator:FuelCell:PowerModule",
+    "Generator:FuelCell:StackCooler",
+    "Generator:FuelCell:WaterSupply",
+    "Generator:FuelSupply",
+    "Generator:InternalCombustionEngine",
+    "Generator:MicroCHP",
+    "Generator:MicroTurbine",
+    "GroundHeatExchanger:HorizontalTrench",
+    "GroundHeatExchanger:Pond",
+    "GroundHeatExchanger:Slinky",
+    "GroundHeatExchanger:Surface",
+    "GroundHeatExchanger:System",
+    "HeaderedPumps:ConstantSpeed",
+    "HeaderedPumps:VariableSpeed",
+    "HeatExchanger:AirToAir:FlatPlate",
+    "HeatExchanger:AirToAir:SensibleAndLatent",
+    "HeatExchanger:Desiccant:BalancedFlow",
+    "HeatExchanger:FluidToFluid",
+    "HeatPump:AirToWater:FuelFired:Cooling",
+    "HeatPump:AirToWater:FuelFired:Heating",
+    "HeatPump:PlantLoop:EIR:Cooling",
+    "HeatPump:PlantLoop:EIR:Heating",
+    "HeatPump:WaterToWater:EquationFit:Cooling",
+    "HeatPump:WaterToWater:EquationFit:Heating",
+    "HeatPump:WaterToWater:ParameterEstimation:Cooling",
+    "HeatPump:WaterToWater:ParameterEstimation:Heating",
+    "Humidifier:Steam:Electric",
+    "Humidifier:Steam:Gas",
+    "Lights",
+    "LoadProfile:Plant",
+    "OutdoorAir:Mixer",
+    "OutdoorAir:Node",
+    "OutdoorAir:NodeList",
+    "Pipe:Adiabatic",
+    "Pipe:Adiabatic:Steam",
+    "Pipe:Indoor",
+    "Pipe:Outdoor",
+    "Pipe:Underground",
+    "PipingSystem:Underground:PipeCircuit",
+    "PlantComponent:TemperatureSource",
+    "PlantComponent:UserDefined",
+    "PlantEquipmentOperation:ChillerHeaterChangeover",
+    "PlantEquipmentOperation:ComponentSetpoint",
+    "PlantEquipmentOperation:OutdoorDewpointDifference",
+    "PlantEquipmentOperation:OutdoorDrybulbDifference",
+    "PlantEquipmentOperation:OutdoorWetbulbDifference",
+    "PlantEquipmentOperation:ThermalEnergyStorage",
+    "PlantLoop",
+    "Pump:ConstantSpeed",
+    "Pump:ConstantVolume",
+    "Pump:VariableSpeed",
+    "Pump:VariableSpeed:Condensate",
+    "Refrigeration:CompressorRack",
+    "Refrigeration:Condenser:AirCooled",
+    "Refrigeration:Condenser:EvaporativeCooled",
+    "Refrigeration:Condenser:WaterCooled",
+    "Refrigeration:GasCooler:AirCooled",
+    "SetpointManager:Coldest",
+    "SetpointManager:CondenserEnteringReset",
+    "SetpointManager:CondenserEnteringReset:Ideal",
+    "SetpointManager:FollowGroundTemperature",
+    "SetpointManager:FollowOutdoorAirTemperature",
+    "SetpointManager:FollowSystemNodeTemperature",
+    "SetpointManager:MixedAir",
+    "SetpointManager:MultiZone:Cooling:Average",
+    "SetpointManager:MultiZone:Heating:Average",
+    "SetpointManager:MultiZone:Humidity:Maximum",
+    "SetpointManager:MultiZone:Humidity:Minimum",
+    "SetpointManager:MultiZone:MaximumHumidity:Average",
+    "SetpointManager:MultiZone:MinimumHumidity:Average",
+    "SetpointManager:OutdoorAirPretreat",
+    "SetpointManager:OutdoorAirReset",
+    "SetpointManager:ReturnTemperature:ChilledWater",
+    "SetpointManager:ReturnTemperature:HotWater",
+    "SetpointManager:Scheduled",
+    "SetpointManager:Scheduled:DualSetpoint",
+    "SetpointManager:SingleZone:Cooling",
+    "SetpointManager:SingleZone:Heating",
+    "SetpointManager:SingleZone:Humidity:Maximum",
+    "SetpointManager:SingleZone:Humidity:Minimum",
+    "SetpointManager:SingleZone:OneStageCooling",
+    "SetpointManager:SingleZone:OneStageHeating",
+    "SetpointManager:SingleZone:Reheat",
+    "SetpointManager:SystemNodeReset:Temperature",
+    "SetpointManager:SystemNodeReset:Humidity",
+    "SetpointManager:Warmest",
+    "SetpointManager:WarmestTemperatureFlow",
+    "SolarCollector:FlatPlate:PhotovoltaicThermal",
+    "SolarCollector:FlatPlate:Water",
+    "SolarCollector:IntegralCollectorStorage",
+    "SolarCollector:UnglazedTranspired",
+    "SurfaceProperty:LocalEnvironment",
+    "SwimmingPool:Indoor",
+    "TemperingValve",
+    "ThermalStorage:ChilledWater:Mixed",
+    "ThermalStorage:ChilledWater:Stratified",
+    "ThermalStorage:Ice:Detailed",
+    "ThermalStorage:Ice:Simple",
+    "WaterHeater:HeatPump",
+    "WaterHeater:HeatPump:PumpedCondenser",
+    "WaterHeater:HeatPump:WrappedCondenser",
+    "WaterHeater:Mixed",
+    "WaterHeater:Stratified",
+    "WaterUse:Connections",
+    "ZoneHVAC:AirDistributionUnit",
+    "ZoneHVAC:Baseboard:Convective:Electric",
+    "ZoneHVAC:Baseboard:Convective:Water",
+    "ZoneHVAC:Baseboard:RadiantConvective:Electric",
+    "ZoneHVAC:Baseboard:RadiantConvective:Steam",
+    "ZoneHVAC:Baseboard:RadiantConvective:Water",
+    "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
+    "ZoneHVAC:Dehumidifier:DX",
+    "ZoneHVAC:EnergyRecoveryVentilator",
+    "ZoneHVAC:EquipmentConnections",
+    "ZoneHVAC:EvaporativeCoolerUnit",
+    "ZoneHVAC:ExhaustControl",
+    "ZoneHVAC:ForcedAir:UserDefined",
+    "ZoneHVAC:FourPipeFanCoil",
+    "ZoneHVAC:HighTemperatureRadiant",
+    "ZoneHVAC:HybridUnitaryHVAC",
+    "ZoneHVAC:IdealLoadsAirSystem",
+    "ZoneHVAC:LowTemperatureRadiant:ConstantFlow",
+    "ZoneHVAC:LowTemperatureRadiant:VariableFlow",
+    "ZoneHVAC:OutdoorAirUnit",
+    "ZoneHVAC:PackagedTerminalAirConditioner",
+    "ZoneHVAC:PackagedTerminalHeatPump",
+    "ZoneHVAC:RefrigerationChillerSet",
+    "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow",
+    "ZoneHVAC:UnitHeater",
+    "ZoneHVAC:UnitVentilator",
+    "ZoneHVAC:VentilatedSlab",
+    "ZoneHVAC:WaterToAirHeatPump",
+    "ZoneHVAC:WindowAirConditioner",
+    "ZoneProperty:LocalEnvironment",
+    "SpaceHVAC:EquipmentConnections",
+    "SpaceHVAC:ZoneEquipmentSplitter",
+    "SpaceHVAC:ZoneEquipmentMixer"};
+
+constexpr std::array<std::string_view, static_cast<int>(Node::ConnObjType::Num)> connObTypeNamesUC = {
+    "UNDEFINED",
+    "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW",
+    "AIRLOOPHVAC",
+    "AIRLOOPHVAC:DEDICATEDOUTDOORAIRSYSTEM",
+    "AIRLOOPHVAC:EXHAUSTSYSTEM",
+    "AIRLOOPHVAC:MIXER",
+    "AIRLOOPHVAC:OUTDOORAIRSYSTEM",
+    "AIRLOOPHVAC:RETURNPATH",
+    "AIRLOOPHVAC:RETURNPLENUM",
+    "AIALOOPHVAC:SPLITTER",
+    "AIRLOOPHVAC:SUPPLYPATH",
+    "AIRLOOPHVAC:SUPPLYPLENUM",
+    "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+    "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+    "AIRLOOPHVAC:UNITARYHEATCOOL",
+    "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS",
+    "AIRLOOPHVAC:UNITARYHEATONLY",
+    "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
+    "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
+    "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
+    "AIRLOOPHVAC:UNITARYSYSTEM",
+    "AIRLOOPHVAC:ZONEMIXER",
+    "AIRLOOPHVAC:ZONESPLITTER",
+    "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
+    "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL",
+    "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT",
+    "AIRTERMINAL:DUALDUCT:VAV",
+    "AIRTERMINAL:DUALDUCT:VAV:COOL",
+    "AIRTERMINAL:DUALDUCT:VAV:HEAT",
+    "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR",
+    "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR",
+    "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR",
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT",
+    "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
+    "AIRTERMINAL:SINGLEDUCT:MIXER",
+    "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
+    "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
+    "AIRTERMINAL:SINGLEDUCT:USERDEFINED",
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
+    "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
+    "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
+    "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
+    "AVAILABILITYMANAGER:DIFFERENTIALTHERMOSTAT",
+    "AVAILABILITYMANAGER:HIGHTEMPERATURETURNOFF",
+    "AVAILABILITYMANAGER:HIGHTEMPERATURETURNON",
+    "AVAILABILITYMANAGER:LOWTEMPERATURETURNOFF",
+    "AVAILABILITYMANAGER:LOWTEMPERATURETURNON",
+    "BOILER:HOTWATER",
+    "BOILER:STEAM",
+    "BRANCH",
+    "CENTRALHEATPUMPSYSTEM",
+    "CHILLER:ABSORPTION",
+    "CHILLER:ABSORPTION:INDIRECT",
+    "CHILLER:COMBUSTIONTURBINE",
+    "CHILLER:CONSTANTCOP",
+    "CHILLER:ELECTRIC",
+    "CHILLER:ELECTRIC:EIR",
+    "CHILLER:ELECTRIC:REFORMULATEDEIR",
+    "CHILLER:ELECTRIC:ASHRAE205",
+    "CHILLER:ENGINEDRIVEN",
+    "CHILLERHEATER:ABSORPTION:DIRECTFIRED",
+    "CHILLERHEATER:ABSORPTION:DOUBLEEFFECT",
+    "COIL:COOLING:DX",
+    "COIL:COOLING:DX:CURVEFIT:SPEED",
+    "COIL:COOLING:DX:MULTISPEED",
+    "COIL:COOLING:DX:SINGLESPEED",
+    "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
+    "COIL:COOLING:DX:SUBCOOLREHEAT",
+    "COIL:COOLING:DX:TWOSPEED",
+    "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE",
+    "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",
+    "COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
+    "COIL:COOLING:DX:VARIABLESPEED",
+    "COIL:COOLING:WATER",
+    "COIL:COOLING:WATER:DETAILEDGEOMETRY",
+    "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+    "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+    "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+    "COIL:HEATING:DX:MULTISPEED",
+    "COIL:HEATING:DX:SINGLESPEED",
+    "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",
+    "COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL",
+    "COIL:HEATING:DX:VARIABLESPEED",
+    "COIL:HEATING:DESUPERHEATER",
+    "COIL:HEATING:ELECTRIC",
+    "COIL:HEATING:ELECTRIC:MULTISTAGE",
+    "COIL:HEATING:FUEL",
+    "COIL:HEATING:GAS:MULTISTAGE",
+    "COIL:HEATING:STEAM",
+    "COIL:HEATING:WATER",
+    "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+    "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+    "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+    "COIL:USERDEFINED",
+    "COIL:WATERHEATING:AIRTOWATERHEATPUMP:PUMPED",
+    "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+    "COIL:WATERHEATING:AIRTOWATERHEATPUMP:WRAPPED",
+    "COIL:WATERHEATING:DESUPERHEATER",
+    "COILSYSTEM:COOLING:DX",
+    "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED",
+    "COILSYSTEM:COOLING:WATER",
+    "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+    "COILSYSTEM:HEATING:DX",
+    "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE",
+    "CONDENSER",
+    "CONDENSERLOOP",
+    "CONNECTOR:MIXER",
+    "CONNECTOR:SPLITTER",
+    "CONTROLLER:OUTDOORAIR",
+    "CONTROLLER:WATERCOIL",
+    "COOLINGTOWER:SINGLESPEED",
+    "COOLINGTOWER:TWOSPEED",
+    "COOLINGTOWER:VARIABLESPEED",
+    "COOLINGTOWER:VARIABLESPEED:MERKEL",
+    "DEHUMIDIFIER:DESICCANT:NOFANS",
+    "DEHUMIDIFIER:DESICCANT:SYSTEM",
+    "DISTRICTCOOLING",
+    "DISTRICTHEATING:WATER",
+    "DISTRICTHEATING:STEAM",
+    "DUCT",
+    "ELECTRICEQUIPMENT:ITE:AIRCOOLED",
+    "EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
+    "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL",
+    "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD",
+    "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL",
+    "EVAPORATIVECOOLER:INDIRECT:WETCOIL",
+    "EVAPORATIVEFLUIDCOOLER:SINGLESPEED",
+    "EVAPORATIVEFLUIDCOOLER:TWOSPEED",
+    "FAN:COMPONENTMODEL",
+    "FAN:CONSTANTVOLUME",
+    "FAN:ONOFF",
+    "FAN:SYSTEMMODEL",
+    "FAN:VARIABLEVOLUME",
+    "FAN:ZONEEXHAUST",
+    "FLUIDCOOLER:SINGLESPEED",
+    "FLUIDCOOLER:TWOSPEED",
+    "GENERATOR:COMBUSTIONTURBINE",
+    "GENERATOR:FUELCELL:AIRSUPPLY",
+    "GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER",
+    "GENERATOR:FUELCELL:POWERMODULE",
+    "GENERATOR:FUELCELL:STACKCOOLER",
+    "GENERATOR:FUELCELL:WATERSUPPLY",
+    "GENERATOR:FUELSUPPLY",
+    "GENERATOR:INTERNALCOMBUSTIONENGINE",
+    "GENERATOR:MICROCHP",
+    "GENERATOR:MICROTURBINE",
+    "GROUNDHEATEXCHANGER:HORIZONTALTRENCH",
+    "GROUNDHEATEXCHANGER:POND",
+    "GROUNDHEATEXCHANGER:SLINKY",
+    "GROUNDHEATEXCHANGER:SURFACE",
+    "GROUNDHEATEXCHANGER:SYSTEM",
+    "HEADEREDPUMPS:CONSTANTSPEED",
+    "HEADEREDPUMPS:VARIABLESPEED",
+    "HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+    "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
+    "HEATEXCHANGER:DESICCANT:BALANCEDFLOW",
+    "HEATEXCHANGER:FLUIDTOFLUID",
+    "HEATPUMP:AIRTOWATER:FUELFIRED:COOLING",
+    "HEATPUMP:AIRTOWATER:FUELFIRED:HEATING",
+    "HEATPUMP:PLANTLOOP:EIR:COOLING",
+    "HEATPUMP:PLANTLOOP:EIR:HEATING",
+    "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING",
+    "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING",
+    "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING",
+    "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING",
+    "HUMIDIFIER:STEAM:ELECTRIC",
+    "HUMIDIFIER:STEAM:GAS",
+    "LIGHTS",
+    "LOADPROFILE:PLANT",
+    "OUTDOORAIR:MIXER",
+    "OUTDOORAIR:NODE",
+    "OUTDOORAIR:NODELIST",
+    "PIPE:ADIABATIC",
+    "PIPE:ADIABATIC:STEAM",
+    "PIPE:INDOOR",
+    "PIPE:OUTDOOR",
+    "PIPE:UNDERGROUND",
+    "PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT",
+    "PLANTCOMPONENT:TEMPERATURESOURCE",
+    "PLANTCOMPONENT:USERDEFINED",
+    "PLANTEQUIPMENTOPERATION:CHILLERHEATERCHANGEOVER",
+    "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT",
+    "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE",
+    "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE",
+    "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE",
+    "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE",
+    "PLANTLOOP",
+    "PUMP:CONSTANTSPEED",
+    "PUMP:CONSTANTVOLUME",
+    "PUMP:VARIABLESPEED",
+    "PUMP:VARIABLESPEED:CONDENSATE",
+    "REFRIGERATION:COMPRESSORRACK",
+    "REFRIGERATION:CONDENSER:AIRCOOLED",
+    "REFRIGERATION:CONDENSER:EVAPORATIVECOOLED",
+    "REFRIGERATION:CONDENSER:WATERCOOLED",
+    "REFRIGERATION:GASCOOLER:AIRCOOLED",
+    "SETPOINTMANAGER:COLDEST",
+    "SETPOINTMANAGER:CONDENSERENTERINGRESET",
+    "SETPOINTMANAGER:CONDENSERENTERINGRESET:IDEAL",
+    "SETPOINTMANAGER:FOLLOWGROUNDTEMPERATURE",
+    "SETPOINTMANAGER:FOLLOWOUTDOORAIRTEMPERATURE",
+    "SETPOINTMANAGER:FOLLOWSYSTEMNODETEMPERATURE",
+    "SETPOINTMANAGER:MIXEDAIR",
+    "SETPOINTMANAGER:MULTIZONE:COOLING:AVERAGE",
+    "SETPOINTMANAGER:MULTIZONE:HEATING:AVERAGE",
+    "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MAXIMUM",
+    "SETPOINTMANAGER:MULTIZONE:HUMIDITY:MINIMUM",
+    "SETPOINTMANAGER:MULTIZONE:MAXIMUMHUMIDITY:AVERAGE",
+    "SETPOINTMANAGER:MULTIZONE:MINIMUMHUMIDITY:AVERAGE",
+    "SETPOINTMANAGER:OUTDOORAIRPRETREAT",
+    "SETPOINTMANAGER:OUTDOORAIRRESET",
+    "SETPOINTMANAGER:RETURNTEMPERATURE:CHILLEDWATER",
+    "SETPOINTMANAGER:RETURNTEMPERATURE:HOTWATER",
+    "SETPOINTMANAGER:SCHEDULED",
+    "SETPOINTMANAGER:SCHEDULED:DUALSETPOINT",
+    "SETPOINTMANAGER:SINGLEZONE:COOLING",
+    "SETPOINTMANAGER:SINGLEZONE:HEATING",
+    "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MAXIMUM",
+    "SETPOINTMANAGER:SINGLEZONE:HUMIDITY:MINIMUM",
+    "SETPOINTMANAGER:SINGLEZONE:ONESTAGECOOLING",
+    "SETPOINTMANAGER:SINGLEZONE:ONESTAGEHEATING",
+    "SETPOINTMANAGER:SINGLEZONE:REHEAT",
+    "SETPOINTMANAGER:SYSTEMNODERESET:TEMPERATURE",
+    "SETPOINTMANAGER:SYSTEMNODERESET:HUMIDITY",
+    "SETPOINTMANAGER:WARMEST",
+    "SETPOINTMANAGER:WARMESTTEMPERATUREFLOW",
+    "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
+    "SOLARCOLLECTOR:FLATPLATE:WATER",
+    "SOLARCOLLECTOR:INTEGRALCOLLECTORSTORAGE",
+    "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
+    "SURFACEPROPERTY:LOCALENVIRONMENT",
+    "SWIMMINGPOOL:INDOOR",
+    "TEMPERINGVALVE",
+    "THERMALSTORAGE:CHILLEDWATER:MIXED",
+    "THERMALSTORAGE:CHILLEDWATER:STRATIFIED",
+    "THERMALSTORAGE:ICE:DETAILED",
+    "THERMALSTORAGE:ICE:SIMPLE",
+    "WATERHEATER:HEATPUMP",
+    "WATERHEATER:HEATPUMP:PUMPEDCONDENSER",
+    "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
+    "WATERHEATER:MIXED",
+    "WATERHEATER:STRATIFIED",
+    "WATERUSE:CONNECTIONS",
+    "ZONEHVAC:AIRDISTRIBUTIONUNIT",
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC",
+    "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER",
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC",
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM",
+    "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER",
+    "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
+    "ZONEHVAC:DEHUMIDIFIER:DX",
+    "ZONEHVAC:ENERGYRECOVERYVENTILATOR",
+    "ZONEHVAC:EQUIPMENTCONNECTIONS",
+    "ZONEHVAC:EVAPORATIVECOOLERUNIT",
+    "ZONEHVAC:EXHAUSTCONTROL",
+    "ZONEHVAC:FORCEDAIR:USERDEFINED",
+    "ZONEHVAC:FOURPIPEFANCOIL",
+    "ZONEHVAC:HIGHTEMPERATURERADIANT",
+    "ZONEHVAC:HYBRIDUNITARYHVAC",
+    "ZONEHVAC:IDEALLOADSAIRSYSTEM",
+    "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW",
+    "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW",
+    "ZONEHVAC:OUTDOORAIRUNIT",
+    "ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER",
+    "ZONEHVAC:PACKAGEDTERMINALHEATPUMP",
+    "ZONEHVAC:REFRIGERATIONCHILLERSET",
+    "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
+    "ZONEHVAC:UNITHEATER",
+    "ZONEHVAC:UNITVENTILATOR",
+    "ZONEHVAC:VENTILATEDSLAB",
+    "ZONEHVAC:WATERTOAIRHEATPUMP",
+    "ZONEHVAC:WINDOWAIRCONDITIONER",
+    "ZONEPROPERTY:LOCALENVIRONMENT",
+    "SPACEHVAC:EQUIPMENTCONNECTIONS",
+    "SPACEHVAC:ZONEEQUIPMENTSPLITTER",
+    "SPACEHVAC:ZONEEQUIPMENTMIXER"
+};
+        
+int GetNodeIndex(EnergyPlusData &state,
+                 std::string const &name)
+{
+    auto found = state.dataLoopNodes->nodeMap.find(name);
+    return (found != state.dataLoopNodes->nodeMap.end()) ? found->second : 0;
+}
+        
 void GetNodeNums(EnergyPlusData &state,
                  std::string const &Name,                                 // Name for which to obtain information
                  int &NumNodes,                                           // Number of nodes accompanying this Name
                  Array1D_int &NodeNumbers,                                // Node Numbers accompanying this Name
                  bool &ErrorsFound,                                       // True when errors are found...
-                 DataLoopNode::NodeFluidType nodeFluidType,               // Fluidtype for checking/setting node FluidType
-                 DataLoopNode::ConnectionObjectType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+                 FluidType nodeFluidType,               // Fluidtype for checking/setting node FluidType
+                 ConnObjType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
                  std::string const &NodeObjectName,                       // Node Object Name (i.e. "MyChiller")
-                 DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
+                 ConnType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                  CompFluidStream const NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                  bool const ObjectIsParent,                               // True/False
                  bool const IncrementFluidStream,                         // True/False
@@ -113,16 +730,18 @@ void GetNodeNums(EnergyPlusData &state,
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetNodeNums: ");
 
-    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
+    auto &dln = state.dataLoopNodes;
+    
+    std::string_view const objTypeStr = Node::connObjTypeNames[static_cast<int>(NodeObjectType)];
 
     if (state.dataNodeInputMgr->GetNodeInputFlag) {
-        GetNodeListsInput(state, ErrorsFound);
+        Node::GetNodeListsInput(state, ErrorsFound);
         state.dataNodeInputMgr->GetNodeInputFlag = false;
     }
 
-    if (nodeFluidType != DataLoopNode::NodeFluidType::Air && nodeFluidType != DataLoopNode::NodeFluidType::Water &&
-        nodeFluidType != DataLoopNode::NodeFluidType::Electric && nodeFluidType != DataLoopNode::NodeFluidType::Steam &&
-        nodeFluidType != DataLoopNode::NodeFluidType::Blank) {
+    if (nodeFluidType != Node::FluidType::Air && nodeFluidType != Node::FluidType::Water &&
+        nodeFluidType != Node::FluidType::Electric && nodeFluidType != Node::FluidType::Steam &&
+        nodeFluidType != Node::FluidType::Blank) {
         ShowSevereError(state, format("{}{}=\"{}=\", invalid fluid type.", RoutineName, objTypeStr, NodeObjectName));
         ShowContinueError(state, format("..Invalid FluidType={}", nodeFluidType));
         ErrorsFound = true;
@@ -132,30 +751,31 @@ void GetNodeNums(EnergyPlusData &state,
     if (!Name.empty()) {
         int ThisOne = Util::FindItemInList(Name, state.dataNodeInputMgr->NodeLists);
         if (ThisOne != 0) {
-            NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumOfNodesInList;
-            NodeNumbers({1, NumNodes}) = state.dataNodeInputMgr->NodeLists(ThisOne).NodeNumbers({1, NumNodes});
+            NumNodes = state.dataNodeInputMgr->NodeLists(ThisOne).NumNodes;
+            NodeNumbers({1, NumNodes}) = state.dataNodeInputMgr->NodeLists(ThisOne).NodeNums({1, NumNodes});
             for (int Loop = 1; Loop <= NumNodes; ++Loop) {
-                if (nodeFluidType != DataLoopNode::NodeFluidType::Blank &&
-                    state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != DataLoopNode::NodeFluidType::Blank) {
-                    if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType != nodeFluidType) {
+                auto *node = dln->nodes(NodeNumbers(Loop));
+                    
+                if (nodeFluidType != Node::FluidType::Blank &&
+                    node->fluidType != Node::FluidType::Blank) {
+                    if (node->fluidType != nodeFluidType) {
                         ShowSevereError(state, format("{}{}=\"{}=\", invalid data.", RoutineName, objTypeStr, NodeObjectName));
                         if (!InputFieldName.empty()) {
                             ShowContinueError(state, fmt::format("...Ref field={}", InputFieldName));
                         }
                         ShowContinueError(
                             state,
-                            format("Existing Fluid type for node, incorrect for request. Node={}", state.dataLoopNodes->NodeID(NodeNumbers(Loop))));
+                            format("Existing Fluid type for node, incorrect for request. Node={}", node->Name));
                         ShowContinueError(
                             state,
                             format("Existing Fluid type={}, Requested Fluid Type={}",
-                                   format("{}",
-                                          DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType)]),
-                                   format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(nodeFluidType)])));
+                                   Node::fluidTypeNames[(int)node->fluidType],
+                                   Node::fluidTypeNames[(int)nodeFluidType]));
                         ErrorsFound = true;
                     }
                 }
-                if (state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType == DataLoopNode::NodeFluidType::Blank) {
-                    state.dataLoopNodes->Node(NodeNumbers(Loop)).FluidType = nodeFluidType;
+                if (node->fluidType == Node::FluidType::Blank) {
+                    node->fluidType = nodeFluidType;
                 }
                 ++state.dataNodeInputMgr->NodeRef(NodeNumbers(Loop));
             }
@@ -170,17 +790,17 @@ void GetNodeNums(EnergyPlusData &state,
     }
 
     // Most calls to this routine use a fixed fluid stream number for all nodes, this is the default
-    NodeInputManager::CompFluidStream FluidStreamNum = NodeFluidStream;
+    Node::CompFluidStream FluidStreamNum = NodeFluidStream;
     for (int Loop = 1; Loop <= NumNodes; ++Loop) {
         // If requested, assign NodeFluidStream to the first node and increment the fluid stream number
         // for each remaining node in the list
         if (IncrementFluidStream) {
-            FluidStreamNum = static_cast<NodeInputManager::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
+            FluidStreamNum = static_cast<Node::CompFluidStream>(static_cast<int>(NodeFluidStream) + (Loop - 1));
         }
 
         RegisterNodeConnection(state,
                                NodeNumbers(Loop),
-                               state.dataLoopNodes->NodeID(NodeNumbers(Loop)),
+                               dln->nodes(NodeNumbers(Loop))->Name,
                                NodeObjectType,
                                NodeObjectName,
                                nodeConnectionType,
@@ -203,261 +823,259 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
     // Nodes have been found (TOTAL NODE NUMBER) or when HVAC warmup is
     // complete, whichever condition is reached first.
 
-    auto &Node = state.dataLoopNodes->Node;
-    auto &NodeID = state.dataLoopNodes->NodeID;
-
+    auto &dln = state.dataLoopNodes;
     if (!state.dataNodeInputMgr->NodeVarsSetup) {
         if (!state.dataErrTracking->AbortProcessing) {
-            state.dataLoopNodes->MoreNodeInfo.allocate(state.dataNodeInputMgr->NumOfUniqueNodeNames);
             for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
+                auto *node = dln->nodes(NumNode);
                 // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
                 SetupOutputVariable(state,
                                     "System Node Temperature",
                                     Constant::Units::C,
-                                    state.dataLoopNodes->Node(NumNode).Temp,
+                                    node->Temp,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Mass Flow Rate",
                                     Constant::Units::kg_s,
-                                    Node(NumNode).MassFlowRate,
+                                    node->MassFlowRate,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
-                                    Node(NumNode).HumRat,
+                                    node->HumRat,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint Temperature",
                                     Constant::Units::C,
-                                    Node(NumNode).TempSetPoint,
+                                    node->TempSetPoint,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint High Temperature",
                                     Constant::Units::C,
-                                    Node(NumNode).TempSetPointHi,
+                                    node->TempSetPointHi,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint Low Temperature",
                                     Constant::Units::C,
-                                    Node(NumNode).TempSetPointLo,
+                                    node->TempSetPointLo,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
-                                    Node(NumNode).HumRatSetPoint,
+                                    node->HumRatSetPoint,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint Minimum Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
-                                    Node(NumNode).HumRatMin,
+                                    node->HumRatMin,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Setpoint Maximum Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
-                                    Node(NumNode).HumRatMax,
+                                    node->HumRatMax,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Relative Humidity",
                                     Constant::Units::Perc,
-                                    state.dataLoopNodes->MoreNodeInfo(NumNode).RelHumidity,
+                                    node->RelHumidity,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Pressure",
                                     Constant::Units::Pa,
-                                    Node(NumNode).Press,
+                                    node->Press,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Standard Density Volume Flow Rate",
                                     Constant::Units::m3_s,
-                                    state.dataLoopNodes->MoreNodeInfo(NumNode).VolFlowRateStdRho,
+                                    node->VolFlowRateStdRho,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
-                if (Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Air ||
-                    Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Water) { // setup volume flow rate report for actual/current density
+                                    node->Name);
+                if (node->fluidType == FluidType::Air ||
+                    node->fluidType == FluidType::Water) { // setup volume flow rate report for actual/current density
                     SetupOutputVariable(state,
                                         "System Node Current Density Volume Flow Rate",
                                         Constant::Units::m3_s,
-                                        state.dataLoopNodes->MoreNodeInfo(NumNode).VolFlowRateCrntRho,
+                                        node->VolFlowRateCrntRho,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Current Density",
                                         Constant::Units::kg_m3,
-                                        state.dataLoopNodes->MoreNodeInfo(NumNode).Density,
+                                        node->Density,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Specific Heat",
                                         Constant::Units::J_kgK,
-                                        state.dataLoopNodes->MoreNodeInfo(NumNode).SpecificHeat,
+                                        node->SpecificHeat,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                 }
 
                 SetupOutputVariable(state,
                                     "System Node Enthalpy",
                                     Constant::Units::J_kg,
-                                    state.dataLoopNodes->MoreNodeInfo(NumNode).ReportEnthalpy,
+                                    node->ReportEnthalpy,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Wetbulb Temperature",
                                     Constant::Units::C,
-                                    state.dataLoopNodes->MoreNodeInfo(NumNode).WetBulbTemp,
+                                    node->WetBulbTemp,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Dewpoint Temperature",
                                     Constant::Units::C,
-                                    state.dataLoopNodes->MoreNodeInfo(NumNode).AirDewPointTemp,
+                                    node->AirDewPointTemp,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Wind Speed",
                                     Constant::Units::m_s,
-                                    Node(NumNode).OutAirWindSpeed,
+                                    node->OutAirWindSpeed,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Wind Direction",
                                     Constant::Units::deg,
-                                    Node(NumNode).OutAirWindDir,
+                                    node->OutAirWindDir,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Quality",
                                     Constant::Units::None,
-                                    Node(NumNode).Quality,
+                                    node->Quality,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 SetupOutputVariable(state,
                                     "System Node Height",
                                     Constant::Units::m,
-                                    Node(NumNode).Height,
+                                    node->Height,
                                     OutputProcessor::TimeStepType::System,
                                     OutputProcessor::StoreType::Average,
-                                    NodeID(NumNode));
+                                    node->Name);
                 if (state.dataGlobal->DisplayAdvancedReportVariables) {
                     SetupOutputVariable(state,
                                         "System Node Minimum Temperature",
                                         Constant::Units::C,
-                                        Node(NumNode).TempMin,
+                                        node->TempMin,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Maximum Temperature",
                                         Constant::Units::C,
-                                        Node(NumNode).TempMax,
+                                        node->TempMax,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Minimum Limit Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateMin,
+                                        node->MassFlowRateMin,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Maximum Limit Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateMax,
+                                        node->MassFlowRateMax,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Minimum Available Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateMinAvail,
+                                        node->MassFlowRateMinAvail,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Maximum Available Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateMaxAvail,
+                                        node->MassFlowRateMaxAvail,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Setpoint Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateSetPoint,
+                                        node->MassFlowRateSetPoint,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Requested Mass Flow Rate",
                                         Constant::Units::kg_s,
-                                        Node(NumNode).MassFlowRateRequest,
+                                        node->MassFlowRateRequest,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Last Timestep Temperature",
                                         Constant::Units::C,
-                                        Node(NumNode).TempLastTimestep,
+                                        node->TempLastTimestep,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                     SetupOutputVariable(state,
                                         "System Node Last Timestep Enthalpy",
                                         Constant::Units::J_kg,
-                                        Node(NumNode).EnthalpyLastTimestep,
+                                        node->EnthalpyLastTimestep,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                 }
                 if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
                     SetupOutputVariable(state,
                                         "System Node CO2 Concentration",
                                         Constant::Units::ppm,
-                                        Node(NumNode).CO2,
+                                        node->CO2,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                 }
                 if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
                     SetupOutputVariable(state,
                                         "System Node Generic Air Contaminant Concentration",
                                         Constant::Units::ppm,
-                                        Node(NumNode).GenContam,
+                                        node->GenContam,
                                         OutputProcessor::TimeStepType::System,
                                         OutputProcessor::StoreType::Average,
-                                        NodeID(NumNode));
+                                        node->Name);
                 }
             }
         }
@@ -482,11 +1100,12 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
         }
         int Count0 = 0;
         for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
+            auto const *node = dln->nodes(NumNode);
             print(state.files.bnd,
                   " Node,{},{},{},{}\n",
                   NumNode,
-                  NodeID(NumNode),
-                  DataLoopNode::NodeFluidTypeNames[static_cast<int>(Node(NumNode).FluidType)],
+                  node->Name,
+                  fluidTypeNames[(int)node->fluidType],
                   state.dataNodeInputMgr->NodeRef(NumNode));
             if (state.dataNodeInputMgr->NodeRef(NumNode) == 0) ++Count0;
         }
@@ -499,12 +1118,13 @@ void SetupNodeVarsForReporting(EnergyPlusData &state)
                 "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
             print(state.files.bnd, "{}\n", Format_703);
             for (int NumNode = 1; NumNode <= state.dataNodeInputMgr->NumOfUniqueNodeNames; ++NumNode) {
+                auto const *node = dln->nodes(NumNode);
                 if (state.dataNodeInputMgr->NodeRef(NumNode) > 0) continue;
                 print(state.files.bnd,
                       " Suspicious Node,{},{},{},{}\n",
                       NumNode,
-                      NodeID(NumNode),
-                      DataLoopNode::NodeFluidTypeNames[static_cast<int>(Node(NumNode).FluidType)],
+                      node->Name,
+                      fluidTypeNames[(int)node->fluidType],
                       state.dataNodeInputMgr->NodeRef(NumNode));
             }
         }
@@ -537,6 +1157,8 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     Array1D_string cAlphas;
     Array1D<Real64> rNumbers;
 
+    auto &dln = state.dataLoopNodes;
+    
     bool localErrorsFound(false);
     state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, CurrentModuleObject, NCount, NumAlphas, NumNumbers);
     cAlphas.allocate(NumAlphas);
@@ -545,7 +1167,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
     state.dataNodeInputMgr->NodeLists.allocate(state.dataNodeInputMgr->NumOfNodeLists);
     for (int i = 1; i <= state.dataNodeInputMgr->NumOfNodeLists; ++i) {
         state.dataNodeInputMgr->NodeLists(i).Name.clear();
-        state.dataNodeInputMgr->NodeLists(i).NumOfNodesInList = 0;
+        state.dataNodeInputMgr->NodeLists(i).NumNodes = 0;
     }
 
     NCount = 0;
@@ -558,9 +1180,9 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         state.dataNodeInputMgr->NodeLists(NCount).Name = cAlphas(1);
         state.dataNodeInputMgr->NodeLists(NCount).NodeNames.allocate(NumAlphas - 1);
         state.dataNodeInputMgr->NodeLists(NCount).NodeNames = "";
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers.allocate(NumAlphas - 1);
-        state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers = 0;
-        state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList = NumAlphas - 1;
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNums.allocate(NumAlphas - 1);
+        state.dataNodeInputMgr->NodeLists(NCount).NodeNums = 0;
+        state.dataNodeInputMgr->NodeLists(NCount).NumNodes = NumAlphas - 1;
         if (NumAlphas <= 1) {
             if (NumAlphas == 1) {
                 ShowSevereError(state, format("{}{}=\"{}\" does not have any nodes.", RoutineName, CurrentModuleObject, cAlphas(1)));
@@ -575,16 +1197,16 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
             state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1) = cAlphas(Loop1 + 1);
             if (cAlphas(Loop1 + 1).empty()) {
                 ShowWarningError(state, format("{}{}=\"{}\", blank node name in list.", RoutineName, CurrentModuleObject, cAlphas(1)));
-                --state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList;
-                if (state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList <= 0) {
+                --state.dataNodeInputMgr->NodeLists(NCount).NumNodes;
+                if (state.dataNodeInputMgr->NodeLists(NCount).NumNodes <= 0) {
                     ShowSevereError(state, format("{}{}=\"{}\" does not have any nodes.", RoutineName, CurrentModuleObject, cAlphas(1)));
                     localErrorsFound = true;
                     break;
                 }
                 continue;
             }
-            state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) = AssignNodeNumber(
-                state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), DataLoopNode::NodeFluidType::Blank, localErrorsFound);
+            state.dataNodeInputMgr->NodeLists(NCount).NodeNums(Loop1) = AssignNodeNumber(
+                state, state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), FluidType::Blank, localErrorsFound);
             if (Util::SameString(state.dataNodeInputMgr->NodeLists(NCount).NodeNames(Loop1), state.dataNodeInputMgr->NodeLists(NCount).Name)) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid node name in list.", RoutineName, CurrentModuleObject, cAlphas(1)));
                 ShowContinueError(state, format("... Node {} Name=\"{}\", duplicates NodeList Name.", Loop1, cAlphas(Loop1 + 1)));
@@ -593,10 +1215,14 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
         }
         // Error on any duplicates
         flagError = true;
-        for (int Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop1) {
-            for (int Loop2 = Loop1 + 1; Loop2 <= state.dataNodeInputMgr->NodeLists(NCount).NumOfNodesInList; ++Loop2) {
-                if (state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1) != state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))
+        for (int Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NodeLists(NCount).NumNodes; ++Loop1) {
+            int nodeNum1 = state.dataNodeInputMgr->NodeLists(NCount).NodeNums(Loop1);
+            auto const *node1 = dln->nodes(nodeNum1);
+            for (int Loop2 = Loop1 + 1; Loop2 <= state.dataNodeInputMgr->NodeLists(NCount).NumNodes; ++Loop2) {
+                int nodeNum2 = state.dataNodeInputMgr->NodeLists(NCount).NodeNums(Loop2);
+                if (nodeNum1 != nodeNum2)
                     continue;
+                auto const *node2 = dln->nodes(nodeNum2);
                 if (flagError) { // only list nodelist name once
                     ShowSevereError(state, format("{}{}=\"{}\" has duplicate nodes:", RoutineName, CurrentModuleObject, cAlphas(1)));
                     flagError = false;
@@ -604,16 +1230,16 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
                 ShowContinueError(state,
                                   format("...list item={}, \"{}\", duplicate list item={}, \"{}\".",
                                          Loop1,
-                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop1)),
+                                         node1->Name,
                                          Loop2,
-                                         state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NodeLists(NCount).NodeNumbers(Loop2))));
+                                         node2->Name));
                 localErrorsFound = true;
             }
         }
     }
 
     for (int Loop = 1; Loop <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop) {
-        for (int Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumOfNodesInList; ++Loop2) {
+        for (int Loop2 = 1; Loop2 <= state.dataNodeInputMgr->NodeLists(Loop).NumNodes; ++Loop2) {
             for (int Loop1 = 1; Loop1 <= state.dataNodeInputMgr->NumOfNodeLists; ++Loop1) {
                 if (Loop == Loop1) continue; // within a nodelist have already checked to see if node name duplicates nodelist name
                 if (!Util::SameString(state.dataNodeInputMgr->NodeLists(Loop).NodeNames(Loop2), state.dataNodeInputMgr->NodeLists(Loop1).Name))
@@ -643,7 +1269,7 @@ void GetNodeListsInput(EnergyPlusData &state, bool &ErrorsFound) // Set to true 
 
 int AssignNodeNumber(EnergyPlusData &state,
                      std::string const &Name,                         // Name for assignment
-                     DataLoopNode::NodeFluidType const nodeFluidType, // must be valid
+                     FluidType const nodeFluidType, // must be valid
                      bool &ErrorsFound)
 {
 
@@ -661,82 +1287,50 @@ int AssignNodeNumber(EnergyPlusData &state,
     // the array as the node number, if there.
 
     // Return value
-    int AssignNodeNumber;
-
-    if (nodeFluidType != DataLoopNode::NodeFluidType::Air && nodeFluidType != DataLoopNode::NodeFluidType::Water &&
-        nodeFluidType != DataLoopNode::NodeFluidType::Electric && nodeFluidType != DataLoopNode::NodeFluidType::Steam &&
-        nodeFluidType != DataLoopNode::NodeFluidType::Blank) {
+    auto &dln = state.dataLoopNodes;
+    
+    if (nodeFluidType != FluidType::Air && nodeFluidType != FluidType::Water &&
+        nodeFluidType != FluidType::Electric && nodeFluidType != FluidType::Steam &&
+        nodeFluidType != FluidType::Blank) {
         ShowSevereError(state, format("AssignNodeNumber: Invalid FluidType={}", nodeFluidType));
         ErrorsFound = true;
         ShowFatalError(state, "AssignNodeNumber: Preceding issue causes termination.");
     }
 
-    int NumNode = 0;
-    if (state.dataNodeInputMgr->NumOfUniqueNodeNames > 0) {
-        NumNode = Util::FindItemInList(
-            Name, state.dataLoopNodes->NodeID({1, state.dataNodeInputMgr->NumOfUniqueNodeNames}), state.dataNodeInputMgr->NumOfUniqueNodeNames);
-        if (NumNode > 0) {
-            AssignNodeNumber = NumNode;
-            ++state.dataNodeInputMgr->NodeRef(NumNode);
-            if (nodeFluidType != DataLoopNode::NodeFluidType::Blank) {
-                if (state.dataLoopNodes->Node(NumNode).FluidType != nodeFluidType &&
-                    state.dataLoopNodes->Node(NumNode).FluidType != DataLoopNode::NodeFluidType::Blank) {
-                    ShowSevereError(state,
-                                    format("Existing Fluid type for node, incorrect for request. Node={}", state.dataLoopNodes->NodeID(NumNode)));
-                    ShowContinueError(
-                        state,
-                        format("Existing Fluid type={}, Requested Fluid Type={}",
-                               format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(state.dataLoopNodes->Node(NumNode).FluidType)]),
-                               format("{}", DataLoopNode::NodeFluidTypeNames[static_cast<int>(nodeFluidType)])));
-                    ErrorsFound = true;
-                }
+    if (auto found  = dln->nodeMap.find(Name); found != dln->nodeMap.end()) {
+        auto *node = dln->nodes(found->second);
+        ++state.dataNodeInputMgr->NodeRef(found->second);
+        if (nodeFluidType != FluidType::Blank) {
+            if (node->fluidType != nodeFluidType && node->fluidType != FluidType::Blank) {
+                ShowSevereError(state, format("Existing Fluid type for node, incorrect for request. Node={}", node->Name));
+                ShowContinueError(state, format("Existing Fluid type={}, Requested Fluid Type={}",
+                                                fluidTypeNames[(int)node->fluidType], fluidTypeNames[(int)nodeFluidType]));
+                ErrorsFound = true;
             }
-            if (state.dataLoopNodes->Node(NumNode).FluidType == DataLoopNode::NodeFluidType::Blank) {
-                state.dataLoopNodes->Node(NumNode).FluidType = nodeFluidType;
-            }
-        } else {
-            ++state.dataNodeInputMgr->NumOfUniqueNodeNames;
-            state.dataLoopNodes->NumOfNodes = state.dataNodeInputMgr->NumOfUniqueNodeNames;
-
-            state.dataLoopNodes->Node.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->NodeID.redimension({0, state.dataLoopNodes->NumOfNodes});
-            state.dataNodeInputMgr->NodeRef.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->MarkedNode.redimension(state.dataLoopNodes->NumOfNodes);
-            state.dataLoopNodes->NodeSetpointCheck.redimension(state.dataLoopNodes->NumOfNodes);
-            // Set new item in Node
-            state.dataLoopNodes->Node(state.dataLoopNodes->NumOfNodes).FluidType = nodeFluidType;
-            state.dataNodeInputMgr->NodeRef(state.dataLoopNodes->NumOfNodes) = 0;
-            state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
-
-            AssignNodeNumber = state.dataNodeInputMgr->NumOfUniqueNodeNames;
         }
+        if (node->fluidType == Node::FluidType::Blank) {
+            node->fluidType = nodeFluidType;
+        }
+        return found->second;
     } else {
-        state.dataLoopNodes->Node.allocate(1);
-        state.dataLoopNodes->Node(1).FluidType = nodeFluidType;
-        // Allocate takes care of defining
-        state.dataLoopNodes->NumOfNodes = 1;
-        state.dataLoopNodes->NodeID.allocate({0, 1});
-        state.dataNodeInputMgr->NodeRef.allocate(1);
-        state.dataLoopNodes->MarkedNode.allocate(1);
-        state.dataLoopNodes->NodeSetpointCheck.allocate(1);
+        auto *node = new NodeData;
+        node->Name = Name;
+        node->fluidType = nodeFluidType;
+        
+        dln->nodes.push_back(node);
+        dln->nodeMap.insert_or_assign(Name, dln->nodes.size());
 
-        state.dataNodeInputMgr->NumOfUniqueNodeNames = 1;
-        state.dataLoopNodes->NodeID(0) = "Undefined";
-        state.dataLoopNodes->NodeID(state.dataNodeInputMgr->NumOfUniqueNodeNames) = Name;
-        AssignNodeNumber = 1;
-        state.dataNodeInputMgr->NodeRef(1) = 0;
+        return dln->nodes.size();
     }
-
-    return AssignNodeNumber;
 }
 
-int GetOnlySingleNode(EnergyPlusData &state,
+int GetSingleNode(EnergyPlusData &state,
                       std::string const &NodeName,
                       bool &errFlag,
-                      DataLoopNode::ConnectionObjectType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+                      Node::ConnObjType const NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
                       std::string const &NodeObjectName,                       // Node Object Name (i.e. "MyChiller")
-                      DataLoopNode::NodeFluidType const nodeFluidType,         // Fluidtype for checking/setting node FluidType
-                      DataLoopNode::ConnectionType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
+                      Node::FluidType const nodeFluidType,         // Fluidtype for checking/setting node FluidType
+                      Node::ConnType const nodeConnectionType,   // Node Connection Type (see DataLoopNode)
                       CompFluidStream const NodeFluidStream,                   // Which Fluid Stream
                       bool const ObjectIsParent,                               // True/False
                       std::string_view const InputFieldName                    // Input Field Name
@@ -751,25 +1345,25 @@ int GetOnlySingleNode(EnergyPlusData &state,
     // This function gets a single node (or error message results) using the
     // node id from the input file.
 
-    static constexpr std::string_view RoutineName("GetOnlySingleNode: ");
+    static constexpr std::string_view RoutineName("GetSingleNode: ");
 
     int NumNodes;
     int NumParams;
     int NumAlphas;
     int NumNums;
 
-    std::string_view const objTypeStr = BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(NodeObjectType)];
+    std::string_view const objTypeStr = Node::connObjTypeNames[(int)NodeObjectType];
 
-    if (state.dataNodeInputMgr->GetOnlySingleNodeFirstTime) {
+    if (state.dataNodeInputMgr->GetSingleNodeFirstTime) {
         state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "NodeList", NumParams, NumAlphas, NumNums);
-        state.dataNodeInputMgr->GetOnlySingleNodeNodeNums.dimension(NumParams, 0);
-        state.dataNodeInputMgr->GetOnlySingleNodeFirstTime = false;
+        state.dataNodeInputMgr->GetSingleNodeNodeNums.dimension(NumParams, 0);
+        state.dataNodeInputMgr->GetSingleNodeFirstTime = false;
     }
 
     GetNodeNums(state,
                 NodeName,
                 NumNodes,
-                state.dataNodeInputMgr->GetOnlySingleNodeNodeNums,
+                state.dataNodeInputMgr->GetSingleNodeNodeNums,
                 errFlag,
                 nodeFluidType,
                 NodeObjectType,
@@ -789,10 +1383,10 @@ int GetOnlySingleNode(EnergyPlusData &state,
         ShowContinueError(state, "...a Nodelist may not be valid in this context.");
         errFlag = true;
     } else if (NumNodes == 0) {
-        state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1) = 0;
+        state.dataNodeInputMgr->GetSingleNodeNodeNums(1) = 0;
     }
 
-    return state.dataNodeInputMgr->GetOnlySingleNodeNodeNums(1);
+    return state.dataNodeInputMgr->GetSingleNodeNodeNums(1);
 }
 
 void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
@@ -807,7 +1401,7 @@ void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine begins a process of checking for unique node names
     // in a sequence of nodes.
-
+#ifdef GET_OUT
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool errFlag(false);
 
@@ -827,14 +1421,10 @@ void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     if (ContextName.empty()) {
         ShowFatalError(state, "Init Uniqueness called with Blank Context Name");
     }
-    if (allocated(state.dataNodeInputMgr->UniqueNodeNames)) {
-        state.dataNodeInputMgr->UniqueNodeNames.deallocate();
-    }
-
     state.dataNodeInputMgr->NumCheckNodes = 0;
     state.dataNodeInputMgr->MaxCheckNodes = 100;
-    state.dataNodeInputMgr->UniqueNodeNames.allocate(state.dataNodeInputMgr->MaxCheckNodes);
     state.dataNodeInputMgr->CurCheckContextName = ContextName;
+#endif // GET_OUT
 }
 
 void CheckUniqueNodeNames(
@@ -857,7 +1447,7 @@ void CheckUniqueNodeNames(
 
     // METHODOLOGY EMPLOYED:
     // checks the current list of items for this (again)
-
+#ifdef GET_OUT
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Found;
 
@@ -878,6 +1468,7 @@ void CheckUniqueNodeNames(
             state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = CheckName;
         }
     }
+#endif // GET_OUT    
 }
 
 void CheckUniqueNodeNumbers(
@@ -900,17 +1491,17 @@ void CheckUniqueNodeNumbers(
 
     // METHODOLOGY EMPLOYED:
     // checks the current list of items for this (again)
-
+#ifdef GET_OUT
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int Found;
 
     if (CheckNumber != 0) {
         Found = Util::FindItemInList(
-            state.dataLoopNodes->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
+            dln->NodeID(CheckNumber), state.dataNodeInputMgr->UniqueNodeNames, state.dataNodeInputMgr->NumCheckNodes);
         if (Found != 0) {
             ShowSevereError(state, format("{}=\"{}\", duplicate node names found.", state.dataNodeInputMgr->CurCheckContextName, ObjectName));
             ShowContinueError(state,
-                              format("...for Node Type(s)={}, duplicate node name=\"{}\".", NodeTypes, state.dataLoopNodes->NodeID(CheckNumber)));
+                              format("...for Node Type(s)={}, duplicate node name=\"{}\".", NodeTypes, dln->NodeID(CheckNumber)));
             ShowContinueError(state, "...Nodes must be unique across instances of this object.");
             ErrorsFound = true;
         } else {
@@ -918,14 +1509,15 @@ void CheckUniqueNodeNumbers(
             if (state.dataNodeInputMgr->NumCheckNodes > state.dataNodeInputMgr->MaxCheckNodes) {
                 state.dataNodeInputMgr->UniqueNodeNames.redimension(state.dataNodeInputMgr->MaxCheckNodes += 100);
             }
-            state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = state.dataLoopNodes->NodeID(CheckNumber);
+            state.dataNodeInputMgr->UniqueNodeNames(state.dataNodeInputMgr->NumCheckNodes) = dln->NodeID(CheckNumber);
         }
     }
+#endif // GET_OUT
 }
 
 void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
 {
-
+#ifdef GET_OUT
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   November 2002
@@ -948,6 +1540,7 @@ void EndUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName)
     if (allocated(state.dataNodeInputMgr->UniqueNodeNames)) {
         state.dataNodeInputMgr->UniqueNodeNames.deallocate();
     }
+#endif // GET_OUT
 }
 
 void CalcMoreNodeInfo(EnergyPlusData &state)
@@ -1007,19 +1600,20 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     Real64 Cp;
     Real64 rhoStd;
 
+    auto &dln = state.dataLoopNodes;
     if (state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag) {
         RhoAirStdInit = state.dataEnvrn->StdRhoAir;
         RhoWaterStdInit = RhoH2O(Constant::InitConvTemp);
-        state.dataNodeInputMgr->NodeWetBulbRepReq.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeWetBulbSchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeRelHumidityRepReq.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeRelHumiditySchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeDewPointRepReq.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeDewPointSchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeSpecificHeatRepReq.allocate(state.dataLoopNodes->NumOfNodes);
-        NodeSpecificHeatSchedPtr.allocate(state.dataLoopNodes->NumOfNodes);
-        nodeReportingStrings.reserve(state.dataLoopNodes->NumOfNodes);
-        nodeFluidNames.reserve(state.dataLoopNodes->NumOfNodes);
+        state.dataNodeInputMgr->NodeWetBulbRepReq.allocate(dln->nodes.size());
+        NodeWetBulbSchedPtr.allocate(dln->nodes.size());
+        NodeRelHumidityRepReq.allocate(dln->nodes.size());
+        NodeRelHumiditySchedPtr.allocate(dln->nodes.size());
+        NodeDewPointRepReq.allocate(dln->nodes.size());
+        NodeDewPointSchedPtr.allocate(dln->nodes.size());
+        NodeSpecificHeatRepReq.allocate(dln->nodes.size());
+        NodeSpecificHeatSchedPtr.allocate(dln->nodes.size());
+        nodeReportingStrings.reserve(dln->nodes.size());
+        nodeFluidNames.reserve(dln->nodes.size());
         state.dataNodeInputMgr->NodeWetBulbRepReq = false;
         NodeWetBulbSchedPtr = 0;
         NodeRelHumidityRepReq = false;
@@ -1029,12 +1623,13 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
         NodeSpecificHeatRepReq = false;
         NodeSpecificHeatSchedPtr = 0;
 
-        for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
-            nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
-            nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
+        for (int iNode = 1; iNode <= dln->nodes.isize(); ++iNode) {
+            auto const *node = dln->nodes(iNode);
+            nodeReportingStrings.push_back(std::string(NodeReportingCalc + node->Name));
+            nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, node->FluidIndex));
 
             for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
-                if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
+                if (Util::SameString(reqVar->key, node->Name) || reqVar->key.empty()) {
                     if (Util::SameString(reqVar->name, "System Node Wetbulb Temperature")) {
                         state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) = true;
                         NodeWetBulbSchedPtr(iNode) = reqVar->SchedPtr;
@@ -1070,7 +1665,8 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
         state.dataNodeInputMgr->CalcMoreNodeInfoMyOneTimeFlag = false;
     }
 
-    for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
+    for (int iNode = 1; iNode <= dln->nodes.isize(); ++iNode) {
+        auto *node = dln->nodes(iNode);
         ReportWetBulb = false;
         ReportRelHumidity = false;
         ReportDewPoint = false;
@@ -1079,7 +1675,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
             ReportWetBulb = (GetCurrentScheduleValue(state, NodeWetBulbSchedPtr(iNode)) > 0.0);
         } else if (state.dataNodeInputMgr->NodeWetBulbRepReq(iNode) && NodeWetBulbSchedPtr(iNode) == 0) {
             ReportWetBulb = true;
-        } else if (state.dataLoopNodes->Node(iNode).SPMNodeWetBulbRepReq) {
+        } else if (node->SPMNodeWetBulbRepReq) {
             ReportWetBulb = true;
         }
         if (NodeRelHumidityRepReq(iNode) && NodeRelHumiditySchedPtr(iNode) > 0) {
@@ -1098,140 +1694,102 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
             ReportSpecificHeat = true;
         }
         // calculate the volume flow rate
-        if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Air) {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirStdInit;
+        if (node->fluidType == FluidType::Air) {
+            node->VolFlowRateStdRho = node->MassFlowRate / RhoAirStdInit;
             // if Node%Press was reliable could be used here.
-            RhoAirCurrent = PsyRhoAirFnPbTdbW(
-                state, state.dataEnvrn->OutBaroPress, state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
-            state.dataLoopNodes->MoreNodeInfo(iNode).Density = RhoAirCurrent;
+            RhoAirCurrent = PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, node->Temp, node->HumRat);
+            node->Density = RhoAirCurrent;
             if (RhoAirCurrent != 0.0)
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateCrntRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirCurrent;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                PsyHFnTdbW(state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
+                node->VolFlowRateCrntRho = node->MassFlowRate / RhoAirCurrent;
+            node->ReportEnthalpy = PsyHFnTdbW(node->Temp, node->HumRat);
             if (ReportWetBulb) {
                 // if Node%Press was reliable could be used here.
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(state,
-                                                                                      state.dataLoopNodes->Node(iNode).Temp,
-                                                                                      state.dataLoopNodes->Node(iNode).HumRat,
-                                                                                      state.dataEnvrn->OutBaroPress,
-                                                                                      nodeReportingStrings[iNode - 1]);
+                node->WetBulbTemp = PsyTwbFnTdbWPb(state, node->Temp, node->HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
+                node->WetBulbTemp = 0.0;
             }
             if (ReportDewPoint) {
-                state.dataLoopNodes->MoreNodeInfo(iNode).AirDewPointTemp =
-                    PsyTdpFnWPb(state, state.dataLoopNodes->Node(iNode).HumRat, state.dataEnvrn->OutBaroPress);
+                node->AirDewPointTemp = PsyTdpFnWPb(state, node->HumRat, state.dataEnvrn->OutBaroPress);
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).AirDewPointTemp = 0.0;
+                node->AirDewPointTemp = 0.0;
             }
             if (ReportRelHumidity) {
                 // if Node%Press was reliable could be used here.
                 // following routines don't issue psych errors and may be more reliable.
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 100.0 * PsyRhFnTdbWPb(state,
-                                                                                             state.dataLoopNodes->Node(iNode).Temp,
-                                                                                             state.dataLoopNodes->Node(iNode).HumRat,
-                                                                                             state.dataEnvrn->OutBaroPress,
-                                                                                             nodeReportingStrings[iNode - 1]);
+                node->RelHumidity = 100.0 * PsyRhFnTdbWPb(state, node->Temp, node->HumRat, state.dataEnvrn->OutBaroPress, nodeReportingStrings[iNode - 1]);
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
+                node->RelHumidity = 0.0;
             }
             if (ReportSpecificHeat) { // only call psych routine if needed.
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(state.dataLoopNodes->Node(iNode).HumRat);
+                node->SpecificHeat = PsyCpAirFnW(node->HumRat);
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
+                node->SpecificHeat = 0.0;
             }
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
+        } else if (node->fluidType == FluidType::Water) {
 
-            if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) &&
-                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
+            if (!((node->FluidIndex > 0) && (node->FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
                 rho = RhoWaterStdInit;
                 rhoStd = RhoWaterStdInit;
-                Cp = CPCW(state.dataLoopNodes->Node(iNode).Temp);
+                Cp = CPCW(node->Temp);
             } else {
-                Cp = GetSpecificHeatGlycol(state,
-                                           nodeFluidNames[iNode - 1],
-                                           state.dataLoopNodes->Node(iNode).Temp,
-                                           state.dataLoopNodes->Node(iNode).FluidIndex,
-                                           nodeReportingStrings[iNode - 1]);
-                rhoStd = GetDensityGlycol(state,
-                                          nodeFluidNames[iNode - 1],
-                                          Constant::InitConvTemp,
-                                          state.dataLoopNodes->Node(iNode).FluidIndex,
-                                          nodeReportingStrings[iNode - 1]);
-                rho = GetDensityGlycol(state,
-                                       nodeFluidNames[iNode - 1],
-                                       state.dataLoopNodes->Node(iNode).Temp,
-                                       state.dataLoopNodes->Node(iNode).FluidIndex,
-                                       nodeReportingStrings[iNode - 1]);
+                Cp = GetSpecificHeatGlycol(state, nodeFluidNames[iNode - 1], node->Temp, node->FluidIndex, nodeReportingStrings[iNode - 1]);
+                rhoStd = GetDensityGlycol(state, nodeFluidNames[iNode - 1], Constant::InitConvTemp, node->FluidIndex, nodeReportingStrings[iNode - 1]);
+                rho = GetDensityGlycol(state, nodeFluidNames[iNode - 1], node->Temp, node->FluidIndex, nodeReportingStrings[iNode - 1]);
             }
 
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / rhoStd;
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateCrntRho = state.dataLoopNodes->Node(iNode).MassFlowRate / rho;
-            state.dataLoopNodes->MoreNodeInfo(iNode).Density = rho;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = Cp * state.dataLoopNodes->Node(iNode).Temp;
-            state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = Cp; // always fill since cp already always being calculated anyway
-            state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 100.0;
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Steam) {
-            if (state.dataLoopNodes->Node(iNode).Quality == 1.0) {
-                SteamDensity = GetSatDensityRefrig(state,
-                                                   fluidNameSteam,
-                                                   state.dataLoopNodes->Node(iNode).Temp,
-                                                   state.dataLoopNodes->Node(iNode).Quality,
-                                                   state.dataLoopNodes->Node(iNode).FluidIndex,
-                                                   RoutineName);
-                EnthSteamInDry = GetSatEnthalpyRefrig(state,
-                                                      fluidNameSteam,
-                                                      state.dataLoopNodes->Node(iNode).Temp,
-                                                      state.dataLoopNodes->Node(iNode).Quality,
-                                                      state.dataLoopNodes->Node(iNode).FluidIndex,
-                                                      RoutineName);
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / SteamDensity;
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = EnthSteamInDry;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
-            } else if (state.dataLoopNodes->Node(iNode).Quality == 0.0) { // The node has condensate water through it
-                state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoWaterStdInit;
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    CPCW(state.dataLoopNodes->Node(iNode).Temp) * state.dataLoopNodes->Node(iNode).Temp;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
+            node->VolFlowRateStdRho = node->MassFlowRate / rhoStd;
+            node->VolFlowRateCrntRho = node->MassFlowRate / rho;
+            node->Density = rho;
+            node->ReportEnthalpy = Cp * node->Temp;
+            node->SpecificHeat = Cp; // always fill since cp already always being calculated anyway
+            node->WetBulbTemp = 0.0;
+            node->RelHumidity = 100.0;
+        } else if (node->fluidType == Node::FluidType::Steam) {
+            if (node->Quality == 1.0) {
+                SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, node->Temp, node->Quality, node->FluidIndex, RoutineName);
+                EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, node->Temp, node->Quality, node->FluidIndex, RoutineName);
+                node->VolFlowRateStdRho = node->MassFlowRate / SteamDensity;
+                node->ReportEnthalpy = EnthSteamInDry;
+                node->WetBulbTemp = 0.0;
+                node->RelHumidity = 0.0;
+            } else if (node->Quality == 0.0) { // The node has condensate water through it
+                node->VolFlowRateStdRho = node->MassFlowRate / RhoWaterStdInit;
+                node->ReportEnthalpy = CPCW(node->Temp) * node->Temp;
+                node->WetBulbTemp = 0.0;
+                node->RelHumidity = 0.0;
             }
-        } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Electric) {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).RelHumidity = 0.0;
-            state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
+        } else if (node->fluidType == FluidType::Electric) {
+            node->VolFlowRateStdRho = 0.0;
+            node->ReportEnthalpy = 0.0;
+            node->WetBulbTemp = 0.0;
+            node->RelHumidity = 0.0;
+            node->SpecificHeat = 0.0;
         } else {
-            state.dataLoopNodes->MoreNodeInfo(iNode).VolFlowRateStdRho = state.dataLoopNodes->Node(iNode).MassFlowRate / RhoAirStdInit;
-            if (state.dataLoopNodes->Node(iNode).HumRat > 0.0) {
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    PsyHFnTdbW(state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat);
+            node->VolFlowRateStdRho = node->MassFlowRate / RhoAirStdInit;
+            if (node->HumRat > 0.0) {
+                node->ReportEnthalpy = PsyHFnTdbW(node->Temp, node->HumRat);
                 if (ReportWetBulb) {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = PsyTwbFnTdbWPb(
-                        state, state.dataLoopNodes->Node(iNode).Temp, state.dataLoopNodes->Node(iNode).HumRat, state.dataEnvrn->StdBaroPress);
+                    node->WetBulbTemp = PsyTwbFnTdbWPb(state, node->Temp, node->HumRat, state.dataEnvrn->StdBaroPress);
                 } else {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
+                    node->WetBulbTemp = 0.0;
                 }
                 if (ReportSpecificHeat) {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(state.dataLoopNodes->Node(iNode).HumRat);
+                    node->SpecificHeat = PsyCpAirFnW(node->HumRat);
                 } else {
-                    state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
+                    node->SpecificHeat = 0.0;
                 }
             } else {
-                state.dataLoopNodes->MoreNodeInfo(iNode).ReportEnthalpy =
-                    CPCW(state.dataLoopNodes->Node(iNode).Temp) * state.dataLoopNodes->Node(iNode).Temp;
-                state.dataLoopNodes->MoreNodeInfo(iNode).WetBulbTemp = 0.0;
-                state.dataLoopNodes->MoreNodeInfo(iNode).SpecificHeat = 0.0;
+                node->ReportEnthalpy = CPCW(node->Temp) * node->Temp;
+                node->WetBulbTemp = 0.0;
+                node->SpecificHeat = 0.0;
             }
         }
     }
 }
 
 void MarkNode(EnergyPlusData &state,
-              int const NodeNumber, // Node Number to be marked
-              DataLoopNode::ConnectionObjectType const ObjectType,
+              int const NodeNum, // Node Number to be marked
+              ConnObjType const ObjectType,
               std::string const &ObjectName,
               std::string const &FieldName)
 {
@@ -1245,10 +1803,13 @@ void MarkNode(EnergyPlusData &state,
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine marks a node -- this node needs to exist in more than one object.
 
-    state.dataLoopNodes->MarkedNode(NodeNumber).IsMarked = true;
-    state.dataLoopNodes->MarkedNode(NodeNumber).ObjectType = ObjectType;
-    state.dataLoopNodes->MarkedNode(NodeNumber).ObjectName = ObjectName;
-    state.dataLoopNodes->MarkedNode(NodeNumber).FieldName = FieldName;
+    auto &dln = state.dataLoopNodes;
+    auto *node = dln->nodes(NodeNum);
+        
+    node->IsMarked = true;
+    node->connObjType = ObjectType;
+    node->ObjectName = ObjectName;
+    node->FieldName = FieldName;
 }
 
 void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
@@ -1262,22 +1823,23 @@ void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound)
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine checks "marked" nodes.
-
-    for (int NodeNum = 1; NodeNum <= state.dataLoopNodes->NumOfNodes; ++NodeNum) {
-        if (state.dataLoopNodes->MarkedNode(NodeNum).IsMarked) {
+    auto &dln = state.dataLoopNodes;
+        
+    for (int NodeNum = 1; NodeNum <= dln->nodes.isize(); ++NodeNum) {
+        auto const *node = dln->nodes(NodeNum);
+            
+        if (node->IsMarked) {
             if (state.dataNodeInputMgr->NodeRef(NodeNum) == 0) {
-                std::string_view objType =
-                    BranchNodeConnections::ConnectionObjectTypeNames[static_cast<int>(state.dataLoopNodes->MarkedNode(NodeNum).ObjectType)];
-                ShowSevereError(state, format("Node=\"{}\" did not find reference by another object.", state.dataLoopNodes->NodeID(NodeNum)));
+                ShowSevereError(state, format("Node=\"{}\" did not find reference by another object.", node->Name));
                 ShowContinueError(state,
                                   format(R"(Object="{}", Name="{}", Field=[{}])",
-                                         objType,
-                                         state.dataLoopNodes->MarkedNode(NodeNum).ObjectName,
-                                         state.dataLoopNodes->MarkedNode(NodeNum).FieldName));
+                                         connObjTypeNames[(int)node->connObjType],
+                                         node->ObjectName,
+                                         node->FieldName));
                 ErrorsFound = true;
             }
         }
     }
 }
 
-} // namespace EnergyPlus::NodeInputManager
+} // namespace EnergyPlus::Node

@@ -72,13 +72,13 @@ namespace MixerComponent {
         Real64 OutletHumRat;
         Real64 OutletEnthalpy;
         Real64 OutletPressure;
-        int OutletNode;
+        int OutNodeNum = 0;
         Real64 OutletMassFlowRate;         // MassFlow through the Mixer being Simulated [kg/Sec]
         Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         bool InitFlag;
-        int NumInletNodes;
-        Array1D_int InletNode;
+        int NumInNodes;
+        Array1D_int InNodeNums;
         Array1D<Real64> InletMassFlowRate;
         Array1D<Real64> InletMassFlowRateMaxAvail;
         Array1D<Real64> InletMassFlowRateMinAvail;
@@ -89,8 +89,8 @@ namespace MixerComponent {
 
         // Default Constructor
         MixerConditions()
-            : OutletTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletNode(0), OutletMassFlowRate(0.0),
-              OutletMassFlowRateMaxAvail(0.0), OutletMassFlowRateMinAvail(0.0), InitFlag(false), NumInletNodes(0)
+            : OutletTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletMassFlowRate(0.0),
+              OutletMassFlowRateMaxAvail(0.0), OutletMassFlowRateMinAvail(0.0), InitFlag(false), NumInNodes(0)
         {
         }
     };
@@ -155,8 +155,8 @@ struct MixerComponentData : BaseGlobalStruct
 {
 
     int NumMixers = 0;
-    int LoopInletNode = 0;
-    int LoopOutletNode = 0;
+    int LoopInNodeNum = 0;
+    int LoopOutNodeNum = 0;
     bool SimAirMixerInputFlag = true;
     bool GetZoneMixerIndexInputFlag = true;
     Array1D_bool CheckEquipName;
@@ -165,8 +165,8 @@ struct MixerComponentData : BaseGlobalStruct
     void clear_state() override
     {
         this->NumMixers = 0;
-        this->LoopInletNode = 0;
-        this->LoopOutletNode = 0;
+        this->LoopInNodeNum = 0;
+        this->LoopOutNodeNum = 0;
         this->GetZoneMixerIndexInputFlag = true;
         this->SimAirMixerInputFlag = true;
         this->CheckEquipName.deallocate();

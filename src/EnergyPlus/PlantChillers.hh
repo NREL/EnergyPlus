@@ -87,10 +87,10 @@ namespace PlantChillers {
         bool ModulatedFlowSetToLoop;            // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;              // true if setpoint warning issued
         bool HRSPErrDone;                       // TRUE if set point warning issued for heat recovery loop
-        int EvapInletNodeNum;                   // Node number on the inlet side of the plant
-        int EvapOutletNodeNum;                  // Node number on the outlet side of the plant
-        int CondInletNodeNum;                   // Node number on the inlet side of the condenser
-        int CondOutletNodeNum;                  // Node number on the outlet side of the condenser
+        int EvapInNodeNum = 0;                   // Node number on the inlet side of the plant
+        int EvapOutNodeNum = 0;                  // Node number on the outlet side of the plant
+        int CondInNodeNum = 0;                   // Node number on the inlet side of the condenser
+        int CondOutNodeNum = 0;                  // Node number on the outlet side of the condenser
         Real64 EvapVolFlowRate;                 // m**3/s - design nominal water volumetric flow rate through the evaporator
         bool EvapVolFlowRateWasAutoSized;       // true if autosized design evap flow rate on input
         Real64 EvapMassFlowRateMax;             // kg/s - design water mass flow rate through evaporator
@@ -148,7 +148,7 @@ namespace PlantChillers {
             : MinPartLoadRat(0.0), MaxPartLoadRat(1.0), OptPartLoadRat(1.0), TempDesCondIn(0.0), TempRiseCoef(0.0), TempDesEvapOut(0.0),
               CondenserType(DataPlant::CondenserType::WaterCooled), NomCap(0.0), NomCapWasAutoSized(false), COP(0.0),
               FlowMode(DataPlant::FlowMode::Invalid), ModulatedFlowSetToLoop(false), ModulatedFlowErrDone(false), HRSPErrDone(false),
-              EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0), EvapVolFlowRate(0.0),
+              EvapVolFlowRate(0.0),
               EvapVolFlowRateWasAutoSized(false), EvapMassFlowRateMax(0.0), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false),
               CondMassFlowRateMax(0.0), CWPlantLoc{}, CDPlantLoc{}, SizFac(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0),
               BasinHeaterSchedulePtr(0), ErrCount1(0), ErrCount2(0), MsgDataLast(0.0), PrintMessage(false), MsgErrorCount(0), CheckEquipName(true),
@@ -199,11 +199,11 @@ namespace PlantChillers {
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous was input autosize.
         Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
         bool HeatRecActive;                        // True entered Heat Rec Vol Flow Rate >0
-        int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
+        int HeatRecInNodeNum = 0;                   // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutNodeNum = 0;                  // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecCapacityFraction;            // user input for heat recovery capacity fraction []
         Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
-        int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
+        int HeatRecSetPointNodeNum = 0;                // index for system node with the heat recover leaving setpoint
         int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
         PlantLocation HRPlantLoc;                  // heat recovery water plant loop component index
         std::string EndUseSubcategory;             // identifier use for the end use subcategory
@@ -218,8 +218,8 @@ namespace PlantChillers {
         // Default Constructor
         ElectricChillerSpecs()
             : CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0),
-              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0),
+              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), 
+              HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), 
               HeatRecInletLimitSchedNum(0), HRPlantLoc{}, CondOutletHumRat(0.0), ActualCOP(0.0), QHeatRecovery(0.0), EnergyHeatRecovery(0.0),
               HeatRecInletTemp(0.0), HeatRecMdot(0.0), ChillerCondAvgTemp(0.0)
         {
@@ -285,8 +285,8 @@ namespace PlantChillers {
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if user input was autosize for heat recover design flow rate
         Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
         bool HeatRecActive;                        // True entered Heat Rec Vol Flow Rate >0
-        int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
+        int HeatRecInNodeNum = 0;                   // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutNodeNum = 0;                  // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecCapacityFraction;            // user input for heat recovery capacity fraction []
         Real64 HeatRecMaxTemp;                     // Max Temp that can be produced in heat recovery
         PlantLocation HRPlantLoc;                  // heat recovery water plant loop component index
@@ -315,8 +315,8 @@ namespace PlantChillers {
             : CapRatCoef(3, 0.0), PowerRatCoef(3, 0.0), FullLoadCoef(3, 0.0), TempLowLimitEvapOut(0.0), ClngLoadtoFuelCurve(0),
               RecJacHeattoFuelCurve(0), RecLubeHeattoFuelCurve(0), TotExhausttoFuelCurve(0), ExhaustTemp(0.0), ExhaustTempCurve(0), UA(0.0),
               UACoef(2, 0.0), MaxExhaustperPowerOutput(0.0), DesignMinExitGasTemp(0.0), FuelHeatingValue(0.0), DesignHeatRecVolFlowRate(0.0),
-              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
-              HeatRecOutletNodeNum(0), HeatRecCapacityFraction(0.0), HeatRecMaxTemp(0.0), HRPlantLoc{}, HeatRecInletTemp(0.0), HeatRecMdotActual(0.0),
+              DesignHeatRecVolFlowRateWasAutoSized(false), DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), 
+              HeatRecCapacityFraction(0.0), HeatRecMaxTemp(0.0), HRPlantLoc{}, HeatRecInletTemp(0.0), HeatRecMdotActual(0.0),
               QTotalHeatRecovered(0.0), QJacketRecovered(0.0),
 
               // engine driven:
@@ -388,8 +388,8 @@ namespace PlantChillers {
         Real64 MaxExhaustperGTPower;               // Max Exhaust Flow per KW Power Out
         Real64 DesignSteamSatTemp;                 // Steam Saturation Temperature
         Real64 ExhaustStackTemp;                   // Temperature of Exhaust Gases
-        int HeatRecInletNodeNum;                   // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
+        int HeatRecInNodeNum = 0;                   // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutNodeNum = 0;                  // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid (HeatRecOutletTemp is in base already)
         Real64 HeatRecMdot;                        // Heat Recovery Loop Mass flow rate
         Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
@@ -414,7 +414,7 @@ namespace PlantChillers {
               PLBasedFuelInputCoef(3, 0.0), TempBasedFuelInputCoef(3, 0.0), ExhaustFlow(0.0), ExhaustFlowCoef(3, 0.0), ExhaustTemp(0.0),
               PLBasedExhaustTempCoef(3, 0.0), TempBasedExhaustTempCoef(3, 0.0), HeatRecLubeEnergy(0.0), HeatRecLubeRate(0.0),
               HeatRecLubeEnergyCoef(3, 0.0), UAtoCapRat(0.0), UAtoCapCoef(3, 0.0), GTEngineCapacity(0.0), GTEngineCapacityWasAutoSized(false),
-              MaxExhaustperGTPower(0.0), DesignSteamSatTemp(0.0), ExhaustStackTemp(0.0), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0),
+              MaxExhaustperGTPower(0.0), DesignSteamSatTemp(0.0), ExhaustStackTemp(0.0), 
               HeatRecInletTemp(0.0), HeatRecMdot(0.0), DesignHeatRecVolFlowRate(0.0), DesignHeatRecVolFlowRateWasAutoSized(false),
               DesignHeatRecMassFlowRate(0.0), HeatRecActive(false), FuelHeatingValue(0.0), HeatRecCapacityFraction(0.0), engineCapacityScalar(0.35),
               HeatRecMaxTemp(0.0), HRPlantLoc{}, FuelEnergyUsed(0.0), FuelEnergyUsedRate(0.0), FuelMassUsed(0.0), FuelMassUsedRate(0.0), FuelCOP(0.0)
@@ -455,7 +455,9 @@ namespace PlantChillers {
     {
         // Members
         Real64 ActualCOP;
-
+        int HeatRecInNodeNum = 0;
+        int HeatRecOutNodeNum = 0;
+            
         // Default Constructor
         ConstCOPChillerSpecs() : ActualCOP(0.0)
         {

@@ -551,7 +551,7 @@ void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVe
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
             for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).ReturnAirInNodeNum) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -613,7 +613,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
         if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysExists) {
             // loop over OA controllers and match node num ?
             for (int loop = 1; loop <= state.dataMixedAir->NumOAControllers; ++loop) {
-                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).RetNode) {
+                if (state.dataAirSystemsData->PrimaryAirSystems(c->airloopNum).OASysInletNodeNum == state.dataMixedAir->OAController(loop).ReturnAirInNodeNum) {
                     c->oaControllerNum = loop;
                 }
             }
@@ -839,7 +839,6 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         }
         // fill out some fan information
         HVAC::FanType locFanType = HVAC::FanType::Invalid;
-        bool errorsFound(false);
         if (c->supFanNum == 0) {
             c->supFanNum = Fans::GetFanIndex(state, c->fanAssociatedWithCoilName);
         }

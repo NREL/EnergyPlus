@@ -66,11 +66,14 @@ void PlantLoopData::UpdateLoopSideReportVars(EnergyPlusData &state,
     //       DATE WRITTEN   July 1998
     //       MODIFIED       Aug 2010 Edwin Lee -- add per LoopSide variable support
     //       RE-ENGINEERED  na
-
-    this->InletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn).MassFlowRate;
-    this->InletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumIn).Temp;
-    this->OutletNodeFlowrate = state.dataLoopNodes->Node(this->LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut).MassFlowRate;
-    this->OutletNodeTemperature = state.dataLoopNodes->Node(this->LoopSide(DataPlant::LoopSideLocation::Supply).NodeNumOut).Temp;
+    auto &dln = state.dataLoopNodes;
+    auto const *supInNode = dln->nodes(this->LoopSide(DataPlant::LoopSideLocation::Supply).InNodeNum);
+    auto const *supOutNode = dln->nodes(this->LoopSide(DataPlant::LoopSideLocation::Supply).OutNodeNum);
+        
+    this->InletNodeFlowrate = supInNode->MassFlowRate;
+    this->InletNodeTemperature = supInNode->Temp;
+    this->OutletNodeFlowrate = supOutNode->MassFlowRate;
+    this->OutletNodeTemperature = supOutNode->Temp;
 
     // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
     if (OtherSideDemand < 0.0) {
@@ -129,11 +132,13 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
     // Initialize
     LoadToLoopSetPoint = 0.0;
 
+    auto &dln = state.dataLoopNodes;
+    auto const *tempSetPointNode = dln->nodes(this->TempSetPointNodeNum);
     // Get temperature at loop setpoint node.
-    TargetTemp = state.dataLoopNodes->Node(this->TempSetPointNodeNum).Temp;
-    MassFlowRate = state.dataLoopNodes->Node(this->TempSetPointNodeNum).MassFlowRate;
+    TargetTemp = tempSetPointNode->Temp;
+    MassFlowRate = tempSetPointNode->MassFlowRate;
 
-    if (this->FluidType == DataLoopNode::NodeFluidType::Water) {
+    if (this->fluidType == Node::FluidType::Water) {
 
         Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
@@ -148,10 +153,11 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
             // Calculate the demand on the loop
             LoadToLoopSetPoint = MassFlowRate * Cp * DeltaTemp;
         } break;
+                
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
             // Get the range of setpoints
-            LoopSetPointTemperatureHi = state.dataLoopNodes->Node(this->TempSetPointNodeNum).TempSetPointHi;
-            LoopSetPointTemperatureLo = state.dataLoopNodes->Node(this->TempSetPointNodeNum).TempSetPointLo;
+            LoopSetPointTemperatureHi = tempSetPointNode->TempSetPointHi;
+            LoopSetPointTemperatureLo = tempSetPointNode->TempSetPointLo;
 
             // Calculate the demand on the loop
             if (MassFlowRate > 0.0) {
@@ -177,7 +183,7 @@ void PlantLoopData::CalcUnmetPlantDemand(EnergyPlusData &state)
             break;
         }
 
-    } else if (this->FluidType == DataLoopNode::NodeFluidType::Steam) {
+    } else if (this->fluidType == Node::FluidType::Steam) {
 
         Cp = GetSpecificHeatGlycol(state, this->FluidName, TargetTemp, this->FluidIndex, RoutineName);
 
@@ -232,30 +238,24 @@ void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVA
     // Using/Aliasing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int LoopInlet;  // plant loop inlet node num.
-    int LoopOutlet; // plant loop outlet node num.
 
     // set local variables: loop inlet and outlet nodes
-    auto &Supply = this->LoopSide(DataPlant::LoopSideLocation::Supply);
-    LoopInlet = Supply.NodeNumIn;
-    LoopOutlet = Supply.NodeNumOut;
+    auto &supplySide = this->LoopSide(DataPlant::LoopSideLocation::Supply);
+
+    auto &dln = state.dataLoopNodes;
+    auto const *supplySideInNode = dln->nodes(supplySide.InNodeNum);
+    auto *supplySideOutNode = dln->nodes(supplySide.OutNodeNum);
+    
     // Check continuity invalid...loop pumps now turned on and off
     if (!FirstHVACIteration && !state.dataGlobal->WarmupFlag) {
-        if (std::abs(state.dataLoopNodes->Node(LoopOutlet).MassFlowRate - state.dataLoopNodes->Node(LoopInlet).MassFlowRate) >
-            DataBranchAirLoopPlant::MassFlowTolerance) {
+        if (std::abs(supplySideOutNode->MassFlowRate - supplySideInNode->MassFlowRate) > DataBranchAirLoopPlant::MassFlowTolerance) {
             if (this->MFErrIndex == 0) {
                 ShowWarningError(state,
                                  "PlantSupplySide: PlantLoop=\"" + this->Name +
                                      "\", Error (CheckLoopExitNode) -- Mass Flow Rate Calculation. Outlet and Inlet differ by more than tolerance.");
                 ShowContinueErrorTimeStamp(state, "");
-                ShowContinueError(state,
-                                  format("Loop inlet node={}, flowrate={:.4R} kg/s",
-                                         state.dataLoopNodes->NodeID(LoopInlet),
-                                         state.dataLoopNodes->Node(LoopInlet).MassFlowRate));
-                ShowContinueError(state,
-                                  format("Loop outlet node={}, flowrate={:.4R} kg/s",
-                                         state.dataLoopNodes->NodeID(LoopOutlet),
-                                         state.dataLoopNodes->Node(LoopOutlet).MassFlowRate));
+                ShowContinueError(state, format("Loop inlet node={}, flowrate={:.4R} kg/s", supplySideInNode->Name, supplySideInNode->MassFlowRate));
+                ShowContinueError(state, format("Loop outlet node={}, flowrate={:.4R} kg/s", supplySideOutNode->Name, supplySideOutNode->MassFlowRate));
                 ShowContinueError(state, "This loop might be helped by a bypass.");
             }
             ShowRecurringWarningErrorAtEnd(
@@ -263,7 +263,7 @@ void PlantLoopData::CheckLoopExitNode(EnergyPlusData &state, bool const FirstHVA
         }
     }
     // Reset Max loop flow rate based on pump performance
-    state.dataLoopNodes->Node(LoopOutlet).MassFlowRateMax = state.dataLoopNodes->Node(LoopInlet).MassFlowRateMax;
+    supplySideOutNode->MassFlowRateMax = supplySideInNode->MassFlowRateMax;
 }
 
 } // namespace EnergyPlus::DataPlant

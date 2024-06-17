@@ -409,9 +409,9 @@ namespace BaseboardElectric {
         baseboard->baseboards(BaseboardNum).ElecUseRate = 0.0;
 
         // Do the every time step initializations
-        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        baseboard->baseboards(BaseboardNum).AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        baseboard->baseboards(BaseboardNum).AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNodeNum;
+        baseboard->baseboards(BaseboardNum).AirInletTemp = state.dataLoopNodes->nodes(ZoneNode)->Temp;
+        baseboard->baseboards(BaseboardNum).AirInletHumRat = state.dataLoopNodes->nodes(ZoneNode)->HumRat;
     }
 
     void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)

@@ -109,8 +109,8 @@ namespace CTElectricGenerator {
         Real64 DesignAirInletTemp = 0.0;        // Design Turbine Air Inlet Temperature (C)
         Real64 ExhaustStackTemp = 0.0;          // turbine exhaust gas temp (C)
         bool HeatRecActive = false;             // true when design max flow rate > 0
-        int HeatRecInletNodeNum = 0;            // Node number on the heat recovery inlet side of the condenser
-        int HeatRecOutletNodeNum = 0;           // Node number on the heat recovery outlet side of the condenser
+        int HeatRecInNodeNum = 0;            // Node number on the heat recovery inlet side of the condenser
+        int HeatRecOutNodeNum = 0;           // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecInletTemp = 0.0;          // Inlet Temperature of the heat recovery fluid
         Real64 HeatRecOutletTemp = 0.0;         // Outlet Temperature of the heat recovery fluid
         Real64 HeatRecMdot = 0.0;               // reporting: Heat Recovery Loop Mass flow rate
@@ -120,7 +120,7 @@ namespace CTElectricGenerator {
         Real64 ElecPowerGenerated = 0.0;        // reporting: power generated (W)
         Real64 ElecEnergyGenerated = 0.0;       // reporting: power generated (W)
         Real64 HeatRecMaxTemp = 0.0;            // Max Temp that can be produced in heat recovery
-        int OAInletNode = 0;                    // optional inlet node index pointer for outdoor air for combustion
+        int OAInNodeNum = 0;                    // optional inlet node index pointer for outdoor air for combustion
         bool MyEnvrnFlag = true;
         bool MyPlantScanFlag = true;
         bool MySizeAndNodeInitFlag = true;

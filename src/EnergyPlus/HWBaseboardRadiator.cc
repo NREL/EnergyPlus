@@ -164,6 +164,9 @@ namespace HWBaseboardRadiator {
 
         if (CompIndex > 0) {
             auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+            auto &dln = state.dataLoopNodes;
+
+            auto const *fluidInNode = dln->nodes(HWBaseboard.FluidInNodeNum);
 
             HWBaseboardDesignData const &HWBaseboardDesignDataObject = state.dataHWBaseboardRad->HWBaseboardDesignObject(
                 HWBaseboard.DesignObjectPtr); // Contains the data for variable flow hydronic systems
@@ -178,8 +181,8 @@ namespace HWBaseboardRadiator {
                 MaxWaterFlow = HWBaseboard.WaterMassFlowRateMax;
                 MinWaterFlow = 0.0;
             } else {
-                MaxWaterFlow = state.dataLoopNodes->Node(HWBaseboard.WaterInletNode).MassFlowRateMaxAvail;
-                MinWaterFlow = state.dataLoopNodes->Node(HWBaseboard.WaterInletNode).MassFlowRateMinAvail;
+                MaxWaterFlow = fluidInNode->MassFlowRateMaxAvail;
+                MinWaterFlow = fluidInNode->MassFlowRateMinAvail;
             }
 
             switch (HWBaseboard.EquipType) {
@@ -190,7 +193,7 @@ namespace HWBaseboardRadiator {
                                   BaseboardNum,
                                   FirstHVACIteration,
                                   QZnReq,
-                                  HWBaseboard.WaterInletNode,
+                                  HWBaseboard.FluidInNodeNum,
                                   MaxWaterFlow,
                                   MinWaterFlow,
                                   HWBaseboardDesignDataObject.Offset,
@@ -472,26 +475,26 @@ namespace HWBaseboardRadiator {
             }
 
             // Get inlet node number
-            thisHWBaseboard.WaterInletNode = GetOnlySingleNode(state,
+            thisHWBaseboard.FluidInNodeNum = GetSingleNode(state,
                                                                state.dataIPShortCut->cAlphaArgs(4),
                                                                ErrorsFound,
-                                                               DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
+                                                               Node::ConnObjType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                               DataLoopNode::NodeFluidType::Water,
-                                                               DataLoopNode::ConnectionType::Inlet,
-                                                               NodeInputManager::CompFluidStream::Primary,
-                                                               DataLoopNode::ObjectIsNotParent);
+                                                               Node::FluidType::Water,
+                                                               Node::ConnType::Inlet,
+                                                               Node::CompFluidStream::Primary,
+                                                               Node::ObjectIsNotParent);
 
             // Get outlet node number
-            thisHWBaseboard.WaterOutletNode = GetOnlySingleNode(state,
+            thisHWBaseboard.FluidOutNodeNum = GetSingleNode(state,
                                                                 state.dataIPShortCut->cAlphaArgs(5),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveWater,
+                                                                Node::ConnObjType::ZoneHVACBaseboardRadiantConvectiveWater,
                                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Outlet,
+                                                                Node::CompFluidStream::Primary,
+                                                                Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state,
                                                cCMO_BBRadiator_Water,
                                                state.dataIPShortCut->cAlphaArgs(1),
@@ -828,13 +831,13 @@ namespace HWBaseboardRadiator {
         Real64 constexpr Coeff(0.0000275); // Correlation coefficient to capacity
         static constexpr std::string_view RoutineName("BaseboardRadiatorWater:InitHWBaseboard");
 
-        int WaterInletNode;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
 
         int NumHWBaseboards = state.dataHWBaseboardRad->NumHWBaseboards;
         auto &HWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-
+        auto &dln = state.dataLoopNodes;
+        
         // Do the one time initializations
         if (state.dataHWBaseboardRad->MyOneTimeFlag) {
 
@@ -878,8 +881,6 @@ namespace HWBaseboardRadiator {
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag(BaseboardNum)) {
             // Initialize
-            WaterInletNode = HWBaseboard.WaterInletNode;
-
             rho = FluidProperties::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidName,
                                                     Constant::HWInitConvTemp,
@@ -888,20 +889,21 @@ namespace HWBaseboardRadiator {
 
             HWBaseboard.WaterMassFlowRateMax = rho * HWBaseboard.WaterVolFlowRateMax;
 
-            PlantUtilities::InitComponentNodes(state, 0.0, HWBaseboard.WaterMassFlowRateMax, HWBaseboard.WaterInletNode, HWBaseboard.WaterOutletNode);
+            PlantUtilities::InitComponentNodes(state, 0.0, HWBaseboard.WaterMassFlowRateMax, HWBaseboard.FluidInNodeNum, HWBaseboard.FluidOutNodeNum);
 
-            state.dataLoopNodes->Node(WaterInletNode).Temp = 60.0;
+            auto *fluidInNode = dln->nodes(HWBaseboard.FluidInNodeNum);
+            fluidInNode->Temp = 60.0;
 
             Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidName,
-                                                        state.dataLoopNodes->Node(WaterInletNode).Temp,
+                                                        fluidInNode->Temp,
                                                         state.dataPlnt->PlantLoop(HWBaseboard.plantLoc.loopNum).FluidIndex,
                                                         RoutineName);
 
-            state.dataLoopNodes->Node(WaterInletNode).Enthalpy = Cp * state.dataLoopNodes->Node(WaterInletNode).Temp;
-            state.dataLoopNodes->Node(WaterInletNode).Quality = 0.0;
-            state.dataLoopNodes->Node(WaterInletNode).Press = 0.0;
-            state.dataLoopNodes->Node(WaterInletNode).HumRat = 0.0;
+            fluidInNode->Enthalpy = Cp * fluidInNode->Temp;
+            fluidInNode->Quality = 0.0;
+            fluidInNode->Press = 0.0;
+            fluidInNode->HumRat = 0.0;
 
             HWBaseboard.ZeroBBSourceSumHATsurf = 0.0;
             HWBaseboard.QBBRadSource = 0.0;
@@ -927,13 +929,13 @@ namespace HWBaseboardRadiator {
         }
 
         // Do the every time step initializations
-        WaterInletNode = HWBaseboard.WaterInletNode;
-        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        HWBaseboard.WaterMassFlowRate = state.dataLoopNodes->Node(WaterInletNode).MassFlowRate;
-        HWBaseboard.WaterInletTemp = state.dataLoopNodes->Node(WaterInletNode).Temp;
-        HWBaseboard.WaterInletEnthalpy = state.dataLoopNodes->Node(WaterInletNode).Enthalpy;
-        HWBaseboard.AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        HWBaseboard.AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        auto const *zoneNode = dln->nodes(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNodeNum);
+        auto const *fluidInNode = dln->nodes(HWBaseboard.FluidInNodeNum);
+        HWBaseboard.WaterMassFlowRate = fluidInNode->MassFlowRate;
+        HWBaseboard.WaterInletTemp = fluidInNode->Temp;
+        HWBaseboard.WaterInletEnthalpy = fluidInNode->Enthalpy;
+        HWBaseboard.AirInletTemp = zoneNode->Temp;
+        HWBaseboard.AirInletHumRat = zoneNode->HumRat;
 
         HWBaseboard.TotPower = 0.0;
         HWBaseboard.Power = 0.0;
@@ -1228,7 +1230,7 @@ namespace HWBaseboardRadiator {
             BaseSizer::reportSizerOutput(state, cCMO_BBRadiator_Water, hWBaseboard.Name, "U-Factor times Area [W/C]", hWBaseboard.UA);
         }
         // save the design water flow rate for use by the water loop sizing algorithms
-        PlantUtilities::RegisterPlantCompDesignFlow(state, hWBaseboard.WaterInletNode, hWBaseboard.WaterVolFlowRateMax);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, hWBaseboard.FluidInNodeNum, hWBaseboard.WaterVolFlowRateMax);
 
         if (ErrorsFound) {
             ShowFatalError(state, "Preceding sizing errors cause program termination");
@@ -1277,12 +1279,15 @@ namespace HWBaseboardRadiator {
         Real64 Cp;
 
         auto &hWBaseboard = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
-
+        auto &dln = state.dataLoopNodes;
+        
         int const ZoneNum = hWBaseboard.ZonePtr;
         Real64 QZnReq = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         Real64 AirInletTemp = hWBaseboard.AirInletTemp;
         Real64 WaterInletTemp = hWBaseboard.WaterInletTemp;
-        Real64 WaterMassFlowRate = state.dataLoopNodes->Node(hWBaseboard.WaterInletNode).MassFlowRate;
+
+        auto const *fluidInNode = dln->nodes(hWBaseboard.FluidInNodeNum);
+        Real64 WaterMassFlowRate = fluidInNode->MassFlowRate;
 
         if (QZnReq > HVAC::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) &&
             (ScheduleManager::GetCurrentScheduleValue(state, hWBaseboard.SchedPtr) > 0) && (WaterMassFlowRate > 0.0)) {
@@ -1367,7 +1372,7 @@ namespace HWBaseboardRadiator {
             AirMassFlowRate = 0.0;
             hWBaseboard.QBBRadSource = 0.0;
             hWBaseboard.WaterOutletEnthalpy = hWBaseboard.WaterInletEnthalpy;
-            PlantUtilities::SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.WaterInletNode, hWBaseboard.plantLoc, false);
+            PlantUtilities::SetActuatedBranchFlowRate(state, WaterMassFlowRate, hWBaseboard.FluidInNodeNum, hWBaseboard.plantLoc, false);
         }
 
         hWBaseboard.WaterOutletTemp = WaterOutletTemp;
@@ -1395,9 +1400,8 @@ namespace HWBaseboardRadiator {
         // and convective only baseboard radiator are combined and modified.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WaterInletNode;
-        int WaterOutletNode;
         auto &thisHWBB = state.dataHWBaseboardRad->HWBaseboard(BaseboardNum);
+        auto &dln = state.dataLoopNodes;
 
         if (state.dataGlobal->BeginEnvrnFlag && state.dataHWBaseboardRad->MyEnvrnFlag2) {
             state.dataHWBaseboardRad->Iter = 0;
@@ -1418,14 +1422,13 @@ namespace HWBaseboardRadiator {
         thisHWBB.LastSysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         thisHWBB.LastTimeStepSys = state.dataHVACGlobal->TimeStepSys;
 
-        WaterInletNode = thisHWBB.WaterInletNode;
-        WaterOutletNode = thisHWBB.WaterOutletNode;
+        auto *fluidOutNode = dln->nodes(thisHWBB.FluidOutNodeNum);
 
         // Set the outlet air nodes of the Baseboard
         // Set the outlet water nodes for the Coil
-        PlantUtilities::SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
-        state.dataLoopNodes->Node(WaterOutletNode).Temp = thisHWBB.WaterOutletTemp;
-        state.dataLoopNodes->Node(WaterOutletNode).Enthalpy = thisHWBB.WaterOutletEnthalpy;
+        PlantUtilities::SafeCopyPlantNode(state, thisHWBB.FluidInNodeNum, thisHWBB.FluidOutNodeNum);
+        fluidOutNode->Temp = thisHWBB.WaterOutletTemp;
+        fluidOutNode->Enthalpy = thisHWBB.WaterOutletEnthalpy;
     }
 
     void UpdateBBRadSourceValAvg(EnergyPlusData &state, bool &HWBaseboardSysOn) // .TRUE. if the radiant system has run this zone time step

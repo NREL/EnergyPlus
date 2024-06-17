@@ -136,8 +136,8 @@ namespace DXCoils {
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
         Array1D<Real64> BypassedFlowFrac; // Fraction of air flow bypassed around coil
         Array1D<Real64> RatedCBF;         // rated coil bypass factor, determined using RatedTotCap and RatedSHR
-        int AirInNode;                    // Air inlet node number
-        int AirOutNode;                   // Air outlet node number
+        int AirInNodeNum = 0;                    // Air inlet node number
+        int AirOutNodeNum = 0;                   // Air outlet node number
         Array1D_int CCapFTemp;            // index of total cooling capacity modifier curve
         // (function of entering wetbulb, outside drybulb)
         int CCapFTempErrorIndex; // Used for warning messages when output of CCapFTemp is negative
@@ -163,7 +163,7 @@ namespace DXCoils {
         // UnitarySystem:HeatPump:AirToAir for proper calculation of crankcase heater energy
         // consumption
         bool FindCompanionUpStreamCoil;    // Flag to get the companion coil in Init.
-        Array1D_int CondenserInletNodeNum; // Node number of outdoor condenser(s) (actually an evaporator for heating coils)
+        Array1D_int CondenserInNodeNums; // Node number of outdoor condenser(s) (actually an evaporator for heating coils)
         int LowOutletTempIndex;            // used for low outlet temperature warnings
         Real64 FullLoadOutAirTempLast;     // used for low outlet temperature warnings
         Real64 FullLoadInletAirTempLast;   // used for low outlet temperature warnings
@@ -289,8 +289,8 @@ namespace DXCoils {
         // 0=normal, 1+=enhanced dehumidification mode
         // end of variables for Multimode DX cooling coil
         // start of variables for heat pump water heater DX coil
-        int WaterInNode;                                                // Condenser water inlet node number for HPWH DX coil
-        int WaterOutNode;                                               // Condenser water outlet node number for HPWH DX coil
+        int WaterInNodeNum = 0;                                         // Condenser water inlet node number for HPWH DX coil
+        int WaterOutNodeNum = 0;                                        // Condenser water outlet node number for HPWH DX coil
         int HCOPFTemp;                                                  // COP as a function of temperature curve index
         int HCOPFTempErrorIndex;                                        // Used for warning messages when output of HCOPFTemp is negative
         int HCOPFAirFlow;                                               // COP as a function of air flow rate ratio curve index
@@ -460,12 +460,12 @@ namespace DXCoils {
               RatedSHREMSOverrideValue(MaxModes, 0.0), RatedCOP(MaxModes, 0.0), RatedAirVolFlowRate(MaxModes, 0.0),
               RatedAirVolFlowRateEMSOverrideON(MaxModes, false), RatedAirVolFlowRateEMSOverrideValue(MaxModes, 0.0),
               FanPowerPerEvapAirFlowRate(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023(MaxModes, 0.0), RatedAirMassFlowRate(MaxModes, 0.0),
-              BypassedFlowFrac(MaxModes, 0.0), RatedCBF(MaxModes, 0.0), AirInNode(0), AirOutNode(0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
+              BypassedFlowFrac(MaxModes, 0.0), RatedCBF(MaxModes, 0.0), CCapFTemp(MaxModes, 0), CCapFTempErrorIndex(0),
               CCapFFlow(MaxModes, 0), CCapFFlowErrorIndex(0), EIRFTemp(MaxModes, 0), EIRFTempErrorIndex(0), EIRFFlow(MaxModes, 0),
               EIRFFlowErrorIndex(0), PLFFPLR(MaxModes, 0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0),
               CrankcaseHeaterPower(0.0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterCapacityCurveIndex(0), CrankcaseHeaterConsumption(0.0),
               BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), CompanionUpstreamDXCoil(0), FindCompanionUpStreamCoil(true),
-              CondenserInletNodeNum(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0),
+              CondenserInNodeNums(MaxModes, 0), LowOutletTempIndex(0), FullLoadOutAirTempLast(0.0), FullLoadInletAirTempLast(0.0),
               PrintLowOutTempMessage(false), HeatingCoilPLFCurvePTR(0), BasinHeaterSchedulePtr(0), RatedTotCap2(0.0), RatedSHR2(0.0), RatedCOP2(0.0),
               RatedAirVolFlowRate2(0.0), FanPowerPerEvapAirFlowRate_LowSpeed(MaxModes, 0.0), FanPowerPerEvapAirFlowRate_2023_LowSpeed(MaxModes, 0.0),
               RatedAirMassFlowRate2(0.0), RatedCBF2(0.0), CCapFTemp2(0), EIRFTemp2(0), RatedEIR2(0.0), InternalStaticPressureDrop(0.0),
@@ -485,7 +485,7 @@ namespace DXCoils {
               EvapCondPumpElecNomPower(MaxModes, 0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsumpRate(0.0),
               EvapWaterConsump(0.0), EvapCondAirFlow2(0.0), EvapCondEffect2(0.0), EvapCondPumpElecNomPower2(0.0), BasinHeaterPower(0.0),
               BasinHeaterConsumption(0.0), NumCapacityStages(1), NumDehumidModes(0), CoilPerformanceType(MaxModes),
-              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0), WaterInNode(0), WaterOutNode(0),
+              CoilPerformanceType_Num(MaxModes, 0), CoilPerformanceName(MaxModes), CoolingCoilStg2RuntimeFrac(0.0),
               HCOPFTemp(0), HCOPFTempErrorIndex(0), HCOPFAirFlow(0), HCOPFAirFlowErrorIndex(0), HCOPFWaterFlow(0), HCOPFWaterFlowErrorIndex(0),
               HCapFTemp(0), HCapFTempErrorIndex(0), HCapFAirFlow(0), HCapFAirFlowErrorIndex(0), HCapFWaterFlow(0), HCapFWaterFlowErrorIndex(0),
               RatedInletDBTemp(0.0), RatedInletWBTemp(0.0), RatedInletWaterTemp(0.0), HPWHCondPumpElecNomPower(0.0), HPWHCondPumpFracToWater(0.0),
@@ -809,7 +809,7 @@ namespace DXCoils {
         bool &ErrorsFound,                                                           // Set to true if certain errors found
         ObjexxFCL::Optional_int HeatingCoilPLFCurvePTR = _,                          // Parameter equivalent of heating coil PLR curve index
         ObjexxFCL::Optional<DataHeatBalance::RefrigCondenserType> CondenserType = _, // Parameter equivalent of condenser type parameter
-        ObjexxFCL::Optional_int CondenserInletNodeNum = _,                           // Parameter equivalent of condenser inlet node number
+        ObjexxFCL::Optional_int CondenserInNodeNum = _,                           // Parameter equivalent of condenser inlet node number
         ObjexxFCL::Optional<Real64> MaxOATCrankcaseHeater = _, // Parameter equivalent of condenser Max OAT for Crank Case Heater temp
         ObjexxFCL::Optional<Real64> MinOATCooling = _,         // Parameter equivalent of condenser Min OAT for compressor cooling operation
         ObjexxFCL::Optional<Real64> MaxOATCooling = _,         // Parameter equivalent of condenser Max OAT for compressor cooling operation

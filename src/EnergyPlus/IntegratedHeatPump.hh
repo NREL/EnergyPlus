@@ -92,49 +92,49 @@ namespace IntegratedHeatPump {
         std::string SCCoilType; // Numeric Equivalent for SC Coil Type
         std::string SCCoilName;
         int SCCoilIndex; // Index to SC coil
-        DataLoopNode::ConnectionObjectType SCCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SCCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SHCoilType; // Numeric Equivalent for SH Coil Type
         std::string SHCoilName;
         int SHCoilIndex; // Index to SH coil
-        DataLoopNode::ConnectionObjectType SHCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SHCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SCWHCoilType; // Numeric Equivalent for SCWH Coil Type
         std::string SCWHCoilName;
         int SCWHCoilIndex; // Index to SCWH coil
-        DataLoopNode::ConnectionObjectType SCWHCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SCWHCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string DWHCoilType; // Numeric Equivalent for DWH Coil Type
         std::string DWHCoilName;
         int DWHCoilIndex; // Index to DWH coil
-        DataLoopNode::ConnectionObjectType DWHCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType DWHCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SCDWHCoolCoilType; // Numeric Equivalent for SCDWH Coil Type, cooling part
         std::string SCDWHCoolCoilName;
         int SCDWHCoolCoilIndex; // Index to SCDWH coil, cooling part
-        DataLoopNode::ConnectionObjectType SCDWHCoolCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SCDWHCoolCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SCDWHWHCoilType; // Numeric Equivalent for SCDWH Coil Type, water heating part
         std::string SCDWHWHCoilName;
         int SCDWHWHCoilIndex; // Index to SCDWH coil, water heating part
-        DataLoopNode::ConnectionObjectType SCDWHWHCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SCDWHWHCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SHDWHHeatCoilType; // Numeric Equivalent for SHDWH Coil Type, heating part
         std::string SHDWHHeatCoilName;
         int SHDWHHeatCoilIndex; // Index to SHDWH coil, heating part
-        DataLoopNode::ConnectionObjectType SHDWHHeatCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SHDWHHeatCoilTypeNum = Node::ConnObjType::Invalid;
 
         std::string SHDWHWHCoilType; // Numeric Equivalent for SHDWH Coil Type, water heating part
         std::string SHDWHWHCoilName;
         int SHDWHWHCoilIndex; // Index to SHDWH coil, water heating part
-        DataLoopNode::ConnectionObjectType SHDWHWHCoilTypeNum = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType SHDWHWHCoilTypeNum = Node::ConnObjType::Invalid;
 
-        int AirCoolInletNodeNum; // Node Number of the Air cooling coil Inlet
-        int AirHeatInletNodeNum; // Node Number of the Air cooling coil Inlet
-        int AirOutletNodeNum;    // Node Number of the Air Outlet
-        int WaterInletNodeNum;   // Node Number of the Water Onlet
-        int WaterOutletNodeNum;  // Node Number of the Water Outlet
-        int WaterTankoutNod;     // water node to monitor the supply water flow amount
+        int CoolCoilAirInNodeNum = 0; // Node Number of the Air cooling coil Inlet
+        int HeatCoilAirInNodeNum = 0; // Node Number of the Air cooling coil Inlet
+        int AirOutNodeNum = 0;    // Node Number of the Air Outlet
+        int WaterInNodeNum = 0;   // Node Number of the Water Onlet
+        int WaterOutNodeNum = 0;  // Node Number of the Water Outlet
+        int WaterTankOutNodeNum = 0;     // water node to monitor the supply water flow amount
 
         int ModeMatchSCWH;
         //- 0: match cooling load, 1 : match water heating load in SCWH mode
@@ -184,8 +184,8 @@ namespace IntegratedHeatPump {
         // IHP indoor fan index
         HVAC::FanPlace fanPlace; // indoor fan placement
 
-        int ODAirInletNodeNum;  // oudoor coil inlet Nod
-        int ODAirOutletNodeNum; // oudoor coil outlet Nod
+        int OutdoorAirInNodeNum = 0;  // oudoor coil inlet Nod
+        int OutdoorAirOutNodeNum = 0; // oudoor coil outlet Nod
         Real64 TankSourceWaterMassFlowRate;
         // tank source water flow rate
         Real64 AirFlowSavInWaterLoop; // air flow saving for SCWH mode
@@ -222,14 +222,12 @@ namespace IntegratedHeatPump {
         // Default Constructor
         IntegratedHeatPumpData()
             : SCCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0),
-              SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
+              SHDWHWHCoilIndex(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
               WHtankType(DataPlant::PlantEquipmentType::Invalid), WHtankID(0), LoopNum(0), LoopSideNum(0), IsWHCallAvail(false), CheckWHCall(false),
               CurMode(IHPOperationMode::Idle), ControlledZoneTemp(0), WaterFlowAccumVol(0), SHDWHRunTime(0), CoolVolFlowScale(0), HeatVolFlowScale(0),
               MaxHeatAirMassFlow(0), MaxHeatAirVolFlow(0), MaxCoolAirMassFlow(0), MaxCoolAirVolFlow(0), IHPCoilsSized(false), IDFanID(0),
-              fanPlace(HVAC::FanPlace::Invalid), ODAirInletNodeNum(0),                                                // oudoor coil inlet Nod
-              ODAirOutletNodeNum(0),                                                                                  // oudoor coil outlet Nod
+              fanPlace(HVAC::FanPlace::Invalid), 
               TankSourceWaterMassFlowRate(0), AirFlowSavInWaterLoop(0), AirFlowSavInAirLoop(0), AirLoopFlowRate(0.0), // air loop mass flow rate
               TotalCoolingRate(0.0),                                                                                  // total cooling rate [w]
               TotalWaterHeatingRate(0.0),                                                                             // total water heating rate [w]

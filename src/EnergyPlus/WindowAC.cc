@@ -219,7 +219,7 @@ namespace WindowAC {
 
         using BranchNodeConnections::SetUpCompSets;
 
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
         auto &GetDXCoilOutletNode(DXCoils::GetCoilOutletNode);
         auto &GetDXHXAsstdCoilOutletNode(HVACHXAssistedCoolingCoil::GetCoilOutletNode);
         using MixedAir::GetOAMixerIndex;
@@ -316,24 +316,24 @@ namespace WindowAC {
             state.dataWindowAC->WindAC(WindACNum).MaxAirVolFlow = Numbers(1);
             state.dataWindowAC->WindAC(WindACNum).OutAirVolFlow = Numbers(2);
 
-            state.dataWindowAC->WindAC(WindACNum).AirInNode = GetOnlySingleNode(state,
+            state.dataWindowAC->WindAC(WindACNum).AirInNode = GetSingleNode(state,
                                                                                 Alphas(3),
                                                                                 ErrorsFound,
-                                                                                DataLoopNode::ConnectionObjectType::ZoneHVACWindowAirConditioner,
+                                                                                Node::ConnObjType::ZoneHVACWindowAirConditioner,
                                                                                 Alphas(1),
-                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                                NodeInputManager::CompFluidStream::Primary,
+                                                                                Node::FluidType::Air,
+                                                                                Node::ConnType::Inlet,
+                                                                                Node::CompFluidStream::Primary,
                                                                                 ObjectIsParent);
 
-            state.dataWindowAC->WindAC(WindACNum).AirOutNode = GetOnlySingleNode(state,
+            state.dataWindowAC->WindAC(WindACNum).AirOutNode = GetSingleNode(state,
                                                                                  Alphas(4),
                                                                                  ErrorsFound,
-                                                                                 DataLoopNode::ConnectionObjectType::ZoneHVACWindowAirConditioner,
+                                                                                 Node::ConnObjType::ZoneHVACWindowAirConditioner,
                                                                                  Alphas(1),
-                                                                                 DataLoopNode::NodeFluidType::Air,
-                                                                                 DataLoopNode::ConnectionType::Outlet,
-                                                                                 NodeInputManager::CompFluidStream::Primary,
+                                                                                 Node::FluidType::Air,
+                                                                                 Node::ConnType::Outlet,
+                                                                                 Node::CompFluidStream::Primary,
                                                                                  ObjectIsParent);
 
             state.dataWindowAC->WindAC(WindACNum).OAMixType = Alphas(5);

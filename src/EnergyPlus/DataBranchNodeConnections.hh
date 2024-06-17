@@ -66,10 +66,10 @@ namespace DataBranchNodeConnections {
     {
         // Members
         // std::string ParentCType; // Parent Object Type (Cannot be SPLITTER or MIXER)
-        DataLoopNode::ConnectionObjectType ParentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType ParentObjectType = Node::ConnObjType::Invalid;
         std::string ParentCName; // Parent Object Name
         // std::string CType;       // Component Type (Cannot be SPLITTER or MIXER)
-        DataLoopNode::ConnectionObjectType ComponentObjectType = DataLoopNode::ConnectionObjectType::Invalid;
+        Node::ConnObjType ComponentObjectType = Node::ConnObjType::Invalid;
         std::string CName;          // Component Name
         std::string InletNodeName;  // Inlet Node ID
         std::string OutletNodeName; // Outlet Node ID
@@ -81,19 +81,18 @@ namespace DataBranchNodeConnections {
         // Members
         int NodeNumber = 0;                                                                          // Node number of this node connection
         std::string NodeName;                                                                        // Node Name of this node connection
-        DataLoopNode::ConnectionObjectType ObjectType = DataLoopNode::ConnectionObjectType::Invalid; // Object/Component Type of this node connection
+        Node::ConnObjType ObjectType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
         std::string ObjectName; // Name of the Object/Component Type of this node connection
-        DataLoopNode::ConnectionType ConnectionType =
-            DataLoopNode::ConnectionType::Invalid; // Connection Type (must be valid) for this node connection
-        NodeInputManager::CompFluidStream FluidStream = NodeInputManager::CompFluidStream::Invalid; // Fluid Stream for this node connection
+        Node::ConnType ConnectionType =
+            Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
+        Node::CompFluidStream FluidStream = Node::CompFluidStream::Invalid; // Fluid Stream for this node connection
         bool ObjectIsParent = false;                                                                // Indicator whether the object is a parent or not
     };
 
     struct ParentListData
     {
         // Members
-        DataLoopNode::ConnectionObjectType ComponentType =
-            DataLoopNode::ConnectionObjectType::Invalid; // Component Type (Cannot be SPLITTER or MIXER)
+        Node::ConnObjType ComponentType = Node::ConnObjType::Invalid; // Component Type (Cannot be SPLITTER or MIXER)
         std::string ComponentName;                       // Component Name
         std::string InletNodeName;                       // Inlet Node ID
         std::string OutletNodeName;                      // Outlet Node ID
@@ -104,11 +103,11 @@ namespace DataBranchNodeConnections {
     {
         // Members
         std::string NodeName;                                                                        // Node Name of this node connection
-        DataLoopNode::ConnectionObjectType ObjectType = DataLoopNode::ConnectionObjectType::Invalid; // Object/Component Type of this node connection
+        Node::ConnObjType ObjectType = Node::ConnObjType::Invalid; // Object/Component Type of this node connection
         std::string ObjectName;     // Name of the Object/Component Type of this node connection
         std::string InputFieldName; // Input Field Name for this connection
-        DataLoopNode::ConnectionType ConnectionType =
-            DataLoopNode::ConnectionType::Invalid; // Connection Type (must be valid) for this node connection
+        Node::ConnType ConnectionType =
+            Node::ConnType::Invalid; // Connection Type (must be valid) for this node connection
     };
 
 } // namespace DataBranchNodeConnections

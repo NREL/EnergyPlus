@@ -432,42 +432,42 @@ namespace WaterToAirHeatPumpSimple {
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).Name = simpleWAHP.Name;
             state.dataHeatBal->HeatReclaimSimple_WAHPCoil(WatertoAirHPNum).SourceType = CurrentModuleObject;
 
-            simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
+            simpleWAHP.WaterInletNodeNum = GetSingleNode(state,
                                                              AlphArray(2),
                                                              ErrorsFound,
-                                                             DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                             Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
                                                              simpleWAHP.Name,
-                                                             DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::ConnectionType::Inlet,
-                                                             NodeInputManager::CompFluidStream::Secondary,
-                                                             DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.WaterOutletNodeNum = GetOnlySingleNode(state,
+                                                             Node::FluidType::Water,
+                                                             Node::ConnType::Inlet,
+                                                             Node::CompFluidStream::Secondary,
+                                                             Node::ObjectIsNotParent);
+            simpleWAHP.WaterOutletNodeNum = GetSingleNode(state,
                                                               AlphArray(3),
                                                               ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                              Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
                                                               simpleWAHP.Name,
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Outlet,
-                                                              NodeInputManager::CompFluidStream::Secondary,
-                                                              DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.AirInletNodeNum = GetOnlySingleNode(state,
+                                                              Node::FluidType::Water,
+                                                              Node::ConnType::Outlet,
+                                                              Node::CompFluidStream::Secondary,
+                                                              Node::ObjectIsNotParent);
+            simpleWAHP.AirInletNodeNum = GetSingleNode(state,
                                                            AlphArray(4),
                                                            ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                           Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
                                                            simpleWAHP.Name,
-                                                           DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Inlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.AirOutletNodeNum = GetOnlySingleNode(state,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Inlet,
+                                                           Node::CompFluidStream::Primary,
+                                                           Node::ObjectIsNotParent);
+            simpleWAHP.AirOutletNodeNum = GetSingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::CoilCoolingWaterToAirHeatPumpEquationFit,
+                                                            Node::ConnObjType::CoilCoolingWaterToAirHeatPumpEquationFit,
                                                             simpleWAHP.Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Outlet,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Outlet,
+                                                            Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, simpleWAHP.Name, AlphArray(2), AlphArray(3), "Water Nodes");
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, simpleWAHP.Name, AlphArray(4), AlphArray(5), "Air Nodes");
@@ -662,42 +662,42 @@ namespace WaterToAirHeatPumpSimple {
             }
 
             CheckSimpleWAHPRatedCurvesOutputs(state, simpleWAHP.Name);
-            simpleWAHP.WaterInletNodeNum = GetOnlySingleNode(state,
+            simpleWAHP.WaterInletNodeNum = GetSingleNode(state,
                                                              AlphArray(2),
                                                              ErrorsFound,
-                                                             DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                             Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
                                                              simpleWAHP.Name,
-                                                             DataLoopNode::NodeFluidType::Water,
-                                                             DataLoopNode::ConnectionType::Inlet,
-                                                             NodeInputManager::CompFluidStream::Secondary,
-                                                             DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.WaterOutletNodeNum = GetOnlySingleNode(state,
+                                                             Node::FluidType::Water,
+                                                             Node::ConnType::Inlet,
+                                                             Node::CompFluidStream::Secondary,
+                                                             Node::ObjectIsNotParent);
+            simpleWAHP.WaterOutletNodeNum = GetSingleNode(state,
                                                               AlphArray(3),
                                                               ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                              Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
                                                               simpleWAHP.Name,
-                                                              DataLoopNode::NodeFluidType::Water,
-                                                              DataLoopNode::ConnectionType::Outlet,
-                                                              NodeInputManager::CompFluidStream::Secondary,
-                                                              DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.AirInletNodeNum = GetOnlySingleNode(state,
+                                                              Node::FluidType::Water,
+                                                              Node::ConnType::Outlet,
+                                                              Node::CompFluidStream::Secondary,
+                                                              Node::ObjectIsNotParent);
+            simpleWAHP.AirInletNodeNum = GetSingleNode(state,
                                                            AlphArray(4),
                                                            ErrorsFound,
-                                                           DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                           Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
                                                            simpleWAHP.Name,
-                                                           DataLoopNode::NodeFluidType::Air,
-                                                           DataLoopNode::ConnectionType::Inlet,
-                                                           NodeInputManager::CompFluidStream::Primary,
-                                                           DataLoopNode::ObjectIsNotParent);
-            simpleWAHP.AirOutletNodeNum = GetOnlySingleNode(state,
+                                                           Node::FluidType::Air,
+                                                           Node::ConnType::Inlet,
+                                                           Node::CompFluidStream::Primary,
+                                                           Node::ObjectIsNotParent);
+            simpleWAHP.AirOutletNodeNum = GetSingleNode(state,
                                                             AlphArray(5),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::CoilHeatingWaterToAirHeatPumpEquationFit,
+                                                            Node::ConnObjType::CoilHeatingWaterToAirHeatPumpEquationFit,
                                                             simpleWAHP.Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Outlet,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Outlet,
+                                                            Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsNotParent);
 
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, simpleWAHP.Name, AlphArray(2), AlphArray(3), "Water Nodes");
             BranchNodeConnections::TestCompSet(state, CurrentModuleObject, simpleWAHP.Name, AlphArray(4), AlphArray(5), "Air Nodes");

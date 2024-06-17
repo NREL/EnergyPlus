@@ -277,24 +277,24 @@ namespace CondenserLoopTowers {
             tower.Name = AlphArray(1);
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_SingleSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
-            tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            tower.WaterInletNodeNum = Node::GetSingleNode(state,
                                                                           AlphArray(2),
                                                                           ErrorsFound,
-                                                                          DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
+                                                                          Node::ConnObjType::CoolingTowerSingleSpeed,
                                                                           tower.Name,
-                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::ConnectionType::Inlet,
-                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                          DataLoopNode::ObjectIsNotParent);
-            tower.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          Node::FluidType::Water,
+                                                                          Node::ConnType::Inlet,
+                                                                          Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
+            tower.WaterOutletNodeNum = Node::GetSingleNode(state,
                                                                            AlphArray(3),
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
+                                                                           Node::ConnObjType::CoolingTowerSingleSpeed,
                                                                            tower.Name,
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Outlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Outlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, tower.Name, AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             tower.DesignWaterFlowRate = NumArray(1);
             if (tower.DesignWaterFlowRate == DataSizing::AutoSize) {
@@ -433,15 +433,15 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 tower.OutdoorAirInletNodeNum = 0;
             } else {
-                tower.OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                tower.OutdoorAirInletNodeNum = Node::GetSingleNode(state,
                                                                                    AlphArray(10),
                                                                                    ErrorsFound,
-                                                                                   DataLoopNode::ConnectionObjectType::CoolingTowerSingleSpeed,
+                                                                                   Node::ConnObjType::CoolingTowerSingleSpeed,
                                                                                    tower.Name,
-                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                                   Node::FluidType::Air,
+                                                                                   Node::ConnType::OutsideAirReference,
+                                                                                   Node::CompFluidStream::Primary,
+                                                                                   Node::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, tower.OutdoorAirInletNodeNum)) {
                     ShowSevereError(state,
                                     format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
@@ -623,24 +623,24 @@ namespace CondenserLoopTowers {
             tower.Name = AlphArray(1);
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_TwoSpd;
             tower.TowerMassFlowRateMultiplier = 2.5;
-            tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            tower.WaterInletNodeNum = Node::GetSingleNode(state,
                                                                           AlphArray(2),
                                                                           ErrorsFound,
-                                                                          DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
+                                                                          Node::ConnObjType::CoolingTowerTwoSpeed,
                                                                           tower.Name,
-                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::ConnectionType::Inlet,
-                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                          DataLoopNode::ObjectIsNotParent);
-            tower.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          Node::FluidType::Water,
+                                                                          Node::ConnType::Inlet,
+                                                                          Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
+            tower.WaterOutletNodeNum = Node::GetSingleNode(state,
                                                                            AlphArray(3),
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
+                                                                           Node::ConnObjType::CoolingTowerTwoSpeed,
                                                                            tower.Name,
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Outlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Outlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
@@ -813,15 +813,15 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                 tower.OutdoorAirInletNodeNum = 0;
             } else {
-                tower.OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                tower.OutdoorAirInletNodeNum = Node::GetSingleNode(state,
                                                                                    AlphArray(10),
                                                                                    ErrorsFound,
-                                                                                   DataLoopNode::ConnectionObjectType::CoolingTowerTwoSpeed,
+                                                                                   Node::ConnObjType::CoolingTowerTwoSpeed,
                                                                                    tower.Name,
-                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                                   Node::FluidType::Air,
+                                                                                   Node::ConnType::OutsideAirReference,
+                                                                                   Node::CompFluidStream::Primary,
+                                                                                   Node::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, tower.OutdoorAirInletNodeNum)) {
                     ShowSevereError(state,
                                     format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
@@ -1020,24 +1020,24 @@ namespace CondenserLoopTowers {
             tower.VSTower = VariableSpeedTowerNumber;
             tower.Name = AlphArray(1);
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpd;
-            tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            tower.WaterInletNodeNum = Node::GetSingleNode(state,
                                                                           AlphArray(2),
                                                                           ErrorsFound,
-                                                                          DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
+                                                                          Node::ConnObjType::CoolingTowerVariableSpeed,
                                                                           AlphArray(1),
-                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::ConnectionType::Inlet,
-                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                          DataLoopNode::ObjectIsNotParent);
-            tower.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          Node::FluidType::Water,
+                                                                          Node::ConnType::Inlet,
+                                                                          Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
+            tower.WaterOutletNodeNum = Node::GetSingleNode(state,
                                                                            AlphArray(3),
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
+                                                                           Node::ConnObjType::CoolingTowerVariableSpeed,
                                                                            AlphArray(1),
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Outlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Outlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if ((Util::SameString(AlphArray(4), "CoolToolsUserDefined") || Util::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
@@ -1480,15 +1480,15 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
                 tower.OutdoorAirInletNodeNum = 0;
             } else {
-                tower.OutdoorAirInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                tower.OutdoorAirInletNodeNum = Node::GetSingleNode(state,
                                                                                    AlphArray(12),
                                                                                    ErrorsFound,
-                                                                                   DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeed,
+                                                                                   Node::ConnObjType::CoolingTowerVariableSpeed,
                                                                                    tower.Name,
-                                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                                   DataLoopNode::ConnectionType::OutsideAirReference,
-                                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                                   DataLoopNode::ObjectIsNotParent);
+                                                                                   Node::FluidType::Air,
+                                                                                   Node::ConnType::OutsideAirReference,
+                                                                                   Node::CompFluidStream::Primary,
+                                                                                   Node::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, tower.OutdoorAirInletNodeNum)) {
                     ShowSevereError(state,
                                     format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
@@ -1527,24 +1527,24 @@ namespace CondenserLoopTowers {
             auto &tower = state.dataCondenserLoopTowers->towers(TowerNum);
             tower.Name = AlphArray(1);
             tower.TowerType = DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel;
-            tower.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            tower.WaterInletNodeNum = Node::GetSingleNode(state,
                                                                           AlphArray(2),
                                                                           ErrorsFound,
-                                                                          DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
+                                                                          Node::ConnObjType::CoolingTowerVariableSpeedMerkel,
                                                                           AlphArray(1),
-                                                                          DataLoopNode::NodeFluidType::Water,
-                                                                          DataLoopNode::ConnectionType::Inlet,
-                                                                          NodeInputManager::CompFluidStream::Primary,
-                                                                          DataLoopNode::ObjectIsNotParent);
-            tower.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                          Node::FluidType::Water,
+                                                                          Node::ConnType::Inlet,
+                                                                          Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
+            tower.WaterOutletNodeNum = Node::GetSingleNode(state,
                                                                            AlphArray(3),
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
+                                                                           Node::ConnObjType::CoolingTowerVariableSpeedMerkel,
                                                                            AlphArray(1),
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Outlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Outlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (Util::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
@@ -1740,15 +1740,15 @@ namespace CondenserLoopTowers {
                 tower.OutdoorAirInletNodeNum = 0;
             } else {
                 tower.OutdoorAirInletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         AlphArray(14),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::CoolingTowerVariableSpeedMerkel,
+                                                        Node::ConnObjType::CoolingTowerVariableSpeedMerkel,
                                                         tower.Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::OutsideAirReference,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::OutsideAirReference,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
                 if (!OutAirNodeManager::CheckOutAirNodeNumber(state, tower.OutdoorAirInletNodeNum)) {
                     ShowSevereError(state,
                                     format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
@@ -1781,9 +1781,11 @@ namespace CondenserLoopTowers {
             ShowFatalError(state, "initialize: Program terminated due to previous condition(s).");
         }
 
+        auto const *waterOutletNode = state.dataLoopNodes->nodes(this->WaterOutletNodeNum);
+        
         // check if setpoint on outlet node
-        this->SetpointIsOnOutlet = !((state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) &&
-                                     (state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPointHi == DataLoopNode::SensedNodeFlagValue));
+        this->SetpointIsOnOutlet = !((waterOutletNode->TempSetPoint == Node::SensedNodeFlagValue) &&
+                                     (waterOutletNode->TempSetPointHi == Node::SensedNodeFlagValue));
     }
 
     void CoolingTower::initEachEnvironment(EnergyPlusData &state)
@@ -1835,13 +1837,15 @@ namespace CondenserLoopTowers {
         }
 
         // Each time initializations
-        this->WaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
+        auto const *outdoorAirInletNode = state.dataLoopNodes->nodes(this->OutdoorAirInletNodeNum);
+        this->WaterTemp = waterInletNode->Temp;
 
         if (this->OutdoorAirInletNodeNum != 0) {
-            this->AirTemp = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Temp;
-            this->AirHumRat = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).HumRat;
-            this->AirPress = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Press;
-            this->AirWetBulb = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
+            this->AirTemp = outdoorAirInletNode->Temp;
+            this->AirHumRat = outdoorAirInletNode->HumRat;
+            this->AirPress = outdoorAirInletNode->Press;
+            this->AirWetBulb = outdoorAirInletNode->OutAirWetBulb;
         } else {
             this->AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->AirHumRat = state.dataEnvrn->OutHumRat;
@@ -4610,10 +4614,13 @@ namespace CondenserLoopTowers {
         //  for glycols, it can be much lower. The fluid type is stored at the loop.
         //  Current choices are Water and Steam, needs to expand for glycols
 
+        auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
+        auto const *waterOutletNode = state.dataLoopNodes->nodes(this->WaterOutletNodeNum);
+
         // set inlet and outlet nodes
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        this->OutletWaterTemp = waterInletNode->Temp;
 
         Real64 freeConvTowerUA = this->FreeConvTowerUA;
         Real64 highSpeedTowerUA = this->HighSpeedTowerUA;
@@ -4623,14 +4630,14 @@ namespace CondenserLoopTowers {
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
             if (this->SetpointIsOnOutlet) {
-                TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPoint;
+                TempSetPoint = waterOutletNode->TempSetPoint;
             } else {
                 TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
             }
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
             if (this->SetpointIsOnOutlet) {
-                TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPointHi;
+                TempSetPoint = waterOutletNode->TempSetPointHi;
             } else {
                 TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
             }
@@ -4715,7 +4722,7 @@ namespace CondenserLoopTowers {
             //   Initialize local variables to the free convection design values
             UAdesign = freeConvTowerUA / this->NumCell;
             AirFlowRate = this->FreeConvAirFlowRate / this->NumCell;
-            OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            OutletWaterTempOFF = waterInletNode->Temp;
             this->OutletWaterTemp = OutletWaterTempOFF;
             FanModeFrac = 0.0;
 
@@ -4839,11 +4846,11 @@ namespace CondenserLoopTowers {
         // Should this be water inlet node num?????
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                      state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
+                                                                      waterInletNode->Temp,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                       RoutineName);
 
-        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
@@ -4915,10 +4922,12 @@ namespace CondenserLoopTowers {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("calculateTwoSpeedTower");
 
+        auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
+        auto const *waterOutletNode = state.dataLoopNodes->nodes(this->WaterOutletNodeNum);
         // init
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        this->OutletWaterTemp = waterInletNode->Temp;
 
         Real64 freeConvTowerUA = this->FreeConvTowerUA;
         Real64 highSpeedTowerUA = this->HighSpeedTowerUA;
@@ -4928,14 +4937,14 @@ namespace CondenserLoopTowers {
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
             if (this->SetpointIsOnOutlet) {
-                TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPoint;
+                TempSetPoint = waterOutletNode->TempSetPoint;
             } else {
                 TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
             }
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
             if (this->SetpointIsOnOutlet) {
-                TempSetPoint = state.dataLoopNodes->Node(this->WaterOutletNodeNum).TempSetPointHi;
+                TempSetPoint = waterOutletNode->TempSetPointHi;
             } else {
                 TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
             }
@@ -5019,7 +5028,7 @@ namespace CondenserLoopTowers {
             // set local variable for tower
             Real64 UAdesign = freeConvTowerUA / this->NumCell; // where is NumCellOn?
             AirFlowRate = this->FreeConvAirFlowRate / this->NumCell;
-            this->WaterMassFlowRate = state.dataLoopNodes->Node(this->WaterInletNodeNum).MassFlowRate;
+            this->WaterMassFlowRate = waterInletNode->MassFlowRate;
             Real64 OutletWaterTemp1stStage = this->OutletWaterTemp;
             Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
             FanModeFrac = 0.0;
@@ -5082,10 +5091,10 @@ namespace CondenserLoopTowers {
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                      state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
+                                                                      waterInletNode->Temp,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                       RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
         this->airFlowRateRatio = (AirFlowRate * this->NumCell) / this->HighSpeedAirFlowRate;
     }
 
@@ -5147,6 +5156,9 @@ namespace CondenserLoopTowers {
         int NumCellMin(0);
         int NumCellMax(0);
         Real64 WaterMassFlowRatePerCell;
+        
+        auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
+
         if (this->DesWaterMassFlowRate > 0.0) {
             WaterMassFlowRatePerCellMin = this->DesWaterMassFlowRate * this->MinFracFlowRate / this->NumCell;
             WaterMassFlowRatePerCellMax = this->DesWaterMassFlowRate * this->MaxFracFlowRate / this->NumCell;
@@ -5171,7 +5183,7 @@ namespace CondenserLoopTowers {
         // Initialize subroutine variables
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        this->OutletWaterTemp = waterInletNode->Temp;
 
         this->WaterUsage = 0.0;
         Real64 Twb = this->AirWetBulb;
@@ -5203,7 +5215,7 @@ namespace CondenserLoopTowers {
             TempSetPoint = TowerOutletTemp_ff - this->FaultyCondenserSWTOffset;
         }
 
-        Real64 Tr = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - TempSetPoint;
+        Real64 Tr = waterInletNode->Temp - TempSetPoint;
         Real64 Ta = TempSetPoint - this->AirWetBulb;
 
         // Do not RETURN here if flow rate is less than MassFlowTolerance. Check basin heater and then RETURN.
@@ -5229,7 +5241,7 @@ namespace CondenserLoopTowers {
             // Initialize inlet node water properties
             Real64 const WaterDensity = FluidProperties::GetDensityGlycol(state,
                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                          state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
+                                                                          waterInletNode->Temp,
                                                                           state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                           RoutineName);
             Real64 const WaterFlowRateRatio = WaterMassFlowRatePerCell / (WaterDensity * this->CalibratedWaterFlowRate / this->NumCell);
@@ -5242,7 +5254,7 @@ namespace CondenserLoopTowers {
             //   regime specified by the user
 
             this->airFlowRateRatio = 1.0;
-            OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            OutletWaterTempOFF = waterInletNode->Temp;
             this->OutletWaterTemp = OutletWaterTempOFF;
             FreeConvectionCapFrac = this->FreeConvectionCapacityFraction;
             OutletWaterTempON = this->calculateVariableTowerOutletTemp(state, WaterFlowRateRatioCapped, this->airFlowRateRatio, TwbCapped);
@@ -5264,8 +5276,7 @@ namespace CondenserLoopTowers {
         // find the correct air ratio only if full flow is  too much
         if (OutletWaterTempON < TempSetPoint) {
             //   outlet water temperature is calculated in the free convection regime
-            OutletWaterTempOFF = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp -
-                                 FreeConvectionCapFrac * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempON);
+            OutletWaterTempOFF = waterInletNode->Temp - FreeConvectionCapFrac * (waterInletNode->Temp - OutletWaterTempON);
             //   fan is OFF
             this->FanCyclingRatio = 0.0;
             //   air flow ratio is assumed to be the fraction of tower capacity in the free convection regime (fan is OFF but air is flowing)
@@ -5363,10 +5374,10 @@ namespace CondenserLoopTowers {
 
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                      state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
+                                                                      waterInletNode->Temp,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                       RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
 
         //   calculate end time of current time step
         Real64 const CurrentEndTime = state.dataGlobal->CurrentTime + state.dataHVACGlobal->SysTimeElapsed;
@@ -5449,14 +5460,16 @@ namespace CondenserLoopTowers {
         Real64 constexpr Acc(1.e-3);           // Accuracy of solver result
         static constexpr std::string_view RoutineName("calculateMerkelVariableSpeedTower");
 
+        auto *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
+        
         Real64 const CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                      state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp,
+                                                                      waterInletNode->Temp,
                                                                       state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                       RoutineName);
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+        this->OutletWaterTemp = waterInletNode->Temp;
 
         Real64 freeConvTowerUA = this->FreeConvTowerUA;
         Real64 highSpeedTowerUA = this->HighSpeedTowerUA;
@@ -5523,7 +5536,7 @@ namespace CondenserLoopTowers {
 
         if (std::abs(MyLoad) <= HVAC::SmallLoad) {
             // tower doesn't need to do anything
-            this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            this->OutletWaterTemp = waterInletNode->Temp;
             this->FanPower = 0.0;
             this->airFlowRateRatio = 0.0;
             this->Qactual = 0.0;
@@ -5535,10 +5548,10 @@ namespace CondenserLoopTowers {
         // first find free convection cooling rate
         UAdesignPerCell = freeConvTowerUA / this->NumCell;
         AirFlowRatePerCell = this->FreeConvAirFlowRate / this->NumCell;
-        this->WaterMassFlowRate = state.dataLoopNodes->Node(this->WaterInletNodeNum).MassFlowRate;
+        this->WaterMassFlowRate = waterInletNode->MassFlowRate;
         Real64 OutletWaterTempOFF = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAdesignPerCell);
 
-        Real64 FreeConvQdot = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempOFF);
+        Real64 FreeConvQdot = this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - OutletWaterTempOFF);
         this->FanPower = 0.0;
 
         if (std::abs(MyLoad) <= FreeConvQdot) { // can meet load with free convection and fan off
@@ -5563,7 +5576,7 @@ namespace CondenserLoopTowers {
         Real64 UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 FullSpeedFanQdot =
-            this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+            this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
         Real64 FanPowerAdjustFac = 0.0;
         if (FullSpeedFanQdot <= std::abs(MyLoad)) { // full speed is what we want.
 
@@ -5583,7 +5596,7 @@ namespace CondenserLoopTowers {
                                       ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin);
                 }
                 FullSpeedFanQdot =
-                    this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+                    this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
             }
             this->Qactual = FullSpeedFanQdot;
             CalcBasinHeaterPower(
@@ -5602,7 +5615,7 @@ namespace CondenserLoopTowers {
         UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 MinSpeedFanQdot =
-            this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+            this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
 
         if (std::abs(MyLoad) <= MinSpeedFanQdot) { // min fan speed already exceeds load)
             this->Qactual = MinSpeedFanQdot;
@@ -5618,13 +5631,14 @@ namespace CondenserLoopTowers {
             // load can be refined by modulating fan speed, call regula-falsi
             auto f = [&state, this, MyLoad, WaterMassFlowRatePerCell, UAdesignPerCell, UAwetbulbAdjFac, UAwaterflowAdjFac, CpWater](
                          Real64 airFlowRateRatioLocal) {
+                auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
                 Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * this->HighSpeedAirFlowRate / this->NumCell;
                 Real64 const UAairflowAdjFac = Curve::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
                 Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                 Real64 OutletWaterTempTrial =
                     this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
                 Real64 const Qdot =
-                    this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - OutletWaterTempTrial);
+                    this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - OutletWaterTempTrial);
                 return std::abs(MyLoad) - Qdot;
             };
             int SolFla = 0;
@@ -5682,7 +5696,7 @@ namespace CondenserLoopTowers {
             UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
             this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-            this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
+            this->Qactual = this->WaterMassFlowRate * CpWater * (waterInletNode->Temp - this->OutletWaterTemp);
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
@@ -6356,20 +6370,21 @@ namespace CondenserLoopTowers {
         // This subroutine is for passing results to the outlet water node.
 
         // set node information
-        state.dataLoopNodes->Node(this->WaterOutletNodeNum).Temp = this->OutletWaterTemp;
+        auto *waterOutletNode = state.dataLoopNodes->nodes(this->WaterOutletNodeNum);
+        waterOutletNode->Temp = this->OutletWaterTemp;
 
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
             state.dataGlobal->WarmupFlag)
             return;
 
         // Check flow rate through tower and compare to design flow rate, show warning if greater than Design * Mulitplier
-        if (state.dataLoopNodes->Node(this->WaterOutletNodeNum).MassFlowRate > this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier) {
+        if (waterOutletNode->MassFlowRate > this->DesWaterMassFlowRate * this->TowerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {
                 ShowWarningError(state, format("{} \"{}\"", DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], this->Name));
                 ShowContinueError(state, " Condenser Loop Mass Flow Rate is much greater than the towers design mass flow rate.");
                 ShowContinueError(
-                    state, format(" Condenser Loop Mass Flow Rate = {:.6T}", state.dataLoopNodes->Node(this->WaterOutletNodeNum).MassFlowRate));
+                    state, format(" Condenser Loop Mass Flow Rate = {:.6T}", waterOutletNode->MassFlowRate));
                 ShowContinueError(state, format(" Tower Design Mass Flow Rate   = {:.6T}", this->DesWaterMassFlowRate));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
@@ -6379,8 +6394,8 @@ namespace CondenserLoopTowers {
                            DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)],
                            this->Name),
                     this->HighMassFlowErrorIndex,
-                    state.dataLoopNodes->Node(this->WaterOutletNodeNum).MassFlowRate,
-                    state.dataLoopNodes->Node(this->WaterOutletNodeNum).MassFlowRate);
+                    waterOutletNode->MassFlowRate,
+                    waterOutletNode->MassFlowRate);
             }
         }
 
@@ -6441,10 +6456,11 @@ namespace CondenserLoopTowers {
         // This subroutine updates the report variables for the tower.
 
         Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
+        auto const *waterInletNode = state.dataLoopNodes->nodes(this->WaterInletNodeNum);
 
         if (!RunFlag) {
-            this->InletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
-            this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            this->InletWaterTemp = waterInletNode->Temp;
+            this->OutletWaterTemp = waterInletNode->Temp;
             this->Qactual = 0.0;
             this->FanPower = 0.0;
             this->FanEnergy = 0.0;
@@ -6456,7 +6472,7 @@ namespace CondenserLoopTowers {
             this->NumCellOn = 0;
             this->SpeedSelected = 0;
         } else {
-            this->InletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            this->InletWaterTemp = waterInletNode->Temp;
             this->FanEnergy = this->FanPower * ReportingConstant;
             this->AirFlowRatio = this->airFlowRateRatio;
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;

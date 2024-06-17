@@ -62,13 +62,9 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace NodeInputManager {
+namespace Node {
 
-    // Using/Aliasing
-    using DataLoopNode::MarkedNodeData;
-    using DataLoopNode::NodeData;
-
-    // For GetOnlySingleNode(), GetNodeNums(), etc
+    // For GetSingleNode(), GetNodeNums(), etc
     enum class CompFluidStream
     {
         Invalid = -1,
@@ -83,14 +79,9 @@ namespace NodeInputManager {
     {
         // Members
         std::string Name;         // Name of this Node List
-        int NumOfNodesInList;     // Number of Nodes in this Node List
+        int NumNodes = 0;     // Number of Nodes in this Node List
         Array1D_string NodeNames; // List of Names in this Node List
-        Array1D_int NodeNumbers;  // Number of each Node (ref NodeNames) in this Node List
-
-        // Default Constructor
-        NodeListDef() : NumOfNodesInList(0)
-        {
-        }
+        Array1D_int NodeNums;  // Number of each Node (ref NodeNames) in this Node List
     };
 
     void GetNodeNums(EnergyPlusData &state,
@@ -98,10 +89,10 @@ namespace NodeInputManager {
                      int &NumNodes,                                     // Number of nodes accompanying this Name
                      Array1D_int &NodeNumbers,                          // Node Numbers accompanying this Name
                      bool &ErrorsFound,                                 // True when errors are found...
-                     DataLoopNode::NodeFluidType nodeFluidType,         // Fluidtype for checking/setting node FluidType
-                     DataLoopNode::ConnectionObjectType NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
+                     FluidType fluidType,         // Fluidtype for checking/setting node FluidType
+                     ConnObjType objType, // Node Object Type (i.e. "Chiller:Electric")
                      std::string const &NodeObjectName,                 // Node Object Name (i.e. "MyChiller")
-                     DataLoopNode::ConnectionType nodeConnectionType,   // Node Connection Type (see DataLoopNode)
+                     ConnType connType,   // Node Connection Type (see DataLoopNode)
                      CompFluidStream NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
                      bool ObjectIsParent,                               // True/False
                      bool const IncrementFluidStream = false,           // True/False
@@ -114,19 +105,19 @@ namespace NodeInputManager {
 
     int AssignNodeNumber(EnergyPlusData &state,
                          std::string const &Name,                   // Name for assignment
-                         DataLoopNode::NodeFluidType nodeFluidType, // must be valid
+                         FluidType fluidType, // must be valid
                          bool &ErrorsFound);
 
-    int GetOnlySingleNode(EnergyPlusData &state,
-                          std::string const &NodeName,
-                          bool &errFlag,
-                          DataLoopNode::ConnectionObjectType NodeObjectType, // Node Object Type (i.e. "Chiller:Electric")
-                          std::string const &NodeObjectName,                 // Node Object Name (i.e. "MyChiller")
-                          DataLoopNode::NodeFluidType nodeFluidType,         // Fluidtype for checking/setting node FluidType
-                          DataLoopNode::ConnectionType nodeConnectionType,   // Node Connection Type (see DataLoopNode)
-                          CompFluidStream NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
-                          bool ObjectIsParent,                               // True/False
-                          std::string_view const InputFieldName = {}         // Input Field Name
+    int GetSingleNode(EnergyPlusData &state,
+                      std::string const &NodeName,
+                      bool &errFlag,
+                      ConnObjType objType, // Node Object Type (i.e. "Chiller:Electric")
+                      std::string const &NodeObjectName,                 // Node Object Name (i.e. "MyChiller")
+                      FluidType fluidType,         // Fluidtype for checking/setting node FluidType
+                      ConnType connType,   // Node Connection Type (see DataLoopNode)
+                      CompFluidStream NodeFluidStream,                   // Which Fluid Stream (1,2,3,...)
+                      bool ObjectIsParent,                               // True/False
+                      std::string_view const InputFieldName = {}         // Input Field Name
     );
 
     void InitUniqueNodeCheck(EnergyPlusData &state, std::string const &ContextName);
@@ -143,12 +134,14 @@ namespace NodeInputManager {
 
     void MarkNode(EnergyPlusData &state,
                   int NodeNumber, // Node Number to be marked
-                  DataLoopNode::ConnectionObjectType ObjectType,
+                  ConnObjType ObjectType,
                   std::string const &ObjectName,
                   std::string const &FieldName);
 
     void CheckMarkedNodes(EnergyPlusData &state, bool &ErrorsFound);
 
+    int GetNodeIndex(EnergyPlusData &state, std::string const &nodeName);
+        
 } // namespace NodeInputManager
 
 struct NodeInputManagerData : BaseGlobalStruct
@@ -161,17 +154,16 @@ struct NodeInputManagerData : BaseGlobalStruct
     bool GetNodeInputFlag = true;    // Flag to Get Node Input(s)
     Array1D_int NodeRef;             // Number of times a Node is "referenced"
     std::string CurCheckContextName; // Used in Uniqueness checks
-    Array1D_string UniqueNodeNames;  // used in uniqueness checks
     int NumCheckNodes = 0;           // Num of Unique nodes in check
     int MaxCheckNodes = 0;           // Current "max" unique nodes in check
     bool NodeVarsSetup = false;      // Setup indicator of node vars for reporting (also that all nodes have been entered)
     Array1D_bool NodeWetBulbRepReq;
     bool CalcMoreNodeInfoMyOneTimeFlag = true; // one time flag
-    Array1D_int GetOnlySingleNodeNodeNums;
-    bool GetOnlySingleNodeFirstTime = true;
+    Array1D_int GetSingleNodeNodeNums;
+    bool GetSingleNodeFirstTime = true;
 
     // Object Data
-    Array1D<NodeInputManager::NodeListDef> NodeLists; // Node Lists
+    Array1D<Node::NodeListDef> NodeLists; // Node Lists
 
     Real64 RhoAirStdInit;
     Real64 RhoWaterStdInit;
@@ -193,13 +185,12 @@ struct NodeInputManagerData : BaseGlobalStruct
         this->GetNodeInputFlag = true;
         this->NodeRef.deallocate();
         this->CurCheckContextName = std::string();
-        this->UniqueNodeNames.deallocate();
         this->NumCheckNodes = 0;
         this->MaxCheckNodes = 0;
         this->NodeVarsSetup = false;
         this->NodeLists.deallocate();
-        this->GetOnlySingleNodeNodeNums.deallocate();
-        this->GetOnlySingleNodeFirstTime = true;
+        this->GetSingleNodeNodeNums.deallocate();
+        this->GetSingleNodeFirstTime = true;
         this->NodeWetBulbRepReq.deallocate();
     }
 };

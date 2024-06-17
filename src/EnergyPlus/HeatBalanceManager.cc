@@ -2334,8 +2334,8 @@ namespace HeatBalanceManager {
         // load input data for Outdoor Air Node for zones
 
         // Using/Aliasing
-        using DataLoopNode::ObjectIsParent;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::ObjectIsParent;
+        using Node::GetSingleNode;
         using OutAirNodeManager::CheckOutAirNodeNumber;
 
         //-----------------------------------------------------------------------
@@ -2392,14 +2392,14 @@ namespace HeatBalanceManager {
                 }
 
                 // Assign outdoor air node number;
-                int NodeNum = GetOnlySingleNode(state,
+                int NodeNum = GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::ZonePropertyLocalEnvironment,
+                                                Node::ConnObjType::ZonePropertyLocalEnvironment,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Air,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
+                                                Node::FluidType::Air,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Primary,
                                                 ObjectIsParent);
                 if (NodeNum == 0 && CheckOutAirNodeNumber(state, NodeNum)) {
                     ShowSevereError(state,
@@ -2423,7 +2423,7 @@ namespace HeatBalanceManager {
             for (int Loop = 1; Loop <= TotZoneEnv; ++Loop) {
                 if (state.dataHeatBal->ZoneLocalEnvironment(Loop).ZonePtr == ZoneLoop) {
                     if (state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr != 0) {
-                        state.dataHeatBal->Zone(ZoneLoop).LinkedOutAirNode = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
+                        state.dataHeatBal->Zone(ZoneLoop).OutdoorAirInNodeNum = state.dataHeatBal->ZoneLocalEnvironment(Loop).OutdoorAirNodePtr;
                     }
                 }
             }
@@ -2742,6 +2742,8 @@ namespace HeatBalanceManager {
         using OutAirNodeManager::SetOutAirNodes;
         using WindowEquivalentLayer::InitEquivalentLayerWindowCalculations;
 
+        auto &dln = state.dataLoopNodes;
+        
         if (state.dataGlobal->BeginSimFlag) {
             AllocateHeatBalArrays(state); // Allocate the Module Arrays
             if (state.dataHeatBal->AnyCTF || state.dataHeatBal->AnyEMPD) {
@@ -2881,34 +2883,31 @@ namespace HeatBalanceManager {
         if (state.dataGlobal->AnyLocalEnvironmentsInModel) {
             SetOutAirNodes(state);
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
-                if (state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode > 0) {
-                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                if (state.dataHeatBal->Zone(ZoneNum).OutdoorAirInNodeNum > 0) {
+                    auto const *linkedOutAirNode = dln->nodes(state.dataHeatBal->Zone(ZoneNum).OutdoorAirInNodeNum);
+                    if (linkedOutAirNode->OutAirDryBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = ScheduleManager::GetCurrentScheduleValue(
-                            state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                            state, linkedOutAirNode->OutAirDryBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp =
-                            state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutDryBulbTemp = linkedOutAirNode->OutAirDryBulb;
                     }
-                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                    if (linkedOutAirNode->OutAirWetBulbSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = ScheduleManager::GetCurrentScheduleValue(
-                            state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                            state, linkedOutAirNode->OutAirWetBulbSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp =
-                            state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                        state.dataHeatBal->Zone(ZoneNum).OutWetBulbTemp = linkedOutAirNode->OutAirWetBulb;
                     }
-                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                    if (linkedOutAirNode->OutAirWindSpeedSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).WindSpeed = ScheduleManager::GetCurrentScheduleValue(
-                            state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                            state, linkedOutAirNode->OutAirWindSpeedSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindSpeed =
-                            state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                        state.dataHeatBal->Zone(ZoneNum).WindSpeed = linkedOutAirNode->OutAirWindSpeed;
                     }
-                    if (state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                    if (linkedOutAirNode->OutAirWindDirSchedNum > 0) {
                         state.dataHeatBal->Zone(ZoneNum).WindDir = ScheduleManager::GetCurrentScheduleValue(
-                            state, state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                            state, linkedOutAirNode->OutAirWindDirSchedNum);
                     } else {
-                        state.dataHeatBal->Zone(ZoneNum).WindDir =
-                            state.dataLoopNodes->Node(state.dataHeatBal->Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                        state.dataHeatBal->Zone(ZoneNum).WindDir = linkedOutAirNode->OutAirWindDir;
                     }
                 }
             }
@@ -3453,7 +3452,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using EconomicTariff::UpdateUtilityBills; // added for computing annual utility costs
-        using NodeInputManager::CalcMoreNodeInfo;
+        using Node::CalcMoreNodeInfo;
         using OutputReportTabular::UpdateTabularReports;
         using ScheduleManager::ReportScheduleValues;
 

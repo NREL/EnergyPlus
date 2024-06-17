@@ -155,9 +155,9 @@ namespace EvaporativeFluidCoolers {
         Real64 Concentration = 0.0;           // fluid/glycol concentration - percent
         int FluidIndex = 0;                   // Index to Property arrays
         Real64 SizFac = 0.0;                  // sizing factor
-        int WaterInletNodeNum = 0;            // Node number on the water inlet side of the evaporative fluid cooler
-        int WaterOutletNodeNum = 0;           // Node number on the water outlet side of the evaporative fluid cooler
-        int OutdoorAirInletNodeNum = 0;       // Node number of outdoor air inlet for the evaporative fluid cooler
+        int WaterInNodeNum = 0;            // Node number on the water inlet side of the evaporative fluid cooler
+        int WaterOutNodeNum = 0;           // Node number on the water outlet side of the evaporative fluid cooler
+        int OutdoorAirInNodeNum = 0;       // Node number of outdoor air inlet for the evaporative fluid cooler
         int HighMassFlowErrorCount = 0;       // Counter when mass flow rate is >
         int HighMassFlowErrorIndex = 0;       // Index for high mass flow recurring error message
         int OutletWaterTempErrorCount = 0;    // Counter when outlet water temperature is < minimum allowed temperature
@@ -183,8 +183,8 @@ namespace EvaporativeFluidCoolers {
         PlantLocation plantLoc;
         Real64 InletWaterTemp = 0.0;    // CW temperature at evaporative fluid cooler inlet
         Real64 OutletWaterTemp = 0.0;   // CW temperature at evaporative fluid cooler outlet
-        int WaterInletNode = 0;         // Node number at evaporative fluid cooler inlet
-        int WaterOutletNode = 0;        // Node number at evaporative fluid cooler outlet
+        int InNodeNum = 0;         // Node number at evaporative fluid cooler inlet
+        int OutNodeNum = 0;        // Node number at evaporative fluid cooler outlet
         Real64 WaterMassFlowRate = 0.0; // WaterMassFlowRate through evaporative fluid cooler
         Real64 Qactual = 0.0;           // Evaporative fluid cooler heat transfer
         Real64 FanPower = 0.0;          // Evaporative fluid cooler fan power used

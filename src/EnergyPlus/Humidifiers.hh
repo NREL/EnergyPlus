@@ -104,8 +104,8 @@ namespace Humidifiers {
         InletWaterTemp InletWaterTempOption; // type inlet water temperature fixed or variable
         Real64 FanPower;                     // nominal fan power [watts]
         Real64 StandbyPower;                 // standby power consumption [watts]
-        int AirInNode;                       // air inlet node of humidifier
-        int AirOutNode;                      // air outlet node of humidifier
+        int AirInNodeNum = 0;                       // air inlet node of humidifier
+        int AirOutNodeNum = 0;                      // air outlet node of humidifier
         Real64 AirInTemp;                    // inlet air temperature [C]
         Real64 AirInHumRat;                  // inlet air humidity ratio [kg water / kg air]
         Real64 AirInEnthalpy;                // inlet air specific enthalpy [J/kg]
@@ -142,7 +142,7 @@ namespace Humidifiers {
         HumidifierData()
             : HumType(HumidType::Invalid), EquipIndex(0), SchedPtr(0), NomCapVol(0.0), NomCap(0.0), NomPower(0.0), ThermalEffRated(1.0),
               CurMakeupWaterTemp(0.0), EfficiencyCurvePtr(0), InletWaterTempOption(InletWaterTemp::Invalid), FanPower(0.0), StandbyPower(0.0),
-              AirInNode(0), AirOutNode(0), AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0),
+              AirInTemp(0.0), AirInHumRat(0.0), AirInEnthalpy(0.0), AirInMassFlowRate(0.0), AirOutTemp(0.0),
               AirOutHumRat(0.0), AirOutEnthalpy(0.0), AirOutMassFlowRate(0.0), HumRatSet(0.0), WaterAdd(0.0), ElecUseEnergy(0.0), ElecUseRate(0.0),
               WaterCons(0.0), WaterConsRate(0.0), SuppliedByWaterSystem(false), WaterTankID(0), WaterTankDemandARRID(0), TankSupplyVdot(0.0),
               TankSupplyVol(0.0), StarvedSupplyVdot(0.0), StarvedSupplyVol(0.0), TankSupplyID(0), MySizeFlag(true), MyEnvrnFlag(true),

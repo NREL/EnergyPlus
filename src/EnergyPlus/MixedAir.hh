@@ -170,11 +170,11 @@ namespace MixedAir {
         // 4=DifferentialEnthalpy, 5=FixedDewPointAndDryBulb, 6 = ElectronicEnthalpy,
         // 7 =DifferentialDryBulbAndEnthalpy
         bool EconBypass = false; // ModulateFlow =FALSE , MinimumFlowWithBypass =TRUE
-        int MixNode = 0;         // Controlled node (mixed air node)
-        int OANode = 0;          // Actuated node (outside air node)
-        int InletNode = 0;       // Inlet Air Node for into Mixer  (BTG Nov 2004)
-        int RelNode = 0;         // Relief Air Node Number
-        int RetNode = 0;         // Return Air Node Number
+        int MixedAirOutNodeNum = 0;         // Controlled node (mixed air node)
+        int OutsideAirInNodeNum = 0;          // Actuated node (outside air node)
+        int AirInNodeNum = 0;       // Inlet Air Node for into Mixer  (BTG Nov 2004)
+        int ReliefAirOutNodeNum = 0;         // Relief Air Node Number
+        int ReturnAirInNodeNum = 0;         // Return Air Node Number
         std::string MinOASch;    // Name of the minimum outside air schedule
         int MinOASchPtr = 0;     // Index to the minimum outside air schedule
         Real64 RelMassFlow = 0.0;
@@ -204,7 +204,7 @@ namespace MixedAir {
         std::string VentilationMechanicalName;   // Name of ventilation:mechanical object used for DCV
         int VentMechObjectNum = 0;               // Index to VENTILATION:MECHANICAL object for this controller
         int HumidistatZoneNum = 0;               // zone number where humidistat is located
-        int NodeNumofHumidistatZone = 0;         // node number of zone where humidistat is located
+        int HumidistatZoneNodeNum = 0;         // node number of zone where humidistat is located
         Real64 HighRHOAFlowRatio = 1.0;          // Modify ratio with respect to maximum outdoor air flow rate (high RH)
         bool ModifyDuringHighOAMoisture = false; // flag to Modify outdoor air flow, TRUE when modify any time, FALSE when modify only when indoor air
                                                  // humrat is less than outdoor HR
@@ -324,15 +324,17 @@ namespace MixedAir {
         );
     };
 
-    struct OAMixerProps // Derived type for Outside Air Mixing Component
+    struct OAMixerProps // Derived type for Outside Air Mixing Component // Derived from what? 
     {
         // Members
         std::string Name;
         int MixerIndex = 0; // Set on first call...
-        int MixNode = 0;    // Outlet node - mixed air
-        int InletNode = 0;  // Inlet node for outside air stream (Nov. 2004 BTG was OANode )
-        int RelNode = 0;    // Outlet node - relief air
-        int RetNode = 0;    // Inlet node - return air
+            
+        // Node names are about the last place you want to skimp
+        int MixedAirOutNodeNum = 0;    // Outlet node - mixed air
+        int OutsideAirInNodeNum = 0;  // Inlet node for outside air stream (Nov. 2004 BTG was OANode )
+        int ReliefAirOutNodeNum = 0;    // Outlet node - relief air
+        int ReturnAirInNodeNum = 0;    // Inlet node - return air
         Real64 MixTemp = 0.0;
         Real64 MixHumRat = 0.0;
         Real64 MixEnthalpy = 0.0;

@@ -69,11 +69,11 @@ namespace PlantValves {
         // Members
         // user input data
         std::string Name;             // User identifier
-        int PltInletNodeNum = 0;      // Node number on the inlet side of the plant
-        int PltOutletNodeNum = 0;     // Node number on the outlet side of the plant
+        int PltInNodeNum = 0;      // Node number on the inlet side of the plant
+        int PltOutNodeNum = 0;     // Node number on the outlet side of the plant
         int PltStream2NodeNum = 0;    // Node number on the outlet side of the second stream
         int PltSetPointNodeNum = 0;   // Node number for the setpoint node.
-        int PltPumpOutletNodeNum = 0; // node number for the pump outlet (for flow rate)
+        int PltPumpOutNodeNum = 0; // node number for the pump outlet (for flow rate)
         // Calculated and from elsewhere
         bool environmentInit = true;    // flag for initializationL true means do the initializations
         Real64 FlowDivFract = 0.0;      // Fraction of flow sent down diversion path

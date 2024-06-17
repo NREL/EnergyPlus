@@ -105,7 +105,6 @@ namespace EnergyPlus::Convect {
 // Subroutines are called to fill the variable HConvIn with the convection coefficient at
 // the inside face.  or outside face for the current surface.
 
-using namespace DataLoopNode;
 using namespace DataHeatBalance;
 using namespace DataSurfaces;
 using namespace DataVectorTypes;
@@ -186,12 +185,12 @@ void InitIntConvCoeff(EnergyPlusData &state,
 
     if (state.dataConvect->NodeCheck) { // done once when conditions are ready...
         if (!state.dataGlobal->SysSizingCalc && !state.dataGlobal->ZoneSizingCalc && state.dataZoneEquip->ZoneEquipInputsFilled &&
-            allocated(state.dataLoopNodes->Node)) {
+            allocated(state.dataLoopNodes->nodes)) {
             state.dataConvect->NodeCheck = false;
             for (int ZoneNum = 1; ZoneNum <= state.dataGlobal->NumOfZones; ++ZoneNum) {
                 auto &zone = state.dataHeatBal->Zone(ZoneNum);
                 if (zone.IntConvAlgo != HcInt::CeilingDiffuser) continue;
-                if (zone.SystemZoneNodeNumber != 0) continue;
+                if (zone.SystemZoneNodeNum != 0) continue;
                 ShowSevereError(
                     state,
                     format("InitInteriorConvectionCoeffs: Inside Convection=CeilingDiffuser, but no system inlet node defined, Zone={}", zone.Name));
@@ -224,37 +223,10 @@ void InitIntConvCoeff(EnergyPlusData &state,
         }
         if (anyAdaptiveConvectionAlgorithm) {
             // need to clear out node conditions because dynamic assignments will be affected
-            if (state.dataLoopNodes->NumOfNodes > 0 && allocated(state.dataLoopNodes->Node)) {
-                for (auto &e : state.dataLoopNodes->Node) {
-                    e.Temp = state.dataLoopNodes->DefaultNodeValues.Temp;
-                    e.TempMin = state.dataLoopNodes->DefaultNodeValues.TempMin;
-                    e.TempMax = state.dataLoopNodes->DefaultNodeValues.TempMax;
-                    e.TempSetPoint = state.dataLoopNodes->DefaultNodeValues.TempSetPoint;
-                    e.MassFlowRate = state.dataLoopNodes->DefaultNodeValues.MassFlowRate;
-                    e.MassFlowRateMin = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMin;
-                    e.MassFlowRateMax = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMax;
-                    e.MassFlowRateMinAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMinAvail;
-                    e.MassFlowRateMaxAvail = state.dataLoopNodes->DefaultNodeValues.MassFlowRateMaxAvail;
-                    e.MassFlowRateSetPoint = state.dataLoopNodes->DefaultNodeValues.MassFlowRateSetPoint;
-                    e.Quality = state.dataLoopNodes->DefaultNodeValues.Quality;
-                    e.Press = state.dataLoopNodes->DefaultNodeValues.Press;
-                    e.Enthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
-                    e.HumRat = state.dataLoopNodes->DefaultNodeValues.HumRat;
-                    e.HumRatMin = state.dataLoopNodes->DefaultNodeValues.HumRatMin;
-                    e.HumRatMax = state.dataLoopNodes->DefaultNodeValues.HumRatMax;
-                    e.HumRatSetPoint = state.dataLoopNodes->DefaultNodeValues.HumRatSetPoint;
-                    e.TempSetPointHi = state.dataLoopNodes->DefaultNodeValues.TempSetPointHi;
-                    e.TempSetPointLo = state.dataLoopNodes->DefaultNodeValues.TempSetPointLo;
-                }
-                if (allocated(state.dataLoopNodes->MoreNodeInfo)) {
-                    for (auto &e : state.dataLoopNodes->MoreNodeInfo) {
-                        e.WetBulbTemp = state.dataLoopNodes->DefaultNodeValues.Temp;
-                        e.RelHumidity = 0.0;
-                        e.ReportEnthalpy = state.dataLoopNodes->DefaultNodeValues.Enthalpy;
-                        e.VolFlowRateStdRho = 0.0;
-                        e.VolFlowRateCrntRho = 0.0;
-                        e.Density = 0.0;
-                    }
+            // What is happening here exactly and why?
+            if (state.dataLoopNodes->nodes.isize() > 0) {
+                for (auto *node : state.dataLoopNodes->nodes) {
+                    new (node) Node::NodeData(); // restore default values
                 }
             }
         }
@@ -2019,7 +1991,7 @@ void CalcDetailedHcInForDVModel(EnergyPlusData &state,
 Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
 {
 
-    if (!allocated(state.dataLoopNodes->Node)) {
+    if (!allocated(state.dataLoopNodes->nodes)) {
         return 0.0;
     } else {
         // Set local variables
@@ -2034,8 +2006,8 @@ Real64 CalcZoneSystemACH(EnergyPlusData &state, int const ZoneNum)
 Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int const ZoneNum)
 {
 
-    int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber;
-    if (ZoneNode <= 0) return state.dataLoopNodes->Node(ZoneNode).Temp;
+    int ZoneNode = state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum;
+    if (ZoneNode <= 0) return state.dataLoopNodes->nodes(ZoneNode)->Temp;
 
     auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(ZoneNum);
     auto &zoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneEquipConfig.EquipListIndex);
@@ -2050,22 +2022,22 @@ Real64 CalcZoneSupplyAirTemp(EnergyPlusData &state, int const ZoneNum)
         auto &equipData = zoneEquipList.EquipData(EquipNum);
         if (equipData.NumOutlets == 0) continue;
 
-        zoneInletNodeNum = equipData.OutletNodeNums(1);
+        zoneInletNodeNum = equipData.OutNodeNums(1);
         if (zoneInletNodeNum == 0) continue;
 
-        auto &zoneInletNode = state.dataLoopNodes->Node(zoneInletNodeNum);
-        if (zoneInletNode.MassFlowRate > 0.0) {
-            SumMdotTemp += zoneInletNode.MassFlowRate * zoneInletNode.Temp;
-            SumMdot += zoneInletNode.MassFlowRate;
+        auto *zoneInletNode = state.dataLoopNodes->nodes(zoneInletNodeNum);
+        if (zoneInletNode->MassFlowRate > 0.0) {
+            SumMdotTemp += zoneInletNode->MassFlowRate * zoneInletNode->Temp;
+            SumMdot += zoneInletNode->MassFlowRate;
         }
     }
 
     if (SumMdot > 0.0) return SumMdotTemp / SumMdot; // mass flow weighted inlet temperature
 
     if (zoneInletNodeNum > 0) {
-        return state.dataLoopNodes->Node(zoneInletNodeNum).Temp;
+        return state.dataLoopNodes->nodes(zoneInletNodeNum)->Temp;
     } else {
-        return state.dataLoopNodes->Node(ZoneNode).Temp;
+        return state.dataLoopNodes->nodes(ZoneNode)->Temp;
     }
 }
 
@@ -2073,13 +2045,13 @@ Real64 CalcZoneSystemVolFlowRate(EnergyPlusData &state, int const ZoneNum)
 {
     auto const &zone = state.dataHeatBal->Zone(ZoneNum);
 
-    if (state.dataGlobal->BeginEnvrnFlag || zone.SystemZoneNodeNumber <= 0) return 0.0;
+    if (state.dataGlobal->BeginEnvrnFlag || zone.SystemZoneNodeNum <= 0) return 0.0;
 
-    auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+    auto const *zoneNode = state.dataLoopNodes->nodes(zone.SystemZoneNodeNum);
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
     Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-        state, state.dataEnvrn->OutBaroPress, zoneNode.Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode.Temp, state.dataEnvrn->OutBaroPress));
-    return zoneNode.MassFlowRate / (AirDensity * ZoneMult);
+        state, state.dataEnvrn->OutBaroPress, zoneNode->Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode->Temp, state.dataEnvrn->OutBaroPress));
+    return zoneNode->MassFlowRate / (AirDensity * ZoneMult);
 }
 
 Real64 CalcCeilingDiffuserACH(EnergyPlusData &state, int const ZoneNum)
@@ -2087,15 +2059,16 @@ Real64 CalcCeilingDiffuserACH(EnergyPlusData &state, int const ZoneNum)
     constexpr Real64 MinFlow(0.01); // Minimum mass flow rate
     constexpr Real64 MaxACH(100.0); // Maximum ceiling diffuser correlation limit
 
+    auto &dln = state.dataLoopNodes;
     auto const &zone = state.dataHeatBal->Zone(ZoneNum);
 
     Real64 ACH = CalcZoneSystemACH(state, ZoneNum); // Air changes per hour
 
     Real64 ZoneMassFlowRate;
     Real64 ZoneMult = zone.Multiplier * zone.ListMultiplier;
-    int ZoneNode = zone.SystemZoneNodeNumber; // Zone node as defined in system simulation
-    if (!state.dataGlobal->BeginEnvrnFlag && ZoneNode > 0) {
-        ZoneMassFlowRate = state.dataLoopNodes->Node(ZoneNode).MassFlowRate / ZoneMult;
+    int ZoneNodeNum = zone.SystemZoneNodeNum; // Zone node as defined in system simulation
+    if (!state.dataGlobal->BeginEnvrnFlag && ZoneNodeNum > 0) {
+        ZoneMassFlowRate = dln->nodes(ZoneNodeNum)->MassFlowRate / ZoneMult;
     } else { // because these are not updated yet for new environment
         ZoneMassFlowRate = 0.0;
     }
@@ -2224,16 +2197,16 @@ void CalcCeilingDiffuserInletCorr(EnergyPlusData &state,
 
     auto const &zone = state.dataHeatBal->Zone(ZoneNum);
 
-    if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(state.dataLoopNodes->Node)) {
+    if (state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc || !allocated(state.dataLoopNodes->nodes)) {
         ACH = 0.0;
     } else {
         // Set local variables
         Real64 ZoneVolume = zone.Volume;
         Real64 ZoneMult = zone.Multiplier * zone.ListMultiplier;
-        auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+        auto const *zoneNode = state.dataLoopNodes->nodes(zone.SystemZoneNodeNum);
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, zoneNode.Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode.Temp, state.dataEnvrn->OutBaroPress));
-        Real64 ZoneMassFlowRate = zoneNode.MassFlowRate / ZoneMult;
+            state, state.dataEnvrn->OutBaroPress, zoneNode->Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode->Temp, state.dataEnvrn->OutBaroPress));
+        Real64 ZoneMassFlowRate = zoneNode->MassFlowRate / ZoneMult;
 
         if (ZoneMassFlowRate < MinFlow) {
             ACH = 0.0;
@@ -3471,7 +3444,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
@@ -3483,7 +3456,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
@@ -3495,7 +3468,7 @@ Real64 EvaluateIntHcModels(EnergyPlusData &state, int const SurfNum, HcInt const
         if (thisSurface.ExtBoundCond == DataSurfaces::KivaFoundation) {
             HnFn = [=](double, double, double, double, double) -> double { return tmpHc; };
         }
-        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNumber > 0) {
+        if (state.dataHeatBal->Zone(ZoneNum).SystemZoneNodeNum > 0) {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneSupplyAirTemp;
         } else {
             state.dataSurface->SurfTAirRef(SurfNum) = DataSurfaces::RefAirTemp::ZoneMeanAirTemp;
@@ -3985,7 +3958,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     } else { // is controlled, lets see by how and if that means is currently active
 
         auto &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(surface.Zone);
-        auto &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+        auto *zoneNode = state.dataLoopNodes->nodes(zone.SystemZoneNodeNum);
 
         if (!(zoneEquipConfig.EquipListIndex > 0) || state.dataGlobal->SysSizingCalc || state.dataGlobal->ZoneSizingCalc ||
             !state.dataZoneEquip->ZoneEquipSimulatedOnce) {
@@ -3998,12 +3971,12 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 switch (zoneEquipList.EquipType(EquipNum)) {
                 case DataZoneEquipment::ZoneEquipType::AirDistributionUnit:
                 case DataZoneEquipment::ZoneEquipType::PurchasedAir: {
-                    if (!allocated(zoneEquipList.EquipData(EquipNum).OutletNodeNums)) continue;
+                    if (!allocated(zoneEquipList.EquipData(EquipNum).OutNodeNums)) continue;
 
                     // get inlet node, not zone node if possible
-                    int zoneInletNodeNum = zoneEquipList.EquipData(EquipNum).OutletNodeNums(1);
-                    if ((zoneInletNodeNum > 0 && state.dataLoopNodes->Node(zoneInletNodeNum).MassFlowRate > 0.0) ||
-                        (zoneInletNodeNum <= 0 && zoneNode.MassFlowRate > 0.0)) {
+                    int zoneInNodeNum = zoneEquipList.EquipData(EquipNum).OutNodeNums(1);
+                    if ((zoneInNodeNum > 0 && state.dataLoopNodes->nodes(zoneInNodeNum)->MassFlowRate > 0.0) ||
+                        (zoneInNodeNum <= 0 && zoneNode->MassFlowRate > 0.0)) {
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::C;
                         HeatingPriorityStack[EquipOnCount] = zoneEquipList.HeatingPriority(EquipNum);
@@ -4019,11 +3992,11 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
                 case DataZoneEquipment::ZoneEquipType::UnitVentilator:
                 case DataZoneEquipment::ZoneEquipType::UnitHeater:
                 case DataZoneEquipment::ZoneEquipType::OutdoorAirUnit: {
-                    if (!allocated(zoneEquipList.EquipData(EquipNum).OutletNodeNums)) continue;
+                    if (!allocated(zoneEquipList.EquipData(EquipNum).OutNodeNums)) continue;
 
-                    int zoneInletNodeNum = zoneEquipList.EquipData(EquipNum).OutletNodeNums(1);
-                    if ((zoneInletNodeNum > 0 && state.dataLoopNodes->Node(zoneInletNodeNum).MassFlowRate > 0.0) ||
-                        (zoneInletNodeNum <= 0 && zoneNode.MassFlowRate > 0.0)) {
+                    int zoneInNodeNum = zoneEquipList.EquipData(EquipNum).OutNodeNums(1);
+                    if ((zoneInNodeNum > 0 && state.dataLoopNodes->nodes(zoneInNodeNum)->MassFlowRate > 0.0) ||
+                        (zoneInNodeNum <= 0 && zoneNode->MassFlowRate > 0.0)) {
 
                         EquipOnCount = min(EquipOnCount + 1, MaxZoneEquipmentIdx);
                         FlowRegimeStack[EquipOnCount] = InConvFlowRegime::D;
@@ -4164,7 +4137,7 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
     // now if flow regimes C or D, then check for Mixed regime or very low flow rates
     if ((FinalFlowRegime == InConvFlowRegime::C) || (FinalFlowRegime == InConvFlowRegime::D)) {
 
-        auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+        auto const *zoneNode = state.dataLoopNodes->nodes(zone.SystemZoneNodeNum);
         // Calculate Grashof, Reynolds, and Richardson numbers for the zone
         // Grashof for zone air based on largest delta T between surfaces and zone height
         for (int spaceNum : zone.spaceIndexes) {
@@ -4181,12 +4154,12 @@ void DynamicIntConvSurfaceClassification(EnergyPlusData &state, int const SurfNu
               ((state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT + Constant::Kelvin) * pow_2(v));
 
         // Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
-        if (zoneNode.MassFlowRate > 0.0) {
+        if (zoneNode->MassFlowRate > 0.0) {
             AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(state,
                                                            state.dataEnvrn->OutBaroPress,
-                                                           zoneNode.Temp,
-                                                           Psychrometrics::PsyWFnTdpPb(state, zoneNode.Temp, state.dataEnvrn->OutBaroPress));
-            Re = zoneNode.MassFlowRate / (v * AirDensity * std::pow(zone.Volume, 1.0 / 3.0));
+                                                           zoneNode->Temp,
+                                                           Psychrometrics::PsyWFnTdpPb(state, zoneNode->Temp, state.dataEnvrn->OutBaroPress));
+            Re = zoneNode->MassFlowRate / (v * AirDensity * std::pow(zone.Volume, 1.0 / 3.0));
         } else {
             Re = 0.0;
         }
@@ -4663,22 +4636,22 @@ Real64 CalcUserDefinedIntHcModel(EnergyPlusData &state, int const SurfNum, int c
     Real64 SumMdot = 0.0;
     Real64 SupplyAirTemp = state.dataZoneTempPredictorCorrector->zoneHeatBalance(zoneNum).MAT;
     if (zone.IsControlled) {
-        auto const &zoneNode = state.dataLoopNodes->Node(zone.SystemZoneNodeNumber);
+        auto const *zoneNode = state.dataLoopNodes->nodes(zone.SystemZoneNodeNum);
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-            state, state.dataEnvrn->OutBaroPress, zoneNode.Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode.Temp, state.dataEnvrn->OutBaroPress));
-        AirChangeRate = (zoneNode.MassFlowRate * Constant::SecInHour) / (AirDensity * zone.Volume);
+            state, state.dataEnvrn->OutBaroPress, zoneNode->Temp, Psychrometrics::PsyWFnTdpPb(state, zoneNode->Temp, state.dataEnvrn->OutBaroPress));
+        AirChangeRate = (zoneNode->MassFlowRate * Constant::SecInHour) / (AirDensity * zone.Volume);
 
         auto const &zoneEquipConfig = state.dataZoneEquip->ZoneEquipConfig(surface.Zone);
         if (zoneEquipConfig.EquipListIndex > 0) {
             auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(zoneEquipConfig.EquipListIndex);
             for (int EquipNum = 1; EquipNum <= zoneEquipList.NumOfEquipTypes; ++EquipNum) {
-                if (!allocated(zoneEquipList.EquipData(EquipNum).OutletNodeNums)) continue;
+                if (!allocated(zoneEquipList.EquipData(EquipNum).OutNodeNums)) continue;
 
-                int zoneInletNodeNum = zoneEquipList.EquipData(EquipNum).OutletNodeNums(1);
-                if (zoneInletNodeNum <= 0) continue;
-                auto const &zoneInletNode = state.dataLoopNodes->Node(zoneInletNodeNum);
-                if (zoneInletNode.MassFlowRate > 0.0) { // Technically speaking, this check is not necessary since x += 0.0 is x.
-                    SumMdotTemp += zoneInletNode.MassFlowRate * zoneInletNode.Temp;
+                int zoneInNodeNum = zoneEquipList.EquipData(EquipNum).OutNodeNums(1);
+                if (zoneInNodeNum <= 0) continue;
+                auto const *zoneInNode = state.dataLoopNodes->nodes(zoneInNodeNum);
+                if (zoneInNode->MassFlowRate > 0.0) { // Technically speaking, this check is not necessary since x += 0.0 is x.
+                    SumMdotTemp += zoneInNode->MassFlowRate * zoneInNode->Temp;
                 }
             } // for (EquipNum)
         }

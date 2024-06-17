@@ -83,8 +83,8 @@ namespace PondGroundHeatExchanger {
         Real64 BulkTemperature;     // current pond bulk temperature
         Real64 PastBulkTemperature; // past pond bulk temperature
         int NumCircuits;            // number of circuits in total
-        int InletNodeNum;           // inlet node number
-        int OutletNodeNum;          // oulet node number
+        int InNodeNum = 0;           // inlet node number
+        int OutNodeNum = 0;          // oulet node number
         int FrozenErrIndex;         // for recurring warnings
         int ConsecutiveFrozen;      // count of time steps consecutive frozen
                                     // loop topology variables
@@ -109,8 +109,8 @@ namespace PondGroundHeatExchanger {
         // Default Constructor
         PondGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
-              GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
-              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), plantLoc{}, InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0),
+              GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), 
+              FrozenErrIndex(0), ConsecutiveFrozen(0), plantLoc{}, InletTemp(0.0), OutletTemp(0.0), MassFlowRate(0.0),
               PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true), setupOutputVarsFlag(true), WaterIndex(0),
               firstTimeThrough(true)
         {

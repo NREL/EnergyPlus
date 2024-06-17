@@ -194,24 +194,24 @@ namespace EvaporativeFluidCoolers {
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
             thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_SingleSpd;
             thisEFC.EvapFluidCoolerMassFlowRateMultiplier = 2.5;
-            thisEFC.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisEFC.WaterInNodeNum = Node::GetSingleNode(state,
                                                                             AlphArray(2),
                                                                             ErrorsFound,
-                                                                            DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerSingleSpeed,
+                                                                            Node::ConnObjType::EvaporativeFluidCoolerSingleSpeed,
                                                                             AlphArray(1),
-                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            DataLoopNode::ObjectIsNotParent);
-            thisEFC.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            Node::FluidType::Water,
+                                                                            Node::ConnType::Inlet,
+                                                                            Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
+            thisEFC.WaterOutNodeNum = Node::GetSingleNode(state,
                                                                              AlphArray(3),
                                                                              ErrorsFound,
-                                                                             DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerSingleSpeed,
+                                                                             Node::ConnObjType::EvaporativeFluidCoolerSingleSpeed,
                                                                              AlphArray(1),
-                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                             DataLoopNode::ObjectIsNotParent);
+                                                                             Node::FluidType::Water,
+                                                                             Node::ConnType::Outlet,
+                                                                             Node::CompFluidStream::Primary,
+                                                                             Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
                 state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
             thisEFC.HighSpeedAirFlowRate = NumArray(1);
@@ -249,25 +249,25 @@ namespace EvaporativeFluidCoolers {
 
             // outdoor air inlet node
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                thisEFC.OutdoorAirInletNodeNum = 0;
+                thisEFC.OutdoorAirInNodeNum = 0;
             } else {
-                thisEFC.OutdoorAirInletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                thisEFC.OutdoorAirInNodeNum =
+                    Node::GetSingleNode(state,
                                                         AlphArray(5),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerSingleSpeed,
+                                                        Node::ConnObjType::EvaporativeFluidCoolerSingleSpeed,
                                                         thisEFC.Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::OutsideAirReference,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::OutsideAirReference,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInNodeNum)) {
                     ShowSevereError(state,
-                                    format("{}, \"{}\" Outdoor Air Inlet DataLoopNode::Node Name not valid Outdoor Air DataLoopNode::Node= {}",
+                                    format("{}, \"{}\" Outdoor Air Inlet Node::Node Name not valid Outdoor Air Node::Node= {}",
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            thisEFC.Name,
                                            AlphArray(5)));
-                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
+                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node::Node.");
                     ErrorsFound = true;
                 }
             }
@@ -531,24 +531,24 @@ namespace EvaporativeFluidCoolers {
             thisEFC.EvapFluidCoolerType = state.dataIPShortCut->cCurrentModuleObject;
             thisEFC.Type = DataPlant::PlantEquipmentType::EvapFluidCooler_TwoSpd;
             thisEFC.EvapFluidCoolerMassFlowRateMultiplier = 2.5;
-            thisEFC.WaterInletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisEFC.WaterInNodeNum = Node::GetSingleNode(state,
                                                                             AlphArray(2),
                                                                             ErrorsFound,
-                                                                            DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerTwoSpeed,
+                                                                            Node::ConnObjType::EvaporativeFluidCoolerTwoSpeed,
                                                                             AlphArray(1),
-                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::ConnectionType::Inlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            DataLoopNode::ObjectIsNotParent);
-            thisEFC.WaterOutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+                                                                            Node::FluidType::Water,
+                                                                            Node::ConnType::Inlet,
+                                                                            Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
+            thisEFC.WaterOutNodeNum = Node::GetSingleNode(state,
                                                                              AlphArray(3),
                                                                              ErrorsFound,
-                                                                             DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerTwoSpeed,
+                                                                             Node::ConnObjType::EvaporativeFluidCoolerTwoSpeed,
                                                                              AlphArray(1),
-                                                                             DataLoopNode::NodeFluidType::Water,
-                                                                             DataLoopNode::ConnectionType::Outlet,
-                                                                             NodeInputManager::CompFluidStream::Primary,
-                                                                             DataLoopNode::ObjectIsNotParent);
+                                                                             Node::FluidType::Water,
+                                                                             Node::ConnType::Outlet,
+                                                                             Node::CompFluidStream::Primary,
+                                                                             Node::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(
                 state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
@@ -604,25 +604,25 @@ namespace EvaporativeFluidCoolers {
 
             // outdoor air inlet node
             if (state.dataIPShortCut->lAlphaFieldBlanks(5)) {
-                thisEFC.OutdoorAirInletNodeNum = 0;
+                thisEFC.OutdoorAirInNodeNum = 0;
             } else {
-                thisEFC.OutdoorAirInletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                thisEFC.OutdoorAirInNodeNum =
+                    Node::GetSingleNode(state,
                                                         AlphArray(5),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::EvaporativeFluidCoolerTwoSpeed,
+                                                        Node::ConnObjType::EvaporativeFluidCoolerTwoSpeed,
                                                         thisEFC.Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::OutsideAirReference,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInletNodeNum)) {
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::OutsideAirReference,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, thisEFC.OutdoorAirInNodeNum)) {
                     ShowSevereError(state,
-                                    format("{}, \"{}\" Outdoor Air Inlet DataLoopNode::Node Name not valid Outdoor Air DataLoopNode::Node= {}",
+                                    format("{}, \"{}\" Outdoor Air Inlet Node::Node Name not valid Outdoor Air Node::Node= {}",
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            thisEFC.Name,
                                            AlphArray(5)));
-                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:DataLoopNode::Node.");
+                    ShowContinueError(state, "...does not appear in an OutdoorAir:NodeList or as an OutdoorAir:Node::Node.");
                     ErrorsFound = true;
                 }
             }
@@ -1271,6 +1271,7 @@ namespace EvaporativeFluidCoolers {
         // Based on InitTower subroutine by Don Shirey Sept/Oct 2002, F Buhl Oct 2002
 
         static constexpr std::string_view RoutineName("InitEvapFluidCooler");
+        auto &dln = state.dataLoopNodes;
 
         this->oneTimeInit(state);
 
@@ -1283,7 +1284,7 @@ namespace EvaporativeFluidCoolers {
                                                            state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                            RoutineName);
             this->DesWaterMassFlowRate = this->DesignWaterFlowRate * rho;
-            PlantUtilities::InitComponentNodes(state, 0.0, this->DesWaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesWaterMassFlowRate, this->WaterInNodeNum, this->WaterOutNodeNum);
             this->MyEnvrnFlag = false;
         }
 
@@ -1292,14 +1293,15 @@ namespace EvaporativeFluidCoolers {
         }
 
         // Each time initializations
-        this->WaterInletNode = this->WaterInletNodeNum;
-        this->inletConds.WaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+        auto *waterInNode = dln->nodes(this->WaterInNodeNum);
+        this->inletConds.WaterTemp = waterInNode->Temp;
 
-        if (this->OutdoorAirInletNodeNum != 0) {
-            this->inletConds.AirTemp = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Temp;
-            this->inletConds.AirHumRat = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).HumRat;
-            this->inletConds.AirPress = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).Press;
-            this->inletConds.AirWetBulb = state.dataLoopNodes->Node(this->OutdoorAirInletNodeNum).OutAirWetBulb;
+        if (this->OutdoorAirInNodeNum != 0) {
+            auto const *oaInNode = dln->nodes(this->OutdoorAirInNodeNum);
+            this->inletConds.AirTemp = oaInNode->Temp;
+            this->inletConds.AirHumRat = oaInNode->HumRat;
+            this->inletConds.AirPress = oaInNode->Press;
+            this->inletConds.AirWetBulb = oaInNode->OutAirWetBulb;
         } else {
             this->inletConds.AirTemp = state.dataEnvrn->OutDryBulbTemp;
             this->inletConds.AirHumRat = state.dataEnvrn->OutHumRat;
@@ -1310,7 +1312,7 @@ namespace EvaporativeFluidCoolers {
         this->WaterMassFlowRate = PlantUtilities::RegulateCondenserCompFlowReqOp(
             state, this->plantLoc, this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier);
 
-        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInletNodeNum, this->WaterOutletNodeNum, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->WaterMassFlowRate, this->WaterInNodeNum, this->WaterOutNodeNum, this->plantLoc);
     }
 
     void EvapFluidCoolerSpecs::SizeEvapFluidCooler(EnergyPlusData &state)
@@ -1465,7 +1467,7 @@ namespace EvaporativeFluidCoolers {
             }
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInletNodeNum, tmpDesignWaterFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->WaterInNodeNum, tmpDesignWaterFlowRate);
 
         if (this->HighSpeedFanPowerWasAutoSized) {
             // We assume the nominal fan power is 0.0105 times the design load
@@ -2163,11 +2165,12 @@ namespace EvaporativeFluidCoolers {
         Real64 TempSetPoint = 0.0;
 
         // set inlet and outlet nodes
-        this->WaterInletNode = this->WaterInletNodeNum;
-        this->WaterOutletNode = this->WaterOutletNodeNum;
+        auto &dln = state.dataLoopNodes;
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        Real64 inletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+
+        auto *waterInNode = dln->nodes(this->WaterInNodeNum);
+        Real64 inletWaterTemp = waterInNode->Temp;
         this->OutletWaterTemp = inletWaterTemp;
         AirFlowRate = 0.0;
 
@@ -2281,10 +2284,10 @@ namespace EvaporativeFluidCoolers {
         // Should this be water inlet node num?????
         CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                         state.dataLoopNodes->Node(this->WaterInletNode).Temp,
+                                                         waterInNode->Temp,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNode).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (waterInNode->Temp - this->OutletWaterTemp);
         this->AirFlowRateRatio = AirFlowRate / this->HighSpeedAirFlowRate;
     }
 
@@ -2341,13 +2344,16 @@ namespace EvaporativeFluidCoolers {
 
         static constexpr std::string_view RoutineName("CalcTwoSpeedEvapFluidCooler");
 
-        this->WaterInletNode = this->WaterInletNodeNum;
-        this->WaterOutletNode = this->WaterOutletNodeNum;
+        auto &dln = state.dataLoopNodes;
+        
         this->Qactual = 0.0;
         this->FanPower = 0.0;
-        this->InletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+
+        auto *waterInNode = dln->nodes(this->WaterInNodeNum);
+        this->InletWaterTemp = waterInNode->Temp;
         this->OutletWaterTemp = this->InletWaterTemp;
 
+        
         Real64 OutletWaterTemp1stStage = this->OutletWaterTemp;
         Real64 OutletWaterTemp2ndStage = this->OutletWaterTemp;
         Real64 AirFlowRate = 0.0;
@@ -2406,10 +2412,10 @@ namespace EvaporativeFluidCoolers {
         // Should this be water inlet node num??
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
-                                                                state.dataLoopNodes->Node(this->WaterInletNode).Temp,
+                                                                waterInNode->Temp,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                 RoutineName);
-        this->Qactual = this->WaterMassFlowRate * CpWater * (state.dataLoopNodes->Node(this->WaterInletNode).Temp - this->OutletWaterTemp);
+        this->Qactual = this->WaterMassFlowRate * CpWater * (waterInNode->Temp - this->OutletWaterTemp);
         this->AirFlowRateRatio = AirFlowRate / this->HighSpeedAirFlowRate;
     }
 
@@ -2439,8 +2445,6 @@ namespace EvaporativeFluidCoolers {
         Real64 constexpr DeltaTwbTolerance(0.001);  // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
         static constexpr std::string_view RoutineName("SimSimpleEvapFluidCooler");
 
-        this->WaterInletNode = this->WaterInletNodeNum;
-        this->WaterOutletNode = this->WaterOutletNodeNum;
         Real64 qActual = 0.0;
         Real64 WetBulbError = 1.0;
         Real64 DeltaTwb = 1.0;
@@ -2650,7 +2654,9 @@ namespace EvaporativeFluidCoolers {
 
         Real64 constexpr TempAllowance(0.02); // Minimum difference b/w fluid cooler water outlet temp and
 
-        state.dataLoopNodes->Node(this->WaterOutletNode).Temp = this->OutletWaterTemp;
+        auto &dln = state.dataLoopNodes;
+        auto *waterOutNode = dln->nodes(this->WaterOutNodeNum); // Why is there both WaterOutNode and WaterOutNodeNum?
+        waterOutNode->Temp = this->OutletWaterTemp;
 
         if (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).FlowLock == DataPlant::FlowLock::Unlocked ||
             state.dataGlobal->WarmupFlag)
@@ -2658,14 +2664,13 @@ namespace EvaporativeFluidCoolers {
 
         // Check flow rate through evaporative fluid cooler and compare to design flow rate,
         // show warning if greater than Design * Mulitplier
-        if (state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate >
-            this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier) {
+        if (waterOutNode->MassFlowRate > this->DesWaterMassFlowRate * this->EvapFluidCoolerMassFlowRateMultiplier) {
             ++this->HighMassFlowErrorCount;
             if (this->HighMassFlowErrorCount < 2) {
                 ShowWarningError(state, format("{} \"{}\"", this->EvapFluidCoolerType, this->Name));
                 ShowContinueError(state, " Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate.");
                 ShowContinueError(state,
-                                  format(" Condenser Loop Mass Flow Rate = {:.6T}", state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate));
+                                  format(" Condenser Loop Mass Flow Rate = {:.6T}", waterOutNode->MassFlowRate));
                 ShowContinueError(state, format(" Evaporative Fluid Cooler Design Mass Flow Rate   = {:.6T}", this->DesWaterMassFlowRate));
                 ShowContinueErrorTimeStamp(state, "");
             } else {
@@ -2674,8 +2679,8 @@ namespace EvaporativeFluidCoolers {
                     this->EvapFluidCoolerType + " \"" + this->Name +
                         "\"  Condenser Loop Mass Flow Rate is much greater than the evaporative fluid coolers design mass flow rate error",
                     this->HighMassFlowErrorIndex,
-                    state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate,
-                    state.dataLoopNodes->Node(this->WaterOutletNode).MassFlowRate);
+                    waterOutNode->MassFlowRate,
+                    waterOutNode->MassFlowRate);
             }
         }
 
@@ -2735,10 +2740,12 @@ namespace EvaporativeFluidCoolers {
         // This subroutine updates the report variables for the evaporative fluid cooler.
 
         Real64 const ReportingConstant = state.dataHVACGlobal->TimeStepSysSec;
-
+        auto &dln = state.dataLoopNodes;
+        auto *waterInNode = dln->nodes(this->WaterInNodeNum);
+        
         if (!RunFlag) {
-            this->fluidCoolerInletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
-            this->fluidCoolerOutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+            this->fluidCoolerInletWaterTemp = waterInNode->Temp;
+            this->fluidCoolerOutletWaterTemp = waterInNode->Temp;
             this->Qactual = 0.0;
             this->FanPower = 0.0;
             this->FanEnergy = 0.0;
@@ -2746,7 +2753,7 @@ namespace EvaporativeFluidCoolers {
             this->WaterAmountUsed = 0.0;
             this->BypassFraction = 0.0;
         } else {
-            this->fluidCoolerInletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNode).Temp;
+            this->fluidCoolerInletWaterTemp = waterInNode->Temp;
             this->fluidCoolerOutletWaterTemp = this->OutletWaterTemp;
             this->FanEnergy = this->FanPower * ReportingConstant;
             this->WaterAmountUsed = this->WaterUsage * ReportingConstant;

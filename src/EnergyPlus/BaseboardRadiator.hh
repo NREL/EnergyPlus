@@ -72,8 +72,8 @@ namespace BaseboardRadiator {
         int SchedPtr = 0;
         DataPlant::PlantEquipmentType EquipType = DataPlant::PlantEquipmentType::Invalid;
         int ZonePtr = 0;
-        int WaterInletNode = 0;
-        int WaterOutletNode = 0;
+        int WaterInNodeNum = 0;
+        int WaterOutNodeNum = 0;
         int ControlCompTypeNum = 0;
         int CompErrIndex = 0;
         Real64 UA = 0.0;

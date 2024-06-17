@@ -593,7 +593,7 @@ namespace DataSurfaces {
         int SchedMovInsulInt = 0;              // Schedule for interior movable insulation
         int ExternalShadingSchInd = 0;         // Schedule for a the external shading
         int SurroundingSurfacesNum = 0;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
-        int LinkedOutAirNode = 0;              // Index of the an OutdoorAir:Node
+        int OutdoorAirNodeNum = 0;              // Index of the an OutdoorAir:Node
         int OutsideHeatSourceTermSchedule = 0; // Pointer to the schedule of additional source of heat flux rate applied to the outside surface
         int InsideHeatSourceTermSchedule = 0;  // Pointer to the schedule of additional source of heat flux rate applied to the inside surface
 
@@ -640,7 +640,7 @@ namespace DataSurfaces {
                     hash<int>()(SchedMovInsulInt),
                     hash<int>()(ExternalShadingSchInd),
                     hash<int>()(SurroundingSurfacesNum),
-                    hash<int>()(LinkedOutAirNode),
+                    hash<int>()(OutdoorAirNodeNum),
                     hash<int>()(OutsideHeatSourceTermSchedule),
                     hash<int>()(InsideHeatSourceTermSchedule)};
         }
@@ -671,7 +671,7 @@ namespace DataSurfaces {
                     MaterialMovInsulExt == other.MaterialMovInsulExt && MaterialMovInsulInt == other.MaterialMovInsulInt &&
                     SchedMovInsulExt == other.SchedMovInsulExt && SchedMovInsulInt == other.SchedMovInsulInt &&
                     ExternalShadingSchInd == other.ExternalShadingSchInd && SurroundingSurfacesNum == other.SurroundingSurfacesNum &&
-                    LinkedOutAirNode == other.LinkedOutAirNode && OutsideHeatSourceTermSchedule == other.OutsideHeatSourceTermSchedule &&
+                    OutdoorAirNodeNum == other.OutdoorAirNodeNum && OutsideHeatSourceTermSchedule == other.OutsideHeatSourceTermSchedule &&
                     InsideHeatSourceTermSchedule == other.InsideHeatSourceTermSchedule);
         }
     };
@@ -821,7 +821,7 @@ namespace DataSurfaces {
         bool SurfSchedExternalShadingFrac;     // true if the external shading is scheduled or calculated externally to be imported
         int SurfSurroundingSurfacesNum;        // Index of a surrounding surfaces list (defined in SurfaceProperties::SurroundingSurfaces)
         int SurfExternalShadingSchInd;         // Schedule for a the external shading
-        int SurfLinkedOutAirNode;              // Index of the an OutdoorAir:Node, zero if none
+        int OutdoorAirNodeNum = 0;             // Index of the an OutdoorAir:Node, zero if none
         Real64 AE = 0.0;                       // Product of area and emissivity for each surface
         Real64 enclAESum = 0.0;                // Sum of area times emissivity for all other surfaces in enclosure
         Real64 SrdSurfTemp;                    // surrounding surfaces average temperature seen by an exterior surface (C)
@@ -843,7 +843,7 @@ namespace DataSurfaces {
               SolarEnclIndex(0), SolarEnclSurfIndex(0), IsAirBoundarySurf(false), IsSurfPropertyGndSurfacesDefined(false),
               SurfPropertyGndSurfIndex(0), UseSurfPropertyGndSurfTemp(false), UseSurfPropertyGndSurfRefl(false), GndReflSolarRad(0.0),
               SurfHasSurroundingSurfProperty(false), SurfSchedExternalShadingFrac(false), SurfSurroundingSurfacesNum(0), SurfExternalShadingSchInd(0),
-              SurfLinkedOutAirNode(0), SrdSurfTemp(0.0), ViewFactorSrdSurfs(0.0)
+              SrdSurfTemp(0.0), ViewFactorSrdSurfs(0.0)
         {
         }
 

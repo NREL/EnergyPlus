@@ -80,12 +80,12 @@ namespace ZonePlenum {
         Real64 OutletPressure = 0.0;
         int ZoneNodeNum = 0;
         int ActualZoneNum = 0;
-        int OutletNode = 0;
+        int OutNodeNum = 0;
         Real64 OutletMassFlowRate = 0.0;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
         Real64 OutletMassFlowRateMaxAvail = 0.0; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail = 0.0; // [kg/Sec]
         int NumInducedNodes = 0;
-        Array1D_int InducedNode;
+        Array1D_int InducedNodeNums;
         Array1D<Real64> InducedMassFlowRate;
         Array1D<Real64> InducedMassFlowRateMaxAvail;
         Array1D<Real64> InducedMassFlowRateMinAvail;
@@ -96,8 +96,8 @@ namespace ZonePlenum {
         Array1D<Real64> InducedCO2;
         Array1D<Real64> InducedGenContam;
         bool InitFlag = false;
-        int NumInletNodes = 0;
-        Array1D_int InletNode;
+        int NumInNodes = 0;
+        Array1D_int InNodeNums;
         Array1D<Real64> InletMassFlowRate;
         Array1D<Real64> InletMassFlowRateMaxAvail;
         Array1D<Real64> InletMassFlowRateMinAvail;
@@ -125,13 +125,13 @@ namespace ZonePlenum {
         Real64 InletPressure = 0.0;
         int ZoneNodeNum = 0;
         int ActualZoneNum = 0;
-        int InletNode = 0;
+        int InNodeNum = 0;
         Real64 InletMassFlowRate = 0.0;         // MassFlow through the ZonePlenum being Simulated [kg/Sec]
         Real64 InletMassFlowRateMaxAvail = 0.0; // [kg/Sec]
         Real64 InletMassFlowRateMinAvail = 0.0; // [kg/Sec]
         bool InitFlag = false;
-        int NumOutletNodes = 0;
-        Array1D_int OutletNode;
+        int NumOutNodes = 0;
+        Array1D_int OutNodeNums;
         Array1D<Real64> OutletMassFlowRate;
         Array1D<Real64> OutletMassFlowRateMaxAvail;
         Array1D<Real64> OutletMassFlowRateMinAvail;

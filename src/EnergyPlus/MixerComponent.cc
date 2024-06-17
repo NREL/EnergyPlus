@@ -77,8 +77,6 @@ namespace EnergyPlus::MixerComponent {
 // it just takes the flow weighted averages of them.
 
 // Using/Aliasing
-using namespace DataLoopNode;
-
 void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompIndex)
 {
 
@@ -161,7 +159,7 @@ void GetMixerInput(EnergyPlusData &state)
     // Uses the status flags to trigger events.
 
     // Using/Aliasing
-    using NodeInputManager::GetOnlySingleNode;
+    using Node::GetSingleNode;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetMixerInput: "); // include trailing blank space
@@ -184,6 +182,8 @@ void GetMixerInput(EnergyPlusData &state)
     Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
     Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
+    auto &dln = state.dataLoopNodes;
+    
     CurrentModuleObject = "AirLoopHVAC:ZoneMixer";
     state.dataMixerComponent->NumMixers = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, CurrentModuleObject);
 
@@ -215,30 +215,30 @@ void GetMixerInput(EnergyPlusData &state)
 
         state.dataMixerComponent->MixerCond(MixerNum).MixerName = AlphArray(1);
 
-        state.dataMixerComponent->MixerCond(MixerNum).OutletNode = GetOnlySingleNode(state,
+        state.dataMixerComponent->MixerCond(MixerNum).OutNodeNum = GetSingleNode(state,
                                                                                      AlphArray(2),
                                                                                      ErrorsFound,
-                                                                                     DataLoopNode::ConnectionObjectType::AirLoopHVACZoneMixer,
+                                                                                     Node::ConnObjType::AirLoopHVACZoneMixer,
                                                                                      AlphArray(1),
-                                                                                     DataLoopNode::NodeFluidType::Air,
-                                                                                     DataLoopNode::ConnectionType::Outlet,
-                                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                                     ObjectIsNotParent);
-        state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes = NumAlphas - 2;
+                                                                                     Node::FluidType::Air,
+                                                                                     Node::ConnType::Outlet,
+                                                                                     Node::CompFluidStream::Primary,
+                                                                                         Node::ObjectIsNotParent);
+        state.dataMixerComponent->MixerCond(MixerNum).NumInNodes = NumAlphas - 2;
 
         for (auto &e : state.dataMixerComponent->MixerCond)
             e.InitFlag = true;
 
-        state.dataMixerComponent->MixerCond(MixerNum).InletNode.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletTemp.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
-        state.dataMixerComponent->MixerCond(MixerNum).InletPressure.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InNodeNums.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletTemp.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
+        state.dataMixerComponent->MixerCond(MixerNum).InletPressure.allocate(state.dataMixerComponent->MixerCond(MixerNum).NumInNodes);
 
-        state.dataMixerComponent->MixerCond(MixerNum).InletNode = 0;
+        state.dataMixerComponent->MixerCond(MixerNum).InNodeNums = 0;
         state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate = 0.0;
         state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail = 0.0;
         state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail = 0.0;
@@ -254,18 +254,18 @@ void GetMixerInput(EnergyPlusData &state)
         state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = 0.0;
         state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = 0.0;
 
-        for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
+        for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++NodeNum) {
 
-            state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum) =
-                GetOnlySingleNode(state,
+            state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(NodeNum) =
+                GetSingleNode(state,
                                   AlphArray(2 + NodeNum),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::AirLoopHVACZoneMixer,
+                                  Node::ConnObjType::AirLoopHVACZoneMixer,
                                   AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
-                                  ObjectIsNotParent);
+                                  Node::FluidType::Air,
+                                  Node::ConnType::Inlet,
+                                  Node::CompFluidStream::Primary,
+                              Node::ObjectIsNotParent);
             if (lAlphaBlanks(2 + NodeNum)) {
                 ShowSevereError(state, format("{} is Blank, {} = {}", cAlphaFields(2 + NodeNum), CurrentModuleObject, AlphArray(1)));
                 ErrorsFound = true;
@@ -276,27 +276,27 @@ void GetMixerInput(EnergyPlusData &state)
 
     // Check for duplicate names specified in Zone Mixer
     for (MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-        NodeNum = state.dataMixerComponent->MixerCond(MixerNum).OutletNode;
-        for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
-            if (NodeNum != state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum1)) continue;
+        NodeNum = state.dataMixerComponent->MixerCond(MixerNum).OutNodeNum;
+        for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InNodeNum1) {
+            if (NodeNum != state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InNodeNum1)) continue;
             ShowSevereError(state,
                             format("{} = {} specifies an inlet node name the same as the outlet node.",
                                    CurrentModuleObject,
                                    state.dataMixerComponent->MixerCond(MixerNum).MixerName));
-            ShowContinueError(state, format("..{} = {}", cAlphaFields(2), state.dataLoopNodes->NodeID(NodeNum)));
+            ShowContinueError(state, format("..{} = {}", cAlphaFields(2), dln->nodes(NodeNum)->Name));
             ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum1));
             ErrorsFound = true;
         }
-        for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeNum1) {
-            for (InNodeNum2 = InNodeNum1 + 1; InNodeNum2 <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeNum2) {
-                if (state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum1) !=
-                    state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeNum2))
+        for (InNodeNum1 = 1; InNodeNum1 <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InNodeNum1) {
+            for (InNodeNum2 = InNodeNum1 + 1; InNodeNum2 <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InNodeNum2) {
+                if (state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InNodeNum1) !=
+                    state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InNodeNum2))
                     continue;
                 ShowSevereError(state,
                                 format("{} = {} specifies duplicate inlet nodes in its inlet node list.",
                                        CurrentModuleObject,
                                        state.dataMixerComponent->MixerCond(MixerNum).MixerName));
-                ShowContinueError(state, format("..Inlet Node #{} Name={}", InNodeNum1, state.dataLoopNodes->NodeID(InNodeNum1)));
+                ShowContinueError(state, format("..Inlet Node #{} Name={}", InNodeNum1, dln->nodes(InNodeNum1)->Name));
                 ShowContinueError(state, format("..Inlet Node #{} is duplicate.", InNodeNum2));
                 ErrorsFound = true;
             }
@@ -355,25 +355,25 @@ void InitAirMixer(EnergyPlusData &state, int const MixerNum)
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
     int NodeNum;
 
+    auto &dln = state.dataLoopNodes;
     // Do the following initializations (every time step): This should be the info from
     // the previous components outlets or the node data in this section.
 
     // Transfer the node data to MixerCond data structure
-    for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++NodeNum) {
+    for (NodeNum = 1; NodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++NodeNum) {
 
-        InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(NodeNum);
+        auto const *inNode = dln->nodes(state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(NodeNum));
         // Set all of the inlet mass flow variables from the nodes
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRate;
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMaxAvail;
-        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(NodeNum) = state.dataLoopNodes->Node(InletNode).MassFlowRateMinAvail;
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(NodeNum) = inNode->MassFlowRate;
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMaxAvail(NodeNum) = inNode->MassFlowRateMaxAvail;
+        state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRateMinAvail(NodeNum) = inNode->MassFlowRateMinAvail;
         // Set all of the inlet state variables from the inlet nodes
-        state.dataMixerComponent->MixerCond(MixerNum).InletTemp(NodeNum) = state.dataLoopNodes->Node(InletNode).Temp;
-        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(NodeNum) = state.dataLoopNodes->Node(InletNode).HumRat;
-        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(NodeNum) = state.dataLoopNodes->Node(InletNode).Enthalpy;
-        state.dataMixerComponent->MixerCond(MixerNum).InletPressure(NodeNum) = state.dataLoopNodes->Node(InletNode).Press;
+        state.dataMixerComponent->MixerCond(MixerNum).InletTemp(NodeNum) = inNode->Temp;
+        state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(NodeNum) = inNode->HumRat;
+        state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(NodeNum) = inNode->Enthalpy;
+        state.dataMixerComponent->MixerCond(MixerNum).InletPressure(NodeNum) = inNode->Press;
     }
 }
 
@@ -428,7 +428,7 @@ void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
     state.dataMixerComponent->MixerCond(MixerNum).OutletPressure = 0.0;
     state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy = 0.0;
 
-    for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+    for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
         state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate +=
             state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum);
         state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail +=
@@ -441,7 +441,7 @@ void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
 
         // Mass balance on moisture to get outlet air humidity ratio
 
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
             state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat +=
                 state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) *
                 state.dataMixerComponent->MixerCond(MixerNum).InletHumRat(InletNodeNum) /
@@ -450,7 +450,7 @@ void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
 
         // "Momentum balance" to get outlet air pressure
 
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
             state.dataMixerComponent->MixerCond(MixerNum).OutletPressure +=
                 state.dataMixerComponent->MixerCond(MixerNum).InletPressure(InletNodeNum) *
                 state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
@@ -459,7 +459,7 @@ void CalcAirMixer(EnergyPlusData &state, int &MixerNum)
 
         // Energy balance to get outlet air enthalpy
 
-        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
+        for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
             state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy +=
                 state.dataMixerComponent->MixerCond(MixerNum).InletEnthalpy(InletNodeNum) *
                 state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
@@ -501,51 +501,51 @@ void UpdateAirMixer(EnergyPlusData &state, int const MixerNum)
     //       RE-ENGINEERED  na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;
-    int InletNode;
     int InletNodeNum;
 
-    OutletNode = state.dataMixerComponent->MixerCond(MixerNum).OutletNode;
-    InletNode = state.dataMixerComponent->MixerCond(MixerNum).InletNode(1); // For now use first inlet node
+    auto &dln = state.dataLoopNodes;
+
+    auto *outNode = dln->nodes(state.dataMixerComponent->MixerCond(MixerNum).OutNodeNum);
+    auto *inNode1 = dln->nodes(state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(1)); // For now use first inlet node
 
     // Set the outlet air nodes of the Mixer
-    state.dataLoopNodes->Node(OutletNode).MassFlowRate = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMaxAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(OutletNode).MassFlowRateMinAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail;
-    state.dataLoopNodes->Node(OutletNode).Temp = state.dataMixerComponent->MixerCond(MixerNum).OutletTemp;
-    state.dataLoopNodes->Node(OutletNode).HumRat = state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat;
-    state.dataLoopNodes->Node(OutletNode).Enthalpy = state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy;
-    state.dataLoopNodes->Node(OutletNode).Press = state.dataMixerComponent->MixerCond(MixerNum).OutletPressure;
+    outNode->MassFlowRate = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
+    outNode->MassFlowRateMaxAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMaxAvail;
+    outNode->MassFlowRateMinAvail = state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRateMinAvail;
+    outNode->Temp = state.dataMixerComponent->MixerCond(MixerNum).OutletTemp;
+    outNode->HumRat = state.dataMixerComponent->MixerCond(MixerNum).OutletHumRat;
+    outNode->Enthalpy = state.dataMixerComponent->MixerCond(MixerNum).OutletEnthalpy;
+    outNode->Press = state.dataMixerComponent->MixerCond(MixerNum).OutletPressure;
     // Set the outlet nodes for properties that just pass through & not used
-    state.dataLoopNodes->Node(OutletNode).Quality = state.dataLoopNodes->Node(InletNode).Quality;
+    outNode->Quality = inNode1->Quality;
 
     if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
         if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
             // CO2 balance to get outlet air CO2
-            state.dataLoopNodes->Node(OutletNode).CO2 = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-                state.dataLoopNodes->Node(OutletNode).CO2 +=
-                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).CO2 *
+            outNode->CO2 = 0.0;
+            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
+                outNode->CO2 +=
+                    dln->nodes(state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InletNodeNum))->CO2 *
                     state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
                     state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
             }
         } else {
-            state.dataLoopNodes->Node(OutletNode).CO2 = state.dataLoopNodes->Node(InletNode).CO2;
+            outNode->CO2 = inNode1->CO2;
         }
     }
 
     if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
         if (state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate > 0.0) {
             // Generic contaminant balance to get outlet air CO2
-            state.dataLoopNodes->Node(OutletNode).GenContam = 0.0;
-            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InletNodeNum) {
-                state.dataLoopNodes->Node(OutletNode).GenContam +=
-                    state.dataLoopNodes->Node(state.dataMixerComponent->MixerCond(MixerNum).InletNode(InletNodeNum)).GenContam *
+            outNode->GenContam = 0.0;
+            for (InletNodeNum = 1; InletNodeNum <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InletNodeNum) {
+                outNode->GenContam +=
+                    dln->nodes(state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InletNodeNum))->GenContam *
                     state.dataMixerComponent->MixerCond(MixerNum).InletMassFlowRate(InletNodeNum) /
                     state.dataMixerComponent->MixerCond(MixerNum).OutletMassFlowRate;
             }
         } else {
-            state.dataLoopNodes->Node(OutletNode).GenContam = state.dataLoopNodes->Node(InletNode).GenContam;
+            outNode->GenContam = inNode1->GenContam;
         }
     }
 }
@@ -639,8 +639,8 @@ int getZoneMixerIndexFromInletNode(EnergyPlusData &state, int const InNodeNum)
 
     if (state.dataMixerComponent->NumMixers > 0) {
         for (int MixerNum = 1; MixerNum <= state.dataMixerComponent->NumMixers; ++MixerNum) {
-            for (int InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInletNodes; ++InNodeCtr) {
-                if (InNodeNum == state.dataMixerComponent->MixerCond(MixerNum).InletNode(InNodeCtr)) {
+            for (int InNodeCtr = 1; InNodeCtr <= state.dataMixerComponent->MixerCond(MixerNum).NumInNodes; ++InNodeCtr) {
+                if (InNodeNum == state.dataMixerComponent->MixerCond(MixerNum).InNodeNums(InNodeCtr)) {
                     return MixerNum;
                 }
             }

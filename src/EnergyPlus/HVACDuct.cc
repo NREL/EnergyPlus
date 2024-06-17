@@ -87,7 +87,6 @@ namespace HVACDuct {
     // USE STATEMENTS:
     // <use statements for data only modules>
     // Using/Aliasing
-    using namespace DataLoopNode;
 
     // <use statements for access to subroutines in other modules>
 
@@ -185,7 +184,7 @@ namespace HVACDuct {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int DuctNum; // duct index
@@ -215,24 +214,24 @@ namespace HVACDuct {
                                                                      state.dataIPShortCut->cNumericFieldNames);
 
             state.dataHVACDuct->Duct(DuctNum).Name = state.dataIPShortCut->cAlphaArgs(1);
-            state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetOnlySingleNode(state,
+            state.dataHVACDuct->Duct(DuctNum).InletNodeNum = GetSingleNode(state,
                                                                                state.dataIPShortCut->cAlphaArgs(2),
                                                                                ErrorsFound,
-                                                                               DataLoopNode::ConnectionObjectType::Duct,
+                                                                               Node::ConnObjType::Duct,
                                                                                state.dataIPShortCut->cAlphaArgs(1),
-                                                                               DataLoopNode::NodeFluidType::Air,
-                                                                               DataLoopNode::ConnectionType::Inlet,
-                                                                               NodeInputManager::CompFluidStream::Primary,
-                                                                               ObjectIsNotParent);
-            state.dataHVACDuct->Duct(DuctNum).OutletNodeNum = GetOnlySingleNode(state,
+                                                                               Node::FluidType::Air,
+                                                                               Node::ConnType::Inlet,
+                                                                               Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
+            state.dataHVACDuct->Duct(DuctNum).OutletNodeNum = GetSingleNode(state,
                                                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                                                 ErrorsFound,
-                                                                                DataLoopNode::ConnectionObjectType::Duct,
+                                                                                Node::ConnObjType::Duct,
                                                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                                                DataLoopNode::NodeFluidType::Air,
-                                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                                NodeInputManager::CompFluidStream::Primary,
-                                                                                ObjectIsNotParent);
+                                                                                Node::FluidType::Air,
+                                                                                Node::ConnType::Outlet,
+                                                                                Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
             TestCompSet(state,
                         cCurrentModuleObject,
                         state.dataIPShortCut->cAlphaArgs(1),
@@ -298,29 +297,27 @@ namespace HVACDuct {
         // Moves duct output to the outlet nodes
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int InNode;  // inlet node number
-        int OutNode; // outlet node number
-
-        InNode = state.dataHVACDuct->Duct(DuctNum).InletNodeNum;
-        OutNode = state.dataHVACDuct->Duct(DuctNum).OutletNodeNum;
+        auto &dln = state.dataLoopNodes;
+        auto const *inNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).InletNodeNum);
+        auto *outNode = dln->nodes(state.dataHVACDuct->Duct(DuctNum).OutletNodeNum);
         // Set the outlet air node conditions of the duct
-        state.dataLoopNodes->Node(OutNode).MassFlowRate = state.dataLoopNodes->Node(InNode).MassFlowRate;
-        state.dataLoopNodes->Node(OutNode).Temp = state.dataLoopNodes->Node(InNode).Temp;
-        state.dataLoopNodes->Node(OutNode).HumRat = state.dataLoopNodes->Node(InNode).HumRat;
-        state.dataLoopNodes->Node(OutNode).Enthalpy = state.dataLoopNodes->Node(InNode).Enthalpy;
-        state.dataLoopNodes->Node(OutNode).Quality = state.dataLoopNodes->Node(InNode).Quality;
-        state.dataLoopNodes->Node(OutNode).Press = state.dataLoopNodes->Node(InNode).Press;
-        state.dataLoopNodes->Node(OutNode).MassFlowRateMin = state.dataLoopNodes->Node(InNode).MassFlowRateMin;
-        state.dataLoopNodes->Node(OutNode).MassFlowRateMax = state.dataLoopNodes->Node(InNode).MassFlowRateMax;
-        state.dataLoopNodes->Node(OutNode).MassFlowRateMinAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(OutNode).MassFlowRateMaxAvail = state.dataLoopNodes->Node(InNode).MassFlowRateMaxAvail;
+        outNode->MassFlowRate = inNode->MassFlowRate;
+        outNode->Temp = inNode->Temp;
+        outNode->HumRat = inNode->HumRat;
+        outNode->Enthalpy = inNode->Enthalpy;
+        outNode->Quality = inNode->Quality;
+        outNode->Press = inNode->Press;
+        outNode->MassFlowRateMin = inNode->MassFlowRateMin;
+        outNode->MassFlowRateMax = inNode->MassFlowRateMax;
+        outNode->MassFlowRateMinAvail = inNode->MassFlowRateMinAvail;
+        outNode->MassFlowRateMaxAvail = inNode->MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            state.dataLoopNodes->Node(OutNode).CO2 = state.dataLoopNodes->Node(InNode).CO2;
+            outNode->CO2 = inNode->CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            state.dataLoopNodes->Node(OutNode).GenContam = state.dataLoopNodes->Node(InNode).GenContam;
+            outNode->GenContam = inNode->GenContam;
         }
     }
 

@@ -635,36 +635,37 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     //  ZoneNum is already equal to ActualZoneNum , changed block of source
 
     auto &patternZoneInfo = state.dataRoomAir->AirPatternZoneInfo(ZoneNum);
-
-    if (patternZoneInfo.ZoneNodeID != 0) {
+    auto &dln = state.dataLoopNodes;
+    
+    if (patternZoneInfo.ZoneNodeNum != 0) {
         // the zone system node should get the conditions leaving the zone (but before return air heat gains are added).
-        state.dataLoopNodes->Node(patternZoneInfo.ZoneNodeID).Temp = patternZoneInfo.Tleaving;
+        dln->nodes(patternZoneInfo.ZoneNodeNum)->Temp = patternZoneInfo.Tleaving;
     }
 
     // What if ZoneNodeID is 0?
 
-    auto &zoneNode = state.dataLoopNodes->Node(patternZoneInfo.ZoneNodeID);
+    auto *zoneNode = dln->nodes(patternZoneInfo.ZoneNodeNum);
     auto &zone = state.dataHeatBal->Zone(ZoneNum);
     auto &zoneHeatBal = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneNum);
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
 
-    for (int returnNodeNum : state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNode) {
+    for (int returnNodeNum : state.dataZoneEquip->ZoneEquipConfig(ZoneNum).ReturnNodeInNodeNums) {
         // BEGIN BLOCK of code from CalcZoneLeavingConditions*********************************
-        auto &returnNode = state.dataLoopNodes->Node(returnNodeNum);
+        auto *returnNode = dln->nodes(returnNodeNum);
 
         // RETURN AIR HEAT GAIN from the Lights statement; this heat gain is stored in
         // Add sensible heat gain from refrigerated cases with under case returns
         Real64 QRetAir = InternalHeatGains::zoneSumAllReturnAirConvectionGains(state, ZoneNum, returnNodeNum);
 
-        Real64 CpAir = PsyCpAirFnW(zoneNode.HumRat);
+        Real64 CpAir = PsyCpAirFnW(zoneNode->HumRat);
 
         // Need to add the energy to the return air from lights and from airflow windows. Where the heat
         // is added depends on if there is system flow or not.  If there is system flow the heat is added
         // to the Zone Return Node.  If there is no system flow then the heat is added back to the zone in the
         // Correct step through the SysDepZoneLoads variable.
 
-        Real64 MassFlowRA = returnNode.MassFlowRate / ZoneMult;
+        Real64 MassFlowRA = returnNode->MassFlowRate / ZoneMult;
         Real64 TempZoneAir = patternZoneInfo.Tleaving; // key difference from
         Real64 TempRetAir = TempZoneAir;
         Real64 WinGapFlowToRA = 0.0;
@@ -679,7 +680,7 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                         state.dataSurface->SurfWinAirflowDestination(SurfNum) == DataSurfaces::WindowAirFlowDestination::Return) {
                         Real64 FlowThisTS =
                             PsyRhoAirFnPbTdbW(
-                                state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), zoneNode.HumRat) *
+                                state, state.dataEnvrn->OutBaroPress, state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum), zoneNode->HumRat) *
                             state.dataSurface->SurfWinAirflowThisTS(SurfNum) * state.dataSurface->Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
                         WinGapFlowTtoRA += FlowThisTS * state.dataSurface->SurfWinTAirflowGapOutlet(SurfNum);
@@ -705,65 +706,65 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 // Add heat-to-return from lights
                 TempRetAir += QRetAir / (MassFlowRA * CpAir);
                 if (TempRetAir > RetTempMax) {
-                    returnNode.Temp = RetTempMax;
+                    returnNode->Temp = RetTempMax;
                     if (!state.dataGlobal->ZoneSizingCalc) {
                         zoneHeatBal.SysDepZoneLoads += CpAir * MassFlowRA * (TempRetAir - RetTempMax);
                     }
                 } else if (TempRetAir < RetTempMin) {
-                    returnNode.Temp = RetTempMin;
+                    returnNode->Temp = RetTempMin;
                     if (!state.dataGlobal->ZoneSizingCalc) {
                         zoneHeatBal.SysDepZoneLoads += CpAir * MassFlowRA * (TempRetAir - RetTempMin);
                     }
                 } else {
-                    returnNode.Temp = TempRetAir;
+                    returnNode->Temp = TempRetAir;
                 }
             } else { // No return air flow
                 // Assign all heat-to-return from window gap airflow to zone air
                 if (WinGapFlowToRA > 0.0) zoneHeatBal.SysDepZoneLoads += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);
                 // Assign all heat-to-return from lights to zone air
                 if (QRetAir > 0.0) zoneHeatBal.SysDepZoneLoads += QRetAir;
-                returnNode.Temp = zoneNode.Temp;
+                returnNode->Temp = zoneNode->Temp;
             }
         } else {
-            returnNode.Temp = zoneNode.Temp;
+            returnNode->Temp = zoneNode->Temp;
         }
 
         // Update the rest of the Return Air Node conditions, if the return air system exists!
-        returnNode.Press = zoneNode.Press;
+        returnNode->Press = zoneNode->Press;
 
-        Real64 H2OHtOfVap = PsyHgAirFnWTdb(zoneNode.HumRat, returnNode.Temp);
+        Real64 H2OHtOfVap = PsyHgAirFnWTdb(zoneNode->HumRat, returnNode->Temp);
 
         // Include impact of under case returns for refrigerated display cases when updateing return node
         // humidity ratio
         if (!zone.NoHeatToReturnAir) {
             if (MassFlowRA > 0) {
                 Real64 SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
-                returnNode.HumRat = zoneNode.HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
+                returnNode->HumRat = zoneNode->HumRat + (SumRetAirLatentGainRate / (H2OHtOfVap * MassFlowRA));
             } else {
                 // If no mass flow rate exists, include the latent HVAC case credit with the latent Zone case credit
-                returnNode.HumRat = zoneNode.HumRat;
+                returnNode->HumRat = zoneNode->HumRat;
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 Real64 SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, 0);
                 zoneHeatBal.latentGain += SumRetAirLatentGainRate;
             }
         } else {
-            returnNode.HumRat = zoneNode.HumRat;
+            returnNode->HumRat = zoneNode->HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
 
             zoneHeatBal.latentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
         }
 
-        returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);
+        returnNode->Enthalpy = PsyHFnTdbW(returnNode->Temp, returnNode->HumRat);
 
         // END BLOCK of code from CalcZoneLeavingConditions*********************************
     }
 
     // set exhaust node leaving temp if present
-    if (allocated(patternZoneInfo.ExhaustAirNodeID)) {
-        for (int exhaustAirNodeID : patternZoneInfo.ExhaustAirNodeID) {
-            state.dataLoopNodes->Node(exhaustAirNodeID).Temp = patternZoneInfo.Texhaust;
+    if (allocated(patternZoneInfo.ExhaustAirNodeNums)) {
+        for (int exhaustAirNodeNum : patternZoneInfo.ExhaustAirNodeNums) {
+            dln->nodes(exhaustAirNodeNum)->Temp = patternZoneInfo.Texhaust;
         }
     }
 

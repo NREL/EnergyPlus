@@ -82,9 +82,17 @@ namespace HVACHXAssistedCoolingCoil {
         HVAC::HXType hxType = HVAC::HXType::Invalid; // Numeric Equivalent for heat exchanger
         std::string HeatExchangerName;               // Heat Exchanger name
         int HeatExchangerIndex;                      // Heat Exchanger index
-        int HXAssistedCoilInletNodeNum;              // Inlet node to HXAssistedCoolingCoil compound object
-        int HXAssistedCoilOutletNodeNum;             // Outlet node to HXAssistedCoolingCoil compound object
-        int HXExhaustAirInletNodeNum;                // Inlet node number for air-to-air heat exchanger
+        int HXAssistedCoilInNodeNum = 0;          // Inlet node to HXAssistedCoolingCoil compound object
+        int HXAssistedCoilOutNodeNum = 0;         // Outlet node to HXAssistedCoolingCoil compound object
+        int HXExhaustAirInNodeNum = 0;            // Inlet node number for air-to-air heat exchanger
+        int SupplyAirInNodeNum = 0;    
+        int SupplyAirOutNodeNum = 0;    
+        int SecondaryAirInNodeNum = 0;    
+        int SecondaryAirOutNodeNum = 0;    
+        int CoolCoilAirInNodeNum = 0;    
+        int CoolCoilAirOutNodeNum = 0;    
+        int CoolCoilWaterInNodeNum = 0;    
+        int CoolCoilWaterOutNodeNum = 0;    
         Real64 MassFlowRate;                         // Mass flow rate through HXAssistedCoolingCoil compound object
         int MaxIterCounter;                          // used in warning messages
         int MaxIterIndex;                            // used in warning messages
@@ -94,7 +102,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Default Constructor
         HXAssistedCoilParameters()
             : HXAssistedCoilType_Num(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), DXCoilNumOfSpeeds(0), HeatExchangerIndex(0),
-              HXAssistedCoilInletNodeNum(0), HXAssistedCoilOutletNodeNum(0), HXExhaustAirInletNodeNum(0), MassFlowRate(0.0), MaxIterCounter(0),
+              MassFlowRate(0.0), MaxIterCounter(0),
               MaxIterIndex(0), ControllerIndex(0)
         {
         }

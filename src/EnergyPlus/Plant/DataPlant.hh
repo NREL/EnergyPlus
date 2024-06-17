@@ -70,7 +70,7 @@ namespace EnergyPlus {
 namespace DataPlant {
 
     // Using/Aliasing
-    using DataLoopNode::SensedNodeFlagValue;
+    using Node::SensedNodeFlagValue;
 
     // Criteria percentage limits for determining re-simulation of connected loop sides
     constexpr Real64 CriteriaDelta_MassFlowRate(0.001);

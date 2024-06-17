@@ -351,8 +351,8 @@ namespace RoomAir {
         int PatternSchedID = 0;             // index of pattern selecting schedule
         // calculated and from elsewhere
         Real64 ZoneHeight = 0.0;      // in meters, from Zone%CeilingHeight
-        int ZoneNodeID = 0;           // index in Node array for this zone
-        Array1D_int ExhaustAirNodeID; // indexes in Node array
+        int ZoneNodeNum = 0;           // index in Node array for this zone
+        Array1D_int ExhaustAirNodeNums; // indexes in Node array
         // Is 23.0 a constexpr somewhere
         Real64 TairMean = 23.0;           // comes from MAT
         Real64 Tstat = 23.0;              // temperature for thermostat
@@ -424,7 +424,7 @@ namespace RoomAir {
         bool HasHVACAssigned = false;          // True if HVAC systems are assigned to this node
         int NumHVACs = 0;                      // Number of HVAC systems
         Array1D<AFNHVAC> HVAC;                 // HVAC struct
-        int AFNNodeID = 0;                     // pointer to AirflowNetworkNodeData structure
+        int AFNNodeNum = 0;                     // pointer to AirflowNetworkNodeData structure
         int NumOfAirflowLinks = 0;             // Number of intra zone links
         Array1D<AFNLinkInfoNested> Link;       // Linkage struct
         Real64 AirVolume = 0.0;                // air volume in control volume associated with this node(m3 / s)
@@ -484,10 +484,10 @@ namespace RoomAir {
         int ActualZoneID = 0;           // Index of controlled zones in ZoneCOnfigure
         std::string AvailSched = "";    // Name of availability schedule
         int AvailSchedID = 0;           // index of availability schedule
-        int ControlAirNodeID = 0;       // index of roomair node that is HVAC control sensor location
-        int NumOfAirNodes = 0;          // Number of air nodes
+        int ControlAirNodeNum = 0;       // index of roomair node that is HVAC control sensor location
+        int NumAirNodes = 0;          // Number of air nodes
         Array1D<AFNAirNodeNested> Node; // Node struct
-        int ZoneNodeID = 0;             // index in system Node array for this zone
+        int ZoneNodeNum = 0;             // index in system Node array for this zone
         Real64 TairMean = 0.0;          // comes from MAT
         Real64 Tstat = 0.0;             // temperature for thermostat
         Real64 Tleaving = 0.0;          // temperature for return air node
@@ -510,9 +510,9 @@ struct RoomAirModelData : BaseGlobalStruct
     Array1D_bool MyEnvrnFlag;
 
     bool anyNonMixingRoomAirModel = false; // True if any zone RoomAirModelType is not Mixing
-    int TotNumOfAirNodes = 0;
-    int TotNumOfRoomAFNNodes = 0;
-    Array1D_int TotNumOfZoneAirNodes;
+    int NumAirNodes = 0;
+    int NumRoomAFNNodes = 0;
+    Array1D_int NumZoneAirNodes;
     Array1D<Real64> ConvectiveFloorSplit;
     Array1D<Real64> InfiltratFloorSplit;
     // UCSD
@@ -653,9 +653,9 @@ struct RoomAirModelData : BaseGlobalStruct
     void clear_state() override
     {
         anyNonMixingRoomAirModel = false;
-        TotNumOfAirNodes = 0;
-        TotNumOfRoomAFNNodes = 0;
-        TotNumOfZoneAirNodes.clear();
+        NumAirNodes = 0;
+        NumRoomAFNNodes = 0;
+        NumZoneAirNodes.clear();
         ConvectiveFloorSplit.clear();
         InfiltratFloorSplit.clear();
         // UCSD

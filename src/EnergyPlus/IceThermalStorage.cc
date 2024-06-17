@@ -210,13 +210,15 @@ namespace IceThermalStorage {
         //                   and outlet node setpoint until MyLoad that is passed in behaves well
 
         Real64 TempSetPt(0.0);
-        Real64 TempIn = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+        auto &dln = state.dataLoopNodes;
+
+        Real64 TempIn = dln->nodes(this->PlantInNodeNum)->Temp;
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+            TempSetPt = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            TempSetPt = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+            TempSetPt = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default: {
             assert(false);
@@ -332,16 +334,15 @@ namespace IceThermalStorage {
                                                             // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
         static constexpr std::string_view RoutineName("DetailedIceStorageData::SimDetailedIceStorage");
 
-        int NodeNumIn = this->PlantInNodeNum;                      // Plant loop inlet node number for component
-        int NodeNumOut = this->PlantOutNodeNum;                    // Plant loop outlet node number for component
-        Real64 TempIn = state.dataLoopNodes->Node(NodeNumIn).Temp; // Inlet temperature to component (from plant loop) [C]
+        auto &dln = state.dataLoopNodes;
+        Real64 TempIn = dln->nodes(this->PlantInNodeNum)->Temp; // Inlet temperature to component (from plant loop) [C]
         Real64 TempSetPt(0.0);                                     // Setpoint temperature defined by loop controls [C]
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPoint;
+            TempSetPt = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            TempSetPt = state.dataLoopNodes->Node(NodeNumOut).TempSetPointHi;
+            TempSetPt = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default: {
             assert(false);
@@ -352,7 +353,7 @@ namespace IceThermalStorage {
 
         // Set derived type variables
         this->InletTemp = TempIn;
-        this->MassFlowRate = state.dataLoopNodes->Node(NodeNumIn).MassFlowRate;
+        this->MassFlowRate = dln->nodes(this->PlantInNodeNum)->MassFlowRate;
 
         // if two-way common pipe and no mass flow and tank is not full, then use design flow rate
         if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
@@ -741,28 +742,28 @@ namespace IceThermalStorage {
             }
 
             // Get Plant Inlet Node Num
-            state.dataIceThermalStorage->SimpleIceStorage(iceNum).PltInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataIceThermalStorage->SimpleIceStorage(iceNum).PlantInNodeNum =
+                Node::GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(3),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::ThermalStorageIceSimple,
+                                                    Node::ConnObjType::ThermalStorageIceSimple,
                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
-            state.dataIceThermalStorage->SimpleIceStorage(iceNum).PltOutletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataIceThermalStorage->SimpleIceStorage(iceNum).PlantOutNodeNum =
+                Node::GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::ThermalStorageIceSimple,
+                                                    Node::ConnObjType::ThermalStorageIceSimple,
                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
 
             // Test InletNode and OutletNode
             BranchNodeConnections::TestCompSet(state,
@@ -853,27 +854,27 @@ namespace IceThermalStorage {
 
             // Get Plant Inlet Node Num
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).PlantInNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+                Node::GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(3),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::ThermalStorageIceDetailed,
+                                                    Node::ConnObjType::ThermalStorageIceDetailed,
                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
 
             // Get Plant Outlet Node Num
             state.dataIceThermalStorage->DetailedIceStorage(iceNum).PlantOutNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+                Node::GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(4),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::ThermalStorageIceDetailed,
+                                                    Node::ConnObjType::ThermalStorageIceDetailed,
                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
 
             // Test InletNode and OutletNode
             BranchNodeConnections::TestCompSet(state,
@@ -1387,7 +1388,7 @@ namespace IceThermalStorage {
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag2) {
             this->DesignMassFlowRate = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).MaxMassFlowRate;
             // no design flow rates for model, assume min is zero and max is plant loop's max
-            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->PlantInNodeNum, this->PlantOutNodeNum);
             if ((state.dataPlnt->PlantLoop(this->plantLoc.loopNum).CommonPipeType == DataPlant::CommonPipeType::TwoWay) &&
                 (this->plantLoc.loopSideNum == DataPlant::LoopSideLocation::Supply)) {
                 // up flow priority of other components on the same branch as the Ice tank
@@ -1473,18 +1474,20 @@ namespace IceThermalStorage {
     void SimpleIceStorageData::CalcIceStorageDormant(EnergyPlusData &state)
     {
         // Provide output results for ITS.
+        auto &dln = state.dataLoopNodes;
+            
         this->ITSMassFlowRate = 0.0; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PlantInNodeNum, this->PlantOutNodeNum, this->plantLoc);
 
-        this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
+        this->ITSInletTemp = dln->nodes(this->PlantInNodeNum)->Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default:
             break;
@@ -1503,18 +1506,19 @@ namespace IceThermalStorage {
         // Initialize
         //--------------------------------------------------------
         // Below values for ITS are reported forCharging process.
+        auto &dln = state.dataLoopNodes;
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PlantInNodeNum, this->PlantOutNodeNum, this->plantLoc);
 
-        this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp; //[C]
+        this->ITSInletTemp = dln->nodes(this->PlantInNodeNum)->Temp; //[C]
         this->ITSOutletTemp = this->ITSInletTemp;                                   //[C]
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default:
             break;
@@ -1536,7 +1540,7 @@ namespace IceThermalStorage {
         this->CalcQiceChargeMaxByChiller(state, QiceMaxByChiller); //[W]
 
         // Chiller is remote now, so chiller out is inlet node temp
-        Real64 chillerOutletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+        Real64 chillerOutletTemp = dln->nodes(this->PlantInNodeNum)->Temp;
         // Calculate Qice charge max by ITS with ChillerOutletTemp
         Real64 QiceMaxByITS;
         this->CalcQiceChargeMaxByITS(chillerOutletTemp, QiceMaxByITS); //[W]
@@ -1604,8 +1608,10 @@ namespace IceThermalStorage {
         // METHODOLOGY EMPLOYED:
         // Calculation inside is IP unit, then return QiceMaxByChiller as SI [W] unit.
 
+        auto &dln = state.dataLoopNodes;
+            
         // Chiller is remote now, so chiller out is inlet node temp
-        Real64 TchillerOut = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+        Real64 TchillerOut = dln->nodes(this->PlantInNodeNum)->Temp;
         QiceMaxByChiller = this->UAIceCh * (FreezTemp - TchillerOut); //[W] = [W/degC]*[degC]
 
         // If it happened, it is occurred at the Discharging or Dormant process.
@@ -1653,6 +1659,8 @@ namespace IceThermalStorage {
     {
         static constexpr std::string_view RoutineName("SimpleIceStorageData::CalcIceStorageDischarge");
 
+        auto &dln = state.dataLoopNodes;
+        
         // Initialize processed Rate and Energy
         this->ITSMassFlowRate = 0.0;
         this->ITSCoolingRate = 0.0;
@@ -1660,10 +1668,10 @@ namespace IceThermalStorage {
 
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            this->ITSOutletSetPointTemp = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+            this->ITSOutletSetPointTemp = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default:
             break;
@@ -1675,7 +1683,7 @@ namespace IceThermalStorage {
         // If no component demand or ITS OFF, then RETURN.
         if (myLoad == 0 || !RunFlag) {
             this->ITSMassFlowRate = 0.0;
-            this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+            this->ITSInletTemp = dln->nodes(this->PlantInNodeNum)->Temp;
             this->ITSOutletTemp = this->ITSInletTemp;
             this->ITSCoolingRate = 0.0;
             this->ITSCoolingEnergy = 0.0;
@@ -1690,7 +1698,7 @@ namespace IceThermalStorage {
 
         Real64 CpFluid = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(loopNum).FluidName,
-                                                           state.dataLoopNodes->Node(this->PltInletNodeNum).Temp,
+                                                           dln->nodes(this->PlantInNodeNum)->Temp,
                                                            state.dataPlnt->PlantLoop(loopNum).FluidIndex,
                                                            RoutineName);
 
@@ -1706,11 +1714,11 @@ namespace IceThermalStorage {
         Real64 Uact = max(Umin, Umax);
 
         // Set ITSInletTemp provided by E+
-        this->ITSInletTemp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+        this->ITSInletTemp = dln->nodes(this->PlantInNodeNum)->Temp;
         // The first thing is to set the ITSMassFlowRate
         this->ITSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
 
-        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, this->ITSMassFlowRate, this->PlantInNodeNum, this->PlantOutNodeNum, this->plantLoc);
 
         // Qice is calculate input U which is within boundary between Umin and Umax.
         Real64 Qice = Uact * this->ITSNomCap / TimeInterval;
@@ -1747,15 +1755,16 @@ namespace IceThermalStorage {
 
         // Qice is minimized when ITSInletTemp and ITSOutletTemp is almost same due to LMTD method.
         // Qice is maximized(=0) when ITSOutletTemp is almost same as FreezTemp(=0).
-
-        Real64 ITSInletTemp_loc = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+        auto &dln = state.dataLoopNodes;
+            
+        Real64 ITSInletTemp_loc = dln->nodes(this->PlantInNodeNum)->Temp;
         Real64 ITSOutletTemp_loc = 0.0;
         switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
         case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-            ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPoint;
+            ITSOutletTemp_loc = dln->nodes(this->PlantOutNodeNum)->TempSetPoint;
         } break;
         case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-            ITSOutletTemp_loc = state.dataLoopNodes->Node(this->PltOutletNodeNum).TempSetPointHi;
+            ITSOutletTemp_loc = dln->nodes(this->PlantOutNodeNum)->TempSetPointHi;
         } break;
         default: {
             assert(false);
@@ -1891,12 +1900,14 @@ namespace IceThermalStorage {
         //       DATE WRITTEN:    October 1998
 
         // Update Node Inlet & Outlet MassFlowRat
-        PlantUtilities::SafeCopyPlantNode(state, this->PltInletNodeNum, this->PltOutletNodeNum);
+        auto &dln = state.dataLoopNodes;
+            
+        PlantUtilities::SafeCopyPlantNode(state, this->PlantInNodeNum, this->PlantOutNodeNum);
         if (myLoad == 0 || !RunFlag) {
             // Update Outlet Conditions so that same as Inlet, so component can be bypassed if necessary
-            state.dataLoopNodes->Node(this->PltOutletNodeNum).Temp = state.dataLoopNodes->Node(this->PltInletNodeNum).Temp;
+            dln->nodes(this->PlantOutNodeNum)->Temp = dln->nodes(this->PlantInNodeNum)->Temp;
         } else {
-            state.dataLoopNodes->Node(this->PltOutletNodeNum).Temp = this->ITSOutletTemp;
+            dln->nodes(this->PlantOutNodeNum)->Temp = this->ITSOutletTemp;
         }
     }
 
@@ -1990,12 +2001,11 @@ namespace IceThermalStorage {
         // for the detailed ice storage system in question.
 
         // Set the temperature and flow rate for the component outlet node
-        int InNodeNum = this->PlantInNodeNum;
-        int OutNodeNum = this->PlantOutNodeNum;
+        auto &dln = state.dataLoopNodes;
+            
+        PlantUtilities::SafeCopyPlantNode(state, this->PlantInNodeNum, this->PlantOutNodeNum);
 
-        PlantUtilities::SafeCopyPlantNode(state, InNodeNum, OutNodeNum);
-
-        state.dataLoopNodes->Node(OutNodeNum).Temp = this->OutletTemp;
+        dln->nodes(this->PlantOutNodeNum)->Temp = this->OutletTemp;
     }
 
     void DetailedIceStorageData::ReportDetailedIceStorage(EnergyPlusData &state)

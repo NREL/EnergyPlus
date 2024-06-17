@@ -81,10 +81,10 @@ namespace HeatPumpWaterToWaterHEATING {
         Real64 LoadSideDesignMassFlow;               // Design flow rate (kg/s)
         Real64 SourceSideVolFlowRate;                // Design Flow Rate on th Source Side m3/sec
         Real64 SourceSideDesignMassFlow;             // Design flow rate (kg/s)
-        int SourceSideInletNodeNum;                  // Node number on the inlet side of the plant
-        int SourceSideOutletNodeNum;                 // Node number on the outlet side of the plant
-        int LoadSideInletNodeNum;                    // Node number on the inlet side of the Load Side
-        int LoadSideOutletNodeNum;                   // Node number on the outlet side of the Load Side
+        int SourceSideInNodeNum = 0;                  // Node number on the inlet side of the plant
+        int SourceSideOutNodeNum = 0;                 // Node number on the outlet side of the plant
+        int LoadSideInNodeNum = 0;                    // Node number on the inlet side of the Load Side
+        int LoadSideOutNodeNum = 0;                   // Node number on the outlet side of the Load Side
         Real64 SourceSideUACoeff;                    // Source Side heat transfer coeff W/K
         Real64 LoadSideUACoeff;                      // Load Side heat transfer coeff  W/K
         Real64 CompPistonDisp;                       // compressor piston displacement m3
@@ -124,7 +124,7 @@ namespace HeatPumpWaterToWaterHEATING {
         GshpPeHeatingSpecs()
             : WWHPPlantType(DataPlant::PlantEquipmentType::Invalid), Available(false), ON(false), COP(0.0), NomCap(0.0), MinPartLoadRat(0.0),
               MaxPartLoadRat(0.0), OptPartLoadRat(0.0), LoadSideVolFlowRate(0.0), LoadSideDesignMassFlow(0.0), SourceSideVolFlowRate(0.0),
-              SourceSideDesignMassFlow(0.0), SourceSideInletNodeNum(0), SourceSideOutletNodeNum(0), LoadSideInletNodeNum(0), LoadSideOutletNodeNum(0),
+              SourceSideDesignMassFlow(0.0), 
               SourceSideUACoeff(0.0), LoadSideUACoeff(0.0), CompPistonDisp(0.0), CompClearanceFactor(0.0), CompSucPressDrop(0.0), SuperheatTemp(0.0),
               PowerLosses(0.0), LossFactor(0.0), HighPressCutoff(0.0), LowPressCutoff(0.0), IsOn(false), MustRun(false), CondMassFlowIndex(0),
               Power(0.0), Energy(0.0), QLoad(0.0), QLoadEnergy(0.0), QSource(0.0), QSourceEnergy(0.0), LoadSideWaterInletTemp(0.0),

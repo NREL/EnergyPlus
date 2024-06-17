@@ -130,10 +130,10 @@ namespace VariableSpeedCoils {
         Real64 RatedCapCoolSens;           // Rated/Ref Sensible Cooling Capacity [W]
         Real64 RatedPowerCool;             // Rated/Ref Cooling Power Consumption[W]
         Real64 RatedCOPCool;               // Rated/Ref Cooling COP [W/W]
-        int AirInletNodeNum;               // Node Number of the Air Inlet
-        int AirOutletNodeNum;              // Node Number of the Air Outlet
-        int WaterInletNodeNum;             // Node Number of the Water Onlet
-        int WaterOutletNodeNum;            // Node Number of the Water Outlet
+        int AirInNodeNum = 0;               // Node Number of the Air Inlet
+        int AirOutNodeNum = 0;              // Node Number of the Air Outlet
+        int WaterInNodeNum = 0;             // Node Number of the Water Onlet
+        int WaterOutNodeNum = 0;            // Node Number of the Water Outlet
         PlantLocation plantLoc;
         // set by parent object and "pushed" to this structure in SetVSWSHPData subroutine
         bool FindCompanionUpStreamCoil; // Flag to get the companion coil in Init
@@ -217,7 +217,7 @@ namespace VariableSpeedCoils {
         Real64 MaxOATCrankcaseHeater;          // maximum OAT for crankcase heater operation [C]
         Real64 CrankcaseHeaterConsumption;     // report variable for total crankcase heater energy consumption [J]
         // condenser evaporative precooling
-        int CondenserInletNodeNum;                          // Node number of outdoor condenser
+        int CondenserInNodeNum = 0;                          // Node number of outdoor condenser
         DataHeatBalance::RefrigCondenserType CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
         bool ReportEvapCondVars;                            // true if any performance mode includes an evap condenser
         Real64 EvapCondPumpElecNomPower;                    // Nominal power input to the evap condenser water circulation pump [W]
@@ -290,8 +290,8 @@ namespace VariableSpeedCoils {
               WaterVolFlowRate(0.0), WaterMassFlowRate(0.0), InletWaterTemp(0.0), InletWaterEnthalpy(0.0), OutletWaterTemp(0.0),
               OutletWaterEnthalpy(0.0), Power(0.0), QLoadTotal(0.0), QSensible(0.0), QLatent(0.0), QSource(0.0), QWasteHeat(0.0), Energy(0.0),
               EnergyLoadTotal(0.0), EnergySensible(0.0), EnergyLatent(0.0), EnergySource(0.0), COP(0.0), RunFrac(0.0), PartLoadRatio(0.0),
-              RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0), plantLoc{}, FindCompanionUpStreamCoil(true), IsDXCoilInZone(false),
+              RatedPowerHeat(0.0), RatedCOPHeat(0.0), RatedCapCoolSens(0.0), RatedPowerCool(0.0), RatedCOPCool(0.0),
+              plantLoc{}, FindCompanionUpStreamCoil(true), IsDXCoilInZone(false),
               CompanionCoolingCoilNum(0), CompanionHeatingCoilNum(0), FanDelayTime(0.0),
               // This one calls into a std::vector, so it's 0-indexed, so we initialize it to -1
               MSHPDesignSpecIndex(-1), MSErrIndex(HVAC::MaxSpeedLevels, 0), MSRatedPercentTotCap(HVAC::MaxSpeedLevels, 0.0),
@@ -308,7 +308,7 @@ namespace VariableSpeedCoils {
               DefrostControl(0), EIRFPLR(0), DefrostEIRFT(0), MinOATCompressor(0.0), OATempCompressorOn(0.0), MaxOATDefrost(0.0), DefrostTime(0.0),
               DefrostCapacity(0.0), HPCompressorRuntime(0.0), HPCompressorRuntimeLast(0.0), TimeLeftToDefrost(0.0), DefrostPower(0.0),
               DefrostConsumption(0.0), ReportCoolingCoilCrankcasePower(true), CrankcaseHeaterCapacity(0.0), CrankcaseHeaterPower(0.0),
-              CrankcaseHeaterCapacityCurveIndex(0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), CondenserInletNodeNum(0),
+              CrankcaseHeaterCapacityCurveIndex(0), MaxOATCrankcaseHeater(0.0), CrankcaseHeaterConsumption(0.0), 
               CondenserType(DataHeatBalance::RefrigCondenserType::Air), ReportEvapCondVars(false), EvapCondPumpElecNomPower(0.0),
               EvapCondPumpElecPower(0.0), EvapWaterConsumpRate(0.0), EvapCondPumpElecConsumption(0.0), EvapWaterConsump(0.0),
               BasinHeaterConsumption(0.0), BasinHeaterPowerFTempDiff(0.0), BasinHeaterSetPointTemp(0.0), BasinHeaterPower(0.0),

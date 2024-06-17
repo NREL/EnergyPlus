@@ -235,10 +235,10 @@ namespace TranspiredCollector {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::ObjectIsNotParent;
+        using Node::ObjectIsNotParent;
         using DataSurfaces::OtherSideCondModeledExt;
         using DataSurfaces::SurfaceData;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
         using ScheduleManager::GetScheduleIndex;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -357,25 +357,25 @@ namespace TranspiredCollector {
                     for (NumOASys = 1; NumOASys <= state.dataTranspiredCollector->UTSC(Item).NumOASysAttached; ++NumOASys) {
                         ACountBase = (NumOASys - 1) * 4 + 2;
                         state.dataTranspiredCollector->UTSC(Item).InletNode(NumOASys) =
-                            GetOnlySingleNode(state,
+                            GetSingleNode(state,
                                               AlphasSplit(ACountBase),
                                               ErrorsFound,
-                                              DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                              Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                               AlphasSplit(1),
-                                              DataLoopNode::NodeFluidType::Air,
-                                              DataLoopNode::ConnectionType::Inlet,
-                                              static_cast<NodeInputManager::CompFluidStream>(NumOASys),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Inlet,
+                                              static_cast<Node::CompFluidStream>(NumOASys),
                                               ObjectIsNotParent);
 
                         state.dataTranspiredCollector->UTSC(Item).OutletNode(NumOASys) =
-                            GetOnlySingleNode(state,
+                            GetSingleNode(state,
                                               AlphasSplit(ACountBase + 1),
                                               ErrorsFound,
-                                              DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                              Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                               AlphasSplit(1),
-                                              DataLoopNode::NodeFluidType::Air,
-                                              DataLoopNode::ConnectionType::Outlet,
-                                              static_cast<NodeInputManager::CompFluidStream>(NumOASys),
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Outlet,
+                                              static_cast<Node::CompFluidStream>(NumOASys),
                                               ObjectIsNotParent);
                         TestCompSet(state,
                                     CurrentModuleObject,
@@ -384,25 +384,25 @@ namespace TranspiredCollector {
                                     AlphasSplit(ACountBase + 1),
                                     "Transpired Collector Air Nodes"); // appears that test fails by design??
                         state.dataTranspiredCollector->UTSC(Item).ControlNode(NumOASys) =
-                            GetOnlySingleNode(state,
+                            GetSingleNode(state,
                                               AlphasSplit(ACountBase + 2),
                                               ErrorsFound,
-                                              DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                              Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                               AlphasSplit(1),
-                                              DataLoopNode::NodeFluidType::Air,
-                                              DataLoopNode::ConnectionType::Sensor,
-                                              NodeInputManager::CompFluidStream::Primary,
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Sensor,
+                                              Node::CompFluidStream::Primary,
                                               ObjectIsNotParent);
 
                         state.dataTranspiredCollector->UTSC(Item).ZoneNode(NumOASys) =
-                            GetOnlySingleNode(state,
+                            GetSingleNode(state,
                                               AlphasSplit(ACountBase + 3),
                                               ErrorsFound,
-                                              DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                              Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                               AlphasSplit(1),
-                                              DataLoopNode::NodeFluidType::Air,
-                                              DataLoopNode::ConnectionType::Sensor,
-                                              NodeInputManager::CompFluidStream::Primary,
+                                              Node::FluidType::Air,
+                                              Node::ConnType::Sensor,
+                                              Node::CompFluidStream::Primary,
                                               ObjectIsNotParent);
 
                     } // Each OA System in a Multisystem
@@ -451,46 +451,46 @@ namespace TranspiredCollector {
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) = 0;
 
                 state.dataTranspiredCollector->UTSC(Item).InletNode(1) =
-                    GetOnlySingleNode(state,
+                    GetSingleNode(state,
                                       Alphas(4),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                      Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                       Alphas(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Inlet,
-                                      NodeInputManager::CompFluidStream::Primary,
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Inlet,
+                                      Node::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).OutletNode(1) =
-                    GetOnlySingleNode(state,
+                    GetSingleNode(state,
                                       Alphas(5),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                      Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                       Alphas(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Outlet,
-                                      NodeInputManager::CompFluidStream::Primary,
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Outlet,
+                                      Node::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 TestCompSet(state, CurrentModuleObject, Alphas(1), Alphas(4), Alphas(5), "Transpired Collector Air Nodes");
 
                 state.dataTranspiredCollector->UTSC(Item).ControlNode(1) =
-                    GetOnlySingleNode(state,
+                    GetSingleNode(state,
                                       Alphas(6),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                      Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                       Alphas(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Sensor,
-                                      NodeInputManager::CompFluidStream::Primary,
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Sensor,
+                                      Node::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 state.dataTranspiredCollector->UTSC(Item).ZoneNode(1) =
-                    GetOnlySingleNode(state,
+                    GetSingleNode(state,
                                       Alphas(7),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::SolarCollectorUnglazedTranspired,
+                                      Node::ConnObjType::SolarCollectorUnglazedTranspired,
                                       Alphas(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Sensor,
-                                      NodeInputManager::CompFluidStream::Primary,
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Sensor,
+                                      Node::CompFluidStream::Primary,
                                       ObjectIsNotParent);
             } // no splitter
 
@@ -981,7 +981,7 @@ namespace TranspiredCollector {
         // Replaced by below
         state.dataTranspiredCollector->UTSC(UTSCNum).InletMDot =
             sum_sub(state.dataLoopNodes->Node,
-                    &DataLoopNode::NodeData::MassFlowRate,
+                    &Node::NodeData::MassFlowRate,
                     state.dataTranspiredCollector->UTSC(UTSCNum).InletNode); // Autodesk:F2C++ Functions handle array subscript usage
         state.dataTranspiredCollector->UTSC(UTSCNum).IsOn = false;           // intialize then turn on if appropriate
         state.dataTranspiredCollector->UTSC(UTSCNum).Tplen = state.dataTranspiredCollector->UTSC(UTSCNum).TplenLast;

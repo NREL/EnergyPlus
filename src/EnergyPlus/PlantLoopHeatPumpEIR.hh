@@ -97,12 +97,8 @@ namespace EIRPlantLoopHeatPumps {
 
     struct InOutNodePair
     {
-        int inlet;
-        int outlet;
-
-        InOutNodePair() : inlet(0), outlet(0)
-        {
-        }
+        int InNodeNum = 0;
+        int OutNodeNum = 0;
     };
 
     struct EIRPlantLoopHeatPump : public EnergyPlus::PlantComponent

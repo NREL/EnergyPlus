@@ -424,24 +424,24 @@ namespace WaterUse {
                 waterConnection.Name = state.dataIPShortCut->cAlphaArgs(1);
 
                 if ((!state.dataIPShortCut->lAlphaFieldBlanks(2)) || (!state.dataIPShortCut->lAlphaFieldBlanks(3))) {
-                    waterConnection.InletNode = NodeInputManager::GetOnlySingleNode(state,
+                    waterConnection.InletNode = Node::GetSingleNode(state,
                                                                                     state.dataIPShortCut->cAlphaArgs(2),
                                                                                     ErrorsFound,
-                                                                                    DataLoopNode::ConnectionObjectType::WaterUseConnections,
+                                                                                    Node::ConnObjType::WaterUseConnections,
                                                                                     waterConnection.Name,
-                                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                                    DataLoopNode::ConnectionType::Inlet,
-                                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                                    DataLoopNode::ObjectIsNotParent);
-                    waterConnection.OutletNode = NodeInputManager::GetOnlySingleNode(state,
+                                                                                    Node::FluidType::Water,
+                                                                                    Node::ConnType::Inlet,
+                                                                                    Node::CompFluidStream::Primary,
+                                                                                    Node::ObjectIsNotParent);
+                    waterConnection.OutletNode = Node::GetSingleNode(state,
                                                                                      state.dataIPShortCut->cAlphaArgs(3),
                                                                                      ErrorsFound,
-                                                                                     DataLoopNode::ConnectionObjectType::WaterUseConnections,
+                                                                                     Node::ConnObjType::WaterUseConnections,
                                                                                      waterConnection.Name,
-                                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                                     DataLoopNode::ConnectionType::Outlet,
-                                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                                     DataLoopNode::ObjectIsNotParent);
+                                                                                     Node::FluidType::Water,
+                                                                                     Node::ConnType::Outlet,
+                                                                                     Node::CompFluidStream::Primary,
+                                                                                     Node::ObjectIsNotParent);
 
                     // Check plant connections
                     BranchNodeConnections::TestCompSet(state,

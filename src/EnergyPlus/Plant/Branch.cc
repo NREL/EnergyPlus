@@ -79,21 +79,20 @@ namespace DataPlant {
         //     This assumes that load range based should not request flow for load-rejection purposes, and we
         //     should only "respond" to other component types.
 
-        int const BranchInletNodeNum = this->NodeNumIn;
-        int const BranchOutletNodeNum = this->NodeNumOut;
         Real64 OverallFlowRequest = 0.0;
-
+        auto &dln = state.dataLoopNodes;
+        
         if (this->controlType != DataBranchAirLoopPlant::ControlType::SeriesActive) {
-            OverallFlowRequest = state.dataLoopNodes->Node(BranchInletNodeNum).MassFlowRateRequest;
+            OverallFlowRequest = state.dataLoopNodes->nodes(this->InNodeNum)->MassFlowRateRequest;
         } else { // is series active, so take largest request of all the component inlet nodes
             for (int CompCounter = 1; CompCounter <= this->TotalComponents; ++CompCounter) {
-                int const CompInletNode = this->Comp(CompCounter).NodeNumIn;
-                OverallFlowRequest = max(OverallFlowRequest, state.dataLoopNodes->Node(CompInletNode).MassFlowRateRequest);
+                auto const *compInNode = dln->nodes(this->Comp(CompCounter).InNodeNum);
+                OverallFlowRequest = max(OverallFlowRequest, compInNode->MassFlowRateRequest);
             }
         }
 
         //~ Now use a worker to bound the value to outlet min/max avail
-        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(state, OverallFlowRequest, BranchOutletNodeNum);
+        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(state, OverallFlowRequest, this->OutNodeNum);
 
         return OverallFlowRequest;
     }

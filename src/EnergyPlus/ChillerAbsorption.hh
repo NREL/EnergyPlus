@@ -109,12 +109,12 @@ namespace ChillerAbsorption {
         Real64 CondMassFlowRateMax = 0.0;                            // Max Design Condenser Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax = 0.0;                             // Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 SizFac = 0.0;                                         // Sizing factor
-        int EvapInletNodeNum = 0;                                    // Node number on the inlet side of the plant
-        int EvapOutletNodeNum = 0;                                   // Node number on the outlet side of the plant
-        int CondInletNodeNum = 0;                                    // Node number on the inlet side of the condenser
-        int CondOutletNodeNum = 0;                                   // Node number on the outlet side of the condenser
-        int GeneratorInletNodeNum = 0;                               // absorber steam inlet node number, water side
-        int GeneratorOutletNodeNum = 0;                              // absorber steam outlet node number, water side
+        int EvapInNodeNum = 0;                                    // Node number on the inlet side of the plant
+        int EvapOutNodeNum = 0;                                   // Node number on the outlet side of the plant
+        int CondInNodeNum = 0;                                    // Node number on the inlet side of the condenser
+        int CondOutNodeNum = 0;                                   // Node number on the outlet side of the condenser
+        int GeneratorInNodeNum = 0;                               // absorber steam inlet node number, water side
+        int GeneratorOutNodeNum = 0;                              // absorber steam outlet node number, water side
         Real64 MinPartLoadRat = 0.0;                                 // (BLAST MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat = 0.0;                                 // (BLAST MAX) max allowed operating frac full load
         Real64 OptPartLoadRat = 0.0;                                 // (BLAST BEST) optimal operating frac full load
@@ -124,7 +124,7 @@ namespace ChillerAbsorption {
         std::array<Real64, 3> PumpPowerCoef = {0.0};                                        // coeff of pumping power poly. fit
         Real64 TempLowLimitEvapOut = 0.0;                                                   // C - low temperature shut off
         int ErrCount2 = 0;                                                                  // error counter
-        DataLoopNode::NodeFluidType GenHeatSourceType = DataLoopNode::NodeFluidType::Blank; // Generator heat source type
+        Node::FluidType GenHeatSourceType = Node::FluidType::Blank; // Generator heat source type
         Real64 GeneratorVolFlowRate = 0.0;                                                  // m3/s - hot water volumetric flow rate through generator
         bool GeneratorVolFlowRateWasAutoSized = false;                                      // true if hot water flow was autosize on input
         Real64 GeneratorSubcool = 0.0;                                                      // amount of subcooling in steam generator

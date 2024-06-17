@@ -251,10 +251,10 @@ namespace UnitarySystems {
         int m_FanAvailSchedPtr = 0;
         HVAC::FanOp m_FanOpMode = HVAC::FanOp::Invalid;
         int m_ATMixerIndex = 0;
-        int m_ATMixerPriNode = 0;
-        int m_ATMixerSecNode = 0;
+        int m_ATMixerPriNodeNum = 0;
+        int m_ATMixerSecNodeNum = 0;
         bool m_AirLoopEquipment = true; // ?
-        int m_ZoneInletNode = 0;
+        int m_ZoneInNodeNum = 0;
         int m_ZoneSequenceCoolingNum = 0;
         int m_ZoneSequenceHeatingNum = 0;
         bool m_HeatCoilExists = false;
@@ -269,7 +269,7 @@ namespace UnitarySystems {
         int m_NumOfSpeedSuppHeating = 0;
         bool m_MultiSpeedHeatingCoil = false;
         bool m_VarSpeedHeatingCoil = false;
-        int HeatCtrlNode = 0;
+        int HeatCtrlNodeNum = 0;
         bool m_CoolCoilExists = false;
         int m_CoolingCoilType_Num = 0;
         int m_NumOfSpeedCooling = 0;
@@ -283,7 +283,7 @@ namespace UnitarySystems {
         int m_ActualDXCoilIndexForHXAssisted = 0;
         bool m_DiscreteSpeedCoolingCoil = false;
         bool m_ContSpeedCoolingCoil = false;
-        int CoolCtrlNode = 0;
+        int CoolCtrlNodeNum = 0;
         HVAC::WaterFlow m_WaterCyclingMode = HVAC::WaterFlow::Invalid;
         bool m_ISHundredPercentDOASDXCoil = false;
         bool m_RunOnSensibleLoad = false;
@@ -293,12 +293,12 @@ namespace UnitarySystems {
         int m_SuppHeatCoilType_Num = 0;
         bool m_SuppCoilExists = false;
         Real64 m_DesignSuppHeatingCapacity = 0.0;
-        int m_SuppCoilAirInletNode = 0;
-        int SuppCoilOutletNodeNum = 0;
-        int m_SuppCoilFluidInletNode = 0;
+        int m_SuppCoilAirInNodeNum = 0;
+        int SuppCoilOutNodeNum = 0;
+        int m_SuppCoilFluidInNodeNum = 0;
         Real64 m_MaxSuppCoilFluidFlow = 0.0;
         int m_SuppHeatCoilIndex = 0;
-        int SuppCtrlNode = 0;
+        int SuppCtrlNodeNum = 0;
         Real64 m_SupHeaterLoad = 0.0;
         int m_CoolingSAFMethod = 0;
         int m_HeatingSAFMethod = 0;
@@ -316,8 +316,8 @@ namespace UnitarySystems {
         Real64 m_DesignHRWaterVolumeFlow = 0.0;
         Real64 m_MaxHROutletWaterTemp = 0.0;
         bool m_HeatRecActive = false;
-        int m_HeatRecoveryInletNodeNum = 0;
-        int m_HeatRecoveryOutletNodeNum = 0;
+        int m_HeatRecoveryInNodeNum = 0;
+        int m_HeatRecoveryOutNodeNum = 0;
         int m_DesignSpecMSHPIndex = -1;
         Real64 m_NoLoadAirFlowRateRatio = 1.0;
         bool m_useNoLoadLowSpeedAirFlow = true;
@@ -342,7 +342,7 @@ namespace UnitarySystems {
         bool m_InitHeatPump = false; // Heat pump initialization flag (for error reporting)
         PlantLocation m_HRPlantLoc;
         PlantLocation m_SuppCoilPlantLoc;
-        int m_SuppCoilFluidOutletNodeNum = 0;
+        int m_SuppCoilFluidOutNodeNum = 0;
 
         Real64 m_CompPartLoadRatio = 0.0;
         Real64 m_CoolingCoilSensDemand = 0.0;
@@ -456,12 +456,12 @@ namespace UnitarySystems {
         bool m_TemperatureOffsetControlActive = false; // true if water-side economizer coil is active
         Real64 m_minAirToWaterTempOffset = 0.0;        // coil entering air to entering water temp offset
 
-        int m_HRcoolCoilFluidInletNode = 0;
-        int m_HRcoolCoilAirInNode = 0;
+        int m_HRcoolCoilFluidInNodeNum = 0;
+        int m_HRcoolCoilAirInNodeNum = 0;
         Real64 m_minWaterLoopTempForHR = 0.0;   // water coil heat recovery loops
         bool m_waterSideEconomizerFlag = false; // user input to enable lockout with economizer
         bool m_WaterHRPlantLoopModel = false;   // signifies water heat recovery loop for this CoilSystem
-        std::array<int, 4> m_OAMixerNodes{0, 0, 0, 0};
+        std::array<int, 4> m_OAMixerNodeNums{0, 0, 0, 0};
         Real64 m_CoolOutAirVolFlow = 0.0;
         Real64 m_CoolOutAirMassFlow = 0.0;
         Real64 m_HeatOutAirVolFlow = 0.0;
@@ -483,13 +483,13 @@ namespace UnitarySystems {
         SimAirServingZones::CompType AirloopEqType = SimAirServingZones::CompType::Invalid;
         int MaxIterIndex = 0;
         int RegulaFalsiFailedIndex = 0;
-        int NodeNumOfControlledZone = 0;
+        int ControlledZoneNodeNum = 0;
         Real64 FanPartLoadRatio = 0.0;
         Real64 CoolCoilWaterFlowRatio = 0.0;
         Real64 HeatCoilWaterFlowRatio = 0.0;
         int ControlZoneNum = 0;                                 // index of unit in ZoneEquipConfig
-        int AirInNode = 0;                                      // Parent inlet air node number
-        int AirOutNode = 0;                                     // Parent outlet air node number
+        int AirInNodeNum = 0;                                      // Parent inlet air node number
+        int AirOutNodeNum = 0;                                     // Parent outlet air node number
         Real64 MaxCoolAirMassFlow = 0.0;                        // Maximum coil air mass flow for cooling [kg/s]
         Real64 MaxHeatAirMassFlow = 0.0;                        // Maximum coil air mass flow for heating [kg/s]
         Real64 MaxNoCoolHeatAirMassFlow = 0.0;                  // Maximum coil air mass flow for no cooling or heating [kg/s]
@@ -499,19 +499,19 @@ namespace UnitarySystems {
         Real64 LowSpeedHeatFanRatio = 0.0;                      // heating mode ratio of low speed fan flow to full flow rate
         Real64 MaxCoolCoilFluidFlow = 0.0;                      // Maximum cooling coil fluid flow for chilled water coil
         Real64 MaxHeatCoilFluidFlow = 0.0;                      // Maximum heating coil fluid flow for hot water or steam coil
-        int CoolCoilInletNodeNum = 0;                           // Cooling coil air inlet node number
-        int CoolCoilOutletNodeNum = 0;                          // Cooling coil air outlet node number
-        int CoolCoilFluidOutletNodeNum = 0;                     // Cooling coil fluid outlet node number (from Plant Loop data)
+        int CoolCoilAirInNodeNum = 0;                           // Cooling coil air inlet node number
+        int CoolCoilAirOutNodeNum = 0;                          // Cooling coil air outlet node number
+        int CoolCoilFluidOutNodeNum = 0;                     // Cooling coil fluid outlet node number (from Plant Loop data)
         PlantLocation CoolCoilPlantLoc;                         // Location of the cooling coil in the plant loop
-        int CoolCoilFluidInletNode = 0;                         // Cooling coil fluid inlet node
+        int CoolCoilFluidInNodeNum = 0;                         // Cooling coil fluid inlet node
         PlantLocation HeatCoilPlantLoc;                         // Location of the heating coil in the plant loop
-        int HeatCoilFluidInletNode = 0;                         // Heating coil fluid inlet node
-        int HeatCoilFluidOutletNodeNum = 0;                     // Heating coil fluid outlet node number (from Plant Loop data)
-        int HeatCoilInletNodeNum = 0;                           // Heating coil air inlet node number
-        int HeatCoilOutletNodeNum = 0;                          // Heating coil air outlet node number
+        int HeatCoilFluidInNodeNum = 0;                         // Heating coil fluid inlet node
+        int HeatCoilFluidOutNodeNum = 0;                     // Heating coil fluid outlet node number (from Plant Loop data)
+        int HeatCoilAirInNodeNum = 0;                           // Heating coil air inlet node number
+        int HeatCoilAirOutNodeNum = 0;                          // Heating coil air outlet node number
         bool ATMixerExists = false;                             // true if AT mixer is connected to Unitary System
         HVAC::MixerType ATMixerType = HVAC::MixerType::Invalid; // type of AT mixer, inlet-side or supply-side
-        int ATMixerOutNode = 0;                                 // AT mixer outlet node number
+        int ATMixerOutNodeNum = 0;                                 // AT mixer outlet node number
         Real64 ControlZoneMassFlowFrac = 0.0;                   // fraction of air flow to the control zone
         DesignSpecMSHP *m_CompPointerMSHP = nullptr;
         std::string Name;
@@ -698,7 +698,7 @@ namespace UnitarySystems {
 
         bool checkNodeSetPoint(EnergyPlusData &state,
                                int const AirLoopNum,       // number of the current air loop being simulated
-                               int const ControlNode,      // Node to test for set point
+                               int const ControlNodeNum,      // Node to test for set point
                                int const CoilType,         // True if cooling coil, then test for HumRatMax set point
                                Real64 const OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
         );
@@ -737,8 +737,8 @@ namespace UnitarySystems {
 
         void updateUnitarySystemControl(EnergyPlusData &state,
                                         int const AirLoopNum,  // number of the current air loop being simulated
-                                        int const OutNode,     // coil outlet node number
-                                        int const ControlNode, // control node number
+                                        int const OutNodeNum,     // coil outlet node number
+                                        int const ControlNodeNum, // control node number
                                         Real64 &OnOffAirFlowRatio,
                                         bool const FirstHVACIteration,
                                         Real64 const OAUCoilOutletTemp, // "ONLY" for zoneHVAC:OutdoorAirUnit
@@ -900,10 +900,10 @@ namespace UnitarySystems {
                                                          int UnitarySysNum,
                                                          bool FirstHVACIteration,
                                                          Real64 QZnReq,
-                                                         int AirControlNode,
+                                                         int AirControlNodeNum,
                                                          Real64 OnOffAirFlowRat,
                                                          int AirLoopNum,
-                                                         int WaterControlNode,
+                                                         int WaterControlNodeNum,
                                                          Real64 highWaterMdot,
                                                          Real64 lowSpeedRatio,
                                                          Real64 airMdot,
@@ -953,10 +953,10 @@ namespace UnitarySystems {
     int getDesignSpecMSHPIndex(EnergyPlusData &state, std::string_view objectName);
     int getUnitarySystemIndex(EnergyPlusData &state, std::string_view objectName);
 
-    bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeIndex);
+    bool searchZoneInletNodes(EnergyPlusData &state, int nodeToFind, int &ZoneEquipConfigIndex, int &InletNodeNum);
     bool searchZoneInletNodesByEquipmentIndex(EnergyPlusData &state, int nodeToFind, int zoneEquipmentIndex);
-    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeIndex);
-    bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeIndex);
+    bool searchZoneInletNodeAirLoopNum(EnergyPlusData &state, int airLoopNumToFind, int ZoneEquipConfigIndex, int &InletNodeNum);
+    bool searchExhaustNodes(EnergyPlusData &state, const int nodeToFind, int &ZoneEquipConfigIndex, int &ExhaustNodeNum);
     bool searchTotalComponents(EnergyPlusData &state,
                                SimAirServingZones::CompType compTypeToFind,
                                std::string_view objectNameToFind,

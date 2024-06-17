@@ -84,14 +84,14 @@ namespace DataPlant {
         // Members
         std::string Name;                      // Name of the component list
         std::string FluidName;                 // Name of the fluid specified for this loop
-        DataLoopNode::NodeFluidType FluidType; // Type of fluid in the loop
+        Node::FluidType fluidType; // Type of fluid in the loop
         int FluidIndex;                        // Index for Fluid in FluidProperties
         int MFErrIndex;                        // for recurring mass flow errors
         int MFErrIndex1;                       // for recurring mass flow errors
         int MFErrIndex2;                       // for recurring mass flow errors
         // (see CheckPlantMixerSplitterConsistency)
         // Loop Operating Setpoints and Limits
-        int TempSetPointNodeNum;         // Node Number for Loop Temp SP associated with SP manager
+        int TempSetPointNodeNum = 0;         // Node Number for Loop Temp SP associated with SP manager
         int MaxBranch;                   // Max branches in the loop
         Real64 MinTemp;                  // Minimum temperature allowed in the loop
         Real64 MaxTemp;                  // Maximum temperature allowed in the loop
@@ -118,8 +118,8 @@ namespace DataPlant {
         DataPlant::LoopDemandCalcScheme LoopDemandCalcScheme; // Load distribution scheme 1 SingleSetPoint,
         // 2 DualSetPointWithDeadBand
         DataPlant::CommonPipeType CommonPipeType;
-        int EconPlantSideSensedNodeNum;
-        int EconCondSideSensedNodeNum;
+        int EconPlantSideSensedNodeNum = 0;
+        int EconCondSideSensedNodeNum = 0;
         int EconPlacement;
         int EconBranch;
         int EconComp;
@@ -145,13 +145,13 @@ namespace DataPlant {
 
         // Default Constructor
         PlantLoopData()
-            : FluidType(DataLoopNode::NodeFluidType::Blank), FluidIndex(1), // default to water
-              MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), TempSetPointNodeNum(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
+            : fluidType(Node::FluidType::Blank), FluidIndex(1), // default to water
+              MFErrIndex(0), MFErrIndex1(0), MFErrIndex2(0), MaxBranch(0), MinTemp(0.0), MaxTemp(0.0), MinTempErrIndex(0),
               MaxTempErrIndex(0), MinVolFlowRate(0.0), MaxVolFlowRate(0.0), MaxVolFlowRateWasAutoSized(false), MinMassFlowRate(0.0),
               MaxMassFlowRate(0.0), Volume(0.0), VolumeWasAutoSized(false), CirculationTime(2.0), Mass(0.0), EMSCtrl(false), EMSValue(0.0),
               NumOpSchemes(0), LoadDistribution(DataPlant::LoadingScheme::Invalid), PlantSizNum(0),
               LoopDemandCalcScheme(DataPlant::LoopDemandCalcScheme::Invalid), CommonPipeType(DataPlant::CommonPipeType::No),
-              EconPlantSideSensedNodeNum(0), EconCondSideSensedNodeNum(0), EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
+              EconPlacement(0), EconBranch(0), EconComp(0), EconControlTempDiff(0.0),
               LoopHasConnectionComp(false), TypeOfLoop(LoopType::Invalid), PressureSimType(DataPlant::PressSimType::NoPressure),
               HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0), CoolingDemand(0.0),
               HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), BypassFrac(0.0), InletNodeFlowrate(0.0), InletNodeTemperature(0.0),

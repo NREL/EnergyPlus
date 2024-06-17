@@ -66,8 +66,8 @@ namespace DataPlant {
         int FlowErrCount;    // For recurring error counting
         int FlowErrIndex;    // For recurring error index
         int TotalComponents; // Total number of components on the branch
-        int NodeNumIn;       // Component inlet node number
-        int NodeNumOut;      // Component outlet node number
+        int InNodeNum = 0;       // Component inlet node number
+        int OutNodeNum = 0;      // Component outlet node number
         bool IsBypass;
         int PumpIndex;
         Real64 PumpSizFac;
@@ -85,7 +85,7 @@ namespace DataPlant {
         // Default Constructor
         BranchData()
             : controlType(DataBranchAirLoopPlant::ControlType::Invalid), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false),
-              ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0),
+              ConstantSpeedBranchMassFlow(0.0), BranchLevel(0), FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), 
               IsBypass(false), PumpIndex(0), PumpSizFac(1.0), EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false),
               PressureDrop(0.0), PressureCurveType(DataBranchAirLoopPlant::PressureCurveType::Invalid), PressureCurveIndex(0),
               PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)

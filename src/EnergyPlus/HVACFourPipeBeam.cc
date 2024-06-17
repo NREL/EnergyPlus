@@ -90,9 +90,6 @@ namespace FourPipeBeam {
     {
 
         using BranchNodeConnections::TestCompSet;
-        using DataLoopNode::ObjectIsNotParent;
-        using DataLoopNode::ObjectIsParent;
-        using NodeInputManager::GetOnlySingleNode;
         using namespace DataSizing;
         using Curve::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
@@ -107,6 +104,8 @@ namespace FourPipeBeam {
         bool airNodeFound;
         int aDUIndex;
 
+        auto &dln = state.dataLoopNodes;
+        
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         std::shared_ptr<HVACFourPipeBeam> thisBeam(new HVACFourPipeBeam());
         auto &cCurrentModuleObject = state.dataIPShortCut->cCurrentModuleObject;
@@ -193,25 +192,25 @@ namespace FourPipeBeam {
             }
         }
 
-        thisBeam->airInNodeNum = GetOnlySingleNode(state,
+        thisBeam->airInNodeNum = GetSingleNode(state,
                                                    state.dataIPShortCut->cAlphaArgs(5),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                   Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                   DataLoopNode::NodeFluidType::Air,
-                                                   DataLoopNode::ConnectionType::Inlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
-                                                   ObjectIsNotParent,
+                                                   Node::FluidType::Air,
+                                                   Node::ConnType::Inlet,
+                                                   Node::CompFluidStream::Primary,
+                                               Node::ObjectIsNotParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(5));
-        thisBeam->airOutNodeNum = GetOnlySingleNode(state,
+        thisBeam->airOutNodeNum = GetSingleNode(state,
                                                     state.dataIPShortCut->cAlphaArgs(6),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                    Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    ObjectIsNotParent,
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent,
                                                     state.dataIPShortCut->cAlphaFieldNames(6));
         if (state.dataIPShortCut->lAlphaFieldBlanks(7) && state.dataIPShortCut->lAlphaFieldBlanks(8)) { // no chilled water nodes, no beam cooling
             thisBeam->beamCoolingPresent = false;
@@ -237,25 +236,25 @@ namespace FourPipeBeam {
                                     state.dataIPShortCut->cAlphaArgs(1)));
         } else {
             thisBeam->beamCoolingPresent = true;
-            thisBeam->cWInNodeNum = GetOnlySingleNode(state,
+            thisBeam->cWInNodeNum = GetSingleNode(state,
                                                       state.dataIPShortCut->cAlphaArgs(7),
                                                       ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                      Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Water,
-                                                      DataLoopNode::ConnectionType::Inlet,
-                                                      NodeInputManager::CompFluidStream::Secondary,
-                                                      ObjectIsParent,
+                                                      Node::FluidType::Water,
+                                                      Node::ConnType::Inlet,
+                                                      Node::CompFluidStream::Secondary,
+                                                  Node::ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(7));
-            thisBeam->cWOutNodeNum = GetOnlySingleNode(state,
+            thisBeam->cWOutNodeNum = GetSingleNode(state,
                                                        state.dataIPShortCut->cAlphaArgs(8),
                                                        ErrorsFound,
-                                                       DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                       Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                       DataLoopNode::NodeFluidType::Water,
-                                                       DataLoopNode::ConnectionType::Outlet,
-                                                       NodeInputManager::CompFluidStream::Secondary,
-                                                       ObjectIsParent,
+                                                       Node::FluidType::Water,
+                                                       Node::ConnType::Outlet,
+                                                       Node::CompFluidStream::Secondary,
+                                                   Node::ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(8));
         }
         if (state.dataIPShortCut->lAlphaFieldBlanks(9) && state.dataIPShortCut->lAlphaFieldBlanks(10)) { // no hot water nodes, no beam heating
@@ -282,25 +281,25 @@ namespace FourPipeBeam {
                                     state.dataIPShortCut->cAlphaArgs(1)));
         } else {
             thisBeam->beamHeatingPresent = true;
-            thisBeam->hWInNodeNum = GetOnlySingleNode(state,
+            thisBeam->hWInNodeNum = GetSingleNode(state,
                                                       state.dataIPShortCut->cAlphaArgs(9),
                                                       ErrorsFound,
-                                                      DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                      Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                       state.dataIPShortCut->cAlphaArgs(1),
-                                                      DataLoopNode::NodeFluidType::Water,
-                                                      DataLoopNode::ConnectionType::Inlet,
-                                                      NodeInputManager::CompFluidStream::Secondary,
-                                                      ObjectIsParent,
+                                                      Node::FluidType::Water,
+                                                      Node::ConnType::Inlet,
+                                                      Node::CompFluidStream::Secondary,
+                                                  Node::ObjectIsParent,
                                                       state.dataIPShortCut->cAlphaFieldNames(9));
-            thisBeam->hWOutNodeNum = GetOnlySingleNode(state,
+            thisBeam->hWOutNodeNum = GetSingleNode(state,
                                                        state.dataIPShortCut->cAlphaArgs(10),
                                                        ErrorsFound,
-                                                       DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
+                                                       Node::ConnObjType::AirTerminalSingleDuctConstantVolumeFourPipeBeam,
                                                        state.dataIPShortCut->cAlphaArgs(1),
-                                                       DataLoopNode::NodeFluidType::Water,
-                                                       DataLoopNode::ConnectionType::Outlet,
-                                                       NodeInputManager::CompFluidStream::Secondary,
-                                                       ObjectIsParent,
+                                                       Node::FluidType::Water,
+                                                       Node::ConnType::Outlet,
+                                                       Node::CompFluidStream::Secondary,
+                                                   Node::ObjectIsParent,
                                                        state.dataIPShortCut->cAlphaFieldNames(10));
         }
         thisBeam->vDotDesignPrimAir = state.dataIPShortCut->rNumericArgs(1);
@@ -367,23 +366,23 @@ namespace FourPipeBeam {
         TestCompSet(state,
                     cCurrentModuleObject,
                     thisBeam->name,
-                    state.dataLoopNodes->NodeID(thisBeam->airInNodeNum),
-                    state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum),
+                    dln->nodes(thisBeam->airInNodeNum)->Name,
+                    dln->nodes(thisBeam->airOutNodeNum)->Name,
                     "Air Nodes");
         if (thisBeam->beamCoolingPresent) {
             TestCompSet(state,
                         cCurrentModuleObject,
                         thisBeam->name,
-                        state.dataLoopNodes->NodeID(thisBeam->cWInNodeNum),
-                        state.dataLoopNodes->NodeID(thisBeam->cWOutNodeNum),
+                        dln->nodes(thisBeam->cWInNodeNum)->Name,
+                        dln->nodes(thisBeam->cWOutNodeNum)->Name,
                         "Chilled Water Nodes");
         }
         if (thisBeam->beamHeatingPresent) {
             TestCompSet(state,
                         cCurrentModuleObject,
                         thisBeam->name,
-                        state.dataLoopNodes->NodeID(thisBeam->hWInNodeNum),
-                        state.dataLoopNodes->NodeID(thisBeam->hWOutNodeNum),
+                        dln->nodes(thisBeam->hWInNodeNum)->Name,
+                        dln->nodes(thisBeam->hWOutNodeNum)->Name,
                         "Hot Water Nodes");
         }
 
@@ -472,36 +471,36 @@ namespace FourPipeBeam {
 
         airNodeFound = false;
         for (aDUIndex = 1; aDUIndex <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++aDUIndex) {
-            if (thisBeam->airOutNodeNum == state.dataDefineEquipment->AirDistUnit(aDUIndex).OutletNodeNum) {
+            if (thisBeam->airOutNodeNum == state.dataDefineEquipment->AirDistUnit(aDUIndex).OutNodeNum) {
                 thisBeam->aDUNum = aDUIndex;
-                state.dataDefineEquipment->AirDistUnit(aDUIndex).InletNodeNum = thisBeam->airInNodeNum;
+                state.dataDefineEquipment->AirDistUnit(aDUIndex).InNodeNum = thisBeam->airInNodeNum;
             }
         }
         // assumes if there isn't one assigned, it's an error
         if (thisBeam->aDUNum == 0) {
             ShowSevereError(state,
                             format("{}No matching Air Distribution Unit, for Unit = [{},{}].", routineName, cCurrentModuleObject, thisBeam->name));
-            ShowContinueError(state, format("...should have outlet node={}", state.dataLoopNodes->NodeID(thisBeam->airOutNodeNum)));
+            ShowContinueError(state, format("...should have outlet node={}", dln->nodes(thisBeam->airOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
             // Fill the Zone Equipment data with the supply air inlet node number of this unit.
             for (int ctrlZone = 1; ctrlZone <= state.dataGlobal->NumOfZones; ++ctrlZone) {
                 if (!state.dataZoneEquip->ZoneEquipConfig(ctrlZone).IsControlled) continue;
-                for (int supAirIn = 1; supAirIn <= state.dataZoneEquip->ZoneEquipConfig(ctrlZone).NumInletNodes; ++supAirIn) {
-                    if (thisBeam->airOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(ctrlZone).InletNode(supAirIn)) {
+                for (int supAirIn = 1; supAirIn <= state.dataZoneEquip->ZoneEquipConfig(ctrlZone).NumInNodes; ++supAirIn) {
+                    if (thisBeam->airOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(ctrlZone).InNodeNums(supAirIn)) {
                         thisBeam->zoneIndex = ctrlZone;
-                        thisBeam->zoneNodeIndex = state.dataZoneEquip->ZoneEquipConfig(ctrlZone).ZoneNode;
+                        thisBeam->zoneNodeIndex = state.dataZoneEquip->ZoneEquipConfig(ctrlZone).ZoneNodeNum;
                         thisBeam->ctrlZoneInNodeIndex = supAirIn;
-                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).InNode = thisBeam->airInNodeNum;
-                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).OutNode = thisBeam->airOutNodeNum;
+                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).InNodeNum = thisBeam->airInNodeNum;
+                        state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).OutNodeNum = thisBeam->airOutNodeNum;
                         state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum =
                             state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitCool(supAirIn).TermUnitSizingIndex;
                         thisBeam->termUnitSizingNum = state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).TermUnitSizingNum;
                         state.dataDefineEquipment->AirDistUnit(thisBeam->aDUNum).ZoneEqNum = ctrlZone;
                         if (thisBeam->beamHeatingPresent) {
-                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).InNode = thisBeam->airInNodeNum;
-                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).OutNode = thisBeam->airOutNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).InNodeNum = thisBeam->airInNodeNum;
+                            state.dataZoneEquip->ZoneEquipConfig(ctrlZone).AirDistUnitHeat(supAirIn).OutNodeNum = thisBeam->airOutNodeNum;
                         }
                         airNodeFound = true;
                         break;
@@ -579,6 +578,8 @@ namespace FourPipeBeam {
 
         static constexpr std::string_view routineName("HVACFourPipeBeam::init");
 
+        auto &dln = state.dataLoopNodes;
+
         if (this->plantLoopScanFlag && allocated(state.dataPlnt->PlantLoop)) {
             bool errFlag = false;
             if (this->beamCoolingPresent) {
@@ -630,7 +631,7 @@ namespace FourPipeBeam {
 
         if (!state.dataGlobal->SysSizingCalc && this->mySizeFlag && !this->plantLoopScanFlag) {
             //    if ( SysSizingCalc && this->mySizeFlag && ! this->plantLoopScanFlag ) {
-            this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
+            this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InNodeAirLoopNum(this->ctrlZoneInNodeIndex);
             state.dataDefineEquipment->AirDistUnit(this->aDUNum).AirLoopNum = this->airLoopNum;
             this->set_size(state);          // calculate autosize values (in any) and convert volume flow rates to mass flow rates
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
@@ -642,13 +643,16 @@ namespace FourPipeBeam {
             this->mySizeFlag = false;
         }
 
+        auto *airInNode = dln->nodes(this->airInNodeNum);
+        auto *airOutNode = dln->nodes(this->airOutNodeNum);
+                
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->myEnvrnFlag) {
 
-            state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMax = this->mDotDesignPrimAir;
-            state.dataLoopNodes->Node(this->airOutNodeNum).MassFlowRateMax = this->mDotDesignPrimAir;
-            state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMin = 0.0;
-            state.dataLoopNodes->Node(this->airOutNodeNum).MassFlowRateMin = 0.0;
+            airInNode->MassFlowRateMax = this->mDotDesignPrimAir;
+            airOutNode->MassFlowRateMax = this->mDotDesignPrimAir;
+            airInNode->MassFlowRateMin = 0.0;
+            airOutNode->MassFlowRateMin = 0.0;
 
             if (this->beamCoolingPresent) { // initialize chilled water design mass flow rate in plant routines
                 InitComponentNodes(state, 0.0, this->mDotDesignCW, this->cWInNodeNum, this->cWOutNodeNum);
@@ -659,7 +663,7 @@ namespace FourPipeBeam {
 
             if (this->airLoopNum == 0) { // fill air loop index
                 if (this->zoneIndex > 0 && this->ctrlZoneInNodeIndex > 0) {
-                    this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InletNodeAirLoopNum(this->ctrlZoneInNodeIndex);
+                    this->airLoopNum = state.dataZoneEquip->ZoneEquipConfig(this->zoneIndex).InNodeAirLoopNum(this->ctrlZoneInNodeIndex);
                 }
             }
 
@@ -689,36 +693,36 @@ namespace FourPipeBeam {
                 this->heatingAvailable = false;
             }
             // check for upstream zero flow. If nonzero and air available, set primary flow to max
-            if (this->airAvailable && state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRate > 0.0) {
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRate = this->mDotDesignPrimAir;
+            if (this->airAvailable && airInNode->MassFlowRate > 0.0) {
+                airInNode->MassFlowRate = this->mDotDesignPrimAir;
             } else {
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRate = 0.0;
+                airInNode->MassFlowRate = 0.0;
             }
             // reset the max and min avail flows
-            if (this->airAvailable && state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMaxAvail > 0.0) {
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMaxAvail = this->mDotDesignPrimAir;
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMinAvail = this->mDotDesignPrimAir;
+            if (this->airAvailable && airInNode->MassFlowRateMaxAvail > 0.0) {
+                airInNode->MassFlowRateMaxAvail = this->mDotDesignPrimAir;
+                airInNode->MassFlowRateMinAvail = this->mDotDesignPrimAir;
             } else {
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMaxAvail = 0.0;
-                state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMinAvail = 0.0;
+                airInNode->MassFlowRateMaxAvail = 0.0;
+                airInNode->MassFlowRateMinAvail = 0.0;
             }
         }
 
         // do these initializations every time step
         if (beamCoolingPresent) {
-            this->cWTempIn = state.dataLoopNodes->Node(this->cWInNodeNum).Temp;
+            this->cWTempIn = dln->nodes(this->cWInNodeNum)->Temp;
             this->cWTempOut = this->cWTempIn;
         }
         if (beamHeatingPresent) {
-            this->hWTempIn = state.dataLoopNodes->Node(this->hWInNodeNum).Temp;
+            this->hWTempIn = dln->nodes(this->hWInNodeNum)->Temp;
             this->hWTempOut = this->hWTempIn;
         }
-        this->mDotSystemAir = state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(this->airInNodeNum).MassFlowRate = this->mDotSystemAir;
-        this->tDBZoneAirTemp = state.dataLoopNodes->Node(this->zoneNodeIndex).Temp;
-        this->tDBSystemAir = state.dataLoopNodes->Node(this->airInNodeNum).Temp;
-        this->cpZoneAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->zoneNodeIndex).HumRat);
-        this->cpSystemAir = Psychrometrics::PsyCpAirFnW(state.dataLoopNodes->Node(this->airInNodeNum).HumRat);
+        this->mDotSystemAir = airInNode->MassFlowRateMaxAvail;
+        airInNode->MassFlowRate = this->mDotSystemAir;
+        this->tDBZoneAirTemp = dln->nodes(this->zoneNodeIndex)->Temp;
+        this->tDBSystemAir = airInNode->Temp;
+        this->cpZoneAir = Psychrometrics::PsyCpAirFnW(dln->nodes(this->zoneNodeIndex)->HumRat);
+        this->cpSystemAir = Psychrometrics::PsyCpAirFnW(airInNode->HumRat);
         this->qDotBeamCooling = 0.0;
         this->qDotBeamHeating = 0.0;
         this->supAirCoolingRate = 0.0;
@@ -1361,39 +1365,41 @@ namespace FourPipeBeam {
 
     void HVACFourPipeBeam::update(EnergyPlusData &state) const // update node date elsewhere in EnergyPlus, does not change state of this
     {
-        auto &Node(state.dataLoopNodes->Node);
+        auto &dln = state.dataLoopNodes;
+        auto *airOutNode = dln->nodes(this->airOutNodeNum);
+        auto const *airInNode = dln->nodes(this->airInNodeNum);
 
         using PlantUtilities::SafeCopyPlantNode;
 
         // Set the outlet air nodes of the unit; note that all quantities are unchanged from inlet to outlet
-        Node(this->airOutNodeNum).MassFlowRate = Node(this->airInNodeNum).MassFlowRate;
-        Node(this->airOutNodeNum).Temp = Node(this->airInNodeNum).Temp;
-        Node(this->airOutNodeNum).HumRat = Node(this->airInNodeNum).HumRat;
-        Node(this->airOutNodeNum).Enthalpy = Node(this->airInNodeNum).Enthalpy;
-        Node(this->airOutNodeNum).Quality = Node(this->airInNodeNum).Quality;
-        Node(this->airOutNodeNum).Press = Node(this->airInNodeNum).Press;
-        Node(this->airOutNodeNum).MassFlowRateMin = Node(this->airInNodeNum).MassFlowRateMin;
-        Node(this->airOutNodeNum).MassFlowRateMax = Node(this->airInNodeNum).MassFlowRateMax;
-        Node(this->airOutNodeNum).MassFlowRateMinAvail = Node(this->airInNodeNum).MassFlowRateMinAvail;
-        Node(this->airOutNodeNum).MassFlowRateMaxAvail = Node(this->airInNodeNum).MassFlowRateMaxAvail;
+        airOutNode->MassFlowRate = airInNode->MassFlowRate;
+        airOutNode->Temp = airInNode->Temp;
+        airOutNode->HumRat = airInNode->HumRat;
+        airOutNode->Enthalpy = airInNode->Enthalpy;
+        airOutNode->Quality = airInNode->Quality;
+        airOutNode->Press = airInNode->Press;
+        airOutNode->MassFlowRateMin = airInNode->MassFlowRateMin;
+        airOutNode->MassFlowRateMax = airInNode->MassFlowRateMax;
+        airOutNode->MassFlowRateMinAvail = airInNode->MassFlowRateMinAvail;
+        airOutNode->MassFlowRateMaxAvail = airInNode->MassFlowRateMaxAvail;
 
         if (state.dataContaminantBalance->Contaminant.CO2Simulation) {
-            Node(this->airOutNodeNum).CO2 = Node(this->airInNodeNum).CO2;
+            airOutNode->CO2 = airInNode->CO2;
         }
 
         if (state.dataContaminantBalance->Contaminant.GenericContamSimulation) {
-            Node(this->airOutNodeNum).GenContam = Node(this->airInNodeNum).GenContam;
+            airOutNode->GenContam = airInNode->GenContam;
         }
 
         // Set the outlet water nodes for the unit
 
         if (this->beamCoolingPresent) {
             SafeCopyPlantNode(state, this->cWInNodeNum, this->cWOutNodeNum);
-            Node(this->cWOutNodeNum).Temp = this->cWTempOut;
+            dln->nodes(this->cWOutNodeNum)->Temp = this->cWTempOut;
         }
         if (this->beamHeatingPresent) {
             SafeCopyPlantNode(state, this->hWInNodeNum, this->hWOutNodeNum);
-            Node(this->hWOutNodeNum).Temp = this->hWTempOut;
+            dln->nodes(this->hWOutNodeNum)->Temp = this->hWTempOut;
         }
     }
 
@@ -1430,8 +1436,10 @@ namespace FourPipeBeam {
     void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        auto &dln = state.dataLoopNodes;
+            
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (state.dataLoopNodes->Node(this->airOutNodeNum).MassFlowRate / state.dataEnvrn->StdRhoAir) *
+            this->OutdoorAirFlowRate = (dln->nodes(this->airOutNodeNum)->MassFlowRate / state.dataEnvrn->StdRhoAir) *
                                        state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;

@@ -493,9 +493,9 @@ namespace RefrigeratedCase {
         int LowTempWarnIndex = 0;                             // Water outlet low temp warning index
         int HighFlowWarnIndex = 0;                            // Water outlet high flow warning index
         int HighInletWarnIndex = 0;                           // Water inlet high temp warning index
-        int InletNode = 0;                                    // Water-cooled condenser inlet node number
+        int WaterInNodeNum = 0;                                    // Water-cooled condenser inlet node number
         Real64 InletTemp = 0.0;                               // Water-cooling condenser inlet temperature (C)
-        int OutletNode = 0;                                   // Water-cooled condenser outlet node number
+        int WaterOutNodeNum = 0;                                   // Water-cooled condenser outlet node number
         int PlantTypeOfNum = 0;                               // Water-cooled condenser plant equipment type
         PlantLocation plantLoc;                               // Water-cooled condenser plant location
         Real64 OutletTemp = 0.0;                              // Water-cooling condenser outlet temperature (C)
@@ -863,17 +863,17 @@ namespace RefrigeratedCase {
         int LowTempWarnIndex = 0;                                         // Water outlet low temp warning index
         int HighFlowWarnIndex = 0;                                        // Water outlet high flow warning index
         int HighInletWarnIndex = 0;                                       // Water inlet high temp warning index
-        int InletNode = 0;                                                // Water-cooled condenser inlet node number
+        int WaterInNodeNum = 0;                                                // Water-cooled condenser inlet node number
         int EvapSchedPtr = 0;                                             // Index to the correct evap condenser availability schedule
         WaterSupply EvapWaterSupplyMode = WaterSupply::FromMains;         // Source of water for evap condenser cooling
         int EvapWaterSupTankID = 0;                                       // TankID when evap condenser uses water from storage tank
         int EvapWaterTankDemandARRID = 0;                                 // Demand index when evap condenser uses water from storage tank
-        int OutletNode = 0;                                               // Water-cooled condenser outlet node number
+        int WaterOutNodeNum = 0;                                               // Water-cooled condenser outlet node number
         int PlantTypeOfNum = 0;                                           // Water-cooled condenser plant equipment type
         PlantLocation plantLoc;                                           // Water-cooled condenser plant location
         int OutletTempSchedPtr = 0;                                       // Schedule pointer for condenser outlet temp setting
-        int InletAirNodeNum = 0;                                          // Inlet air node number, can be outside or in a zone
-        int InletAirZoneNum = 0;                                          // Inlet air zone number, if located in a zone
+        int AirInNodeNum = 0;                                          // Inlet air node number, can be outside or in a zone
+        int AirInZoneNum = 0;                                          // Inlet air zone number, if located in a zone
         FanSpeedCtrlType FanSpeedControlType = FanSpeedCtrlType::Invalid; // fixed, two-speed, or variable
         int CapCurvePtr = 0;                                              // capcity curve pointer for air-cooled condensers
         int CascadeSysID = 0;                                             // System ID number for system rejecting heat to cascade condenser
@@ -985,8 +985,8 @@ namespace RefrigeratedCase {
         int CapCurvePtr = 0;                       // capacity curve pointer for gas cooler
         FanSpeedCtrlType FanSpeedControlType = FanSpeedCtrlType::Invalid; // fixed, two-speed, or variable
         int GasCoolerCreditWarnIndex = 0;                                 // Used to count warnings
-        int InletAirNodeNum = 0;                                          // Inlet air node number, can be outside or in a zone
-        int InletAirZoneNum = 0;                                          // Inlet air zone number, if located in a zone
+        int AirInNodeNum = 0;                                          // Inlet air node number, can be outside or in a zone
+        int AirInZoneNum = 0;                                          // Inlet air zone number, if located in a zone
         int NumSysAttach = 0;                                             // Number of systems attached to gas cooler
         Real64 ActualFanPower = 0.0;                                      // Actual gas cooler fan power (W)
         Real64 CpGasCoolerOut = 0.0;                                      // Saturated liquid specific heat at gas cooler outlet (J/kg-C)

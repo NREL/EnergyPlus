@@ -98,7 +98,6 @@ namespace EnergyPlus::PackagedThermalStorageCoil {
 // encapsulate the data and algorithms for modeling packaged thermals storage cooling coils
 
 // Using/Aliasing
-using namespace DataLoopNode;
 using namespace Psychrometrics;
 using namespace Curve;
 
@@ -203,7 +202,7 @@ void GetTESCoilInput(EnergyPlusData &state)
     using FluidProperties::GetFluidDensityTemperatureLimits;
     using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
     using GlobalNames::VerifyUniqueCoilName;
-    using NodeInputManager::GetOnlySingleNode;
+    using Node::GetSingleNode;
     using ScheduleManager::GetScheduleIndex;
     using WaterManager::SetupTankDemandComponent;
     using WaterManager::SetupTankSupplyComponent;
@@ -355,15 +354,15 @@ void GetTESCoilInput(EnergyPlusData &state)
 
         thisTESCoil.StorageCapacitySizingFactor = state.dataIPShortCut->rNumericArgs(3);
 
-        thisTESCoil.StorageAmbientNodeNum = GetOnlySingleNode(state,
+        thisTESCoil.StorageAmbientNodeNum = GetSingleNode(state,
                                                               state.dataIPShortCut->cAlphaArgs(7),
                                                               ErrorsFound,
-                                                              DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                              Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                               state.dataIPShortCut->cAlphaArgs(1),
-                                                              DataLoopNode::NodeFluidType::Air,
-                                                              DataLoopNode::ConnectionType::Sensor,
-                                                              NodeInputManager::CompFluidStream::Primary,
-                                                              ObjectIsNotParent);
+                                                              Node::FluidType::Air,
+                                                              Node::ConnType::Sensor,
+                                                              Node::CompFluidStream::Primary,
+                                                          Node::ObjectIsNotParent);
 
         int const ZoneIndexTrial = FindControlledZoneIndexFromSystemNodeNumberForZone(state, thisTESCoil.StorageAmbientNodeNum);
         if (ZoneIndexTrial > 0) { // tank is inside a zone so setup internal gains
@@ -375,24 +374,24 @@ void GetTESCoilInput(EnergyPlusData &state)
         thisTESCoil.RatedFluidTankTemp = state.dataIPShortCut->rNumericArgs(5);
         thisTESCoil.RatedEvapAirVolFlowRate = state.dataIPShortCut->rNumericArgs(6);
 
-        thisTESCoil.EvapAirInletNodeNum = GetOnlySingleNode(state,
+        thisTESCoil.EvapAirInNodeNum = GetSingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(8),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                            Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Inlet,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            ObjectIsNotParent);
-        thisTESCoil.EvapAirOutletNodeNum = GetOnlySingleNode(state,
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Inlet,
+                                                            Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+        thisTESCoil.EvapAirOutNodeNum = GetSingleNode(state,
                                                              state.dataIPShortCut->cAlphaArgs(9),
                                                              ErrorsFound,
-                                                             DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                             Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                              state.dataIPShortCut->cAlphaArgs(1),
-                                                             DataLoopNode::NodeFluidType::Air,
-                                                             DataLoopNode::ConnectionType::Outlet,
-                                                             NodeInputManager::CompFluidStream::Primary,
-                                                             ObjectIsNotParent);
+                                                             Node::FluidType::Air,
+                                                             Node::ConnType::Outlet,
+                                                             Node::CompFluidStream::Primary,
+                                                         Node::ObjectIsNotParent);
         TestCompSet(state,
                     cCurrentModuleObject,
                     state.dataIPShortCut->cAlphaArgs(1),
@@ -1427,24 +1426,24 @@ void GetTESCoilInput(EnergyPlusData &state)
         thisTESCoil.AncillaryControlsPower = state.dataIPShortCut->rNumericArgs(31);
         thisTESCoil.ColdWeatherMinimumTempLimit = state.dataIPShortCut->rNumericArgs(32);
         thisTESCoil.ColdWeatherAncillaryPower = state.dataIPShortCut->rNumericArgs(33);
-        thisTESCoil.CondAirInletNodeNum = GetOnlySingleNode(state,
+        thisTESCoil.CondAirInNodeNum = GetSingleNode(state,
                                                             state.dataIPShortCut->cAlphaArgs(56),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                            Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                             thisTESCoil.Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::OutsideAirReference,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            ObjectIsNotParent);
-        thisTESCoil.CondAirOutletNodeNum = GetOnlySingleNode(state,
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::OutsideAirReference,
+                                                            Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+        thisTESCoil.CondAirOutNodeNum = GetSingleNode(state,
                                                              state.dataIPShortCut->cAlphaArgs(57),
                                                              ErrorsFound,
-                                                             DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                             Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                              thisTESCoil.Name,
-                                                             DataLoopNode::NodeFluidType::Air,
-                                                             DataLoopNode::ConnectionType::ReliefAir,
-                                                             NodeInputManager::CompFluidStream::Primary,
-                                                             ObjectIsNotParent);
+                                                             Node::FluidType::Air,
+                                                             Node::ConnType::ReliefAir,
+                                                             Node::CompFluidStream::Primary,
+                                                         Node::ObjectIsNotParent);
 
         thisTESCoil.CondenserAirVolumeFlow = state.dataIPShortCut->rNumericArgs(34);
         thisTESCoil.CondenserAirFlowSizingFactor = state.dataIPShortCut->rNumericArgs(35);
@@ -1502,30 +1501,30 @@ void GetTESCoilInput(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(62)) {
-            thisTESCoil.TESPlantInletNodeNum = GetOnlySingleNode(state,
+            thisTESCoil.TESPlantInNodeNum = GetSingleNode(state,
                                                                  state.dataIPShortCut->cAlphaArgs(62),
                                                                  ErrorsFound,
-                                                                 DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                                 Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                                 DataLoopNode::NodeFluidType::Water,
-                                                                 DataLoopNode::ConnectionType::Inlet,
-                                                                 NodeInputManager::CompFluidStream::Secondary,
-                                                                 ObjectIsNotParent);
+                                                                 Node::FluidType::Water,
+                                                                 Node::ConnType::Inlet,
+                                                                 Node::CompFluidStream::Secondary,
+                                                             Node::ObjectIsNotParent);
 
             thisTESCoil.TESPlantConnectionAvailable = true;
         } else {
             thisTESCoil.TESPlantConnectionAvailable = false;
         }
         if (!state.dataIPShortCut->lAlphaFieldBlanks(63)) {
-            thisTESCoil.TESPlantOutletNodeNum = GetOnlySingleNode(state,
+            thisTESCoil.TESPlantOutNodeNum = GetSingleNode(state,
                                                                   state.dataIPShortCut->cAlphaArgs(63),
                                                                   ErrorsFound,
-                                                                  DataLoopNode::ConnectionObjectType::CoilCoolingDXSingleSpeedThermalStorage,
+                                                                  Node::ConnObjType::CoilCoolingDXSingleSpeedThermalStorage,
                                                                   state.dataIPShortCut->cAlphaArgs(1),
-                                                                  DataLoopNode::NodeFluidType::Water,
-                                                                  DataLoopNode::ConnectionType::Outlet,
-                                                                  NodeInputManager::CompFluidStream::Secondary,
-                                                                  ObjectIsNotParent);
+                                                                  Node::FluidType::Water,
+                                                                  Node::ConnType::Outlet,
+                                                                  Node::CompFluidStream::Secondary,
+                                                              Node::ObjectIsNotParent);
         } else {
             if (thisTESCoil.TESPlantConnectionAvailable) {
                 ShowSevereError(state, format("{}{}=\"{}\", invalid", RoutineName, cCurrentModuleObject, thisTESCoil.Name));
@@ -1891,6 +1890,7 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
+    auto &dln = state.dataLoopNodes;
 
     if (state.dataPackagedThermalStorageCoil->MyOneTimeFlag) {
         // initialize the environment and sizing flags
@@ -1917,8 +1917,8 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
             thisTESCoil.TESPlantBranchNum = plantLoc.branchNum;
             thisTESCoil.TESPlantCompNum = plantLoc.compNum;
 
-            if ((DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumIn != thisTESCoil.TESPlantInletNodeNum) ||
-                (DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumOut != thisTESCoil.TESPlantOutletNodeNum)) {
+            if ((DataPlant::CompData::getPlantComponent(state, plantLoc).InNodeNum != thisTESCoil.TESPlantInNodeNum) ||
+                (DataPlant::CompData::getPlantComponent(state, plantLoc).OutNodeNum != thisTESCoil.TESPlantOutNodeNum)) {
                 ShowSevereError(
                     state, format("InitTESCoil: Coil:Cooling:DX:SingleSpeed:ThermalStorage =\"{}\", non-matching plant nodes.", thisTESCoil.Name));
                 ShowContinueError(state,
@@ -1929,12 +1929,12 @@ void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
                                              .Name));
                 ShowContinueError(
                     state,
-                    format("...Inlet Node=\"{}", state.dataLoopNodes->NodeID(DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumIn)));
+                    format("...Inlet Node=\"{}", dln->nodes(DataPlant::CompData::getPlantComponent(state, plantLoc).InNodeNum)->Name));
                 ShowContinueError(
                     state,
-                    format("...Outlet Node=\"{}", state.dataLoopNodes->NodeID(DataPlant::CompData::getPlantComponent(state, plantLoc).NodeNumOut)));
-                ShowContinueError(state, format("...TES Inlet Node=\"{}", state.dataLoopNodes->NodeID(thisTESCoil.TESPlantInletNodeNum)));
-                ShowContinueError(state, format("...TES Outlet Node=\"{}", state.dataLoopNodes->NodeID(thisTESCoil.TESPlantOutletNodeNum)));
+                    format("...Outlet Node=\"{}", dln->nodes(DataPlant::CompData::getPlantComponent(state, plantLoc).OutNodeNum)->Name));
+                ShowContinueError(state, format("...TES Inlet Node=\"{}", dln->nodes(thisTESCoil.TESPlantInNodeNum)->Name));
+                ShowContinueError(state, format("...TES Outlet Node=\"{}", dln->nodes(thisTESCoil.TESPlantOutNodeNum)->Name));
                 errFlag = true;
             }
             if (errFlag) {
@@ -2454,24 +2454,24 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     thisTESCoil.ElecCoolingPower = StandbyAncillaryPower;
     thisTESCoil.ElecCoolingEnergy = StandbyAncillaryPower * TimeStepSysSec;
 
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
 
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
+    evapAirOutNode->Temp = evapAirInNode->Temp;
+    evapAirOutNode->HumRat = evapAirInNode->HumRat;
+    evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+    evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+    evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+    evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
+
+    condAirOutNode->Temp = condAirInNode->Temp;
+    condAirOutNode->HumRat = condAirInNode->HumRat;
+    condAirInNode->MassFlowRate = 0.0;
+    condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+    condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
     thisTESCoil.RuntimeFraction = 0.0;
     thisTESCoil.EvapTotCoolingRate = 0.0;
     thisTESCoil.EvapTotCoolingEnergy = 0.0;
@@ -2485,7 +2485,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
 
     UpdateTEStorage(state, TESCoilNum);
 
-    thisTESCoil.CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
+    thisTESCoil.CondInletTemp = condAirInNode->Temp;
 
     UpdateColdWeatherProtection(state, TESCoilNum);
 
@@ -2519,28 +2519,33 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
                             // For evap condenser, its the humidity ratio of the air leaving the evap cooling pads.
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
+    
     // first deal with condenser
     if (thisTESCoil.CondenserType == TESCondenserType::Air) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        Real64 const CondAirSidePressure = condAirInNode->Press;
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
             CondInletHumRat = state.dataEnvrn->OutHumRat;
         } else {
-            CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            CondInletHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            CondInletTemp = condAirInNode->Temp;
+            CondInletHumRat = condAirInNode->HumRat;
         }
     } else if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
-        Real64 CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
+        Real64 CondAirSidePressure = condAirInNode->Press;
         Real64 OutdoorDryBulb = 0.0;
         Real64 OutdoorWetBulb = 0.0;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             CondAirSidePressure = state.dataEnvrn->OutBaroPress;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            Real64 const OutdoorHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            OutdoorDryBulb = condAirInNode->Temp;
+            Real64 const OutdoorHumRat = condAirInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
         }
         // direct evap cool model
@@ -2548,14 +2553,14 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         CondInletHumRat = PsyWFnTdbTwbPb(state, CondInletTemp, OutdoorWetBulb, CondAirSidePressure, RoutineName);
     }
 
-    Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
+    Real64 const EvapAirMassFlow = evapAirInNode->MassFlowRate;
 
     if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
-        Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
+        Real64 const EvapInletDryBulb = evapAirInNode->Temp;
+        Real64 const EvapInletHumRat = evapAirInNode->HumRat;
         Real64 const EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
-        Real64 const EvapInletEnthalpy = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Enthalpy;
+        Real64 const EvapInletEnthalpy = evapAirInNode->Enthalpy;
 
         Real64 const AirMassFlowRatio = EvapAirMassFlow / thisTESCoil.RatedEvapAirMassFlowRate;
         Real64 TotCapTempModFac = EnergyPlus::Curve::CurveValue(state, thisTESCoil.CoolingOnlyCapFTempCurve, EvapInletWetBulb, CondInletTemp);
@@ -2674,24 +2679,22 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
 
         Real64 const ElecCoolingPower = TotCap * EIR * RuntimeFraction;
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = EvapOutletAirHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = EvapOutletAirEnthalpy;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate = EvapAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
+        evapAirOutNode->Temp = EvapOutletAirTemp;
+        evapAirOutNode->HumRat = EvapOutletAirHumRat;
+        evapAirOutNode->Enthalpy = EvapOutletAirEnthalpy;
+        evapAirOutNode->MassFlowRate = EvapAirMassFlow;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
 
         // determine condenser leaving conditions
         Real64 const QdotCond = TotCap * RuntimeFraction + ElecCoolingPower;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirInNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirOutNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
         Real64 const CondInletEnthalpy = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
         Real64 const CondOutletEnthalpy = CondInletEnthalpy + QdotCond / thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = CondInletHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
+        condAirOutNode->Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
+        condAirOutNode->HumRat = CondInletHumRat;
+        condAirOutNode->Enthalpy = CondOutletEnthalpy;
 
         thisTESCoil.ElecCoolingPower = ElecCoolingPower + thisTESCoil.AncillaryControlsPower;
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
@@ -2700,8 +2703,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         thisTESCoil.CondenserRuntimeFraction = RuntimeFraction;
         thisTESCoil.EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
         thisTESCoil.EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSysSec;
-        Real64 const MinAirHumRat = min(state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat,
-                                        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat);
+        Real64 const MinAirHumRat = min(evapAirOutNode->HumRat, evapAirInNode->HumRat);
         thisTESCoil.EvapSensCoolingRate =
             EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
         if (thisTESCoil.EvapSensCoolingRate > thisTESCoil.EvapTotCoolingRate) {
@@ -2716,24 +2718,18 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
         thisTESCoil.RuntimeFraction = 0.0;
         thisTESCoil.CondenserRuntimeFraction = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+        evapAirOutNode->Temp = evapAirInNode->Temp;
+        evapAirOutNode->HumRat = evapAirInNode->HumRat;
+        evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+        evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
 
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
+        condAirOutNode->Temp = condAirInNode->Temp;
+        condAirOutNode->HumRat = condAirInNode->HumRat;
+        condAirInNode->MassFlowRate = 0.0;
+        condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+        condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
         thisTESCoil.EvapTotCoolingRate = 0.0;
         thisTESCoil.EvapTotCoolingEnergy = 0.0;
         thisTESCoil.EvapSensCoolingRate = 0.0;
@@ -2753,7 +2749,7 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
 
     if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
-        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInletNodeNum);
+        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInNodeNum);
     }
 }
 
@@ -2787,27 +2783,32 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
                             // For evap condenser, its the humidity ratio of the air leaving the evap cooling pads.
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
+    
     // first deal with condenser
     if (thisTESCoil.CondenserType == TESCondenserType::Air) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        Real64 const CondAirSidePressure = condAirInNode->Press;
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
             CondInletHumRat = state.dataEnvrn->OutHumRat;
         } else {
-            CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            CondInletHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            CondInletTemp = condAirInNode->Temp;
+            CondInletHumRat = condAirInNode->HumRat;
         }
     } else if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
+        Real64 const CondAirSidePressure = condAirInNode->Press;
         Real64 OutdoorDryBulb = 0.0;
         Real64 OutdoorWetBulb = 0.0;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            Real64 const OutdoorHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            OutdoorDryBulb = condAirInNode->Temp;
+            Real64 const OutdoorHumRat = condAirInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
         }
         // direct evap cool model
@@ -2850,11 +2851,11 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
     }
 
     // local for evaporator air mass flow [kg/s]
-    Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
+    Real64 const EvapAirMassFlow = evapAirInNode->MassFlowRate;
     // evaporator inlet air drybulb [C]
-    Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
+    Real64 const EvapInletDryBulb = evapAirInNode->Temp;
     // evaporator inlet air humidity ratio [kg/kg]
-    Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
+    Real64 const EvapInletHumRat = evapAirInNode->HumRat;
     // evaporator inlet air wetbulb [C]
     Real64 const EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
 
@@ -2862,7 +2863,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
 
     if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
-        Real64 const EvapInletEnthalpy = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Enthalpy;
+        Real64 const EvapInletEnthalpy = evapAirInNode->Enthalpy;
 
         // evaporator inlet air mass flow divided by design mass flow [ ]
         Real64 const AirMassFlowRatio = EvapAirMassFlow / thisTESCoil.RatedEvapAirMassFlowRate;
@@ -3025,26 +3026,24 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
             EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
         }
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = EvapOutletAirHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = EvapOutletAirEnthalpy;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate = EvapAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
+        evapAirOutNode->Temp = EvapOutletAirTemp;
+        evapAirOutNode->HumRat = EvapOutletAirHumRat;
+        evapAirOutNode->Enthalpy = EvapOutletAirEnthalpy;
+        evapAirOutNode->MassFlowRate = EvapAirMassFlow;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
 
         // determine condenser leaving conditions
         // condenser total heat rejection rate [W]
         Real64 const QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower + TotChargeCap + ChargeElectricCoolingPower;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirInNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirOutNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
         // condenser inlet enthalpy [J/kg]
         Real64 const CondInletEnthalpy = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
         Real64 const CondOutletEnthalpy = CondInletEnthalpy + QdotCond / thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = CondInletHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
+        condAirOutNode->Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
+        condAirOutNode->HumRat = CondInletHumRat;
+        condAirOutNode->Enthalpy = CondOutletEnthalpy;
 
         thisTESCoil.ElecCoolingPower = EvapElecCoolingPower + ChargeElectricCoolingPower + thisTESCoil.AncillaryControlsPower;
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
@@ -3058,8 +3057,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
 
         thisTESCoil.EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction; // double check this
         thisTESCoil.EvapTotCoolingEnergy = EvapTotCap * EvapRuntimeFraction * TimeStepSysSec;
-        Real64 const MinAirHumRat = min(state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat,
-                                        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat);
+        Real64 const MinAirHumRat = min(evapAirOutNode->HumRat, evapAirInNode->HumRat);
         thisTESCoil.EvapSensCoolingRate =
             EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
         if (thisTESCoil.EvapSensCoolingRate > thisTESCoil.EvapTotCoolingRate) {
@@ -3110,16 +3108,12 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
 
         thisTESCoil.RuntimeFraction = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+        evapAirOutNode->Temp = evapAirInNode->Temp;
+        evapAirOutNode->HumRat = evapAirInNode->HumRat;
+        evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+        evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
 
         thisTESCoil.EvapTotCoolingRate = 0.0;
         thisTESCoil.EvapTotCoolingEnergy = 0.0;
@@ -3129,25 +3123,23 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
         thisTESCoil.EvapLatCoolingEnergy = 0.0;
 
         if (TotChargeCap == 0.0) {
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-                state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-                state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
+            condAirOutNode->Temp = condAirInNode->Temp;
+            condAirOutNode->HumRat = condAirInNode->HumRat;
+            condAirInNode->MassFlowRate = 0.0;
+            condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+            condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
             thisTESCoil.CondenserRuntimeFraction = 0.0;
         } else {
 
             // determine condenser leaving conditions
             Real64 const QdotCond = TotChargeCap + ChargeElectricCoolingPower;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+            condAirInNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+            condAirOutNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
             Real64 const CondInletEnthalpy = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
             Real64 const CondOutletEnthalpy = CondInletEnthalpy + QdotCond / thisTESCoil.CondenserAirMassFlow;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = CondInletHumRat;
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
+            condAirOutNode->Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
+            condAirOutNode->HumRat = CondInletHumRat;
+            condAirOutNode->Enthalpy = CondOutletEnthalpy;
             thisTESCoil.CondenserRuntimeFraction = 1.0;
         }
     }
@@ -3163,7 +3155,7 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
 
     if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
-        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInletNodeNum);
+        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInNodeNum);
     }
 }
 
@@ -3197,27 +3189,32 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
                             // For evap condenser, its the humidity ratio of the air leaving the evap cooling pads.
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
+    
     // first deal with condenser
     if (thisTESCoil.CondenserType == TESCondenserType::Air) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        Real64 const CondAirSidePressure = condAirInNode->Press;
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
             CondInletHumRat = state.dataEnvrn->OutHumRat;
         } else {
-            CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            CondInletHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            CondInletTemp = condAirInNode->Temp;
+            CondInletHumRat = condAirInNode->HumRat;
         }
     } else if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
+        Real64 const CondAirSidePressure = condAirInNode->Press;
         Real64 OutdoorDryBulb = 0.0;
         Real64 OutdoorWetBulb = 0.0;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            Real64 const OutdoorHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            OutdoorDryBulb = condAirInNode->Temp;
+            Real64 const OutdoorHumRat = condAirInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
         }
         // direct evap cool model
@@ -3258,14 +3255,14 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
         break;
     }
 
-    Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
+    Real64 const EvapAirMassFlow = evapAirInNode->MassFlowRate;
 
     if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0)) { // coil is running
 
-        Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
+        Real64 const EvapInletDryBulb = evapAirInNode->Temp;
+        Real64 const EvapInletHumRat = evapAirInNode->HumRat;
         Real64 const EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
-        Real64 const EvapInletEnthalpy = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Enthalpy;
+        Real64 const EvapInletEnthalpy = evapAirInNode->Enthalpy;
 
         // evaporator inlet air mass flow divided by design mass flow [ ]
         Real64 const AirMassFlowRatio = EvapAirMassFlow / thisTESCoil.RatedEvapAirMassFlowRate;
@@ -3434,24 +3431,22 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
             EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
         }
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = EvapOutletAirHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = EvapOutletAirEnthalpy;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate = EvapAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
+        evapAirOutNode->Temp = EvapOutletAirTemp;
+        evapAirOutNode->HumRat = EvapOutletAirHumRat;
+        evapAirOutNode->Enthalpy = EvapOutletAirEnthalpy;
+        evapAirOutNode->MassFlowRate = EvapAirMassFlow;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
 
         // determine condenser leaving conditions
         Real64 const QdotCond = EvapTotCap * EvapRuntimeFraction + EvapElecCoolingPower;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirInNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirOutNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
         Real64 const CondInletEnthalpy = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
         Real64 const CondOutletEnthalpy = CondInletEnthalpy + QdotCond / thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = CondInletHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
+        condAirOutNode->Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
+        condAirOutNode->HumRat = CondInletHumRat;
+        condAirOutNode->Enthalpy = CondOutletEnthalpy;
 
         thisTESCoil.ElecCoolingPower = EvapElecCoolingPower + DischargeElectricCoolingPower + thisTESCoil.AncillaryControlsPower;
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
@@ -3460,8 +3455,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
 
         thisTESCoil.EvapTotCoolingRate = EvapTotCap * EvapRuntimeFraction + TotDischargeCap * DischargeRuntimeFraction;
         thisTESCoil.EvapTotCoolingEnergy = thisTESCoil.EvapTotCoolingRate * TimeStepSysSec;
-        Real64 const MinAirHumRat = min(state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat,
-                                        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat);
+        Real64 const MinAirHumRat = min(evapAirOutNode->HumRat, evapAirInNode->HumRat);
         thisTESCoil.EvapSensCoolingRate =
             EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
         if (thisTESCoil.EvapSensCoolingRate > thisTESCoil.EvapTotCoolingRate) {
@@ -3486,25 +3480,19 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
         thisTESCoil.EvapLatCoolingRate = 0.0;
         thisTESCoil.EvapLatCoolingEnergy = 0.0;
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+        evapAirOutNode->Temp = evapAirInNode->Temp;
+        evapAirOutNode->HumRat = evapAirInNode->HumRat;
+        evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+        evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
         // nothing happens at condenser
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
-        thisTESCoil.CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
+        condAirOutNode->Temp = condAirInNode->Temp;
+        condAirOutNode->HumRat = condAirInNode->HumRat;
+        condAirInNode->MassFlowRate = 0.0;
+        condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+        condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
+        thisTESCoil.CondInletTemp = condAirInNode->Temp;
     }
     thisTESCoil.Q_TES = thisTESCoil.QdotTES * TimeStepSysSec;
     UpdateTEStorage(state, TESCoilNum);
@@ -3513,7 +3501,7 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
 
     if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
-        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInletNodeNum);
+        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInNodeNum);
     }
 }
 
@@ -3541,39 +3529,39 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
                             // For evap condenser, its the humidity ratio of the air leaving the evap cooling pads.
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
     // nothing happens at Evaporator
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-    state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+    evapAirOutNode->Temp = evapAirInNode->Temp;
+    evapAirOutNode->HumRat = evapAirInNode->HumRat;
+    evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+    evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+    evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+    evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
 
     // first deal with condenser
     if (thisTESCoil.CondenserType == TESCondenserType::Air) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        Real64 const CondAirSidePressure = condAirInNode->Press;
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             CondInletTemp = state.dataEnvrn->OutDryBulbTemp;
             CondInletHumRat = state.dataEnvrn->OutHumRat;
         } else {
-            CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            CondInletHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            CondInletTemp = condAirInNode->Temp;
+            CondInletHumRat = condAirInNode->HumRat;
         }
     } else if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
-        Real64 const CondAirSidePressure = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Press;
+        Real64 const CondAirSidePressure = condAirInNode->Press;
         Real64 OutdoorDryBulb = 0.0;
         Real64 OutdoorWetBulb = 0.0;
-        if (CondAirSidePressure == state.dataLoopNodes->DefaultNodeValues.Press) {
+        if (CondAirSidePressure == DataEnvironment::StdPressureSeaLevel) {
             OutdoorDryBulb = state.dataEnvrn->OutDryBulbTemp;
             OutdoorWetBulb = state.dataEnvrn->OutWetBulbTemp;
         } else {
-            OutdoorDryBulb = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-            Real64 const OutdoorHumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
+            OutdoorDryBulb = condAirInNode->Temp;
+            Real64 const OutdoorHumRat = condAirInNode->HumRat;
             OutdoorWetBulb = PsyTwbFnTdbWPb(state, OutdoorDryBulb, OutdoorHumRat, CondAirSidePressure, RoutineName);
         }
         // direct evap cool model
@@ -3635,14 +3623,14 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         Real64 const ElecCoolingPower = TotCap * EIR;
         // condenser total heat rejection rate [W]
         Real64 const &QdotCond = TotCap + ElecCoolingPower;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirInNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
+        condAirOutNode->MassFlowRate = thisTESCoil.CondenserAirMassFlow;
         // condenser inlet enthalpy [J/kg]
         Real64 const CondInletEnthalpy = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
         Real64 const CondOutletEnthalpy = CondInletEnthalpy + QdotCond / thisTESCoil.CondenserAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = CondInletHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = CondOutletEnthalpy;
+        condAirOutNode->Temp = PsyTdbFnHW(CondOutletEnthalpy, CondInletHumRat);
+        condAirOutNode->HumRat = CondInletHumRat;
+        condAirOutNode->Enthalpy = CondOutletEnthalpy;
 
         thisTESCoil.ElecCoolingPower = ElecCoolingPower + thisTESCoil.AncillaryControlsPower;
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
@@ -3654,13 +3642,11 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
         thisTESCoil.RuntimeFraction = 0.0;
         thisTESCoil.QdotTES = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
+        condAirOutNode->Temp = condAirInNode->Temp;
+        condAirOutNode->HumRat = condAirInNode->HumRat;
+        condAirInNode->MassFlowRate = 0.0;
+        condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+        condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
     }
     thisTESCoil.Q_TES = thisTESCoil.QdotTES * TimeStepSysSec;
 
@@ -3677,7 +3663,7 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
 
     if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
-        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInletNodeNum);
+        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, CondInletHumRat, thisTESCoil.CondAirInNodeNum);
     }
 }
 
@@ -3741,16 +3727,21 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
     }
 
     // local for evaporator air mass flow [kg/s]
-    Real64 const EvapAirMassFlow = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
+    auto &dln = state.dataLoopNodes;
+    auto *evapAirOutNode = dln->nodes(thisTESCoil.EvapAirOutNodeNum);
+    auto const *evapAirInNode = dln->nodes(thisTESCoil.EvapAirInNodeNum);
+    auto *condAirOutNode = dln->nodes(thisTESCoil.CondAirOutNodeNum);
+    auto *condAirInNode = dln->nodes(thisTESCoil.CondAirInNodeNum);
+    Real64 const EvapAirMassFlow = evapAirInNode->MassFlowRate;
 
     if ((EvapAirMassFlow > HVAC::SmallMassFlow) && (PartLoadRatio > 0.0) && TESHasSomeCharge) { // coil is running
 
         Real64 PLR = PartLoadRatio;
 
-        Real64 const EvapInletDryBulb = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        Real64 const EvapInletHumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
+        Real64 const EvapInletDryBulb = evapAirInNode->Temp;
+        Real64 const EvapInletHumRat = evapAirInNode->HumRat;
         Real64 const EvapInletWetBulb = PsyTwbFnTdbWPb(state, EvapInletDryBulb, EvapInletHumRat, state.dataEnvrn->OutBaroPress, RoutineName);
-        Real64 const EvapInletEnthalpy = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Enthalpy;
+        Real64 const EvapInletEnthalpy = evapAirInNode->Enthalpy;
 
         // evaporator inlet air mass flow divided by design mass flow [ ]
         Real64 const AirMassFlowRatio = EvapAirMassFlow / thisTESCoil.RatedEvapAirMassFlowRate;
@@ -3883,21 +3874,18 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
             EvapOutletAirHumRat = PsyWFnTdbH(state, EvapOutletAirTemp, EvapOutletAirEnthalpy, RoutineName);
         }
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = EvapOutletAirTemp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = EvapOutletAirHumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = EvapOutletAirEnthalpy;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate = EvapAirMassFlow;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
+        evapAirOutNode->Temp = EvapOutletAirTemp;
+        evapAirOutNode->HumRat = EvapOutletAirHumRat;
+        evapAirOutNode->Enthalpy = EvapOutletAirEnthalpy;
+        evapAirOutNode->MassFlowRate = EvapAirMassFlow;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
         thisTESCoil.ElecCoolingPower = ElecCoolingPower + thisTESCoil.AncillaryControlsPower;
         thisTESCoil.ElecCoolingEnergy = thisTESCoil.ElecCoolingPower * TimeStepSysSec;
         thisTESCoil.RuntimeFraction = RuntimeFraction;
         thisTESCoil.EvapTotCoolingRate = TotCap * RuntimeFraction; // double check this
         thisTESCoil.EvapTotCoolingEnergy = TotCap * RuntimeFraction * TimeStepSysSec;
-        Real64 const MinAirHumRat = min(state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat,
-                                        state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat);
+        Real64 const MinAirHumRat = min(evapAirOutNode->HumRat, evapAirInNode->HumRat);
         thisTESCoil.EvapSensCoolingRate =
             EvapAirMassFlow * (PsyHFnTdbW(EvapInletDryBulb, MinAirHumRat) - PsyHFnTdbW(EvapOutletAirTemp, MinAirHumRat));
         if (thisTESCoil.EvapSensCoolingRate > thisTESCoil.EvapTotCoolingRate) {
@@ -3924,27 +3912,21 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
         thisTESCoil.EvapLatCoolingRate = 0.0;
         thisTESCoil.EvapLatCoolingEnergy = 0.0;
 
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).Temp;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).HumRat;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRate =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRate;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMinAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirInletNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-            state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.EvapAirOutletNodeNum).HumRat);
+        evapAirOutNode->Temp = evapAirInNode->Temp;
+        evapAirOutNode->HumRat = evapAirInNode->HumRat;
+        evapAirOutNode->MassFlowRate = evapAirInNode->MassFlowRate;
+        evapAirOutNode->MassFlowRateMinAvail = evapAirInNode->MassFlowRateMinAvail;
+        evapAirOutNode->MassFlowRateMaxAvail = evapAirInNode->MassFlowRateMaxAvail;
+        evapAirOutNode->Enthalpy = PsyHFnTdbW(evapAirOutNode->Temp, evapAirOutNode->HumRat);
     }
 
     // nothing happens at condenser
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate = 0.0;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).MassFlowRate =
-        state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).MassFlowRate;
-    state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Enthalpy = PsyHFnTdbW(
-        state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).Temp, state.dataLoopNodes->Node(thisTESCoil.CondAirOutletNodeNum).HumRat);
-    thisTESCoil.CondInletTemp = state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).Temp;
+    condAirOutNode->Temp = condAirInNode->Temp;
+    condAirOutNode->HumRat = condAirInNode->HumRat;
+    condAirInNode->MassFlowRate = 0.0;
+    condAirOutNode->MassFlowRate = condAirInNode->MassFlowRate;
+    condAirOutNode->Enthalpy = PsyHFnTdbW(condAirOutNode->Temp, condAirOutNode->HumRat);
+    thisTESCoil.CondInletTemp = condAirInNode->Temp;
     thisTESCoil.Q_TES = thisTESCoil.QdotTES * TimeStepSysSec;
     UpdateTEStorage(state, TESCoilNum);
 
@@ -3952,8 +3934,7 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
 
     if (thisTESCoil.CondenserType == TESCondenserType::Evap) {
         UpdateEvaporativeCondenserBasinHeater(state, TESCoilNum);
-        UpdateEvaporativeCondenserWaterUse(
-            state, TESCoilNum, state.dataLoopNodes->Node(thisTESCoil.CondAirInletNodeNum).HumRat, thisTESCoil.CondAirInletNodeNum);
+        UpdateEvaporativeCondenserWaterUse(state, TESCoilNum, condAirInNode->HumRat, thisTESCoil.CondAirInNodeNum);
     }
 }
 
@@ -3999,7 +3980,11 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
     using WaterThermalTanks::WaterThermalTankData;
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto const *tesPlantInNode = dln->nodes(thisTESCoil.TESPlantInNodeNum);
+    auto *tesPlantOutNode = dln->nodes(thisTESCoil.TESPlantOutNodeNum);
+        
+    
     // Seconds in one timestep (s)
     Real64 const SecInTimeStep = TimeStepSysSec;
     // Time remaining in the current timestep (s)
@@ -4017,9 +4002,9 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
     // Instantaneous tank temperature (C)
     Real64 const TankTemp = thisTESCoil.FluidTankTempFinalLastTimestep;
     // Current ambient air temperature around tank (C)
-    Real64 const AmbientTemp = state.dataLoopNodes->Node(thisTESCoil.StorageAmbientNodeNum).Temp;
+    Real64 const AmbientTemp = dln->nodes(thisTESCoil.StorageAmbientNodeNum)->Temp;
     // Use side inlet temperature (C)
-    Real64 const UseInletTemp = state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).Temp;
+    Real64 const UseInletTemp = tesPlantInNode->Temp;
     // Source side inlet temperature (C)
     Real64 const SourceInletTemp = thisTESCoil.FluidTankTempFinalLastTimestep;
     // density of water in tank (kg/m3)
@@ -4030,9 +4015,7 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
     Real64 const CpTank = GetSpecificHeatGlycol(state, thisTESCoil.StorageFluidName, TankTemp, thisTESCoil.StorageFluidIndex, RoutineName);
 
     // Use side flow rate, including effectiveness factor (kg/s)
-    Real64 const UseMassFlowRate = thisTESCoil.TESPlantConnectionAvailable
-                                       ? state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).MassFlowRate * thisTESCoil.TESPlantEffectiveness
-                                       : 0.0;
+    Real64 const UseMassFlowRate = thisTESCoil.TESPlantConnectionAvailable ? tesPlantInNode->MassFlowRate * thisTESCoil.TESPlantEffectiveness : 0.0;
 
     // Source side flow rate, including effectiveness factor (kg/s)
     Real64 constexpr SourceMassFlowRate = 0.0;
@@ -4060,20 +4043,19 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
         // Specific heat of fluid in plant connection (J/kg K)
         Real64 const CpPlantConnection = GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(thisTESCoil.TESPlantLoopNum).FluidName,
-                                                               state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).Temp,
+                                                               tesPlantInNode->Temp,
                                                                state.dataPlnt->PlantLoop(thisTESCoil.TESPlantLoopNum).FluidIndex,
                                                                calcTESIceStorageTank);
 
-        thisTESCoil.QdotPlant = state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).MassFlowRate * CpPlantConnection *
+        thisTESCoil.QdotPlant = tesPlantInNode->MassFlowRate * CpPlantConnection *
                                 thisTESCoil.TESPlantEffectiveness * (UseInletTemp - NewTankTemp);
         thisTESCoil.Q_Plant = thisTESCoil.QdotPlant * TimeStepSysSec;
         // now get correct outlet temp with actual massflow (not modified by effectiveness)
         Real64 NewOutletTemp = UseInletTemp; // calculated new tankoutlet temp (C)
-        if (state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            NewOutletTemp =
-                UseInletTemp - thisTESCoil.QdotPlant / (state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum).MassFlowRate * CpPlantConnection);
+        if (tesPlantInNode->MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            NewOutletTemp = UseInletTemp - thisTESCoil.QdotPlant / (tesPlantInNode->MassFlowRate * CpPlantConnection);
         }
-        state.dataLoopNodes->Node(thisTESCoil.TESPlantOutletNodeNum).Temp = NewOutletTemp;
+        tesPlantOutNode->Temp = NewOutletTemp;
     }
 
     // Change in integrated tank temperature, dividing by time gives the average (C s)
@@ -4111,7 +4093,9 @@ void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
     static constexpr std::string_view RoutineName("CalcTESIceStorageTank");
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
-
+    auto &dln = state.dataLoopNodes;
+    auto *storageAmbientNode = dln->nodes(thisTESCoil.StorageAmbientNodeNum);
+    
     // Fraction of the current hour that has elapsed (h)
     Real64 const TimeElapsed =
         state.dataGlobal->HourOfDay + state.dataGlobal->TimeStep * state.dataGlobal->TimeStepZone + state.dataHVACGlobal->SysTimeElapsed;
@@ -4124,21 +4108,22 @@ void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
     // update plant connection (if any)
     if (thisTESCoil.TESPlantConnectionAvailable) {
 
-        auto const &inletNode = state.dataLoopNodes->Node(thisTESCoil.TESPlantInletNodeNum);
+        auto const *tesPlantInNode = dln->nodes(thisTESCoil.TESPlantInNodeNum);
+        auto *tesPlantOutNode = dln->nodes(thisTESCoil.TESPlantOutNodeNum);
         Real64 const Cp = GetSpecificHeatGlycol(state,
                                                 state.dataPlnt->PlantLoop(thisTESCoil.TESPlantLoopNum).FluidName,
-                                                inletNode.Temp,
+                                                tesPlantInNode->Temp,
                                                 state.dataPlnt->PlantLoop(thisTESCoil.TESPlantLoopNum).FluidIndex,
                                                 RoutineName);
 
-        thisTESCoil.QdotPlant = inletNode.MassFlowRate * Cp * thisTESCoil.TESPlantEffectiveness * (inletNode.Temp - FreezingTemp);
+        thisTESCoil.QdotPlant = tesPlantInNode->MassFlowRate * Cp * thisTESCoil.TESPlantEffectiveness * (tesPlantInNode->Temp - FreezingTemp);
         thisTESCoil.Q_Plant = thisTESCoil.QdotPlant * TimeStepSysSec;
         // now get correct outlet temp with actual massflow (not modified by effectiveness)
-        Real64 NewOutletTemp = inletNode.Temp; // calculated new tank outlet temp (C)
-        if (inletNode.MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
-            NewOutletTemp += thisTESCoil.QdotPlant / (inletNode.MassFlowRate * Cp);
+        Real64 NewOutletTemp = tesPlantInNode->Temp; // calculated new tank outlet temp (C)
+        if (tesPlantInNode->MassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
+            NewOutletTemp += thisTESCoil.QdotPlant / (tesPlantInNode->MassFlowRate * Cp);
         }
-        state.dataLoopNodes->Node(thisTESCoil.TESPlantOutletNodeNum).Temp = NewOutletTemp;
+        tesPlantOutNode->Temp = NewOutletTemp;
     } else {
         thisTESCoil.QdotPlant = 0.0;
         thisTESCoil.Q_Plant = 0.0;
@@ -4146,7 +4131,7 @@ void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
 
     // update ambient heat transfer
 
-    thisTESCoil.QdotAmbient = thisTESCoil.StorageUA * (state.dataLoopNodes->Node(thisTESCoil.StorageAmbientNodeNum).Temp - FreezingTemp);
+    thisTESCoil.QdotAmbient = thisTESCoil.StorageUA * (storageAmbientNode->Temp - FreezingTemp);
     thisTESCoil.Q_Ambient = thisTESCoil.QdotAmbient * TimeStepSysSec;
 
     // local rate of heat transfer to ice (negative cooling) [W]
@@ -4178,17 +4163,17 @@ void UpdateColdWeatherProtection(EnergyPlusData &state, int const TESCoilNum)
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
     using ScheduleManager::GetCurrentScheduleValue;
 
-    if ((state.dataLoopNodes->Node(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).StorageAmbientNodeNum).Temp <
-         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ColdWeatherMinimumTempLimit) &&
-        (GetCurrentScheduleValue(state, state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).AvailSchedNum) != 0.0)) {
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower =
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ColdWeatherAncillaryPower;
+    auto &tesCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum); 
+    auto &dln = state.dataLoopNodes;
+    auto const *storageAmbientNode = dln->nodes(tesCoil.StorageAmbientNodeNum);
+    
+    if ((storageAmbientNode->Temp < tesCoil.ColdWeatherMinimumTempLimit) && (GetCurrentScheduleValue(state, tesCoil.AvailSchedNum) != 0.0)) {
+        tesCoil.ElectColdWeatherPower = tesCoil.ColdWeatherAncillaryPower;
 
     } else {
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower = 0.0;
+        tesCoil.ElectColdWeatherPower = 0.0;
     }
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherEnergy =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectColdWeatherPower * TimeStepSysSec;
+    tesCoil.ElectColdWeatherEnergy = tesCoil.ElectColdWeatherPower * TimeStepSysSec;
 }
 
 void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESCoilNum)
@@ -4205,18 +4190,17 @@ void UpdateEvaporativeCondenserBasinHeater(EnergyPlusData &state, int const TESC
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-
+    auto &tesCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum); 
     CalcBasinHeaterPower(state,
-                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).BasinHeaterPowerFTempDiff,
-                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).BasinHeaterAvailSchedNum,
-                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).BasinHeaterSetpointTemp,
-                         state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower);
+                         tesCoil.BasinHeaterPowerFTempDiff,
+                         tesCoil.BasinHeaterAvailSchedNum,
+                         tesCoil.BasinHeaterSetpointTemp,
+                         tesCoil.ElectEvapCondBasinHeaterPower);
 
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectEvapCondBasinHeaterEnergy =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).ElectEvapCondBasinHeaterPower * TimeStepSysSec;
+    tesCoil.ElectEvapCondBasinHeaterEnergy = tesCoil.ElectEvapCondBasinHeaterPower * TimeStepSysSec;
 }
 
-void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InletNodeNum)
+void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoilNum, Real64 const HumRatAfterEvap, int const InNodeNum)
 {
 
     // SUBROUTINE INFORMATION:
@@ -4227,44 +4211,38 @@ void UpdateEvaporativeCondenserWaterUse(EnergyPlusData &state, int const TESCoil
 
     // PURPOSE OF THIS SUBROUTINE:
     // update and calculate water consumption for evaporatively cooled condensers
+    auto &tesCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum); 
+    auto &dln = state.dataLoopNodes;
+    auto const *inNode = dln->nodes(InNodeNum);
+        
+    Real64 const RhoWater = RhoH2O(inNode->Temp);
 
-    Real64 const RhoWater = RhoH2O(state.dataLoopNodes->Node(InletNodeNum).Temp);
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate =
-        (HumRatAfterEvap - state.dataLoopNodes->Node(InletNodeNum).HumRat) * state.dataLoopNodes->Node(InletNodeNum).MassFlowRate / RhoWater *
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserRuntimeFraction;
+    tesCoil.EvapWaterConsumpRate = (HumRatAfterEvap - inNode->HumRat) * inNode->MassFlowRate / RhoWater * tesCoil.CondenserRuntimeFraction;
 
     // Set the demand request for supply water from water storage tank (if needed)
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
-        state.dataWaterData->WaterStorage(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupTankID)
-            .VdotRequestDemand(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterTankDemandARRID) =
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate;
+    if (tesCoil.EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
+        state.dataWaterData->WaterStorage(tesCoil.EvapWaterSupTankID)
+            .VdotRequestDemand(tesCoil.EvapWaterTankDemandARRID) = tesCoil.EvapWaterConsumpRate;
     }
 
     // check if should be starved by restricted flow from tank
-    if (state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
-        Real64 const AvailWaterRate = state.dataWaterData->WaterStorage(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterSupTankID)
-                                          .VdotAvailDemand(state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterTankDemandARRID);
-        if (AvailWaterRate < state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate) {
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakupRate =
-                state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate - AvailWaterRate;
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate = AvailWaterRate;
+    if (tesCoil.EvapWaterSupplyMode == EvapWaterSupply::WaterSupplyFromTank) {
+        Real64 const AvailWaterRate = state.dataWaterData->WaterStorage(tesCoil.EvapWaterSupTankID).VdotAvailDemand(tesCoil.EvapWaterTankDemandARRID);
+        if (AvailWaterRate < tesCoil.EvapWaterConsumpRate) {
+            tesCoil.EvapWaterStarvMakupRate = tesCoil.EvapWaterConsumpRate - AvailWaterRate;
+            tesCoil.EvapWaterConsumpRate = AvailWaterRate;
         } else {
-            state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakupRate = 0.0;
+            tesCoil.EvapWaterStarvMakupRate = 0.0;
         }
     }
 
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsump =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterConsumpRate * TimeStepSysSec;
+    tesCoil.EvapWaterConsump = tesCoil.EvapWaterConsumpRate * TimeStepSysSec;
 
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakup =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapWaterStarvMakupRate * TimeStepSysSec;
+    tesCoil.EvapWaterStarvMakup = tesCoil.EvapWaterStarvMakupRate * TimeStepSysSec;
 
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecPower =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecNomPower *
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).CondenserRuntimeFraction;
-    state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecConsumption =
-        state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum).EvapCondPumpElecPower * TimeStepSysSec;
+    tesCoil.EvapCondPumpElecPower = tesCoil.EvapCondPumpElecNomPower * tesCoil.CondenserRuntimeFraction;
+    tesCoil.EvapCondPumpElecConsumption = tesCoil.EvapCondPumpElecPower * TimeStepSysSec;
 }
 
 void GetTESCoilIndex(
@@ -4339,7 +4317,7 @@ void GetTESCoilAirInletNode(
         ErrorsFound = true;
         CoilAirInletNode = 0;
     } else {
-        CoilAirInletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirInletNodeNum;
+        CoilAirInletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirInNodeNum;
     }
 }
 
@@ -4378,7 +4356,7 @@ void GetTESCoilAirOutletNode(
         ErrorsFound = true;
         CoilAirOutletNode = 0;
     } else {
-        CoilAirOutletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirOutletNodeNum;
+        CoilAirOutletNode = state.dataPackagedThermalStorageCoil->TESCoil(CoilIndex).EvapAirOutNodeNum;
     }
 }
 

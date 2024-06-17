@@ -135,9 +135,9 @@ namespace Curve {
         // This allows the report variable for curve/table objects to show an inactive state.
 
         for (auto const &c : state.dataCurveManager->PerfCurve) {
-            c->output = DataLoopNode::SensedNodeFlagValue;
+            c->output = Node::SensedNodeFlagValue;
             for (auto &i : c->inputs) {
-                i = DataLoopNode::SensedNodeFlagValue;
+                i = Node::SensedNodeFlagValue;
             }
         }
     }

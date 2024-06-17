@@ -190,10 +190,10 @@ namespace PlantCentralGSHP {
         int ChillerCapFTIDX;              // Capacity function of temperature curve index
         int ChillerEIRFTIDX;              // Elec Input to demand output ratio function of temperature curve index
         int ChillerEIRFPLRIDX;            // Elec Input to demand output ratio function of PLR curve index
-        int EvapInletNodeNum;             // Node number on the inlet side of the plant (evaporator side)
-        int EvapOutletNodeNum;            // Node number on the outlet side of the plant (evaporator side)
-        int CondInletNodeNum;             // Node number on the inlet side of the condenser
-        int CondOutletNodeNum;            // Node number on the outlet side of the condenser
+        int EvapInNodeNum = 0;             // Node number on the inlet side of the plant (evaporator side)
+        int EvapOutNodeNum = 0;            // Node number on the outlet side of the plant (evaporator side)
+        int CondInNodeNum = 0;             // Node number on the inlet side of the condenser
+        int CondOutNodeNum = 0;            // Node number on the outlet side of the condenser
         int ChillerCapFTError;            // Used for negative capacity as a function of temp warnings
         int ChillerCapFTErrorIndex;       // Used for negative capacity as a function of temp warnings
         int ChillerEIRFTError;            // Used for negative EIR as a function of temp warnings
@@ -256,8 +256,8 @@ namespace PlantCentralGSHP {
             : ConstantFlow(false), VariableFlow(false), CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), CoolSetPointErrDone(false),
               HeatSetPointErrDone(false), PossibleSubcooling(false), ChillerHeaterNum(1), condenserType(CondenserType::Invalid),
               ChillerCapFTCoolingIDX(0), ChillerEIRFTCoolingIDX(0), ChillerEIRFPLRCoolingIDX(0), ChillerCapFTHeatingIDX(0), ChillerEIRFTHeatingIDX(0),
-              ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), EvapInletNodeNum(0), EvapOutletNodeNum(0),
-              CondInletNodeNum(0), CondOutletNodeNum(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
+              ChillerEIRFPLRHeatingIDX(0), ChillerCapFTIDX(0), ChillerEIRFTIDX(0), ChillerEIRFPLRIDX(0), 
+              ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0),
               ChillerEIRFTErrorIndex(0), ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerEIRRefTempErrorIndex(0), DeltaTErrCount(0),
               DeltaTErrCountIndex(0), CondMassFlowIndex(0), RefCapCooling(0.0), RefCapCoolingWasAutoSized(false), RefCOPCooling(0.0),
               TempRefEvapOutCooling(0.0), TempRefCondInCooling(0.0), TempRefCondOutCooling(0.0), MaxPartLoadRatCooling(0.0),
@@ -326,12 +326,12 @@ namespace PlantCentralGSHP {
         int SchedPtr;               // Schedule value for ancillary power control
         int CHSchedPtr;             // Schedule value for individual chiller heater control
         CondenserType ControlMode;  // SmartMixing or FullyMixing
-        int CHWInletNodeNum;        // Node number on the inlet side of the plant (Chilled Water side)
-        int CHWOutletNodeNum;       // Node number on the outlet side of the plant (Chilled Water side)
-        int HWInletNodeNum;         // Node number on the inlet side of the plant (Hot Water side)
-        int HWOutletNodeNum;        // Node number on the outlet side of the plant (Hot Water side)
-        int GLHEInletNodeNum;       // Node number on the inlet side of the plant (GLHE Water side)
-        int GLHEOutletNodeNum;      // Node number on the outlet side of the plant (GLHE Water side)
+        int CHWInNodeNum = 0;        // Node number on the inlet side of the plant (Chilled Water side)
+        int CHWOutNodeNum = 0;       // Node number on the outlet side of the plant (Chilled Water side)
+        int HWInNodeNum = 0;         // Node number on the inlet side of the plant (Hot Water side)
+        int HWOutNodeNum = 0;        // Node number on the outlet side of the plant (Hot Water side)
+        int GLHEInNodeNum = 0;       // Node number on the inlet side of the plant (GLHE Water side)
+        int GLHEOutNodeNum = 0;      // Node number on the outlet side of the plant (GLHE Water side)
         int NumOfComp;              // Number of Components under the wrapper
         Real64 CHWMassFlowRate;     // Chilled water mass flow rate
         Real64 HWMassFlowRate;      // Hot water mass flow rate
@@ -368,8 +368,8 @@ namespace PlantCentralGSHP {
         bool mySizesReported;
 
         WrapperSpecs()
-            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(CondenserType::Invalid), CHWInletNodeNum(0), CHWOutletNodeNum(0),
-              HWInletNodeNum(0), HWOutletNodeNum(0), GLHEInletNodeNum(0), GLHEOutletNodeNum(0), NumOfComp(0), CHWMassFlowRate(0.0),
+            : VariableFlowCH(false), SchedPtr(0), CHSchedPtr(0), ControlMode(CondenserType::Invalid), 
+              NumOfComp(0), CHWMassFlowRate(0.0),
               HWMassFlowRate(0.0), GLHEMassFlowRate(0.0), CHWMassFlowRateMax(0.0), HWMassFlowRateMax(0.0), GLHEMassFlowRateMax(0.0),
               WrapperCoolingLoad(0.0), WrapperHeatingLoad(0.0), AncillaryPower(0.0), CoolSetPointErrDone(false), HeatSetPointErrDone(false),
               CoolSetPointSetToLoop(false), HeatSetPointSetToLoop(false), ChillerHeaterNums(0), CWPlantLoc{}, HWPlantLoc{}, GLHEPlantLoc{},

@@ -443,33 +443,33 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(7)) {
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum =
+                Node::GetSingleNode(state,
                                                     AlphArray(7),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
+                                                    Node::ConnObjType::GeneratorMicroTurbine,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(8)) {
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterOutNodeNum =
+                Node::GetSingleNode(state,
                                                     AlphArray(8),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
+                                                    Node::ConnObjType::GeneratorMicroTurbine,
                                                     state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
-                                                    DataLoopNode::NodeFluidType::Water,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Water,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
         }
 
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0 &&
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum > 0) {
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum > 0 &&
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterOutNodeNum > 0) {
             BranchNodeConnections::TestCompSet(state,
                                                state.dataIPShortCut->cCurrentModuleObject,
                                                state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name,
@@ -478,10 +478,10 @@ void GetMTGeneratorInput(EnergyPlusData &state)
                                                "Heat Recovery Nodes");
         }
 
-        if ((state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum > 0 &&
-             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum == 0) ||
-            (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum == 0 &&
-             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum > 0)) {
+        if ((state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterOutNodeNum > 0 &&
+             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum == 0) ||
+            (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterOutNodeNum == 0 &&
+             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum > 0)) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state, "... If one Heat Recovery Water Node Name is specified, then both the Inlet and Outlet Heat Recovery");
@@ -490,8 +490,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         //   Heat recovery to water input fields only valid if water nodes are defined
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum != 0 &&
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecOutletNodeNum != 0) {
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum != 0 &&
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterOutNodeNum != 0) {
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecActive = true;
 
@@ -723,7 +723,7 @@ void GetMTGeneratorInput(EnergyPlusData &state)
             }
 
             PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecInletNodeNum,
+                                                        state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecWaterInNodeNum,
                                                         state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxVolFlowRate);
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).HeatRecMaxWaterTemp = NumArray(17);
@@ -732,21 +732,21 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         //             MTGenerator(GeneratorNum)%HeatRecOutletNodeNum .NE. 0) THEN'
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInNodeNum =
+                Node::GetSingleNode(state,
                                                     AlphArray(15),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
+                                                    Node::ConnObjType::GeneratorMicroTurbine,
                                                     AlphArray(1),
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Secondary,
+                                                    Node::ObjectIsNotParent);
         }
 
         //    Combustion air inlet node must be an outside air node
         if (!state.dataIPShortCut->lAlphaFieldBlanks(15) &&
-            !OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum)) {
+            !OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInNodeNum)) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state, format("{} is not a valid Outdoor Air Node = {}", state.dataIPShortCut->cAlphaFieldNames(15), AlphArray(15)));
@@ -755,20 +755,20 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         if (!state.dataIPShortCut->lAlphaFieldBlanks(16)) {
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutNodeNum =
+                Node::GetSingleNode(state,
                                                     AlphArray(16),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::GeneratorMicroTurbine,
+                                                    Node::ConnObjType::GeneratorMicroTurbine,
                                                     AlphArray(1),
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Secondary,
+                                                    Node::ObjectIsNotParent);
         }
 
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum > 0 &&
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum == 0) {
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutNodeNum > 0 &&
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInNodeNum == 0) {
             ShowSevereError(
                 state, format("{} \"{}\"", state.dataIPShortCut->cCurrentModuleObject, state.dataMircoturbElectGen->MTGenerator(GeneratorNum).Name));
             ShowContinueError(state,
@@ -779,8 +779,8 @@ void GetMTGeneratorInput(EnergyPlusData &state)
         }
 
         //   Get other exhaust air inputs only if combustion air inlet and outlet nodes are valid
-        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutletNodeNum > 0 &&
-            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInletNodeNum > 0) {
+        if (state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirOutNodeNum > 0 &&
+            state.dataMircoturbElectGen->MTGenerator(GeneratorNum).CombustionAirInNodeNum > 0) {
 
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).ExhAirCalcsActive = true;
             state.dataMircoturbElectGen->MTGenerator(GeneratorNum).RefExhaustAirMassFlowRate = NumArray(18);
@@ -1125,7 +1125,8 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
 
     // METHODOLOGY EMPLOYED:
     //  Uses the status flags to trigger initializations.
-
+    auto &dln = state.dataLoopNodes;
+        
     this->oneTimeInit(state); // end one time inits
 
     if (!this->HeatRecActive) return;
@@ -1133,10 +1134,10 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag) {
         // set the node max and min mass flow rates
-        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum);
 
-        state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp = 20.0; // Set the node temperature, assuming freeze control
-        state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = 20.0;
+        dln->nodes(this->HeatRecWaterInNodeNum)->Temp = 20.0; // Set the node temperature, assuming freeze control
+        dln->nodes(this->HeatRecWaterOutNodeNum)->Temp = 20.0;
 
         this->MyEnvrnFlag = false;
     } // end environmental inits
@@ -1157,7 +1158,7 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
             if (this->HeatRecFlowFTempPowCurveNum != 0) {
                 DesiredMassFlowRate =
                     this->DesignHeatRecMassFlowRate *
-                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, dln->nodes(this->HeatRecWaterInNodeNum)->Temp, MyLoad);
             } else {
                 DesiredMassFlowRate = this->DesignHeatRecMassFlowRate; // Assume modifier = 1 if curve not specified
             }
@@ -1168,28 +1169,28 @@ void MTGeneratorSpecs::InitMTGenerators(EnergyPlusData &state,
             DesiredMassFlowRate = this->DesignHeatRecMassFlowRate;
         }
 
-        PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+        PlantUtilities::SetComponentFlowRate(state, DesiredMassFlowRate, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum, this->HRPlantLoc);
     } else { // not FirstHVACIteration
+
+        auto *heatRecWaterInNode = dln->nodes(this->HeatRecWaterInNodeNum);    
         if (!RunFlag) {
-            state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
-                min(DataPrecisionGlobals::constant_zero, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRateMaxAvail);
-            state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate =
-                max(DataPrecisionGlobals::constant_zero, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRateMinAvail);
+            heatRecWaterInNode->MassFlowRate = min(DataPrecisionGlobals::constant_zero, heatRecWaterInNode->MassFlowRateMaxAvail);
+            heatRecWaterInNode->MassFlowRate = max(DataPrecisionGlobals::constant_zero, heatRecWaterInNode->MassFlowRateMinAvail);
 
         } else if (RunFlag && this->InternalFlowControl) {
             // assume dispatch power in MyLoad is what gets produced (future, reset during calc routine and iterate)
             if (this->HeatRecFlowFTempPowCurveNum != 0) {
                 Real64 DesiredMassFlowRate =
                     this->DesignHeatRecMassFlowRate *
-                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp, MyLoad);
+                    Curve::CurveValue(state, this->HeatRecFlowFTempPowCurveNum, heatRecWaterInNode->Temp, MyLoad);
                 PlantUtilities::SetComponentFlowRate(
-                    state, DesiredMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+                    state, DesiredMassFlowRate, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum, this->HRPlantLoc);
             } else {
                 PlantUtilities::SetComponentFlowRate(
-                    state, this->HeatRecMdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+                    state, this->HeatRecMdot, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum, this->HRPlantLoc);
             }
         } else if (RunFlag && (!this->InternalFlowControl)) {
-            PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, this->HeatRecMdot, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum, this->HRPlantLoc);
         }
     }
 }
@@ -1249,14 +1250,18 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     Real64 heatRecMdot;   // Heat recovery fluid mass flow rate (kg/s)
     Real64 HeatRecCp;     // Specific heat of the heat recovery fluid (J/kg-K)
 
+    auto &dln = state.dataLoopNodes;
+
+    auto *heatRecWaterInNode = dln->nodes(this->HeatRecWaterInNodeNum);
+    
     if (this->HeatRecActive) {
-        HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
+        HeatRecInTemp = heatRecWaterInNode->Temp;
         HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            HeatRecInTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
                                                            RoutineName);
-        heatRecMdot = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).MassFlowRate;
+        heatRecMdot = heatRecWaterInNode->MassFlowRate;
     } else {
         HeatRecInTemp = 0.0;
         HeatRecCp = 0.0;
@@ -1268,19 +1273,20 @@ void MTGeneratorSpecs::CalcMTGeneratorModel(EnergyPlusData &state,
     Real64 CombustionAirInletW;     // Combustion air inlet humidity ratio (kg/kg)
 
     //   Set combustion inlet air temperature, humidity ratio and pressure local variables
-    if (this->CombustionAirInletNodeNum == 0) { // no inlet air node specified, so use weather file values
+    if (this->CombustionAirInNodeNum == 0) { // no inlet air node specified, so use weather file values
         CombustionAirInletTemp = state.dataEnvrn->OutDryBulbTemp;
         CombustionAirInletW = state.dataEnvrn->OutHumRat;
         CombustionAirInletPress = state.dataEnvrn->OutBaroPress;
     } else { // use inlet node information
-        CombustionAirInletTemp = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Temp;
-        CombustionAirInletW = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).HumRat;
-        CombustionAirInletPress = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Press;
-        if (state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).Height > 0.0) {
+        auto const *combustionAirInNode = dln->nodes(this->CombustionAirInNodeNum);
+        CombustionAirInletTemp = combustionAirInNode->Temp;
+        CombustionAirInletW = combustionAirInNode->HumRat;
+        CombustionAirInletPress = combustionAirInNode->Press;
+        if (combustionAirInNode->Height > 0.0) {
         }
         //     Initialize combustion outlet air conditions to inlet air conditions (all node properties)
         if (this->ExhAirCalcsActive) {
-            state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum) = state.dataLoopNodes->Node(this->CombustionAirInletNodeNum);
+            *dln->nodes(this->CombustionAirOutNodeNum) = *combustionAirInNode;
         }
     }
 
@@ -1903,21 +1909,24 @@ void MTGeneratorSpecs::UpdateMTGeneratorRecords(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     //  Reporting and updating nodes if necessary.
-
+    auto &dln = state.dataLoopNodes;
+    auto *heatRecWaterOutNode = dln->nodes(this->HeatRecWaterOutNodeNum);
+        
     if (this->HeatRecActive) {
-        state.dataLoopNodes->Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
+        heatRecWaterOutNode->Temp = this->HeatRecOutletTemp;
     }
 
     if (this->ExhAirCalcsActive) {
-        state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
-        state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRate = this->ExhaustAirMassFlowRate;
+        auto *combustionAirOutNode = dln->nodes(this->CombustionAirOutNodeNum);
+        auto *combustionAirInNode = dln->nodes(this->CombustionAirInNodeNum);
+            
+        combustionAirOutNode->MassFlowRate = this->ExhaustAirMassFlowRate;
+        combustionAirInNode->MassFlowRate = this->ExhaustAirMassFlowRate;
 
-        state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).Temp = this->ExhaustAirTemperature;
-        state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).HumRat = this->ExhaustAirHumRat;
-        state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRateMaxAvail =
-            state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMaxAvail;
-        state.dataLoopNodes->Node(this->CombustionAirOutletNodeNum).MassFlowRateMinAvail =
-            state.dataLoopNodes->Node(this->CombustionAirInletNodeNum).MassFlowRateMinAvail;
+        combustionAirOutNode->Temp = this->ExhaustAirTemperature;
+        combustionAirOutNode->HumRat = this->ExhaustAirHumRat;
+        combustionAirOutNode->MassFlowRateMaxAvail = combustionAirInNode->MassFlowRateMaxAvail;
+        combustionAirOutNode->MassFlowRateMinAvail = combustionAirInNode->MassFlowRateMinAvail;
     }
 
     this->EnergyGen = this->ElecPowerGenerated * state.dataHVACGlobal->TimeStepSysSec;
@@ -1967,7 +1976,7 @@ void MTGeneratorSpecs::oneTimeInit(EnergyPlusData &state)
         this->DesignHeatRecMassFlowRate = rho * this->RefHeatRecVolFlowRate;
         this->HeatRecMaxMassFlowRate = rho * this->HeatRecMaxVolFlowRate;
 
-        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->HeatRecMaxMassFlowRate, this->HeatRecWaterInNodeNum, this->HeatRecWaterOutNodeNum);
 
         this->MySizeAndNodeInitFlag = false;
     }

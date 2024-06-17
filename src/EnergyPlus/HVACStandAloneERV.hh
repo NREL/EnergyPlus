@@ -76,14 +76,14 @@ namespace HVACStandAloneERV {
         std::string HeatExchangerName;               // name of the heat exchanger within the ERV unit
         int HeatExchangerIndex;                      // Pointer to heat exchanger
         HVAC::HXType hxType = HVAC::HXType::Invalid; // Parameter equivalent of HX object type
-        int SupplyAirInletNode;                      // supply air inlet node for the stand alone ERV
-        int SupplyAirOutletNode;                     // supply air outlet node for the stand alone ERV
+        int SupplyAirInNodeNum = 0;                      // supply air inlet node for the stand alone ERV
+        int SupplyAirOutNodeNum = 0;                     // supply air outlet node for the stand alone ERV
         std::string SupplyAirFanName;                // fan name in the supply air stream of the ERV
         int SupplyAirFanIndex;                       // index to supply air fan
         int SupplyAirFanSchPtr;                      // index to supply air fan schedule
         HVAC::FanType supplyAirFanType;              // parameter equivalent of fan type
-        int ExhaustAirInletNode;                     // exhaust air inlet node for the stand alone ERV
-        int ExhaustAirOutletNode;                    // exhaust air outlet node for the stand alone ERV
+        int ExhaustAirInNodeNum = 0;                     // exhaust air inlet node for the stand alone ERV
+        int ExhaustAirOutNodeNum = 0;                    // exhaust air outlet node for the stand alone ERV
         std::string ExhaustAirFanName;               // fan name in exhaust air stream of the ERV
         int ExhaustAirFanIndex;                      // index to exhaust air fan
         int ExhaustAirFanSchPtr;                     // index to exhaust air fan schedule
@@ -127,8 +127,8 @@ namespace HVACStandAloneERV {
 
         // Default Constructor
         StandAloneERVData()
-            : SchedPtr(0), HeatExchangerIndex(0), SupplyAirInletNode(0), SupplyAirOutletNode(0), SupplyAirFanIndex(0), SupplyAirFanSchPtr(0),
-              supplyAirFanType(HVAC::FanType::Invalid), ExhaustAirInletNode(0), ExhaustAirOutletNode(0), ExhaustAirFanIndex(0),
+            : SchedPtr(0), HeatExchangerIndex(0), SupplyAirFanIndex(0), SupplyAirFanSchPtr(0),
+              supplyAirFanType(HVAC::FanType::Invalid), ExhaustAirFanIndex(0),
               ExhaustAirFanSchPtr(0), exhaustAirFanType(HVAC::FanType::Invalid), SupplyAirVolFlow(0.0), ExhaustAirVolFlow(0.0),
               ControllerNameDefined(false), ControlledZoneNum(0), ControllerIndex(0), MaxSupAirMassFlow(0.0), MaxExhAirMassFlow(0.0),
               HighRHOAFlowRatio(1.0), DesignSAFanVolFlowRate(0.0), DesignEAFanVolFlowRate(0.0), DesignHXVolFlowRate(0.0),

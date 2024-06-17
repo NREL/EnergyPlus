@@ -87,7 +87,6 @@ namespace RoomAir {
     // Routines that implement the UCSD Displacement Ventilation
 
     // Using/Aliasing
-    using namespace DataLoopNode;
     using namespace DataEnvironment;
     using namespace DataHeatBalance;
     using namespace DataHeatBalSurface;
@@ -632,9 +631,10 @@ namespace RoomAir {
         // Check to make sure if this is a controlled zone and determine ZoneEquipConfigNum
         ZoneEquipConfigNum = ZoneNum;
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).IsControlled) {
-            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
-                NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
-                MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
+            for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInNodes; ++NodeNum) {
+                auto *inletNode = state.dataLoopNodes->nodes(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InNodeNums(NodeNum));
+                NodeTemp = inletNode->Temp;
+                MassFlowRate = inletNode->MassFlowRate;
                 CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -1046,8 +1046,8 @@ namespace RoomAir {
         }
 
         if (state.dataZoneEquip->ZoneEquipConfig(ZoneNum).IsControlled) {
-            int ZoneNodeNum = zone.SystemZoneNodeNumber;
-            state.dataLoopNodes->Node(ZoneNodeNum).Temp = state.dataRoomAir->ZTMX(ZoneNum);
+            int ZoneNodeNum = zone.SystemZoneNodeNum;
+            state.dataLoopNodes->nodes(ZoneNodeNum)->Temp = state.dataRoomAir->ZTMX(ZoneNum);
         }
 
         // Mixed for reporting purposes

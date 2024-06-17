@@ -512,8 +512,8 @@ int AbortEnergyPlus(EnergyPlusData &state)
     using BranchNodeConnections::TestCompSetInletOutletNodes;
     using ExternalInterface::CloseSocket;
 
-    using NodeInputManager::CheckMarkedNodes;
-    using NodeInputManager::SetupNodeVarsForReporting;
+    using Node::CheckMarkedNodes;
+    using Node::SetupNodeVarsForReporting;
     using PlantManager::CheckPlantOnAbort;
     using SimulationManager::ReportLoopConnections;
     using SolarShading::ReportSurfaceErrors;

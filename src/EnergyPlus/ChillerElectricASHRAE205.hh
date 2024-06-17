@@ -84,13 +84,13 @@ namespace ChillerElectricASHRAE205 {
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};
 
-        int OilCoolerInletNode{0};
-        int OilCoolerOutletNode{0};
+        int OilCoolerInNodeNum{0};
+        int OilCoolerOutNodeNum{0};
         Real64 OilCoolerVolFlowRate{0};
         Real64 OilCoolerMassFlowRate{0};
         PlantLocation OCPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};
-        int AuxiliaryHeatInletNode{0};
-        int AuxiliaryHeatOutletNode{0};
+        int AuxiliaryHeatInNodeNum{0};
+        int AuxiliaryHeatOutNodeNum{0};
         Real64 AuxiliaryVolFlowRate{0};
         Real64 AuxiliaryMassFlowRate{0};
         PlantLocation AHPlantLoc{0, DataPlant::LoopSideLocation::Invalid, 0, 0};

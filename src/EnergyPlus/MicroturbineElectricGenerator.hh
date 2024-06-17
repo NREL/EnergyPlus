@@ -89,8 +89,8 @@ namespace MicroturbineElectricGenerator {
         Real64 StandbyPower;               // Standby Power entered by user (W)
         Real64 AncillaryPower;             // Ancillary Power entered by user (W)
         int AncillaryPowerFuelCurveNum;    // Index to ancillary power modifer curve (function of fuel input)
-        int HeatRecInletNodeNum;           // Heat Recovery Water Inlet Node number
-        int HeatRecOutletNodeNum;          // Heat Recovery Water Outlet Node number
+        int HeatRecWaterInNodeNum = 0;           // Heat Recovery Water Inlet Node number
+        int HeatRecWaterOutNodeNum = 0;          // Heat Recovery Water Outlet Node number
         Real64 RefThermalEffLHV;           // Reference Thermal Efficiency (LHV Basis)
         Real64 RefInletWaterTemp;          // Reference Inlet Water Temperature for heat recovery (C)
         bool InternalFlowControl;          // A9, \field Heat Recovery Water Flow Operating Mode
@@ -104,8 +104,8 @@ namespace MicroturbineElectricGenerator {
         Real64 HeatRecMinVolFlowRate;      // Minimum Heat Recovery Water volume Flow Rate (m3/s)
         Real64 HeatRecMaxVolFlowRate;      // Maximum Heat Recovery Water volume Flow Rate (m3/s)
         Real64 HeatRecMaxWaterTemp;        // Maximum Heat Recovery Water Temperature (C)
-        int CombustionAirInletNodeNum;     // Combustion Air Inlet Node number
-        int CombustionAirOutletNodeNum;    // Combustion Air Outlet (Exhaust) Node number
+        int CombustionAirInNodeNum = 0;     // Combustion Air Inlet Node number
+        int CombustionAirOutNodeNum = 0;    // Combustion Air Outlet (Exhaust) Node number
         bool ExhAirCalcsActive;            // Flag to enable exhaust air calculations
         Real64 RefExhaustAirMassFlowRate;  // Reference Exhaust Air Mass Flow Rate (kg/s)
         Real64 ExhaustAirMassFlowRate;     // Actual Exhaust Air Mass Flow Rate (kg/s)
@@ -173,11 +173,11 @@ namespace MicroturbineElectricGenerator {
             : RefElecPowerOutput(0.0), MinElecPowerOutput(0.0), MaxElecPowerOutput(0.0), RefThermalPowerOutput(0.0), MinThermalPowerOutput(0.0),
               MaxThermalPowerOutput(0.0), RefElecEfficiencyLHV(0.0), RefCombustAirInletTemp(0.0), RefCombustAirInletHumRat(0.0), RefElevation(0.0),
               ElecPowFTempElevCurveNum(0), ElecEffFTempCurveNum(0), ElecEffFPLRCurveNum(0), FuelHigherHeatingValue(0.0), FuelLowerHeatingValue(0.0),
-              StandbyPower(0.0), AncillaryPower(0.0), AncillaryPowerFuelCurveNum(0), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0),
+              StandbyPower(0.0), AncillaryPower(0.0), AncillaryPowerFuelCurveNum(0), 
               RefThermalEffLHV(0.0), RefInletWaterTemp(0.0), InternalFlowControl(false), PlantFlowControl(true), RefHeatRecVolFlowRate(0.0),
               HeatRecFlowFTempPowCurveNum(0), ThermEffFTempElevCurveNum(0), HeatRecRateFPLRCurveNum(0), HeatRecRateFTempCurveNum(0),
               HeatRecRateFWaterFlowCurveNum(0), HeatRecMinVolFlowRate(0.0), HeatRecMaxVolFlowRate(0.0), HeatRecMaxWaterTemp(0.0),
-              CombustionAirInletNodeNum(0), CombustionAirOutletNodeNum(0), ExhAirCalcsActive(false), RefExhaustAirMassFlowRate(0.0),
+              ExhAirCalcsActive(false), RefExhaustAirMassFlowRate(0.0),
               ExhaustAirMassFlowRate(0.0), ExhFlowFTempCurveNum(0), ExhFlowFPLRCurveNum(0), NomExhAirOutletTemp(0.0), ExhAirTempFTempCurveNum(0),
               ExhAirTempFPLRCurveNum(0), ExhaustAirTemperature(0.0), ExhaustAirHumRat(0.0), CompType_Num(GeneratorType::Microturbine),
               RefCombustAirInletDensity(0.0), MinPartLoadRat(0.0), MaxPartLoadRat(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyUseRateLHV(0.0),

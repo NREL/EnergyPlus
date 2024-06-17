@@ -101,7 +101,7 @@ namespace EnergyPlus::Pumps {
 // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
 // Using/Aliasing
-using DataLoopNode::ObjectIsNotParent;
+using Node::ObjectIsNotParent;
 using HVAC::SmallWaterVolFlow;
 
 static constexpr std::array<std::string_view, static_cast<int>(PumpType::Num)> pumpTypeIDFNames = {
@@ -219,7 +219,7 @@ void GetPumpInput(EnergyPlusData &state)
     using DataSizing::AutoSize;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSatDensityRefrig;
-    using NodeInputManager::GetOnlySingleNode;
+    using Node::GetSingleNode;
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
 
@@ -296,24 +296,24 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.pumpType = PumpType::VarSpeed; //'Pump:VariableSpeed'
         thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpVariableSpeed;
 
-        thisPump.InletNodeNum = GetOnlySingleNode(state,
+        thisPump.InNodeNum = GetSingleNode(state,
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::PumpVariableSpeed,
+                                                  Node::ConnObjType::PumpVariableSpeed,
                                                   thisPump.Name,
-                                                  DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::ConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  Node::FluidType::Water,
+                                                  Node::ConnType::Inlet,
+                                                  Node::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
-        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+        thisPump.OutNodeNum = GetSingleNode(state,
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::PumpVariableSpeed,
+                                                   Node::ConnObjType::PumpVariableSpeed,
                                                    thisPump.Name,
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Outlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   Node::FluidType::Water,
+                                                   Node::ConnType::Outlet,
+                                                   Node::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
@@ -542,24 +542,24 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.pumpType = PumpType::ConSpeed; //'Pump:ConstantSpeed'
         thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpConstantSpeed;
 
-        thisPump.InletNodeNum = GetOnlySingleNode(state,
+        thisPump.InNodeNum = GetSingleNode(state,
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
+                                                  Node::ConnObjType::PumpConstantSpeed,
                                                   thisPump.Name,
-                                                  DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::ConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  Node::FluidType::Water,
+                                                  Node::ConnType::Inlet,
+                                                  Node::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
-        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+        thisPump.OutNodeNum = GetSingleNode(state,
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::PumpConstantSpeed,
+                                                   Node::ConnObjType::PumpConstantSpeed,
                                                    thisPump.Name,
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Outlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   Node::FluidType::Water,
+                                                   Node::ConnType::Outlet,
+                                                   Node::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
@@ -703,24 +703,24 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.pumpType = PumpType::Cond; //'Pump:VariableSpeed:Condensate'
         thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpCondensate;
 
-        thisPump.InletNodeNum = GetOnlySingleNode(state,
+        thisPump.InNodeNum = GetSingleNode(state,
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
+                                                  Node::ConnObjType::PumpVariableSpeedCondensate,
                                                   thisPump.Name,
-                                                  DataLoopNode::NodeFluidType::Steam,
-                                                  DataLoopNode::ConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  Node::FluidType::Steam,
+                                                  Node::ConnType::Inlet,
+                                                  Node::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
-        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+        thisPump.OutNodeNum = GetSingleNode(state,
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::PumpVariableSpeedCondensate,
+                                                   Node::ConnObjType::PumpVariableSpeedCondensate,
                                                    thisPump.Name,
-                                                   DataLoopNode::NodeFluidType::Steam,
-                                                   DataLoopNode::ConnectionType::Outlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   Node::FluidType::Steam,
+                                                   Node::ConnType::Outlet,
+                                                   Node::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
@@ -836,24 +836,24 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.pumpType = PumpType::Bank_VarSpeed; //'HeaderedPumps:VariableSpeed'
         thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpBankVariableSpeed;
 
-        thisPump.InletNodeNum = GetOnlySingleNode(state,
+        thisPump.InNodeNum = GetSingleNode(state,
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::HeaderedPumpsVariableSpeed,
+                                                  Node::ConnObjType::HeaderedPumpsVariableSpeed,
                                                   thisPump.Name,
-                                                  DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::ConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  Node::FluidType::Water,
+                                                  Node::ConnType::Inlet,
+                                                  Node::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
-        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+        thisPump.OutNodeNum = GetSingleNode(state,
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::HeaderedPumpsVariableSpeed,
+                                                   Node::ConnObjType::HeaderedPumpsVariableSpeed,
                                                    thisPump.Name,
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Outlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   Node::FluidType::Water,
+                                                   Node::ConnType::Outlet,
+                                                   Node::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
@@ -983,24 +983,24 @@ void GetPumpInput(EnergyPlusData &state)
         thisPump.pumpType = PumpType::Bank_ConSpeed; //'HeaderedPumps:ConstantSpeed'
         thisPump.TypeOf_Num = DataPlant::PlantEquipmentType::PumpBankConstantSpeed;
 
-        thisPump.InletNodeNum = GetOnlySingleNode(state,
+        thisPump.InNodeNum = GetSingleNode(state,
                                                   thisInput->cAlphaArgs(2),
                                                   ErrorsFound,
-                                                  DataLoopNode::ConnectionObjectType::HeaderedPumpsConstantSpeed,
+                                                  Node::ConnObjType::HeaderedPumpsConstantSpeed,
                                                   thisPump.Name,
-                                                  DataLoopNode::NodeFluidType::Water,
-                                                  DataLoopNode::ConnectionType::Inlet,
-                                                  NodeInputManager::CompFluidStream::Primary,
+                                                  Node::FluidType::Water,
+                                                  Node::ConnType::Inlet,
+                                                  Node::CompFluidStream::Primary,
                                                   ObjectIsNotParent);
 
-        thisPump.OutletNodeNum = GetOnlySingleNode(state,
+        thisPump.OutNodeNum = GetSingleNode(state,
                                                    thisInput->cAlphaArgs(3),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::HeaderedPumpsConstantSpeed,
+                                                   Node::ConnObjType::HeaderedPumpsConstantSpeed,
                                                    thisPump.Name,
-                                                   DataLoopNode::NodeFluidType::Water,
-                                                   DataLoopNode::ConnectionType::Outlet,
-                                                   NodeInputManager::CompFluidStream::Primary,
+                                                   Node::FluidType::Water,
+                                                   Node::ConnType::Outlet,
+                                                   Node::CompFluidStream::Primary,
                                                    ObjectIsNotParent);
         TestCompSet(state, cCurrentModuleObject, thisPump.Name, thisInput->cAlphaArgs(2), thisInput->cAlphaArgs(3), "Water Nodes");
 
@@ -1365,8 +1365,6 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     static constexpr std::string_view RoutineName("PlantPumps::InitializePumps ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;  // pump inlet node number
-    int OutletNode; // pump outlet node number
     Real64 TotalEffic;
     Real64 SteamDensity; // Density of working fluid
     int DummyWaterIndex(1);
@@ -1381,8 +1379,11 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
 
     // Set some variables for convenience
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
-    InletNode = thisPump.InletNodeNum;
-    OutletNode = thisPump.OutletNodeNum;
+
+    auto &dln = state.dataLoopNodes;
+    
+    auto *inNode = dln->nodes(thisPump.InNodeNum);
+    auto *outNode = dln->nodes(thisPump.OutNodeNum);
 
     // One time inits
     if (thisPump.PumpOneTimeFlag) {
@@ -1394,17 +1395,17 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
         brnum = thisPump.plantLoc.branchNum;
         cpnum = thisPump.plantLoc.compNum;
         if (plloopnum > 0 && lsnum != DataPlant::LoopSideLocation::Invalid && brnum > 0 && cpnum > 0) {
-            auto &thisPumpLoc = state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum);
-            auto &thisLoopNodeID = state.dataLoopNodes->NodeID;
-            if (thisPumpLoc.Comp(cpnum).NodeNumIn != InletNode || thisPumpLoc.Comp(cpnum).NodeNumOut != OutletNode) {
+            auto &pumpBranch = state.dataPlnt->PlantLoop(plloopnum).LoopSide(lsnum).Branch(brnum);
+            auto &pumpComp = pumpBranch.Comp(cpnum);
+            if (pumpComp.InNodeNum != thisPump.InNodeNum || pumpComp.OutNodeNum != thisPump.OutNodeNum) {
                 ShowSevereError(
                     state,
-                    format("InitializePumps: {}=\"{}\", non-matching nodes.", pumpTypeIDFNames[static_cast<int>(thisPump.pumpType)], thisPump.Name));
-                ShowContinueError(state, format("...in Branch={}, Component referenced with:", thisPumpLoc.Name));
-                ShowContinueError(state, format("...Inlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumIn)));
-                ShowContinueError(state, format("...Outlet Node={}", thisLoopNodeID(thisPumpLoc.Comp(cpnum).NodeNumOut)));
-                ShowContinueError(state, format("...Pump Inlet Node={}", thisLoopNodeID(InletNode)));
-                ShowContinueError(state, format("...Pump Outlet Node={}", thisLoopNodeID(OutletNode)));
+                    format("InitializePumps: {}=\"{}\", non-matching nodes.", pumpTypeIDFNames[(int)thisPump.pumpType], thisPump.Name));
+                ShowContinueError(state, format("...in Branch={}, Component referenced with:", pumpBranch.Name));
+                ShowContinueError(state, format("...Inlet Node={}", inNode->Name));
+                ShowContinueError(state, format("...Outlet Node={}", outNode->Name));
+                ShowContinueError(state, format("...Pump Inlet Node={}", dln->nodes(thisPump.InNodeNum)->Name));
+                ShowContinueError(state, format("...Pump Outlet Node={}", dln->nodes(thisPump.OutNodeNum)->Name));
                 errFlag = true;
             }
         } else { // CR9292
@@ -1513,7 +1514,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             // inlet node actually less than the 'minimum flow rate' specified by the user, than a
             // loop shutdown must  be triggered.
             mdotMin = 0.0;
-            InitComponentNodes(state, mdotMin, mdotMax, InletNode, OutletNode);
+            InitComponentNodes(state, mdotMin, mdotMax, thisPump.InNodeNum, thisPump.OutNodeNum);
             thisPump.MassFlowRateMax = mdotMax;
             thisPump.MassFlowRateMin = thisPump.MinVolFlowRate * SteamDensity;
 
@@ -1524,7 +1525,7 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
             // mdotMin = PumpEquip(PumpNum)%MinVolFlowRate * TempWaterDensity
             // see note above
             mdotMin = 0.0;
-            InitComponentNodes(state, mdotMin, mdotMax, InletNode, OutletNode);
+            InitComponentNodes(state, mdotMin, mdotMax, thisPump.InNodeNum, thisPump.OutNodeNum);
             thisPump.MassFlowRateMax = mdotMax;
             thisPump.MassFlowRateMin = thisPump.MinVolFlowRate * TempWaterDensity;
         }
@@ -1585,8 +1586,6 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     using ScheduleManager::GetCurrentScheduleValue;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;  // pump inlet node number
-    int OutletNode; // pump outlet node number
     Real64 InletNodeMax;
     Real64 InletNodeMin;
     Real64 PumpMassFlowRateMax; // max allowable flow rate at the pump
@@ -1598,15 +1597,13 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
 
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
 
-    // Inlet/Outlet Node Numbers
-    InletNode = thisPump.InletNodeNum;
-    OutletNode = thisPump.OutletNodeNum;
-    auto &thisInNode = state.dataLoopNodes->Node(InletNode);
-    auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
+    auto &dln = state.dataLoopNodes;
+    auto *inNode = dln->nodes(thisPump.InNodeNum);
+    auto *outNode = dln->nodes(thisPump.OutNodeNum);
 
     // Inlet node Min/MaxAvail
-    InletNodeMax = thisInNode.MassFlowRateMaxAvail;
-    InletNodeMin = thisInNode.MassFlowRateMinAvail;
+    InletNodeMax = inNode->MassFlowRateMaxAvail;
+    InletNodeMin = inNode->MassFlowRateMinAvail;
 
     // Retrive the pump speed fraction from the pump schedule
     if (thisPump.PumpScheduleIndex != 0) {
@@ -1655,7 +1652,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
 
                     state.dataPumps->PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
                                                                                   thisPump.plantLoc.loopNum,
-                                                                                  state.dataLoopNodes->Node(thisPump.InletNodeNum).MassFlowRate,
+                                                                                  inNode->MassFlowRate,
                                                                                   thisPump.PressureCurve_Index,
                                                                                   thisPump.RotSpeed,
                                                                                   thisPump.ImpellerDiameter,
@@ -1673,7 +1670,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
                     GetRequiredMassFlowRate(state,
                                             LoopNum,
                                             PumpNum,
-                                            state.dataLoopNodes->Node(thisPump.InletNodeNum).MassFlowRate,
+                                            inNode->MassFlowRate,
                                             state.dataPumps->PumpMassFlowRate,
                                             PumpMassFlowRateMin,
                                             PumpMassFlowRateMax);
@@ -1685,13 +1682,13 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
         }
 
         if (thisPump.PumpControl == PumpControlType::Continuous) {
-            thisInNode.MassFlowRateRequest = PumpMassFlowRateMin;
+            inNode->MassFlowRateRequest = PumpMassFlowRateMin;
         }
     } break;
     case PumpType::ConSpeed: {
         if (thisPump.PumpControl == PumpControlType::Continuous) {
             PumpMassFlowRateMin = PumpMassFlowRateMax;
-            thisInNode.MassFlowRateRequest = PumpMassFlowRateMin;
+            inNode->MassFlowRateRequest = PumpMassFlowRateMin;
         }
 
         // Override (lock down flow) for pressure drop if applicable
@@ -1700,7 +1697,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
                 thisPumpPlant.PressureDrop > 0.0) {
                 state.dataPumps->PumpMassFlowRate = ResolveLoopFlowVsPressure(state,
                                                                               thisPump.plantLoc.loopNum,
-                                                                              state.dataLoopNodes->Node(thisPump.InletNodeNum).MassFlowRate,
+                                                                              inNode->MassFlowRate,
                                                                               thisPump.PressureCurve_Index,
                                                                               thisPump.RotSpeed,
                                                                               thisPump.ImpellerDiameter,
@@ -1731,8 +1728,8 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
 
     // Update outlet node to allow loop solver to get data
     // could avoid this by passing data in/out to avoid putting things on nodes
-    thisOutNode.MassFlowRateMinAvail = PumpMassFlowRateMin;
-    thisOutNode.MassFlowRateMaxAvail = PumpMassFlowRateMax;
+    outNode->MassFlowRateMinAvail = PumpMassFlowRateMin;
+    outNode->MassFlowRateMaxAvail = PumpMassFlowRateMax;
 }
 
 void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowRequest, bool &PumpRunning)
@@ -1766,8 +1763,6 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     static constexpr std::string_view RoutineName("PlantPumps:CalcPumps: ");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int InletNode;
-    int OutletNode;
     Real64 LoopDensity;
     Real64 VolFlowRate = 0.0;
     Real64 PartLoadRatio;
@@ -1783,15 +1778,15 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     Real64 PumpActualRPMValueOne;
     Real64 PumpActualRPMValueTwo;
 
-    auto &daPumps = state.dataPumps;
+    
+    auto &daPumps = state.dataPumps; // LOL
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
 
-    InletNode = thisPump.InletNodeNum;
-    OutletNode = thisPump.OutletNodeNum;
     pumpType = thisPump.pumpType;
 
-    auto &thisInNode = state.dataLoopNodes->Node(InletNode);
-    auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
+    auto &dln = state.dataLoopNodes;
+    auto *inNode = dln->nodes(thisPump.InNodeNum);
+    auto *outNode = dln->nodes(thisPump.OutNodeNum);
 
     //****************************!
     //** SETTING PUMP FLOW RATE **!
@@ -1824,7 +1819,7 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     daPumps->PumpMassFlowRate = min(thisPump.MassFlowRateMax, daPumps->PumpMassFlowRate);
     daPumps->PumpMassFlowRate = max(thisPump.MassFlowRateMin, daPumps->PumpMassFlowRate);
 
-    SetComponentFlowRate(state, daPumps->PumpMassFlowRate, InletNode, OutletNode, thisPump.plantLoc);
+    SetComponentFlowRate(state, daPumps->PumpMassFlowRate, thisPump.InNodeNum, thisPump.OutNodeNum, thisPump.plantLoc);
 
     auto &thisPumpPlant = state.dataPlnt->PlantLoop(thisPump.plantLoc.loopNum);
 
@@ -1880,14 +1875,14 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     //***** EXIT IF NO FLOW ******!
     //****************************!
     if (daPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
-        thisOutNode.Temp = thisInNode.Temp;
-        thisOutNode.Press = thisInNode.Press;
-        thisOutNode.Quality = thisInNode.Quality;
+        outNode->Temp = inNode->Temp;
+        outNode->Press = inNode->Press;
+        outNode->Quality = inNode->Quality;
         return;
     }
 
     // density used for volumetric flow calculations
-    LoopDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, thisInNode.Temp, thisPumpPlant.FluidIndex, RoutineName);
+    LoopDensity = GetDensityGlycol(state, thisPumpPlant.FluidName, inNode->Temp, thisPumpPlant.FluidIndex, RoutineName);
 
     //****************************!
     //***** CALCULATE POWER (1) **!
@@ -1996,9 +1991,9 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     thisPump.Power = daPumps->Power;
 
     // Update outlet node conditions
-    thisOutNode.Temp = thisInNode.Temp;
-    thisOutNode.Press = thisInNode.Press;
-    thisOutNode.Quality = thisInNode.Quality;
+    outNode->Temp = inNode->Temp;
+    outNode->Press = inNode->Press;
+    outNode->Quality = inNode->Quality;
 }
 
 void SizePump(EnergyPlusData &state, int const PumpNum)
@@ -2066,7 +2061,7 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
                     auto &thisPumpBranch = thisPumpLoop.Branch(BranchNum);
                     for (int CompNum = 1; CompNum <= thisPumpBranch.TotalComponents; ++CompNum) {
                         auto &thisPumpComp = thisPumpBranch.Comp(CompNum);
-                        if (thisPump.InletNodeNum == thisPumpComp.NodeNumIn && thisPump.OutletNodeNum == thisPumpComp.NodeNumOut) {
+                        if (thisPump.InNodeNum == thisPumpComp.InNodeNum && thisPump.OutNodeNum == thisPumpComp.OutNodeNum) {
                             if (thisPumpBranch.PumpSizFac > 0.0) {
                                 PumpSizFac = thisPumpBranch.PumpSizFac;
                             } else {
@@ -2215,26 +2210,27 @@ void ReportPumps(EnergyPlusData &state, int const PumpNum)
     // This subroutine sets the pump reporting variables.
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int OutletNode;    // pump outlet node number
     PumpType PumpType; // Current pump type
 
+    auto &daPumps = state.dataPumps;
     auto &thisPump = state.dataPumps->PumpEquip(PumpNum);
     auto &thisPumpRep = state.dataPumps->PumpEquipReport(PumpNum);
 
     PumpType = thisPump.pumpType;
-    OutletNode = thisPump.OutletNodeNum;
-    auto &thisOutNode = state.dataLoopNodes->Node(OutletNode);
-    auto &daPumps = state.dataPumps;
+
+    auto &dln = state.dataLoopNodes;
+    auto *outNode = dln->nodes(thisPump.OutNodeNum);
+    
 
     if (daPumps->PumpMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance) {
         new (&(state.dataPumps->PumpEquipReport(PumpNum))) ReportVars();
-        thisPumpRep.OutletTemp = thisOutNode.Temp;
+        thisPumpRep.OutletTemp = outNode->Temp;
         thisPump.Power = 0.0;
         thisPump.Energy = 0.0;
     } else {
         thisPumpRep.PumpMassFlowRate = daPumps->PumpMassFlowRate;
         thisPumpRep.PumpHeattoFluid = daPumps->PumpHeattoFluid;
-        thisPumpRep.OutletTemp = thisOutNode.Temp;
+        thisPumpRep.OutletTemp = outNode->Temp;
         thisPump.Power = daPumps->Power;
         thisPump.Energy = thisPump.Power * state.dataHVACGlobal->TimeStepSysSec;
         thisPumpRep.ShaftPower = daPumps->ShaftPower;

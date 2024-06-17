@@ -597,11 +597,11 @@ namespace RoomAir {
 
                 if (found != 0) {
 
-                    state.dataRoomAir->AirPatternZoneInfo(i).ZoneNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNode;
-                    if (allocated(state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode)) {
-                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeID.allocate(
+                    state.dataRoomAir->AirPatternZoneInfo(i).ZoneNodeNum = state.dataZoneEquip->ZoneEquipConfig(found).ZoneNodeNum;
+                    if (allocated(state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNodeNums)) {
+                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeNums.allocate(
                             state.dataZoneEquip->ZoneEquipConfig(found).NumExhaustNodes);
-                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeID = state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNode;
+                        state.dataRoomAir->AirPatternZoneInfo(i).ExhaustAirNodeNums = state.dataZoneEquip->ZoneEquipConfig(found).ExhaustNodeNums;
                     } // exhaust nodes present
                 }     // found ZoneEquipConf
 
@@ -637,13 +637,13 @@ namespace RoomAir {
         auto &ipsc = state.dataIPShortCut;
 
         // Initialize default values for air nodes
-        state.dataRoomAir->TotNumOfZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
-        state.dataRoomAir->TotNumOfAirNodes = 0;
-        state.dataRoomAir->TotNumOfZoneAirNodes = 0;
+        state.dataRoomAir->NumZoneAirNodes.allocate(state.dataGlobal->NumOfZones);
+        state.dataRoomAir->NumAirNodes = 0;
+        state.dataRoomAir->NumZoneAirNodes = 0;
         ipsc->cCurrentModuleObject = "RoomAir:Node";
-        state.dataRoomAir->TotNumOfAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        state.dataRoomAir->NumAirNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
 
-        if (state.dataRoomAir->TotNumOfAirNodes <= 0) {
+        if (state.dataRoomAir->NumAirNodes <= 0) {
             // no air node object is found, terminate the program
             ShowSevereError(state, format("No {} objects found in input.", ipsc->cCurrentModuleObject));
             ShowContinueError(state, format("The OneNodeDisplacementVentilation model requires {} objects", ipsc->cCurrentModuleObject));
@@ -651,10 +651,10 @@ namespace RoomAir {
             return;
         } else {
             // air node objects are found so allocate airnode variable
-            state.dataRoomAir->AirNode.allocate(state.dataRoomAir->TotNumOfAirNodes);
+            state.dataRoomAir->AirNode.allocate(state.dataRoomAir->NumAirNodes);
         }
 
-        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
+        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->NumAirNodes; ++AirNodeNum) {
 
             // get air node objects
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
@@ -772,11 +772,11 @@ namespace RoomAir {
         } // for (AirNodeNum)
 
         // get number of air nodes in each zone
-        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->TotNumOfAirNodes; ++AirNodeNum) {
+        for (int AirNodeNum = 1; AirNodeNum <= state.dataRoomAir->NumAirNodes; ++AirNodeNum) {
             auto const &airNode = state.dataRoomAir->AirNode(AirNodeNum);
             // this zone uses other air model so skip the rest
             if (state.dataRoomAir->AirModel(airNode.ZonePtr).AirModel == RoomAirModel::DispVent1Node)
-                ++state.dataRoomAir->TotNumOfZoneAirNodes(airNode.ZonePtr);
+                ++state.dataRoomAir->NumZoneAirNodes(airNode.ZonePtr);
         }
     }
 
@@ -1302,23 +1302,23 @@ namespace RoomAir {
             roomAFNZoneInfo.Name = ipsc->cAlphaArgs(1);
             roomAFNZoneInfo.ZoneName = ipsc->cAlphaArgs(2); // Zone Name
 
-            roomAFNZoneInfo.NumOfAirNodes = (NumAlphas - 3);
+            roomAFNZoneInfo.NumAirNodes = (NumAlphas - 3);
 
-            if (roomAFNZoneInfo.NumOfAirNodes > 0) {
-                roomAFNZoneInfo.Node.allocate(roomAFNZoneInfo.NumOfAirNodes);
+            if (roomAFNZoneInfo.NumAirNodes > 0) {
+                roomAFNZoneInfo.Node.allocate(roomAFNZoneInfo.NumAirNodes);
             } else {
                 ShowSevereError(state,
                                 format("GetRoomAirflowNetworkData: Incomplete input in {} = {}", ipsc->cCurrentModuleObject, ipsc->cAlphaArgs(1)));
                 ErrorsFound = true;
             }
 
-            for (int iAirNode = 1; iAirNode <= roomAFNZoneInfo.NumOfAirNodes; ++iAirNode) {
+            for (int iAirNode = 1; iAirNode <= roomAFNZoneInfo.NumAirNodes; ++iAirNode) {
                 roomAFNZoneInfo.Node(iAirNode).Name = ipsc->cAlphaArgs(iAirNode + 3);
             }
             // control point node
 
-            roomAFNZoneInfo.ControlAirNodeID = Util::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
-            if (roomAFNZoneInfo.ControlAirNodeID == 0) {
+            roomAFNZoneInfo.ControlAirNodeNum = Util::FindItemInList(ipsc->cAlphaArgs(3), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumAirNodes);
+            if (roomAFNZoneInfo.ControlAirNodeNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(3), ipsc->cAlphaArgs(3));
                 ErrorsFound = true;
                 continue;
@@ -1332,8 +1332,8 @@ namespace RoomAir {
         } // for (Loop)
 
         ipsc->cCurrentModuleObject = "RoomAir:Node:AirflowNetwork";
-        state.dataRoomAir->TotNumOfRoomAFNNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
-        for (int Loop = 1; Loop <= state.dataRoomAir->TotNumOfRoomAFNNodes; ++Loop) {
+        state.dataRoomAir->NumRoomAFNNodes = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, ipsc->cCurrentModuleObject);
+        for (int Loop = 1; Loop <= state.dataRoomAir->NumRoomAFNNodes; ++Loop) {
             state.dataInputProcessing->inputProcessor->getObjectItem(state,
                                                                      ipsc->cCurrentModuleObject,
                                                                      Loop,
@@ -1356,7 +1356,7 @@ namespace RoomAir {
             }
 
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(ZoneNum);
-            int RAFNNodeNum = Util::FindItemInList(ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumOfAirNodes);
+            int RAFNNodeNum = Util::FindItemInList(ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, roomAFNZoneInfo.NumAirNodes);
             if (RAFNNodeNum == 0) {
                 ShowSevereItemNotFound(state, eoh, ipsc->cAlphaFieldNames(1), ipsc->cAlphaArgs(1));
                 ErrorsFound = true;
@@ -1404,9 +1404,9 @@ namespace RoomAir {
                 // find surface list
                 int RAFNNodeNum = 0;
                 auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
-                if (roomAFNZoneInfo.NumOfAirNodes > 0) {
+                if (roomAFNZoneInfo.NumAirNodes > 0) {
                     RAFNNodeNum = Util::FindItemInList(
-                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeSurfListName, roomAFNZoneInfo.NumOfAirNodes);
+                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeSurfListName, roomAFNZoneInfo.NumAirNodes);
                 }
 
                 if (RAFNNodeNum == 0) continue;
@@ -1497,9 +1497,9 @@ namespace RoomAir {
                 auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 // find surface list
                 int RAFNNodeNum = 0;
-                if (roomAFNZoneInfo.NumOfAirNodes > 0) {
+                if (roomAFNZoneInfo.NumAirNodes > 0) {
                     RAFNNodeNum = Util::FindItemInList(
-                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeIntGainsListName, roomAFNZoneInfo.NumOfAirNodes);
+                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeIntGainsListName, roomAFNZoneInfo.NumAirNodes);
                 }
                 if (RAFNNodeNum == 0) continue;
 
@@ -1595,9 +1595,9 @@ namespace RoomAir {
                 auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
                 // find surface list
                 int RAFNNodeNum = 0;
-                if (roomAFNZoneInfo.NumOfAirNodes > 0) {
+                if (roomAFNZoneInfo.NumAirNodes > 0) {
                     RAFNNodeNum = Util::FindItemInList(
-                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeHVACListName, roomAFNZoneInfo.NumOfAirNodes);
+                        ipsc->cAlphaArgs(1), roomAFNZoneInfo.Node, &AFNAirNodeNested::NodeHVACListName, roomAFNZoneInfo.NumAirNodes);
                 }
 
                 if (RAFNNodeNum == 0) continue;
@@ -1661,11 +1661,11 @@ namespace RoomAir {
         // do some checks on input data
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
-            if (roomAFNZoneInfo.NumOfAirNodes == 0) continue;
+            if (roomAFNZoneInfo.NumAirNodes == 0) continue;
 
             // Check zone volume fraction
             Real64 SumFraction = 0.0;
-            for (int iRoomAFNNode = 1; iRoomAFNNode <= roomAFNZoneInfo.NumOfAirNodes; ++iRoomAFNNode) {
+            for (int iRoomAFNNode = 1; iRoomAFNNode <= roomAFNZoneInfo.NumAirNodes; ++iRoomAFNNode) {
                 SumFraction += roomAFNZoneInfo.Node(iRoomAFNNode).ZoneVolumeFraction;
             }
             if (std::abs(SumFraction - 1.0) > 0.001) {
@@ -1677,7 +1677,7 @@ namespace RoomAir {
             }
 
             // Check internal gain fraction
-            for (int iRoomAFNNode = 1; iRoomAFNNode <= roomAFNZoneInfo.NumOfAirNodes; ++iRoomAFNNode) {
+            for (int iRoomAFNNode = 1; iRoomAFNNode <= roomAFNZoneInfo.NumAirNodes; ++iRoomAFNNode) {
                 auto &roomAFNNode = roomAFNZoneInfo.Node(iRoomAFNNode);
                 for (int iGain = 1; iGain <= roomAFNNode.NumIntGains; ++iGain) {
                     auto &intGain = roomAFNNode.IntGain(iGain);
@@ -1685,7 +1685,7 @@ namespace RoomAir {
                     Real64 SumFraction = roomAFNNode.IntGainsFractions(iGain);
                     intGain.FractionCheck = true;
 
-                    for (int iRoomAFNNode2 = 1; iRoomAFNNode2 <= roomAFNZoneInfo.NumOfAirNodes; ++iRoomAFNNode2) {
+                    for (int iRoomAFNNode2 = 1; iRoomAFNNode2 <= roomAFNZoneInfo.NumAirNodes; ++iRoomAFNNode2) {
                         auto &roomAFNNode2 = roomAFNZoneInfo.Node(iRoomAFNNode2);
                         for (int iGain2 = 1; iGain2 <= roomAFNNode2.NumIntGains; ++iGain2) {
                             auto &intGain2 = roomAFNNode2.IntGain(iGain2);
@@ -1714,9 +1714,9 @@ namespace RoomAir {
 
         for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
             auto &roomAFNZoneInfo = state.dataRoomAir->AFNZoneInfo(iZone);
-            if (!roomAFNZoneInfo.IsUsed || roomAFNZoneInfo.NumOfAirNodes == 0) continue;
+            if (!roomAFNZoneInfo.IsUsed || roomAFNZoneInfo.NumAirNodes == 0) continue;
 
-            for (int iAirNode = 1; iAirNode <= roomAFNZoneInfo.NumOfAirNodes; ++iAirNode) {
+            for (int iAirNode = 1; iAirNode <= roomAFNZoneInfo.NumAirNodes; ++iAirNode) {
                 auto &roomAFNZoneNode = roomAFNZoneInfo.Node(iAirNode);
                 SetupOutputVariable(state,
                                     "RoomAirflowNetwork Node Temperature",
@@ -2656,8 +2656,8 @@ namespace RoomAir {
         RAFNNodeNum = 0;
         for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
             auto const &afnZoneInfo = state.dataRoomAir->AFNZoneInfo(I);
-            if (afnZoneInfo.NumOfAirNodes > 0) {
-                RAFNNodeNum = Util::FindItemInList(RAFNNodeName, afnZoneInfo.Node, afnZoneInfo.NumOfAirNodes);
+            if (afnZoneInfo.NumAirNodes > 0) {
+                RAFNNodeNum = Util::FindItemInList(RAFNNodeName, afnZoneInfo.Node, afnZoneInfo.NumAirNodes);
                 if (RAFNNodeNum > 0) {
                     ZoneNum = I;
                     break;
@@ -2705,6 +2705,8 @@ namespace RoomAir {
         Array1D<Real64> Numbers; // Numeric input items for object
         bool errorfound;
 
+        auto &dln = state.dataLoopNodes;
+        
         NumAlphas = 1;
         NumNumbers = 1;
         EquipFind = false;
@@ -2755,10 +2757,10 @@ namespace RoomAir {
                 errorfound = true;
             }
 
-            int nodeNum = state.dataFans->fans(fanIndex)->outletNodeNum;
+            int nodeNum = state.dataFans->fans(fanIndex)->outNodeNum;
             if (errorfound) {
             }
-            SupplyNodeName = state.dataLoopNodes->NodeID(nodeNum); // ?????
+            SupplyNodeName = dln->nodes(nodeNum)->Name; // ?????
             ReturnNodeName = "";                                   // Zone exhaust node
         } break;
         case DataZoneEquipment::ZoneEquipType::FourPipeFanCoil: { // ZoneHVAC : FourPipeFanCoil

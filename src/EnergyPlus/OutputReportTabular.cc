@@ -6197,7 +6197,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         auto const &thisZone = state.dataHeatBal->Zone(iZone);
 
         Real64 const mult = thisZone.Multiplier * thisZone.ListMultiplier;
-        if (thisZone.SystemZoneNodeNumber > 0) { // conditioned y/n
+        if (thisZone.SystemZoneNodeNum > 0) { // conditioned y/n
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, thisLight.Name, "Y");
         } else {
             PreDefTableEntry(state, state.dataOutRptPredefined->pdchInLtCond, thisLight.Name, "N");
@@ -6269,7 +6269,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
         auto const &thisZone = state.dataHeatBal->Zone(iZone);
 
         int const zoneMult = thisZone.Multiplier * thisZone.ListMultiplier;
-        if (thisZone.SystemZoneNodeNumber >= 0) { // conditioned zones only
+        if (thisZone.SystemZoneNodeNum >= 0) { // conditioned zones only
 
             auto &thisZonePreDefRep = state.dataHeatBal->ZonePreDefRep(iZone);
 
@@ -6286,8 +6286,8 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
             // air loop name
             if (thisZone.IsControlled) {
                 std::string airLoopName = "";
-                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInletNodes; ++zoneInNode) {
-                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InletNodeAirLoopNum(zoneInNode);
+                for (int zoneInNode = 1; zoneInNode <= state.dataZoneEquip->ZoneEquipConfig(iZone).NumInNodes; ++zoneInNode) {
+                    int airLoopNumber = state.dataZoneEquip->ZoneEquipConfig(iZone).InNodeAirLoopNum(zoneInNode);
                     if (airLoopNumber > 0) {
                         if (airLoopName.empty()) {
                             airLoopName = state.dataAirSystemsData->PrimaryAirSystems(airLoopNumber).Name;
@@ -6624,7 +6624,7 @@ void FillRemainingPredefinedEntries(EnergyPlusData &state)
     // Add the number of conditioned and unconditioned zones to the count report
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
 
-        if (state.dataHeatBal->Zone(iZone).SystemZoneNodeNumber > 0) { // conditioned zones only
+        if (state.dataHeatBal->Zone(iZone).SystemZoneNodeNum > 0) { // conditioned zones only
             ++state.dataOutRptTab->numCondZones;
         } else {
             ++state.dataOutRptTab->numUncondZones;
@@ -11190,7 +11190,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
                 }
                 int const zonePt = thisSurf.Zone;
 
-                bool const isConditioned = (zonePt > 0) && (state.dataHeatBal->Zone(zonePt).SystemZoneNodeNumber > 0);
+                bool const isConditioned = (zonePt > 0) && (state.dataHeatBal->Zone(zonePt).SystemZoneNodeNum > 0);
                 if ((thisSurf.Tilt >= 60.0) && (thisSurf.Tilt <= 120.0)) {
                     // vertical walls and windows
                     switch (thisSurf.Class) {
@@ -11590,7 +11590,7 @@ void WriteVeriSumTable(EnergyPlusData &state)
             rowHead(iZone) = thisZone.Name;
             // Conditioned or not
             bool zoneIsCond = false;
-            if (thisZone.SystemZoneNodeNumber > 0) {
+            if (thisZone.SystemZoneNodeNum > 0) {
                 tableBody(2, iZone) = "Yes";
                 zoneIsCond = true;
             } else {
@@ -11965,7 +11965,7 @@ void writeVeriSumSpaceTables(EnergyPlusData &state, bool produceTabular, bool pr
             spaceTableBody(colEnclName, spaceTableRowNum) = state.dataViewFactor->EnclSolInfo(curSpace.solarEnclosureNum).Name;
             spaceTableBody(colSpaceArea, spaceTableRowNum) = RealToStr(curSpace.FloorArea * state.dataOutRptTab->m2_unitConvWVST, 2);
             // Conditioned or not
-            if (curZone.SystemZoneNodeNumber > 0) {
+            if (curZone.SystemZoneNodeNum > 0) {
                 spaceTableBody(colConditioned, spaceTableRowNum) = "Yes";
                 spaceIsCond = true;
             } else {
@@ -17664,7 +17664,7 @@ void DetermineBuildingFloorArea(EnergyPlusData &state)
             // If a ZoneHVAC:EquipmentConnections is used for a zone then
             // it is considered conditioned. Also ZONE SUPPLY PLENUM and ZONE RETURN PLENUM are
             // also is considered conditioned.
-            if (thisZone.SystemZoneNodeNumber > 0) {
+            if (thisZone.SystemZoneNodeNum > 0) {
                 ort->buildingConditionedFloorArea += curZoneArea;
             }
         }
@@ -17955,7 +17955,7 @@ void ResetRemainingPredefinedEntries(EnergyPlusData &state)
     for (int iZone = 1; iZone <= state.dataGlobal->NumOfZones; ++iZone) {
         auto const &thisZone = state.dataHeatBal->Zone(iZone);
 
-        if (thisZone.SystemZoneNodeNumber >= 0) { // conditioned zones only
+        if (thisZone.SystemZoneNodeNum >= 0) { // conditioned zones only
             if (thisZone.isNominalOccupied) {
                 auto &thisZonePreDefRep = state.dataHeatBal->ZonePreDefRep(iZone);
 

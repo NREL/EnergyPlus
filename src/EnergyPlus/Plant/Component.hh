@@ -172,10 +172,10 @@ namespace DataPlant {
         LoopFlowStatus FlowPriority;                  // status for overall loop flow determination
         bool ON;                                      // TRUE = designated component or operation scheme available
         bool Available;                               // TRUE = designated component or operation scheme available
-        std::string NodeNameIn;                       // Component inlet node name
-        std::string NodeNameOut;                      // Component outlet node name
-        int NodeNumIn;                                // Component inlet node number
-        int NodeNumOut;                               // Component outlet node number
+        std::string InNodeName;                       // Component inlet node name
+        std::string OutNodeName;                      // Component outlet node name
+        int InNodeNum = 0;                                // Component inlet node number
+        int OutNodeNum = 0;                               // Component outlet node number
         Real64 MyLoad;                                // Distributed Load
         Real64 MaxLoad;                               // Maximum load
         Real64 MinLoad;                               // Minimum Load
@@ -196,7 +196,7 @@ namespace DataPlant {
         bool FreeCoolCntrlShutDown;                       // true if component was shut down because of free cooling
         Real64 FreeCoolCntrlMinCntrlTemp;                 // current control temp value for free cooling controls
         DataPlant::FreeCoolControlMode FreeCoolCntrlMode; // type of sensor used for free cooling controls
-        int FreeCoolCntrlNodeNum;                         // chiller condenser inlet node number for free cooling controls
+        int FreeCoolCntrlNodeNum = 0;                         // chiller condenser inlet node number for free cooling controls
         int IndexInLoopSidePumps;                         // If I'm a pump, this tells my index in PL(:)%LS(:)%Pumps
         Real64 TempDesCondIn;
         Real64 TempDesEvapOut;
@@ -206,11 +206,11 @@ namespace DataPlant {
         // Default Constructor
         CompData()
             : Type(DataPlant::PlantEquipmentType::Invalid), CompNum(0), FlowCtrl(DataBranchAirLoopPlant::ControlType::Invalid),
-              FlowPriority(LoopFlowStatus::Invalid), ON(false), Available(false), NodeNumIn(0), NodeNumOut(0), MyLoad(0.0), MaxLoad(0.0),
+              FlowPriority(LoopFlowStatus::Invalid), ON(false), Available(false), MyLoad(0.0), MaxLoad(0.0),
               MinLoad(0.0), OptLoad(0.0), SizFac(0.0), CurOpSchemeType(DataPlant::OpScheme::Invalid), NumOpSchemes(0), CurCompLevelOpNum(0),
               EquipDemand(0.0), EMSLoadOverrideOn(false), EMSLoadOverrideValue(0.0), HowLoadServed(DataPlant::HowMet::Invalid), MinOutletTemp(0.0),
               MaxOutletTemp(0.0), FreeCoolCntrlShutDown(false), FreeCoolCntrlMinCntrlTemp(0.0),
-              FreeCoolCntrlMode(DataPlant::FreeCoolControlMode::Invalid), FreeCoolCntrlNodeNum(0), IndexInLoopSidePumps(0), TempDesCondIn(0.0),
+              FreeCoolCntrlMode(DataPlant::FreeCoolControlMode::Invalid), IndexInLoopSidePumps(0), TempDesCondIn(0.0),
               TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }

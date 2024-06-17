@@ -631,25 +631,25 @@ namespace UserDefinedComponents {
                         const std::string LoopStr = fmt::to_string(ConnectionLoop);
                         int aArgCount = (ConnectionLoop - 1) * 6 + 3;
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).InletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::PlantComponentUserDefined,
+                                                                Node::ConnObjType::PlantComponentUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Inlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop),
+                                                                Node::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserPlantComp(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount + 1),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::PlantComponentUserDefined,
+                                                                Node::ConnObjType::PlantComponentUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Outlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop),
+                                                                Node::ObjectIsNotParent);
 
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes " + LoopStr);
@@ -823,15 +823,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(27)) {
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.InletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(27),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::PlantComponentUserDefined,
+                                                            Node::ConnObjType::PlantComponentUserDefined,
                                                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::OutsideAirReference,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::OutsideAirReference,
+                                                            Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsNotParent);
                     // model input related internal variables
                     SetupEMSInternalVariable(state,
                                              "Inlet Temperature for Air Connection",
@@ -862,15 +862,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(28)) {
                     state.dataUserDefinedComponents->UserPlantComp(CompLoop).Air.OutletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(28),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::PlantComponentUserDefined,
+                                                            Node::ConnObjType::PlantComponentUserDefined,
                                                             state.dataUserDefinedComponents->UserPlantComp(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::ReliefAir,
-                                                            NodeInputManager::CompFluidStream::Primary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::ReliefAir,
+                                                            Node::CompFluidStream::Primary,
+                                                            Node::ObjectIsNotParent);
                     // outlet air node results
                     SetupEMSActuator(state,
                                      "Air Connection",
@@ -1115,15 +1115,15 @@ namespace UserDefinedComponents {
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumAirConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 4;
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                                                                Node::ConnObjType::CoilUserDefined,
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
-                                                                DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Air,
+                                                                Node::ConnType::Inlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop),
+                                                                Node::ObjectIsNotParent);
 
                         const std::string LoopStr = fmt::to_string(ConnectionLoop);
                         // model input related internal variables
@@ -1154,15 +1154,15 @@ namespace UserDefinedComponents {
                                                  state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).InletCp);
 
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Air(ConnectionLoop).OutletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount + 1),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                                                                Node::ConnObjType::CoilUserDefined,
                                                                 state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
-                                                                DataLoopNode::NodeFluidType::Air,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Air,
+                                                                Node::ConnType::Outlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop),
+                                                                Node::ObjectIsNotParent);
                         SetupEMSActuator(state,
                                          "Air Connection " + LoopStr,
                                          state.dataUserDefinedComponents->UserCoil(CompLoop).Name,
@@ -1201,25 +1201,25 @@ namespace UserDefinedComponents {
 
                     if (state.dataUserDefinedComponents->UserCoil(CompLoop).PlantIsConnected) { // get input
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.InletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(9),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                                                                Node::ConnObjType::CoilUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                NodeInputManager::CompFluidStream::Tertiary,
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Inlet,
+                                                                Node::CompFluidStream::Tertiary,
+                                                                Node::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserCoil(CompLoop).Loop.OutletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(10),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::CoilUserDefined,
+                                                                Node::ConnObjType::CoilUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                NodeInputManager::CompFluidStream::Tertiary,
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Outlet,
+                                                                Node::CompFluidStream::Tertiary,
+                                                                Node::ObjectIsNotParent);
 
                         BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(9), cAlphaArgs(10), "Plant Nodes");
 
@@ -1510,15 +1510,15 @@ namespace UserDefinedComponents {
                 }
 
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         cAlphaArgs(4),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                        Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
                 // model input related internal variables
                 SetupEMSInternalVariable(state,
                                          "Inlet Temperature for Primary Air Connection",
@@ -1570,15 +1570,15 @@ namespace UserDefinedComponents {
                                  state.dataUserDefinedComponents->lDummy_GetUserDefComp,
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.InletMassFlowRate);
                 state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).ZoneAir.OutletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         cAlphaArgs(5),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                        Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
                 SetupEMSActuator(state,
                                  "Primary Air Connection",
                                  state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
@@ -1603,15 +1603,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(6)) {
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.InletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(6),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                            Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                             state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Inlet,
-                                                            NodeInputManager::CompFluidStream::Secondary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Inlet,
+                                                            Node::CompFluidStream::Secondary,
+                                                            Node::ObjectIsNotParent);
                     // model input related internal variables
                     SetupEMSInternalVariable(state,
                                              "Inlet Temperature for Secondary Air Connection",
@@ -1645,15 +1645,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(7)) {
                     state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).SourceAir.OutletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(7),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                            Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                             state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Outlet,
-                                                            NodeInputManager::CompFluidStream::Secondary,
-                                                            DataLoopNode::ObjectIsNotParent);
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Outlet,
+                                                            Node::CompFluidStream::Secondary,
+                                                            Node::ObjectIsNotParent);
                     SetupEMSActuator(state,
                                      "Secondary Air Connection",
                                      state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Name,
@@ -1689,25 +1689,25 @@ namespace UserDefinedComponents {
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 8;
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).InletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                                Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Inlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop + 2),
+                                                                Node::ObjectIsNotParent);
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount + 1),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::ZoneHVACForcedAirUserDefined,
+                                                                Node::ConnObjType::ZoneHVACForcedAirUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
-                                                                DataLoopNode::ObjectIsNotParent);
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Outlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop + 2),
+                                                                Node::ObjectIsNotParent);
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");
                         state.dataUserDefinedComponents->UserZoneAirHVAC(CompLoop).Loop(ConnectionLoop).HowLoadServed = DataPlant::HowMet::NoneDemand;
@@ -1971,15 +1971,15 @@ namespace UserDefinedComponents {
                 }
 
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         cAlphaArgs(4),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                        Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent,
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent,
                                                         cAlphaFieldNames(4));
                 // model input related internal variables
                 SetupEMSInternalVariable(state,
@@ -2032,15 +2032,15 @@ namespace UserDefinedComponents {
                                  state.dataUserDefinedComponents->lDummy_GetUserDefComp,
                                  state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.InletMassFlowRate);
                 state.dataUserDefinedComponents->UserAirTerminal(CompLoop).AirLoop.OutletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                    Node::GetSingleNode(state,
                                                         cAlphaArgs(5),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                        Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent,
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent,
                                                         cAlphaFieldNames(5));
                 SetupEMSActuator(state,
                                  "Primary Air Connection",
@@ -2118,15 +2118,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(6)) {
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.InletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(6),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                            Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                             state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Inlet,
-                                                            NodeInputManager::CompFluidStream::Secondary,
-                                                            DataLoopNode::ObjectIsNotParent,
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Inlet,
+                                                            Node::CompFluidStream::Secondary,
+                                                            Node::ObjectIsNotParent,
                                                             cAlphaFieldNames(6));
                     // model input related internal variables
                     SetupEMSInternalVariable(state,
@@ -2161,15 +2161,15 @@ namespace UserDefinedComponents {
 
                 if (!lAlphaFieldBlanks(7)) {
                     state.dataUserDefinedComponents->UserAirTerminal(CompLoop).SourceAir.OutletNodeNum =
-                        NodeInputManager::GetOnlySingleNode(state,
+                        Node::GetSingleNode(state,
                                                             cAlphaArgs(7),
                                                             ErrorsFound,
-                                                            DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                            Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                             state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Name,
-                                                            DataLoopNode::NodeFluidType::Air,
-                                                            DataLoopNode::ConnectionType::Outlet,
-                                                            NodeInputManager::CompFluidStream::Secondary,
-                                                            DataLoopNode::ObjectIsNotParent,
+                                                            Node::FluidType::Air,
+                                                            Node::ConnType::Outlet,
+                                                            Node::CompFluidStream::Secondary,
+                                                            Node::ObjectIsNotParent,
                                                             cAlphaFieldNames(7));
                     SetupEMSActuator(state,
                                      "Secondary Air Connection",
@@ -2205,26 +2205,26 @@ namespace UserDefinedComponents {
                     for (int ConnectionLoop = 1; ConnectionLoop <= NumPlantConnections; ++ConnectionLoop) {
                         int aArgCount = (ConnectionLoop - 1) * 2 + 8;
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).InletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                                Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Inlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
-                                                                DataLoopNode::ObjectIsNotParent,
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Inlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop + 2),
+                                                                Node::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount));
                         state.dataUserDefinedComponents->UserAirTerminal(CompLoop).Loop(ConnectionLoop).OutletNodeNum =
-                            NodeInputManager::GetOnlySingleNode(state,
+                            Node::GetSingleNode(state,
                                                                 cAlphaArgs(aArgCount + 1),
                                                                 ErrorsFound,
-                                                                DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctUserDefined,
+                                                                Node::ConnObjType::AirTerminalSingleDuctUserDefined,
                                                                 cAlphaArgs(1),
-                                                                DataLoopNode::NodeFluidType::Water,
-                                                                DataLoopNode::ConnectionType::Outlet,
-                                                                static_cast<NodeInputManager::CompFluidStream>(ConnectionLoop + 2),
-                                                                DataLoopNode::ObjectIsNotParent,
+                                                                Node::FluidType::Water,
+                                                                Node::ConnType::Outlet,
+                                                                static_cast<Node::CompFluidStream>(ConnectionLoop + 2),
+                                                                Node::ObjectIsNotParent,
                                                                 cAlphaFieldNames(aArgCount + 1));
                         BranchNodeConnections::TestCompSet(
                             state, cCurrentModuleObject, cAlphaArgs(1), cAlphaArgs(aArgCount), cAlphaArgs(aArgCount + 1), "Plant Nodes");

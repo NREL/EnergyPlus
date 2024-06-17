@@ -115,10 +115,10 @@ namespace SteamCoils {
         Real64 OutletSteamQuality;        // Quality of steam at outlet
         Real64 DegOfSubcooling;
         Real64 LoopSubcoolReturn;
-        int AirInletNodeNum;                                   // Inlet node number at air side
-        int AirOutletNodeNum;                                  // Outlet node number at air side
-        int SteamInletNodeNum;                                 // SteamInletNodeNum
-        int SteamOutletNodeNum;                                // SteamOutletNodeNum
+        int AirInNodeNum = 0;                                   // Inlet node number at air side
+        int AirOutNodeNum = 0;                                  // Outlet node number at air side
+        int FluidInNodeNum = 0;                                 // SteamInletNodeNum
+        int FluidOutNodeNum = 0;                                // SteamOutletNodeNum
         int TempSetPointNodeNum;                               // If applicable : node number that the temp setpoint exists.
         CoilControlType TypeOfCoil = CoilControlType::Invalid; // Control of Coil , temperature or Zone load
         int FluidIndex;                                        // Fluid index for FluidProperties (Steam)
@@ -142,8 +142,8 @@ namespace SteamCoils {
               TotSteamHeatingCoilRate(0.0), LoopLoss(0.0), TotSteamCoolingCoilRate(0.0), SenSteamCoolingCoilRate(0.0), LeavingRelHum(0.0),
               DesiredOutletTemp(0.0), DesiredOutletHumRat(0.0), InletSteamTemp(0.0), OutletSteamTemp(0.0), InletSteamMassFlowRate(0.0),
               OutletSteamMassFlowRate(0.0), MaxSteamVolFlowRate(0.0), MaxSteamMassFlowRate(0.0), InletSteamEnthalpy(0.0), OutletWaterEnthalpy(0.0),
-              InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0), AirInletNodeNum(0),
-              AirOutletNodeNum(0), SteamInletNodeNum(0), SteamOutletNodeNum(0), TempSetPointNodeNum(0), FluidIndex(0), plantLoc{},
+              InletSteamPress(0.0), InletSteamQuality(0.0), OutletSteamQuality(0.0), DegOfSubcooling(0.0), LoopSubcoolReturn(0.0), 
+              TempSetPointNodeNum(0), FluidIndex(0), plantLoc{},
               CoilType(DataPlant::PlantEquipmentType::Invalid), OperatingCapacity(0.0), DesiccantRegenerationCoil(false), DesiccantDehumNum(0),
               FaultyCoilSATFlag(false), FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), reportCoilFinalSizes(true), DesCoilCapacity(0.0),
               DesAirVolFlow(0.0)

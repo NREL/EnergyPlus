@@ -107,7 +107,6 @@ namespace EnergyPlus::PoweredInductionUnits {
 // to meet the zone load.
 
 // Using/Aliasing
-using namespace DataLoopNode;
 using HVAC::SmallAirVolFlow;
 using HVAC::SmallLoad;
 using HVAC::SmallMassFlow;
@@ -234,7 +233,7 @@ void GetPIUs(EnergyPlusData &state)
     using BranchNodeConnections::TestCompSet;
 
     using FluidProperties::FindRefrigerant;
-    using NodeInputManager::GetOnlySingleNode;
+    using Node::GetSingleNode;
     using SteamCoils::GetCoilSteamInletNode;
     using WaterCoils::GetCoilWaterInletNode;
 
@@ -247,6 +246,8 @@ void GetPIUs(EnergyPlusData &state)
     bool ErrorsFound(false);                                    // Set to true if errors in input, fatal at end of routine
     static constexpr std::string_view RoutineName("GetPIUs: "); // include trailing blank space
     bool SteamMessageNeeded = true;
+
+    auto &dln = state.dataLoopNodes;
 
     // find the number of each type of fan coil unit
     state.dataPowerInductionUnits->NumSeriesPIUs =
@@ -348,57 +349,57 @@ void GetPIUs(EnergyPlusData &state)
         }
         }
 
-        thisPIU.PriAirInNode = GetOnlySingleNode(state,
+        thisPIU.PriAirInNodeNum = GetSingleNode(state,
                                                  state.dataIPShortCut->cAlphaArgs(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                                                 Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsParent,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                             Node::ObjectIsParent,
                                                  state.dataIPShortCut->cAlphaFieldNames(3));
 
-        thisPIU.SecAirInNode = GetOnlySingleNode(state,
+        thisPIU.SecAirInNodeNum = GetSingleNode(state,
                                                  state.dataIPShortCut->cAlphaArgs(4),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                                                 Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsParent,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                             Node::ObjectIsParent,
                                                  state.dataIPShortCut->cAlphaFieldNames(4));
 
-        thisPIU.OutAirNode = GetOnlySingleNode(state,
+        thisPIU.AirOutNodeNum = GetSingleNode(state,
                                                state.dataIPShortCut->cAlphaArgs(5),
                                                ErrorsFound,
-                                               DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                                               Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
                                                state.dataIPShortCut->cAlphaArgs(1),
-                                               DataLoopNode::NodeFluidType::Air,
-                                               DataLoopNode::ConnectionType::Outlet,
-                                               NodeInputManager::CompFluidStream::Primary,
-                                               ObjectIsParent,
+                                               Node::FluidType::Air,
+                                               Node::ConnType::Outlet,
+                                               Node::CompFluidStream::Primary,
+                                           Node::ObjectIsParent,
                                                state.dataIPShortCut->cAlphaFieldNames(5));
 
-        thisPIU.HCoilInAirNode = GetOnlySingleNode(state,
+        thisPIU.HCoilAirInNodeNum = GetSingleNode(state,
                                                    state.dataIPShortCut->cAlphaArgs(6),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctSeriesPIUReheat,
+                                                   Node::ConnObjType::AirTerminalSingleDuctSeriesPIUReheat,
                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                   DataLoopNode::NodeFluidType::Air,
-                                                   DataLoopNode::ConnectionType::Internal,
-                                                   NodeInputManager::CompFluidStream::Primary,
-                                                   ObjectIsParent,
+                                                   Node::FluidType::Air,
+                                                   Node::ConnType::Internal,
+                                                   Node::CompFluidStream::Primary,
+                                               Node::ObjectIsParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(6));
         // The reheat coil control node is necessary for hot water reheat, but not necessary for
         // electric or gas reheat.
         if (thisPIU.HCoilType == HtgCoilType::SimpleHeating) {
-            thisPIU.HotControlNode =
+            thisPIU.HotControlNodeNum =
                 GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
         if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
-            thisPIU.HotControlNode =
+            thisPIU.HotControlNodeNum =
                 GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
         thisPIU.MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
@@ -453,20 +454,20 @@ void GetPIUs(EnergyPlusData &state)
         TestCompSet(state,
                     thisPIU.UnitType,
                     thisPIU.Name,
-                    state.dataLoopNodes->NodeID(thisPIU.PriAirInNode),
-                    state.dataLoopNodes->NodeID(thisPIU.OutAirNode),
+                    dln->nodes(thisPIU.PriAirInNodeNum)->Name,
+                    dln->nodes(thisPIU.AirOutNodeNum)->Name,
                     "Air Nodes");
 
         for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (thisPIU.OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+            if (thisPIU.AirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
                 thisPIU.ADUNum = ADUNum;
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = thisPIU.PriAirInNode;
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = thisPIU.PriAirInNodeNum;
             }
         }
         // one assumes if there isn't one assigned, it's an error?
         if (thisPIU.ADUNum == 0) {
             ShowSevereError(state, format("{}No matching Air Distribution Unit, for PIU = [{},{}].", RoutineName, thisPIU.UnitType, thisPIU.Name));
-            ShowContinueError(state, format("...should have outlet node = {}", state.dataLoopNodes->NodeID(thisPIU.OutAirNode)));
+            ShowContinueError(state, format("...should have outlet node = {}", dln->nodes(thisPIU.AirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
@@ -476,16 +477,16 @@ void GetPIUs(EnergyPlusData &state)
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) {
                     continue;
                 }
-                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (thisPIU.OutAirNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = thisPIU.PriAirInNode;
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = thisPIU.OutAirNode;
+                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (thisPIU.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum = thisPIU.PriAirInNodeNum;
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum = thisPIU.AirOutNodeNum;
                         state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).TermUnitSizingNum =
                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                         state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).ZoneEqNum = CtrlZone;
                         AirNodeFound = true;
                         thisPIU.CtrlZoneNum = CtrlZone; // fill index for later use in finding air loop index
-                        thisPIU.ctrlZoneInNodeIndex = SupAirIn;
+                        thisPIU.ctrlZoneInNodeNum = SupAirIn;
                         break;
                     }
                 }
@@ -574,55 +575,55 @@ void GetPIUs(EnergyPlusData &state)
             ErrorsFound = true;
         }
 
-        thisPIU.PriAirInNode = GetOnlySingleNode(state,
+        thisPIU.PriAirInNodeNum = GetSingleNode(state,
                                                  state.dataIPShortCut->cAlphaArgs(3),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                                                 Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsParent,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsParent,
                                                  state.dataIPShortCut->cAlphaFieldNames(3));
 
-        thisPIU.SecAirInNode = GetOnlySingleNode(state,
+        thisPIU.SecAirInNodeNum = GetSingleNode(state,
                                                  state.dataIPShortCut->cAlphaArgs(4),
                                                  ErrorsFound,
-                                                 DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                                                 Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
                                                  state.dataIPShortCut->cAlphaArgs(1),
-                                                 DataLoopNode::NodeFluidType::Air,
-                                                 DataLoopNode::ConnectionType::Inlet,
-                                                 NodeInputManager::CompFluidStream::Primary,
-                                                 ObjectIsParent,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                Node::ObjectIsParent,
                                                  state.dataIPShortCut->cAlphaFieldNames(4));
 
-        thisPIU.OutAirNode = GetOnlySingleNode(state,
+        thisPIU.AirOutNodeNum = GetSingleNode(state,
                                                state.dataIPShortCut->cAlphaArgs(5),
                                                ErrorsFound,
-                                               DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                                               Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
                                                state.dataIPShortCut->cAlphaArgs(1),
-                                               DataLoopNode::NodeFluidType::Air,
-                                               DataLoopNode::ConnectionType::Outlet,
-                                               NodeInputManager::CompFluidStream::Primary,
-                                               ObjectIsParent,
+                                               Node::FluidType::Air,
+                                               Node::ConnType::Outlet,
+                                               Node::CompFluidStream::Primary,
+                                              Node::ObjectIsParent,
                                                state.dataIPShortCut->cAlphaFieldNames(5));
 
-        thisPIU.HCoilInAirNode = GetOnlySingleNode(state,
+        thisPIU.HCoilAirInNodeNum = GetSingleNode(state,
                                                    state.dataIPShortCut->cAlphaArgs(6),
                                                    ErrorsFound,
-                                                   DataLoopNode::ConnectionObjectType::AirTerminalSingleDuctParallelPIUReheat,
+                                                   Node::ConnObjType::AirTerminalSingleDuctParallelPIUReheat,
                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                   DataLoopNode::NodeFluidType::Air,
-                                                   DataLoopNode::ConnectionType::Internal,
-                                                   NodeInputManager::CompFluidStream::Primary,
-                                                   ObjectIsParent,
+                                                   Node::FluidType::Air,
+                                                   Node::ConnType::Internal,
+                                                   Node::CompFluidStream::Primary,
+                                                  Node::ObjectIsParent,
                                                    state.dataIPShortCut->cAlphaFieldNames(6));
         if (thisPIU.HCoilType == HtgCoilType::SimpleHeating) {
-            thisPIU.HotControlNode =
+            thisPIU.HotControlNodeNum =
                 GetCoilWaterInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
-        if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
-            thisPIU.HotControlNode =
+        else if (thisPIU.HCoilType == HtgCoilType::SteamAirHeating) {
+            thisPIU.HotControlNodeNum =
                 GetCoilSteamInletNode(state, state.dataIPShortCut->cAlphaArgs(9), state.dataIPShortCut->cAlphaArgs(10), ErrorsFound);
         }
         thisPIU.MixerName = state.dataIPShortCut->cAlphaArgs(7); // name of zone mixer object
@@ -676,21 +677,21 @@ void GetPIUs(EnergyPlusData &state)
         TestCompSet(state,
                     thisPIU.UnitType,
                     thisPIU.Name,
-                    state.dataLoopNodes->NodeID(thisPIU.PriAirInNode),
-                    state.dataLoopNodes->NodeID(thisPIU.OutAirNode),
+                    dln->nodes(thisPIU.PriAirInNodeNum)->Name,
+                    dln->nodes(thisPIU.AirOutNodeNum)->Name,
                     "Air Nodes");
 
         for (int ADUNum = 1; ADUNum <= (int)state.dataDefineEquipment->AirDistUnit.size(); ++ADUNum) {
-            if (thisPIU.OutAirNode == state.dataDefineEquipment->AirDistUnit(ADUNum).OutletNodeNum) {
+            if (thisPIU.AirOutNodeNum == state.dataDefineEquipment->AirDistUnit(ADUNum).OutNodeNum) {
                 //      AirDistUnit(ADUNum)%InletNodeNum = PIU(PIUNum)%InletNodeNum
-                state.dataDefineEquipment->AirDistUnit(ADUNum).InletNodeNum = thisPIU.PriAirInNode;
+                state.dataDefineEquipment->AirDistUnit(ADUNum).InNodeNum = thisPIU.PriAirInNodeNum;
                 thisPIU.ADUNum = ADUNum;
             }
         }
         // one assumes if there isn't one assigned, it's an error?
         if (thisPIU.ADUNum == 0) {
             ShowSevereError(state, format("{}No matching Air Distribution Unit, for PIU = [{},{}].", RoutineName, thisPIU.UnitType, thisPIU.Name));
-            ShowContinueError(state, format("...should have outlet node = {}", state.dataLoopNodes->NodeID(thisPIU.OutAirNode)));
+            ShowContinueError(state, format("...should have outlet node = {}", dln->nodes(thisPIU.AirOutNodeNum)->Name));
             ErrorsFound = true;
         } else {
 
@@ -700,15 +701,15 @@ void GetPIUs(EnergyPlusData &state)
                 if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZone).IsControlled) {
                     continue;
                 }
-                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInletNodes; ++SupAirIn) {
-                    if (thisPIU.OutAirNode == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InletNode(SupAirIn)) {
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNode = thisPIU.PriAirInNode;
-                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNode = thisPIU.OutAirNode;
+                for (int SupAirIn = 1; SupAirIn <= state.dataZoneEquip->ZoneEquipConfig(CtrlZone).NumInNodes; ++SupAirIn) {
+                    if (thisPIU.AirOutNodeNum == state.dataZoneEquip->ZoneEquipConfig(CtrlZone).InNodeNums(SupAirIn)) {
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).InNodeNum = thisPIU.PriAirInNodeNum;
+                        state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).OutNodeNum = thisPIU.AirOutNodeNum;
                         state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).TermUnitSizingNum =
                             state.dataZoneEquip->ZoneEquipConfig(CtrlZone).AirDistUnitCool(SupAirIn).TermUnitSizingIndex;
                         state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).ZoneEqNum = CtrlZone;
                         thisPIU.CtrlZoneNum = CtrlZone;
-                        thisPIU.ctrlZoneInNodeIndex = SupAirIn;
+                        thisPIU.ctrlZoneInNodeNum = SupAirIn;
                         AirNodeFound = true;
                     }
                 }
@@ -799,6 +800,8 @@ void InitPIU(EnergyPlusData &state,
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
 
+    auto &dln = state.dataLoopNodes;
+    
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("InitPIU");
@@ -819,7 +822,7 @@ void InitPIU(EnergyPlusData &state,
             if (errFlag) {
                 ShowFatalError(state, "InitPIU: Program terminated due to previous condition(s).");
             }
-            thisPIU.HotCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, thisPIU.HWplantLoc).NodeNumOut;
+            thisPIU.HotCoilOutNodeNum = DataPlant::CompData::getPlantComponent(state, thisPIU.HWplantLoc).OutNodeNum;
         }
         state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) = false;
     } else if (state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum) && !state.dataGlobal->AnyPlantInModel) {
@@ -854,7 +857,7 @@ void InitPIU(EnergyPlusData &state,
         SizePIU(state, PIUNum);
 
         // If there's a hot water control node number defined in PIU
-        if (thisPIU.HotControlNode > 0) {
+        if (thisPIU.HotControlNodeNum > 0) {
             // plant upgrade note? why no separate handling of steam coil? add it ?
             // local plant fluid density
             Real64 const rho = GetDensityGlycol(state,
@@ -865,47 +868,47 @@ void InitPIU(EnergyPlusData &state,
 
             thisPIU.MaxHotWaterFlow = rho * thisPIU.MaxVolHotWaterFlow;
             thisPIU.MinHotWaterFlow = rho * thisPIU.MinVolHotWaterFlow;
-            InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum);
+            InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum);
         }
 
         state.dataPowerInductionUnits->MySizeFlag(PIUNum) = false;
     }
 
-    int const PriNode = thisPIU.PriAirInNode;
-    int const SecNode = thisPIU.SecAirInNode;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+    auto *airOutNode = dln->nodes(thisPIU.AirOutNodeNum);
 
     // Do the Begin Environment initializations
     if (state.dataGlobal->BeginEnvrnFlag && state.dataPowerInductionUnits->MyEnvrnFlag(PIUNum)) {
         Real64 const RhoAir = state.dataEnvrn->StdRhoAir;
-        int const OutletNode = thisPIU.OutAirNode;
         // set the mass flow rates from the input volume flow rates
         if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
             // series
             thisPIU.MaxTotAirMassFlow = RhoAir * thisPIU.MaxTotAirVolFlow;
             thisPIU.MaxPriAirMassFlow = RhoAir * thisPIU.MaxPriAirVolFlow;
             thisPIU.MinPriAirMassFlow = RhoAir * thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow;
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMin = thisPIU.MinPriAirMassFlow;
-            state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = thisPIU.MaxTotAirMassFlow;
+            priAirInNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+            priAirInNode->MassFlowRateMin = thisPIU.MinPriAirMassFlow;
+            airOutNode->MassFlowRateMax = thisPIU.MaxTotAirMassFlow;
         } else {
             // parallel
             thisPIU.MaxPriAirMassFlow = RhoAir * thisPIU.MaxPriAirVolFlow;
             thisPIU.MinPriAirMassFlow = RhoAir * thisPIU.MinPriAirFlowFrac * thisPIU.MaxPriAirVolFlow;
             thisPIU.MaxSecAirMassFlow = RhoAir * thisPIU.MaxSecAirVolFlow;
             thisPIU.FanOnAirMassFlow = RhoAir * thisPIU.FanOnFlowFrac * thisPIU.MaxPriAirVolFlow;
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMin = thisPIU.MinPriAirMassFlow;
-            state.dataLoopNodes->Node(OutletNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+            priAirInNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+            priAirInNode->MassFlowRateMin = thisPIU.MinPriAirMassFlow;
+            airOutNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
         }
 
         if (((thisPIU.HCoilType == HtgCoilType::SimpleHeating) || (thisPIU.HCoilType == HtgCoilType::SteamAirHeating)) &&
             !state.dataPowerInductionUnits->MyPlantScanFlag(PIUNum)) {
-            InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum);
+            InitComponentNodes(state, thisPIU.MinHotWaterFlow, thisPIU.MaxHotWaterFlow, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum);
         }
 
         if (thisPIU.AirLoopNum == 0) { // fill air loop index
-            if (thisPIU.CtrlZoneNum > 0 && thisPIU.ctrlZoneInNodeIndex > 0) {
-                thisPIU.AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(thisPIU.CtrlZoneNum).InletNodeAirLoopNum(thisPIU.ctrlZoneInNodeIndex);
+            if (thisPIU.CtrlZoneNum > 0 && thisPIU.ctrlZoneInNodeNum > 0) {
+                thisPIU.AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(thisPIU.CtrlZoneNum).InNodeAirLoopNum(thisPIU.ctrlZoneInNodeNum);
                 state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).AirLoopNum = thisPIU.AirLoopNum;
             }
         }
@@ -920,36 +923,36 @@ void InitPIU(EnergyPlusData &state,
     // Do the start of HVAC time step initializations
     if (FirstHVACIteration) {
         // check for upstream zero flow. If nonzero and schedule ON, set primary flow to max
-        if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRate > 0.0) {
+        if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) > 0.0 && priAirInNode->MassFlowRate > 0.0) {
             if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-                state.dataLoopNodes->Node(PriNode).MassFlowRate = thisPIU.MaxPriAirMassFlow;
-                state.dataLoopNodes->Node(SecNode).MassFlowRate = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MaxPriAirMassFlow);
+                priAirInNode->MassFlowRate = thisPIU.MaxPriAirMassFlow;
+                secAirInNode->MassFlowRate = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MaxPriAirMassFlow);
             } else {
-                state.dataLoopNodes->Node(PriNode).MassFlowRate = thisPIU.MaxPriAirMassFlow;
-                state.dataLoopNodes->Node(SecNode).MassFlowRate = thisPIU.MaxSecAirMassFlow;
+                priAirInNode->MassFlowRate = thisPIU.MaxPriAirMassFlow;
+                secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
             }
         } else {
-            state.dataLoopNodes->Node(PriNode).MassFlowRate = 0.0;
-            state.dataLoopNodes->Node(SecNode).MassFlowRate = 0.0;
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = 0.0;
         }
         // reset the max and min avail flows
-        if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) > 0.0 && state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail > 0.0) {
+        if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) > 0.0 && priAirInNode->MassFlowRateMaxAvail > 0.0) {
             if (thisPIU.UnitType == "AirTerminal:SingleDuct:SeriesPIU:Reheat") {
-                state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = thisPIU.MaxPriAirMassFlow;
-                state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = thisPIU.MinPriAirMassFlow;
-                state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow);
-                state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MaxPriAirMassFlow);
+                priAirInNode->MassFlowRateMaxAvail = thisPIU.MaxPriAirMassFlow;
+                priAirInNode->MassFlowRateMinAvail = thisPIU.MinPriAirMassFlow;
+                secAirInNode->MassFlowRateMaxAvail = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MinPriAirMassFlow);
+                secAirInNode->MassFlowRateMinAvail = max(0.0, thisPIU.MaxTotAirMassFlow - thisPIU.MaxPriAirMassFlow);
             } else {
-                state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = thisPIU.MaxPriAirMassFlow;
-                state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = thisPIU.MinPriAirMassFlow;
-                state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
-                state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = 0.0;
+                priAirInNode->MassFlowRateMaxAvail = thisPIU.MaxPriAirMassFlow;
+                priAirInNode->MassFlowRateMinAvail = thisPIU.MinPriAirMassFlow;
+                secAirInNode->MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
+                secAirInNode->MassFlowRateMinAvail = 0.0;
             }
         } else {
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMaxAvail = 0.0;
-            state.dataLoopNodes->Node(PriNode).MassFlowRateMinAvail = 0.0;
-            state.dataLoopNodes->Node(SecNode).MassFlowRateMaxAvail = 0.0;
-            state.dataLoopNodes->Node(SecNode).MassFlowRateMinAvail = 0.0;
+            priAirInNode->MassFlowRateMaxAvail = 0.0;
+            priAirInNode->MassFlowRateMinAvail = 0.0;
+            secAirInNode->MassFlowRateMaxAvail = 0.0;
+            secAirInNode->MassFlowRateMinAvail = 0.0;
         }
     }
 
@@ -1099,7 +1102,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
     // if a sizing run has been done, check if system sizing has been done for this system
     bool SizingDesRunThisAirSys = false;
     if (state.dataSize->SysSizingRunDone) {
-        int const AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(thisPIU.CtrlZoneNum).InletNodeAirLoopNum(thisPIU.ctrlZoneInNodeIndex);
+        int const AirLoopNum = state.dataZoneEquip->ZoneEquipConfig(thisPIU.CtrlZoneNum).InNodeAirLoopNum(thisPIU.ctrlZoneInNodeNum);
         if (AirLoopNum > 0) {
             CheckThisAirSystemForSizing(state, AirLoopNum, SizingDesRunThisAirSys);
         }
@@ -1508,7 +1511,7 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 void CalcSeriesPIU(EnergyPlusData &state,
                    int const PIUNum,             // number of the current PIU being simulated
                    int const ZoneNum,            // number of zone being served
-                   int const ZoneNode,           // zone node number
+                   int const ZoneNodeNum,        // zone node number
                    bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
 )
 {
@@ -1574,29 +1577,37 @@ void CalcSeriesPIU(EnergyPlusData &state,
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
 
-    Real64 PriAirMassFlow = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate;                  // primary air mass flow rate [kg/s]
-    Real64 const PriAirMassFlowMax = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
-    Real64 const PriAirMassFlowMin = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
-    Real64 SecAirMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;                  // secondary air mass flow rate [kg/s]
+    auto &dln = state.dataLoopNodes;
+    auto *airOutNode = dln->nodes(thisPIU.AirOutNodeNum);
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+    auto *heatCoilAirInNode = dln->nodes(thisPIU.HCoilAirInNodeNum);
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    
+    Real64 PriAirMassFlow = priAirInNode->MassFlowRate;                  // primary air mass flow rate [kg/s]
+    Real64 const PriAirMassFlowMax = priAirInNode->MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
+    Real64 const PriAirMassFlowMin = priAirInNode->MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
+    Real64 SecAirMassFlow = secAirInNode->MassFlowRate;                  // secondary air mass flow rate [kg/s]
     Real64 const QZnReq =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // heating or cooling needed by zone [Watts]
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
-    Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
+    Real64 const CpAirZn = PsyCpAirFnW(zoneNode->HumRat);          // zone air specific heat [J/kg-C]
 
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
-    if (thisPIU.HotControlNode > 0) {
+    if (thisPIU.HotControlNodeNum > 0) {
+        auto *hotControlNode = dln->nodes(thisPIU.HotControlNodeNum);
         if (FirstHVACIteration) {
             MaxWaterFlow = thisPIU.MaxHotWaterFlow;
             MinWaterFlow = thisPIU.MinHotWaterFlow;
             MaxSteamFlow = thisPIU.MaxHotWaterFlow; // TODO: Need TO change THESE******************************
             MinSteamFlow = thisPIU.MinHotWaterFlow;
         } else {
-            MaxWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMaxAvail;
-            MinWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMinAvail;
-            MaxSteamFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMaxAvail;
-            MinSteamFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMinAvail;
+            MaxWaterFlow = hotControlNode->MassFlowRateMaxAvail;
+            MinWaterFlow = hotControlNode->MassFlowRateMinAvail;
+            MaxSteamFlow = hotControlNode->MassFlowRateMaxAvail;
+            MinSteamFlow = hotControlNode->MassFlowRateMinAvail;
         }
     }
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
@@ -1633,27 +1644,24 @@ void CalcSeriesPIU(EnergyPlusData &state,
             // cooling: set the primary air flow rate to meet the load.
             // First calculate the fan temperature rise
             // use only secondary air for this calculation
-            state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
-            state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxTotAirMassFlow;
+            priAirInNode->MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MaxTotAirMassFlow;
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
             // fan temperature rise [C]
-            Real64 const FanDeltaTemp = state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp;
+            Real64 const FanDeltaTemp = heatCoilAirInNode->Temp - secAirInNode->Temp;
             // using the required zone load, calculate the air temperature needed to meet the load
-            // PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - state.dataLoopNodes->Node(ZoneNodeNum)%Temp) = QZnReq
-            Real64 const OutletTempNeeded = state.dataLoopNodes->Node(ZoneNode).Temp + QZnReq / (thisPIU.MaxTotAirMassFlow * CpAirZn);
+            // PIU(PIUNum)%MaxTotAirMassFlow * CpAirZn * (OutletTempNeeded - dln->Node(ZoneNodeNum)%Temp) = QZnReq
+            Real64 const OutletTempNeeded = zoneNode->Temp + QZnReq / (thisPIU.MaxTotAirMassFlow * CpAirZn);
             // mixer outlet temperature needed to meet cooling load
             Real64 const MixTempNeeded = OutletTempNeeded - FanDeltaTemp;
-            if (MixTempNeeded <= state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp) {
+            if (MixTempNeeded <= priAirInNode->Temp) {
                 PriAirMassFlow = PriAirMassFlowMax;
-            } else if (MixTempNeeded >= state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp &&
-                       MixTempNeeded >= state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp) {
+            } else if (MixTempNeeded >= priAirInNode->Temp && MixTempNeeded >= secAirInNode->Temp) {
                 PriAirMassFlow = PriAirMassFlowMin;
             } else {
-                PriAirMassFlow =
-                    thisPIU.MaxTotAirMassFlow * (state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp - MixTempNeeded) /
-                    max(SmallTempDiff, state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp - state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp);
+                PriAirMassFlow = thisPIU.MaxTotAirMassFlow * (secAirInNode->Temp - MixTempNeeded) / max(SmallTempDiff, secAirInNode->Temp - priAirInNode->Temp);
                 PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
             }
             SecAirMassFlow = max(0.0, thisPIU.MaxTotAirMassFlow - PriAirMassFlow);
@@ -1664,8 +1672,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
         SecAirMassFlow = 0.0;
     }
     // Set inlet node flowrates
-    state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = PriAirMassFlow;
-    state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = SecAirMassFlow;
+    priAirInNode->MassFlowRate = PriAirMassFlow;
+    secAirInNode->MassFlowRate = SecAirMassFlow;
     if (PriAirMassFlowMax == 0) {
         thisPIU.PriDamperPosition = 0;
     } else {
@@ -1679,9 +1687,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
     state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
     // the heating load seen by the reheat coil [W]
-    Real64 const QActualHeating =
-        QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                           (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+    Real64 const QActualHeating = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
     // check if heating coil is off
     if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
@@ -1695,7 +1701,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             // call the reheat coil with the NO FLOW condition
             Real64 mdot = 0.0;
-            SetComponentFlowRate(state, mdot, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
+            SetComponentFlowRate(state, mdot, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
 
             SimulateWaterCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index);
         } else {
@@ -1706,14 +1712,14 @@ void CalcSeriesPIU(EnergyPlusData &state,
                               thisPIU.HCoil_Index,
                               FirstHVACIteration,
                               QActualHeating,
-                              thisPIU.HotControlNode,
+                              thisPIU.HotControlNodeNum,
                               MaxWaterFlow,
                               MinWaterFlow,
                               thisPIU.HotControlOffset,
                               thisPIU.ControlCompTypeNum,
                               thisPIU.CompErrIndex,
-                              thisPIU.HCoilInAirNode,
-                              thisPIU.OutAirNode,
+                              thisPIU.HCoilAirInNodeNum,
+                              thisPIU.AirOutNodeNum,
                               _,
                               _,
                               _,
@@ -1725,8 +1731,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
 
@@ -1736,8 +1741,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
 
@@ -1747,8 +1751,7 @@ void CalcSeriesPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
@@ -1758,28 +1761,26 @@ void CalcSeriesPIU(EnergyPlusData &state,
     }
 
     // Power supplied
-    Real64 const PowerMet = state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate *
-                            (PsyHFnTdbW(state.dataLoopNodes->Node(thisPIU.OutAirNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) -
-                             PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
+    Real64 const PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
     thisPIU.HeatingRate = max(0.0, PowerMet);
     thisPIU.SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
-    if (state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate == 0.0) {
-        state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
-        state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = 0.0;
+    if (airOutNode->MassFlowRate == 0.0) {
+        priAirInNode->MassFlowRate = 0.0;
+        secAirInNode->MassFlowRate = 0.0;
     }
     if (thisPIU.InducesPlenumAir) {
-        state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;
+        state.dataHVACGlobal->PlenumInducedMassFlow = secAirInNode->MassFlowRate;
     } else {
         state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
     }
     state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
-    state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRateMax = thisPIU.MaxTotAirMassFlow;
+    airOutNode->MassFlowRateMax = thisPIU.MaxTotAirMassFlow;
 }
 
 void CalcParallelPIU(EnergyPlusData &state,
                      int const PIUNum,             // number of the current PIU being simulated
                      int const ZoneNum,            // number of zone being served
-                     int const ZoneNode,           // zone node number
+                     int const ZoneNodeNum,           // zone node number
                      bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
 )
 {
@@ -1830,25 +1831,33 @@ void CalcParallelPIU(EnergyPlusData &state,
     // initialize local variables
     auto &thisPIU = state.dataPowerInductionUnits->PIU(PIUNum);
 
-    Real64 PriAirMassFlow = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate;                  // primary air mass flow rate [kg/s]
-    Real64 const PriAirMassFlowMax = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
-    Real64 const PriAirMassFlowMin = state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
-    Real64 SecAirMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;                  // secondary air mass flow rate [kg/s]
+    auto &dln = state.dataLoopNodes;
+    auto *priAirInNode = dln->nodes(thisPIU.PriAirInNodeNum);
+    auto *secAirInNode = dln->nodes(thisPIU.SecAirInNodeNum);
+    auto *heatCoilAirInNode = dln->nodes(thisPIU.HCoilAirInNodeNum);
+    auto *airOutNode = dln->nodes(thisPIU.AirOutNodeNum);
+    auto *zoneNode = dln->nodes(ZoneNodeNum);
+    
+    Real64 PriAirMassFlow = priAirInNode->MassFlowRate;                  // primary air mass flow rate [kg/s]
+    Real64 const PriAirMassFlowMax = priAirInNode->MassFlowRateMaxAvail; // max primary air mass flow rate [kg/s]
+    Real64 const PriAirMassFlowMin = priAirInNode->MassFlowRateMinAvail; // min primary air mass flow rate [kg/s]
+    Real64 SecAirMassFlow = secAirInNode->MassFlowRate;                  // secondary air mass flow rate [kg/s]
     Real64 const QZnReq =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired; // heating or cooling needed by zone [Watts]
     Real64 const QToHeatSetPt =
         state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP; // [W]  remaining load to heating setpoint
-    Real64 const CpAirZn = PsyCpAirFnW(state.dataLoopNodes->Node(ZoneNode).HumRat);          // zone air specific heat [J/kg-C]
+    Real64 const CpAirZn = PsyCpAirFnW(zoneNode->HumRat);          // zone air specific heat [J/kg-C]
 
     // On the first HVAC iteration the system values are given to the controller, but after that
     // the demand limits are in place and there needs to be feedback to the Zone Equipment
-    if (thisPIU.HotControlNode > 0) {
+    if (thisPIU.HotControlNodeNum > 0) {
         if (FirstHVACIteration) {
             MaxWaterFlow = thisPIU.MaxHotWaterFlow;
             MinWaterFlow = thisPIU.MinHotWaterFlow;
         } else {
-            MaxWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMaxAvail;
-            MinWaterFlow = state.dataLoopNodes->Node(thisPIU.HotControlNode).MassFlowRateMinAvail;
+            auto const *hotControlNode = dln->nodes(thisPIU.HotControlNodeNum);
+            MaxWaterFlow = hotControlNode->MassFlowRateMaxAvail;
+            MinWaterFlow = hotControlNode->MassFlowRateMinAvail;
         }
     }
     if (GetCurrentScheduleValue(state, thisPIU.SchedPtr) <= 0.0) {
@@ -1864,7 +1873,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         bool ReheatRequired = false;
         Real64 const qMinPrimary =
             PriAirMassFlowMin *
-            (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
+            (CpAirZn * min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
         if (qMinPrimary < QToHeatSetPt) {
             ReheatRequired = true;
         }
@@ -1897,20 +1906,20 @@ void CalcParallelPIU(EnergyPlusData &state,
         } else {
             // cooling: set the primary air flow rate to meet the load.
             // First calculate the fan temperature rise
-            state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = thisPIU.MaxSecAirMassFlow;
-            state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
-            state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
+            secAirInNode->MassFlowRate = thisPIU.MaxSecAirMassFlow;
+            secAirInNode->MassFlowRateMaxAvail = thisPIU.MaxSecAirMassFlow;
+            priAirInNode->MassFlowRate = 0.0;
 
             state.dataFans->fans(thisPIU.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
             SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num); // fire the mixer
             // fan temperature rise [C]
-            Real64 const FanDeltaTemp = state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp;
+            Real64 const FanDeltaTemp = heatCoilAirInNode->Temp - secAirInNode->Temp;
             // Assuming the fan is off, calculate the primary air flow needed to meet the zone cooling demand.
             // CpAir*PriAirMassFlow*(Node(thisPIU.PriAirInNode)%Temp - Node(ZoneNodeNum)%Temp) = QZnReq
             PriAirMassFlow =
                 QZnReq /
-                (CpAirZn * min(-SmallTempDiff, (state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
+                (CpAirZn * min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
             PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
             // check for fan on or off
             if ((PriAirMassFlow > thisPIU.FanOnAirMassFlow) && !ReheatRequired) {
@@ -1922,9 +1931,9 @@ void CalcParallelPIU(EnergyPlusData &state,
                 //   CpAir*SecAirMassFlow*(Node(thisPIU.SecAirInNode)%Temp + FanDeltaTemp - Node(ZoneNodeNum)%Temp) = QZnReq
                 PriAirMassFlow =
                     (QZnReq - CpAirZn * SecAirMassFlow *
-                                  (state.dataLoopNodes->Node(thisPIU.SecAirInNode).Temp + FanDeltaTemp - state.dataLoopNodes->Node(ZoneNode).Temp)) /
+                                  (secAirInNode->Temp + FanDeltaTemp - zoneNode->Temp)) /
                     (CpAirZn *
-                     min(-SmallTempDiff, (state.dataLoopNodes->Node(thisPIU.PriAirInNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp)));
+                     min(-SmallTempDiff, (priAirInNode->Temp - zoneNode->Temp)));
                 PriAirMassFlow = min(max(PriAirMassFlow, PriAirMassFlowMin), PriAirMassFlowMax);
                 SecAirMassFlow = thisPIU.MaxSecAirMassFlow;
             }
@@ -1935,9 +1944,9 @@ void CalcParallelPIU(EnergyPlusData &state,
         SecAirMassFlow = 0.0;
     }
     // Set inlet node flowrates
-    state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = PriAirMassFlow;
-    state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = SecAirMassFlow;
-    state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRateMaxAvail = SecAirMassFlow;
+    priAirInNode->MassFlowRate = PriAirMassFlow;
+    secAirInNode->MassFlowRate = SecAirMassFlow;
+    secAirInNode->MassFlowRateMaxAvail = SecAirMassFlow;
     if (PriAirMassFlowMax == 0) {
         thisPIU.PriDamperPosition = 0;
     } else {
@@ -1952,8 +1961,7 @@ void CalcParallelPIU(EnergyPlusData &state,
     SimAirMixer(state, thisPIU.MixerName, thisPIU.Mixer_Num);
     // the heating load seen by the reheat coil [W]
     Real64 const QActualHeating =
-        QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                           (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+        QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
     // check if heating coil is off
     if ((!UnitOn) || (QActualHeating < SmallLoad) || (state.dataHeatBalFanSys->TempControlType(ZoneNum) == HVAC::ThermostatType::SingleCooling) ||
         (PriAirMassFlow > PriAirMassFlowMin)) {
@@ -1966,7 +1974,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             // call the reheat coil with the NO FLOW condition
             Real64 mdot = 0.0;
-            SetComponentFlowRate(state, mdot, thisPIU.HotControlNode, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
+            SetComponentFlowRate(state, mdot, thisPIU.HotControlNodeNum, thisPIU.HotCoilOutNodeNum, thisPIU.HWplantLoc);
             SimulateWaterCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index);
         } else {
             // control water flow to obtain output matching QZnReq
@@ -1976,14 +1984,14 @@ void CalcParallelPIU(EnergyPlusData &state,
                               thisPIU.HCoil_Index,
                               FirstHVACIteration,
                               QActualHeating,
-                              thisPIU.HotControlNode,
+                              thisPIU.HotControlNodeNum,
                               MaxWaterFlow,
                               MinWaterFlow,
                               thisPIU.HotControlOffset,
                               thisPIU.ControlCompTypeNum,
                               thisPIU.CompErrIndex,
-                              thisPIU.HCoilInAirNode,
-                              thisPIU.OutAirNode,
+                              thisPIU.HCoilAirInNodeNum,
+                              thisPIU.AirOutNodeNum,
                               _,
                               _,
                               _,
@@ -1995,8 +2003,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateSteamCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, thisPIU.HCoil_Index, QCoilReq);
         break;
@@ -2005,8 +2012,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
 
@@ -2016,8 +2022,7 @@ void CalcParallelPIU(EnergyPlusData &state,
         if (!HCoilOn) {
             QCoilReq = 0.0;
         } else {
-            QCoilReq = QToHeatSetPt - state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).MassFlowRate * CpAirZn *
-                                          (state.dataLoopNodes->Node(thisPIU.HCoilInAirNode).Temp - state.dataLoopNodes->Node(ZoneNode).Temp);
+            QCoilReq = QToHeatSetPt - heatCoilAirInNode->MassFlowRate * CpAirZn * (heatCoilAirInNode->Temp - zoneNode->Temp);
         }
         SimulateHeatingCoilComponents(state, thisPIU.HCoil, FirstHVACIteration, QCoilReq, thisPIU.HCoil_Index);
         break;
@@ -2026,22 +2031,20 @@ void CalcParallelPIU(EnergyPlusData &state,
         break;
     }
     // Power supplied
-    Real64 const PowerMet = state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate *
-                            (PsyHFnTdbW(state.dataLoopNodes->Node(thisPIU.OutAirNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat) -
-                             PsyHFnTdbW(state.dataLoopNodes->Node(ZoneNode).Temp, state.dataLoopNodes->Node(ZoneNode).HumRat));
+    Real64 const PowerMet = airOutNode->MassFlowRate * (PsyHFnTdbW(airOutNode->Temp, zoneNode->HumRat) - PsyHFnTdbW(zoneNode->Temp, zoneNode->HumRat));
     thisPIU.HeatingRate = max(0.0, PowerMet);
     thisPIU.SensCoolRate = std::abs(min(DataPrecisionGlobals::constant_zero, PowerMet));
-    if (state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate == 0.0) {
-        state.dataLoopNodes->Node(thisPIU.PriAirInNode).MassFlowRate = 0.0;
-        state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate = 0.0;
+    if (airOutNode->MassFlowRate == 0.0) {
+        priAirInNode->MassFlowRate = 0.0;
+        secAirInNode->MassFlowRate = 0.0;
     }
     if (thisPIU.InducesPlenumAir) {
-        state.dataHVACGlobal->PlenumInducedMassFlow = state.dataLoopNodes->Node(thisPIU.SecAirInNode).MassFlowRate;
+        state.dataHVACGlobal->PlenumInducedMassFlow = secAirInNode->MassFlowRate;
     } else {
         state.dataHVACGlobal->PlenumInducedMassFlow = 0.0;
     }
     state.dataDefineEquipment->AirDistUnit(thisPIU.ADUNum).MassFlowRatePlenInd = state.dataHVACGlobal->PlenumInducedMassFlow;
-    state.dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
+    airOutNode->MassFlowRateMax = thisPIU.MaxPriAirMassFlow;
 }
 
 void ReportPIU(EnergyPlusData &state, int const PIUNum) // number of the current fan coil unit being simulated
@@ -2119,7 +2122,7 @@ void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum) // induced ai
     }
 
     for (int PIUIndex = 1; PIUIndex <= state.dataPowerInductionUnits->NumPIUs; ++PIUIndex) {
-        if (NodeNum == state.dataPowerInductionUnits->PIU(PIUIndex).SecAirInNode) {
+        if (NodeNum == state.dataPowerInductionUnits->PIU(PIUIndex).SecAirInNodeNum) {
             state.dataPowerInductionUnits->PIU(PIUIndex).InducesPlenumAir = true;
             break;
         }
@@ -2129,8 +2132,10 @@ void PIUInducesPlenumAir(EnergyPlusData &state, int const NodeNum) // induced ai
 void PowIndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
 {
     // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+    auto &dln = state.dataLoopNodes;
+        
     if (this->AirLoopNum > 0) {
-        this->OutdoorAirFlowRate = (state.dataLoopNodes->Node(this->PriAirInNode).MassFlowRate / state.dataEnvrn->StdRhoAir) *
+        this->OutdoorAirFlowRate = (dln->nodes(this->PriAirInNodeNum)->MassFlowRate / state.dataEnvrn->StdRhoAir) *
                                    state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
     } else {
         this->OutdoorAirFlowRate = 0.0;

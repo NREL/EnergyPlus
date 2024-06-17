@@ -212,6 +212,8 @@ namespace GeneratorDynamicsManager {
         bool RunFlag; // true if generator supposed to run
         DataGenerators::OperatingMode newOpMode(DataGenerators::OperatingMode::Invalid);
 
+        auto &dln = state.dataLoopNodes;
+        
         // inits
         PLRforSubtimestepStartUp = 1.0;
         PLRforSubtimestepShutDown = 0.0;
@@ -222,8 +224,8 @@ namespace GeneratorDynamicsManager {
         // get index for this generator in dynamics control structure
         int DynaCntrlNum = state.dataCHPElectGen->MicroCHP(GeneratorNum).DynamicsControlID;
         // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
-        state.dataGenerator->InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID;
-        state.dataGenerator->TcwIn = state.dataLoopNodes->Node(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
+        state.dataGenerator->InletCWnode = state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInNodeNum;
+        state.dataGenerator->TcwIn = dln->nodes(state.dataCHPElectGen->MicroCHP(GeneratorNum).PlantInNodeNum)->Temp;
         if (state.dataCHPElectGen->MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
             state.dataGenerator->InternalFlowControl = true;
         }
@@ -252,11 +254,12 @@ namespace GeneratorDynamicsManager {
         if (state.dataGenerator->InternalFlowControl && (SchedVal > 0.0)) {
             state.dataGenerator->TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, state.dataGenerator->TcwIn);
         } else {
-            state.dataGenerator->TrialMdotcw = state.dataLoopNodes->Node(state.dataGenerator->InletCWnode).MassFlowRate;
+            state.dataGenerator->TrialMdotcw = dln->nodes(state.dataGenerator->InletCWnode)->MassFlowRate;
         }
 
         // determine current operating mode.
         switch (thisGen.LastOpMode) {
+
         case DataGenerators::OperatingMode::Off:
         case DataGenerators::OperatingMode::Standby: {
             // possible future states {Off, Standby, WarmUp,Normal }
@@ -308,6 +311,7 @@ namespace GeneratorDynamicsManager {
             }
 
         } break;
+                
         case DataGenerators::OperatingMode::WarmUp: {
             // possible Future states {OFF, WarmUp, Normal, CoolDown }
             // check availability manager
@@ -391,6 +395,7 @@ namespace GeneratorDynamicsManager {
                 }
             }
         } break;
+                
         case DataGenerators::OperatingMode::Normal: {
             // possible Future states {CoolDown, standby, off}
             if (((SchedVal == 0.0) || (!RunFlag)) || (state.dataGenerator->TrialMdotcw < state.dataGenerator->LimitMinMdotcw)) {
@@ -428,6 +433,7 @@ namespace GeneratorDynamicsManager {
                 newOpMode = DataGenerators::OperatingMode::Normal;
             }
         } break;
+                
         case DataGenerators::OperatingMode::CoolDown: {
             // possible Future States {Standby, OFF, WarmUp, Normal}
 
@@ -622,6 +628,7 @@ namespace GeneratorDynamicsManager {
         thisMicroCHP.A42Model.WarmUpModeTime = 0.0;
         thisMicroCHP.A42Model.NormalModeTime = 0.0;
         thisMicroCHP.A42Model.CoolDownModeTime = 0.0;
+
         switch (newOpMode) {
         case DataGenerators::OperatingMode::Off: {
             if (PLRforSubtimestepShutDown == 0.0) {
@@ -633,6 +640,7 @@ namespace GeneratorDynamicsManager {
                 thisMicroCHP.A42Model.OffModeTime = TimeStepSysSec;
             }
         } break;
+                
         case DataGenerators::OperatingMode::Standby: {
             if (PLRforSubtimestepShutDown == 0.0) {
                 thisMicroCHP.A42Model.StandyByModeTime = TimeStepSysSec;
@@ -643,6 +651,7 @@ namespace GeneratorDynamicsManager {
                 thisMicroCHP.A42Model.StandyByModeTime = TimeStepSysSec;
             }
         } break;
+                
         case DataGenerators::OperatingMode::WarmUp: {
             if (PLRforSubtimestepShutDown == 0.0) {
                 thisMicroCHP.A42Model.WarmUpModeTime = TimeStepSysSec;
@@ -653,6 +662,7 @@ namespace GeneratorDynamicsManager {
                 thisMicroCHP.A42Model.WarmUpModeTime = TimeStepSysSec;
             }
         } break;
+                
         case DataGenerators::OperatingMode::Normal: {
             if (PLRforSubtimestepStartUp == 0.0) {
                 thisMicroCHP.A42Model.WarmUpModeTime = TimeStepSysSec;
@@ -671,12 +681,15 @@ namespace GeneratorDynamicsManager {
                 }
             }
         } break;
+                
         case DataGenerators::OperatingMode::CoolDown: {
             thisMicroCHP.A42Model.CoolDownModeTime = TimeStepSysSec;
         } break;
-        default:
-            break;
-        }
+                
+        default: {
+        } break;
+
+        } // switch()
 
         ElecLoadProvided = Pel;
 
@@ -749,11 +762,7 @@ namespace GeneratorDynamicsManager {
         // METHODOLOGY EMPLOYED:
         // apply contraints imposed by plant according to flow lock, first HVAC iteration etc.
 
-        // Return value
-        Real64 FuncDetermineCWMdotForInternalFlowControl;
         auto const &thisMicroCHP = state.dataCHPElectGen->MicroCHP(GeneratorNum);
-        int const InletNode = thisMicroCHP.PlantInletNodeID;
-        int const OutletNode = thisMicroCHP.PlantOutletNodeID;
 
         // first evaluate curve
         Real64 MdotCW = Curve::CurveValue(state, thisMicroCHP.A42Model.WaterFlowCurveID, Pnetss, TcwIn);
@@ -763,11 +772,10 @@ namespace GeneratorDynamicsManager {
 
         // make sure plant can provide, utility call may change flow
         if (thisMicroCHP.CWPlantLoc.loopNum > 0) { // protect early calls
-            PlantUtilities::SetComponentFlowRate(state, MdotCW, InletNode, OutletNode, thisMicroCHP.CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, MdotCW, thisMicroCHP.PlantInNodeNum, thisMicroCHP.PlantOutNodeNum, thisMicroCHP.CWPlantLoc);
         }
 
-        FuncDetermineCWMdotForInternalFlowControl = MdotCW;
-        return FuncDetermineCWMdotForInternalFlowControl;
+        return MdotCW;
     }
 
 } // namespace GeneratorDynamicsManager

@@ -139,8 +139,8 @@ namespace PackagedThermalStorageCoil {
         int ControlModeErrorIndex;
         Real64 RatedEvapAirVolFlowRate;  // [m3/s]
         Real64 RatedEvapAirMassFlowRate; // [kg/s]
-        int EvapAirInletNodeNum;         // evaporator inlet node pointer
-        int EvapAirOutletNodeNum;        // evaporator outlet node pointer
+        int EvapAirInNodeNum = 0;         // evaporator inlet node pointer
+        int EvapAirOutNodeNum = 0;        // evaporator outlet node pointer
         // Cooling Only Mode
         bool CoolingOnlyModeIsAvailable;
         Real64 CoolingOnlyRatedTotCap; // gross total cooling capacity at rating conditions [W]
@@ -298,8 +298,8 @@ namespace PackagedThermalStorageCoil {
         Real64 AncillaryControlsPower;                          // standby and controls electric power, draws when available [W]
         Real64 ColdWeatherMinimumTempLimit;                     // temperature limit for cold weather operation mode [C]
         Real64 ColdWeatherAncillaryPower;                       // electrical power draw during cold weather [W]
-        int CondAirInletNodeNum;                                // Condenser air inlet node num pointer
-        int CondAirOutletNodeNum;                               // condenser air outlet node num pointer
+        int CondAirInNodeNum = 0;                                // Condenser air inlet node num pointer
+        int CondAirOutNodeNum = 0;                               // condenser air outlet node num pointer
         TESCondenserType CondenserType = TESCondenserType::Air; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
         Real64 CondenserAirVolumeFlow;                          // design air flow rate thru condenser [m3/s]
         Real64 CondenserAirFlowSizingFactor;                    // scale condenser air flow relative to evap air flow when autosizing
@@ -329,11 +329,11 @@ namespace PackagedThermalStorageCoil {
         Real64 MinimumFluidTankTempLimit;   // optional inputs [C]
         Real64 MaximumFluidTankTempLimit;   // optional inputs [C]
         Real64 RatedFluidTankTemp;          // rating point condition for fluid storage tanks [C]
-        int StorageAmbientNodeNum;          // node "pointer" for ambient conditions exposed to TES
+        int StorageAmbientNodeNum = 0;          // node "pointer" for ambient conditions exposed to TES
         Real64 StorageUA;                   // overall heat transfer coefficient for TES to ambient [W/k]
         bool TESPlantConnectionAvailable;
-        int TESPlantInletNodeNum;                        // plant loop inlet node index
-        int TESPlantOutletNodeNum;                       // plant loop outlet node index
+        int TESPlantInNodeNum = 0;                        // plant loop inlet node index
+        int TESPlantOutNodeNum = 0;                       // plant loop outlet node index
         int TESPlantLoopNum;                             // plant loop connection index
         DataPlant::LoopSideLocation TESPlantLoopSideNum; // plant loop side connection index
         int TESPlantBranchNum;                           // plant loop branch connection index
@@ -377,7 +377,7 @@ namespace PackagedThermalStorageCoil {
         // Default Constructor
         PackagedTESCoolingCoilStruct()
             : AvailSchedNum(0), ModeControlType(PTSCCtrlType::Invalid), ControlModeSchedNum(0), EMSControlModeOn(false), EMSControlModeValue(0.0),
-              ControlModeErrorIndex(0), RatedEvapAirVolFlowRate(0.0), RatedEvapAirMassFlowRate(0.0), EvapAirInletNodeNum(0), EvapAirOutletNodeNum(0),
+              ControlModeErrorIndex(0), RatedEvapAirVolFlowRate(0.0), RatedEvapAirMassFlowRate(0.0),
               CoolingOnlyModeIsAvailable(false), CoolingOnlyRatedTotCap(0.0), CoolingOnlyRatedSHR(0.0), CoolingOnlyRatedCOP(0.0),
               CoolingOnlyCapFTempCurve(0), CoolingOnlyCapFTempObjectNum(0), CoolingOnlyCapFFlowCurve(0), CoolingOnlyCapFFlowObjectNum(0),
               CoolingOnlyEIRFTempCurve(0), CoolingOnlyEIRFTempObjectNum(0), CoolingOnlyEIRFFlowCurve(0), CoolingOnlyEIRFFlowObjectNum(0),
@@ -414,14 +414,14 @@ namespace PackagedThermalStorageCoil {
               DischargeOnlyCapFFlowCurve(0), DischargeOnlyCapFFlowObjectNum(0), DischargeOnlyEIRFTempCurve(0), DischargeOnlyEIRFTempObjectNum(0),
               DischargeOnlyEIRFFlowCurve(0), DischargeOnlyEIRFFlowObjectNum(0), DischargeOnlyPLFFPLRCurve(0), DischargeOnlyPLFFPLRObjectNum(0),
               DischargeOnlySHRFTempCurve(0), DischargeOnlySHRFTempObjectNum(0), DischargeOnlySHRFFLowCurve(0), DischargeOnlySHRFFLowObjectNum(0),
-              AncillaryControlsPower(0.0), ColdWeatherMinimumTempLimit(0.0), ColdWeatherAncillaryPower(0.0), CondAirInletNodeNum(0),
-              CondAirOutletNodeNum(0), CondenserAirVolumeFlow(0.0), CondenserAirFlowSizingFactor(0.0), CondenserAirMassFlow(0.0), EvapCondEffect(0.0),
+              AncillaryControlsPower(0.0), ColdWeatherMinimumTempLimit(0.0), ColdWeatherAncillaryPower(0.0), 
+              CondenserAirVolumeFlow(0.0), CondenserAirFlowSizingFactor(0.0), CondenserAirMassFlow(0.0), EvapCondEffect(0.0),
               CondInletTemp(0.0), EvapCondPumpElecNomPower(0.0), EvapCondPumpElecEnergy(0.0), BasinHeaterPowerFTempDiff(0.0),
               BasinHeaterAvailSchedNum(0), BasinHeaterSetpointTemp(0.0), EvapWaterSupplyMode(EvapWaterSupply::WaterSupplyFromMains),
               EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0), CondensateCollectMode(CondensateAction::Discard), CondensateTankID(0),
               CondensateTankSupplyARRID(0), StorageMedia(MediaType::Invalid), StorageFluidIndex(0), FluidStorageVolume(0.0), IceStorageCapacity(0.0),
               StorageCapacitySizingFactor(0.0), MinimumFluidTankTempLimit(0.0), MaximumFluidTankTempLimit(100.0), RatedFluidTankTemp(0.0),
-              StorageAmbientNodeNum(0), StorageUA(0.0), TESPlantConnectionAvailable(false), TESPlantInletNodeNum(0), TESPlantOutletNodeNum(0),
+              StorageUA(0.0), TESPlantConnectionAvailable(false), 
               TESPlantLoopNum(0), TESPlantLoopSideNum(DataPlant::LoopSideLocation::Invalid), TESPlantBranchNum(0), TESPlantCompNum(0),
               TESPlantDesignVolumeFlowRate(0.0), TESPlantDesignMassFlowRate(0.0), TESPlantEffectiveness(0.0), TimeElapsed(0.0), IceFracRemain(0.0),
               IceFracRemainLastTimestep(0.0), FluidTankTempFinal(0.0), FluidTankTempFinalLastTimestep(0.0), QdotPlant(0.0), Q_Plant(0.0),

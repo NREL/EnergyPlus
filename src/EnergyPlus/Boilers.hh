@@ -101,8 +101,8 @@ namespace Boilers {
         Real64 DesMassFlowRate = 0.0;                                // kg/s - Boiler water design mass flow rate
         Real64 MassFlowRate = 0.0;                                   // kg/s - Boiler water mass flow rate
         Real64 SizFac = 0.0;                                         // sizing factor
-        int BoilerInletNodeNum = 0;                                  // Node number at the boiler inlet
-        int BoilerOutletNodeNum = 0;                                 // Node number at the boiler outlet
+        int BoilerInNodeNum = 0;                                  // Node number at the boiler inlet
+        int BoilerOutNodeNum = 0;                                 // Node number at the boiler outlet
         Real64 MinPartLoadRat = 0.0;                                 // Minimum allowed operating part load ratio
         Real64 MaxPartLoadRat = 0.0;                                 // Maximum allowed operating part load ratio
         Real64 OptPartLoadRat = 0.0;                                 // Optimal operating part load ratio

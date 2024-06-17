@@ -79,8 +79,8 @@ namespace PlantComponentTemperatureSources {
     {
         // Members
         std::string Name;                       // user identifier
-        int InletNodeNum;                       // Node number on the inlet side of the plant
-        int OutletNodeNum;                      // Node number on the outlet side of the plant
+        int InNodeNum = 0;                       // Node number on the inlet side of the plant
+        int OutNodeNum = 0;                      // Node number on the outlet side of the plant
         Real64 DesVolFlowRate;                  // m**3/s - design nominal volumetric flow rate
         bool DesVolFlowRateWasAutoSized;        // true if design flow rate was autosized on input
         Real64 MassFlowRateMax;                 // kg/s - design mass flow rate
@@ -104,7 +104,7 @@ namespace PlantComponentTemperatureSources {
 
         // Default Constructor
         WaterSourceSpecs()
-            : InletNodeNum(0), OutletNodeNum(0), DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
+            : DesVolFlowRate(0.0), DesVolFlowRateWasAutoSized(false), MassFlowRateMax(0.0),
               EMSOverrideOnMassFlowRateMax(false), EMSOverrideValueMassFlowRateMax(0.0), MassFlowRate(0.0), tempSpecType(TempSpecType::Invalid),
               TempSpecScheduleNum(0), BoundaryTemp(0.0), OutletTemp(0.0), InletTemp(0.0), HeatRate(0.0), HeatEnergy(0.0), plantLoc{}, SizFac(0.0),
               CheckEquipName(true), MyFlag(true), MyEnvironFlag(true), IsThisSized(false)

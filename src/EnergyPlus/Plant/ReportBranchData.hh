@@ -58,12 +58,12 @@ namespace DataPlant {
         // Members
         std::string Name;             // Name of the branch
         int TotalComponents;          // Total number of components on the branch
-        int NodeNumIn;                // Branch inlet node number
-        int NodeNumOut;               // Branch outlet node number
+        int InNodeNum = 0;                // Branch inlet node number
+        int OutNodeNum = 0;               // Branch outlet node number
         Array1D<ReportCompData> Comp; // Component type list
 
         // Default Constructor
-        ReportBranchData() : TotalComponents(0), NodeNumIn(0), NodeNumOut(0)
+        ReportBranchData() : TotalComponents(0) 
         {
         }
     };

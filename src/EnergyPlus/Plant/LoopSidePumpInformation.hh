@@ -58,7 +58,7 @@ namespace DataPlant {
         int PumpTypeOf;
         int BranchNum;
         int CompNum;
-        int PumpOutletNode;
+        int PumpOutNodeNum = 0;
         Real64 PumpFlowRate;
         Real64 CurrentMinAvail;
         Real64 CurrentMaxAvail;
@@ -66,7 +66,7 @@ namespace DataPlant {
 
         // Default Constructor
         LoopSidePumpInformation()
-            : PumpTypeOf(0), BranchNum(0), CompNum(0), PumpOutletNode(0), PumpFlowRate(0.0), CurrentMinAvail(0.0), CurrentMaxAvail(0.0),
+            : PumpTypeOf(0), BranchNum(0), CompNum(0), PumpFlowRate(0.0), CurrentMinAvail(0.0), CurrentMaxAvail(0.0),
               PumpHeatToFluid(0.0)
         {
         }

@@ -202,10 +202,11 @@ namespace HVACHXAssistedCoolingCoil {
         //  Call ReportHXAssistedCoolingCoil(HXAssistedCoilNum), not required. No reporting variables for this compound component.
 
         if (present(QTotOut)) {
-            int InletNodeNum = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInletNodeNum;
-            int OutletNodeNum = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutletNodeNum;
-            Real64 AirMassFlow = state.dataLoopNodes->Node(OutletNodeNum).MassFlowRate;
-            QTotOut = AirMassFlow * (state.dataLoopNodes->Node(InletNodeNum).Enthalpy - state.dataLoopNodes->Node(OutletNodeNum).Enthalpy);
+            auto &dln = state.dataLoopNodes;
+            auto const *inletNode = dln->nodes(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilInNodeNum);
+            auto const *outletNode = dln->nodes(state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilOutNodeNum);
+            Real64 AirMassFlow = outletNode->MassFlowRate;
+            QTotOut = AirMassFlow * (inletNode->Enthalpy - outletNode->Enthalpy);
         }
     }
 
@@ -237,13 +238,13 @@ namespace HVACHXAssistedCoolingCoil {
         bool ErrorsFound(false);          // set TRUE if errors detected in input
         bool HXErrFlag;                   // Error flag for HX node numbers mining call
         bool CoolingCoilErrFlag;          // Error flag for cooling coil node numbers mining call
-        int SupplyAirInletNode;           // supply air inlet node number mined from heat exchanger object (ExchCond structure)
-        int SupplyAirOutletNode;          // supply air outlet node number mined from heat exchanger object (ExchCond structure)
-        int SecondaryAirInletNode;        // secondary air inlet node number mined from heat exchanger object (ExchCond structure)
-        int SecondaryAirOutletNode;       // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
-        int CoolingCoilInletNodeNum;      // air outlet node number of cooling coil, used for warning messages
-        int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
-        int CoolingCoilOutletNodeNum;     // air outlet node number of cooling coil, used for warning messages
+        // int SupplyAirInletNode;           // supply air inlet node number mined from heat exchanger object (ExchCond structure)
+        // int SupplyAirOutletNode;          // supply air outlet node number mined from heat exchanger object (ExchCond structure)
+        // int SecondaryAirInletNode;        // secondary air inlet node number mined from heat exchanger object (ExchCond structure)
+        // int SecondaryAirOutletNode;       // secondary air outlet node number mined from heat exchanger object (ExchCond structure)
+        // int CoolingCoilInletNodeNum;      // air outlet node number of cooling coil, used for warning messages
+        // int CoolingCoilWaterInletNodeNum; // water coil water inlet node number used to find controller index
+        // int CoolingCoilOutletNodeNum;     // air outlet node number of cooling coil, used for warning messages
         std::string CurrentModuleObject;  // Object type for getting and error messages
         Array1D_string AlphArray;         // Alpha input items for object
         Array1D_string cAlphaFields;      // Alpha field names
@@ -253,6 +254,8 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         int TotalArgs(0);                 // Total number of alpha and numeric arguments (max) for a
 
+        auto &dln = state.dataLoopNodes;
+        
         int NumHXAssistedDXCoils =
             state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "CoilSystem:Cooling:DX:HeatExchangerAssisted");
         int NumHXAssistedWaterCoils =
@@ -365,32 +368,32 @@ namespace HVACHXAssistedCoolingCoil {
             }
 
             HXErrFlag = false;
-            SupplyAirInletNode = HeatRecovery::GetSupplyInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SupplyAirInNodeNum = HeatRecovery::GetSupplyInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SupplyAirOutletNode = HeatRecovery::GetSupplyOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SupplyAirOutNodeNum = HeatRecovery::GetSupplyOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SecondaryAirInletNode = HeatRecovery::GetSecondaryInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SecondaryAirInNodeNum = HeatRecovery::GetSecondaryInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SecondaryAirOutletNode = HeatRecovery::GetSecondaryOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SecondaryAirOutNodeNum = HeatRecovery::GetSecondaryOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX")) {
-                CoolingCoilInletNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].evapInletNodeIndex;
-                if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
+                thisHXCoil.CoolCoilAirInNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].evapInNodeNum;
+                if (thisHXCoil.SupplyAirOutNodeNum != thisHXCoil.CoolCoilAirInNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -401,13 +404,13 @@ namespace HVACHXAssistedCoolingCoil {
                         state,
                         format("must match the cooling coil inlet node name in {}=\"{}\"", thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName));
                     ShowContinueError(state,
-                                      format("Heat exchanger supply air outlet node name=\"{}\"", state.dataLoopNodes->NodeID(SupplyAirOutletNode)));
-                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum)));
+                                      format("Heat exchanger supply air outlet node name=\"{}\"", dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name));
+                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", dln->nodes(thisHXCoil.CoolCoilAirInNodeNum)->Name));
                     ErrorsFound = true;
                 }
 
-                CoolingCoilOutletNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].evapOutletNodeIndex;
-                if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
+                thisHXCoil.CoolCoilAirOutNodeNum = state.dataCoilCooingDX->coilCoolingDXs[thisHXCoil.CoolingCoilIndex].evapOutNodeNum;
+                if (thisHXCoil.SecondaryAirInNodeNum != thisHXCoil.CoolCoilAirOutNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -419,21 +422,21 @@ namespace HVACHXAssistedCoolingCoil {
                                              thisHXCoil.CoolingCoilType,
                                              thisHXCoil.CoolingCoilName));
                     ShowContinueError(
-                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", state.dataLoopNodes->NodeID(SecondaryAirInletNode)));
+                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name));
                     ShowContinueError(state,
-                                      format("Cooling coil air outlet node name =\"{}\".", state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum)));
+                                      format("Cooling coil air outlet node name =\"{}\".", dln->nodes(thisHXCoil.CoolCoilAirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
 
             } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum =
+                thisHXCoil.CoolCoilAirInNodeNum =
                     DXCoils::GetCoilInletNode(state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                 }
-                if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
+                if (thisHXCoil.SupplyAirOutNodeNum != thisHXCoil.CoolCoilAirInNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -444,17 +447,17 @@ namespace HVACHXAssistedCoolingCoil {
                         state,
                         format("must match the cooling coil inlet node name in = {}=\"{}\"", thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName));
                     ShowContinueError(state,
-                                      format("Heat exchanger supply air outlet node name=\"{}\"", state.dataLoopNodes->NodeID(SupplyAirOutletNode)));
-                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum)));
+                                      format("Heat exchanger supply air outlet node name=\"{}\"", dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name));
+                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", dln->nodes(thisHXCoil.CoolCoilAirInNodeNum)->Name));
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum =
+                thisHXCoil.CoolCoilAirOutNodeNum =
                     DXCoils::GetCoilOutletNode(state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                 }
-                if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
+                if (thisHXCoil.SecondaryAirInNodeNum != thisHXCoil.CoolCoilAirOutNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -466,21 +469,21 @@ namespace HVACHXAssistedCoolingCoil {
                                              thisHXCoil.CoolingCoilType,
                                              thisHXCoil.CoolingCoilName));
                     ShowContinueError(
-                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", state.dataLoopNodes->NodeID(SecondaryAirInletNode)));
+                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name));
                     ShowContinueError(state,
-                                      format("Cooling coil air outlet node name =\"{}\".", state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum)));
+                                      format("Cooling coil air outlet node name =\"{}\".", dln->nodes(thisHXCoil.CoolCoilAirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
 
             } else if (Util::SameString(thisHXCoil.CoolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
+                thisHXCoil.CoolCoilAirInNodeNum = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(
                     state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                 }
-                if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
+                if (thisHXCoil.SupplyAirOutNodeNum != thisHXCoil.CoolCoilAirInNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -491,17 +494,17 @@ namespace HVACHXAssistedCoolingCoil {
                         state,
                         format("must match the cooling coil inlet node name in = {}=\"{}\"", thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName));
                     ShowContinueError(state,
-                                      format("Heat exchanger supply air outlet node name=\"{}\"", state.dataLoopNodes->NodeID(SupplyAirOutletNode)));
-                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum)));
+                                      format("Heat exchanger supply air outlet node name=\"{}\"", dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name));
+                    ShowContinueError(state, format("Cooling coil air inlet node name=\"{}\"", dln->nodes(thisHXCoil.CoolCoilAirInNodeNum)->Name));
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
+                thisHXCoil.CoolCoilAirOutNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
                     state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
                 }
-                if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
+                if (thisHXCoil.SecondaryAirInNodeNum != thisHXCoil.CoolCoilAirOutNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -513,9 +516,9 @@ namespace HVACHXAssistedCoolingCoil {
                                              thisHXCoil.CoolingCoilType,
                                              thisHXCoil.CoolingCoilName));
                     ShowContinueError(
-                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", state.dataLoopNodes->NodeID(SecondaryAirInletNode)));
+                        state, format("Heat exchanger secondary air inlet node name =\"{}\".", dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name));
                     ShowContinueError(state,
-                                      format("Cooling coil air outlet node name =\"{}\".", state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum)));
+                                      format("Cooling coil air outlet node name =\"{}\".", dln->nodes(thisHXCoil.CoolCoilAirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
             }
@@ -523,50 +526,51 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::TestCompSet(state,
                                                thisHXCoil.HXAssistedCoilType,
                                                thisHXCoil.Name,
-                                               state.dataLoopNodes->NodeID(SupplyAirInletNode),
-                                               state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                               dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
+                                               dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                "Air Nodes");
 
-            thisHXCoil.HXAssistedCoilInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SupplyAirInletNode),
+            thisHXCoil.HXAssistedCoilInNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingDXHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
-            // no need to capture CoolingCoilInletNodeNum as the return value, it's not used anywhere
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
+            // no need to capture CoolingCoilInNodeNum as the return value, it's not used anywhere
+            thisHXCoil.CoolCoilAirInNodeNum =
+                    Node::GetSingleNode(state,
+                                                dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted,
+                                                Node::ConnObjType::CoilSystemCoolingDXHeatExchangerAssisted,
                                                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                DataLoopNode::NodeFluidType::Air,
-                                                DataLoopNode::ConnectionType::Internal,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
-            thisHXCoil.HXExhaustAirInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SecondaryAirInletNode),
+                                                Node::FluidType::Air,
+                                                Node::ConnType::Internal,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsParent);
+            thisHXCoil.HXExhaustAirInNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingDXHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Internal,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
-            thisHXCoil.HXAssistedCoilOutletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Internal,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
+            thisHXCoil.HXAssistedCoilOutNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingDXHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingDXHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
 
             // Add cooling coil to component sets array
             BranchNodeConnections::SetUpCompSets(state,
@@ -574,8 +578,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                  thisHXCoil.Name,
                                                  thisHXCoil.CoolingCoilType,
                                                  thisHXCoil.CoolingCoilName,
-                                                 state.dataLoopNodes->NodeID(SupplyAirOutletNode),
-                                                 state.dataLoopNodes->NodeID(SecondaryAirInletNode),
+                                                 dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
                                                  "Air Nodes");
             // Add heat exchanger to component sets array
             BranchNodeConnections::SetUpCompSets(state,
@@ -583,16 +587,16 @@ namespace HVACHXAssistedCoolingCoil {
                                                  thisHXCoil.Name,
                                                  HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
-                                                 state.dataLoopNodes->NodeID(SupplyAirInletNode),
-                                                 state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                 dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
                                                  "Process Air Nodes");
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
                                                  HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
-                                                 state.dataLoopNodes->NodeID(SecondaryAirInletNode),
-                                                 state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                                 dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                  "Secondary Air Nodes");
 
         } // End of the Coil:DX:CoolingHXAssisted Loop
@@ -635,25 +639,25 @@ namespace HVACHXAssistedCoolingCoil {
             thisHXCoil.CoolingCoilName = AlphArray(5);
 
             HXErrFlag = false;
-            SupplyAirInletNode = HeatRecovery::GetSupplyInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SupplyAirInNodeNum = HeatRecovery::GetSupplyInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SupplyAirOutletNode = HeatRecovery::GetSupplyOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SupplyAirOutNodeNum = HeatRecovery::GetSupplyOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SecondaryAirInletNode = HeatRecovery::GetSecondaryInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SecondaryAirInNodeNum = HeatRecovery::GetSecondaryInletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
 
             HXErrFlag = false;
-            SecondaryAirOutletNode = HeatRecovery::GetSecondaryOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
+            thisHXCoil.SecondaryAirOutNodeNum = HeatRecovery::GetSecondaryOutletNode(state, thisHXCoil.HeatExchangerName, HXErrFlag);
             if (HXErrFlag) {
                 ShowContinueError(state, format("...Occurs in {}=\"{}\"", CurrentModuleObject, thisHXCoil.Name));
             }
@@ -671,14 +675,14 @@ namespace HVACHXAssistedCoolingCoil {
 
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum =
+                thisHXCoil.CoolCoilAirInNodeNum =
                     WaterCoils::GetCoilInletNode(state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
-                CoolingCoilWaterInletNodeNum =
+                thisHXCoil.CoolCoilWaterInNodeNum =
                     WaterCoils::GetCoilWaterInletNode(state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 HVACControllers::GetControllerNameAndIndex(
-                    state, CoolingCoilWaterInletNodeNum, thisHXCoil.ControllerName, thisHXCoil.ControllerIndex, CoolingCoilErrFlag);
+                    state, thisHXCoil.CoolCoilWaterInNodeNum, thisHXCoil.ControllerName, thisHXCoil.ControllerIndex, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CurrentModuleObject, thisHXCoil.Name));
-                if (SupplyAirOutletNode != CoolingCoilInletNodeNum) {
+                if (thisHXCoil.SupplyAirOutNodeNum != thisHXCoil.CoolCoilAirInNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -689,16 +693,16 @@ namespace HVACHXAssistedCoolingCoil {
                         state,
                         format("must match the cooling coil inlet node name in = {}=\"{}\"", thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName));
                     ShowContinueError(state,
-                                      format("Heat exchanger supply air outlet node name =\"{}\"", state.dataLoopNodes->NodeID(SupplyAirOutletNode)));
+                                      format("Heat exchanger supply air outlet node name =\"{}\"", dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name));
                     ShowContinueError(state,
-                                      format("Cooling coil air inlet node name = \"{}\"", state.dataLoopNodes->NodeID(CoolingCoilInletNodeNum)));
+                                      format("Cooling coil air inlet node name = \"{}\"", dln->nodes(thisHXCoil.CoolCoilAirInNodeNum)->Name));
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum =
+                thisHXCoil.CoolCoilAirOutNodeNum =
                     WaterCoils::GetCoilOutletNode(state, thisHXCoil.CoolingCoilType, thisHXCoil.CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) ShowContinueError(state, format("...occurs in {} \"{}\"", CurrentModuleObject, thisHXCoil.Name));
-                if (SecondaryAirInletNode != CoolingCoilOutletNodeNum) {
+                if (thisHXCoil.SecondaryAirInNodeNum != thisHXCoil.CoolCoilAirOutNodeNum) {
                     ShowSevereError(state, format("{}{}=\"{}\"", RoutineName, CurrentModuleObject, thisHXCoil.Name));
                     ShowContinueError(state, "Node names are inconsistent in heat exchanger and cooling coil object.");
                     ShowContinueError(state,
@@ -710,9 +714,9 @@ namespace HVACHXAssistedCoolingCoil {
                                              thisHXCoil.CoolingCoilType,
                                              thisHXCoil.CoolingCoilName));
                     ShowContinueError(
-                        state, format("Heat exchanger secondary air inlet node name = \"{}\".", state.dataLoopNodes->NodeID(SecondaryAirInletNode)));
+                        state, format("Heat exchanger secondary air inlet node name = \"{}\".", dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name));
                     ShowContinueError(state,
-                                      format("Cooling coil air outlet node name = \"{}\".", state.dataLoopNodes->NodeID(CoolingCoilOutletNodeNum)));
+                                      format("Cooling coil air outlet node name = \"{}\".", dln->nodes(thisHXCoil.CoolCoilAirOutNodeNum)->Name));
                     ErrorsFound = true;
                 }
 
@@ -724,50 +728,50 @@ namespace HVACHXAssistedCoolingCoil {
             BranchNodeConnections::TestCompSet(state,
                                                thisHXCoil.HXAssistedCoilType,
                                                thisHXCoil.Name,
-                                               state.dataLoopNodes->NodeID(SupplyAirInletNode),
-                                               state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                               dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
+                                               dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                "Air Nodes");
 
-            thisHXCoil.HXAssistedCoilInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SupplyAirInletNode),
+            thisHXCoil.HXAssistedCoilInNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingWaterHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingWaterHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Inlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
-            // no need to capture CoolingCoilInletNodeNum as the return value, it's not used anywhere
-            NodeInputManager::GetOnlySingleNode(state,
-                                                state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Inlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
+            // no need to capture CoolingCoilInNodeNum as the return value, it's not used anywhere
+            thisHXCoil.CoolCoilAirInNodeNum = Node::GetSingleNode(state,
+                                                dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CoilSystemCoolingWaterHeatExchangerAssisted,
+                                                Node::ConnObjType::CoilSystemCoolingWaterHeatExchangerAssisted,
                                                 state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum).Name,
-                                                DataLoopNode::NodeFluidType::Air,
-                                                DataLoopNode::ConnectionType::Internal,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsParent);
-            thisHXCoil.HXExhaustAirInletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SecondaryAirInletNode),
+                                                Node::FluidType::Air,
+                                                Node::ConnType::Internal,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsParent);
+            thisHXCoil.HXExhaustAirInNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingWaterHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingWaterHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Internal,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
-            thisHXCoil.HXAssistedCoilOutletNodeNum =
-                NodeInputManager::GetOnlySingleNode(state,
-                                                    state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Internal,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
+            thisHXCoil.HXAssistedCoilOutNodeNum =
+                Node::GetSingleNode(state,
+                                                    dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::CoilSystemCoolingWaterHeatExchangerAssisted,
+                                                    Node::ConnObjType::CoilSystemCoolingWaterHeatExchangerAssisted,
                                                     thisHXCoil.Name,
-                                                    DataLoopNode::NodeFluidType::Air,
-                                                    DataLoopNode::ConnectionType::Outlet,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsParent);
+                                                    Node::FluidType::Air,
+                                                    Node::ConnType::Outlet,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsParent);
 
             // Add cooling coil to component sets array
             BranchNodeConnections::SetUpCompSets(state,
@@ -775,8 +779,8 @@ namespace HVACHXAssistedCoolingCoil {
                                                  thisHXCoil.Name,
                                                  thisHXCoil.CoolingCoilType,
                                                  thisHXCoil.CoolingCoilName,
-                                                 state.dataLoopNodes->NodeID(SupplyAirOutletNode),
-                                                 state.dataLoopNodes->NodeID(SecondaryAirInletNode),
+                                                 dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
                                                  "Air Nodes");
             // Add heat exchanger to component sets array
             BranchNodeConnections::SetUpCompSets(state,
@@ -784,16 +788,16 @@ namespace HVACHXAssistedCoolingCoil {
                                                  thisHXCoil.Name,
                                                  HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
-                                                 state.dataLoopNodes->NodeID(SupplyAirInletNode),
-                                                 state.dataLoopNodes->NodeID(SupplyAirOutletNode),
+                                                 dln->nodes(thisHXCoil.SupplyAirInNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SupplyAirOutNodeNum)->Name,
                                                  "Process Air Nodes");
             BranchNodeConnections::SetUpCompSets(state,
                                                  thisHXCoil.HXAssistedCoilType,
                                                  thisHXCoil.Name,
                                                  HVAC::hxTypeNames[(int)thisHXCoil.hxType],
                                                  thisHXCoil.HeatExchangerName,
-                                                 state.dataLoopNodes->NodeID(SecondaryAirInletNode),
-                                                 state.dataLoopNodes->NodeID(SecondaryAirOutletNode),
+                                                 dln->nodes(thisHXCoil.SecondaryAirInNodeNum)->Name,
+                                                 dln->nodes(thisHXCoil.SecondaryAirOutNodeNum)->Name,
                                                  "Secondary Air Nodes");
 
         } // End of the Coil:Water:CoolingHXAssisted Loop
@@ -832,7 +836,9 @@ namespace HVACHXAssistedCoolingCoil {
 
         // Do these initializations every time
         auto &thisHXCoil = state.dataHVACAssistedCC->HXAssistedCoil(HXAssistedCoilNum);
-        thisHXCoil.MassFlowRate = state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).MassFlowRate;
+        auto &dln = state.dataLoopNodes;
+        auto *hxAssistedCoilInNode = dln->nodes(thisHXCoil.HXAssistedCoilInNodeNum);
+        thisHXCoil.MassFlowRate = hxAssistedCoilInNode->MassFlowRate;
 
         if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling) {
             //
@@ -886,7 +892,12 @@ namespace HVACHXAssistedCoolingCoil {
         int Iter = 0;             // Initialize iteration counter to zero
 
         // Set mass flow rate at inlet of exhaust side of heat exchanger to supply side air mass flow rate entering this compound object
-        state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
+        auto &dln = state.dataLoopNodes;
+        auto *hxExhaustedAirInNode = dln->nodes(thisHXCoil.HXExhaustAirInNodeNum);
+        auto const *hxAssistedCoilInNode = dln->nodes(thisHXCoil.HXAssistedCoilInNodeNum);
+        auto const *hxAssistedCoilOutNode = dln->nodes(thisHXCoil.HXAssistedCoilOutNodeNum);
+        
+        hxExhaustedAirInNode->MassFlowRate = AirMassFlow;
 
         if (thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_Cooling || thisHXCoil.CoolingCoilType_Num == HVAC::CoilDX_CoolingSingleSpeed ||
             thisHXCoil.CoolingCoilType_Num == HVAC::Coil_CoolingAirToAirVariableSpeed) {
@@ -900,14 +911,10 @@ namespace HVACHXAssistedCoolingCoil {
         // Reset node data to minimize iteration. This initialization reduces the number of iterations by 50%.
         // CAUTION: Do not use Node(x) = Node(y) here, this can overwrite the coil outlet node setpoint.
         if (PartLoadRatio == 0.0) {
-            state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).Temp =
-                state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).Temp;
-            state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).HumRat =
-                state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).HumRat;
-            state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).Enthalpy =
-                state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).Enthalpy;
-            state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).MassFlowRate =
-                state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilInletNodeNum).MassFlowRate;
+            hxExhaustedAirInNode->Temp = hxAssistedCoilInNode->Temp;
+            hxExhaustedAirInNode->HumRat = hxAssistedCoilInNode->HumRat;
+            hxExhaustedAirInNode->Enthalpy = hxAssistedCoilInNode->Enthalpy;
+            hxExhaustedAirInNode->MassFlowRate = hxAssistedCoilInNode->MassFlowRate;
         }
 
         // Force at least 2 iterations to pass outlet node information
@@ -997,13 +1004,13 @@ namespace HVACHXAssistedCoolingCoil {
                 WaterCoils::SimulateWaterCoilComponents(state, thisHXCoil.CoolingCoilName, FirstHVACIteration, thisHXCoil.CoolingCoilIndex);
             }
 
-            Error = state.dataHVACAssistedCC->CoilOutputTempLast - state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).Temp;
+            Error = state.dataHVACAssistedCC->CoilOutputTempLast - hxExhaustedAirInNode->Temp;
             if (Iter > 40) { // check for oscillation (one of these being negative and one positive) before hitting max iteration limit
                 if (Error + ErrorLast < 0.000001)
                     Error = 0.0; // result bounced back and forth with same positive and negative result, no possible solution without this check
             }
             ErrorLast = Error;
-            state.dataHVACAssistedCC->CoilOutputTempLast = state.dataLoopNodes->Node(thisHXCoil.HXExhaustAirInletNodeNum).Temp;
+            state.dataHVACAssistedCC->CoilOutputTempLast = hxExhaustedAirInNode->Temp;
             ++Iter;
         }
 
@@ -1025,10 +1032,8 @@ namespace HVACHXAssistedCoolingCoil {
             }
         }
 
-        state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(HXAssistedCoilNum) =
-            state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilOutletNodeNum).Temp;
-        state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(HXAssistedCoilNum) =
-            state.dataLoopNodes->Node(thisHXCoil.HXAssistedCoilOutletNodeNum).HumRat;
+        state.dataHVACAssistedCC->HXAssistedCoilOutletTemp(HXAssistedCoilNum) = hxAssistedCoilOutNode->Temp;
+        state.dataHVACAssistedCC->HXAssistedCoilOutletHumRat(HXAssistedCoilNum) = hxAssistedCoilOutNode->HumRat;
     }
 
     //        End of Reporting subroutines for the HXAssistedCoil Module
@@ -1333,7 +1338,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (WhichCoil != 0) {
-            return state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilInletNodeNum;
+            return state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilInNodeNum;
         } else {
             ShowSevereError(state, format("GetCoilInletNode: Could not find Coil, Type=\"{}\" Name=\"{}\"", CoilType, CoilName));
             ErrorsFound = true;
@@ -1431,9 +1436,9 @@ namespace HVACHXAssistedCoolingCoil {
         }
 
         if (WhichCoil != 0) {
-            return state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilOutletNodeNum;
+            return state.dataHVACAssistedCC->HXAssistedCoil(WhichCoil).HXAssistedCoilOutNodeNum;
         } else {
-            ShowSevereError(state, format("GetCoilOutletNode: Could not find Coil, Type=\"{}\" Name=\"{}", CoilType, CoilName));
+            ShowSevereError(state, format("GetCoilOutNode: Could not find Coil, Type=\"{}\" Name=\"{}", CoilType, CoilName));
             ErrorsFound = true;
             return 0;
         }

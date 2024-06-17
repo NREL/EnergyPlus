@@ -146,7 +146,7 @@ namespace HVACControllers {
         // --------------------
         // Actuated variable
         // --------------------
-        int ActuatedNode;                   // The node that is acted upon by the controller
+        int ActuatedNodeNum = 0;                   // The node that is acted upon by the controller
         Real64 ActuatedValue;               // Value of actuated variable before change by the controller
         Real64 NextActuatedValue;           // The new control actuated value
         PlantLocation ActuatedNodePlantLoc; // Location for actuated node
@@ -154,7 +154,7 @@ namespace HVACControllers {
         // --------------------
         // Sensed variable
         // --------------------
-        int SensedNode;             // The sensed node number from the grid
+        int SensedNodeNum = 0;             // The sensed node number from the grid
         bool IsSetPointDefinedFlag; // If TRUE indicates that the setpoint has been defined and can
         // be used to compute DeltaSensed
         Real64 SetPointValue;                         // Desired setpoint; set in the SetPoint Manager or computed in Init() routine
@@ -190,7 +190,7 @@ namespace HVACControllers {
               Action(ControllerAction::NoAction), InitFirstPass(true), NumCalcCalls(0), Mode(ControllerMode::None), DoWarmRestartFlag(false),
               ReuseIntermediateSolutionFlag(false), ReusePreviousSolutionFlag(false), SolutionTrackers(2), MaxAvailActuated(0.0), MaxAvailSensed(0.0),
               MinAvailActuated(0.0), MinAvailSensed(0.0), MaxVolFlowActuated(0.0), MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0),
-              ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoc{}, SensedNode(0), IsSetPointDefinedFlag(false),
+              ActuatedValue(0.0), NextActuatedValue(0.0), ActuatedNodePlantLoc{}, IsSetPointDefinedFlag(false),
               SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(SetPointManager::CtrlVarType::Invalid), Range(0.0),
               Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false), FaultyCoilSATIndex(0),
               FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)

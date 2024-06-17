@@ -209,12 +209,12 @@ namespace LowTempRadiantSystem {
         Array1D<Real64> NumCircuits; // Number of fluid circuits in the surface
         Real64 TubeLength = 0.0;     // tube length embedded in radiant surface (meters)
         bool HeatingSystem = false;  // .TRUE. when the system is able to heat (parameters are valid)
-        int HotWaterInNode = 0;      // hot water inlet node
-        int HotWaterOutNode = 0;     // hot water outlet node
+        int HotWaterInNodeNum = 0;      // hot water inlet node
+        int HotWaterOutNodeNum = 0;     // hot water outlet node
         PlantLocation HWPlantLoc{};
         bool CoolingSystem = false; // .TRUE. when the system is able to cool (parameters are valid)
-        int ColdWaterInNode = 0;    // cold water inlet node
-        int ColdWaterOutNode = 0;   // cold water outlet node
+        int ColdWaterInNodeNum = 0;    // cold water inlet node
+        int ColdWaterOutNodeNum = 0;   // cold water outlet node
         PlantLocation CWPlantLoc{};
         int GlycolIndex = 0;             // Index to Glycol (Water) Properties
         int CondErrIndex = 0;            // Error index for recurring warning messages
@@ -405,7 +405,7 @@ namespace LowTempRadiantSystem {
 
         void
         calculateLowTemperatureRadiantSystemComponents(EnergyPlusData &state,
-                                                       int const MainLoopNodeIn, // Node number on main loop of the inlet node to the radiant system
+                                                       int const MainLoopInNodeNum, // Node number on main loop of the inlet node to the radiant system
                                                        bool const Iteration,     // FALSE for the regular solution, TRUE when we had to loop back
                                                        Real64 &LoadMet,          // Load met by the low temperature radiant system, in Watts
                                                        LowTempRadiantSystem::SystemType typeOfRadiantSystem);

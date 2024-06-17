@@ -1508,16 +1508,16 @@ namespace PlantPipingSystemsManager {
 
             // Read inlet and outlet node names and validate them
             thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
-            thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisCircuit.InNodeNum = Node::GetSingleNode(state,
                                                                            state.dataIPShortCut->cAlphaArgs(2),
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
+                                                                           Node::ConnObjType::PipingSystemUndergroundPipeCircuit,
                                                                            state.dataIPShortCut->cAlphaArgs(1),
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Inlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.InletNodeNum == 0) {
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Inlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
+            if (thisCircuit.InNodeNum == 0) {
                 CurIndex = 2;
                 IssueSevereInputFieldError(state,
                                            RoutineName,
@@ -1529,16 +1529,16 @@ namespace PlantPipingSystemsManager {
                                            ErrorsFound);
             }
             thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
-            thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisCircuit.OutNodeNum = Node::GetSingleNode(state,
                                                                             state.dataIPShortCut->cAlphaArgs(3),
                                                                             ErrorsFound,
-                                                                            DataLoopNode::ConnectionObjectType::PipingSystemUndergroundPipeCircuit,
+                                                                            Node::ConnObjType::PipingSystemUndergroundPipeCircuit,
                                                                             state.dataIPShortCut->cAlphaArgs(1),
-                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.OutletNodeNum == 0) {
+                                                                            Node::FluidType::Water,
+                                                                            Node::ConnType::Outlet,
+                                                                            Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
+            if (thisCircuit.OutNodeNum == 0) {
                 CurIndex = 3;
                 IssueSevereInputFieldError(state,
                                            RoutineName,
@@ -1646,29 +1646,29 @@ namespace PlantPipingSystemsManager {
 
             // Read inlet and outlet node names and validate them
             thisCircuit.InletNodeName = state.dataIPShortCut->cAlphaArgs(2);
-            thisCircuit.InletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisCircuit.InNodeNum = Node::GetSingleNode(state,
                                                                            thisCircuit.InletNodeName,
                                                                            ErrorsFound,
-                                                                           DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
+                                                                           Node::ConnObjType::GroundHeatExchangerHorizontalTrench,
                                                                            thisTrenchName,
-                                                                           DataLoopNode::NodeFluidType::Water,
-                                                                           DataLoopNode::ConnectionType::Inlet,
-                                                                           NodeInputManager::CompFluidStream::Primary,
-                                                                           DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.InletNodeNum == 0) {
+                                                                           Node::FluidType::Water,
+                                                                           Node::ConnType::Inlet,
+                                                                           Node::CompFluidStream::Primary,
+                                                                           Node::ObjectIsNotParent);
+            if (thisCircuit.InNodeNum == 0) {
                 CurIndex = 2;
             }
             thisCircuit.OutletNodeName = state.dataIPShortCut->cAlphaArgs(3);
-            thisCircuit.OutletNodeNum = NodeInputManager::GetOnlySingleNode(state,
+            thisCircuit.OutNodeNum = Node::GetSingleNode(state,
                                                                             thisCircuit.OutletNodeName,
                                                                             ErrorsFound,
-                                                                            DataLoopNode::ConnectionObjectType::GroundHeatExchangerHorizontalTrench,
+                                                                            Node::ConnObjType::GroundHeatExchangerHorizontalTrench,
                                                                             thisTrenchName,
-                                                                            DataLoopNode::NodeFluidType::Water,
-                                                                            DataLoopNode::ConnectionType::Outlet,
-                                                                            NodeInputManager::CompFluidStream::Primary,
-                                                                            DataLoopNode::ObjectIsNotParent);
-            if (thisCircuit.OutletNodeNum == 0) {
+                                                                            Node::FluidType::Water,
+                                                                            Node::ConnType::Outlet,
+                                                                            Node::CompFluidStream::Primary,
+                                                                            Node::ObjectIsNotParent);
+            if (thisCircuit.OutNodeNum == 0) {
                 CurIndex = 3;
             }
             BranchNodeConnections::TestCompSet(
@@ -2092,6 +2092,9 @@ namespace PlantPipingSystemsManager {
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("InitPipingSystems");
 
+        auto &dln = state.dataLoopNodes;
+        auto const *inNode = dln->nodes(thisCircuit->InNodeNum);
+        
         // Do any one-time initializations
         if (thisCircuit->NeedToFindOnPlantLoop) {
 
@@ -2149,7 +2152,7 @@ namespace PlantPipingSystemsManager {
 
             // this seemed to clean up a lot of reverse DD stuff because fluid thermal properties were
             // being based on the inlet temperature, which wasn't updated until later
-            thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(thisCircuit->InletNodeNum).Temp;
+            thisCircuit->CurCircuitInletTemp = inNode->Temp;
             thisCircuit->InletTemperature = thisCircuit->CurCircuitInletTemp;
 
             this->DoOneTimeInitializations(state, thisCircuit);
@@ -2168,13 +2171,11 @@ namespace PlantPipingSystemsManager {
         }
 
         // Get the mass flow and inlet temperature to use for this time step
-        int InletNodeNum = thisCircuit->InletNodeNum;
-        int OutletNodeNum = thisCircuit->OutletNodeNum;
-        thisCircuit->CurCircuitInletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+        thisCircuit->CurCircuitInletTemp = inNode->Temp;
 
         // request design, set component flow will decide what to give us based on restrictions and flow lock status
         thisCircuit->CurCircuitFlowRate = thisCircuit->DesignMassFlowRate;
-        PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate, InletNodeNum, OutletNodeNum, thisCircuit->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, thisCircuit->CurCircuitFlowRate, thisCircuit->InNodeNum, thisCircuit->OutNodeNum, thisCircuit->plantLoc);
     }
 
     void Domain::UpdatePipingSystems(EnergyPlusData &state, Circuit *thisCircuit)
@@ -2185,10 +2186,10 @@ namespace PlantPipingSystemsManager {
         //       DATE WRITTEN   Summer 2011
         //       MODIFIED       na
         //       RE-ENGINEERED  na
-
-        int OutletNodeNum = thisCircuit->OutletNodeNum;
+        auto &dln = state.dataLoopNodes;
+        auto *outNode = dln->nodes(thisCircuit->OutNodeNum);
         auto const &out_cell = thisCircuit->CircuitOutletCell;
-        state.dataLoopNodes->Node(OutletNodeNum).Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
+        outNode->Temp = this->Cells(out_cell.X, out_cell.Y, out_cell.Z).PipeCellData.Fluid.Temperature;
     }
 
     void IssueSevereInputFieldError(EnergyPlusData &state,

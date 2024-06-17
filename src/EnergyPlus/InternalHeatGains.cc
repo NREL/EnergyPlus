@@ -193,9 +193,8 @@ namespace InternalHeatGains {
         using namespace ScheduleManager;
 
         using namespace OutputReportPredefined;
-        using namespace DataLoopNode;
         using Curve::GetCurveIndex;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetInternalHeatGains: ");
@@ -1482,16 +1481,16 @@ namespace InternalHeatGains {
                             ErrorsFound = true;
                         } else {
                             bool exhaustNodeError = false;
-                            thisLights.ZoneExhaustNodeNum = GetOnlySingleNode(state,
+                            thisLights.ZoneExhaustNodeNum = GetSingleNode(state,
                                                                               IHGAlphas(8),
                                                                               exhaustNodeError,
-                                                                              DataLoopNode::ConnectionObjectType::Lights,
+                                                                              Node::ConnObjType::Lights,
                                                                               thisLights.Name,
-                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::ConnectionType::ZoneExhaust,
-                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                              ObjectIsNotParent);
-                            if (!exhaustNodeError) { // GetOnlySingleNode will throw error messages if this is a NodeList Name and for other issues
+                                                                              Node::FluidType::Air,
+                                                                              Node::ConnType::ZoneExhaust,
+                                                                              Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
+                            if (!exhaustNodeError) { // GetSingleNode will throw error messages if this is a NodeList Name and for other issues
                                 exhaustNodeError =
                                     DataZoneEquipment::VerifyLightsExhaustNodeForZone(state, thisLights.ZonePtr, thisLights.ZoneExhaustNodeNum);
                             }
@@ -1507,7 +1506,7 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             } else {
                                 if (thisLights.ZoneReturnNum > 0) {
-                                    state.dataZoneEquip->ZoneEquipConfig(thisLights.ZonePtr).ReturnNodeExhaustNodeNum(thisLights.ZoneReturnNum) =
+                                    state.dataZoneEquip->ZoneEquipConfig(thisLights.ZonePtr).ReturnNodeExhaustNodeNums(thisLights.ZoneReturnNum) =
                                         thisLights.ZoneExhaustNodeNum;
                                     CheckSharedExhaustFlag = true;
                                 } else {
@@ -1552,7 +1551,7 @@ namespace InternalHeatGains {
                 int returnNodeNum = 0;
                 if ((state.dataHeatBal->Lights(lightsNum).ZoneReturnNum > 0) &&
                     (state.dataHeatBal->Lights(lightsNum).ZoneReturnNum <= state.dataZoneEquip->ZoneEquipConfig(zoneNum).NumReturnNodes)) {
-                    returnNodeNum = state.dataZoneEquip->ZoneEquipConfig(zoneNum).ReturnNode(state.dataHeatBal->Lights(lightsNum).ZoneReturnNum);
+                    returnNodeNum = state.dataZoneEquip->ZoneEquipConfig(zoneNum).ReturnNodeNums(state.dataHeatBal->Lights(lightsNum).ZoneReturnNum);
                 }
                 if (!ErrorsFound) {
                     SetupSpaceInternalGain(state,
@@ -3223,22 +3222,22 @@ namespace InternalHeatGains {
                                 ErrorsFound = true;
                             }
                         } else {
-                            thisZoneITEq.SupplyAirNodeNum = GetOnlySingleNode(state,
+                            thisZoneITEq.SupplyAirNodeNum = GetSingleNode(state,
                                                                               IHGAlphas(14),
                                                                               ErrorsFound,
-                                                                              DataLoopNode::ConnectionObjectType::ElectricEquipmentITEAirCooled,
+                                                                              Node::ConnObjType::ElectricEquipmentITEAirCooled,
                                                                               IHGAlphas(1),
-                                                                              DataLoopNode::NodeFluidType::Air,
-                                                                              DataLoopNode::ConnectionType::Sensor,
-                                                                              NodeInputManager::CompFluidStream::Primary,
-                                                                              ObjectIsNotParent);
+                                                                              Node::FluidType::Air,
+                                                                              Node::ConnType::Sensor,
+                                                                              Node::CompFluidStream::Primary,
+                                                                          Node::ObjectIsNotParent);
                         }
 
                         // check supply air node for matches with zone equipment supply air node
                         int zoneEqIndex = DataZoneEquipment::GetControlledZoneIndex(state, state.dataHeatBal->Zone(thisZoneITEq.ZonePtr).Name);
                         if (zoneEqIndex > 0) { // zoneEqIndex could be zero in the case of an uncontrolled zone
-                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.begin();
-                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InletNode.end();
+                            auto itStart = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InNodeNums.begin();
+                            auto itEnd = state.dataZoneEquip->ZoneEquipConfig(zoneEqIndex).InNodeNums.end();
                             int key = thisZoneITEq.SupplyAirNodeNum;
                             thisZoneITEq.inControlledZone = true;
                             bool supplyNodeFound = false;
@@ -7939,7 +7938,6 @@ namespace InternalHeatGains {
         static constexpr std::string_view RoutineName("CalcZoneITEq");
         int Loop;
         int NZ;
-        int SupplyNodeNum;                // Supply air node number (if zero, then not specified)
         Real64 OperSchedFrac;             // Operating schedule fraction
         Real64 CPULoadSchedFrac;          // CPU loading schedule fraction
         ITEInletConnection AirConnection; // Air connection type
@@ -7967,6 +7965,8 @@ namespace InternalHeatGains {
 
         std::map<int, std::vector<int>> ZoneITEMap;
 
+        auto &dln = state.dataLoopNodes;
+        
         //  Zero out time step variables
         // Object report variables
         for (Loop = 1; Loop <= state.dataHeatBal->TotITEquip; ++Loop) {
@@ -8060,20 +8060,20 @@ namespace InternalHeatGains {
             // Determine inlet air temperature and humidity
             AirConnection = state.dataHeatBal->ZoneITEq(Loop).AirConnectionType;
             RecircFrac = 0.0;
-            SupplyNodeNum = state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum;
+            auto const *supplyNode = dln->nodes(state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum);
             if (state.dataHeatBal->ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
-                WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
+                TSupply = supplyNode->Temp;
+                WSupply = supplyNode->HumRat;
                 if (state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirIn = TSupply + GetCurrentScheduleValue(state, state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
                     TAirIn = TSupply + state.dataHeatBal->ZoneITEq(Loop).SupplyApproachTemp;
                 }
-                WAirIn = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
+                WAirIn = supplyNode->HumRat;
             } else {
                 if (AirConnection == ITEInletConnection::AdjustedSupply) {
-                    TSupply = state.dataLoopNodes->Node(SupplyNodeNum).Temp;
-                    WSupply = state.dataLoopNodes->Node(SupplyNodeNum).HumRat;
+                    TSupply = supplyNode->Temp;
+                    WSupply = supplyNode->HumRat;
                     if (state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve != 0) {
                         RecircFrac = state.dataHeatBal->ZoneITEq(Loop).DesignRecircFrac *
                                      CurveValue(state, state.dataHeatBal->ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
@@ -8092,8 +8092,8 @@ namespace InternalHeatGains {
                 } else {
                     // TAirIn = TRoomAirNodeIn, according to EngineeringRef 17.1.4
                     if (state.dataHeatBal->ZoneITEq(Loop).inControlledZone) {
-                        int ZoneAirInletNode = state.dataZoneEquip->ZoneEquipConfig(NZ).InletNode(1);
-                        TSupply = state.dataLoopNodes->Node(ZoneAirInletNode).Temp;
+                        auto const *zoneAirInNode = dln->nodes(state.dataZoneEquip->ZoneEquipConfig(NZ).InNodeNums(1));
+                        TSupply = zoneAirInNode->Temp;
                     } else {
                         TSupply = thisZoneHB.MAT;
                     }
@@ -8171,7 +8171,7 @@ namespace InternalHeatGains {
                 TAirOut = TSupply;
             }
 
-            if ((SupplyNodeNum != 0) && (TAirOut != TSupply)) {
+            if ((state.dataHeatBal->ZoneITEq(Loop).SupplyAirNodeNum != 0) && (TAirOut != TSupply)) {
                 SupplyHeatIndex = (TAirIn - TSupply) / (TAirOut - TSupply);
             } else {
                 SupplyHeatIndex = 0.0;

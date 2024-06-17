@@ -103,7 +103,7 @@ namespace SteamBaseboardRadiator {
     // 1. HWBaseboardRadiator module (ZoneHVAC:Baseboard:RadiantConvective:Water)
     // 2. SteamCoils module (Coil:Heating:Steam)
 
-    using DataLoopNode::ObjectIsNotParent;
+    using Node::ObjectIsNotParent;
     using HVAC::SmallLoad;
 
     using DataZoneEquipment::CheckZoneEquipmentList;
@@ -270,7 +270,7 @@ namespace SteamBaseboardRadiator {
         using FluidProperties::FindRefrigerant;
 
         using GlobalNames::VerifyUniqueBaseboardName;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataSizing;
@@ -564,26 +564,26 @@ namespace SteamBaseboardRadiator {
 
             // Get inlet node number
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamInletNode =
-                GetOnlySingleNode(state,
+                GetSingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(4),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
+                                  Node::ConnObjType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
-                                  DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
+                                  Node::FluidType::Steam,
+                                  Node::ConnType::Inlet,
+                                  Node::CompFluidStream::Primary,
                                   ObjectIsNotParent);
 
             // Get outlet node number
             state.dataSteamBaseboardRadiator->SteamBaseboard(BaseboardNum).SteamOutletNode =
-                GetOnlySingleNode(state,
+                GetSingleNode(state,
                                   state.dataIPShortCut->cAlphaArgs(5),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::ZoneHVACBaseboardRadiantConvectiveSteam,
+                                  Node::ConnObjType::ZoneHVACBaseboardRadiantConvectiveSteam,
                                   state.dataIPShortCut->cAlphaArgs(1),
-                                  DataLoopNode::NodeFluidType::Steam,
-                                  DataLoopNode::ConnectionType::Outlet,
-                                  NodeInputManager::CompFluidStream::Primary,
+                                  Node::FluidType::Steam,
+                                  Node::ConnType::Outlet,
+                                  Node::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             TestCompSet(state,
                         state.dataSteamBaseboardRadiator->cCMO_BBRadiator_Steam,

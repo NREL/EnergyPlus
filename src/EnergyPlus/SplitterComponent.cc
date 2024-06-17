@@ -165,7 +165,7 @@ namespace SplitterComponent {
         // Uses the status flags to trigger events.
 
         // Using/Aliasing
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr std::string_view RoutineName("GetSplitterInput: "); // include trailing blank space
@@ -223,14 +223,14 @@ namespace SplitterComponent {
 
             state.dataSplitterComponent->SplitterCond(SplitterNum).SplitterName = AlphArray(1);
             state.dataSplitterComponent->SplitterCond(SplitterNum).InletNode =
-                GetOnlySingleNode(state,
+                GetSingleNode(state,
                                   AlphArray(2),
                                   ErrorsFound,
-                                  DataLoopNode::ConnectionObjectType::AirLoopHVACZoneSplitter,
+                                  Node::ConnObjType::AirLoopHVACZoneSplitter,
                                   AlphArray(1),
-                                  DataLoopNode::NodeFluidType::Air,
-                                  DataLoopNode::ConnectionType::Inlet,
-                                  NodeInputManager::CompFluidStream::Primary,
+                                  Node::FluidType::Air,
+                                  Node::ConnType::Inlet,
+                                  Node::CompFluidStream::Primary,
                                   ObjectIsNotParent);
             state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes = NumAlphas - 2;
 
@@ -258,14 +258,14 @@ namespace SplitterComponent {
             for (NodeNum = 1; NodeNum <= state.dataSplitterComponent->SplitterCond(SplitterNum).NumOutletNodes; ++NodeNum) {
 
                 state.dataSplitterComponent->SplitterCond(SplitterNum).OutletNode(NodeNum) =
-                    GetOnlySingleNode(state,
+                    GetSingleNode(state,
                                       AlphArray(2 + NodeNum),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::AirLoopHVACZoneSplitter,
+                                      Node::ConnObjType::AirLoopHVACZoneSplitter,
                                       AlphArray(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Outlet,
-                                      NodeInputManager::CompFluidStream::Primary,
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Outlet,
+                                      Node::CompFluidStream::Primary,
                                       ObjectIsNotParent);
                 if (lAlphaBlanks(2 + NodeNum)) {
                     ShowSevereError(state, format("{} is Blank, {} = {}", cAlphaFields(2 + NodeNum), CurrentModuleObject, AlphArray(1)));

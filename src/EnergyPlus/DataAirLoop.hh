@@ -72,16 +72,16 @@ namespace DataAirLoop {
         int NumSupplyNodes = 0;                    // number of supply nodes exiting primary air system
         int NumZonesCooled = 0;                    // number of zones cooled by this primary air system
         int NumZonesHeated = 0;                    // number of zones heated by this primary air system
-        Array1D_int ZoneEquipReturnNodeNum;        // Zone Equip side return air node numbers (currently limited to 1 node)
-        Array1D_int ZoneEquipSupplyNodeNum;        // Zone equip side supply air node numbers
-        Array1D_int AirLoopReturnNodeNum;          // Air loop side return air node numbers
-        Array1D_int AirLoopSupplyNodeNum;          // Air loop side supply air node numbers
+        Array1D_int ZoneEquipReturnNodeNums;        // Zone Equip side return air node numbers (currently limited to 1 node)
+        Array1D_int ZoneEquipSupplyNodeNums;        // Zone equip side supply air node numbers
+        Array1D_int AirLoopReturnNodeNums;          // Air loop side return air node numbers
+        Array1D_int AirLoopSupplyNodeNums;          // Air loop side supply air node numbers
         Array1D_int CoolCtrlZoneNums;              // Controlled zone numbers of zones cooled by this air loop
         Array1D_int HeatCtrlZoneNums;              // Controlled zone numbers of zones heated by this air loop
-        Array1D_int CoolZoneInletNodes;            // Zone inlet node numbers of zones cooled by this air loop
-        Array1D_int HeatZoneInletNodes;            // Zone inlet node numbers of zones heated by this air loop
-        Array1D_int TermUnitCoolInletNodes;        // Air terminal unit cooling inlet node numbers for this air loop
-        Array1D_int TermUnitHeatInletNodes;        // Air terminal unit heating inlet node numbers for this air loop
+        Array1D_int CoolZoneInNodeNums;            // Zone inlet node numbers of zones cooled by this air loop
+        Array1D_int HeatZoneInNodeNums;            // Zone inlet node numbers of zones heated by this air loop
+        Array1D_int TermUnitCoolInNodeNums;        // Air terminal unit cooling inlet node numbers for this air loop
+        Array1D_int TermUnitHeatInNodeNums;        // Air terminal unit heating inlet node numbers for this air loop
         Array1D_int TermUnitCoolSizingIndex;       // Air terminal sizing numbers for zones cooled by this air loop
         Array1D_int TermUnitHeatSizingIndex;       // Air terminal sizing numbers for zones heated by this air loop
         Array1D<HVAC::AirDuctType> SupplyDuctType; // 1=main, 2=cooling, 3=heating, 4=other
@@ -91,8 +91,8 @@ namespace DataAirLoop {
     {
         // Members
         bool OASysExists = false;   // true if there is an Outside Air Sys
-        int OASysInletNodeNum = 0;  // node number of return air inlet to OA sys
-        int OASysOutletNodeNum = 0; // node number of mixed air outlet of OA sys
+        int OASysInNodeNum = 0;  // node number of return air inlet to OA sys
+        int OASysOutNodeNum = 0; // node number of mixed air outlet of OA sys
     };
 
     struct DefinePriAirSysAvailMgrs
@@ -210,8 +210,8 @@ namespace DataAirLoop {
         Array1D_string ControllerType;
         EPVector<ControllerKind> controllerTypeEnum; // Controller:OutdoorAir or Controller:WaterCoil
         Array1D_int ControllerIndex;                 // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;                    // component inlet node number
-        Array1D_int OutletNodeNum;                   // component outlet node number
+        Array1D_int InNodeNums;                    // component inlet node number
+        Array1D_int OutNodeNums;                   // component outlet node number
         bool HeatExchangerFlag = false;              // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum = -1;                     // AirLoopHVAC:DedicatedOutdoorAirSystem number
     };

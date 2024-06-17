@@ -138,6 +138,9 @@ void PlantProfileData::simulate(EnergyPlusData &state,
     static constexpr std::string_view RoutineName("SimulatePlantProfile");
     Real64 DeltaTemp;
 
+    auto &dln = state.dataLoopNodes;
+    auto *outNode = dln->nodes(this->OutNodeNum);
+    
     this->InitPlantProfile(state);
 
     if (this->FluidType == PlantLoopFluidType::Water) {
@@ -181,8 +184,8 @@ void PlantProfileData::simulate(EnergyPlusData &state,
 
             // Steam Mass Flow Rate Required
             this->MassFlowRate = this->Power / (LatentHeatSteam + this->DegOfSubcooling * CpWater);
-            PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InletNode, this->OutletNode, this->plantLoc);
-            state.dataLoopNodes->Node(this->OutletNode).Quality = 0.0;
+            PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InNodeNum, this->OutNodeNum, this->plantLoc);
+            outNode->Quality = 0.0;
             // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
             // This is required for outlet water temperature, otherwise it will be saturation temperature.
             // Steam Trap drains off all the Water formed.
@@ -220,16 +223,20 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     static constexpr std::string_view RoutineName("InitPlantProfile");
     Real64 FluidDensityInit;
 
+    auto &dln = state.dataLoopNodes;
+    auto const *inNode = dln->nodes(this->InNodeNum);
+    auto *outNode = dln->nodes(this->OutNodeNum);
+    
     // Do the one time initializations
 
     if (!state.dataGlobal->SysSizingCalc && this->InitSizing) {
-        PlantUtilities::RegisterPlantCompDesignFlow(state, InletNode, this->PeakVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InNodeNum, this->PeakVolFlowRate);
         this->InitSizing = false;
     }
 
     if (state.dataGlobal->BeginEnvrnFlag && this->Init) {
         // Clear node initial conditions
-        state.dataLoopNodes->Node(OutletNode).Temp = 0.0;
+        outNode->Temp = 0.0;
 
         if (this->FluidType == PlantLoopFluidType::Water) {
             FluidDensityInit = FluidProperties::GetDensityGlycol(state,
@@ -254,7 +261,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
         Real64 MaxFlowMultiplier = ScheduleManager::GetScheduleMaxValue(state, this->FlowRateFracSchedule);
 
         PlantUtilities::InitComponentNodes(
-            state, 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InletNode, this->OutletNode);
+            state, 0.0, this->PeakVolFlowRate * FluidDensityInit * MaxFlowMultiplier, this->InNodeNum, this->OutNodeNum);
 
         this->EMSOverrideMassFlow = false;
         this->EMSMassFlowValue = 0.0;
@@ -265,7 +272,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
 
     if (!state.dataGlobal->BeginEnvrnFlag) this->Init = true;
 
-    this->InletTemp = state.dataLoopNodes->Node(InletNode).Temp;
+    this->InletTemp = inNode->Temp;
     this->Power = ScheduleManager::GetCurrentScheduleValue(state, this->LoadSchedule);
 
     if (this->EMSOverridePower) this->Power = this->EMSPowerValue;
@@ -293,7 +300,7 @@ void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     if (this->EMSOverrideMassFlow) this->MassFlowRate = this->EMSMassFlowValue;
 
     // Request the mass flow rate from the plant component flow utility routine
-    PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, InletNode, OutletNode, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, this->MassFlowRate, this->InNodeNum, this->OutNodeNum, this->plantLoc);
 
     this->VolFlowRate = this->MassFlowRate / FluidDensityInit;
 
@@ -312,7 +319,9 @@ void PlantProfileData::UpdatePlantProfile(EnergyPlusData &state) const
     // Updates the node variables with local variables.
 
     // Set outlet node variables that are possibly changed
-    state.dataLoopNodes->Node(this->OutletNode).Temp = this->OutletTemp;
+    auto &dln = state.dataLoopNodes;
+    auto *outNode = dln->nodes(this->OutNodeNum);
+    outNode->Temp = this->OutletTemp;
 }
 
 void PlantProfileData::ReportPlantProfile(EnergyPlusData &state)
@@ -376,7 +385,6 @@ void GetPlantProfileInput(EnergyPlusData &state)
     // Gets the plant load profile input from the input file and sets up the objects.
 
     // Using/Aliasing
-    using namespace DataLoopNode;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
@@ -418,47 +426,47 @@ void GetPlantProfileInput(EnergyPlusData &state)
             }
 
             if (state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType == PlantLoopFluidType::Water) {
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).InNodeNum =
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::LoadProfilePlant,
+                                                        Node::ConnObjType::LoadProfilePlant,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        ObjectIsNotParent);
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                        Node::ObjectIsNotParent);
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutNodeNum =
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::LoadProfilePlant,
+                                                        Node::ConnObjType::LoadProfilePlant,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        ObjectIsNotParent);
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                        Node::ObjectIsNotParent);
             } else { // state.dataPlantLoadProfile->PlantProfile(ProfileNum).FluidType == PlantLoopFluidType::Steam
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).InletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).InNodeNum =
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(2),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::LoadProfilePlant,
+                                                        Node::ConnObjType::LoadProfilePlant,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Steam,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        ObjectIsNotParent);
-                state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                                                        Node::FluidType::Steam,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                        Node::ObjectIsNotParent);
+                state.dataPlantLoadProfile->PlantProfile(ProfileNum).OutNodeNum =
+                    Node::GetSingleNode(state,
                                                         state.dataIPShortCut->cAlphaArgs(3),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::LoadProfilePlant,
+                                                        Node::ConnObjType::LoadProfilePlant,
                                                         state.dataIPShortCut->cAlphaArgs(1),
-                                                        DataLoopNode::NodeFluidType::Steam,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        ObjectIsNotParent);
+                                                        Node::FluidType::Steam,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                        Node::ObjectIsNotParent);
             }
 
             state.dataPlantLoadProfile->PlantProfile(ProfileNum).LoadSchedule =

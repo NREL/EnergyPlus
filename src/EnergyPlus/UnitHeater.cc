@@ -219,7 +219,7 @@ namespace UnitHeater {
         using BranchNodeConnections::SetUpCompSets;
 
         using DataSizing::AutoSize;
-        using NodeInputManager::GetOnlySingleNode;
+        using Node::GetSingleNode;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetSteamCoilIndex;
         using WaterCoils::GetCoilWaterInletNode;
@@ -312,24 +312,24 @@ namespace UnitHeater {
             }
 
             // Main air nodes (except outside air node):
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode = GetOnlySingleNode(state,
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirInNode = GetSingleNode(state,
                                                                                        Alphas(3),
                                                                                        ErrorsFound,
-                                                                                       DataLoopNode::ConnectionObjectType::ZoneHVACUnitHeater,
+                                                                                       Node::ConnObjType::ZoneHVACUnitHeater,
                                                                                        Alphas(1),
-                                                                                       DataLoopNode::NodeFluidType::Air,
-                                                                                       DataLoopNode::ConnectionType::Inlet,
-                                                                                       NodeInputManager::CompFluidStream::Primary,
+                                                                                       Node::FluidType::Air,
+                                                                                       Node::ConnType::Inlet,
+                                                                                       Node::CompFluidStream::Primary,
                                                                                        ObjectIsParent);
 
-            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetOnlySingleNode(state,
+            state.dataUnitHeaters->UnitHeat(UnitHeatNum).AirOutNode = GetSingleNode(state,
                                                                                         Alphas(4),
                                                                                         ErrorsFound,
-                                                                                        DataLoopNode::ConnectionObjectType::ZoneHVACUnitHeater,
+                                                                                        Node::ConnObjType::ZoneHVACUnitHeater,
                                                                                         Alphas(1),
-                                                                                        DataLoopNode::NodeFluidType::Air,
-                                                                                        DataLoopNode::ConnectionType::Outlet,
-                                                                                        NodeInputManager::CompFluidStream::Primary,
+                                                                                        Node::FluidType::Air,
+                                                                                        Node::ConnType::Outlet,
+                                                                                        Node::CompFluidStream::Primary,
                                                                                         ObjectIsParent);
 
             auto &unitHeat = state.dataUnitHeaters->UnitHeat(UnitHeatNum);

@@ -78,8 +78,8 @@ namespace HWBaseboardRadiator {
         Array1D_int SurfacePtr;
         int ZonePtr = 0;
         int SchedPtr = 0;
-        int WaterInletNode = 0;
-        int WaterOutletNode = 0;
+        int FluidInNodeNum = 0;
+        int FluidOutNodeNum = 0;
         int TotSurfToDistrib = 0;
         int ControlCompTypeNum = 0;
         int CompErrIndex = 0;

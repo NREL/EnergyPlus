@@ -165,8 +165,8 @@ void WrapperSpecs::simulate(
                                                             calledFromLocation.loopNum,
                                                             this->GLHEPlantLoc.loopSideNum,
                                                             DataPlant::PlantEquipmentType::CentralGroundSourceHeatPump,
-                                                            this->GLHEInletNodeNum,
-                                                            this->GLHEOutletNodeNum,
+                                                            this->GLHEInNodeNum,
+                                                            this->GLHEOutNodeNum,
                                                             this->Report.GLHERate,
                                                             this->Report.GLHEInletTemp,
                                                             this->Report.GLHEOutletTemp,
@@ -533,10 +533,10 @@ void WrapperSpecs::SizeWrapper(EnergyPlusData &state)
             TotalHotWaterVolFlowRate += this->ChillerHeater(NumChillerHeater).DesignHotWaterVolFlowRate;
         }
 
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->CHWInletNodeNum, TotalEvapVolFlowRate);
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->HWInletNodeNum, TotalHotWaterVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->CHWInNodeNum, TotalEvapVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->HWInNodeNum, TotalHotWaterVolFlowRate);
         // save the reference condenser water volumetric flow rate for use by the condenser water loop sizing algorithms
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->GLHEInletNodeNum, TotalCondVolFlowRate);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->GLHEInNodeNum, TotalCondVolFlowRate);
 
         if (state.dataPlnt->PlantFinalSizesOkayToReport) {
             this->mySizesReported = true;
@@ -597,26 +597,26 @@ void GetWrapperInput(EnergyPlusData &state)
             state.dataPlantCentralGSHP->Wrapper(WrapperNum).ControlMode = CondenserType::SmartMixing;
         }
 
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWInNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).CHWOutNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(4),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent);
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Outlet,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -624,26 +624,26 @@ void GetWrapperInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(4),
                                            "Chilled Water Nodes");
 
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEInNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(5),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Secondary,
+                                                Node::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).GLHEOutNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(6),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Secondary,
-                                                DataLoopNode::ObjectIsNotParent);
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Outlet,
+                                                Node::CompFluidStream::Secondary,
+                                                Node::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -651,26 +651,26 @@ void GetWrapperInput(EnergyPlusData &state)
                                            state.dataIPShortCut->cAlphaArgs(6),
                                            "GLHE Nodes");
 
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWInletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWInNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(7),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Tertiary,
-                                                DataLoopNode::ObjectIsNotParent); // node name : connection should be careful!
-        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Tertiary,
+                                                Node::ObjectIsNotParent); // node name : connection should be careful!
+        state.dataPlantCentralGSHP->Wrapper(WrapperNum).HWOutNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(8),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::CentralHeatPumpSystem,
+                                                Node::ConnObjType::CentralHeatPumpSystem,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Tertiary,
-                                                DataLoopNode::ObjectIsNotParent);
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Outlet,
+                                                Node::CompFluidStream::Tertiary,
+                                                Node::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            state.dataIPShortCut->cCurrentModuleObject,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -1543,11 +1543,19 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
 
     static constexpr std::string_view RoutineName("InitCGSHPHeatPump");
 
+    auto &dln = state.dataLoopNodes;
+    
     if (this->setupOutputVarsFlag) {
         this->setupOutputVars(state);
         this->setupOutputVarsFlag = false;
     }
 
+    auto *cwOutNode = dln->nodes(this->CHWOutNodeNum);
+    auto *cwInNode = dln->nodes(this->CHWInNodeNum);
+    auto *hwOutNode = dln->nodes(this->HWOutNodeNum);
+    auto *hwInNode = dln->nodes(this->HWInNodeNum);
+    auto *glheInNode = dln->nodes(this->GLHEInNodeNum);
+            
     if (this->MyWrapperFlag) {
         // Locate the chillers on the plant loops for later usage
         bool errFlag = false;
@@ -1559,7 +1567,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 _,
                                                 _,
                                                 _,
-                                                this->CHWInletNodeNum,
+                                                this->CHWInNodeNum,
                                                 _);
 
         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -1570,7 +1578,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 _,
                                                 _,
                                                 _,
-                                                this->HWInletNodeNum,
+                                                this->HWInNodeNum,
                                                 _);
 
         PlantUtilities::ScanPlantLoopsForObject(state,
@@ -1581,7 +1589,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                                                 _,
                                                 _,
                                                 _,
-                                                this->GLHEInletNodeNum,
+                                                this->GLHEInNodeNum,
                                                 _);
 
         PlantUtilities::InterConnectTwoPlantLoopSides(
@@ -1602,7 +1610,7 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             }
 
             // check if setpoint on outlet node - chilled water loop
-            if (state.dataLoopNodes->Node(this->CHWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
+            if (cwOutNode->TempSetPoint == Node::SensedNodeFlagValue) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->CoolSetPointErrDone) {
                         ShowWarningError(state,
@@ -1617,8 +1625,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, this->CHWOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
-                    state.dataLoopNodes->NodeSetpointCheck(this->CHWOutletNodeNum).needsSetpointChecking = false;
+                        state, this->CHWOutNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                    cwOutNode->needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->CoolSetPointErrDone) {
                             ShowWarningError(state,
@@ -1632,11 +1640,10 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                     }
                 }
                 this->CoolSetPointSetToLoop = true;
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).TempSetPoint =
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+                cwOutNode->TempSetPoint = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum)->TempSetPoint;
             }
 
-            if (state.dataLoopNodes->Node(this->HWOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue) {
+            if (hwOutNode->TempSetPoint == Node::SensedNodeFlagValue) {
                 if (!state.dataGlobal->AnyEnergyManagementSystemInModel) {
                     if (!this->HeatSetPointErrDone) {
                         ShowWarningError(state,
@@ -1651,8 +1658,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                     // need call to EMS to check node
                     bool FatalError = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(
-                        state, this->HWOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
-                    state.dataLoopNodes->NodeSetpointCheck(this->HWOutletNodeNum).needsSetpointChecking = false;
+                        state, this->HWOutNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                    hwOutNode->needsSetpointChecking = false;
                     if (FatalError) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError(state,
@@ -1666,8 +1673,8 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
                     }
                 }
                 this->HeatSetPointSetToLoop = true;
-                state.dataLoopNodes->Node(this->HWOutletNodeNum).TempSetPoint =
-                    state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+                hwOutNode->TempSetPoint =
+                    dln->nodes(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum)->TempSetPoint;
             }
         }
         this->MyWrapperFlag = false;
@@ -1697,9 +1704,9 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
             this->HWMassFlowRateMax = this->HWVolFlowRate * rho;
             this->GLHEMassFlowRateMax = this->GLHEVolFlowRate * rho;
 
-            PlantUtilities::InitComponentNodes(state, 0.0, this->CHWMassFlowRateMax, this->CHWInletNodeNum, this->CHWOutletNodeNum);
-            PlantUtilities::InitComponentNodes(state, 0.0, this->HWMassFlowRateMax, this->HWInletNodeNum, this->HWOutletNodeNum);
-            PlantUtilities::InitComponentNodes(state, 0.0, this->GLHEMassFlowRateMax, this->GLHEInletNodeNum, this->GLHEOutletNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->CHWMassFlowRateMax, this->CHWInNodeNum, this->CHWOutNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->HWMassFlowRateMax, this->HWInNodeNum, this->HWOutNodeNum);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->GLHEMassFlowRateMax, this->GLHEInNodeNum, this->GLHEOutNodeNum);
 
             // Initialize nodes for individual chiller heaters
             for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
@@ -1725,15 +1732,14 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
         this->MyWrapperEnvrnFlag = true;
     }
 
+    auto *tempSetPointNode = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum);
     if (this->CoolSetPointSetToLoop) {
         // IF (CurCoolingLoad > 0.0d0) THEN
-        state.dataLoopNodes->Node(this->CHWOutletNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+        cwOutNode->TempSetPoint = tempSetPointNode->TempSetPoint;
     }
     // IF (CurHeatingLoad > 0.0d0) THEN
     if (this->HeatSetPointSetToLoop) {
-        state.dataLoopNodes->Node(this->HWOutletNodeNum).TempSetPoint =
-            state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+        hwOutNode->TempSetPoint = tempSetPointNode->TempSetPoint;
         // ENDIF
     }
 
@@ -1744,61 +1750,61 @@ void WrapperSpecs::initialize(EnergyPlusData &state,
     // Switch over the mass flow rate to the condenser loop, i.e., ground heat exchanger
     if (LoopNum == this->CWPlantLoc.loopNum) { // called for on cooling loop
         if (MyLoad < -1.0) {                   // calling for cooling
-            mdotCHW = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMax;
+            mdotCHW = cwInNode->MassFlowRateMax;
         } else {
             mdotCHW = 0.0;
         }
         if (this->WrapperHeatingLoad > 1.0) {
-            mdotHW = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMax;
+            mdotHW = hwInNode->MassFlowRateMax;
         } else {
             mdotHW = 0.0;
         }
         if ((MyLoad < -1.0) || (this->WrapperHeatingLoad > 1.0)) {
-            mdotGLHE = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMax;
+            mdotGLHE = glheInNode->MassFlowRateMax;
         } else {
             mdotGLHE = 0.0;
         }
 
     } else if (LoopNum == this->HWPlantLoc.loopNum) {
         if (MyLoad > 1.0) {
-            mdotHW = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMax;
+            mdotHW = hwInNode->MassFlowRateMax;
         } else {
             mdotHW = 0.0;
         }
         if (this->WrapperCoolingLoad > 1.0) {
-            mdotCHW = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMax;
+            mdotCHW = cwInNode->MassFlowRateMax;
         } else {
             mdotCHW = 0.0;
         }
         if ((MyLoad > 1.0) || (this->WrapperCoolingLoad > 1.0)) {
-            mdotGLHE = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMax;
+            mdotGLHE = glheInNode->MassFlowRateMax;
         } else {
             mdotGLHE = 0.0;
         }
 
     } else if (LoopNum == this->GLHEPlantLoc.loopNum) {
         if (this->WrapperCoolingLoad > 1.0) {
-            mdotCHW = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMax;
+            mdotCHW = cwInNode->MassFlowRateMax;
         } else {
             mdotCHW = 0.0;
         }
         if (this->WrapperHeatingLoad > 1.0) {
-            mdotHW = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMax;
+            mdotHW = hwInNode->MassFlowRateMax;
         } else {
             mdotHW = 0.0;
         }
         if ((this->WrapperHeatingLoad > 1.0) || (this->WrapperCoolingLoad > 1.0)) {
-            mdotGLHE = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMax;
+            mdotGLHE = glheInNode->MassFlowRateMax;
         } else {
             mdotGLHE = 0.0;
         }
     }
 
-    PlantUtilities::SetComponentFlowRate(state, mdotCHW, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotCHW, this->CHWInNodeNum, this->CHWOutNodeNum, this->CWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(state, mdotHW, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotHW, this->HWInNodeNum, this->HWOutNodeNum, this->HWPlantLoc);
 
-    PlantUtilities::SetComponentFlowRate(state, mdotGLHE, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+    PlantUtilities::SetComponentFlowRate(state, mdotGLHE, this->GLHEInNodeNum, this->GLHEOutNodeNum, this->GLHEPlantLoc);
 }
 
 void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
@@ -1830,8 +1836,12 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
     // Cooling load evaporator should meet
     Real64 EvaporatorLoad = this->WrapperCoolingLoad;
 
+    auto &dln = state.dataLoopNodes;
+    auto *cwInNode = dln->nodes(this->CHWInNodeNum);
+    auto *glheInNode = dln->nodes(this->GLHEInNodeNum);
+    
     // Chilled water inlet mass flow rate
-    Real64 CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
+    Real64 CHWInletMassFlowRate = cwInNode->MassFlowRate;
 
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
 
@@ -1849,8 +1859,8 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
         Real64 QEvaporator = 0.0;
         Real64 FRAC = 1.0;
         Real64 ActualCOP = 0.0;
-        Real64 EvapInletTemp = state.dataLoopNodes->Node(this->CHWInletNodeNum).Temp;
-        Real64 CondInletTemp = state.dataLoopNodes->Node(this->GLHEInletNodeNum).Temp;
+        Real64 EvapInletTemp = cwInNode->Temp;
+        Real64 CondInletTemp = glheInNode->Temp;
         Real64 EvapOutletTemp = EvapInletTemp;
         Real64 CondOutletTemp = CondInletTemp;
         this->ChillerHeater(ChillerHeaterNum).Report.CurrentMode = 0;
@@ -2037,7 +2047,7 @@ void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
                                                                RoutineName);
 
             // Calculate cooling load this chiller should meet and the other chillers are demanded
-            EvapOutletTempSetPoint = state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+            EvapOutletTempSetPoint = dln->nodes(state.dataPlnt->PlantLoop(this->CWPlantLoc.loopNum).TempSetPointNodeNum)->TempSetPoint;
 
             // Minimum capacity of the evaporator
             Real64 EvaporatorCapMin =
@@ -2281,7 +2291,12 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     Real64 CurAvailHWMassFlowRate(0.0); // Maximum available hot water mass within the wrapper bank
 
     CondenserLoad = this->WrapperHeatingLoad;
-    Real64 HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
+
+    auto &dln = state.dataLoopNodes;
+    auto const *hwInNode = dln->nodes(this->HWInNodeNum);
+    auto const *glheInNode = dln->nodes(this->GLHEInNodeNum);
+    
+    Real64 HWInletMassFlowRate = hwInNode->MassFlowRate;
 
     for (int ChillerHeaterNum = 1; ChillerHeaterNum <= this->ChillerHeaterNums; ++ChillerHeaterNum) {
 
@@ -2297,8 +2312,8 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
         Real64 CondDeltaTemp = 0.0;
         Real64 CoolingPower = 0.0;
         Real64 ActualCOP = 0.0;
-        Real64 EvapInletTemp = state.dataLoopNodes->Node(this->GLHEInletNodeNum).Temp;
-        Real64 CondInletTemp = state.dataLoopNodes->Node(this->HWInletNodeNum).Temp;
+        Real64 EvapInletTemp = glheInNode->Temp;
+        Real64 CondInletTemp = hwInNode->Temp;
         Real64 EvapOutletTemp = EvapInletTemp;
         Real64 CondOutletTemp = CondInletTemp;
 
@@ -2506,7 +2521,7 @@ void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
                                       format("Chiller condenser temperature for curve fit are not decided, default value= cond_leaving ({:.3R}).",
                                              state.dataPlantCentralGSHP->ChillerCapFT));
                     CondTempforCurve =
-                        state.dataLoopNodes->Node(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum).TempSetPoint;
+                        dln->nodes(state.dataPlnt->PlantLoop(this->HWPlantLoc.loopNum).TempSetPointNodeNum)->TempSetPoint;
                 }
 
                 Real64 MinPartLoadRat; // Min allowed operating fraction of full load
@@ -2795,42 +2810,52 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
     Real64 HWInletMassFlowRate = 0.0;
     Real64 GLHEInletMassFlowRate = 0.0;
-    Real64 CHWInletTemp = state.dataLoopNodes->Node(this->CHWInletNodeNum).Temp;
+
+    auto &dln = state.dataLoopNodes;
+    auto *cwInNode = dln->nodes(this->CHWInNodeNum);
+    auto *hwInNode = dln->nodes(this->HWInNodeNum);
+    auto *glheInNode = dln->nodes(this->GLHEInNodeNum);
+
+    auto *cwOutNode = dln->nodes(this->CHWOutNodeNum);
+    auto *hwOutNode = dln->nodes(this->HWOutNodeNum);
+    auto *glheOutNode = dln->nodes(this->GLHEOutNodeNum);
+
+    Real64 CHWInletTemp = cwInNode->Temp;
 
     // Chiller heater bank hot water inlet temperature
-    Real64 HWInletTemp = state.dataLoopNodes->Node(this->HWInletNodeNum).Temp;
+    Real64 HWInletTemp = hwInNode->Temp;
 
     // Chiller heater bank condenser loop inlet temperature
-    Real64 GLHEInletTemp = state.dataLoopNodes->Node(this->GLHEInletNodeNum).Temp;
+    Real64 GLHEInletTemp = glheInNode->Temp;
 
     Real64 CurCoolingLoad = 0.0; // Total cooling load chiller heater bank (wrapper) meets
 
     // Initiate loads and inlet temperatures each loop
     if (LoopNum == this->CWPlantLoc.loopNum) {
-        CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRateMaxAvail;
-        HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
-        GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
+        CHWInletMassFlowRate = cwInNode->MassFlowRateMaxAvail;
+        HWInletMassFlowRate = hwInNode->MassFlowRate;
+        GLHEInletMassFlowRate = glheInNode->MassFlowRateMaxAvail;
         DataPlant::LoopSideLocation LoopSideNum = this->CWPlantLoc.loopSideNum;
         this->WrapperCoolingLoad = 0.0;
         CurCoolingLoad = std::abs(MyLoad);
         this->WrapperCoolingLoad = CurCoolingLoad;
         // Set actual mass flow rate at the nodes when it's locked
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
+            CHWInletMassFlowRate = cwInNode->MassFlowRate;
         }
         if (CHWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
 
     } else if (LoopNum == this->HWPlantLoc.loopNum) {
-        CHWInletMassFlowRate = state.dataLoopNodes->Node(this->CHWInletNodeNum).MassFlowRate;
-        HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRateMaxAvail;
-        GLHEInletMassFlowRate = state.dataLoopNodes->Node(this->GLHEInletNodeNum).MassFlowRateMaxAvail;
+        CHWInletMassFlowRate = cwInNode->MassFlowRate;
+        HWInletMassFlowRate = hwInNode->MassFlowRateMaxAvail;
+        GLHEInletMassFlowRate = glheInNode->MassFlowRateMaxAvail;
         DataPlant::LoopSideLocation LoopSideNum = this->HWPlantLoc.loopSideNum;
         this->WrapperHeatingLoad = 0.0;
         CurHeatingLoad = MyLoad;
         this->WrapperHeatingLoad = CurHeatingLoad;
         // Set actual mass flow rate at the nodes when it's locked
         if (state.dataPlnt->PlantLoop(LoopNum).LoopSide(LoopSideNum).FlowLock == DataPlant::FlowLock::Locked) {
-            HWInletMassFlowRate = state.dataLoopNodes->Node(this->HWInletNodeNum).MassFlowRate;
+            HWInletMassFlowRate = hwInNode->MassFlowRate;
         }
         if (HWInletMassFlowRate == 0.0) GLHEInletMassFlowRate = 0.0;
     }
@@ -2899,9 +2924,9 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                     WrapperElecPowerCool += (this->AncillaryPower * ScheduleManager::GetCurrentScheduleValue(state, this->SchedPtr));
                 }
 
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
-                state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = HWOutletTemp;
-                state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = GLHEOutletTemp;
+                cwOutNode->Temp = CHWOutletTemp;
+                hwOutNode->Temp = HWOutletTemp;
+                glheOutNode->Temp = GLHEOutletTemp;
 
             } else {
 
@@ -2944,7 +2969,7 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
             }
 
             if (this->SimulHtgDominant || this->SimulClgDominant) {
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
+                cwOutNode->Temp = CHWOutletTemp;
                 this->Report.CHWInletTempSimul = CHWInletTemp;
                 this->Report.CHWOutletTempSimul = CHWOutletTemp;
                 this->Report.CHWmdotSimul = CHWInletMassFlowRate;
@@ -2958,9 +2983,9 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
             } else {
 
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
-                state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = HWOutletTemp;
-                state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = GLHEOutletTemp;
+                cwOutNode->Temp = CHWOutletTemp;
+                hwOutNode->Temp = HWOutletTemp;
+                glheOutNode->Temp = GLHEOutletTemp;
                 this->Report.CHWInletTemp = CHWInletTemp;
                 this->Report.CHWOutletTemp = CHWOutletTemp;
                 this->Report.HWInletTemp = HWInletTemp;
@@ -2981,11 +3006,11 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                 this->Report.HeatingRate = WrapperHeatRate;
                 this->Report.GLHERate = WrapperGLHERate;
             }
-            PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInNodeNum, this->CHWOutNodeNum, this->CWPlantLoc);
 
-            PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInNodeNum, this->HWOutNodeNum, this->HWPlantLoc);
 
-            PlantUtilities::SetComponentFlowRate(state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+            PlantUtilities::SetComponentFlowRate(state, GLHEInletMassFlowRate, this->GLHEInNodeNum, this->GLHEOutNodeNum, this->GLHEPlantLoc);
 
         } // End of cooling
 
@@ -3293,12 +3318,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
 
                 } // End of calculations
 
-                PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, CHWInletMassFlowRate, this->CHWInNodeNum, this->CHWOutNodeNum, this->CWPlantLoc);
 
-                PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInNodeNum, this->HWOutNodeNum, this->HWPlantLoc);
 
                 PlantUtilities::SetComponentFlowRate(
-                    state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+                    state, GLHEInletMassFlowRate, this->GLHEInNodeNum, this->GLHEOutNodeNum, this->GLHEPlantLoc);
 
                 // Local variables
                 this->Report.CHWInletTemp = CHWInletTemp;
@@ -3321,18 +3346,18 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                 this->Report.HeatingRate = WrapperHeatRate;
                 this->Report.GLHERate = WrapperGLHERate;
 
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
-                state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = HWOutletTemp;
-                state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = GLHEOutletTemp;
+                cwOutNode->Temp = CHWOutletTemp;
+                hwOutNode->Temp = HWOutletTemp;
+                glheOutNode->Temp = GLHEOutletTemp;
 
             } else { // Central chiller heater system is off
 
                 CHWOutletTemp = CHWInletTemp;
                 HWOutletTemp = HWInletTemp;
                 GLHEOutletTemp = GLHEInletTemp;
-                state.dataLoopNodes->Node(this->CHWOutletNodeNum).Temp = CHWOutletTemp;
-                state.dataLoopNodes->Node(this->HWOutletNodeNum).Temp = HWOutletTemp;
-                state.dataLoopNodes->Node(this->GLHEOutletNodeNum).Temp = GLHEOutletTemp;
+                cwOutNode->Temp = CHWOutletTemp;
+                hwOutNode->Temp = HWOutletTemp;
+                glheOutNode->Temp = GLHEOutletTemp;
 
                 if (this->WrapperCoolingLoad == 0.0 && !this->SimulHtgDominant) {
 
@@ -3389,12 +3414,12 @@ void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int c
                     this->Report.GLHERate = WrapperGLHERate;
 
                     PlantUtilities::SetComponentFlowRate(
-                        state, CHWInletMassFlowRate, this->CHWInletNodeNum, this->CHWOutletNodeNum, this->CWPlantLoc);
+                        state, CHWInletMassFlowRate, this->CHWInNodeNum, this->CHWOutNodeNum, this->CWPlantLoc);
 
-                    PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInletNodeNum, this->HWOutletNodeNum, this->HWPlantLoc);
+                    PlantUtilities::SetComponentFlowRate(state, HWInletMassFlowRate, this->HWInNodeNum, this->HWOutNodeNum, this->HWPlantLoc);
 
                     PlantUtilities::SetComponentFlowRate(
-                        state, GLHEInletMassFlowRate, this->GLHEInletNodeNum, this->GLHEOutletNodeNum, this->GLHEPlantLoc);
+                        state, GLHEInletMassFlowRate, this->GLHEInNodeNum, this->GLHEOutNodeNum, this->GLHEPlantLoc);
                 }
 
             } // Heating loop calculation

@@ -110,8 +110,8 @@ namespace HeatingCoils {
         Real64 DesiredOutletTemp = 0.0;
         Real64 DesiredOutletHumRat = 0.0;
         Real64 AvailTemperature = 0.0; // Used in heat recovery test [C]
-        int AirInletNodeNum = 0;
-        int AirOutletNodeNum = 0;
+        int AirInNodeNum = 0;
+        int AirOutNodeNum = 0;
         int TempSetPointNodeNum = 0; // If applicable this is the node number that the temp setpoint exists.
         int Control = 0;
         int PLFCurveIndex = 0;                 // Index for part-load factor curve index for gas heating coil

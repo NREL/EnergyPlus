@@ -94,16 +94,16 @@ struct EquipListCompData
     Real64 SetPointFlowRate;                    // COMP SETPOINT CTRL ONLY--load calculation comp flow rate
     bool SetPointFlowRateWasAutosized;          // true if comp setpoint control flow rate was autosize on input (not used)
     std::string DemandNodeName;                 // COMP SETPOINT CTRL ONLY--The name of each item in the list
-    int DemandNodeNum;                          // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+    int DemandNodeNum = 0;                          // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
     std::string SetPointNodeName;               // COMP SETPOINT CTRL ONLY--The name of each item in the list
-    int SetPointNodeNum;                        // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
+    int SetPointNodeNum = 0;                        // COMP SETPOINT CTRL ONLY--The 'keyWord' identifying each item in list
     Real64 EMSIntVarRemainingLoadValue;         // EMS internal variable remaining load, neg cooling [W]
     Real64 EMSActuatorDispatchedLoadValue;      // EMS actuator for dispatched load, neg= cooling [W]
 
     // Default Constructor
     EquipListCompData()
         : CtrlType(DataPlant::CtrlType::Invalid), LoopNumPtr(0), LoopSideNumPtr(DataPlant::LoopSideLocation::Invalid), BranchNumPtr(0), CompNumPtr(0),
-          SetPointFlowRate(0.0), SetPointFlowRateWasAutosized(false), DemandNodeNum(0), SetPointNodeNum(0), EMSIntVarRemainingLoadValue(0.0),
+          SetPointFlowRate(0.0), SetPointFlowRateWasAutosized(false), EMSIntVarRemainingLoadValue(0.0),
           EMSActuatorDispatchedLoadValue(0.0)
     {
     }
@@ -174,9 +174,9 @@ struct PlantOpsData
     bool SimultaneousHeatingCoolingWithCoolingDominant = false; //
     bool SimultaneousHeatingCoolingWithHeatingDominant = false;
     int PrimaryHWLoopIndex = 0;
-    int PrimaryHWLoopSupInletNode = 0;
+    int PrimaryHWLoopSupInNodeNum = 0;
     int PrimaryChWLoopIndex = 0;
-    int PrimaryChWLoopSupInletNode = 0;
+    int PrimaryChWLoopSupInNodeNum = 0;
     int SecondaryHWLoopIndex = 0;
     int SecondaryChWLoopIndex = 0;
 };
@@ -269,7 +269,7 @@ struct OperationData
     Array1D<EquipOpList> EquipList; // Component type list
     int EquipListNumForLastStage;   // points to the equipment list with the highest upper limit
     std::string ReferenceNodeName;  // DELTA CTRL ONLY--for calculation of delta Temp
-    int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp
+    int ReferenceNodeNum = 0;        // DELTA CTRL ONLY--for calculation of delta Temp
     int ErlSimProgramMngr;          // EMS:ProgramManager to always run when this model is called
     int ErlInitProgramMngr;         // EMS:ProgramManager to run when this model is initialized and setup
     int initPluginLocation;         // If Python Plugins are used to init this, this defines the location in the plugin structure
@@ -281,7 +281,7 @@ struct OperationData
     // Default Constructor
     OperationData()
         : Type(DataPlant::OpScheme::Invalid), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0),
-          ReferenceNodeNumber(0), ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
+          ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1),
           EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
     {
     }

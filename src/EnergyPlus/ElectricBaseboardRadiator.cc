@@ -516,6 +516,8 @@ namespace ElectricBaseboardRadiator {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine initializes the Baseboard units during simulation.
 
+        auto &dln = state.dataLoopNodes;
+            
         auto &elecBaseboard = state.dataElectBaseboardRad->ElecBaseboard(BaseboardNum);
 
         if (!state.dataGlobal->SysSizingCalc && elecBaseboard.MySizeFlag) {
@@ -550,9 +552,9 @@ namespace ElectricBaseboardRadiator {
         }
 
         // Do the every time step initializations
-        int ZoneNode = state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNode;
-        elecBaseboard.AirInletTemp = state.dataLoopNodes->Node(ZoneNode).Temp;
-        elecBaseboard.AirInletHumRat = state.dataLoopNodes->Node(ZoneNode).HumRat;
+        auto const *zoneNode = dln->nodes(state.dataZoneEquip->ZoneEquipConfig(ControlledZoneNum).ZoneNodeNum);
+        elecBaseboard.AirInletTemp = zoneNode->Temp;
+        elecBaseboard.AirInletHumRat = zoneNode->HumRat;
 
         // Set the reporting variables to zero at each timestep.
         elecBaseboard.TotPower = 0.0;

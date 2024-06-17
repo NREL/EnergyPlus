@@ -173,8 +173,9 @@ void SimCoolingPanel(
             MaxWaterFlow = thisCP.WaterMassFlowRateMax;
             MinWaterFlow = 0.0;
         } else {
-            MaxWaterFlow = state.dataLoopNodes->Node(thisCP.WaterInletNode).MassFlowRateMaxAvail;
-            MinWaterFlow = state.dataLoopNodes->Node(thisCP.WaterInletNode).MassFlowRateMinAvail;
+            auto const *waterInletNode = state.dataLoopNodes->nodes(thisCP.WaterInNodeNum);
+            MaxWaterFlow = waterInletNode->MassFlowRateMaxAvail;
+            MinWaterFlow = waterInletNode->MassFlowRateMinAvail;
         }
 
         switch (thisCP.EquipType) {
@@ -304,26 +305,26 @@ void GetCoolingPanelInput(EnergyPlusData &state)
         }
 
         // Get inlet node number
-        thisCP.WaterInletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                    state.dataIPShortCut->cAlphaArgs(3),
-                                                                    ErrorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
-                                                                    state.dataIPShortCut->cAlphaArgs(1),
-                                                                    DataLoopNode::NodeFluidType::Water,
-                                                                    DataLoopNode::ConnectionType::Inlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
+        thisCP.WaterInNodeNum = Node::GetSingleNode(state,
+                                                       state.dataIPShortCut->cAlphaArgs(3),
+                                                       ErrorsFound,
+                                                       Node::ConnObjType::ZoneHVACCoolingPanelRadiantConvectiveWater,
+                                                       state.dataIPShortCut->cAlphaArgs(1),
+                                                       Node::FluidType::Water,
+                                                       Node::ConnType::Inlet,
+                                                       Node::CompFluidStream::Primary,
+                                                       Node::ObjectIsNotParent);
 
         // Get outlet node number
-        thisCP.WaterOutletNode = NodeInputManager::GetOnlySingleNode(state,
-                                                                     state.dataIPShortCut->cAlphaArgs(4),
-                                                                     ErrorsFound,
-                                                                     DataLoopNode::ConnectionObjectType::ZoneHVACCoolingPanelRadiantConvectiveWater,
-                                                                     state.dataIPShortCut->cAlphaArgs(1),
-                                                                     DataLoopNode::NodeFluidType::Water,
-                                                                     DataLoopNode::ConnectionType::Outlet,
-                                                                     NodeInputManager::CompFluidStream::Primary,
-                                                                     DataLoopNode::ObjectIsNotParent);
+        thisCP.WaterOutNodeNum = Node::GetSingleNode(state,
+                                                        state.dataIPShortCut->cAlphaArgs(4),
+                                                        ErrorsFound,
+                                                        Node::ConnObjType::ZoneHVACCoolingPanelRadiantConvectiveWater,
+                                                        state.dataIPShortCut->cAlphaArgs(1),
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
         BranchNodeConnections::TestCompSet(state,
                                            cCMO_CoolingPanel_Simple,
                                            state.dataIPShortCut->cAlphaArgs(1),
@@ -796,7 +797,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     Real64 Cp;  // local fluid specific heat
 
     auto &thisCP = state.dataChilledCeilingPanelSimple->CoolingPanel(CoolingPanelNum);
-    auto &ThisInNode = state.dataLoopNodes->Node(thisCP.WaterInletNode);
+    auto *waterInletNode = state.dataLoopNodes->nodes(thisCP.WaterInNodeNum);
 
     if (thisCP.ZonePtr <= 0) thisCP.ZonePtr = ControlledZoneNum;
 
@@ -829,14 +830,14 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
             thisCP.MySizeFlagCoolPanel = false;
 
             // set design mass flow rates
-            if (thisCP.WaterInletNode > 0) {
+            if (thisCP.WaterInNodeNum > 0) {
                 rho = FluidProperties::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
                                                         RoutineName);
                 thisCP.WaterMassFlowRateMax = rho * thisCP.WaterVolFlowRateMax;
-                PlantUtilities::InitComponentNodes(state, 0.0, thisCP.WaterMassFlowRateMax, thisCP.WaterInletNode, thisCP.WaterOutletNode);
+                PlantUtilities::InitComponentNodes(state, 0.0, thisCP.WaterMassFlowRateMax, thisCP.WaterInNodeNum, thisCP.WaterOutNodeNum);
             }
         }
     }
@@ -853,20 +854,20 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
         thisCP.WaterMassFlowRateMax = rho * thisCP.WaterVolFlowRateMax;
 
-        PlantUtilities::InitComponentNodes(state, 0.0, thisCP.WaterMassFlowRateMax, thisCP.WaterInletNode, thisCP.WaterOutletNode);
+        PlantUtilities::InitComponentNodes(state, 0.0, thisCP.WaterMassFlowRateMax, thisCP.WaterInNodeNum, thisCP.WaterOutNodeNum);
 
-        ThisInNode.Temp = 7.0;
+        waterInletNode->Temp = 7.0;
 
         Cp = FluidProperties::GetSpecificHeatGlycol(state,
                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
-                                                    ThisInNode.Temp,
+                                                    waterInletNode->Temp,
                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
                                                     RoutineName);
 
-        ThisInNode.Enthalpy = Cp * ThisInNode.Temp;
-        ThisInNode.Quality = 0.0;
-        ThisInNode.Press = 0.0;
-        ThisInNode.HumRat = 0.0;
+        waterInletNode->Enthalpy = Cp * waterInletNode->Temp;
+        waterInletNode->Quality = 0.0;
+        waterInletNode->Press = 0.0;
+        waterInletNode->HumRat = 0.0;
 
         thisCP.ZeroCPSourceSumHATsurf = 0.0;
         thisCP.CoolingPanelSource = 0.0;
@@ -892,9 +893,9 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     }
 
     // Do the every time step initializations
-    thisCP.WaterMassFlowRate = ThisInNode.MassFlowRate;
-    thisCP.WaterInletTemp = ThisInNode.Temp;
-    thisCP.WaterInletEnthalpy = ThisInNode.Enthalpy;
+    thisCP.WaterMassFlowRate = waterInletNode->MassFlowRate;
+    thisCP.WaterInletTemp = waterInletNode->Temp;
+    thisCP.WaterInletEnthalpy = waterInletNode->Enthalpy;
     thisCP.TotPower = 0.0;
     thisCP.Power = 0.0;
     thisCP.ConvPower = 0.0;
@@ -1027,9 +1028,9 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                     state, CompType, thisCP.Name, "User-Specified Maximum Cold Water Flow [m3/s]", thisCP.WaterVolFlowRateMax);
             }
         } else { // Autosize or hard-size with sizing run
-            if (thisCP.WaterInletNode > 0 && thisCP.WaterOutletNode > 0) {
+            if (thisCP.WaterInNodeNum > 0 && thisCP.WaterOutNodeNum > 0) {
                 int PltSizCoolNum =
-                    PlantUtilities::MyPlantSizingIndex(state, CompType, thisCP.Name, thisCP.WaterInletNode, thisCP.WaterOutletNode, ErrorsFound);
+                    PlantUtilities::MyPlantSizingIndex(state, CompType, thisCP.Name, thisCP.WaterInNodeNum, thisCP.WaterOutNodeNum, ErrorsFound);
                 if (PltSizCoolNum > 0) {
                     if (DesCoilLoad >= HVAC::SmallLoad) {
                         rho = FluidProperties::GetDensityGlycol(state,
@@ -1084,7 +1085,7 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
         }
     }
 
-    PlantUtilities::RegisterPlantCompDesignFlow(state, thisCP.WaterInletNode, thisCP.WaterVolFlowRateMax);
+    PlantUtilities::RegisterPlantCompDesignFlow(state, thisCP.WaterInNodeNum, thisCP.WaterVolFlowRateMax);
 
     if (!thisCP.SizeCoolingPanelUA(state)) {
         ShowFatalError(state, "SizeCoolingPanelUA: Program terminated for previous conditions.");
@@ -1311,15 +1312,17 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
             MdotLow = 0.0;
             MCpEpsHigh = waterMassFlowRateMax * Cp * (1.0 - exp(-this->UA / (waterMassFlowRateMax * Cp)));
             MdotHigh = waterMassFlowRateMax;
+
+            auto *waterInletNode = state.dataLoopNodes->nodes(this->WaterInNodeNum);
             if (MCpEpsAct <= MCpEpsLow) {
                 MCpEpsAct = MCpEpsLow;
                 waterMassFlowRate = 0.0;
-                state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = 0.0;
+                waterInletNode->MassFlowRate = 0.0;
                 CoolingPanelOn = false;
             } else if (MCpEpsAct >= MCpEpsHigh) {
                 MCpEpsAct = MCpEpsHigh;
                 waterMassFlowRate = waterMassFlowRateMax;
-                state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRateMax;
+                waterInletNode->MassFlowRate = waterMassFlowRateMax;
             } else {
                 for (int iter = 1; iter <= Maxiter; ++iter) {
                     FracGuess = (MCpEpsAct - MCpEpsLow) / (MCpEpsHigh - MCpEpsLow);
@@ -1334,7 +1337,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
                     }
                     if (((MCpEpsAct - MCpEpsGuess) / MCpEpsAct) <= IterTol) {
                         waterMassFlowRate = MdotGuess;
-                        state.dataLoopNodes->Node(this->WaterInletNode).MassFlowRate = waterMassFlowRate;
+                        waterInletNode->MassFlowRate = waterMassFlowRate;
                         break;
                     }
                 }
@@ -1369,7 +1372,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
     }
 
     if (CoolingPanelOn) {
-        PlantUtilities::SetComponentFlowRate(state, waterMassFlowRate, this->WaterInletNode, this->WaterOutletNode, this->plantLoc);
+        PlantUtilities::SetComponentFlowRate(state, waterMassFlowRate, this->WaterInNodeNum, this->WaterOutNodeNum, this->plantLoc);
         if (waterMassFlowRate <= 0.0) CoolingPanelOn = false;
     }
 
@@ -1500,20 +1503,17 @@ void UpdateCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
     thisCP.LastSysTimeElapsed = SysTimeElapsed;
     thisCP.LastTimeStepSys = TimeStepSys;
 
-    int WaterInletNode = thisCP.WaterInletNode;
-    int WaterOutletNode = thisCP.WaterOutletNode;
-
-    auto &ThisInNode(state.dataLoopNodes->Node(WaterInletNode));
-    auto &ThisOutNode(state.dataLoopNodes->Node(WaterOutletNode));
+    auto *waterInNode = state.dataLoopNodes->nodes(thisCP.WaterInNodeNum);
+    auto *waterOutNode = state.dataLoopNodes->nodes(thisCP.WaterOutNodeNum);
 
     // Set the outlet water nodes for the panel
-    PlantUtilities::SafeCopyPlantNode(state, WaterInletNode, WaterOutletNode);
-    ThisOutNode.Temp = thisCP.WaterOutletTemp;
-    ThisOutNode.Enthalpy = thisCP.WaterOutletEnthalpy;
-    ThisInNode.MassFlowRate = thisCP.WaterMassFlowRate;
-    ThisOutNode.MassFlowRate = thisCP.WaterMassFlowRate;
-    ThisInNode.MassFlowRateMax = thisCP.WaterMassFlowRateMax;
-    ThisOutNode.MassFlowRateMax = thisCP.WaterMassFlowRateMax;
+    PlantUtilities::SafeCopyPlantNode(state, thisCP.WaterInNodeNum, thisCP.WaterOutNodeNum);
+    waterOutNode->Temp = thisCP.WaterOutletTemp;
+    waterOutNode->Enthalpy = thisCP.WaterOutletEnthalpy;
+    waterInNode->MassFlowRate = thisCP.WaterMassFlowRate;
+    waterOutNode->MassFlowRate = thisCP.WaterMassFlowRate;
+    waterInNode->MassFlowRateMax = thisCP.WaterMassFlowRateMax;
+    waterOutNode->MassFlowRateMax = thisCP.WaterMassFlowRateMax;
 }
 
 void UpdateCoolingPanelSourceValAvg(EnergyPlusData &state,

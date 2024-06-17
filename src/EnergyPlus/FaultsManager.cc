@@ -904,8 +904,8 @@ namespace FaultsManager {
                     state.dataHVACControllers->ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
 
                     // Check whether the controller match the coil
-                    if (state.dataHVACControllers->ControllerProps(ControlNum).SensedNode !=
-                        state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
+                    if (state.dataHVACControllers->ControllerProps(ControlNum).SensedNodeNum !=
+                        state.dataWaterCoils->WaterCoil(CoilNum).AirOutNodeNum) {
                         ShowSevereError(state,
                                         format("{} = \"{}\" invalid {} = \"{}\" does not match {} = \"{}",
                                                cFaultCurrentObject,

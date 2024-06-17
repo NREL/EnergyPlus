@@ -125,11 +125,11 @@ namespace EvaporativeCoolers {
         Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         bool InitFlag;
-        int InletNode;
-        int OutletNode;
-        int SecondaryInletNode;   // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNode;  // This outlet node of the secondary side and ilet to the secondary fan
-        int TertiaryInletNode;    // This node is used to run building exhaust into purge side.
+        int InletNodeNum = 0;
+        int OutletNodeNum = 0;
+        int SecondaryInletNodeNum = 0;   // This is usually OA node feeding into the purge/secondary side
+        int SecondaryOutletNodeNum = 0;  // This outlet node of the secondary side and ilet to the secondary fan
+        int TertiaryInletNodeNum = 0;    // This node is used to run building exhaust into purge side.
         Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletMassFlowRateMaxAvail;
         Real64 InletMassFlowRateMinAvail;
@@ -211,8 +211,8 @@ namespace EvaporativeCoolers {
         EvapConditions()
             : EquipIndex(0), evapCoolerType(EvapCoolerType::Invalid), SchedPtr(0), VolFlowRate(0.0), DesVolFlowRate(0.0), OutletTemp(0.0),
               OuletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0), OutletPressure(0.0), OutletMassFlowRate(0.0),
-              OutletMassFlowRateMaxAvail(0.0), OutletMassFlowRateMinAvail(0.0), InitFlag(false), InletNode(0), OutletNode(0), SecondaryInletNode(0),
-              SecondaryOutletNode(0), TertiaryInletNode(0), InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0),
+              OutletMassFlowRateMaxAvail(0.0), OutletMassFlowRateMinAvail(0.0), InitFlag(false),
+              InletMassFlowRate(0.0), InletMassFlowRateMaxAvail(0.0), InletMassFlowRateMinAvail(0.0),
               InletTemp(0.0), InletWetBulbTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), SecInletMassFlowRate(0.0),
               SecInletMassFlowRateMaxAvail(0.0), SecInletMassFlowRateMinAvail(0.0), SecInletTemp(0.0), SecInletWetBulbTemp(0.0), SecInletHumRat(0.0),
               SecInletEnthalpy(0.0), SecInletPressure(0.0), SecOutletTemp(0.0), SecOuletWetBulbTemp(0.0), SecOutletHumRat(0.0),

@@ -166,16 +166,16 @@ namespace MicroCHPElectricGenerator {
         std::string ZoneName;
         int ZoneID;
         std::string PlantInletNodeName;
-        int PlantInletNodeID;
+        int PlantInNodeNum = 0;
         std::string PlantOutletNodeName;
-        int PlantOutletNodeID;
+        int PlantOutNodeNum = 0;
         Real64 PlantMassFlowRate;              // only if internal control
         Real64 PlantMassFlowRateMax;           // hardware limit for node%massflowrateMax
         bool PlantMassFlowRateMaxWasAutoSized; // true if mass flow rate was autosized on input
         std::string AirInletNodeName;
-        int AirInletNodeID;
+        int AirInNodeNum = 0;
         std::string AirOutletNodeName;
-        int AirOutletNodeID;
+        int AirOutNodeNum = 0;
         int FuelSupplyID;         // index for fuel supply data structure
         int DynamicsControlID;    // index in GeneratorDynamics data where control issues are handled
         int AvailabilitySchedID;  // index for availability schedule
@@ -188,8 +188,8 @@ namespace MicroCHPElectricGenerator {
 
         // Default Constructor
         MicroCHPDataStruct()
-            : NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0), PlantMassFlowRateMax(0.0),
-              PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0), DynamicsControlID(0),
+            : NomEff(0.0), ZoneID(0), PlantMassFlowRate(0.0), PlantMassFlowRateMax(0.0),
+              PlantMassFlowRateMaxWasAutoSized(false), FuelSupplyID(0), DynamicsControlID(0),
               AvailabilitySchedID(0), CWPlantLoc{}, CheckEquipName(true), MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
         {
         }

@@ -161,8 +161,8 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 maxRatedVolFlowPerRatedTotCap = HVAC::MaxRatedVolFlowPerRatedTotCap1;
 
     void CalcSpeedOutput(EnergyPlusData &state,
-                         const DataLoopNode::NodeData &inletNode,
-                         DataLoopNode::NodeData &outletNode,
+                         Node::NodeData const &inletNode,
+                         Node::NodeData &outletNode,
                          Real64 &PLR,
                          HVAC::FanOp const fanOp,
                          Real64 condInletTemp);
@@ -176,7 +176,7 @@ struct CoilCoolingDXCurveFitSpeed
                             Real64 const h,   // Inlet enthalpy {J/kg-dryair}
                             Real64 const p);  // Outlet node pressure {Pa}
 
-    Real64 calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
+    Real64 calcEffectiveSHR(const Node::NodeData &inletNode,
                             Real64 const inletWetBulb,
                             Real64 const SHRss,      // Steady-state sensible heat ratio
                             Real64 const RTF,        // Compressor run-time fraction

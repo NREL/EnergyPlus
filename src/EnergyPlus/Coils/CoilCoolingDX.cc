@@ -147,45 +147,45 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 
     // other construction below
-    this->evapInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
-                                                                   input_data.evaporator_inlet_node_name,
-                                                                   errorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::CoilCoolingDX,
-                                                                   input_data.name,
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Primary,
-                                                                   DataLoopNode::ObjectIsNotParent);
-    this->evapOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
-                                                                    input_data.evaporator_outlet_node_name,
-                                                                    errorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDX,
-                                                                    input_data.name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Primary,
-                                                                    DataLoopNode::ObjectIsNotParent);
-
-    this->condInletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
-                                                                   input_data.condenser_inlet_node_name,
-                                                                   errorsFound,
-                                                                   DataLoopNode::ConnectionObjectType::CoilCoolingDX,
-                                                                   input_data.name,
-                                                                   DataLoopNode::NodeFluidType::Air,
-                                                                   DataLoopNode::ConnectionType::Inlet,
-                                                                   NodeInputManager::CompFluidStream::Secondary,
-                                                                   DataLoopNode::ObjectIsNotParent);
-
-    this->condOutletNodeIndex = NodeInputManager::GetOnlySingleNode(state,
-                                                                    input_data.condenser_outlet_node_name,
-                                                                    errorsFound,
-                                                                    DataLoopNode::ConnectionObjectType::CoilCoolingDX,
-                                                                    input_data.name,
-                                                                    DataLoopNode::NodeFluidType::Air,
-                                                                    DataLoopNode::ConnectionType::Outlet,
-                                                                    NodeInputManager::CompFluidStream::Secondary,
-                                                                    DataLoopNode::ObjectIsNotParent);
-
+    this->evapInNodeNum = Node::GetSingleNode(state,
+                                                 input_data.evaporator_inlet_node_name,
+                                                 errorsFound,
+                                                 Node::ConnObjType::CoilCoolingDX,
+                                                 input_data.name,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Primary,
+                                                 Node::ObjectIsNotParent);
+    this->evapOutNodeNum = Node::GetSingleNode(state,
+                                                  input_data.evaporator_outlet_node_name,
+                                                  errorsFound,
+                                                  Node::ConnObjType::CoilCoolingDX,
+                                                  input_data.name,
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Primary,
+                                                  Node::ObjectIsNotParent);
+    
+    this->condInNodeNum = Node::GetSingleNode(state,
+                                                 input_data.condenser_inlet_node_name,
+                                                 errorsFound,
+                                                 Node::ConnObjType::CoilCoolingDX,
+                                                 input_data.name,
+                                                 Node::FluidType::Air,
+                                                 Node::ConnType::Inlet,
+                                                 Node::CompFluidStream::Secondary,
+                                                 Node::ObjectIsNotParent);
+    
+    this->condOutNodeNum = Node::GetSingleNode(state,
+                                                  input_data.condenser_outlet_node_name,
+                                                  errorsFound,
+                                                  Node::ConnObjType::CoilCoolingDX,
+                                                  input_data.name,
+                                                  Node::FluidType::Air,
+                                                  Node::ConnType::Outlet,
+                                                  Node::CompFluidStream::Secondary,
+                                                  Node::ObjectIsNotParent);
+    
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
         WaterManager::SetupTankSupplyComponent(state,
                                                this->name,
@@ -207,12 +207,12 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     }
 
     if (input_data.availability_schedule_name.empty()) {
-        this->availScheduleIndex = ScheduleManager::ScheduleAlwaysOn;
+        this->availScheduleNum = ScheduleManager::ScheduleAlwaysOn;
     } else {
-        this->availScheduleIndex = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
+        this->availScheduleNum = ScheduleManager::GetScheduleIndex(state, input_data.availability_schedule_name);
     }
 
-    if (this->availScheduleIndex == 0) {
+    if (this->availScheduleNum == 0) {
         ShowSevereError(state, std::string{routineName} + state.dataCoilCooingDX->coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError(state, "...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
@@ -607,9 +607,9 @@ void CoilCoolingDX::getFixedData(int &_evapInletNodeIndex,
                                  CoilCoolingDXCurveFitPerformance::CapControlMethod &_capacityControlMethod,
                                  Real64 &_minOutdoorDryBulb)
 {
-    _evapInletNodeIndex = this->evapInletNodeIndex;
-    _evapOutletNodeIndex = this->evapOutletNodeIndex;
-    _condInletNodeIndex = this->condInletNodeIndex;
+    _evapInletNodeIndex = this->evapInNodeNum;
+    _evapOutletNodeIndex = this->evapOutNodeNum;
+    _condInletNodeIndex = this->condInNodeNum;
     _normalModeNumSpeeds = (int)this->performance.normalMode.speeds.size();
     _capacityControlMethod = this->performance.capControlMethod;
     _minOutdoorDryBulb = this->performance.minOutdoorDrybulb;
@@ -673,19 +673,19 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     static constexpr std::string_view RoutineName = "CoilCoolingDX::simulate";
 
     // get node references
-    auto &evapInletNode = state.dataLoopNodes->Node(this->evapInletNodeIndex);
-    auto &evapOutletNode = state.dataLoopNodes->Node(this->evapOutletNodeIndex);
-    auto &condInletNode = state.dataLoopNodes->Node(this->condInletNodeIndex);
-    auto &condOutletNode = state.dataLoopNodes->Node(this->condOutletNodeIndex);
+    auto *evapInNode = state.dataLoopNodes->nodes(this->evapInNodeNum);
+    auto *evapOutNode = state.dataLoopNodes->nodes(this->evapOutNodeNum);
+    auto *condInNode = state.dataLoopNodes->nodes(this->condInNodeNum);
+    auto *condOutNode = state.dataLoopNodes->nodes(this->condOutNodeNum);
 
     // set some reporting variables
-    this->condenserInletTemperature = condInletNode.Temp;
+    this->condenserInletTemperature = condInNode->Temp;
     this->dehumidificationMode = coilMode;
 
     // set condenser inlet/outlet nodes
     // once condenser inlet is connected to upstream components, will need to revisit
-    condInletNode.MassFlowRate = this->condMassFlowRate(coilMode);
-    condOutletNode.MassFlowRate = condInletNode.MassFlowRate;
+    condInNode->MassFlowRate = this->condMassFlowRate(coilMode);
+    condOutNode->MassFlowRate = condInNode->MassFlowRate;
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
@@ -693,8 +693,8 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
     this->performance.simulate(
-        state, evapInletNode, evapOutletNode, coilMode, PLR, speedNum, speedRatio, fanOp, condInletNode, condOutletNode, singleMode, LoadSHR);
-    CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
+        state, *evapInNode, *evapOutNode, coilMode, PLR, speedNum, speedRatio, fanOp, *condInNode, *condOutNode, singleMode, LoadSHR);
+    CoilCoolingDX::passThroughNodeData(*evapInNode, *evapOutNode);
 
     // calculate energy conversion factor
     Real64 reportingConstant = state.dataHVACGlobal->TimeStepSys * Constant::SecInHour;
@@ -704,18 +704,18 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
         if (speedNum > 0) {
             // calculate and report condensation rates  (how much water extracted from the air stream)
             // water flow of water in m3/s for water system interactions
-            Real64 averageTemp = (evapInletNode.Temp + evapOutletNode.Temp) / 2.0;
+            Real64 averageTemp = (evapInNode->Temp + evapOutNode->Temp) / 2.0;
             Real64 waterDensity = Psychrometrics::RhoH2O(averageTemp);
-            Real64 inHumidityRatio = evapInletNode.HumRat;
-            Real64 outHumidityRatio = evapOutletNode.HumRat;
-            this->condensateVolumeFlow = max(0.0, (evapInletNode.MassFlowRate * (inHumidityRatio - outHumidityRatio) / waterDensity));
+            Real64 inHumidityRatio = evapInNode->HumRat;
+            Real64 outHumidityRatio = evapOutNode->HumRat;
+            this->condensateVolumeFlow = max(0.0, (evapInNode->MassFlowRate * (inHumidityRatio - outHumidityRatio) / waterDensity));
             this->condensateVolumeConsumption = this->condensateVolumeFlow * reportingConstant;
             state.dataWaterData->WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) =
                 this->condensateVolumeFlow;
-            state.dataWaterData->WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
+            state.dataWaterData->WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutNode->Temp;
         } else {
             state.dataWaterData->WaterStorage(this->condensateTankIndex).VdotAvailSupply(this->condensateTankSupplyARRID) = 0.0;
-            state.dataWaterData->WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutletNode.Temp;
+            state.dataWaterData->WaterStorage(this->condensateTankIndex).TwaterSupply(this->condensateTankSupplyARRID) = evapOutNode->Temp;
         }
     }
 
@@ -729,7 +729,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
                 Psychrometrics::PsyWFnTdbTwbPb(state, condInletTemp, state.dataEnvrn->OutWetBulbTemp, state.dataEnvrn->OutBaroPress, RoutineName);
             Real64 outdoorHumRat = state.dataEnvrn->OutHumRat;
 
-            Real64 condAirMassFlow = condInletNode.MassFlowRate;
+            Real64 condAirMassFlow = condInNode->MassFlowRate;
             Real64 waterDensity = Psychrometrics::RhoH2O(state.dataEnvrn->OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
@@ -744,17 +744,17 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
     }
 
     // update report variables
-    this->airMassFlowRate = evapOutletNode.MassFlowRate;
-    this->inletAirDryBulbTemp = evapInletNode.Temp;
-    this->inletAirHumRat = evapInletNode.HumRat;
-    this->outletAirDryBulbTemp = evapOutletNode.Temp;
-    this->outletAirHumRat = evapOutletNode.HumRat;
+    this->airMassFlowRate = evapOutNode->MassFlowRate;
+    this->inletAirDryBulbTemp = evapInNode->Temp;
+    this->inletAirHumRat = evapInNode->HumRat;
+    this->outletAirDryBulbTemp = evapOutNode->Temp;
+    this->outletAirHumRat = evapOutNode->HumRat;
 
-    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate,
-                                      evapInletNode.Temp,
-                                      evapInletNode.HumRat,
-                                      evapOutletNode.Temp,
-                                      evapOutletNode.HumRat,
+    CalcComponentSensibleLatentOutput(evapOutNode->MassFlowRate,
+                                      evapInNode->Temp,
+                                      evapInNode->HumRat,
+                                      evapOutNode->Temp,
+                                      evapOutNode->HumRat,
                                       this->sensCoolingEnergyRate,
                                       this->latCoolingEnergyRate,
                                       this->totalCoolingEnergyRate);
@@ -823,10 +823,10 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             }
 
             // report out coil rating conditions, just create a set of dummy nodes and run calculate on them
-            DataLoopNode::NodeData dummyEvapInlet;
-            DataLoopNode::NodeData dummyEvapOutlet;
-            DataLoopNode::NodeData dummyCondInlet;
-            DataLoopNode::NodeData dummyCondOutlet;
+            Node::NodeData dummyEvapInlet;
+            Node::NodeData dummyEvapOutlet;
+            Node::NodeData dummyCondInlet;
+            Node::NodeData dummyCondOutlet;
             Real64 dummyPLR = 1.0;
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
@@ -852,7 +852,7 @@ void CoilCoolingDX::simulate(EnergyPlusData &state,
             dummyCondInlet.HumRat =
                 Psychrometrics::PsyWFnTdbTwbPb(state, RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, RoutineName);
             dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
-            dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
+            dummyCondInlet.Press = condInNode->Press; // for now; TODO: Investigate
 
             // overriding outdoor conditions temporarily
             Real64 holdOutDryBulbTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -941,7 +941,7 @@ void CoilCoolingDX::setToHundredPercentDOAS()
     }
 }
 
-void CoilCoolingDX::passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out)
+void CoilCoolingDX::passThroughNodeData(Node::NodeData &in, Node::NodeData &out)
 {
     // pass through all the other node variables that we don't update as a part of this model calculation
     out.MassFlowRate = in.MassFlowRate;

@@ -109,9 +109,9 @@ namespace FuelCellElectricGenerator {
         Real64 NdotDilutionAir;            // user defined constant flow of dilution air (kmol/sec)
         Real64 StackHeatLossToDilution;    // (watts)
         std::string DilutionInletNodeName; // dilution -> AirHR ?? added air heat recovery path
-        int DilutionInletNode;             // pointer to node for inlet
+        int DilutionInletNodeNum = 0;             // pointer to node for inlet
         std::string DilutionExhaustNodeName;
-        int DilutionExhaustNode; // pointer to node getting exhaust
+        int DilutionExhaustNodeNum = 0; // pointer to node getting exhaust
         Real64 PelMin;           // minimum operating point for FCPM electrical power Pel
         Real64 PelMax;           // maximum operating point for FCPM electrical power Pel
         // Calculated values and input from elsewhere
@@ -149,7 +149,7 @@ namespace FuelCellElectricGenerator {
               NumRunHours(0.0), OperateDegradRat(0.0), ThreshRunHours(0.0), UpTranLimit(0.0), DownTranLimit(0.0), StartUpTime(0.0), StartUpFuel(0.0),
               StartUpElectConsum(0.0), StartUpElectProd(0.0), ShutDownTime(0.0), ShutDownFuel(0.0), ShutDownElectConsum(0.0), ANC0(0.0), ANC1(0.0),
               SkinLossMode(DataGenerators::SkinLoss::Invalid), ZoneID(0), RadiativeFract(0.0), QdotSkin(0.0), UAskin(0.0), SkinLossCurveID(0),
-              WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), DilutionInletNode(0), DilutionExhaustNode(0), PelMin(0.0),
+              WaterSupplyCurveID(0), NdotDilutionAir(0.0), StackHeatLossToDilution(0.0), PelMin(0.0),
               PelMax(0.0), Pel(0.0), PelLastTimeStep(0.0), Eel(0.0), QdotStackCool(0.0), FractionalDayofLastStartUp(0.0),
               FractionalDayofLastShutDown(0.0), HasBeenOn(true), DuringShutDown(false), DuringStartUp(false), NdotFuel(0.0), TotFuelInEnthalphy(0.0),
               NdotProdGas(0.0), ConstitMolalFract(14, 0.0), GasLibID(14, GasID::Invalid), TprodGasLeavingFCPM(0.0), NdotAir(0.0),
@@ -258,12 +258,12 @@ namespace FuelCellElectricGenerator {
     {
         std::string Name;                         // name of this exhaust gas heat recovery
         std::string WaterInNodeName;              // HR Water Inlet Node
-        int WaterInNode;                          // HR Water Outlet Node ID
+        int WaterInNodeNum = 0;                          // HR Water Outlet Node ID
         std::string WaterOutNodeName;             // HR water outlet Node name
-        int WaterOutNode;                         // HR Water outlet Node ID
+        int WaterOutNodeNum = 0;                         // HR Water outlet Node ID
         Real64 WaterVolumeFlowMax;                // HR water flow rate max avail
         std::string ExhaustOutNodeName;           // air node for exhaust flow
-        int ExhaustOutNode;                       // Exhaust Air node ID
+        int ExhaustOutNodeNum = 0;                       // Exhaust Air node ID
         DataGenerators::ExhaustGasHX HXmodelMode; // Heat Exchanger Calculation Method
         Real64 HXEffect;                          // Heat Exchanger Effectiveness (method 1)
         Real64 hxs0;                              // (method 2)
@@ -299,7 +299,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCExhaustHXDataStruct()
-            : WaterInNode(0), WaterOutNode(0), WaterVolumeFlowMax(0.0), ExhaustOutNode(0), HXmodelMode(DataGenerators::ExhaustGasHX::Invalid),
+            : WaterVolumeFlowMax(0.0), HXmodelMode(DataGenerators::ExhaustGasHX::Invalid),
               HXEffect(0.0), hxs0(0.0), hxs1(0.0), hxs2(0.0), hxs3(0.0), hxs4(0.0), h0gas(0.0), NdotGasRef(0.0), nCoeff(0.0), AreaGas(0.0),
               h0Water(0.0), NdotWaterRef(0.0), mCoeff(0.0), AreaWater(0.0), Fadjust(0.0), l1Coeff(0.0), l2Coeff(0.0), CondensationThresholdTemp(0.0),
               qHX(0.0), THXexh(0.0), WaterMassFlowRateDesign(0.0), WaterMassFlowRate(0.0), WaterInletTemp(0.0), WaterVaporFractExh(0.0),
@@ -481,9 +481,9 @@ namespace FuelCellElectricGenerator {
     {
         std::string Name;             // name of this stack cooler module
         std::string WaterInNodeName;  // HR Water Inlet Node
-        int WaterInNode;              // HR Water Outlet Node ID
+        int WaterInNodeNum = 0;              // HR Water Outlet Node ID
         std::string WaterOutNodeName; // HR water outlet Node name
-        int WaterOutNode;             // HR Water outlet Node ID
+        int WaterOutNodeNum = 0;             // HR Water outlet Node ID
         Real64 TstackNom;             // nominal fuel cell stack temperature
         Real64 TstackActual;          // actual fuel cell stack temperature
         Real64 r0;                    // stack cooling power coefficient r0
@@ -509,7 +509,7 @@ namespace FuelCellElectricGenerator {
 
         // Default Constructor
         FCStackCoolerDataStruct()
-            : WaterInNode(0), WaterOutNode(0), TstackNom(0.0), TstackActual(0.0), r0(0.0), r1(0.0), r2(0.0), r3(0.0), MdotStackCoolant(0.0),
+            : TstackNom(0.0), TstackActual(0.0), r0(0.0), r1(0.0), r2(0.0), r3(0.0), MdotStackCoolant(0.0),
               UAs_cool(0.0), Fs_cogen(0.0), As_cogen(0.0), MdotCogenNom(0.0), hCogenNom(0.0), ns(0.0), PstackPumpEl(0.0), PmpPowerLossFactor(0.0),
               f0(0.0), f1(0.0), f2(0.0), StackCoolerPresent(false), qs_cool(0.0), qs_air(0.0)
         {

@@ -214,17 +214,17 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
         // get inlet node data
         state.dataPondGHE->PondGHE(Item).InletNode = state.dataIPShortCut->cAlphaArgs(2);
-        state.dataPondGHE->PondGHE(Item).InletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+        state.dataPondGHE->PondGHE(Item).InNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(2),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::GroundHeatExchangerPond,
+                                                Node::ConnObjType::GroundHeatExchangerPond,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Inlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent);
-        if (state.dataPondGHE->PondGHE(Item).InletNodeNum == 0) {
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Inlet,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
+        if (state.dataPondGHE->PondGHE(Item).InNodeNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(2), state.dataIPShortCut->cAlphaArgs(2)));
             ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -232,17 +232,17 @@ void GetPondGroundHeatExchanger(EnergyPlusData &state)
 
         // get outlet node data
         state.dataPondGHE->PondGHE(Item).OutletNode = state.dataIPShortCut->cAlphaArgs(3);
-        state.dataPondGHE->PondGHE(Item).OutletNodeNum =
-            NodeInputManager::GetOnlySingleNode(state,
+        state.dataPondGHE->PondGHE(Item).OutNodeNum =
+            Node::GetSingleNode(state,
                                                 state.dataIPShortCut->cAlphaArgs(3),
                                                 ErrorsFound,
-                                                DataLoopNode::ConnectionObjectType::GroundHeatExchangerPond,
+                                                Node::ConnObjType::GroundHeatExchangerPond,
                                                 state.dataIPShortCut->cAlphaArgs(1),
-                                                DataLoopNode::NodeFluidType::Water,
-                                                DataLoopNode::ConnectionType::Outlet,
-                                                NodeInputManager::CompFluidStream::Primary,
-                                                DataLoopNode::ObjectIsNotParent);
-        if (state.dataPondGHE->PondGHE(Item).OutletNodeNum == 0) {
+                                                Node::FluidType::Water,
+                                                Node::ConnType::Outlet,
+                                                Node::CompFluidStream::Primary,
+                                                Node::ObjectIsNotParent);
+        if (state.dataPondGHE->PondGHE(Item).OutNodeNum == 0) {
             ShowSevereError(state, format("Invalid {}={}", state.dataIPShortCut->cAlphaFieldNames(3), state.dataIPShortCut->cAlphaArgs(3)));
             ShowContinueError(state, format("Entered in {}={}", state.dataIPShortCut->cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)));
             ErrorsFound = true;
@@ -415,7 +415,9 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
 
     // repeated warm up days tend to drive the initial pond temperature toward the drybulb temperature
     // For each environment start the pond midway between drybulb and ground temp.
-
+    auto &dln = state.dataLoopNodes;
+    auto *inNode = dln->nodes(this->InNodeNum);
+        
     this->oneTimeInit(state);
 
     if (FirstHVACIteration && !state.dataHVACGlobal->ShortenTimeStepSys && this->firstTimeThrough) {
@@ -426,16 +428,16 @@ void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &st
         this->firstTimeThrough = true;
     }
 
-    this->InletTemp = state.dataLoopNodes->Node(InletNodeNum).Temp;
+    this->InletTemp = inNode->Temp;
     this->PondTemp = this->BulkTemperature;
 
     // Hypothetical design flow rate
     Real64 DesignFlow = PlantUtilities::RegulateCondenserCompFlowReqOp(state, this->plantLoc, this->DesignMassFlowRate);
 
-    PlantUtilities::SetComponentFlowRate(state, DesignFlow, this->InletNodeNum, this->OutletNodeNum, this->plantLoc);
+    PlantUtilities::SetComponentFlowRate(state, DesignFlow, this->InNodeNum, this->OutNodeNum, this->plantLoc);
 
     // get the current flow rate - module variable
-    this->MassFlowRate = state.dataLoopNodes->Node(InletNodeNum).MassFlowRate;
+    this->MassFlowRate = inNode->MassFlowRate;
 }
 
 void PondGroundHeatExchangerData::CalcPondGroundHeatExchanger(EnergyPlusData &state)
@@ -838,6 +840,9 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
 
     static constexpr std::string_view RoutineName("PondGroundHeatExchanger:Update");
 
+    auto &dln = state.dataLoopNodes;
+    auto *outNode = dln->nodes(this->OutNodeNum);
+
     // Calculate the water side outlet conditions and set the
     // appropriate conditions on the correct HVAC node.
     Real64 CpFluid = FluidProperties::GetSpecificHeatGlycol(state,
@@ -846,7 +851,7 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                             RoutineName);
 
-    PlantUtilities::SafeCopyPlantNode(state, InletNodeNum, OutletNodeNum);
+    PlantUtilities::SafeCopyPlantNode(state, this->InNodeNum, this->OutNodeNum);
 
     // update outlet temp
     if ((CpFluid > 0.0) && (this->MassFlowRate > 0.0)) {
@@ -856,8 +861,8 @@ void PondGroundHeatExchangerData::UpdatePondGroundHeatExchanger(EnergyPlusData &
     }
 
     // update node
-    state.dataLoopNodes->Node(this->OutletNodeNum).Temp = this->OutletTemp;
-    state.dataLoopNodes->Node(this->OutletNodeNum).MassFlowRate = this->MassFlowRate;
+    outNode->Temp = this->OutletTemp;
+    outNode->MassFlowRate = this->MassFlowRate;
 
     // update heat transfer rate
     // compute pond heat transfer
@@ -908,8 +913,8 @@ void PondGroundHeatExchangerData::oneTimeInit(EnergyPlusData &state)
                                                            RoutineName);
         this->DesignMassFlowRate = Constant::Pi / 4.0 * pow_2(this->TubeInDiameter) * DesignVelocity * rho * this->NumCircuits;
         this->DesignCapacity = this->DesignMassFlowRate * Cp * 10.0; // assume 10C delta T?
-        PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InletNodeNum, this->OutletNodeNum);
-        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InletNodeNum, this->DesignMassFlowRate / rho);
+        PlantUtilities::InitComponentNodes(state, 0.0, this->DesignMassFlowRate, this->InNodeNum, this->OutNodeNum);
+        PlantUtilities::RegisterPlantCompDesignFlow(state, this->InNodeNum, this->DesignMassFlowRate / rho);
 
         this->MyFlag = false;
     }

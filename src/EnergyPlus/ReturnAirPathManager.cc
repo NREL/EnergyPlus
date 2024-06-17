@@ -108,8 +108,7 @@ namespace ReturnAirPathManager {
         // PURPOSE OF THIS SUBROUTINE: This subroutine
 
         // Using/Aliasing
-        using NodeInputManager::GetOnlySingleNode;
-        using namespace DataLoopNode;
+        using Node::GetSingleNode;
 
         // Locals
         int PathNum;
@@ -151,16 +150,16 @@ namespace ReturnAirPathManager {
                 state.dataZoneEquip->ReturnAirPath(PathNum).Name = state.dataIPShortCut->cAlphaArgs(1);
                 state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents = nint((NumAlphas - 2.0) / 2.0);
 
-                state.dataZoneEquip->ReturnAirPath(PathNum).OutletNodeNum =
-                    GetOnlySingleNode(state,
+                state.dataZoneEquip->ReturnAirPath(PathNum).OutNodeNum =
+                    GetSingleNode(state,
                                       state.dataIPShortCut->cAlphaArgs(2),
                                       ErrorsFound,
-                                      DataLoopNode::ConnectionObjectType::AirLoopHVACReturnPath,
+                                      Node::ConnObjType::AirLoopHVACReturnPath,
                                       state.dataIPShortCut->cAlphaArgs(1),
-                                      DataLoopNode::NodeFluidType::Air,
-                                      DataLoopNode::ConnectionType::Outlet,
-                                      NodeInputManager::CompFluidStream::Primary,
-                                      ObjectIsParent);
+                                      Node::FluidType::Air,
+                                      Node::ConnType::Outlet,
+                                      Node::CompFluidStream::Primary,
+                                  Node::ObjectIsParent);
 
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType.allocate(state.dataZoneEquip->ReturnAirPath(PathNum).NumOfComponents);
                 state.dataZoneEquip->ReturnAirPath(PathNum).ComponentType = "";

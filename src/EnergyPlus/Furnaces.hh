@@ -114,11 +114,15 @@ namespace Furnaces {
         int SchedPtr;                                              // Index to furnace operating schedule
         int FanSchedPtr;                                           // Index to fan operating mode schedule
         int FanAvailSchedPtr;                                      // Index to fan availability schedule
+        int FanInNodeNum = 0;
+        int FanOutNodeNum = 0;
         int ControlZoneNum;                                        // Index to controlled zone
         int ZoneSequenceCoolingNum;                                // Index to cooling sequence/priority for this zone
         int ZoneSequenceHeatingNum;                                // Index to heating sequence/priority for this zone
         int CoolingCoilType_Num;                                   // Numeric Equivalent for Cooling Coil Type
         int CoolingCoilIndex;                                      // Index to cooling coil
+        int CoolCoilAirInNodeNum = 0;
+        int CoolCoilAirOutNodeNum = 0;
         int ActualDXCoilIndexForHXAssisted;                        // Index to DX cooling coil when HX assisted
         bool CoolingCoilUpstream;                                  // Indicates if cooling coil is upstream of heating coil
         int HeatingCoilType_Num;                                   // Numeric Equivalent for Heating Coil Type
@@ -127,26 +131,26 @@ namespace Furnaces {
         int ReheatingCoilIndex;                                    // Index to reheat coil
         std::string HeatingCoilName;                               // name of heating coil
         std::string HeatingCoilType;                               // type of heating coil
-        int CoilControlNode;                                       // control node for hot water and steam heating coils
-        int HWCoilAirInletNode;                                    // air inlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
-        int HWCoilAirOutletNode;                                   // air outlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
-        int SuppCoilAirInletNode;                                  // air inlet node number of HW coil for HeatCool Reheat Coil
-        int SuppCoilAirOutletNode;                                 // air outlet node number of HW coil for HeatCool Reheat Coil
-        int SuppHeatCoilType_Num;                                  // Numeric Equivalent for Supplemental Heat Coil Type
-        int SuppHeatCoilIndex;                                     // Index to supplemental heater
-        int SuppCoilControlNode;                                   // control node for steam and hot water heating coil
-        std::string SuppHeatCoilName;                              // name of supplemental heating coil
-        std::string SuppHeatCoilType;                              // type of supplemental heating coil
+        int CoilControlNodeNum = 0;                                       // control node for hot water and steam heating coils
+        int HeatCoilAirInNodeNum = 0;                                    // air inlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
+        int HeatCoilAirOutNodeNum = 0;                                   // air outlet node number of HW coil for PTAC, PTHP, HeatCool, HeatOnly
+        int SuppCoilAirInNodeNum = 0;                                  // air inlet node number of HW coil for HeatCool Reheat Coil
+        int SuppCoilAirOutNodeNum = 0;                                 // air outlet node number of HW coil for HeatCool Reheat Coil
+        int SuppCoilType_Num;                                  // Numeric Equivalent for Supplemental Heat Coil Type
+        int SuppCoilIndex;                                     // Index to supplemental heater
+        int SuppCoilControlNodeNum = 0;                                   // control node for steam and hot water heating coil
+        std::string SuppCoilName;                              // name of supplemental heating coil
+        std::string SuppCoilType;                              // type of supplemental heating coil
         HVAC::FanType fanType;                                     // Integer equivalent of fan type (1=OnOff, 2 = ConstVolume)
         int FanIndex;                                              // Index to fan object
-        int FurnaceInletNodeNum;                                   // Furnace inlet node number
-        int FurnaceOutletNodeNum;                                  // Furnace inlet node number
+        int FurnaceInNodeNum = 0;                                   // Furnace inlet node number
+        int FurnaceOutNodeNum = 0;                                  // Furnace inlet node number
         HVAC::FanOp fanOp = HVAC::FanOp::Invalid;                  // operation mode: 1 = cycling fan, cycling coils
         //                 2 = continuous fan, cycling coils
         Furnaces::ModeOfOperation LastMode;                    // last mode of operation, coolingmode or heatingmode
         AirFlowControlConstFan AirFlowControl;                 // fan control mode, UseCompressorOnFlow or UseCompressorOffFlow
         HVAC::FanPlace fanPlace;                               // fan placement; 1=blow through, 2=draw through
-        int NodeNumOfControlledZone;                           // Node number of controlled zone air node
+        int ControlledZoneNodeNum = 0;                         // Node number of controlled zone air node
         WAHPCoilType WatertoAirHPType = WAHPCoilType::Invalid; // Type of water to air heat pump model used
         Real64 CoolingConvergenceTolerance;                    // Convergence tolerance for cooling,
         //   ratio (CoolingCoilLoad - FurnaceCoolingOutput)/CoolingCoilLoad
@@ -206,16 +210,16 @@ namespace Furnaces {
         Real64 HeatingSpeedRatio;                           // Fan speed ratio in heating mode
         Real64 CoolingSpeedRatio;                           // Fan speed ratio in cooling mode
         Real64 NoHeatCoolSpeedRatio;                        // Fan speed ratio when no cooling or heating
-        int ZoneInletNode;                                  // Zone inlet node number in the controlled zone
+        int ZoneInNodeNum = 0;                                  // Zone inlet node number in the controlled zone
         Real64 SenLoadLoss;                                 // Air distribution system sensible loss
         Real64 LatLoadLoss;                                 // Air distribution system latent loss
         Real64 SensibleLoadMet;                             // System sensible load
         Real64 LatentLoadMet;                               // System latent load
         Real64 DehumidInducedHeatingDemandRate;             // Additional heating demand on supplemental heater
         // when heat pumps operate on dehumidification mode
-        int CoilOutletNode;                   // outlet node for hot water and steam heating coil
+        int CoilOutNodeNum = 0;                   // outlet node for hot water and steam heating coil
         PlantLocation plantLoc;               // plant loop component location for water and steam heating coil
-        int SuppCoilOutletNode;               // outlet node for hot water and steam supplemental heating coil
+        int SuppCoilOutNodeNum = 0;               // outlet node for hot water and steam supplemental heating coil
         PlantLocation SuppPlantLoc;           // plant loop component location for water and steam supplemental heating coil
         int HotWaterCoilMaxIterIndex;         // Index to recurring warning message
         int HotWaterCoilMaxIterIndex2;        // Index to recurring warning message
@@ -257,11 +261,11 @@ namespace Furnaces {
         FurnaceEquipConditions()
             : FurnaceIndex(0), SchedPtr(0), FanSchedPtr(0), FanAvailSchedPtr(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0),
               ZoneSequenceHeatingNum(0), CoolingCoilType_Num(0), CoolingCoilIndex(0), ActualDXCoilIndexForHXAssisted(0), CoolingCoilUpstream(true),
-              HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0), CoilControlNode(0), HWCoilAirInletNode(0),
-              HWCoilAirOutletNode(0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
-              SuppCoilControlNode(0), fanType(HVAC::FanType::Invalid), FanIndex(0), FurnaceInletNodeNum(0), FurnaceOutletNodeNum(0),
+              HeatingCoilType_Num(0), HeatingCoilIndex(0), ReheatingCoilType_Num(0), ReheatingCoilIndex(0),
+              SuppCoilType_Num(0), SuppCoilIndex(0),
+              fanType(HVAC::FanType::Invalid), FanIndex(0),
               LastMode(Furnaces::ModeOfOperation::Invalid), AirFlowControl(AirFlowControlConstFan::Invalid), fanPlace(HVAC::FanPlace::Invalid),
-              NodeNumOfControlledZone(0), CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0),
+              CoolingConvergenceTolerance(0.0), HeatingConvergenceTolerance(0.0), DesignHeatingCapacity(0.0),
               DesignCoolingCapacity(0.0), CoolingCoilSensDemand(0.0), HeatingCoilSensDemand(0.0), CoolingCoilLatentDemand(0.0),
               DesignSuppHeatingCapacity(0.0), DesignFanVolFlowRate(0.0), DesignFanVolFlowRateEMSOverrideOn(false),
               DesignFanVolFlowRateEMSOverrideValue(0.0), DesignMassFlowRate(0.0), MaxCoolAirVolFlow(0.0), MaxCoolAirVolFlowEMSOverrideOn(false),
@@ -275,8 +279,8 @@ namespace Furnaces {
               LatentRegulaFalsiFailedIndex2(0), SensibleMaxIterIndex(0), SensibleRegulaFalsiFailedIndex(0), WSHPHeatMaxIterIndex(0),
               WSHPHeatRegulaFalsiFailedIndex(0), DXHeatingMaxIterIndex(0), DXHeatingRegulaFalsiFailedIndex(0), HeatingMaxIterIndex(0),
               HeatingMaxIterIndex2(0), HeatingRegulaFalsiFailedIndex(0), ActualFanVolFlowRate(0.0), HeatingSpeedRatio(1.0), CoolingSpeedRatio(1.0),
-              NoHeatCoolSpeedRatio(1.0), ZoneInletNode(0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
-              DehumidInducedHeatingDemandRate(0.0), CoilOutletNode(0), plantLoc{}, SuppPlantLoc{}, HotWaterCoilMaxIterIndex(0),
+              NoHeatCoolSpeedRatio(1.0), SenLoadLoss(0.0), LatLoadLoss(0.0), SensibleLoadMet(0.0), LatentLoadMet(0.0),
+              DehumidInducedHeatingDemandRate(0.0), plantLoc{}, SuppPlantLoc{}, HotWaterCoilMaxIterIndex(0),
               HotWaterCoilMaxIterIndex2(0), EMSOverrideSensZoneLoadRequest(false), EMSSensibleZoneLoadValue(0.0),
               EMSOverrideMoistZoneLoadRequest(false), EMSMoistureZoneLoadValue(0.0), HeatCoolMode(Furnaces::ModeOfOperation::Invalid),
               NumOfSpeedCooling(0), NumOfSpeedHeating(0), IdleSpeedRatio(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), FanVolFlow(0.0),

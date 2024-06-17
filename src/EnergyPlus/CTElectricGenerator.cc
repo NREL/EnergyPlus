@@ -190,15 +190,15 @@ namespace CTElectricGenerator {
 
             // Not sure what to do with electric nodes, so do not use optional arguments
             state.dataCTElectricGenerator->CTGenerator(genNum).ElectricCircuitNode =
-                NodeInputManager::GetOnlySingleNode(state,
+                Node::GetSingleNode(state,
                                                     AlphArray(2),
                                                     ErrorsFound,
-                                                    DataLoopNode::ConnectionObjectType::GeneratorCombustionTurbine,
+                                                    Node::ConnObjType::GeneratorCombustionTurbine,
                                                     AlphArray(1),
-                                                    DataLoopNode::NodeFluidType::Electric,
-                                                    DataLoopNode::ConnectionType::Electric,
-                                                    NodeInputManager::CompFluidStream::Primary,
-                                                    DataLoopNode::ObjectIsNotParent);
+                                                    Node::FluidType::Electric,
+                                                    Node::ConnType::Electric,
+                                                    Node::CompFluidStream::Primary,
+                                                    Node::ObjectIsNotParent);
 
             state.dataCTElectricGenerator->CTGenerator(genNum).MinPartLoadRat = NumArray(2);
             state.dataCTElectricGenerator->CTGenerator(genNum).MaxPartLoadRat = NumArray(3);
@@ -265,32 +265,32 @@ namespace CTElectricGenerator {
 
             if (state.dataCTElectricGenerator->CTGenerator(genNum).DesignHeatRecVolFlowRate > 0.0) {
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecActive = true;
-                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInNodeNum =
+                    Node::GetSingleNode(state,
                                                         AlphArray(9),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::GeneratorCombustionTurbine,
+                                                        Node::ConnObjType::GeneratorCombustionTurbine,
                                                         AlphArray(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Inlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum == 0) {
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Inlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+                if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInNodeNum == 0) {
                     ShowSevereError(
                         state, format("Missing Node Name, Heat Recovery Inlet, for {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
                     ErrorsFound = true;
                 }
-                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum =
-                    NodeInputManager::GetOnlySingleNode(state,
+                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutNodeNum =
+                    Node::GetSingleNode(state,
                                                         AlphArray(10),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::GeneratorCombustionTurbine,
+                                                        Node::ConnObjType::GeneratorCombustionTurbine,
                                                         AlphArray(1),
-                                                        DataLoopNode::NodeFluidType::Water,
-                                                        DataLoopNode::ConnectionType::Outlet,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum == 0) {
+                                                        Node::FluidType::Water,
+                                                        Node::ConnType::Outlet,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+                if (state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutNodeNum == 0) {
                     ShowSevereError(
                         state,
                         format("Missing Node Name, Heat Recovery Outlet, for {}={}", state.dataIPShortCut->cCurrentModuleObject, AlphArray(1)));
@@ -299,12 +299,12 @@ namespace CTElectricGenerator {
                 BranchNodeConnections::TestCompSet(
                     state, state.dataIPShortCut->cCurrentModuleObject, AlphArray(1), AlphArray(9), AlphArray(10), "Heat Recovery Nodes");
                 PlantUtilities::RegisterPlantCompDesignFlow(state,
-                                                            state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum,
+                                                            state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInNodeNum,
                                                             state.dataCTElectricGenerator->CTGenerator(genNum).DesignHeatRecVolFlowRate);
             } else {
                 state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecActive = false;
-                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInletNodeNum = 0;
-                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutletNodeNum = 0;
+                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecInNodeNum = 0;
+                state.dataCTElectricGenerator->CTGenerator(genNum).HeatRecOutNodeNum = 0;
                 if (!state.dataIPShortCut->lAlphaFieldBlanks(9) || !state.dataIPShortCut->lAlphaFieldBlanks(10)) {
                     ShowWarningError(state,
                                      format("Since Design Heat Flow Rate = 0.0, Heat Recovery inactive for {}={}",
@@ -327,19 +327,19 @@ namespace CTElectricGenerator {
 
             // begin CR7021
             if (state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode = 0;
+                state.dataCTElectricGenerator->CTGenerator(genNum).OAInNodeNum = 0;
             } else {
-                state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode =
-                    NodeInputManager::GetOnlySingleNode(state,
+                state.dataCTElectricGenerator->CTGenerator(genNum).OAInNodeNum =
+                    Node::GetSingleNode(state,
                                                         AlphArray(12),
                                                         ErrorsFound,
-                                                        DataLoopNode::ConnectionObjectType::GeneratorCombustionTurbine,
+                                                        Node::ConnObjType::GeneratorCombustionTurbine,
                                                         AlphArray(1),
-                                                        DataLoopNode::NodeFluidType::Air,
-                                                        DataLoopNode::ConnectionType::OutsideAirReference,
-                                                        NodeInputManager::CompFluidStream::Primary,
-                                                        DataLoopNode::ObjectIsNotParent);
-                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInletNode)) {
+                                                        Node::FluidType::Air,
+                                                        Node::ConnType::OutsideAirReference,
+                                                        Node::CompFluidStream::Primary,
+                                                        Node::ObjectIsNotParent);
+                if (!OutAirNodeManager::CheckOutAirNodeNumber(state, state.dataCTElectricGenerator->CTGenerator(genNum).OAInNodeNum)) {
                     ShowSevereError(state,
                                     format("{}, \"{}\" Outdoor Air Inlet Node Name not valid Outdoor Air Node= {}",
                                            state.dataIPShortCut->cCurrentModuleObject,
@@ -552,8 +552,8 @@ namespace CTElectricGenerator {
         Real64 heatRecCp;   // Specific Heat of the Heat Recovery Fluid (J/kg-K)
 
         if (this->HeatRecActive) {
-            int heatRecInNode = this->HeatRecInletNodeNum;
-            heatRecInTemp = state.dataLoopNodes->Node(heatRecInNode).Temp;
+            int heatRecInNode = this->HeatRecInNodeNum;
+            heatRecInTemp = state.dataLoopNodes->nodes(heatRecInNode)->Temp;
 
             heatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
@@ -563,7 +563,7 @@ namespace CTElectricGenerator {
             if (FirstHVACIteration && RunFlag) {
                 heatRecMdot = this->DesignHeatRecMassFlowRate;
             } else {
-                heatRecMdot = state.dataLoopNodes->Node(heatRecInNode).MassFlowRate;
+                heatRecMdot = state.dataLoopNodes->nodes(heatRecInNode)->MassFlowRate;
             }
         } else {
             heatRecInTemp = 0.0;
@@ -604,10 +604,10 @@ namespace CTElectricGenerator {
         // SET OFF-DESIGN AIR TEMPERATURE DIFFERENCE
         // (ATAIR) Difference between ambient actual and ambient design temperatures
         Real64 ambientDeltaT;
-        if (this->OAInletNode == 0) {
+        if (this->OAInNodeNum == 0) {
             ambientDeltaT = state.dataEnvrn->OutDryBulbTemp - designAirInletTemp;
         } else {
-            ambientDeltaT = state.dataLoopNodes->Node(this->OAInletNode).Temp - designAirInletTemp;
+            ambientDeltaT = state.dataLoopNodes->nodes(this->OAInNodeNum)->Temp - designAirInletTemp;
         }
 
         // Use Curve fit to determine Fuel Energy Input.  For electric power generated in Watts, the fuel
@@ -729,8 +729,7 @@ namespace CTElectricGenerator {
         this->ExhaustStackTemp = exhaustStackTemp;
 
         if (this->HeatRecActive) {
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = this->HeatRecOutletTemp;
+            state.dataLoopNodes->nodes(this->HeatRecOutNodeNum)->Temp = this->HeatRecOutletTemp;
         }
     }
 
@@ -746,18 +745,19 @@ namespace CTElectricGenerator {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for initializations of the CT generators.
-
+        auto &dln = state.dataLoopNodes;
+            
         this->oneTimeInit(state); // Do one-time inits
 
         // Do the Begin Environment initializations
         if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && this->HeatRecActive) {
-            int HeatRecInletNode = this->HeatRecInletNodeNum;
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
+            auto *heatRecInNode = dln->nodes(this->HeatRecInNodeNum);
+            auto *heatRecOutNode = dln->nodes(this->HeatRecOutNodeNum);
             // set the node Temperature, assuming freeze control
-            state.dataLoopNodes->Node(HeatRecInletNode).Temp = 20.0;
-            state.dataLoopNodes->Node(HeatRecOutletNode).Temp = 20.0;
+            heatRecInNode->Temp = 20.0;
+            heatRecOutNode->Temp = 20.0;
             // set the node max and min mass flow rates
-            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, HeatRecInletNode, HeatRecOutletNode);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInNodeNum, this->HeatRecOutNodeNum);
 
             this->MyEnvrnFlag = false;
         } // end environmental inits
@@ -774,11 +774,11 @@ namespace CTElectricGenerator {
                 } else {
                     mdot = 0.0;
                 }
-                PlantUtilities::SetComponentFlowRate(state, mdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+                PlantUtilities::SetComponentFlowRate(state, mdot, this->HeatRecInNodeNum, this->HeatRecOutNodeNum, this->HRPlantLoc);
 
             } else {
                 PlantUtilities::SetComponentFlowRate(
-                    state, this->HeatRecMdot, this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum, this->HRPlantLoc);
+                    state, this->HeatRecMdot, this->HeatRecInNodeNum, this->HeatRecOutNodeNum, this->HRPlantLoc);
             }
         }
     }
@@ -806,9 +806,6 @@ namespace CTElectricGenerator {
         }
 
         if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
-            int HeatRecInletNode = this->HeatRecInletNodeNum;
-            int HeatRecOutletNode = this->HeatRecOutletNodeNum;
-
             // size mass flow rate
             Real64 rho = FluidProperties::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
@@ -818,7 +815,7 @@ namespace CTElectricGenerator {
 
             this->DesignHeatRecMassFlowRate = rho * this->DesignHeatRecVolFlowRate;
 
-            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, HeatRecInletNode, HeatRecOutletNode);
+            PlantUtilities::InitComponentNodes(state, 0.0, this->DesignHeatRecMassFlowRate, this->HeatRecInNodeNum, this->HeatRecOutNodeNum);
 
             this->MySizeAndNodeInitFlag = false;
         }

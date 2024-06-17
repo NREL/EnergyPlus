@@ -116,8 +116,8 @@ namespace PlantHeatExchangerFluidToFluid {
     struct PlantConnectionStruct : PlantLocation
     {
         // Members
-        int inletNodeNum;                      // plant loop inlet node index
-        int outletNodeNum;                     // plant loop outlet node index
+        int InNodeNum = 0;                      // plant loop inlet node index
+        int OutNodeNum = 0;                     // plant loop outlet node index
         Real64 MassFlowRateMin;                // minimum (hardware) flow rate for component [kg/s]
         Real64 MassFlowRateMax;                // maximum (hardware) flow rate for component [kg/s]
         Real64 DesignVolumeFlowRate;           // design flow rate [m3/s]
@@ -132,7 +132,7 @@ namespace PlantHeatExchangerFluidToFluid {
 
         // Default Constructor
         PlantConnectionStruct()
-            : inletNodeNum(0), outletNodeNum(0), MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0),
+            : MassFlowRateMin(0.0), MassFlowRateMax(0.0), DesignVolumeFlowRate(0.0),
               DesignVolumeFlowRateWasAutoSized(false), MyLoad(0.0), MinLoad(0.0), MaxLoad(0.0), OptLoad(0.0), InletTemp(0.0), InletMassFlowRate(0.0),
               OutletTemp(0.0)
         {
@@ -142,12 +142,7 @@ namespace PlantHeatExchangerFluidToFluid {
     struct PlantLocatorStruct : PlantLocation
     {
         // Members
-        int inletNodeNum; // plant loop inlet node index
-
-        // Default Constructor
-        PlantLocatorStruct() : inletNodeNum(0)
-        {
-        }
+        int InNodeNum = 0; // plant loop inlet node index
     };
 
     struct HeatExchangerStruct : PlantComponent
@@ -159,7 +154,7 @@ namespace PlantHeatExchangerFluidToFluid {
         Real64 UA;
         bool UAWasAutoSized; // true is UA was autosized on input
         ControlType controlMode;
-        int SetPointNodeNum;
+        int SetPointNodeNum = 0;
         Real64 TempControlTol;
         CtrlTempType ControlSignalTemp;
         Real64 MinOperationTemp;
@@ -187,7 +182,7 @@ namespace PlantHeatExchangerFluidToFluid {
         // Default Constructor
         HeatExchangerStruct()
             : AvailSchedNum(0), HeatExchangeModelType(FluidHXType::Invalid), UA(0.0), UAWasAutoSized(false), controlMode(ControlType::Invalid),
-              SetPointNodeNum(0), TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
+              TempControlTol(0.0), ControlSignalTemp(CtrlTempType::Invalid), MinOperationTemp(-99999.0),
               MaxOperationTemp(99999.0), ComponentType(DataPlant::PlantEquipmentType::Invalid), SizingFactor(1.0), HeatTransferRate(0.0),
               HeatTransferEnergy(0.0), Effectiveness(0.0), OperationStatus(0.0), DmdSideModulatSolvNoConvergeErrorCount(0),
               DmdSideModulatSolvNoConvergeErrorIndex(0), DmdSideModulatSolvFailErrorCount(0), DmdSideModulatSolvFailErrorIndex(0),
