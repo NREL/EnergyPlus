@@ -238,7 +238,7 @@ namespace extendedHI {
                     Ts,
                     [&](Real64 Ts) { return (Ts - Ta) / Ra_un(Ts, Ta) + (Pc - Pa) / (Zs((Tc - Ts) / (Q - Qv(Ta, Pa))) + Za_un) - (Q - Qv(Ta, Pa)); },
                     0.0,
-                    Ts);
+                    Tc);
                 Rs = (Tc - Ts) / (Q - Qv(Ta, Pa));
                 eqvar_name = "Rs";
                 Real64 Ps = Pc - (Pc - Pa) * Zs(Rs) / (Zs(Rs) + Za_un);
@@ -305,15 +305,15 @@ namespace extendedHI {
         std::map<std::string, int> dic = {{"phi", 1}, {"Rf", 2}, {"Rs", 3}, {"Rs*", 3}, {"dTcdt", 4}};
         auto eqvars = find_eqvar(state, Ta, RH);
         std::string eqvar_name = std::get<0>(eqvars);
-        int eqvar_value = 1; // fixme: what to init to?
+        Real64 eqvar_value;
         if (eqvar_name == "phi") {
-            eqvar_value = 1;
+            eqvar_value = std::get<1>(eqvars);
         } else if (eqvar_name == "Rf") {
-            eqvar_value = 2;
+            eqvar_value = std::get<2>(eqvars);
         } else if (eqvar_name == "Rs" || eqvar_name == "Rs*") {
-            eqvar_value = 3;
+            eqvar_value = std::get<3>(eqvars);
         } else if (eqvar_name == "dTcdt") {
-            eqvar_value = 4;
+            eqvar_value = std::get<4>(eqvars);
         }
 
         auto result = find_T(state, eqvar_name, eqvar_value);
