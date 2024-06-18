@@ -67,6 +67,7 @@
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACSystemRootFindingAlgorithm.hh>
 #include <EnergyPlus/extendedHI.hh>
 
 namespace EnergyPlus {
@@ -301,6 +302,9 @@ namespace extendedHI {
 
     Real64 heatindex(EnergyPlusData &state, Real64 Ta, Real64 RH, bool show_info = false)
     {
+
+        auto const HVACSystemRootSolverBackup = state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver;
+        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverAlgorithm::Bisection;
         // Dictionary to map eqvar_name to tuple index
         std::map<std::string, int> dic = {{"phi", 1}, {"Rf", 2}, {"Rs", 3}, {"Rs*", 3}, {"dTcdt", 4}};
         auto eqvars = find_eqvar(state, Ta, RH);
@@ -352,6 +356,7 @@ namespace extendedHI {
             }
         }
 
+        state.dataRootFinder->HVACSystemRootFinding.HVACSystemRootSolver = HVACSystemRootSolverBackup;
         return T;
     }
 
