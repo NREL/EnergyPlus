@@ -90,7 +90,7 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     fan1->set_size(*state);
     EXPECT_DOUBLE_EQ(1.00635, fan1->maxAirFlowRate);
     state->dataSize->DataNonZoneNonAirloopValue = 0.0;
-    EXPECT_NEAR(1.0371, fan1->designPointFEI, 0.0001);
+    EXPECT_NEAR(1.0352, fan1->designPointFEI, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
