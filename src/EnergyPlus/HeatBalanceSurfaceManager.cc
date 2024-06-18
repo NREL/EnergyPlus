@@ -5572,6 +5572,13 @@ void CalcThermalResilience(EnergyPlusData &state)
                                 OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->Zone(ZoneNum).Name);
             SetupOutputVariable(state,
+                                "Zone Extended Heat Index",
+                                Constant::Units::C,
+                                state.dataHeatBal->Resilience(ZoneNum).ZoneExtendedHeatIndex,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
+                                state.dataHeatBal->Zone(ZoneNum).Name);
+            SetupOutputVariable(state,
                                 "Zone Humidity Index",
                                 Constant::Units::None,
                                 state.dataHeatBal->Resilience(ZoneNum).ZoneHumidex,
