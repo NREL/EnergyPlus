@@ -11259,19 +11259,10 @@ void WaterThermalTankData::SizeTankForSupplySide(EnergyPlusData &state)
     } else if (this->Sizing.DesignMode == SizingMode::PerSolarColArea) {
 
         this->Sizing.TotalSolarCollectorArea = 0.0;
-        if (state.dataSolarCollectors->GetInputFlag) {
-            SolarCollectors::GetSolarCollectorInput(state);
-            state.dataSolarCollectors->GetInputFlag = false;
-        }
 
         for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
             auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
             this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
-        }
-
-        if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
-            PhotovoltaicThermalCollectors::GetPVTcollectorsInput(state);
-            state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
         }
 
         for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
@@ -11831,19 +11822,10 @@ void WaterThermalTankData::SizeStandAloneWaterHeater(EnergyPlusData &state)
         case SizingMode::PerSolarColArea: {
 
             this->Sizing.TotalSolarCollectorArea = 0.0;
-            if (state.dataSolarCollectors->GetInputFlag) {
-                SolarCollectors::GetSolarCollectorInput(state);
-                state.dataSolarCollectors->GetInputFlag = false;
-            }
 
             for (int CollectorNum = 1; CollectorNum <= state.dataSolarCollectors->NumOfCollectors; ++CollectorNum) {
                 auto const &collector = state.dataSolarCollectors->Collector(CollectorNum);
                 this->Sizing.TotalSolarCollectorArea += state.dataSurface->Surface(collector.Surface).Area;
-            }
-
-            if (state.dataPhotovoltaicThermalCollector->GetInputFlag) {
-                PhotovoltaicThermalCollectors::GetPVTcollectorsInput(state);
-                state.dataPhotovoltaicThermalCollector->GetInputFlag = false;
             }
 
             for (int CollectorNum = 1; CollectorNum <= state.dataPhotovoltaicThermalCollector->NumPVT; ++CollectorNum) {
