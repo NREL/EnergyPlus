@@ -3280,6 +3280,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
+                zoneSizingIndex.spaceConcurrence =
+                    static_cast<DataSizing::Concurrence>(getEnumValue(DataSizing::ConcurrenceMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 zoneSizingIndex.zoneSizingMethod =
                     static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {

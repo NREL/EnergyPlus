@@ -333,6 +333,7 @@ namespace DataSizing {
         DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         Real64 DOASLowSetpoint = 0.0;                           // Dedicated Outside Air Low Setpoint for Design [C]
         Real64 DOASHighSetpoint = 0.0;                          // Dedicated Outside Air High Setpoint for Design [C]
+        DataSizing::Concurrence spaceConcurrence = DataSizing::Concurrence::Coincident; // coincident or noncoincident space loads
 
         // zone latent sizing inputs
         bool zoneLatentSizing = false;
@@ -458,9 +459,10 @@ namespace DataSizing {
         bool AccountForDOAS = false;           // False: do nothing; True: calculate the effect of a DOA system on the zone sizing arrays
         DOASControl DOASControlStrategy = DOASControl::Invalid; // 0=neutral ventilation air; 1=neutral dehumidified ventilation air, 2 = cooled air;
         // 3=supply cold ventilation air
-        Real64 DOASLowSetpoint = 0.0;          // Dedicated Outside Air Low Setpoint for Design [C]
-        Real64 DOASHighSetpoint = 0.0;         // Dedicated Outside Air High Setpoint for Design [C]
-        bool EMSOverrideDesHeatMassOn = false; // true if EMS is acting on this structure
+        Real64 DOASLowSetpoint = 0.0;                                                   // Dedicated Outside Air Low Setpoint for Design [C]
+        Real64 DOASHighSetpoint = 0.0;                                                  // Dedicated Outside Air High Setpoint for Design [C]
+        DataSizing::Concurrence spaceConcurrence = DataSizing::Concurrence::Coincident; // coincident or noncoincident space loads
+        bool EMSOverrideDesHeatMassOn = false;                                          // true if EMS is acting on this structure
         Real64 EMSValueDesHeatMassFlow = 0.0;  // Value EMS directing to use for Design Heating air mass flow [kg/s]
         bool EMSOverrideDesCoolMassOn = false; // true if EMS is acting on this structure
         Real64 EMSValueDesCoolMassFlow = 0.0;  // Value EMS directing to use for Design Cooling air mass flow [kg/s]
