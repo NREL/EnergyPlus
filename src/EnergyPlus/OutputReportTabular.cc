@@ -15351,7 +15351,7 @@ void WriteLoadComponentSummaryTables(EnergyPlusData &state)
                 }
                 for (int SysSizIndex = 1; SysSizIndex <= state.dataSize->NumSysSizInput; ++SysSizIndex) {
                     if (state.dataSize->SysSizInput(SysSizIndex).AirLoopNum != iAirLoop) continue;
-                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::Concurrence::Coincident) {
+                    if (state.dataSize->SysSizInput(SysSizIndex).SizingOption == DataSizing::SizingConcurrence::Coincident) {
                         airLoopCoolTable.peakDesSensLoad = finalSysSizing.SysCoolCoinSpaceSens;
                         airLoopCoolTable.designPeakLoad = finalSysSizing.SysDesCoolLoad;
 

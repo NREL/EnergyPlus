@@ -99,8 +99,9 @@ public:                                  // data
     int typeof_Coil; // type of coil, e.g., PlantEquipmentType::CoilWaterSimpleHeating, PlantEquipmentType::CoilWaterDetailedFlatCooling,
                      // PlantEquipmentType::CoilWaterCooling
 
-    DataSizing::Concurrence coilSizingMethodConcurrence = DataSizing::Concurrence::NA; // non-coincident, coincident, combination, n/a
-    std::string coilSizingMethodConcurrenceName;                                       // string name of sizing method for concurrence
+    DataSizing::CoilSizingConcurrence coilSizingMethodConcurrence =
+        DataSizing::CoilSizingConcurrence::NA;   // non-coincident, coincident, combination, n/a
+    std::string coilSizingMethodConcurrenceName; // string name of sizing method for concurrence
 
     int coilSizingMethodCapacity; // 8=CoolingDesignCapacity, 9=HeatingDesignCapacity, 10=CapacityPerFloorArea, 11=FractionOfAutosizedCoolingCapacity,
                                   // 12=FractionOfAutosizedHeatingCapacity

@@ -734,7 +734,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
             c->oaPeakVolFrac = -999.0;
         }
 
-        c->coilSizingMethodConcurrenceName = DataSizing::ConcurrenceMethodNames[(int)c->coilSizingMethodConcurrence];
+        c->coilSizingMethodConcurrenceName = DataSizing::CoilSizingConcurrenceNames[(int)c->coilSizingMethodConcurrence];
 
         if (c->coilSizingMethodCapacity == DataSizing::CoolingDesignCapacity) {
             c->coilSizingMethodCapacityName = "CoolingDesignCapacity";
@@ -1264,7 +1264,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->oaPeakHumRat = finalSysSizing.OutHumRatAtCoolPeak;
         c->raPeakTemp = finalSysSizing.RetTempAtCoolPeak;
         c->raPeakHumRat = finalSysSizing.RetHumRatAtCoolPeak;
-        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(finalSysSizing.SizingOption);
         c->coilSizingMethodCapacity = finalSysSizing.CoolingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleCoolSAFMethod;
         // DesOutAirVolFlow
@@ -1323,9 +1323,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             c->rmPeakRelHum = -999.0;
         }
 
-        if (c->coilSizingMethodConcurrence == DataSizing::Concurrence::Coincident) {
+        if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::Coincident) {
             c->rmSensibleAtPeak = finalSysSizing.SysCoolCoinSpaceSens;
-        } else if (c->coilSizingMethodConcurrence == DataSizing::Concurrence::NonCoincident) {
+        } else if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::NonCoincident) {
             c->rmSensibleAtPeak = sumSensLoad;
         } else { // DataSizing::Combination or other
             c->rmSensibleAtPeak = sumSensLoad;
@@ -1470,7 +1470,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                     state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilCoolingCapacity");
                 c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             }
-            DataSizing::Concurrence sizMethod = DataSizing::Concurrence::Invalid;
+            DataSizing::SizingConcurrence sizMethod = DataSizing::SizingConcurrence::Invalid;
             bool sizMethodsAreTheSame = true;
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
@@ -1483,9 +1483,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
                 }
             }
             if (sizMethodsAreTheSame) {
-                c->coilSizingMethodConcurrence = sizMethod;
+                c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(sizMethod);
             } else {
-                c->coilSizingMethodConcurrence = DataSizing::Concurrence::Combination;
+                c->coilSizingMethodConcurrence = DataSizing::CoilSizingConcurrence::Combination;
             }
         }
     } else {
@@ -1533,7 +1533,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
         c->raPeakTemp = finalSysSizing.HeatRetTemp;
         c->raPeakHumRat = finalSysSizing.HeatRetHumRat;
-        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
+        c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(finalSysSizing.SizingOption);
         c->coilSizingMethodCapacity = finalSysSizing.HeatingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleHeatSAFMethod;
 
@@ -1588,9 +1588,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             c->rmPeakRelHum = -999.0;
         }
 
-        if (c->coilSizingMethodConcurrence == DataSizing::Concurrence::Coincident) {
+        if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::Coincident) {
             c->rmSensibleAtPeak = finalSysSizing.SysHeatCoinSpaceSens;
-        } else if (c->coilSizingMethodConcurrence == DataSizing::Concurrence::NonCoincident) {
+        } else if (c->coilSizingMethodConcurrence == DataSizing::CoilSizingConcurrence::NonCoincident) {
             c->rmSensibleAtPeak = sumLoad;
         }
 
@@ -1767,7 +1767,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                     state, c->coilDesLvgTemp, c->coilDesLvgHumRat, state.dataEnvrn->StdBaroPress, "ReportCoilSelection::setCoilHeatingCapacity");
                 c->coilDesLvgEnth = Psychrometrics::PsyHFnTdbW(c->coilDesLvgTemp, c->coilDesLvgHumRat);
             }
-            DataSizing::Concurrence sizMethod = DataSizing::Concurrence::Invalid;
+            DataSizing::SizingConcurrence sizMethod = DataSizing::SizingConcurrence::Invalid;
             bool sizMethodsAreTheSame = true;
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
@@ -1780,9 +1780,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
                 }
             }
             if (sizMethodsAreTheSame) {
-                c->coilSizingMethodConcurrence = sizMethod;
+                c->coilSizingMethodConcurrence = static_cast<DataSizing::CoilSizingConcurrence>(sizMethod);
             } else {
-                c->coilSizingMethodConcurrence = DataSizing::Concurrence::Combination;
+                c->coilSizingMethodConcurrence = DataSizing::CoilSizingConcurrence::Combination;
             }
         }
     } else {

@@ -1116,8 +1116,9 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                 // correct sizing design heating volume flow rate based on finalized air terminal unit operation
 
                 if (FinalSysSizing(AirLoopNum).SizingOption ==
-                    DataSizing::Concurrence::NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's from
-                                                              // air terminals directly
+                    DataSizing::SizingConcurrence::NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's
+                                                                    // from
+                                                                    // air terminals directly
                     FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
                     FinalSysSizing(AirLoopNum).DesMainVolFlow = max(airLoopMaxFlowRateSum, FinalSysSizing(AirLoopNum).DesMainVolFlow);
                     if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) {
@@ -1127,7 +1128,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                         FinalSysSizing(AirLoopNum).DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                         FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                     }
-                } else if (FinalSysSizing(AirLoopNum).SizingOption == DataSizing::Concurrence::Coincident) {
+                } else if (FinalSysSizing(AirLoopNum).SizingOption == DataSizing::SizingConcurrence::Coincident) {
 
                     if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) { // use minimum heating flow sum from air terminals
                         // know that minimum heating flow is a hard minimum regardless of concurrence situation, so make sure that design is at
@@ -3280,8 +3281,8 @@ void GetZoneSizingInput(EnergyPlusData &state)
                         ErrorsFound = true;
                     }
                 }
-                zoneSizingIndex.spaceConcurrence =
-                    static_cast<DataSizing::Concurrence>(getEnumValue(DataSizing::ConcurrenceMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
+                zoneSizingIndex.spaceConcurrence = static_cast<DataSizing::SizingConcurrence>(
+                    getEnumValue(DataSizing::SizingConcurrenceNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 zoneSizingIndex.zoneSizingMethod =
                     static_cast<DataSizing::ZoneSizing>(getEnumValue(DataSizing::ZoneSizingMethodNamesUC, state.dataIPShortCut->cAlphaArgs(10)));
                 if (zoneSizingIndex.zoneSizingMethod != ZoneSizing::SensibleOnly) {
@@ -3581,9 +3582,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             std::string const &sizingOption = state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum);
             if (sizingOption == "COINCIDENT") {
-                SysSizInput(SysSizIndex).SizingOption = DataSizing::Concurrence::Coincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::SizingConcurrence::Coincident;
             } else if (sizingOption == "NONCOINCIDENT") {
-                SysSizInput(SysSizIndex).SizingOption = DataSizing::Concurrence::NonCoincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::SizingConcurrence::NonCoincident;
             } else {
                 ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,

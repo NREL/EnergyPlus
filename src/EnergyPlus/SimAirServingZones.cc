@@ -5510,7 +5510,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             auto &sysSizing = state.dataSize->SysSizing(state.dataSize->CurOverallSimDay, AirLoopNum);
 
             switch (sysSizing.SizingOption) {
-            case DataSizing::Concurrence::Coincident: {
+            case DataSizing::SizingConcurrence::Coincident: {
                 if (finalSysSizing.SystemOAMethod == SysOAMethod::ZoneSum) {
                     sysSizing.DesCoolVolFlow = sysSizing.CoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     sysSizing.DesHeatVolFlow = sysSizing.CoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
@@ -5841,7 +5841,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                 sysSizing.DesMainVolFlow = max(sysSizing.DesCoolVolFlow, sysSizing.DesHeatVolFlow);
                 // this should also be as least as big as is needed for Vot
             } break;
-            case DataSizing::Concurrence::NonCoincident: {
+            case DataSizing::SizingConcurrence::NonCoincident: {
                 if (finalSysSizing.SystemOAMethod == SysOAMethod::ZoneSum) {
                     sysSizing.DesCoolVolFlow = sysSizing.NonCoinCoolMassFlow / state.dataEnvrn->StdRhoAir;
                     sysSizing.DesHeatVolFlow = sysSizing.NonCoinHeatMassFlow / state.dataEnvrn->StdRhoAir;
@@ -6540,7 +6540,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
             }
 
             // move the noncoincident results into the system sizing array
-            if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == DataSizing::Concurrence::NonCoincident) {
+            if (state.dataSize->CalcSysSizing(AirLoopNum).SizingOption == DataSizing::SizingConcurrence::NonCoincident) {
                 // But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
                 if (!(state.dataSize->FinalSysSizing(AirLoopNum).CoolOAOption == OAControl::AllOA &&
                       SysSensCoolCap <= 0.0)) { // CoolOAOption = Yes 100% OA
@@ -6762,7 +6762,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                         }
                         state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(ZoneOARatio);
                     } else if ((SysCoolSizingRat > 1.0) ||
-                               (SysCoolSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::Concurrence::NonCoincident)) {
+                               (SysCoolSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::SizingConcurrence::NonCoincident)) {
                         // size on user input system design flows
                         state.dataSize->TermUnitFinalZoneSizing(TermUnitSizingIndex).scaleZoneCooling(SysCoolSizingRat);
                     }
@@ -6823,7 +6823,7 @@ void UpdateSysSizing(EnergyPlusData &state, Constant::CallIndicator const CallIn
                             ZoneOARatio *= (1.0 + state.dataSize->TermUnitSizing(TermUnitSizingIndex).InducRat);
                             termUnitFinalZoneSizing.scaleZoneHeating(ZoneOARatio);
                         } else if ((SysHeatSizingRat > 1.0) ||
-                                   (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::Concurrence::NonCoincident)) {
+                                   (SysHeatSizingRat < 1.0 && finalSysSizing.SizingOption == DataSizing::SizingConcurrence::NonCoincident)) {
                             // size on user input system design flows
                             termUnitFinalZoneSizing.scaleZoneHeating(SysHeatSizingRat);
                         }
