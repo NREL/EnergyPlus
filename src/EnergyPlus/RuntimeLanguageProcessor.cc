@@ -833,7 +833,12 @@ ErlValueType EvaluateStack(EnergyPlusData &state, int const StackNum)
                 auto &thisErlVar = state.dataRuntimeLang->ErlVariable(ESVariableNum);
                 ReturnValue = EvaluateExpression(state, thisInstruction.Argument2, seriousErrorFound);
                 if ((!thisErlVar.ReadOnly) && (!thisErlVar.Value.TrendVariable)) {
-                    thisErlVar.Value = ReturnValue;
+                    // #10279 - We don't do `thisErlVar.Value = ReturnValue;` because we don't want to copy TrendVariable stuff
+                    thisErlVar.Value.Type = ReturnValue.Type;
+                    thisErlVar.Value.Number = ReturnValue.Number;
+                    // thisErlVar.Value.String = ReturnValue.String;
+                    thisErlVar.Value.Error = ReturnValue.Error;
+                    thisErlVar.Value.initialized = ReturnValue.initialized;
                 } else if (thisErlVar.Value.TrendVariable) {
                     thisErlVar.Value.Number = ReturnValue.Number;
                     thisErlVar.Value.Error = ReturnValue.Error;
