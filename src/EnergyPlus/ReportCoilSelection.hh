@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -99,8 +98,8 @@ public:                                  // data
     int typeof_Coil; // type of coil, e.g., PlantEquipmentType::CoilWaterSimpleHeating, PlantEquipmentType::CoilWaterDetailedFlatCooling,
                      // PlantEquipmentType::CoilWaterCooling
 
-    DataSizing::Concurrence coilSizingMethodConcurrence = DataSizing::Concurrence::NA; // non-coincident, coincident, combination, n/a
-    std::string coilSizingMethodConcurrenceName;                                       // string name of sizing method for concurrence
+    int coilSizingMethodConcurrence;             // 1 = noncoincident, 2 = coincident
+    std::string coilSizingMethodConcurrenceName; // string name of sizing method for concurrence
 
     int coilSizingMethodCapacity; // 8=CoolingDesignCapacity, 9=HeatingDesignCapacity, 10=CapacityPerFloorArea, 11=FractionOfAutosizedCoolingCapacity,
                                   // 12=FractionOfAutosizedHeatingCapacity

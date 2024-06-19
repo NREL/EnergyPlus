@@ -117,7 +117,7 @@ namespace DataSizing {
         Num
     };
 
-    // parameters for sizing (keept this for now to avoid plant sizing output changes)
+    // parameters for sizing (keep this for now to avoid plant sizing and coil selection output changes)
     constexpr int NonCoincident(1);
     constexpr int Coincident(2);
     constexpr int Combination(3);
