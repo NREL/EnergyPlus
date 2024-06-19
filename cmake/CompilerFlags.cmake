@@ -126,16 +126,13 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" O
 
   set(need_arithm_debug_genex "$<OR:$<BOOL:${FORCE_DEBUG_ARITHM_GCC_OR_CLANG}>,$<CONFIG:Debug>>")
 
-  # TODO: after we fix all tests, remove this if statement (keeping the block to always execute) to enable this by default on Debug builds
-  if (FORCE_DEBUG_ARITHM_GCC_OR_CLANG)
-    # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
-    target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
-    include(CheckCXXSymbolExists)
-    check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
-    message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
-    if(HAVE_FEENABLEEXCEPT)
-      target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
-    endif()
+  # in main.cc for E+ and gtest: feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)
+  target_compile_definitions(project_fp_options INTERFACE $<${need_arithm_debug_genex}:DEBUG_ARITHM_GCC_OR_CLANG>)
+  include(CheckCXXSymbolExists)
+  check_cxx_symbol_exists(feenableexcept "fenv.h" HAVE_FEENABLEEXCEPT)
+  message(VERBOSE "HAVE_FEENABLEEXCEPT=${HAVE_FEENABLEEXCEPT}")
+  if(HAVE_FEENABLEEXCEPT)
+    target_compile_definitions(project_fp_options INTERFACE HAVE_FEENABLEEXCEPT)
   endif()
 
   # ADDITIONAL GCC-SPECIFIC FLAGS
