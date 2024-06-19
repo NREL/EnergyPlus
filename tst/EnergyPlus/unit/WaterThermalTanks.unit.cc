@@ -78,6 +78,8 @@
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
+#include <cmath>
+
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
 
@@ -5688,4 +5690,24 @@ TEST_F(EnergyPlusFixture, MixedTank_PVT_Per_VolumeSizing_PerSolarCollectorArea)
     EXPECT_DOUBLE_EQ(5.00, Tank.Sizing.TotalSolarCollectorArea);
     EXPECT_DOUBLE_EQ(0.2, Tank.Sizing.TankCapacityPerCollectorArea);
     EXPECT_DOUBLE_EQ(1.0, Tank.Volume);
+
+    state->dataGlobal->HourOfDay = 0;
+    state->dataGlobal->TimeStep = 1;
+    state->dataGlobal->TimeStepZone = 1.0 / 60.0; // one-minute system time step
+    state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
+    state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
+    Tank.SavedTankTemp = 60.0;
+    Tank.TankTemp = 60.0;
+    Tank.AmbientTempZone = 20.0;
+    Tank.AmbientTemp = 20.0;
+    Tank.UseInletTemp = 20.0;
+    Tank.SetPointTemp = 55.0;
+    Tank.SetPointTemp2 = Tank.SetPointTemp;
+    Tank.TimeElapsed = 0.0;
+
+    Tank.SourceMassFlowRate = 0.0;
+
+    Tank.CalcWaterThermalTankMixed(*state);
+    EXPECT_FALSE(std::isnan(Tank.AmbientZoneGain));
+    EXPECT_DOUBLE_EQ(0.0, Tank.AmbientZoneGain); // Didn't define on/off cycle losses
 }
