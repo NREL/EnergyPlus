@@ -2898,7 +2898,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
     auto &finalSysSizing = state->dataSize->FinalSysSizing(1);
     auto &sysSizPeakDDNum = state->dataSize->SysSizPeakDDNum(1);
     EXPECT_ENUM_EQ(finalSysSizing.coolingPeakLoad, DataSizing::PeakLoad::SensibleCooling);
-    EXPECT_EQ(finalSysSizing.SizingOption, DataSizing::NonCoincident);
+    EXPECT_ENUM_EQ(finalSysSizing.SizingOption, DataSizing::Concurrence::NonCoincident);
     EXPECT_EQ(sysSizPeakDDNum.SensCoolPeakDD, coolPeakDD);
     int timeStepIndexAtPeakCoolLoad = sysSizPeakDDNum.TimeStepAtSensCoolPk(coolPeakDD);
     EXPECT_EQ(sysSizPeakDDNum.TimeStepAtTotCoolPk(coolPeakDD), timeStepIndexAtPeakCoolLoad);

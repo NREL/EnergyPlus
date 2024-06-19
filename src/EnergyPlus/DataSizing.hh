@@ -784,13 +784,13 @@ namespace DataSizing {
     struct SystemSizingInputData
     {
         // Members
-        std::string AirPriLoopName;                                                   // name of an AirLoopHVAC object
-        int AirLoopNum = 0;                                                           // index number of air loop
-        LoadSizing loadSizingType = LoadSizing::Invalid;                              // type of load to size on sensible, latent, total, ventilation
-        DataSizing::Concurrence concurrenceMethod = DataSizing::Concurrence::Invalid; // noncoincident, coincident
-        OAControl CoolOAOption = OAControl::Invalid;                                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        OAControl HeatOAOption = OAControl::Invalid;                                  // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow = 0.0;                                                // design (minimum) outside air flow rate [m3/s]
+        std::string AirPriLoopName;                                                    // name of an AirLoopHVAC object
+        int AirLoopNum = 0;                                                            // index number of air loop
+        LoadSizing loadSizingType = LoadSizing::Invalid;                               // type of load to size on sensible, latent, total, ventilation
+        DataSizing::Concurrence SizingOption = DataSizing::Concurrence::NonCoincident; // noncoincident, coincident
+        OAControl CoolOAOption = OAControl::Invalid;                                   // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid;                                   // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;                                                 // design (minimum) outside air flow rate [m3/s]
         Real64 SysAirMinFlowRat = 0.0;             // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
         bool SysAirMinFlowRatWasAutoSized = false; // true if central heating maximum system air flow ratio was autosize on input
         Real64 PreheatTemp = 0.0;                  // preheat design set temperature [C]
@@ -836,14 +836,14 @@ namespace DataSizing {
     struct SystemSizingData // Contains data for system sizing
     {
         // Members
-        std::string AirPriLoopName;                                                   // name of an AirLoopHVAC object
-        std::string CoolDesDay;                                                       // name of a cooling design day
-        std::string HeatDesDay;                                                       // name of a heating design day
-        LoadSizing loadSizingType = LoadSizing::Invalid;                              // type of load to size on Sensible, Latent, Total, Ventilation
-        DataSizing::Concurrence concurrenceMethod = DataSizing::Concurrence::Invalid; // noncoincident, coincident.
-        OAControl CoolOAOption = OAControl::Invalid;                                  // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
-        OAControl HeatOAOption = OAControl::Invalid;                                  // 1 = use 100% outside air; 2 = use min OA; for heating sizing
-        Real64 DesOutAirVolFlow = 0.0;                                                // design (minimum) outside air flow rate [m3/s]
+        std::string AirPriLoopName;                                                    // name of an AirLoopHVAC object
+        std::string CoolDesDay;                                                        // name of a cooling design day
+        std::string HeatDesDay;                                                        // name of a heating design day
+        LoadSizing loadSizingType = LoadSizing::Invalid;                               // type of load to size on Sensible, Latent, Total, Ventilation
+        DataSizing::Concurrence SizingOption = DataSizing::Concurrence::NonCoincident; // noncoincident, coincident.
+        OAControl CoolOAOption = OAControl::Invalid;                                   // 1 = use 100% outside air; 2 = use min OA; for cooling sizing
+        OAControl HeatOAOption = OAControl::Invalid;                                   // 1 = use 100% outside air; 2 = use min OA; for heating sizing
+        Real64 DesOutAirVolFlow = 0.0;                                                 // design (minimum) outside air flow rate [m3/s]
         Real64 SysAirMinFlowRat = 0.0;             // minimum system air flow ratio for heating, Central Heating Maximum System Air Flow Ratio
         bool SysAirMinFlowRatWasAutoSized = false; // true if central heating maximum system air flow ratio was autosize on input
         Real64 PreheatTemp = 0.0;                  // preheat design set temperature

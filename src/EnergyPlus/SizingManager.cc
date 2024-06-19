@@ -1115,7 +1115,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
             if (allocated(FinalSysSizing)) {
                 // correct sizing design heating volume flow rate based on finalized air terminal unit operation
 
-                if (FinalSysSizing(AirLoopNum).concurrenceMethod ==
+                if (FinalSysSizing(AirLoopNum).SizingOption ==
                     DataSizing::Concurrence::NonCoincident) { // If non-coincident sizing method for this air loop, the we can use these sum's from
                                                               // air terminals directly
                     FinalSysSizing(AirLoopNum).DesHeatVolFlow = max(airLoopHeatingMaximumFlowRateSum, FinalSysSizing(AirLoopNum).DesHeatVolFlow);
@@ -1127,7 +1127,7 @@ void ManageSystemSizingAdjustments(EnergyPlusData &state)
                         FinalSysSizing(AirLoopNum).DesCoolVolFlow = max(airLoopHeatingMinimumFlowRateSum, FinalSysSizing(AirLoopNum).DesCoolVolFlow);
                         FinalSysSizing(AirLoopNum).MassFlowAtCoolPeak = FinalSysSizing(AirLoopNum).DesCoolVolFlow * state.dataEnvrn->StdRhoAir;
                     }
-                } else if (FinalSysSizing(AirLoopNum).concurrenceMethod == DataSizing::Concurrence::Coincident) {
+                } else if (FinalSysSizing(AirLoopNum).SizingOption == DataSizing::Concurrence::Coincident) {
 
                     if (FinalSysSizing(AirLoopNum).sysSizeCoolingDominant) { // use minimum heating flow sum from air terminals
                         // know that minimum heating flow is a hard minimum regardless of concurrence situation, so make sure that design is at
@@ -3579,9 +3579,9 @@ void GetSystemSizingInput(EnergyPlusData &state)
         {
             std::string const &sizingOption = state.dataIPShortCut->cAlphaArgs(iSizingOptionAlphaNum);
             if (sizingOption == "COINCIDENT") {
-                SysSizInput(SysSizIndex).concurrenceMethod = DataSizing::Concurrence::Coincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::Concurrence::Coincident;
             } else if (sizingOption == "NONCOINCIDENT") {
-                SysSizInput(SysSizIndex).concurrenceMethod = DataSizing::Concurrence::NonCoincident;
+                SysSizInput(SysSizIndex).SizingOption = DataSizing::Concurrence::NonCoincident;
             } else {
                 ShowSevereError(state, format("{}=\"{}\", invalid data.", cCurrentModuleObject, state.dataIPShortCut->cAlphaArgs(iNameAlphaNum)));
                 ShowContinueError(state,

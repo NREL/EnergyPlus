@@ -1264,7 +1264,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
         c->oaPeakHumRat = finalSysSizing.OutHumRatAtCoolPeak;
         c->raPeakTemp = finalSysSizing.RetTempAtCoolPeak;
         c->raPeakHumRat = finalSysSizing.RetHumRatAtCoolPeak;
-        c->coilSizingMethodConcurrence = finalSysSizing.concurrenceMethod;
+        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
         c->coilSizingMethodCapacity = finalSysSizing.CoolingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleCoolSAFMethod;
         // DesOutAirVolFlow
@@ -1475,9 +1475,9 @@ void ReportCoilSelection::setCoilCoolingCapacity(
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
                 if (airLoopNum == 0) {
-                    sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).concurrenceMethod;
+                    sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption;
                 } else {
-                    if (sizMethod != state.dataSize->FinalSysSizing(actualAirLoopNum).concurrenceMethod) {
+                    if (sizMethod != state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption) {
                         sizMethodsAreTheSame = false;
                     }
                 }
@@ -1533,7 +1533,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
         c->oaPeakVolFlow = finalSysSizing.DesOutAirVolFlow;
         c->raPeakTemp = finalSysSizing.HeatRetTemp;
         c->raPeakHumRat = finalSysSizing.HeatRetHumRat;
-        c->coilSizingMethodConcurrence = finalSysSizing.concurrenceMethod;
+        c->coilSizingMethodConcurrence = finalSysSizing.SizingOption;
         c->coilSizingMethodCapacity = finalSysSizing.HeatingCapMethod;
         c->coilSizingMethodAirFlow = finalSysSizing.ScaleHeatSAFMethod;
 
@@ -1772,9 +1772,9 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             for (int airLoopNum = 0; airLoopNum < state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].NumOfAirLoops; ++airLoopNum) {
                 int actualAirLoopNum = state.dataAirLoopHVACDOAS->airloopDOAS[DOASSysNum].m_AirLoopNum[airLoopNum];
                 if (airLoopNum == 0) {
-                    sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).concurrenceMethod;
+                    sizMethod = state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption;
                 } else {
-                    if (sizMethod != state.dataSize->FinalSysSizing(actualAirLoopNum).concurrenceMethod) {
+                    if (sizMethod != state.dataSize->FinalSysSizing(actualAirLoopNum).SizingOption) {
                         sizMethodsAreTheSame = false;
                     }
                 }
