@@ -1,5 +1,5 @@
 24.1.0,24.2.0,Transition notes - some of these are EMS variable names
-0,0,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
+10,10,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
 Zone Windows Total Transmitted Solar Radiation Rate,Enclosure Windows Total Transmitted Solar Radiation Rate,
 Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,
 Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,
