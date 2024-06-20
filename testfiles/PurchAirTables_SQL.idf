@@ -2007,7 +2007,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
     Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Zone Interior Windows Total Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 7 Name
+    Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 7 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 7
 
   Output:Table:Monthly,

@@ -5055,7 +5055,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Zone Windows Total Heat Loss Rate,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Zone Windows Total Transmitted Solar Radiation Rate,  !- Variable or Meter 3 Name
+    Enclosure Windows Total Transmitted Solar Radiation Rate,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
