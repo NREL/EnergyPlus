@@ -7742,11 +7742,9 @@ TEST_F(EnergyPlusFixture, MixedAir_TemperatureError)
     state->dataLoopNodes->Node(return_node).Press = 99063;
     state->dataLoopNodes->Node(return_node).MassFlowRate = 0.2923;
 
-    MixedAir::SimOAMixer(
-        *state, state->dataAirLoop->OutsideAirSys(1).ComponentName(1), state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
+    MixedAir::SimOAMixer(*state, state->dataAirLoop->OutsideAirSys(1).ComponentName(1), state->dataAirLoop->OutsideAirSys(1).ComponentIndex(1));
 
-    auto T_sat = Psychrometrics::PsyTsatFnHPb(
-        *state, state->dataMixedAir->OAMixer(1).MixEnthalpy, state->dataMixedAir->OAMixer(1).MixPressure); 
+    auto T_sat = Psychrometrics::PsyTsatFnHPb(*state, state->dataMixedAir->OAMixer(1).MixEnthalpy, state->dataMixedAir->OAMixer(1).MixPressure);
 
     // T_db must be >= T_sat at the mixed-air node to remain physical
     EXPECT_TRUE(state->dataMixedAir->OAMixer(1).MixTemp >= T_sat);
