@@ -5146,6 +5146,7 @@ void InverseModelTemperature(EnergyPlusData &state,
 
     int ZoneMult = zone.Multiplier * zone.ListMultiplier;
     zone.ZoneMeasuredTemperature = ScheduleManager::GetCurrentScheduleValue(state, hybridModelZone.ZoneMeasuredTemperatureSchedulePtr);
+    zone.ZoneVolCapMultpSensHM = 1.0; // Initialize to 1.0 in case hybrid not active
 
     // HM calculation only HM calculation period start
     if (state.dataEnvrn->DayOfYear >= hybridModelZone.HybridStartDayOfYear && state.dataEnvrn->DayOfYear <= hybridModelZone.HybridEndDayOfYear) {
@@ -5253,8 +5254,7 @@ void InverseModelTemperature(EnergyPlusData &state,
 
             processInverseModelMultpHM(
                 state, MultpHM, zone.ZoneVolCapMultpSensHMSum, zone.ZoneVolCapMultpSensHMCountSum, zone.ZoneVolCapMultpSensHMAverage, ZoneNum);
-
-            zone.ZoneVolCapMultpSensHM = MultpHM; // For timestep output
+            zone.ZoneVolCapMultpSensHM = MultpHM;
 
         } // Hybrid model internal thermal mass calcualtion end
 
@@ -5350,7 +5350,7 @@ void processInverseModelMultpHM(EnergyPlusData &state,
         if (thisZoneHB.hmThermalMassMultErrIndex == 0) {
             ShowWarningMessage(state, format("Hybrid model thermal mass multiplier higher than the limit for {}", zone.Name));
             ShowContinueError(state, "This means that the ratio of the zone air heat capacity for the current time step to the");
-            ShowContinueError(state, format("zone air heat storage is higher than the maximum limit of {:.1R},", maxHMMultValue));
+            ShowContinueError(state, format("zone air heat storage is higher than the maximum limit of {:.1R}.", maxHMMultValue));
         }
         ShowRecurringWarningErrorAtEnd(
             state, "Hybrid model thermal mass multiplier limit exceeded in zone " + zone.Name, thisZoneHB.hmThermalMassMultErrIndex);
