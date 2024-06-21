@@ -451,7 +451,7 @@ TEST_F(EnergyPlusFixture, DISABLED_PackagedTerminalHP_VSCoils_Sizing)
     GetZoneEquipmentData(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "Zone WSHP", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "Zone WSHP", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "Zone WSHP", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -850,7 +850,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     GetZoneAirLoopEquipment(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -1202,7 +1202,7 @@ TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
     GetZoneEquipmentData(*state);
     GetZoneAirLoopEquipment(*state);
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
 
     state->dataZoneEquip->ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
@@ -4299,7 +4299,7 @@ TEST_F(EnergyPlusFixture, PTAC_ZoneEquipment_NodeInputTest)
     ZonePlenum::GetZonePlenumInput(*state);
     ASSERT_TRUE(has_err_output(true)); // clear schedule warnings from err stream
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     bool isZoneEquipment = true;
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", isZoneEquipment, 0);
@@ -4568,7 +4568,7 @@ TEST_F(EnergyPlusFixture, ZonePTHP_ElectricityRateTest)
     ASSERT_FALSE(has_err_output(false));
     HVACSystemData *mySys;
     std::string compName = "PTHP THERMAL ZONE ONE";
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, compName, zoneEquipment, 0);
     auto &thisSys = state->dataUnitarySystems->unitarySys[0];
     thisSys.getUnitarySystemInput(*state, "PTHP THERMAL ZONE ONE", zoneEquipment, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -4898,7 +4898,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     GetZoneAirLoopEquipment(*state);
     state->dataZoneEquip->ZoneEquipInputsFilled = true;
     HVACSystemData *mySys;
-    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySys_AnyCoilType, "SPACE1-1 PTAC", true, 0);
+    mySys = UnitarySystems::UnitarySys::factory(*state, HVAC::UnitarySysType::Unitary_AnyCoilType, "SPACE1-1 PTAC", true, 0);
     auto &thisSys(state->dataUnitarySystems->unitarySys[0]);
     thisSys.getUnitarySystemInput(*state, "SPACE1-1 PTAC", true, 0);
     state->dataUnitarySystems->getInputOnceFlag = false;
@@ -4998,7 +4998,7 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     int NumZones(1);
     int SysAvailNum = 1;
     int PriAirSysNum = 0;
-    int AvailStatus = 0;
+    Avail::Status availStatus = Avail::Status::NoAction;
     constexpr DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner;
     int constexpr CompNum = 1;
     bool SimAir = false;
@@ -5015,13 +5015,13 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.1;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
     // get system availability schedule
-    SystemAvailabilityManager::GetSysAvailManagerListInputs(*state);
-    SystemAvailabilityManager::GetSysAvailManagerInputs(*state);
-    state->dataSystemAvailabilityManager->GetAvailListsInput = false;
-    auto &sysAvailMgr = state->dataSystemAvailabilityManager->NightCycleData(1);
+    Avail::GetSysAvailManagerListInputs(*state);
+    Avail::GetSysAvailManagerInputs(*state);
+    state->dataAvail->GetAvailListsInput = false;
+    auto &sysAvailMgr = state->dataAvail->NightCycleData(1);
     // check the three cycling run time control types
-    EXPECT_EQ(1, state->dataSystemAvailabilityManager->NumNCycSysAvailMgrs);
-    EXPECT_TRUE(compare_enums(SystemAvailabilityManager::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl));
+    EXPECT_EQ(1, state->dataAvail->NumNCycSysAvailMgrs);
+    EXPECT_ENUM_EQ(Avail::CyclingRunTimeControl::ThermostatWithMinimumRunTime, sysAvailMgr.cyclingRunTimeControl);
     // test for initialization and does not crash
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
 
@@ -5030,11 +5030,11 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     state->dataHVACGlobal->TurnFansOff = true;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.1;
-    sysAvailMgr.AvailStatus = 0;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
     // run calc system availability requirement
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, zoneEquipType, CompNum);
+    availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
     // check that the fan is off
-    EXPECT_EQ(HVAC::NoAction, sysAvailMgr.AvailStatus);
+    EXPECT_EQ((int)Avail::Status::NoAction, (int)sysAvailMgr.availStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_TRUE(state->dataHVACGlobal->TurnFansOff);
     // run to set zone night cycle manager
@@ -5047,20 +5047,20 @@ TEST_F(EnergyPlusFixture, PTAC_AvailabilityManagerTest)
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
 
     // test 2: availability manager status to on
-    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
-    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StartTime = 0.0;
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).StopTime = 4.0;
     state->dataHeatBalFanSys->TempZoneThermostatSetPoint(1) = 21.10;
     state->dataHeatBalFanSys->TempTstatAir(1) = 21.5;
-    sysAvailMgr.AvailStatus = 0;
+    sysAvailMgr.availStatus = Avail::Status::NoAction;
     state->dataScheduleMgr->Schedule(1).CurrentValue = 1;
     state->dataScheduleMgr->Schedule(2).CurrentValue = 0;
     // run calc system availability requirement
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, AvailStatus, zoneEquipType, CompNum);
+    availStatus = Avail::CalcNCycSysAvailMgr(*state, SysAvailNum, PriAirSysNum, zoneEquipType, CompNum);
     // check that the availability manager is cycling On
-    EXPECT_EQ(HVAC::CycleOn, sysAvailMgr.AvailStatus);
+    EXPECT_EQ((int)Avail::Status::CycleOn, (int)sysAvailMgr.availStatus);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOn);
     EXPECT_FALSE(state->dataHVACGlobal->TurnFansOff);
-    state->dataHVACGlobal->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).AvailStatus = HVAC::CycleOn;
+    state->dataAvail->ZoneComp(zoneEquipType).ZoneCompAvailMgrs(1).availStatus = Avail::Status::CycleOn;
     // run to set zone night cycle manager
     ZoneEquipmentManager::SimZoneEquipment(*state, true, SimAir);
     // test global zone fan control variables are turned on

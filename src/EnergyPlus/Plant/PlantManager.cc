@@ -287,14 +287,12 @@ void GetPlantLoopData(EnergyPlusData &state)
     // Using/Aliasing
     using ScheduleManager::GetScheduleIndex;
     using SetPointManager::IsNodeOnSetPtManager;
-    SetPointManager::CtrlVarType localTempSetPt = SetPointManager::CtrlVarType::Temp;
+    HVAC::CtrlVarType localTempSetPt = HVAC::CtrlVarType::Temp;
     using NodeInputManager::GetOnlySingleNode;
     using namespace BranchInputManager;
     using DataSizing::AutoSize;
     using FluidProperties::CheckFluidPropertyName;
     using FluidProperties::FindGlycol;
-    ;
-    using SystemAvailabilityManager::GetPlantAvailabilityManager;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("GetPlant/CondenserLoopData: ");
@@ -328,8 +326,8 @@ void GetPlantLoopData(EnergyPlusData &state)
     if (state.dataPlnt->TotNumLoops > 0) {
         state.dataPlnt->PlantLoop.allocate(state.dataPlnt->TotNumLoops);
         state.dataConvergeParams->PlantConvergence.allocate(state.dataPlnt->TotNumLoops);
-        if (!allocated(state.dataPlnt->PlantAvailMgr)) {
-            state.dataPlnt->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
+        if (!allocated(state.dataAvail->PlantAvailMgr)) {
+            state.dataAvail->PlantAvailMgr.allocate(state.dataPlnt->TotNumLoops);
         }
     } else {
         return;
@@ -656,7 +654,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         ErrFound = false;
 
         if (this_loop.TypeOfLoop == LoopType::Plant) {
-            GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
+            Avail::GetPlantAvailabilityManager(state, Alpha(15), LoopNum, state.dataPlnt->TotNumLoops, ErrFound);
         }
 
         if (ErrFound) {
@@ -737,7 +735,7 @@ void GetPlantLoopData(EnergyPlusData &state)
         SetupOutputVariable(state,
                             "Plant System Cycle On Off Status",
                             Constant::Units::None,
-                            state.dataPlnt->PlantAvailMgr(LoopNum).AvailStatus,
+                            (int &)state.dataAvail->PlantAvailMgr(LoopNum).availStatus,
                             OutputProcessor::TimeStepType::System,
                             OutputProcessor::StoreType::Average,
                             state.dataPlnt->PlantLoop(LoopNum).Name);
@@ -2156,8 +2154,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                         state.dataHVACGlobal->SetPointErrorFlag = true;
                     } else {
                         // need call to EMS to check node
-                        CheckIfNodeSetPointManagedByEMS(
-                            state, SensedNode, EMSManager::SPControlType::TemperatureSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                        CheckIfNodeSetPointManagedByEMS(state, SensedNode, HVAC::CtrlVarType::Temp, state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state,
                                             "PlantManager: No Setpoint Manager Defined for Node=" + state.dataLoopNodes->NodeID(SensedNode) +
@@ -2341,7 +2338,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                     } else {
                         CheckIfNodeSetPointManagedByEMS(state,
                                                         state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                        EMSManager::SPControlType::TemperatureMaxSetPoint,
+                                                        HVAC::CtrlVarType::Temp,
                                                         state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing high temperature setpoint for dual setpoint deadband demand scheme");
@@ -2363,7 +2360,7 @@ void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // tr
                     } else {
                         CheckIfNodeSetPointManagedByEMS(state,
                                                         state.dataPlnt->PlantLoop(LoopNum).TempSetPointNodeNum,
-                                                        EMSManager::SPControlType::TemperatureMinSetPoint,
+                                                        HVAC::CtrlVarType::Temp,
                                                         state.dataHVACGlobal->SetPointErrorFlag);
                         if (state.dataHVACGlobal->SetPointErrorFlag) {
                             ShowSevereError(state, "Plant Loop: missing low temperature setpoint for dual setpoint deadband demand scheme");

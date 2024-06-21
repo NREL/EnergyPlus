@@ -110,7 +110,7 @@ constexpr Real64 gigaJoulesToJoules = 1.e+09;
 void SimTESCoil(EnergyPlusData &state,
                 std::string_view CompName, // name of the fan coil unit
                 int &CompIndex,
-                int const FanOpMode, // allows parent object to control fan mode
+                HVAC::FanOp const fanOp, // allows parent object to control fan mode
                 PTSCOperatingMode &TESOpMode,
                 ObjexxFCL::Optional<Real64 const> PartLoadRatio // part load ratio (for single speed cycling unit)
 )
@@ -167,13 +167,13 @@ void SimTESCoil(EnergyPlusData &state,
         CalcTESCoilOffMode(state, TESCoilNum);
         break;
     case PTSCOperatingMode::CoolingOnly:
-        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingOnlyMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndCharge:
-        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndChargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::CoolingAndDischarge:
-        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, FanOpMode, PartLoadRatio);
+        CalcTESCoilCoolingAndDischargeMode(state, TESCoilNum, fanOp, PartLoadRatio);
         break;
     case PTSCOperatingMode::ChargeOnly:
         CalcTESCoilChargeOnlyMode(state, TESCoilNum);
@@ -2494,7 +2494,7 @@ void CalcTESCoilOffMode(EnergyPlusData &state, int const TESCoilNum)
     }
 }
 
-void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] HVAC::FanOp const fanOp, Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2757,7 +2757,10 @@ void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, [[m
     }
 }
 
-void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
+                                     int const TESCoilNum,
+                                     [[maybe_unused]] HVAC::FanOp const fanOp,
+                                     Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:
@@ -3164,7 +3167,10 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum
     }
 }
 
-void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, [[maybe_unused]] int const FanOpMode, Real64 const PartLoadRatio)
+void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
+                                        int const TESCoilNum,
+                                        [[maybe_unused]] HVAC::FanOp const fanOp,
+                                        Real64 const PartLoadRatio)
 {
 
     // SUBROUTINE INFORMATION:

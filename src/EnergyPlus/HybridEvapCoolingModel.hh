@@ -65,6 +65,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 
 namespace EnergyPlus {
 
@@ -237,7 +238,7 @@ namespace HybridEvapCoolingModel {
         int SchedPtr; // Pointer to the correct schedule
         int ZoneNodeNum;                  // index of zone air node in node structure
         std::string AvailManagerListName; // Name of an availability manager list object
-        int AvailStatus;
+        Avail::Status availStatus = Avail::Status::NoAction;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
         bool FanHeatGain;                                // .TRUE. = fan heat gain is accounted for in the lookup tables

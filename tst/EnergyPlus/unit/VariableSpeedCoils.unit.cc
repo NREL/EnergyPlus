@@ -53,6 +53,7 @@
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -3001,9 +3002,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.1;
     // set coil parameters
-    int const CyclingScheme = HVAC::ContFanCycCoil;
+    HVAC::FanOp fanOp = HVAC::FanOp::Continuous;
     int DXCoilNum = 1;
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::Off;
     int constexpr SpeedCal = 1;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;
@@ -3012,13 +3013,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     Real64 SpeedRatio = 0.0;
 
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
     // test 1: compressor is On but PLR = 0
-    CompressorOp = HVAC::CompressorOperation::On;
+    compressorOp = HVAC::CompressorOp::On;
     PartLoadFrac = 0.0;
     // set coil inlet air flow rate to speed 1
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
@@ -3027,7 +3028,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
     state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     ;
     // check coil outlet and inlet air conditions match
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
@@ -3038,7 +3039,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
     ;
     // test 2: compressor is On and PLR > 0
-    CompressorOp = HVAC::CompressorOperation::On;
+    compressorOp = HVAC::CompressorOp::On;
     PartLoadFrac = 0.1;
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
@@ -3052,7 +3053,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ContFanCycCoil_Test)
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     // run the coil
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // check coil air outlet conditions
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp, 5.23333, 0.00001);
     EXPECT_NEAR(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirHumRat, 0.00810, 0.00001);
@@ -6911,7 +6912,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
     // Set coil parameters
     int DXCoilNum = 1;
-    int const CyclingScheme = HVAC::ContFanCycCoil;
+    HVAC::FanOp const fanOp = HVAC::FanOp::Continuous;
 
     int constexpr SpeedCal = 1;
     Real64 SpeedRatio = 0.2;
@@ -6927,12 +6928,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     state->dataEnvrn->OutDryBulbTemp = -5.0;
 
     // Run a compressor "On" scenario first
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::On;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
-                                              CyclingScheme,
-                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              fanOp,
+                                              compressorOp, // compressor on/off. 0 = off; 1= on
                                               PartLoadFrac,
                                               SpeedCal,
                                               SpeedRatio,
@@ -6948,8 +6949,8 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
-                                              CyclingScheme,
-                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              fanOp,
+                                              compressorOp, // compressor on/off. 0 = off; 1= on
                                               PartLoadFrac,
                                               SpeedCal,
                                               SpeedRatio,
@@ -6962,12 +6963,12 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
     // In this case, the "DefrostPower" need to be cleared to be zero if done correctly;
     // Otherwise the problem reported in Issue 10108 will show up.
 
-    CompressorOp = HVAC::CompressorOperation::Off;
+    compressorOp = HVAC::CompressorOp::Off;
     VariableSpeedCoils::SimVariableSpeedCoils(*state,
                                               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).Name,
                                               DXCoilNum,
-                                              CyclingScheme,
-                                              CompressorOp, // compressor on/off. 0 = off; 1= on
+                                              fanOp,
+                                              compressorOp, // compressor on/off. 0 = off; 1= on
                                               PartLoadFrac,
                                               SpeedCal,
                                               SpeedRatio,
@@ -6981,7 +6982,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Coil_Defrost_Power_Fix_Test)
 
 TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
 {
-    // Code borrowed/modified from another test (VariableSpeedCoils_ContFanCycCoil_Test) above
+    // Code borrowed/modified from another test (VariableSpeedCoils_FanOp::Continuous_Test) above
     std::string const idf_objects = delimited_string({
         "  Coil:Cooling:DX:VariableSpeed,",
         "    VS DXCOIL,               !- Name",
@@ -7098,9 +7099,9 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
     state->dataEnvrn->WindDir = 270.0;
     state->dataEnvrn->StdRhoAir = 1.1;
     // set coil parameters
-    int const CyclingScheme = HVAC::ContFanCycCoil;
+    HVAC::FanOp const fanOp = HVAC::FanOp::Continuous;
     int DXCoilNum = 1;
-    HVAC::CompressorOperation CompressorOp = HVAC::CompressorOperation::Off;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::Off;
     int constexpr SpeedCal = 1;
     Real64 SensLoad = 0.0;
     Real64 LatentLoad = 0.0;
@@ -7109,13 +7110,13 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
     Real64 SpeedRatio = 0.0;
 
     // run coil init
-    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+    VariableSpeedCoils::InitVarSpeedCoil(*state, DXCoilNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     // set coil inlet condition
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirDBTemp = 24.0;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat = 0.009;
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy = Psychrometrics::PsyHFnTdbW(24.0, 0.009);
     // test 1: compressor is On, PLR > 0, but RatedCapCoolTotal
-    CompressorOp = HVAC::CompressorOperation::On;
+    compressorOp = HVAC::CompressorOp::On;
     PartLoadFrac = 1.0;
     // set coil inlet air flow rate to speed 1
     state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate =
@@ -7124,7 +7125,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
     state->dataLoopNodes->Node(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirInletNodeNum).MassFlowRate =
         state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).AirMassFlowRate;
     VariableSpeedCoils::CalcVarSpeedCoilCooling(
-        *state, DXCoilNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
+        *state, DXCoilNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadFrac, OnOffAirFlowRatio, SpeedRatio, SpeedCal);
     VariableSpeedCoils::UpdateVarSpeedCoil(*state, DXCoilNum);
     // check coil outlet and inlet air conditions match
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirDBTemp,
@@ -7133,6 +7134,80 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_ZeroRatedCoolingCapacity_Test)
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirHumRat);
     EXPECT_EQ(state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).OutletAirEnthalpy,
               state->dataVariableSpeedCoils->VarSpeedCoil(DXCoilNum).InletAirEnthalpy);
+}
+
+TEST_F(EnergyPlusFixture, VariableSpeedCoils_UpdateVarSpeedCoil_Test)
+{
+    int coilNum = 1;
+    Real64 constexpr closeEnough = 0.001;
+    state->dataVariableSpeedCoils->VarSpeedCoil.allocate(1);
+    auto &thisVarSpeedCoil = state->dataVariableSpeedCoils->VarSpeedCoil(1);
+    state->dataLoopNodes->Node.allocate(2);
+    auto &thisInletNode = state->dataLoopNodes->Node(1);
+    auto &thisOutletNode = state->dataLoopNodes->Node(2);
+
+    // Set up test data
+    state->dataHVACGlobal->TimeStepSysSec = 60.0;
+    thisVarSpeedCoil.SimFlag = false; // not running (doesn't matter if it's running or not, this is mostly to test the GenContam fix)
+    thisVarSpeedCoil.InletAirDBTemp = 21.0;
+    thisVarSpeedCoil.InletAirHumRat = 0.003;
+    thisVarSpeedCoil.InletAirEnthalpy = 28.743;
+    thisVarSpeedCoil.InletWaterTemp = 0.0;
+    thisVarSpeedCoil.InletWaterEnthalpy = 0.0;
+    thisVarSpeedCoil.AirInletNodeNum = 1;
+    thisVarSpeedCoil.WaterInletNodeNum = 0;
+    thisVarSpeedCoil.AirOutletNodeNum = 2;
+    thisVarSpeedCoil.WaterOutletNodeNum = 0;
+    state->dataLoopNodes->Node(1).MassFlowRate = 0.123;
+    state->dataLoopNodes->Node(2).MassFlowRate = 0.0;
+    thisVarSpeedCoil.OutletAirDBTemp = 0.0;
+    thisVarSpeedCoil.OutletAirHumRat = 0.0;
+    thisVarSpeedCoil.OutletAirEnthalpy = 0.0;
+    thisVarSpeedCoil.OutletWaterTemp = -1.0;
+    thisVarSpeedCoil.OutletWaterEnthalpy = -10.0;
+    thisInletNode.Quality = 0.1;
+    thisInletNode.Press = 101234.;
+    thisInletNode.MassFlowRateMin = 0.1;
+    thisInletNode.MassFlowRateMax = 1.0;
+    thisInletNode.MassFlowRateMinAvail = 0.2;
+    thisInletNode.MassFlowRateMaxAvail = 0.9;
+    thisOutletNode.Quality = 0.0;
+    thisOutletNode.Press = 0.0;
+    thisOutletNode.MassFlowRateMin = 0.0;
+    thisOutletNode.MassFlowRateMax = 0.0;
+    thisOutletNode.MassFlowRateMinAvail = 0.0;
+    thisOutletNode.MassFlowRateMaxAvail = 0.0;
+    state->dataContaminantBalance->Contaminant.CO2Simulation = true;
+    thisInletNode.CO2 = 55.5;
+    thisOutletNode.CO2 = 0.0;
+    state->dataContaminantBalance->Contaminant.GenericContamSimulation = true;
+    thisInletNode.GenContam = 12.345;
+    thisOutletNode.GenContam = 0.0;
+    thisVarSpeedCoil.reportCoilFinalSizes = false;
+    thisVarSpeedCoil.VSCoilType == HVAC::Coil_CoolingAirToAirVariableSpeed;
+
+    // Run the test
+    VariableSpeedCoils::UpdateVarSpeedCoil(*state, coilNum);
+
+    // Check the results
+    EXPECT_NEAR(thisVarSpeedCoil.Energy, 0.0, closeEnough);
+    EXPECT_NEAR(thisVarSpeedCoil.OutletAirDBTemp, thisVarSpeedCoil.InletAirDBTemp, closeEnough);
+    EXPECT_NEAR(thisVarSpeedCoil.OutletAirHumRat, thisVarSpeedCoil.InletAirHumRat, closeEnough);
+    EXPECT_NEAR(thisVarSpeedCoil.OutletAirEnthalpy, thisVarSpeedCoil.InletAirEnthalpy, closeEnough);
+    EXPECT_NEAR(thisVarSpeedCoil.OutletWaterTemp, thisVarSpeedCoil.InletWaterTemp, closeEnough);
+    EXPECT_NEAR(thisVarSpeedCoil.OutletWaterEnthalpy, thisVarSpeedCoil.InletWaterEnthalpy, closeEnough);
+    EXPECT_NEAR(thisOutletNode.MassFlowRate, thisInletNode.MassFlowRate, closeEnough);
+    EXPECT_NEAR(thisOutletNode.Temp, thisVarSpeedCoil.OutletAirDBTemp, closeEnough);
+    EXPECT_NEAR(thisOutletNode.HumRat, thisVarSpeedCoil.OutletAirHumRat, closeEnough);
+    EXPECT_NEAR(thisOutletNode.Enthalpy, thisVarSpeedCoil.OutletAirEnthalpy, closeEnough);
+    EXPECT_NEAR(thisOutletNode.Quality, thisInletNode.Quality, closeEnough);
+    EXPECT_NEAR(thisOutletNode.Press, thisInletNode.Press, closeEnough);
+    EXPECT_NEAR(thisOutletNode.MassFlowRateMin, thisInletNode.MassFlowRateMin, closeEnough);
+    EXPECT_NEAR(thisOutletNode.MassFlowRateMax, thisInletNode.MassFlowRateMax, closeEnough);
+    EXPECT_NEAR(thisOutletNode.MassFlowRateMinAvail, thisInletNode.MassFlowRateMinAvail, closeEnough);
+    EXPECT_NEAR(thisOutletNode.MassFlowRateMaxAvail, thisInletNode.MassFlowRateMaxAvail, closeEnough);
+    EXPECT_NEAR(thisOutletNode.CO2, thisInletNode.CO2, closeEnough);
+    EXPECT_NEAR(thisOutletNode.GenContam, thisInletNode.GenContam, closeEnough);
 }
 
 } // namespace EnergyPlus
