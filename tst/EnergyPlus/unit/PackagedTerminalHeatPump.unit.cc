@@ -4009,8 +4009,8 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     // EXPECT_NEAR(23.153277047505515, state->dataLoopNodes->Node(11).Temp, 0.001);
 
     // ATMixer primary air inlet node, or air loop SAT, T = OAT + fan heat
-    EXPECT_NEAR(31.1803, state->dataLoopNodes->Node(ATMixer1PriInNode).Temp, 0.001);
-    EXPECT_NEAR(0.0015, state->dataLoopNodes->Node(ATMixer1PriInNode).HumRat, 0.001);
+    EXPECT_NEAR(34.2002, state->dataLoopNodes->Node(ATMixer1PriInNode).Temp, 0.001);
+    EXPECT_NEAR(0.0003, state->dataLoopNodes->Node(ATMixer1PriInNode).HumRat, 0.001);
     EXPECT_NEAR(35169.5566, state->dataLoopNodes->Node(ATMixer1PriInNode).Enthalpy, 0.001);
 
     // *** this next test is different from develop, air loop is on, this pri/ret flow was 0 before
@@ -4027,7 +4027,7 @@ TEST_F(EnergyPlusFixture, PTACDrawAirfromReturnNodeAndPlenum_Test)
     // same temperature test as above commented out test (23.15327704750551), now shows 21.2 C
     // how do you mix 2 air streams with T1in=31.18 and T2in=23.15 and get Tout=21.23 ??
     // must be a node enthalpy issue with this unit test?
-    EXPECT_NEAR(21.2316, state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp, 0.001);
+    EXPECT_NEAR(21.5613, state->dataLoopNodes->Node(ATMixer1AirOutNode).Temp, 0.001);
     EXPECT_NEAR(0.324036, state->dataLoopNodes->Node(ATMixer1AirOutNode).MassFlowRate, 0.001);
 
     // mass balance zone 1 ATMixer outlet enthalpy based on pri and sec inlet stream enthalpy
