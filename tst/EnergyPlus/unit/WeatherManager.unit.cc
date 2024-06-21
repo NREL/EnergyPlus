@@ -384,7 +384,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -424,7 +424,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -465,7 +465,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -519,7 +519,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_Actual)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -565,7 +565,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest_ActualBroken)
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -601,7 +601,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     Weather::GetWaterMainsTemperatures(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_TRUE(compare_enums(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile));
+    EXPECT_ENUM_EQ(state->dataWeather->WaterMainsTempsMethod, Weather::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(state->dataWeather->WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(state->dataWeather->WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -708,7 +708,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = state->dataWeather->DesDayInput(EnvrnNum).TauB;
     Real64 TauD = state->dataWeather->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_TRUE(compare_enums(Weather::DesDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).solarModel));
+    EXPECT_ENUM_EQ(Weather::DesDaySolarModel::ASHRAE_Tau2017, state->dataWeather->DesDayInput(EnvrnNum).solarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -811,7 +811,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::DesignDay);
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -885,7 +885,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     Weather::SetUpDesignDay(*state, 1);
-    EXPECT_TRUE(compare_enums(state->dataWeather->DesDayInput(1).HumIndType, Weather::DesDayHumIndType::Enthalpy));
+    EXPECT_ENUM_EQ(state->dataWeather->DesDayInput(1).HumIndType, Weather::DesDayHumIndType::Enthalpy);
     EXPECT_EQ(state->dataWeather->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
@@ -1850,7 +1850,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_OK)
 
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 }
 
 TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
@@ -1915,7 +1915,7 @@ TEST_F(EnergyPlusFixture, WeatherRunPeriod_WeatherFile_Missing)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 }
 
 TEST_F(EnergyPlusFixture, epwHeaderTest)
@@ -2004,11 +2004,11 @@ TEST_F(EnergyPlusFixture, epwHeaderTest)
     EXPECT_FALSE(has_err_output());
     EXPECT_TRUE(state->dataWeather->WFAllowsLeapYears);
     EXPECT_TRUE(state->dataWeather->EPWDaylightSaving);
-    EXPECT_TRUE(compare_enums(state->dataWeather->EPWDST.StDateType, Weather::DateType::NthDayInMonth));
+    EXPECT_ENUM_EQ(state->dataWeather->EPWDST.StDateType, Weather::DateType::NthDayInMonth);
     EXPECT_EQ(state->dataWeather->EPWDST.StMon, 5);
     EXPECT_EQ(state->dataWeather->EPWDST.StDay, 1);
     EXPECT_EQ(state->dataWeather->EPWDST.StWeekDay, 2);
-    EXPECT_TRUE(compare_enums(state->dataWeather->EPWDST.EnDateType, Weather::DateType::MonthDay));
+    EXPECT_ENUM_EQ(state->dataWeather->EPWDST.EnDateType, Weather::DateType::MonthDay);
     EXPECT_EQ(state->dataWeather->EPWDST.EnMon, 7);
     EXPECT_EQ(state->dataWeather->EPWDST.EnDay, 31);
     EXPECT_EQ(state->dataWeather->EPWDST.EnWeekDay, 2);
@@ -2485,7 +2485,7 @@ TEST_F(EnergyPlusFixture, EPW_no_eol_at_end_of_file)
     ASSERT_FALSE(ErrorsFound);
     EXPECT_TRUE(compare_err_stream("", true));
     EXPECT_EQ(1, state->dataWeather->NumOfEnvrn);
-    EXPECT_TRUE(compare_enums(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather));
+    EXPECT_ENUM_EQ(state->dataWeather->Environment(1).KindOfEnvrn, Constant::KindOfSim::RunPeriodWeather);
 
     EXPECT_NO_THROW(Weather::ReadWeatherForDay(*state, 1, 1, true));
     EXPECT_TRUE(compare_err_stream("", true));

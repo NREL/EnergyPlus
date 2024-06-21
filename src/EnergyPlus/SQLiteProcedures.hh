@@ -104,7 +104,6 @@ protected:
 
     bool m_writeOutputToSQLite;
     std::shared_ptr<std::ostream> m_errorStream;
-    sqlite3 *m_connection;
     std::shared_ptr<sqlite3> m_db;
 };
 

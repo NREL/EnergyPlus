@@ -1715,7 +1715,7 @@ namespace DesiccantDehumidifiers {
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                    state, ControlNode, HVAC::CtrlVarType::MaxHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                     ShowContinueError(state, format("Dehumidifier:Desiccant:NoFans: {}", desicDehum.Name));
@@ -1817,7 +1817,7 @@ namespace DesiccantDehumidifiers {
                             state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                state, ControlNode, HVAC::CtrlVarType::MaxHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                 ShowContinueError(state, format("{}: {}", desicDehum.DehumType, desicDehum.Name));
@@ -2467,7 +2467,7 @@ namespace DesiccantDehumidifiers {
                     if ((desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingSingleSpeed) ||
                         (desicDehum.coolingCoil_TypeNum == HVAC::CoilDX_CoolingTwoStageWHumControl)) {
                         DDPartLoadRatio = state.dataDXCoils->DXCoilPartLoadRatio(desicDehum.DXCoilIndex);
-                        if (state.dataDXCoils->DXCoilFanOpMode(desicDehum.DXCoilIndex) == HVAC::ContFanCycCoil) {
+                        if (state.dataDXCoils->DXCoilFanOp(desicDehum.DXCoilIndex) == HVAC::FanOp::Continuous) {
                             NewRegenInTemp =
                                 state.dataLoopNodes->Node(desicDehum.CondenserInletNode).Temp +
                                 CondenserWasteHeat / (CpAir * (state.dataLoopNodes->Node(desicDehum.RegenAirInNode).MassFlowRate) * DDPartLoadRatio);
@@ -2554,7 +2554,7 @@ namespace DesiccantDehumidifiers {
                                                   desicDehum.HXName,
                                                   FirstHVACIteration,
                                                   desicDehum.CompIndex,
-                                                  HVAC::ContFanCycCoil,
+                                                  HVAC::FanOp::Continuous,
                                                   1.0,
                                                   true,
                                                   CompanionCoilIndexNum,
@@ -2632,7 +2632,7 @@ namespace DesiccantDehumidifiers {
                                                       desicDehum.HXName,
                                                       FirstHVACIteration,
                                                       desicDehum.CompIndex,
-                                                      HVAC::ContFanCycCoil,
+                                                      HVAC::FanOp::Continuous,
                                                       1.0,
                                                       true,
                                                       CompanionCoilIndexNum,
@@ -2703,7 +2703,7 @@ namespace DesiccantDehumidifiers {
                                           desicDehum.HXName,
                                           FirstHVACIteration,
                                           desicDehum.CompIndex,
-                                          HVAC::ContFanCycCoil,
+                                          HVAC::FanOp::Continuous,
                                           DDPartLoadRatio,
                                           true,
                                           CompanionCoilIndexNum,
@@ -2754,7 +2754,7 @@ namespace DesiccantDehumidifiers {
                                           desicDehum.HXName,
                                           FirstHVACIteration,
                                           desicDehum.CompIndex,
-                                          HVAC::ContFanCycCoil,
+                                          HVAC::FanOp::Continuous,
                                           0.0,
                                           false,
                                           CompanionCoilIndexNum,

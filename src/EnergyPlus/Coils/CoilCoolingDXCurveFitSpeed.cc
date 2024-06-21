@@ -428,7 +428,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
                                                  Real64 &_PLR,
-                                                 int const fanOpMode,
+                                                 HVAC::FanOp const fanOp,
                                                  const Real64 condInletTemp)
 {
 
@@ -534,7 +534,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
     if (indexPLRFPLF > 0) {
         PLF = Curve::CurveValue(state, indexPLRFPLF, _PLR); // Calculate part-load factor
     }
-    if (fanOpMode == HVAC::CycFanCycCoil) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
+    if (fanOp == HVAC::FanOp::Cycling) state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
 
     Real64 EIRTempModFac = 1.0; // EIR as a function of temperature curve result
     if (indexEIRFT > 0) {
@@ -566,7 +566,7 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(EnergyPlus::EnergyPlusData &sta
 
     //  If constant fan with cycling compressor, call function to determine "effective SHR"
     //  which includes the part-load degradation on latent capacity
-    if (this->doLatentDegradation && (fanOpMode == HVAC::ContFanCycCoil)) {
+    if (this->doLatentDegradation && (fanOp == HVAC::FanOp::Continuous)) {
         Real64 QLatActual = TotCap * (1.0 - SHR);
         // TODO: Figure out HeatingRTF for this
         Real64 HeatingRTF = 0.0;

@@ -235,7 +235,7 @@ struct BaseSizer
     // WaterHeatingCoilUASizing
     bool dataNomCapInpMeth = false;
     int dataCoilNum = 0;
-    int dataFanOpMode = 0;
+    HVAC::FanOp dataFanOp = HVAC::FanOp::Invalid;
     Real64 dataDesignCoilCapacity = 0.0;
     bool dataErrorsFound = false;
 

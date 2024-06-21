@@ -57,7 +57,7 @@ fs::path configured_source_directory()
 
 fs::path configured_build_directory()
 {
-    return ("${CMAKE_BUILD_DIR}");
+    return ("${CMAKE_BINARY_DIR}");
 }
 
 } // namespace EnergyPlus
