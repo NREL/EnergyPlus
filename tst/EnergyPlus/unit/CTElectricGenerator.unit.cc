@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     GetCTGeneratorInput(*state);
 
-    EXPECT_TRUE(compare_enums(state->dataCTElectricGenerator->CTGenerator(1).FuelType, Constant::eFuel::NaturalGas));
+    EXPECT_ENUM_EQ(state->dataCTElectricGenerator->CTGenerator(1).FuelType, Constant::eFuel::NaturalGas);
 }
 
 } // namespace EnergyPlus

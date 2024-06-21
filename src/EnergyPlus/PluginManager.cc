@@ -1481,7 +1481,7 @@ void PluginManager::runSingleUserDefinedPlugin([[maybe_unused]] EnergyPlusData &
 
 int PluginManager::getUserDefinedCallbackIndex(EnergyPlusData &state, const std::string &callbackProgramName)
 {
-    for (int i = 0; i < state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
+    for (int i = 0; i < (int)state.dataPluginManager->userDefinedCallbackNames.size(); i++) {
         if (state.dataPluginManager->userDefinedCallbackNames[i] == callbackProgramName) {
             return i;
         }

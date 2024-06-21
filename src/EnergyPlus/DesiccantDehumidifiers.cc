@@ -1715,7 +1715,7 @@ namespace DesiccantDehumidifiers {
                                 state.dataHVACGlobal->SetPointErrorFlag = true;
                             } else {
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                    state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                    state, ControlNode, HVAC::CtrlVarType::MaxHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                                 if (state.dataHVACGlobal->SetPointErrorFlag) {
                                     ShowSevereError(state, "Missing humidity ratio setpoint (HumRatMax) for ");
                                     ShowContinueError(state, format("Dehumidifier:Desiccant:NoFans: {}", desicDehum.Name));
@@ -1817,7 +1817,7 @@ namespace DesiccantDehumidifiers {
                             state.dataHVACGlobal->SetPointErrorFlag = true;
                         } else {
                             EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                state, ControlNode, EMSManager::SPControlType::HumidityRatioMaxSetPoint, state.dataHVACGlobal->SetPointErrorFlag);
+                                state, ControlNode, HVAC::CtrlVarType::MaxHumRat, state.dataHVACGlobal->SetPointErrorFlag);
                             if (state.dataHVACGlobal->SetPointErrorFlag) {
                                 ShowSevereError(state, "Missing maximum humidity ratio setpoint (MaxHumRat) for ");
                                 ShowContinueError(state, format("{}: {}", desicDehum.DehumType, desicDehum.Name));
