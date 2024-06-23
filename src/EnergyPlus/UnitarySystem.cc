@@ -8419,7 +8419,11 @@ namespace UnitarySystems {
         this->setOnOffMassFlowRate(state, OnOffAirFlowRatio, PartLoadRatio);
 
         if (!state.dataUnitarySystems->HeatingLoad && !state.dataUnitarySystems->CoolingLoad && state.dataUnitarySystems->MoistureLoad >= 0.0) return;
-
+        if (state.dataUnitarySystems->HeatingLoad) {
+            this->m_HeatingSpeedNum = 1;
+        } else {
+            this->m_CoolingSpeedNum = 1;
+        }
         this->calcUnitarySystemToLoad(state,
                                       AirLoopNum,
                                       FirstHVACIteration,
@@ -8601,7 +8605,6 @@ namespace UnitarySystems {
                 if (this->m_NumOfSpeedCooling > 0) {
                     this->m_CoolingSpeedRatio = 1.0;
                     this->m_CoolingCycRatio = 1.0;
-                    this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
                 }
                 if (this->m_Staged && this->m_StageNum < 0) {
                     if (this->m_NumOfSpeedCooling > 0) this->m_CoolingSpeedNum = min(std::abs(this->m_StageNum), this->m_NumOfSpeedCooling);
@@ -8714,8 +8717,6 @@ namespace UnitarySystems {
 
         // Do the non-variable or non-multispeed coils have a NumOfSpeed = 0 ? We don't need to do this for single speed coils.
         // Check to see which speed to meet the load
-        this->m_HeatingSpeedNum = 0;
-        this->m_CoolingSpeedNum = 0;
         if (!this->m_Staged) {
             if (state.dataUnitarySystems->HeatingLoad) {
                 for (SpeedNum = 1; SpeedNum <= this->m_NumOfSpeedHeating; ++SpeedNum) {
@@ -9266,204 +9267,246 @@ namespace UnitarySystems {
                                                       CompressorONFlag);
                         PartLoadRatio = CoolPLR;
                     } else {
+                        bool higherSpeedMeetsLoad = false;
+                        if ((this->m_MultiOrVarSpeedCoolCoil && state.dataUnitarySystems->CoolingLoad ||
+                             this->m_MultiOrVarSpeedHeatCoil && state.dataUnitarySystems->HeatingLoad) &&
+                            this->m_FanOpMode == HVAC::FanOp::Continuous) {
+                            CoolPLR = 0.0;
+                            HeatPLR = 0.0;
+                            this->calcUnitarySystemToLoad(state,
+                                                          AirLoopNum,
+                                                          FirstHVACIteration,
+                                                          CoolPLR,
+                                                          HeatPLR,
+                                                          OnOffAirFlowRatio,
+                                                          SensOutput,
+                                                          LatOutput,
+                                                          HXUnitOn,
+                                                          HeatCoilLoad,
+                                                          SupHeaterLoad,
+                                                          CompressorONFlag);
+                            if ((state.dataUnitarySystems->CoolingLoad && SensOutput < ZoneLoad) ||
+                                (state.dataUnitarySystems->HeatingLoad && SensOutput > ZoneLoad)) {
+                                higherSpeedMeetsLoad = true;
+                            }
+                        }
+                        if (higherSpeedMeetsLoad) {
+                            PartLoadRatio = CoolPLR; // CoolPLR and HeatPLR are both 0 so just use cooling PLR here
+                        } else {
+                            Real64 par6 = state.dataUnitarySystems->CoolingLoad ? 1.0 : 0.0;
+                            auto f = [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                         Real64 const PartLoadRatio) {
+                                return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                                 PartLoadRatio,
+                                                                                 this->m_UnitarySysNum,
+                                                                                 FirstHVACIteration,
+                                                                                 // par 3 not used?
+                                                                                 CompressorONFlag,
+                                                                                 ZoneLoad,
+                                                                                 par6,
+                                                                                 1.0,
+                                                                                 OnOffAirFlowRatio,
+                                                                                 HXUnitOn,
+                                                                                 // par 10 not used
+                                                                                 AirLoopNum);
+                            };
+                            //     Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
+                            General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
 
-                        Real64 par6 = state.dataUnitarySystems->CoolingLoad ? 1.0 : 0.0;
-                        auto f = [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
-                                     Real64 const PartLoadRatio) {
-                            return UnitarySys::calcUnitarySystemLoadResidual(state,
-                                                                             PartLoadRatio,
-                                                                             this->m_UnitarySysNum,
-                                                                             FirstHVACIteration,
-                                                                             // par 3 not used?
-                                                                             CompressorONFlag,
-                                                                             ZoneLoad,
-                                                                             par6,
-                                                                             1.0,
-                                                                             OnOffAirFlowRatio,
-                                                                             HXUnitOn,
-                                                                             // par 10 not used
-                                                                             AirLoopNum);
-                        };
-                        //     Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                        General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, PartLoadRatio, f, 0.0, 1.0);
-
-                        if (SolFlag == -1) {
-                            if (state.dataUnitarySystems->HeatingLoad) {
-                                // IF iteration limit is exceeded, find tighter boundary of solution and repeat RegulaFalsi
-                                // This does cause a problem when coil cannot turn on when OAT < min allowed or scheduled off
-                                // If max iteration limit is exceeded, how do we know if the heating coil is operating?
-                                TempMaxPLR = -0.1;
-                                TempSensOutput = SensOutputOff;
-                                while ((TempSensOutput - ZoneLoad) < 0.0 && TempMaxPLR < 1.0) {
-                                    // find upper limit of HeatingPLR
-                                    TempMaxPLR += 0.1;
-
-                                    // SUBROUTINE SetSpeedVariables(UnitarySysNum, SensibleLoad, PartLoadRatio)
-                                    this->setSpeedVariables(state, true, TempMaxPLR);
-                                    this->calcUnitarySystemToLoad(state,
-                                                                  AirLoopNum,
-                                                                  FirstHVACIteration,
-                                                                  CoolPLR,
-                                                                  TempMaxPLR,
-                                                                  OnOffAirFlowRatio,
-                                                                  TempSensOutput,
-                                                                  TempLatOutput,
-                                                                  HXUnitOn,
-                                                                  HeatCoilLoad,
-                                                                  SupHeaterLoad,
-                                                                  CompressorONFlag);
-                                }
-                                TempMinPLR = TempMaxPLR;
-                                while ((TempSensOutput - ZoneLoad) > 0.0 && TempMinPLR > 0.0) {
-                                    // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
-                                    TempMaxPLR = TempMinPLR;
-                                    // find minimum limit of HeatingPLR
-                                    TempMinPLR -= 0.01;
-                                    this->setSpeedVariables(state, true, TempMinPLR);
-                                    this->calcUnitarySystemToLoad(state,
-                                                                  AirLoopNum,
-                                                                  FirstHVACIteration,
-                                                                  CoolPLR,
-                                                                  TempMinPLR,
-                                                                  OnOffAirFlowRatio,
-                                                                  TempSensOutput,
-                                                                  TempLatOutput,
-                                                                  HXUnitOn,
-                                                                  HeatCoilLoad,
-                                                                  SupHeaterLoad,
-                                                                  CompressorONFlag);
-                                }
-                                // Now solve again with tighter PLR limits
-                                auto f2 = // (AUTO_OK_LAMBDA)
-                                    [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
-                                        Real64 const PartLoadRatio) {
-                                        return UnitarySys::calcUnitarySystemLoadResidual(state,
-                                                                                         PartLoadRatio,
-                                                                                         this->m_UnitarySysNum,
-                                                                                         FirstHVACIteration,
-                                                                                         // par 3 not used?
-                                                                                         CompressorONFlag,
-                                                                                         ZoneLoad,
-                                                                                         par6,
-                                                                                         1.0,
-                                                                                         OnOffAirFlowRatio,
-                                                                                         HXUnitOn,
-                                                                                         // par 10 not used
-                                                                                         AirLoopNum);
-                                    };
-                                General::SolveRoot(state, this->m_HeatConvTol, MaxIter, SolFlag, HeatPLR, f2, TempMinPLR, TempMaxPLR);
-                                this->calcUnitarySystemToLoad(state,
-                                                              AirLoopNum,
-                                                              FirstHVACIteration,
-                                                              CoolPLR,
-                                                              HeatPLR,
-                                                              OnOffAirFlowRatio,
-                                                              TempSensOutput,
-                                                              TempLatOutput,
-                                                              HXUnitOn,
-                                                              HeatCoilLoad,
-                                                              SupHeaterLoad,
-                                                              CompressorONFlag);
-                            } else if (state.dataUnitarySystems->CoolingLoad) {
-                                // RegulaFalsi may not find cooling PLR when the latent degradation model is used.
-                                // IF iteration limit is exceeded (SolFlag = -1), find tighter boundary of solution and repeat RegulaFalsi
-                                TempMaxPLR = -0.1;
-                                TempSysOutput = SensOutputOff;
-                                TempLoad = ZoneLoad;
-                                while ((TempSysOutput - TempLoad) > 0.0 &&
-                                       TempMaxPLR < 0.95) { // avoid PLR > 1 by limiting TempMaxPLR to 1 (i.e., TempMaxPLR += 0.1)
-                                    // find upper limit of HeatingPLR
-                                    TempMaxPLR += 0.1;
-                                    if (TempMaxPLR > 0.95 && TempMaxPLR < 1.05) {
-                                        TempMaxPLR = 1.0; // enforce a perfect 1.0 at the top end
-                                    }
-                                    this->setSpeedVariables(state, true, TempMaxPLR);
-                                    this->calcUnitarySystemToLoad(state,
-                                                                  AirLoopNum,
-                                                                  FirstHVACIteration,
-                                                                  TempMaxPLR,
-                                                                  HeatPLR,
-                                                                  OnOffAirFlowRatio,
-                                                                  TempSensOutput,
-                                                                  TempLatOutput,
-                                                                  HXUnitOn,
-                                                                  HeatCoilLoad,
-                                                                  SupHeaterLoad,
-                                                                  CompressorONFlag);
-                                    TempSysOutput = TempSensOutput;
-                                }
-                                TempMinPLR = TempMaxPLR;
-                                while ((TempSysOutput - TempLoad) < 0.0 &&
-                                       TempMinPLR > 0.025) { // lower limit might be changed to 0.005 without adverse affect
-                                    // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
-                                    TempMaxPLR = TempMinPLR;
-                                    // find minimum limit of HeatingPLR
-                                    TempMinPLR -= 0.01;
-                                    this->setSpeedVariables(state, true, TempMinPLR);
-                                    this->calcUnitarySystemToLoad(state,
-                                                                  AirLoopNum,
-                                                                  FirstHVACIteration,
-                                                                  TempMinPLR,
-                                                                  HeatPLR,
-                                                                  OnOffAirFlowRatio,
-                                                                  TempSensOutput,
-                                                                  TempLatOutput,
-                                                                  HXUnitOn,
-                                                                  HeatCoilLoad,
-                                                                  SupHeaterLoad,
-                                                                  CompressorONFlag);
-                                    TempSysOutput = TempSensOutput;
-                                }
-                                // Now solve again with tighter PLR limits
-                                auto f2 = // (AUTO_OK_LAMBDA)
-                                    [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
-                                        Real64 const PartLoadRatio) {
-                                        return UnitarySys::calcUnitarySystemLoadResidual(state,
-                                                                                         PartLoadRatio,
-                                                                                         this->m_UnitarySysNum,
-                                                                                         FirstHVACIteration,
-                                                                                         // par 3 not used?
-                                                                                         CompressorONFlag,
-                                                                                         ZoneLoad,
-                                                                                         par6,
-                                                                                         1.0,
-                                                                                         OnOffAirFlowRatio,
-                                                                                         HXUnitOn,
-                                                                                         // par 10 not used
-                                                                                         AirLoopNum);
-                                    };
-                                General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, CoolPLR, f2, TempMinPLR, TempMaxPLR);
-                                this->calcUnitarySystemToLoad(state,
-                                                              AirLoopNum,
-                                                              FirstHVACIteration,
-                                                              CoolPLR,
-                                                              HeatPLR,
-                                                              OnOffAirFlowRatio,
-                                                              TempSensOutput,
-                                                              TempLatOutput,
-                                                              HXUnitOn,
-                                                              HeatCoilLoad,
-                                                              SupHeaterLoad,
-                                                              CompressorONFlag);
-                            } // IF(HeatingLoad)THEN
                             if (SolFlag == -1) {
-                                if (std::abs(ZoneLoad - TempSensOutput) > HVAC::SmallLoad) {
-                                    if (this->MaxIterIndex == 0) {
-                                        ShowWarningMessage(state, format("Coil control failed to converge for {}:{}", this->UnitType, this->Name));
-                                        ShowContinueError(state, "  Iteration limit exceeded in calculating system sensible part-load ratio.");
-                                        ShowContinueErrorTimeStamp(state,
-                                                                   format("Sensible load to be met = {:.2T} (watts), sensible output = {:.2T} "
-                                                                          "(watts), and the simulation continues.",
-                                                                          ZoneLoad,
-                                                                          TempSensOutput));
+                                if (state.dataUnitarySystems->HeatingLoad) {
+                                    // IF iteration limit is exceeded, find tighter boundary of solution and repeat RegulaFalsi
+                                    // This does cause a problem when coil cannot turn on when OAT < min allowed or scheduled off
+                                    // If max iteration limit is exceeded, how do we know if the heating coil is operating?
+                                    TempMaxPLR = -0.1;
+                                    TempSensOutput = SensOutputOff;
+                                    while ((TempSensOutput - ZoneLoad) < 0.0 && TempMaxPLR < 1.0) {
+                                        // find upper limit of HeatingPLR
+                                        TempMaxPLR += 0.1;
+
+                                        // SUBROUTINE SetSpeedVariables(UnitarySysNum, SensibleLoad, PartLoadRatio)
+                                        this->setSpeedVariables(state, true, TempMaxPLR);
+                                        this->calcUnitarySystemToLoad(state,
+                                                                      AirLoopNum,
+                                                                      FirstHVACIteration,
+                                                                      CoolPLR,
+                                                                      TempMaxPLR,
+                                                                      OnOffAirFlowRatio,
+                                                                      TempSensOutput,
+                                                                      TempLatOutput,
+                                                                      HXUnitOn,
+                                                                      HeatCoilLoad,
+                                                                      SupHeaterLoad,
+                                                                      CompressorONFlag);
                                     }
-                                    ShowRecurringWarningErrorAtEnd(state,
-                                                                   this->UnitType + " \"" + this->Name +
-                                                                       "\" - Iteration limit exceeded in calculating sensible part-load ratio error "
-                                                                       "continues. Sensible load statistics:",
-                                                                   this->MaxIterIndex,
-                                                                   ZoneLoad,
-                                                                   ZoneLoad);
+                                    TempMinPLR = TempMaxPLR;
+                                    while ((TempSensOutput - ZoneLoad) > 0.0 && TempMinPLR > 0.0) {
+                                        // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
+                                        TempMaxPLR = TempMinPLR;
+                                        // find minimum limit of HeatingPLR
+                                        TempMinPLR -= 0.01;
+                                        this->setSpeedVariables(state, true, TempMinPLR);
+                                        this->calcUnitarySystemToLoad(state,
+                                                                      AirLoopNum,
+                                                                      FirstHVACIteration,
+                                                                      CoolPLR,
+                                                                      TempMinPLR,
+                                                                      OnOffAirFlowRatio,
+                                                                      TempSensOutput,
+                                                                      TempLatOutput,
+                                                                      HXUnitOn,
+                                                                      HeatCoilLoad,
+                                                                      SupHeaterLoad,
+                                                                      CompressorONFlag);
+                                    }
+                                    // Now solve again with tighter PLR limits
+                                    auto f2 = // (AUTO_OK_LAMBDA)
+                                        [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                            Real64 const PartLoadRatio) {
+                                            return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                                             PartLoadRatio,
+                                                                                             this->m_UnitarySysNum,
+                                                                                             FirstHVACIteration,
+                                                                                             // par 3 not used?
+                                                                                             CompressorONFlag,
+                                                                                             ZoneLoad,
+                                                                                             par6,
+                                                                                             1.0,
+                                                                                             OnOffAirFlowRatio,
+                                                                                             HXUnitOn,
+                                                                                             // par 10 not used
+                                                                                             AirLoopNum);
+                                        };
+                                    General::SolveRoot(state, this->m_HeatConvTol, MaxIter, SolFlag, HeatPLR, f2, TempMinPLR, TempMaxPLR);
+                                    this->calcUnitarySystemToLoad(state,
+                                                                  AirLoopNum,
+                                                                  FirstHVACIteration,
+                                                                  CoolPLR,
+                                                                  HeatPLR,
+                                                                  OnOffAirFlowRatio,
+                                                                  TempSensOutput,
+                                                                  TempLatOutput,
+                                                                  HXUnitOn,
+                                                                  HeatCoilLoad,
+                                                                  SupHeaterLoad,
+                                                                  CompressorONFlag);
+                                } else if (state.dataUnitarySystems->CoolingLoad) {
+                                    // RegulaFalsi may not find cooling PLR when the latent degradation model is used.
+                                    // IF iteration limit is exceeded (SolFlag = -1), find tighter boundary of solution and repeat RegulaFalsi
+                                    TempMaxPLR = -0.1;
+                                    TempSysOutput = SensOutputOff;
+                                    TempLoad = ZoneLoad;
+                                    while ((TempSysOutput - TempLoad) > 0.0 &&
+                                           TempMaxPLR < 0.95) { // avoid PLR > 1 by limiting TempMaxPLR to 1 (i.e., TempMaxPLR += 0.1)
+                                        // find upper limit of HeatingPLR
+                                        TempMaxPLR += 0.1;
+                                        if (TempMaxPLR > 0.95 && TempMaxPLR < 1.05) {
+                                            TempMaxPLR = 1.0; // enforce a perfect 1.0 at the top end
+                                        }
+                                        this->setSpeedVariables(state, true, TempMaxPLR);
+                                        this->calcUnitarySystemToLoad(state,
+                                                                      AirLoopNum,
+                                                                      FirstHVACIteration,
+                                                                      TempMaxPLR,
+                                                                      HeatPLR,
+                                                                      OnOffAirFlowRatio,
+                                                                      TempSensOutput,
+                                                                      TempLatOutput,
+                                                                      HXUnitOn,
+                                                                      HeatCoilLoad,
+                                                                      SupHeaterLoad,
+                                                                      CompressorONFlag);
+                                        TempSysOutput = TempSensOutput;
+                                    }
+                                    TempMinPLR = TempMaxPLR;
+                                    while ((TempSysOutput - TempLoad) < 0.0 &&
+                                           TempMinPLR > 0.025) { // lower limit might be changed to 0.005 without adverse affect
+                                        // pull upper limit of HeatingPLR down to last valid limit (i.e. heat output still exceeds SystemSensibleLoad)
+                                        TempMaxPLR = TempMinPLR;
+                                        // find minimum limit of HeatingPLR
+                                        TempMinPLR -= 0.01;
+                                        this->setSpeedVariables(state, true, TempMinPLR);
+                                        this->calcUnitarySystemToLoad(state,
+                                                                      AirLoopNum,
+                                                                      FirstHVACIteration,
+                                                                      TempMinPLR,
+                                                                      HeatPLR,
+                                                                      OnOffAirFlowRatio,
+                                                                      TempSensOutput,
+                                                                      TempLatOutput,
+                                                                      HXUnitOn,
+                                                                      HeatCoilLoad,
+                                                                      SupHeaterLoad,
+                                                                      CompressorONFlag);
+                                        TempSysOutput = TempSensOutput;
+                                    }
+                                    // Now solve again with tighter PLR limits
+                                    auto f2 = // (AUTO_OK_LAMBDA)
+                                        [&state, this, FirstHVACIteration, CompressorONFlag, ZoneLoad, par6, OnOffAirFlowRatio, HXUnitOn, AirLoopNum](
+                                            Real64 const PartLoadRatio) {
+                                            return UnitarySys::calcUnitarySystemLoadResidual(state,
+                                                                                             PartLoadRatio,
+                                                                                             this->m_UnitarySysNum,
+                                                                                             FirstHVACIteration,
+                                                                                             // par 3 not used?
+                                                                                             CompressorONFlag,
+                                                                                             ZoneLoad,
+                                                                                             par6,
+                                                                                             1.0,
+                                                                                             OnOffAirFlowRatio,
+                                                                                             HXUnitOn,
+                                                                                             // par 10 not used
+                                                                                             AirLoopNum);
+                                        };
+                                    General::SolveRoot(state, this->m_CoolConvTol, MaxIter, SolFlag, CoolPLR, f2, TempMinPLR, TempMaxPLR);
+                                    this->calcUnitarySystemToLoad(state,
+                                                                  AirLoopNum,
+                                                                  FirstHVACIteration,
+                                                                  CoolPLR,
+                                                                  HeatPLR,
+                                                                  OnOffAirFlowRatio,
+                                                                  TempSensOutput,
+                                                                  TempLatOutput,
+                                                                  HXUnitOn,
+                                                                  HeatCoilLoad,
+                                                                  SupHeaterLoad,
+                                                                  CompressorONFlag);
+                                } // IF(HeatingLoad)THEN
+                                if (SolFlag == -1) {
+                                    if (std::abs(ZoneLoad - TempSensOutput) > HVAC::SmallLoad) {
+                                        if (this->MaxIterIndex == 0) {
+                                            ShowWarningMessage(state,
+                                                               format("Coil control failed to converge for {}:{}", this->UnitType, this->Name));
+                                            ShowContinueError(state, "  Iteration limit exceeded in calculating system sensible part-load ratio.");
+                                            ShowContinueErrorTimeStamp(state,
+                                                                       format("Sensible load to be met = {:.2T} (watts), sensible output = {:.2T} "
+                                                                              "(watts), and the simulation continues.",
+                                                                              ZoneLoad,
+                                                                              TempSensOutput));
+                                        }
+                                        ShowRecurringWarningErrorAtEnd(
+                                            state,
+                                            this->UnitType + " \"" + this->Name +
+                                                "\" - Iteration limit exceeded in calculating sensible part-load ratio error "
+                                                "continues. Sensible load statistics:",
+                                            this->MaxIterIndex,
+                                            ZoneLoad,
+                                            ZoneLoad);
+                                    }
+                                } else if (SolFlag == -2) {
+                                    if (this->RegulaFalsiFailedIndex == 0) {
+                                        ShowWarningMessage(state, format("Coil control failed for {}:{}", this->UnitType, this->Name));
+                                        ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
+                                        ShowContinueErrorTimeStamp(
+                                            state, format("Sensible load to be met = {:.2T} (watts), and the simulation continues.", ZoneLoad));
+                                    }
+                                    ShowRecurringWarningErrorAtEnd(
+                                        state,
+                                        this->UnitType + " \"" + this->Name +
+                                            "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
+                                        this->RegulaFalsiFailedIndex,
+                                        ZoneLoad,
+                                        ZoneLoad);
                                 }
                             } else if (SolFlag == -2) {
                                 if (this->RegulaFalsiFailedIndex == 0) {
@@ -9479,22 +9522,8 @@ namespace UnitarySystems {
                                     this->RegulaFalsiFailedIndex,
                                     ZoneLoad,
                                     ZoneLoad);
-                            }
-                        } else if (SolFlag == -2) {
-                            if (this->RegulaFalsiFailedIndex == 0) {
-                                ShowWarningMessage(state, format("Coil control failed for {}:{}", this->UnitType, this->Name));
-                                ShowContinueError(state, "  sensible part-load ratio determined to be outside the range of 0-1.");
-                                ShowContinueErrorTimeStamp(
-                                    state, format("Sensible load to be met = {:.2T} (watts), and the simulation continues.", ZoneLoad));
-                            }
-                            ShowRecurringWarningErrorAtEnd(
-                                state,
-                                this->UnitType + " \"" + this->Name +
-                                    "\" - sensible part-load ratio out of range error continues. Sensible load statistics:",
-                                this->RegulaFalsiFailedIndex,
-                                ZoneLoad,
-                                ZoneLoad);
-                        } // IF (SolFlag == -1) THEN
+                            } // IF (SolFlag == -1) THEN
+                        }
                     }
                 } else { // load is not bounded by capacity. Leave PLR=1 or turn off unit?
                     this->m_CoolingPartLoadFrac = 0.0;
