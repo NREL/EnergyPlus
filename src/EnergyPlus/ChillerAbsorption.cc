@@ -725,8 +725,7 @@ void BLASTAbsorberSpecs::oneTimeInit(EnergyPlusData &state)
             } else {
                 // need call to EMS to check node
                 bool FatalError = false; // but not really fatal yet, but should be.
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, this->EvapOutletNodeNum, EMSManager::SPControlType::TemperatureSetPoint, FatalError);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, this->EvapOutletNodeNum, HVAC::CtrlVarType::Temp, FatalError);
                 state.dataLoopNodes->NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                 if (FatalError) {
                     if (!this->ModulatedFlowErrDone) {

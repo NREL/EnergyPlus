@@ -5741,11 +5741,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
             bool EMSSetPointErrorFlag = false;
             switch (ControlledVar) {
             case HVACControllers::CtrlVarType::Temperature: {
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, SetPointManager::CtrlVarType::Temp)) {
+                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, HVAC::CtrlVarType::Temp)) {
                         std::string_view WaterCoilType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType)];
                         ShowWarningError(state, format("{}{}=\"{}\". ", RoutineName, WaterCoilType, state.dataWaterCoils->WaterCoil(WhichCoil).Name));
@@ -5758,11 +5757,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 break;
             }
             case HVACControllers::CtrlVarType::HumidityRatio: {
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, HVAC::CtrlVarType::MaxHumRat, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, SetPointManager::CtrlVarType::MaxHumRat)) {
+                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, HVAC::CtrlVarType::MaxHumRat)) {
                         std::string_view WaterCoilType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType)];
                         ShowWarningError(state, format("{}{}=\"{}\". ", RoutineName, WaterCoilType, state.dataWaterCoils->WaterCoil(WhichCoil).Name));
@@ -5775,11 +5773,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                 break;
             }
             case HVACControllers::CtrlVarType::TemperatureAndHumidityRatio: {
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, SensorNodeNum, EMSManager::SPControlType::TemperatureSetPoint, EMSSetPointErrorFlag);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, HVAC::CtrlVarType::Temp, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, SetPointManager::CtrlVarType::Temp)) {
+                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, HVAC::CtrlVarType::Temp)) {
                         std::string_view WaterCoilType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType)];
                         ShowWarningError(state, format("{}{}=\"{}\". ", RoutineName, WaterCoilType, state.dataWaterCoils->WaterCoil(WhichCoil).Name));
@@ -5790,11 +5787,10 @@ void CheckForSensorAndSetPointNode(EnergyPlusData &state,
                     }
                 }
                 EMSSetPointErrorFlag = false;
-                EMSManager::CheckIfNodeSetPointManagedByEMS(
-                    state, SensorNodeNum, EMSManager::SPControlType::HumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                EMSManager::CheckIfNodeSetPointManagedByEMS(state, SensorNodeNum, HVAC::CtrlVarType::MaxHumRat, EMSSetPointErrorFlag);
                 state.dataLoopNodes->NodeSetpointCheck(SensorNodeNum).needsSetpointChecking = false;
                 if (EMSSetPointErrorFlag) {
-                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, SetPointManager::CtrlVarType::MaxHumRat)) {
+                    if (!SetPointManager::NodeHasSPMCtrlVarType(state, SensorNodeNum, HVAC::CtrlVarType::MaxHumRat)) {
                         std::string_view WaterCoilType =
                             DataPlant::PlantEquipTypeNames[static_cast<int>(state.dataWaterCoils->WaterCoil(WhichCoil).WaterCoilType)];
                         ShowWarningError(state, format("{}{}=\"{}\". ", RoutineName, WaterCoilType, state.dataWaterCoils->WaterCoil(WhichCoil).Name));

@@ -3924,12 +3924,13 @@ namespace SurfaceGeometry {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = Ground;
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!state.dataEnvrn->GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
                             ShowWarningError(state,
                                              "GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, format("Found first in surface={}", state.dataIPShortCut->cAlphaArgs(1)));
-                            ShowContinueError(
-                                state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
+                            ShowContinueError(state,
+                                              format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                                     state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
@@ -3938,7 +3939,7 @@ namespace SurfaceGeometry {
                 } else if (Util::SameString(state.dataIPShortCut->cAlphaArgs(ArgPointer), "GroundFCfactorMethod")) {
                     state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond = GroundFCfactorMethod;
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!state.dataEnvrn->FCGroundTemps) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::FCFactorMethod]) {
                             ShowSevereError(state,
                                             "GetHTSurfaceData: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
@@ -4594,19 +4595,20 @@ namespace SurfaceGeometry {
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == Ground) {
 
                     if (state.dataSurfaceGeometry->NoGroundTempObjWarning) {
-                        if (!state.dataEnvrn->GroundTempObjInput) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::BuildingSurface]) {
                             ShowWarningError(state,
                                              "GetRectSurfaces: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.");
                             ShowContinueError(state, format("Found first in surface={}", state.dataIPShortCut->cAlphaArgs(1)));
-                            ShowContinueError(
-                                state, format("Defaults, constant throughout the year of ({:.1R}) will be used.", state.dataEnvrn->GroundTemp));
+                            ShowContinueError(state,
+                                              format("Defaults, constant throughout the year of ({:.1R}) will be used.",
+                                                     state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface]));
                         }
                         state.dataSurfaceGeometry->NoGroundTempObjWarning = false;
                     }
 
                 } else if (state.dataSurfaceGeometry->SurfaceTmp(SurfNum).ExtBoundCond == GroundFCfactorMethod) {
                     if (state.dataSurfaceGeometry->NoFCGroundTempObjWarning) {
-                        if (!state.dataEnvrn->FCGroundTemps) {
+                        if (!state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::FCFactorMethod]) {
                             ShowSevereError(state,
                                             "GetRectSurfaces: Surfaces with interface to GroundFCfactorMethod found but no \"FC Ground "
                                             "Temperatures\" were input.");
