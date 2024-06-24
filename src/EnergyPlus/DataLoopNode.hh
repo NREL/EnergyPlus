@@ -537,9 +537,13 @@ struct LoopNodeData : BaseGlobalStruct
     Array1D<DataLoopNode::MarkedNodeData> MarkedNode;
     Array1D<DataLoopNode::NodeSetpointCheckData> NodeSetpointCheck;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = LoopNodeData();
+        new (this) LoopNodeData();
     }
 };
 

@@ -2463,25 +2463,28 @@ namespace SurfaceGeometry {
                         // Use the new generic code (assuming only one blind) as follows
                         for (iTmp1 = 1; iTmp1 <= state.dataConstruction->Construct(ConstrNumSh).TotLayers; ++iTmp1) {
                             iTmp2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(iTmp1);
-                            auto *thisMaterial = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(iTmp2));
-                            assert(thisMaterial != nullptr);
-                            if (thisMaterial->group == Material::Group::WindowBlind) {
-                                BlNum = thisMaterial->BlindDataPtr;
-                                state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
-                                // TH 2/18/2010. CR 8010
-                                // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
-                                //  the new blind is created only once, it can be shared by multiple windows though.
-                                if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
-                                    state.dataMaterial->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
-                                    errFlag = false;
-                                    AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
-                                    // point to the new blind
-                                    thisMaterial->BlindDataPtr = BlNumNew;
-                                    // window surface points to new blind
-                                    state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
-                                }
-                                break;
+                            auto *mat = state.dataMaterial->Material(iTmp2);
+
+                            if (mat->group != Material::Group::WindowBlind) continue;
+
+                            auto *matBlind = dynamic_cast<Material::MaterialChild *>(mat);
+                            assert(matBlind != nullptr);
+
+                            BlNum = matBlind->BlindDataPtr;
+                            state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNum;
+                            // TH 2/18/2010. CR 8010
+                            // if it is a blind with movable slats, create one new blind and set it to VariableSlat if not done so yet.
+                            //  the new blind is created only once, it can be shared by multiple windows though.
+                            if (state.dataSurface->SurfWinMovableSlats(SurfNum) &&
+                                state.dataMaterial->Blind(BlNum).SlatAngleType != DataWindowEquivalentLayer::AngleType::Variable) {
+                                errFlag = false;
+                                AddVariableSlatBlind(state, BlNum, BlNumNew, errFlag);
+                                // point to the new blind
+                                matBlind->BlindDataPtr = BlNumNew;
+                                // window surface points to new blind
+                                state.dataSurface->SurfWinBlindNumber(SurfNum) = BlNumNew;
                             }
+                            break;
                         }
 
                         if (errFlag) {
@@ -11044,7 +11047,8 @@ namespace SurfaceGeometry {
                     MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(2);
                     if (state.dataConstruction->Construct(ConstrNum).TotGlassLayers == 3)
                         MatGapFlow = state.dataConstruction->Construct(ConstrNum).LayerPoint(4);
-                    if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow))->gasTypes(1) != Material::GasType::Air) {
+                    if (dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(MatGapFlow))->gases[0].type !=
+                        Material::GasType::Air) {
                         ErrorsFound = true;
                         ShowSevereError(state,
                                         format("{}=\"{}\", Gas type not air in airflow gap of construction {}",
@@ -11065,9 +11069,9 @@ namespace SurfaceGeometry {
                                     MatGapFlow1 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(4);
                                     MatGapFlow2 = state.dataConstruction->Construct(ConstrNumSh).LayerPoint(6);
                                 }
-                                if (dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow1))->gasTypes(1) !=
+                                if (dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(MatGapFlow1))->gases[0].type !=
                                         Material::GasType::Air ||
-                                    dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(MatGapFlow2))->gasTypes(1) !=
+                                    dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(MatGapFlow2))->gases[0].type !=
                                         Material::GasType::Air) {
                                     ErrorsFound = true;
                                     ShowSevereError(state,
@@ -14036,7 +14040,7 @@ namespace SurfaceGeometry {
             // Create new material
             state.dataMaterial->TotMaterials = state.dataMaterial->TotMaterials + 1;
             newAirMaterial = state.dataMaterial->TotMaterials;
-            auto *thisMaterial = new Material::MaterialChild;
+            auto *thisMaterial = new Material::MaterialGasMix;
             state.dataMaterial->Material.push_back(thisMaterial);
             state.dataHeatBal->NominalR.redimension(state.dataMaterial->TotMaterials);
             thisMaterial->Name = MatNameStAir;
@@ -14044,58 +14048,45 @@ namespace SurfaceGeometry {
             thisMaterial->Roughness = Material::SurfaceRoughness::MediumRough;
             thisMaterial->Conductivity = 0.0;
             thisMaterial->Density = 0.0;
-            thisMaterial->IsoMoistCap = 0.0;
-            thisMaterial->Porosity = 0.0;
+            // thisMaterial->IsoMoistCap = 0.0;
+            // thisMaterial->Porosity = 0.0;
             thisMaterial->Resistance = 0.0;
             thisMaterial->SpecHeat = 0.0;
-            thisMaterial->ThermGradCoef = 0.0;
+            // thisMaterial->ThermGradCoef = 0.0;
             thisMaterial->Thickness = distance;
-            thisMaterial->VaporDiffus = 0.0;
-            thisMaterial->gasTypes = Material::GasType::Custom;
-            thisMaterial->GasCon = 0.0;
-            thisMaterial->GasVis = 0.0;
-            thisMaterial->GasCp = 0.0;
-            thisMaterial->GasWght = 0.0;
-            thisMaterial->GasFract = 0.0;
-            thisMaterial->gasTypes(1) = Material::GasType::Air;
-            thisMaterial->GlassSpectralDataPtr = 0;
-            thisMaterial->NumberOfGasesInMixture = 1;
-            thisMaterial->GasCon(1, 1) = 2.873e-3;
-            thisMaterial->GasCon(2, 1) = 7.760e-5;
-            thisMaterial->GasVis(1, 1) = 3.723e-6;
-            thisMaterial->GasVis(2, 1) = 4.940e-8;
-            thisMaterial->GasCp(1, 1) = 1002.737;
-            thisMaterial->GasCp(2, 1) = 1.2324e-2;
-            thisMaterial->GasWght(1) = 28.97;
-            thisMaterial->GasFract(1) = 1.0;
+            // thisMaterial->VaporDiffus = 0.0;
+            // thisMaterial->GlassSpectralDataPtr = 0;
+            thisMaterial->numGases = 1;
+            thisMaterial->gases[0] = Material::gases[(int)Material::GasType::Air];
+            thisMaterial->gasFracts[0] = 1.0;
             thisMaterial->AbsorpSolar = 0.0;
             thisMaterial->AbsorpThermal = 0.0;
             thisMaterial->AbsorpVisible = 0.0;
             thisMaterial->Trans = 0.0;
             thisMaterial->TransVis = 0.0;
-            thisMaterial->GlassTransDirtFactor = 0.0;
-            thisMaterial->ReflectShade = 0.0;
-            thisMaterial->ReflectShadeVis = 0.0;
-            thisMaterial->AbsorpThermalBack = 0.0;
-            thisMaterial->AbsorpThermalFront = 0.0;
-            thisMaterial->ReflectSolBeamBack = 0.0;
-            thisMaterial->ReflectSolBeamFront = 0.0;
-            thisMaterial->ReflectSolDiffBack = 0.0;
-            thisMaterial->ReflectSolDiffFront = 0.0;
-            thisMaterial->ReflectVisBeamBack = 0.0;
-            thisMaterial->ReflectVisBeamFront = 0.0;
-            thisMaterial->ReflectVisDiffBack = 0.0;
-            thisMaterial->ReflectVisDiffFront = 0.0;
-            thisMaterial->TransSolBeam = 0.0;
-            thisMaterial->TransThermal = 0.0;
-            thisMaterial->TransVisBeam = 0.0;
-            thisMaterial->BlindDataPtr = 0;
-            thisMaterial->WinShadeToGlassDist = 0.0;
-            thisMaterial->WinShadeTopOpeningMult = 0.0;
-            thisMaterial->WinShadeBottomOpeningMult = 0.0;
-            thisMaterial->WinShadeLeftOpeningMult = 0.0;
-            thisMaterial->WinShadeRightOpeningMult = 0.0;
-            thisMaterial->WinShadeAirFlowPermeability = 0.0;
+            // thisMaterial->GlassTransDirtFactor = 0.0;
+            // thisMaterial->ReflectShade = 0.0;
+            // thisMaterial->ReflectShadeVis = 0.0;
+            // thisMaterial->AbsorpThermalBack = 0.0;
+            // thisMaterial->AbsorpThermalFront = 0.0;
+            // thisMaterial->ReflectSolBeamBack = 0.0;
+            // thisMaterial->ReflectSolBeamFront = 0.0;
+            // thisMaterial->ReflectSolDiffBack = 0.0;
+            // thisMaterial->ReflectSolDiffFront = 0.0;
+            // thisMaterial->ReflectVisBeamBack = 0.0;
+            // thisMaterial->ReflectVisBeamFront = 0.0;
+            // thisMaterial->ReflectVisDiffBack = 0.0;
+            // thisMaterial->ReflectVisDiffFront = 0.0;
+            // thisMaterial->TransSolBeam = 0.0;
+            // thisMaterial->TransThermal = 0.0;
+            // thisMaterial->TransVisBeam = 0.0;
+            // thisMaterial->BlindDataPtr = 0;
+            // thisMaterial->WinShadeToGlassDist = 0.0;
+            // thisMaterial->WinShadeTopOpeningMult = 0.0;
+            // thisMaterial->WinShadeBottomOpeningMult = 0.0;
+            // thisMaterial->WinShadeLeftOpeningMult = 0.0;
+            // thisMaterial->WinShadeRightOpeningMult = 0.0;
+            // thisMaterial->WinShadeAirFlowPermeability = 0.0;
         }
         return (newAirMaterial);
     }

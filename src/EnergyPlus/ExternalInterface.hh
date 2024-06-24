@@ -392,6 +392,10 @@ struct ExternalInterfaceData : BaseGlobalStruct
     int nOutVal; // Number of output values (E+ -> ExternalInterface)
     int nInpVar; // Number of input values (ExternalInterface -> E+)
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->tComm = 0.0;

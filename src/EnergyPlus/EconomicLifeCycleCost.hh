@@ -512,6 +512,10 @@ struct EconomicLifeCycleCostData : BaseGlobalStruct
     EPVector<EconomicLifeCycleCost::UseAdjustmentType> UseAdjustment;
     std::vector<EconomicLifeCycleCost::CashFlowType> CashFlow;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->LCCparamPresent = false;

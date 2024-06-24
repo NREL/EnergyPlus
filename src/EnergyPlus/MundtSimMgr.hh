@@ -168,6 +168,10 @@ struct MundtSimMgrData : BaseGlobalStruct
     Array2D<RoomAir::DefineSurfaceSettings> MundtAirSurf; // surfaces
     Array1D<RoomAir::DefineSurfaceSettings> FloorSurf;    // floor
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->FloorSurfSetIDs.clear();   // fixed variable for floors

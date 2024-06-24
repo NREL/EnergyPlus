@@ -86,6 +86,10 @@ struct OutAirNodeManagerData : BaseGlobalStruct
     int NumOutsideAirNodes = 0;          // Number of single outside air nodes
     bool GetOutAirNodesInputFlag = true; // Flag set to make sure you get input once
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->OutsideAirNodeList.deallocate();

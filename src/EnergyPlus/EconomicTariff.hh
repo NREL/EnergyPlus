@@ -778,6 +778,10 @@ struct EconomicTariffData : BaseGlobalStruct
     EPVector<EconomicTariff::ComputationType> computation;
     Array1D<EconomicTariff::StackType> stack;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->numEconVar = 0;
