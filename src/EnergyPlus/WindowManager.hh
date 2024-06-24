@@ -555,6 +555,10 @@ struct WindowManagerData : BaseGlobalStruct
 
     std::array<int, Window::maxGlassLayers> LayerNum = {0}; // Glass layer number
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->ngllayer = 0;

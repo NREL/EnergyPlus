@@ -1009,6 +1009,10 @@ struct UnitarySystemsData : BaseGlobalStruct
     bool getInputFlag = true;
     bool setupOutputOnce = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         numUnitarySystems = 0;

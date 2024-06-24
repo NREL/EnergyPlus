@@ -226,6 +226,10 @@ struct FourPipeBeamData : BaseGlobalStruct
     ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
     Array1D<std::shared_ptr<FourPipeBeam::HVACFourPipeBeam>> FourPipeBeams; // dimension to number of machines
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         FourPipeBeams.clear();

@@ -185,6 +185,10 @@ struct NodeInputManagerData : BaseGlobalStruct
     std::vector<std::string> nodeReportingStrings;
     std::vector<std::string> nodeFluidNames;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->CalcMoreNodeInfoMyOneTimeFlag = true;

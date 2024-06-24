@@ -231,6 +231,10 @@ struct PlantUtilitiesData : BaseGlobalStruct
 
     Array1D<PlantUtilities::CriteriaData> CriteriaChecks; // stores criteria information
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->CriteriaChecks.deallocate();

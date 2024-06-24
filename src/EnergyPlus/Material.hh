@@ -713,6 +713,11 @@ struct MaterialData : BaseGlobalStruct
     EPVector<Material::WindowBlindProperties> Blind;
     EPVector<Material::WindowComplexShade> ComplexShade;
     EPVector<Material::WindowThermalModelParams> WindowThermalModel;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         for (int i = 0; i < TotMaterials; ++i) {

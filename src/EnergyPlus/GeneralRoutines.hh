@@ -220,6 +220,10 @@ struct GeneralRoutinesData : BaseGlobalStruct
     IntervalHalf ZoneInterHalf = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false, false, false, false};
     ZoneEquipControllerProps ZoneController = {0.0, 0.0, 0.0, 0.0, 0.0};
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->MyICSEnvrnFlag = true;

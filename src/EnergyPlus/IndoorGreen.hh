@@ -127,6 +127,11 @@ struct IndoorGreenData : BaseGlobalStruct
     int NumIndoorGreen = 0; // Number of Indoor Greenery Systems found in input
     bool getInputFlag = true;
     Array1D<IndoorGreen::IndoorGreenParams> indoorGreens;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) IndoorGreenData();
