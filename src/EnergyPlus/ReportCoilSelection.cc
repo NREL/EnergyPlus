@@ -917,46 +917,53 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
     // now search equipment
     auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
     bool keepLooking = true;
+    std::string fanType;
+    std::string fanName;
     for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
-        if (zoneEquipList.EquipName(equipLoop) == c->coilName_) {
-            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-            c->coilLocation = "Zone Equipment";
-            keepLooking = false;
-            break;
-        }
-        if (keepLooking) {
-            if (zoneEquipList.EquipData(equipLoop).Name == c->coilName_) {
+        for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
+            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).TypeOf == "FAN:SYSTEMMODEL") {
+                fanType = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).TypeOf;
+                fanName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name;
+            }
+            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name == c->coilName_) {
                 c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
                 c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
                 c->coilLocation = "Zone Equipment";
+                int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
+                if (c->zoneNum.empty()) c->zoneNum.resize(1);
+                c->zoneNum[0] = zoneEqListIndex;
+                if (c->zoneName.empty()) c->zoneName.resize(1);
+                c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
                 keepLooking = false;
+            }
+            if (!keepLooking) {
+                c->fanAssociatedWithCoilName = fanName;
+                c->fanTypeName = fanType;
                 break;
             }
             if (keepLooking) {
-                for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
-                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name == c->coilName_) {
+                for (int subsubEq = 1; subsubEq <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++subsubEq) {
+                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).TypeOf == "FAN:SYSTEMMODEL") {
+                        fanType = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).TypeOf;
+                        fanName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name;
+                    }
+                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name == c->coilName_) {
                         c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
                         c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
                         c->coilLocation = "Zone Equipment";
+                        int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
+                        if (c->zoneNum.empty()) c->zoneNum.resize(1);
+                        c->zoneNum[0] = zoneEqListIndex;
+                        if (c->zoneName.empty()) c->zoneName.resize(1);
+                        c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
                         keepLooking = false;
-                        break;
                     }
-                    if (keepLooking) {
-                        for (int subsubEq = 1; subsubEq <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++subsubEq) {
-                            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name == c->coilName_) {
-                                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                                c->coilLocation = "Zone Equipment";
-                                keepLooking = false;
-                                break;
-                            }
-                        }
-                        if (!keepLooking) break;
-                    }
-                    if (!keepLooking) break;
                 }
-                if (!keepLooking) break;
+                if (!keepLooking) {
+                    c->fanAssociatedWithCoilName = fanName;
+                    c->fanTypeName = fanType;
+                    break;
+                }
             }
             if (!keepLooking) break;
         }
