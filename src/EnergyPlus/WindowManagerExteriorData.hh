@@ -101,7 +101,7 @@ class CMultiLayerScattered;
 
 namespace EnergyPlus {
 
-namespace WindowManager {
+namespace Window {
 
     // using IGU_BSDFLayers = std::vector< std::shared_ptr< SingleLayerOptics::CBSDFLayer > >;
     using IGU_Layers = std::vector<SingleLayerOptics::CScatteringLayer>;
@@ -160,11 +160,11 @@ namespace WindowManager {
         std::map<std::pair<FenestrationCommon::WavelengthRange, int>, std::shared_ptr<MultiLayerOptics::CMultiLayerScattered>> m_Equivalent;
     };
 
-} // namespace WindowManager
+} // namespace Window
 
 struct WindowManagerExteriorData : BaseGlobalStruct
 {
-    std::unique_ptr<WindowManager::CWindowConstructionsSimplified> p_inst;
+    std::unique_ptr<Window::CWindowConstructionsSimplified> p_inst;
     void clear_state() override
     {
         new (this) WindowManagerExteriorData();
