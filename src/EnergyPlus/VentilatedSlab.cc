@@ -1290,6 +1290,7 @@ namespace VentilatedSlab {
                 break;
             }
             case CoilType::Heating: { // 'Heating'
+                // Add heating coil to component sets array when no cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
                               ventSlab.Name,
