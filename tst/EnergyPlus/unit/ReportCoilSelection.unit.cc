@@ -977,9 +977,11 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     zoneEquipList.EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
     zoneEquipList.EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
     zoneEquipList.EquipData(1).Name = "ZoneHVAC:FourPipeFanCoil";
-    zoneEquipList.EquipData(1).NumSubEquip = 1;
-    zoneEquipList.EquipData(1).SubEquipData.allocate(1);
+    zoneEquipList.EquipData(1).NumSubEquip = 2;
+    zoneEquipList.EquipData(1).SubEquipData.allocate(2);
     zoneEquipList.EquipData(1).SubEquipData(1).Name = "ElecHeatCoil";
+    zoneEquipList.EquipData(1).SubEquipData(2).Name = "MyFan1";
+    zoneEquipList.EquipData(1).SubEquipData(2).TypeOf = "FAN:ONOFF";
 
     // test that 1 equipment in the equipment list has data that is read from EquipmentList data.
     EXPECT_TRUE(Util::SameString(c1->coilLocation, "unknown"));
@@ -992,6 +994,8 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c1->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
     EXPECT_TRUE(Util::SameString(c1->userNameforHVACsystem, "Zone 1 FCU"));
     EXPECT_TRUE(Util::SameString(c1->zoneName[0], "ThisZone"));
+    EXPECT_TRUE(Util::SameString(c1->fanTypeName, "FAN:ONOFF"));
+    EXPECT_TRUE(Util::SameString(c1->fanAssociatedWithCoilName, "MyFan1"));
 
     // add another coil and hvac system and increase equipment list to 2
     zoneEquipList.NumOfEquipTypes = 2;
@@ -1012,9 +1016,11 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     zoneEquipList.EquipTypeName(1) = "ZoneHVAC:FourPipeFanCoil";
     zoneEquipList.EquipType(1) = DataZoneEquipment::ZoneEquipType::FourPipeFanCoil;
     zoneEquipList.EquipData(1).Name = "ZoneHVAC:FourPipeFanCoil";
-    zoneEquipList.EquipData(1).NumSubEquip = 1;
-    zoneEquipList.EquipData(1).SubEquipData.allocate(1);
+    zoneEquipList.EquipData(1).NumSubEquip = 2;
+    zoneEquipList.EquipData(1).SubEquipData.allocate(2);
     zoneEquipList.EquipData(1).SubEquipData(1).Name = coil1Name;
+    zoneEquipList.EquipData(1).SubEquipData(2).Name = "MyFan1";
+    zoneEquipList.EquipData(1).SubEquipData(2).TypeOf = "FAN:ONOFF";
 
     zoneEquipList.EquipName(2) = "Zone 1 ADU";
     zoneEquipList.EquipTypeName(2) = "ZoneHVAC:AirDistributionUnit";
@@ -1044,6 +1050,8 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c1a->userNameforHVACsystem, "Zone 1 FCU"));
     EXPECT_TRUE(Util::SameString(c1a->coilName_, coil1Name));
     EXPECT_TRUE(Util::SameString(c1a->zoneName[0], "ThisZone"));
+    EXPECT_TRUE(Util::SameString(c1a->fanTypeName, "FAN:ONOFF"));
+    EXPECT_TRUE(Util::SameString(c1a->fanAssociatedWithCoilName, "MyFan1"));
 
     EXPECT_TRUE(Util::SameString(c2a->coilLocation, "Zone Equipment"));
     EXPECT_TRUE(Util::SameString(c2a->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
@@ -1106,4 +1114,6 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 FCU"));
     EXPECT_TRUE(Util::SameString(c2b->coilName_, coil1Name));
     EXPECT_TRUE(Util::SameString(c2b->zoneName[0], "ThisZone"));
+    EXPECT_TRUE(Util::SameString(c2b->fanTypeName, "FAN:ONOFF"));
+    EXPECT_TRUE(Util::SameString(c2b->fanAssociatedWithCoilName, "MyFan1"));
 }

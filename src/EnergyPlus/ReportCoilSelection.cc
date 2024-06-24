@@ -913,14 +913,11 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
     // now search equipment
     auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
     bool keepLooking = true;
+    bool fanFound = false;
     std::string fanType;
     std::string fanName;
     for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
         for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
-            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).TypeOf == "FAN:SYSTEMMODEL") {
-                fanType = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).TypeOf;
-                fanName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name;
-            }
             if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name == c->coilName_) {
                 c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
                 c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
@@ -933,16 +930,22 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
                 keepLooking = false;
             }
             if (!keepLooking) {
-                c->fanAssociatedWithCoilName = fanName;
-                c->fanTypeName = fanType;
+                // if coil is found look in this same list for a fan
+                for (int fanEqNum = 1; fanEqNum <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++fanEqNum) {
+                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:SYSTEMMODEL" ||
+                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:ONOFF" ||
+                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:CONSTANTVOLUME" ||
+                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:VARIABLEVOLUME" ||
+                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:COMPONENTMODEL") {
+                        c->fanTypeName = zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf;
+                        c->fanAssociatedWithCoilName = zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).Name;
+                        break;
+                    }
+                }
                 break;
             }
             if (keepLooking) {
                 for (int subsubEq = 1; subsubEq <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++subsubEq) {
-                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).TypeOf == "FAN:SYSTEMMODEL") {
-                        fanType = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).TypeOf;
-                        fanName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name;
-                    }
                     if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name == c->coilName_) {
                         c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
                         c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
@@ -956,8 +959,18 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
                     }
                 }
                 if (!keepLooking) {
-                    c->fanAssociatedWithCoilName = fanName;
-                    c->fanTypeName = fanType;
+                    // if coil is found look in this same list for a fan
+                    for (int fanEqNum = 1; fanEqNum <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++fanEqNum) {
+                        if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:SYSTEMMODEL" ||
+                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:ONOFF" ||
+                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:CONSTANTVOLUME" ||
+                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:VARIABLEVOLUME" ||
+                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:COMPONENTMODEL") {
+                            c->fanTypeName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf;
+                            c->fanAssociatedWithCoilName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).Name;
+                            break;
+                        }
+                    }
                     break;
                 }
             }
