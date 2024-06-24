@@ -578,6 +578,7 @@ namespace Constant {
     Real64 constexpr TwoPi = 2.0 * Pi;         // 2*Pi 6.2831853071795864769252868
     Real64 constexpr GravityConstant = 9.807;
     Real64 constexpr DegToRadians = Pi / 180.0;                           // Conversion for Degrees to Radians
+    Real64 constexpr DegToRad = Pi / 180.0;                               // Why is it DegToRadians and RadToDeg? Why? WHY?
     Real64 constexpr RadToDeg = 180.0 / Pi;                               // Conversion for Radians to Degrees
     Real64 constexpr SecInHour = 3600.0;                                  // Conversion for hours to seconds
     Real64 constexpr HoursInDay = 24.0;                                   // Number of Hours in Day

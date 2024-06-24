@@ -376,6 +376,10 @@ struct ThermalComfortsData : BaseGlobalStruct
     bool useEpwDataCEN = false;
     bool firstDaySet = false; // first day is set with initiate -- so do not update
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) ThermalComfortsData();

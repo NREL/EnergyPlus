@@ -162,9 +162,13 @@ struct BoilerSteamData : BaseGlobalStruct
     bool getSteamBoilerInput = true;
     Array1D<BoilerSteam::BoilerSpecs> Boiler;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = BoilerSteamData();
+        new (this) BoilerSteamData();
     }
 };
 

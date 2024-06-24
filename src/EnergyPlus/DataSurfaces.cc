@@ -84,7 +84,7 @@ using namespace DataZoneEquipment;
 using namespace DataLoopNode;
 using namespace Psychrometrics;
 using namespace DataEnvironment;
-using namespace WindowManager;
+using namespace Window;
 
 Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
@@ -326,11 +326,11 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
         Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
-        value = state.dataWindowManager->sigma * pow_4(tout);
-        value = ViewFactorSkyIR *
-                    (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                     (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
-                ViewFactorGroundIR * value;
+        value = Constant::StefanBoltzmann * pow_4(tout);
+        value =
+            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * Constant::StefanBoltzmann * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
+            ViewFactorGroundIR * value;
     }
     return value;
 }

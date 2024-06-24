@@ -98,6 +98,10 @@ struct TARCOGGasses90Data : BaseGlobalStruct
     Array1D<Real64> kpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
     Array1D<Real64> kdpdown = Array1D<Real64>(TARCOGGassesParams::maxgas);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         fvis = Array1D<Real64>(TARCOGGassesParams::maxgas);
