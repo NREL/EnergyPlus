@@ -130,7 +130,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_CalcOutsideSurfTemp)
 
     state->dataSurface->Surface(SurfNum).Class = DataSurfaces::SurfaceClass::Wall;
     state->dataSurface->Surface(SurfNum).Area = 10.0;
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
     SurfaceGeometry::AllocateSurfaceWindows(*state, SurfNum);
     SolarShading::AllocateModuleArrays(*state);
     AllocateSurfaceHeatBalArrays(*state);
@@ -4893,7 +4893,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_IncSolarMultiplier)
 
     state->dataSurface->Surface(SurfNum).Area = 100.0;
 
-    WindowManager::initWindowModel(*state);
+    Window::initWindowModel(*state);
     SurfaceGeometry::AllocateSurfaceWindows(*state, SurfNum);
     state->dataGlobal->numSpaces = 1;
     state->dataViewFactor->EnclSolInfo.allocate(state->dataGlobal->numSpaces);

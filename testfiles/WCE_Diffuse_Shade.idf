@@ -625,7 +625,7 @@
 
   Output:Variable,Room 102 Window,Surface Inside Face Convection Heat Transfer Coefficient,Timestep;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,Timestep;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,Timestep;
 
   Output:Variable,Room 102 Window,Surface Window Heat Gain Rate,Timestep;
 

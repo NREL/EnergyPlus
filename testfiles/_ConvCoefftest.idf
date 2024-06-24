@@ -609,7 +609,7 @@
 
   Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,timestep;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,timestep;
 
   Output:Surfaces:Drawing,dxf;
 

@@ -9,7 +9,7 @@ env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   BUILD_TYPE: Release
-  Python_REQUIRED_VERSION: 3.8
+  Python_REQUIRED_VERSION: 3.12.2
 
 jobs:
   build_installer_artifact:
@@ -52,7 +52,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Python ${{ env.Python_REQUIRED_VERSION }}
-      uses: actions/setup-python@v5
+      uses: jmarrec/setup-python@v5
       id: setup-python
       with:
         python-version: ${{ env.Python_REQUIRED_VERSION }}

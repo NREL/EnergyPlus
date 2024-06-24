@@ -2926,19 +2926,21 @@ Zone,Average, Surface Inside Face Beam Solar Radiation Heat Gain Rate [W]
 Output variables applicable to exterior windows and glass doors:
 
 \begin{lstlisting}
-Zone,Average,Zone Windows Total Transmitted Solar Radiation Rate [W]
+Zone,Average,Enclosure Windows Total Transmitted Solar Radiation Rate [W]
+Zone,Sum,Enclosure Windows Total Transmitted Solar Radiation Energy [J]
 Zone,Sum,Zone Transmitted Solar Energy [J]
 Zone,Average,Zone Windows Total Heat Gain Rate [W]
 Zone,Sum,Zone Windows Total Heat Gain Energy [J]
 Zone,Average,Zone Windows Total Heat Loss Rate [W]
 Zone,Sum,Zone Windows Total Heat Loss Energy [J]
-Zone,Average,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
-Zone,Sum,Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
-Zone,Average,Zone Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
-Zone,Sum,Zone Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
-Zone,Average,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
-Zone,Sum,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
-Zone,Average,Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Average,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate [W]
+Zone,Sum,Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy [J]
+Zone,Average,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
+Zone,Average,Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate [W]
+Zone,Sum,Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy [J]
 Zone,Average,Surface Window Total Glazing Layers Absorbed Solar Radiation Rate [W]
 Zone,Average,Surface Window Total Glazing Layers Absorbed Shortwave Radiation Rate [W]
 Zone,Sum,Surface Window Total Glazing Layers Absorbed Solar Radiation Energy [J]
@@ -3446,11 +3448,11 @@ Beam solar radiation from exterior windows absorbed on the inside face of an opa
 
 The following output variables apply to subsurfaces that are windows or glass doors. These two subsurface types are called ``window'' here. ``Exterior window'' means that the base surface of the window is an exterior wall, floor, roof or ceiling (i.e., the base surface is a \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed} with OutsideFaceEnvironment = ExteriorEnvironment). ``Interior window'' means that the base surface of the window is an inter-zone wall, floor or ceiling. ``Glass'' means a transparent solid layer, usually glass, but possibly plastic or other transparent material. ``Shading device'' means an interior, exterior or between-glass shade or blind, or an exterior screen (only exterior windows can have a shading device).
 
-\subsubsection{Zone Windows Total Transmitted Solar Radiation Rate {[}W{]}}\label{zone-windows-total-transmitted-solar-radiation-rate-w}
+\subsubsection{Enclosure Windows Total Transmitted Solar Radiation Rate {[}W{]}}\label{zone-windows-total-transmitted-solar-radiation-rate-w}
 
-\subsubsection{Zone Windows Total Transmitted Solar Radiation Energy {[}J{]}}\label{zone-windows-total-transmitted-solar-radiation-energy-j}
+\subsubsection{Enclosure Windows Total Transmitted Solar Radiation Energy {[}J{]}}\label{zone-windows-total-transmitted-solar-radiation-energy-j}
 
-The total Surface Window Transmitted Solar Radiation Rate of all the exterior windows in a zone.
+The total Surface Window Transmitted Solar Radiation Rate of all the exterior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Zone Windows Total Heat Gain Rate {[}W{]}}\label{zone-windows-total-heat-gain-rate-w}
 
@@ -3508,17 +3510,17 @@ For a window with a blind, this transmitted radiation consists of beam radiation
 
 For a window with a blind, this transmitted radiation consists of diffuse radiation reflected from beam by the slats. For a window with a screen, this value consists of diffuse radiation reflected by the screen material.
 
-\subsubsection{Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-rate-w}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-rate-w}
 
-\subsubsection{Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-energy-j}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-beam-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all exterior windows in a zone.
+The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all exterior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
-\subsubsection{Zone Interior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-rate-w}
+\subsubsection{Enclosure Interior Windows Total Transmitted Beam Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-rate-w}
 
-\subsubsection{Zone Interior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-energy-j}
+\subsubsection{Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-beam-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all interior windows in a zone.
+The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definition above) from all interior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Surface Window Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{surface-window-transmitted-diffuse-solar-radiation-rate-w}
 
@@ -3526,17 +3528,17 @@ The sum of the Surface Window Transmitted Beam Solar Radiation Rate (see definit
 
 The solar radiation transmitted by an exterior window whose source is diffuse solar incident on the outside of the window. For a bare window, this transmitted radiation consists of diffuse radiation passing through the glass. For a window with a shade, this transmitted radiation is totally diffuse (shades are assumed to be perfect diffusers). For a window with a blind, this transmitted radiation consists of diffuse radiation that passes between the slats and diffuse radiation from diffuse-to-diffuse reflection from the slats. For a window with a screen, this value consists of diffuse radiation transmitted through the screen (gaps between the screen material) and diffuse radiation from diffuse-to-diffuse reflection from the screen material.
 
-\subsubsection{Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
 
-\subsubsection{Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
+\subsubsection{Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-exterior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
 
-The combined beam and diffuse solar that first entered adjacent zones through exterior windows in the adjacent zones, was subsequently reflected from interior surfaces in those zones (becoming diffuse through that reflection), and was then transmitted through interior windows into the current zone.
+The combined beam and diffuse solar that first entered adjacent zones through exterior windows in the adjacent zones, was subsequently reflected from interior surfaces in those zones (becoming diffuse through that reflection), and was then transmitted through interior windows into the current enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
-\subsubsection{Zone Interior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
+\subsubsection{Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Rate {[}W{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-rate-w}
 
-\subsubsection{Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
+\subsubsection{Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy {[}J{]}}\label{zone-interior-windows-total-transmitted-diffuse-solar-radiation-energy-j}
 
-The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in a zone.
+The sum of the Surface Window Transmitted Diffuse Solar Radiation Rate (see definition above) from all interior windows in an enclosure. If the user wishes to report these variables only for a specific enclosure and is uncertain as to what the name of the enclosure is, the enclosure name can be obtained from the the "Input Verification and Results Summary" output report in the "Space Summary" subtable.
 
 \subsubsection{Surface Window System Solar Transmittance {[]}}\label{surface-window-system-solar-transmittance}
 
