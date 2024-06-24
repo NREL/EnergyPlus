@@ -57,6 +57,7 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+//#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -962,6 +963,8 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     auto &c1 = state->dataRptCoilSelection->coilSelectionReportObj->coilSelectionDataObjs[0];
     c1->zoneEqNum = curZoneEqNum;
 
+    state->dataHeatBal->Zone.allocate(1);
+    state->dataHeatBal->Zone(1).Name = "ThisZone";
     state->dataZoneEquip->ZoneEquipList.allocate(1);
     auto &zoneEquipList = state->dataZoneEquip->ZoneEquipList(curZoneEqNum);
 
@@ -988,6 +991,7 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c1->coilLocation, "Zone Equipment"));
     EXPECT_TRUE(Util::SameString(c1->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
     EXPECT_TRUE(Util::SameString(c1->userNameforHVACsystem, "Zone 1 FCU"));
+    EXPECT_TRUE(Util::SameString(c1->zoneName[0], "ThisZone"));
 
     // add another coil and hvac system and increase equipment list to 2
     zoneEquipList.NumOfEquipTypes = 2;
@@ -1039,11 +1043,13 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c1a->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
     EXPECT_TRUE(Util::SameString(c1a->userNameforHVACsystem, "Zone 1 FCU"));
     EXPECT_TRUE(Util::SameString(c1a->coilName_, coil1Name));
+    EXPECT_TRUE(Util::SameString(c1a->zoneName[0], "ThisZone"));
 
     EXPECT_TRUE(Util::SameString(c2a->coilLocation, "Zone Equipment"));
     EXPECT_TRUE(Util::SameString(c2a->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
     EXPECT_TRUE(Util::SameString(c2a->userNameforHVACsystem, "Zone 1 ADU"));
     EXPECT_TRUE(Util::SameString(c2a->coilName_, coil2Name));
+    EXPECT_TRUE(Util::SameString(c2a->zoneName[0], "ThisZone"));
 
     // check equipment order and note coil1Name is associated with 4PipeFanCoil
     EXPECT_ENUM_EQ(zoneEquipList.EquipType(1), DataZoneEquipment::ZoneEquipType::FourPipeFanCoil);
@@ -1092,10 +1098,12 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     EXPECT_TRUE(Util::SameString(c1b->typeHVACname, "ZoneHVAC:AirDistributionUnit"));
     EXPECT_TRUE(Util::SameString(c1b->userNameforHVACsystem, "Zone 1 ADU"));
     EXPECT_TRUE(Util::SameString(c1b->coilName_, coil2Name));
+    EXPECT_TRUE(Util::SameString(c1b->zoneName[0], "ThisZone"));
 
     // note coil1Name is associated with 4PipeFanCoil
     EXPECT_TRUE(Util::SameString(c2b->coilLocation, "Zone Equipment"));
     EXPECT_TRUE(Util::SameString(c2b->typeHVACname, "ZoneHVAC:FourPipeFanCoil"));
     EXPECT_TRUE(Util::SameString(c2b->userNameforHVACsystem, "Zone 1 FCU"));
     EXPECT_TRUE(Util::SameString(c2b->coilName_, coil1Name));
+    EXPECT_TRUE(Util::SameString(c2b->zoneName[0], "ThisZone"));
 }

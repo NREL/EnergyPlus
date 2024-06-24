@@ -1002,14 +1002,6 @@ namespace VentilatedSlab {
                 ventSlab.MaxOASchedPtr = ventSlab.MinOASchedPtr;
             }
 
-            //// Add fan to internal component sets array
-            // SetUpCompSets(state,
-            //              CurrentModuleObject,
-            //              ventSlab.Name + "-SYSTEM",
-            //              "UNDEFINED",
-            //              state.dataIPShortCut->cAlphaArgs(25),
-            //              state.dataIPShortCut->cAlphaArgs(23),
-            //              state.dataIPShortCut->cAlphaArgs(24));
             // Add fan to component sets array
             SetUpCompSets(state,
                           CurrentModuleObject,
@@ -1278,24 +1270,6 @@ namespace VentilatedSlab {
 
             switch (ventSlab.coilOption) {
             case CoilType::Both: { // 'HeatingAndCooling'
-                //// Add cooling coil to interanal component sets array when present
-                // SetUpCompSets(state,
-                //              CurrentModuleObject,
-                //              ventSlab.Name + "-SYSTEM",
-                //              state.dataIPShortCut->cAlphaArgs(30),
-                //              state.dataIPShortCut->cAlphaArgs(31),
-                //              state.dataIPShortCut->cAlphaArgs(24),
-                //              "UNDEFINED");
-
-                //// Add heating coil to internal component sets array when cooling coil present
-                // SetUpCompSets(state,
-                //              CurrentModuleObject,
-                //              ventSlab.Name + "-SYSTEM",
-                //              state.dataIPShortCut->cAlphaArgs(27),
-                //              state.dataIPShortCut->cAlphaArgs(28),
-                //              "UNDEFINED",
-                //              state.dataIPShortCut->cAlphaArgs(19));
-
                 // Add cooling coil to component sets array when present
                 SetUpCompSets(state,
                               CurrentModuleObject,
@@ -1316,15 +1290,6 @@ namespace VentilatedSlab {
                 break;
             }
             case CoilType::Heating: { // 'Heating'
-                //// Add heating coil to internal component sets array when no cooling coil present
-                // SetUpCompSets(state,
-                //              CurrentModuleObject,
-                //              ventSlab.Name + "-SYSTEM",
-                //              state.dataIPShortCut->cAlphaArgs(27),
-                //              state.dataIPShortCut->cAlphaArgs(28),
-                //              state.dataIPShortCut->cAlphaArgs(24),
-                //              state.dataIPShortCut->cAlphaArgs(19));
-                // Add heating coil to component sets array when no cooling coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
                               ventSlab.Name,
@@ -1335,14 +1300,6 @@ namespace VentilatedSlab {
                 break;
             }
             case CoilType::Cooling: { // 'Cooling'
-                //// Add cooling coil to internal component sets array when no heating coil present
-                // SetUpCompSets(state,
-                //              CurrentModuleObject,
-                //              ventSlab.Name + "-SYSTEM",
-                //              state.dataIPShortCut->cAlphaArgs(30),
-                //              state.dataIPShortCut->cAlphaArgs(31),
-                //              state.dataIPShortCut->cAlphaArgs(24),
-                //              state.dataIPShortCut->cAlphaArgs(19));
                 // Add cooling coil to component sets array when no heating coil present
                 SetUpCompSets(state,
                               CurrentModuleObject,
