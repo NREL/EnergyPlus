@@ -4683,7 +4683,7 @@ void CalcOAMixer(EnergyPlusData &state, int const OAMixerNum)
         Psychrometrics::PsyTdbFnHW(state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixHumRat);
 
     // Check for saturation temperature > dry-bulb temperature and modify temperature at constant enthalpy
-    auto T_sat =
+    Real64 T_sat =
         Psychrometrics::PsyTsatFnHPb(state, state.dataMixedAir->OAMixer(OAMixerNum).MixEnthalpy, state.dataMixedAir->OAMixer(OAMixerNum).MixPressure);
     if (state.dataMixedAir->OAMixer(OAMixerNum).MixTemp < T_sat) {
         state.dataMixedAir->OAMixer(OAMixerNum).MixTemp = T_sat;
