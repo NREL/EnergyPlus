@@ -980,6 +980,7 @@ TEST_F(EnergyPlusFixture, Test_finishCoilSummaryReportTable)
     zoneEquipList.EquipData(1).NumSubEquip = 2;
     zoneEquipList.EquipData(1).SubEquipData.allocate(2);
     zoneEquipList.EquipData(1).SubEquipData(1).Name = "ElecHeatCoil";
+    zoneEquipList.EquipData(1).SubEquipData(1).TypeOf = "Coil:Heating:Electric";
     zoneEquipList.EquipData(1).SubEquipData(2).Name = "MyFan1";
     zoneEquipList.EquipData(1).SubEquipData(2).TypeOf = "FAN:ONOFF";
 

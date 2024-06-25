@@ -912,41 +912,45 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
     c->userNameforHVACsystem = "Unknown";
     // now search equipment
     auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
-    bool keepLooking = true;
-    bool fanFound = false;
+    bool coilFound = false;
     std::string fanType;
     std::string fanName;
     for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
-        for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
-            if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).Name == c->coilName_) {
-                c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                c->coilLocation = "Zone Equipment";
-                int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
-                if (c->zoneNum.empty()) c->zoneNum.resize(1);
-                c->zoneNum[0] = zoneEqListIndex;
-                if (c->zoneName.empty()) c->zoneName.resize(1);
-                c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
-                keepLooking = false;
-            }
-            if (!keepLooking) {
-                // if coil is found look in this same list for a fan
-                for (int fanEqNum = 1; fanEqNum <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++fanEqNum) {
-                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:SYSTEMMODEL" ||
-                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:ONOFF" ||
-                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:CONSTANTVOLUME" ||
-                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:VARIABLEVOLUME" ||
-                        zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf == "FAN:COMPONENTMODEL") {
-                        c->fanTypeName = zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).TypeOf;
-                        c->fanAssociatedWithCoilName = zoneEquipList.EquipData(equipLoop).SubEquipData(fanEqNum).Name;
-                        break;
-                    }
-                }
-                break;
-            }
-            if (keepLooking) {
-                for (int subsubEq = 1; subsubEq <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++subsubEq) {
-                    if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(subsubEq).Name == c->coilName_) {
+        // coil should be found only once, fan could be found multiple times, reset here
+        bool fanFound = false;
+        auto &thisSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData;
+        auto thisSubCoilLambda = [&c](const DataZoneEquipment::SubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+        auto thisSubFanLambda = [](const DataZoneEquipment::SubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+
+        // search for coil and fan SubEquipData and return parent type/name and fan type/name for coil reports.
+        auto const &coilIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda);
+        if (std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda) != thisSubEq.end()) {
+            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+            c->coilLocation = "Zone Equipment";
+            int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
+            if (c->zoneNum.empty()) c->zoneNum.resize(1);
+            c->zoneNum[0] = zoneEqListIndex;
+            if (c->zoneName.empty()) c->zoneName.resize(1);
+            c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
+            coilFound = true;
+        }
+        auto const &fanIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubFanLambda);
+        if (fanIterator != thisSubEq.end()) {
+            unsigned int fanIndex = fanIterator - thisSubEq.begin();
+            fanType = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].TypeOf;
+            fanName = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].Name;
+            fanFound = true;
+        }
+        // if coil not found in SubEquipData then maybe it's HXAssisted and in SubSubEquipData. Fan is usually already found if exists.
+        if (!coilFound || !fanFound) {
+            auto thisSubSubCoilLambda = [&c](const DataZoneEquipment::SubSubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+            auto thisSubSubFanLambda = [](const DataZoneEquipment::SubSubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+            for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
+                auto &thisSubSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData;
+                if (!coilFound) {
+                    auto const &coilIterator2 = std::find_if(thisSubSubEq.begin(), thisSubSubEq.end(), thisSubSubCoilLambda);
+                    if (coilIterator2 != thisSubSubEq.end()) {
                         c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
                         c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
                         c->coilLocation = "Zone Equipment";
@@ -955,28 +959,29 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
                         c->zoneNum[0] = zoneEqListIndex;
                         if (c->zoneName.empty()) c->zoneName.resize(1);
                         c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
-                        keepLooking = false;
+                        coilFound = true;
                     }
                 }
-                if (!keepLooking) {
-                    // if coil is found look in this same list for a fan
-                    for (int fanEqNum = 1; fanEqNum <= zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).NumSubSubEquip; ++fanEqNum) {
-                        if (zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:SYSTEMMODEL" ||
-                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:ONOFF" ||
-                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:CONSTANTVOLUME" ||
-                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:VARIABLEVOLUME" ||
-                            zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf == "FAN:COMPONENTMODEL") {
-                            c->fanTypeName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).TypeOf;
-                            c->fanAssociatedWithCoilName = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData(fanEqNum).Name;
-                            break;
-                        }
+                if (!fanFound) {
+                    auto const &fanIterator2 = std::find_if(thisSubSubEq.begin(), thisSubSubEq.end(), thisSubSubFanLambda);
+                    if (fanIterator2 != thisSubSubEq.end()) {
+                        unsigned int fanIndex = fanIterator2 - thisSubSubEq.begin();
+                        fanType = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].TypeOf;
+                        fanName = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].Name;
+                        fanFound = true;
                     }
-                    break;
                 }
+                if (coilFound && fanFound) break;
             }
-            if (!keepLooking) break;
         }
-        if (!keepLooking) break;
+        if (coilFound) {
+            if (fanFound) {
+                c->fanTypeName = fanType;
+                c->fanAssociatedWithCoilName = fanName;
+            }
+            break;
+        }
+
     } // for (equipLoop)
 
     if (c->typeHVACname == "Unknown") {
