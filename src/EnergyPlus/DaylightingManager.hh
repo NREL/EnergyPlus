@@ -569,6 +569,10 @@ struct DaylightingData : BaseGlobalStruct
     Array1D<Real64> YValue;
     Array2D<Real64> IllumValue;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->CalcDayltghCoefficients_firstTime = true;

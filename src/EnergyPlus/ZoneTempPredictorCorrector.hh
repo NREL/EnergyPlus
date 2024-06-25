@@ -448,6 +448,10 @@ struct ZoneTempPredictorCorrectorData : BaseGlobalStruct
     EPVector<ZoneTempPredictorCorrector::ZoneHeatBalanceData> zoneHeatBalance;
     EPVector<ZoneTempPredictorCorrector::SpaceHeatBalanceData> spaceHeatBalance;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) ZoneTempPredictorCorrectorData();

@@ -1337,6 +1337,10 @@ struct SizingData : BaseGlobalStruct
     Array1D<Real64> FaByZoneCool;    // triggers allocation in UpdateSysSizing
     Array1D<Real64> SensCoolCapTemp; // triggers allocation in UpdateSysSizing
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) SizingData();

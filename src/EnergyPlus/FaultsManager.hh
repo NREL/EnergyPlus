@@ -417,6 +417,10 @@ struct FaultsManagerData : BaseGlobalStruct
     Array1D<FaultsManager::FaultPropertiesChillerFouling> FaultsChillerFouling;
     Array1D<FaultsManager::FaultPropertiesEvapCoolerFouling> FaultsEvapCoolerFouling;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         RunFaultMgrOnceFlag = false;

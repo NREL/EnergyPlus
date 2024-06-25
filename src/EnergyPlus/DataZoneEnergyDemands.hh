@@ -172,6 +172,10 @@ struct DataZoneEnergyDemandsData : BaseGlobalStruct
     EPVector<DataZoneEnergyDemands::ZoneSystemSensibleDemand> spaceSysEnergyDemand;
     EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> spaceSysMoistureDemand;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) DataZoneEnergyDemandsData();

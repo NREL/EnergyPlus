@@ -562,6 +562,10 @@ struct MixedAirData : BaseGlobalStruct
     Array1D_bool OAControllerMySizeFlag;
     Array1D_bool MechVentCheckFlag;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumControllerLists = 0;
