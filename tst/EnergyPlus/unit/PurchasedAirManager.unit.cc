@@ -77,7 +77,6 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::DataHeatBalFanSys;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataSurfaces;
@@ -126,7 +125,7 @@ protected:
         state->dataHeatBal->RefrigCaseCredit.allocate(1);
 
         state->dataHeatBalFanSys->TempControlType.allocate(1);
-        state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::SingleHeating;
+        state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::SingleHeating;
         state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback.allocate(1);
         state->dataZoneEnergyDemand->DeadBandOrSetback(1) = false;
@@ -300,10 +299,10 @@ TEST_F(EnergyPlusFixture, IdealLoadsAirSystem_GetInput)
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirTemp, 13.0);
     EXPECT_EQ(PurchAir(1).MaxHeatSuppAirHumRat, 0.015);
     EXPECT_EQ(PurchAir(1).MinCoolSuppAirHumRat, 0.009);
-    EXPECT_TRUE(compare_enums(PurchAir(1).HeatingLimit, LimitType::NoLimit));
-    EXPECT_TRUE(compare_enums(PurchAir(1).CoolingLimit, LimitType::NoLimit));
-    EXPECT_TRUE(compare_enums(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
-    EXPECT_TRUE(compare_enums(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio));
+    EXPECT_ENUM_EQ(PurchAir(1).HeatingLimit, LimitType::NoLimit);
+    EXPECT_ENUM_EQ(PurchAir(1).CoolingLimit, LimitType::NoLimit);
+    EXPECT_ENUM_EQ(PurchAir(1).DehumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
+    EXPECT_ENUM_EQ(PurchAir(1).HumidCtrlType, HumControl::ConstantSupplyHumidityRatio);
 }
 
 TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
@@ -406,6 +405,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_PlenumTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -518,6 +518,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_ExhaustNodeTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -644,6 +645,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_IntermediateOutputVarsTest)
     bool SimAir(false);
 
     EnergyPlus::SizingManager::GetOARequirements(*state);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -921,7 +923,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_NoCapacityTest)
     bool FirstHVACIteration(true);
     bool SimZone(true);
     bool SimAir(false);
-
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     ManageZoneEquipment(*state,
                         FirstHVACIteration,
                         SimZone,
@@ -1451,7 +1453,7 @@ TEST_F(ZoneIdealLoadsTest, IdealLoads_Fix_SA_HumRat_Test)
     int ControlledZoneNum = 1;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(ControlledZoneNum).RemainingOutputReqToCoolSP = -1000.0;
     state->dataZoneEnergyDemand->ZoneSysMoistureDemand(ControlledZoneNum).RemainingOutputReqToDehumidSP = -0.0002;
-    state->dataHeatBalFanSys->TempControlType(ControlledZoneNum) = DataHVACGlobals::ThermostatType::SingleCooling;
+    state->dataHeatBalFanSys->TempControlType(ControlledZoneNum) = HVAC::ThermostatType::SingleCooling;
 
     state->dataLoopNodes->Node(1).Temp = 30;
     state->dataLoopNodes->Node(1).HumRat = 0.012;

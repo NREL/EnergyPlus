@@ -69,7 +69,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -115,8 +114,8 @@ namespace WaterToAirHeatPumpSimple {
                                int &CompIndex,            // Index for Component name
                                Real64 const SensLoad,     // Sensible demand load [W]
                                Real64 const LatentLoad,   // Latent demand load [W]
-                               int const CyclingScheme,   // Continuous fan OR cycling compressor
-                               DataHVACGlobals::CompressorOperation const CompressorOp,
+                               HVAC::FanOp const fanOp,   // Continuous fan OR cycling compressor
+                               HVAC::CompressorOp const compressorOp,
                                Real64 const PartLoadRatio,
                                bool const FirstHVACIteration,
                                Real64 const OnOffAirFlowRatio // ratio of comp on to comp off air flow rate
@@ -181,13 +180,13 @@ namespace WaterToAirHeatPumpSimple {
 
         if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPCoolingSimple(state, HPNum, CyclingScheme, SensLoad, LatentLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, LatentLoad, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPCoolingSimple(state, HPNum, fanOp, SensLoad, LatentLoad, compressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, CyclingScheme, OnOffAirFlowRatio, FirstHVACIteration);
-            CalcHPHeatingSimple(state, HPNum, CyclingScheme, SensLoad, CompressorOp, PartLoadRatio, OnOffAirFlowRatio);
+            InitSimpleWatertoAirHP(state, HPNum, SensLoad, DataPrecisionGlobals::constant_zero, fanOp, OnOffAirFlowRatio, FirstHVACIteration);
+            CalcHPHeatingSimple(state, HPNum, fanOp, SensLoad, compressorOp, PartLoadRatio, OnOffAirFlowRatio);
             UpdateSimpleWatertoAirHP(state, HPNum);
         } else {
             ShowFatalError(state, "SimWatertoAirHPSimple: WatertoAir heatpump not in either HEATING or COOLING mode");
@@ -479,49 +478,46 @@ namespace WaterToAirHeatPumpSimple {
                                 "Cooling Coil Electricity Energy",
                                 Constant::Units::J,
                                 simpleWAHP.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Cooling,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Cooling);
             SetupOutputVariable(state,
                                 "Cooling Coil Total Cooling Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergyLoadTotal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Cooling Coil Sensible Cooling Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergySensible,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Latent Cooling Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergyLatent,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name);
             SetupOutputVariable(state,
                                 "Cooling Coil Source Side Heat Transfer Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergySource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::PlantLoopCoolingDemand,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::CoolingCoils);
 
             // create predefined report entries
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCoolCoilType, simpleWAHP.Name, CurrentModuleObject);
@@ -711,35 +707,32 @@ namespace WaterToAirHeatPumpSimple {
                                 "Heating Coil Electricity Energy",
                                 Constant::Units::J,
                                 simpleWAHP.Energy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::Heating,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::Heating);
             SetupOutputVariable(state,
                                 "Heating Coil Heating Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergyLoadTotal,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Heating Coil Source Side Heat Transfer Energy",
                                 Constant::Units::J,
                                 simpleWAHP.EnergySource,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 simpleWAHP.Name,
                                 Constant::eResource::PlantLoopHeatingDemand,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
 
             // create predefined report entries
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchHeatCoilType, simpleWAHP.Name, CurrentModuleObject);
@@ -769,107 +762,107 @@ namespace WaterToAirHeatPumpSimple {
                                     "Cooling Coil Electricity Rate",
                                     Constant::Units::W,
                                     simpleWAHP.Power,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Total Cooling Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QLoadTotal,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Sensible Cooling Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QSensible,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Latent Cooling Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QLatent,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Heat Transfer Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QSource,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Part Load Ratio",
                                     Constant::Units::None,
                                     simpleWAHP.PartLoadRatio,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Runtime Fraction",
                                     Constant::Units::None,
                                     simpleWAHP.RunFrac,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     simpleWAHP.AirMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.InletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Inlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     simpleWAHP.InletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.OutletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Air Outlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     simpleWAHP.OutletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     simpleWAHP.WaterMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Inlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.InletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Cooling Coil Source Side Outlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.OutletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
 
             } else if (simpleWAHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPHeatingEquationFit) {
@@ -878,101 +871,101 @@ namespace WaterToAirHeatPumpSimple {
                                     "Heating Coil Electricity Rate",
                                     Constant::Units::W,
                                     simpleWAHP.Power,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Heating Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QLoadTotal,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Sensible Heating Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QSensible,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Heat Transfer Rate",
                                     Constant::Units::W,
                                     simpleWAHP.QSource,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Part Load Ratio",
                                     Constant::Units::None,
                                     simpleWAHP.PartLoadRatio,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Runtime Fraction",
                                     Constant::Units::None,
                                     simpleWAHP.RunFrac,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
 
                 SetupOutputVariable(state,
                                     "Heating Coil Air Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     simpleWAHP.AirMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.InletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Inlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     simpleWAHP.InletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.OutletAirDBTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Air Outlet Humidity Ratio",
                                     Constant::Units::kgWater_kgDryAir,
                                     simpleWAHP.OutletAirHumRat,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Mass Flow Rate",
                                     Constant::Units::kg_s,
                                     simpleWAHP.WaterMassFlowRate,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Inlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.InletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
                 SetupOutputVariable(state,
                                     "Heating Coil Source Side Outlet Temperature",
                                     Constant::Units::C,
                                     simpleWAHP.OutletWaterTemp,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     simpleWAHP.Name);
             }
         }
@@ -985,7 +978,7 @@ namespace WaterToAirHeatPumpSimple {
                                 int const HPNum,                                 // Current HPNum under simulation
                                 Real64 const SensLoad,                           // Control zone sensible load[W]
                                 Real64 const LatentLoad,                         // Control zone latent load[W]
-                                [[maybe_unused]] int const CyclingScheme,        // fan operating mode
+                                [[maybe_unused]] HVAC::FanOp const fanOp,        // fan operating mode
                                 [[maybe_unused]] Real64 const OnOffAirFlowRatio, // ratio of compressor on flow to average flow over time step
                                 bool const FirstHVACIteration                    // Iteration flag
     )
@@ -1048,18 +1041,18 @@ namespace WaterToAirHeatPumpSimple {
                 if (simpleWatertoAirHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
                         if (simpleWatertoAirHP.WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Cooling;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Cooling;
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).LastOperatingMode =
-                                DataHVACGlobals::Cooling;
+                                HVAC::Cooling;
                         } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Heating;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Heating;
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).LastOperatingMode =
-                                DataHVACGlobals::Heating;
+                                HVAC::Heating;
                         }
                         state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(simpleWatertoAirHP.CompanionHeatingCoilNum) = false;
                     } else {
                         if (simpleWatertoAirHP.WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Cooling;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Cooling;
                         }
                     }
                     state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(HPNum) = false;
@@ -1067,18 +1060,18 @@ namespace WaterToAirHeatPumpSimple {
                     // it is a heating coil
                     if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
                         if (simpleWatertoAirHP.WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Heating;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Heating;
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).LastOperatingMode =
-                                DataHVACGlobals::Heating;
+                                HVAC::Heating;
                         } else if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Cooling;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Cooling;
                             state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).LastOperatingMode =
-                                DataHVACGlobals::Cooling;
+                                HVAC::Cooling;
                         }
                         state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(simpleWatertoAirHP.CompanionCoolingCoilNum) = false;
                     } else {
                         if (simpleWatertoAirHP.WaterFlowMode) {
-                            simpleWatertoAirHP.LastOperatingMode = DataHVACGlobals::Heating;
+                            simpleWatertoAirHP.LastOperatingMode = HVAC::Heating;
                         }
                     }
                     state.dataWaterToAirHeatPumpSimple->SimpleHPTimeStepFlag(HPNum) = false;
@@ -1203,17 +1196,17 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.WaterFlowMode = false;
             simpleWatertoAirHP.WaterMassFlowRate = 0.0;
             simpleWatertoAirHP.AirMassFlowRate = 0.0;
-            if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WAHPPlantType == DataPlant::PlantEquipmentType::CoilWAHPCoolingEquationFit) {
                     if (simpleWatertoAirHP.CompanionHeatingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionHeatingCoilNum).QLoadTotal > 0.0) {
                             // do nothing, there will be flow through this coil
-                        } else if (simpleWatertoAirHP.LastOperatingMode == DataHVACGlobals::Cooling) {
+                        } else if (simpleWatertoAirHP.LastOperatingMode == HVAC::Cooling) {
                             // set the flow rate to full design flow
                             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                         }
                     } else {
-                        if (simpleWatertoAirHP.LastOperatingMode == DataHVACGlobals::Cooling) {
+                        if (simpleWatertoAirHP.LastOperatingMode == HVAC::Cooling) {
                             // set the flow rate to full design flow
                             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                         }
@@ -1223,12 +1216,12 @@ namespace WaterToAirHeatPumpSimple {
                     if (simpleWatertoAirHP.CompanionCoolingCoilNum > 0) {
                         if (state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(simpleWatertoAirHP.CompanionCoolingCoilNum).QLoadTotal > 0.0) {
                             // do nothing, there will be flow through this coil
-                        } else if (simpleWatertoAirHP.LastOperatingMode == DataHVACGlobals::Heating) {
+                        } else if (simpleWatertoAirHP.LastOperatingMode == HVAC::Heating) {
                             // set the flow rate to full design flow
                             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                         }
                     } else {
-                        if (simpleWatertoAirHP.LastOperatingMode == DataHVACGlobals::Heating) {
+                        if (simpleWatertoAirHP.LastOperatingMode == HVAC::Heating) {
                             // set the flow rate to full design flow
                             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                         }
@@ -1425,7 +1418,7 @@ namespace WaterToAirHeatPumpSimple {
                 CheckSysSizing(state,
                                format("COIL:{}:WATERTOAIRHEATPUMP:EQUATIONFIT", WatertoAirHPNamesUC[static_cast<int>(simpleWatertoAirHP.WAHPType)]),
                                simpleWatertoAirHP.Name);
-                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= DataHVACGlobals::SmallAirVolFlow) {
+                if (state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow >= HVAC::SmallAirVolFlow) {
                     RatedAirVolFlowRateDes = state.dataSize->FinalSysSizing(state.dataSize->CurSysNum).DesMainVolFlow;
                     CoolingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesCoolVolFlow;
                     HeatingAirVolFlowRateDes = state.dataSize->CalcSysSizing(state.dataSize->CurSysNum).DesHeatVolFlow;
@@ -1452,7 +1445,7 @@ namespace WaterToAirHeatPumpSimple {
                                              state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow);
                 CoolingAirVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolVolFlow;
                 HeatingAirVolFlowRateDes = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatVolFlow;
-                if (RatedAirVolFlowRateDes < DataHVACGlobals::SmallAirVolFlow) {
+                if (RatedAirVolFlowRateDes < HVAC::SmallAirVolFlow) {
                     RatedAirVolFlowRateDes = 0.0;
                 }
             }
@@ -1529,7 +1522,7 @@ namespace WaterToAirHeatPumpSimple {
                         VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
                     }
                     // cooling design day calculations
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                             MixTemp = finalSysSizing.OutTempAtCoolPeak;
@@ -1578,27 +1571,14 @@ namespace WaterToAirHeatPumpSimple {
                         // determine the coil ratio of coil dT with system air flow to design heating air flow
                         dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                DataAirSystems::FanPlacement::BlowThru) {
+                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
-                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                       DataAirSystems::FanPlacement::DrawThru) {
+                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                                       HVAC::FanPlace::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
                             }
                         }
@@ -1675,7 +1655,7 @@ namespace WaterToAirHeatPumpSimple {
                     } else {
                         VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
                     }
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         // cooling design calculations
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
@@ -1724,23 +1704,11 @@ namespace WaterToAirHeatPumpSimple {
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, SupHumRat);
                         // determine the coil ratio of coil dH with system air flow to design heating air flow
                         dHratio = (SupEnth - MixEnthSys) / (SupEnth - MixEnth);
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                            if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
                             } else {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
@@ -1798,7 +1766,7 @@ namespace WaterToAirHeatPumpSimple {
                         RatedCapCoolTotalDes = 0.0;
                     }
                 }
-                if (RatedCapCoolTotalDes < DataHVACGlobals::SmallLoad) {
+                if (RatedCapCoolTotalDes < HVAC::SmallLoad) {
                     RatedCapCoolTotalDes = 0.0;
                 }
             }
@@ -1828,7 +1796,7 @@ namespace WaterToAirHeatPumpSimple {
                     } else {
                         VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
                     }
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                             MixTemp = finalSysSizing.OutTempAtCoolPeak;
@@ -1861,27 +1829,14 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                DataAirSystems::FanPlacement::BlowThru) {
+                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
-                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                       DataAirSystems::FanPlacement::DrawThru) {
+                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                                       HVAC::FanPlace::DrawThru) {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
                             }
                         }
@@ -1956,7 +1911,7 @@ namespace WaterToAirHeatPumpSimple {
                     } else {
                         VolFlowRate = HeatingAirVolFlowRateDes; // system air flow
                     }
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
                                 MixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesCoolCoilInTemp;
@@ -1985,23 +1940,11 @@ namespace WaterToAirHeatPumpSimple {
                         MixEnth = Psychrometrics::PsyHFnTdbW(MixTemp, MixHumRat);
                         SupEnth = Psychrometrics::PsyHFnTdbW(SupTemp, MixHumRat);
                         Real64 FanCoolLoad = 0.0;
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanCoolLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanCoolLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanCoolLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(MixHumRat);
-                            if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                            if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
                             } else {
                                 SupTemp -= FanCoolLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
@@ -2058,7 +2001,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
-            if (RatedCapCoolSensDes < DataHVACGlobals::SmallLoad) {
+            if (RatedCapCoolSensDes < HVAC::SmallLoad) {
                 RatedCapCoolSensDes = 0.0;
             }
             if (RatedCapCoolTotalAutoSized && RatedCapCoolSensAutoSized) {
@@ -2409,7 +2352,7 @@ namespace WaterToAirHeatPumpSimple {
                         VolFlowRate = CoolingAirVolFlowRateDes; // system air flow
                     }
                     // heating design day calculations
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         auto &finalSysSizing(state.dataSize->FinalSysSizing(state.dataSize->CurSysNum));
                         if (state.dataSize->CurOASysNum > 0) { // coil is in the OA stream
                             HeatMixTemp = finalSysSizing.HeatOutTemp;
@@ -2450,28 +2393,16 @@ namespace WaterToAirHeatPumpSimple {
                         }
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                        (HeatSupTemp - HeatMixTemp);                                     // heating coil load
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // remove fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanHeatLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                                        (HeatSupTemp - HeatMixTemp); // heating coil load
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid &&
+                            state.dataSize->DataFanIndex > 0) { // remove fan heat to coil load
+                            FanHeatLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(HeatMixHumRat);
-                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                DataAirSystems::FanPlacement::BlowThru) {
+                            if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace == HVAC::FanPlace::BlowThru) {
                                 HeatMixTemp += FanHeatLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
-                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanLocation ==
-                                       DataAirSystems::FanPlacement::DrawThru) {
+                            } else if (state.dataAirSystemsData->PrimaryAirSystems(state.dataSize->CurSysNum).supFanPlace ==
+                                       HVAC::FanPlace::DrawThru) {
                                 HeatSupTemp -= FanHeatLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
                             }
                         }
@@ -2538,7 +2469,7 @@ namespace WaterToAirHeatPumpSimple {
                     } else {
                         VolFlowRate = CoolingAirVolFlowRateDes; // system air flow
                     }
-                    if (VolFlowRate >= DataHVACGlobals::SmallAirVolFlow) {
+                    if (VolFlowRate >= HVAC::SmallAirVolFlow) {
                         if (state.dataSize->ZoneEqDXCoil) {
                             if (ZoneEqSizing(state.dataSize->CurZoneEqNum).OAVolFlow > 0.0) {
                                 HeatMixTemp = state.dataSize->FinalZoneSizing(state.dataSize->CurZoneEqNum).DesHeatCoilInTemp;
@@ -2569,24 +2500,12 @@ namespace WaterToAirHeatPumpSimple {
                         HeatdTratio = (HeatSupTemp - HeatMixTempSys) / (HeatSupTemp - HeatMixTemp);
                         rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(state, state.dataEnvrn->StdBaroPress, HeatMixTemp, HeatMixHumRat, RoutineName);
                         HeatCapAtPeak = rhoair * VolFlowRate * Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero) *
-                                        (HeatSupTemp - HeatMixTemp);                                     // heating coil load
-                        if (state.dataSize->DataFanEnumType > -1 && state.dataSize->DataFanIndex > -1) { // add fan heat to coil load
-                            switch (state.dataSize->DataFanEnumType) {
-                            case DataAirSystems::StructArrayLegacyFanModels: {
-                                FanHeatLoad = Fans::FanDesHeatGain(state, state.dataSize->DataFanIndex, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::ObjectVectorOOFanSystemModel: {
-                                FanHeatLoad = state.dataHVACFan->fanObjs[state.dataSize->DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
-                                break;
-                            }
-                            case DataAirSystems::Invalid: {
-                                // do nothing
-                                break;
-                            }
-                            } // end switch
+                                        (HeatSupTemp - HeatMixTemp);                                                     // heating coil load
+                        if (state.dataSize->DataFanType != HVAC::FanType::Invalid && state.dataSize->DataFanIndex > 0) { // add fan heat to coil load
+                            FanHeatLoad = state.dataFans->fans(state.dataSize->DataFanIndex)->getDesignHeatGain(state, VolFlowRate);
+
                             Real64 CpAir = Psychrometrics::PsyCpAirFnW(HeatMixHumRat);
-                            if (state.dataSize->DataFanPlacement == DataSizing::ZoneFanPlacement::BlowThru) {
+                            if (state.dataSize->DataFanPlacement == HVAC::FanPlace::BlowThru) {
                                 HeatMixTemp += FanHeatLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature entering the coil
                             } else {
                                 HeatSupTemp -= FanHeatLoad / (CpAir * rhoair * VolFlowRate); // this is now the temperature leaving the coil
@@ -3060,13 +2979,13 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPCoolingSimple(EnergyPlusData &state,
-                             int const HPNum,                                         // Heat Pump Number
-                             int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
-                             [[maybe_unused]] Real64 const SensDemand,                // Cooling Sensible Demand [W] !unused1208
-                             [[maybe_unused]] Real64 const LatentDemand,              // Cooling Latent Demand [W]
-                             DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
-                             Real64 const PartLoadRatio,                              // compressor part load ratio
-                             [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                                // Heat Pump Number
+                             HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
+                             [[maybe_unused]] Real64 const SensDemand,       // Cooling Sensible Demand [W] !unused1208
+                             [[maybe_unused]] Real64 const LatentDemand,     // Cooling Latent Demand [W]
+                             HVAC::CompressorOp const compressorOp,          // compressor operation flag
+                             Real64 const PartLoadRatio,                     // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -3165,7 +3084,7 @@ namespace WaterToAirHeatPumpSimple {
         Twet_Rated = simpleWatertoAirHP.Twet_Rated;
         Gamma_Rated = simpleWatertoAirHP.Gamma_Rated;
 
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             LoadSideFullMassFlowRate = simpleWatertoAirHP.AirMassFlowRate;
         } else {
             // default to cycling fan, cycling compressor, full load air flow
@@ -3192,7 +3111,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }
@@ -3202,7 +3121,7 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWatertoAirHP.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
@@ -3284,7 +3203,7 @@ namespace WaterToAirHeatPumpSimple {
                     SHReff = CalcEffectiveSHR(state,
                                               HPNum,
                                               SHRss,
-                                              CyclingScheme,
+                                              fanOp,
                                               simpleWatertoAirHP.RunFrac,
                                               state.dataWaterToAirHeatPumpSimple->QLatRated,
                                               state.dataWaterToAirHeatPumpSimple->QLatActual,
@@ -3308,7 +3227,7 @@ namespace WaterToAirHeatPumpSimple {
         state.dataWaterToAirHeatPumpSimple->LoadSideOutletHumRat =
             Psychrometrics::PsyWFnTdbH(state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, LoadSideFullOutletEnthalpy, RoutineName);
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             simpleWatertoAirHP.OutletAirEnthalpy =
                 PartLoadRatio * LoadSideFullOutletEnthalpy + (1.0 - PartLoadRatio) * state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth;
@@ -3360,7 +3279,7 @@ namespace WaterToAirHeatPumpSimple {
         }
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
-        if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {
+        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Cycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
@@ -3375,7 +3294,7 @@ namespace WaterToAirHeatPumpSimple {
                     state.dataWaterToAirHeatPumpSimple->SourceSideInletEnth + simpleWatertoAirHP.QSource / simpleWatertoAirHP.WaterMassFlowRate;
             }
         } else {
-            if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WaterFlowMode) {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -3397,12 +3316,12 @@ namespace WaterToAirHeatPumpSimple {
     }
 
     void CalcHPHeatingSimple(EnergyPlusData &state,
-                             int const HPNum,                                         // Heat Pump Number
-                             int const CyclingScheme,                                 // Fan/Compressor cycling scheme indicator
-                             [[maybe_unused]] Real64 const SensDemand,                // Sensible Demand [W] !unused1208
-                             DataHVACGlobals::CompressorOperation const CompressorOp, // compressor operation flag
-                             Real64 const PartLoadRatio,                              // compressor part load ratio
-                             [[maybe_unused]] Real64 const OnOffAirFlowRatio          // ratio of compressor on flow to average flow over time step
+                             int const HPNum,                                // Heat Pump Number
+                             HVAC::FanOp const fanOp,                        // Fan/Compressor cycling scheme indicator
+                             [[maybe_unused]] Real64 const SensDemand,       // Sensible Demand [W] !unused1208
+                             HVAC::CompressorOp const compressorOp,          // compressor operation flag
+                             Real64 const PartLoadRatio,                     // compressor part load ratio
+                             [[maybe_unused]] Real64 const OnOffAirFlowRatio // ratio of compressor on flow to average flow over time step
     )
     {
 
@@ -3456,7 +3375,7 @@ namespace WaterToAirHeatPumpSimple {
         HeatPowerRated = simpleWatertoAirHP.RatedPowerHeat;
         AirVolFlowRateRated = simpleWatertoAirHP.RatedAirVolFlowRate;
         WaterVolFlowRateRated = simpleWatertoAirHP.RatedWaterVolFlowRate;
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             LoadSideFullMassFlowRate = simpleWatertoAirHP.AirMassFlowRate;
         } else {
             // default to cycling fan, cycling compressor, full load air flow
@@ -3494,7 +3413,7 @@ namespace WaterToAirHeatPumpSimple {
             simpleWatertoAirHP.SimFlag = true;
         }
 
-        if (CompressorOp == DataHVACGlobals::CompressorOperation::Off) {
+        if (compressorOp == HVAC::CompressorOp::Off) {
             simpleWatertoAirHP.SimFlag = false;
             return;
         }
@@ -3504,7 +3423,7 @@ namespace WaterToAirHeatPumpSimple {
         if (simpleWatertoAirHP.PLFCurveIndex > 0) {
             PLF = Curve::CurveValue(state, simpleWatertoAirHP.PLFCurveIndex, PartLoadRatio); // Calculate part-load factor
         }
-        if (CyclingScheme == DataHVACGlobals::CycFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Cycling) {
             state.dataHVACGlobal->OnOffFanPartLoadFraction = PLF;
         }
         simpleWatertoAirHP.RunFrac = PartLoadRatio / PLF;
@@ -3537,7 +3456,7 @@ namespace WaterToAirHeatPumpSimple {
             Psychrometrics::PsyWFnTdbH(state, state.dataWaterToAirHeatPumpSimple->LoadSideOutletDBTemp, LoadSideFullOutletEnthalpy, RoutineName);
 
         // Actual outlet conditions are "average" for time step
-        if (CyclingScheme == DataHVACGlobals::ContFanCycCoil) {
+        if (fanOp == HVAC::FanOp::Continuous) {
             // continuous fan, cycling compressor
             simpleWatertoAirHP.OutletAirEnthalpy =
                 PartLoadRatio * LoadSideFullOutletEnthalpy + (1.0 - PartLoadRatio) * state.dataWaterToAirHeatPumpSimple->LoadSideInletEnth;
@@ -3577,7 +3496,7 @@ namespace WaterToAirHeatPumpSimple {
         }
         simpleWatertoAirHP.PartLoadRatio = PartLoadRatio;
 
-        if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterCycling) {
+        if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Cycling) {
             // plant can lock flow at coil water inlet node, use design flow multiplied by PLR to calculate water mass flow rate
             simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate * PartLoadRatio;
             PlantUtilities::SetComponentFlowRate(state,
@@ -3592,7 +3511,7 @@ namespace WaterToAirHeatPumpSimple {
                     state.dataWaterToAirHeatPumpSimple->SourceSideInletEnth - simpleWatertoAirHP.QSource / simpleWatertoAirHP.WaterMassFlowRate;
             }
         } else {
-            if ((simpleWatertoAirHP.WaterCyclingMode) == DataHVACGlobals::WaterConstant) {
+            if ((simpleWatertoAirHP.WaterCyclingMode) == HVAC::WaterFlow::Constant) {
                 if (simpleWatertoAirHP.WaterFlowMode) {
                     simpleWatertoAirHP.WaterMassFlowRate = simpleWatertoAirHP.DesignWaterMassFlowRate;
                     PlantUtilities::SetComponentFlowRate(state,
@@ -3732,7 +3651,7 @@ namespace WaterToAirHeatPumpSimple {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // Fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // Fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -3744,7 +3663,7 @@ namespace WaterToAirHeatPumpSimple {
         // FUNCTION INFORMATION:
         //    AUTHOR         Richard Raustad, FSEC
         //    DATE WRITTEN   September 2003
-        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating CycFanCycCoil
+        //    MODIFIED       Kenneth Tang (Aug 2004) Added capability for simulating FanOp::Cycling
 
         // PURPOSE OF THIS FUNCTION:
         //    Adjust sensible heat ratio to account for degradation of DX coil latent
@@ -3821,12 +3740,12 @@ namespace WaterToAirHeatPumpSimple {
         //  Calculate the compressor on and off times using a converntional thermostat curve
         Ton = 3600.0 / (4.0 * MaxONOFFCyclesperHour * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
 
-        if ((CyclingScheme == DataHVACGlobals::CycFanCycCoil) && (FanDelayTime != 0.0)) {
-            // For CycFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+        if ((fanOp == HVAC::FanOp::Cycling) && (FanDelayTime != 0.0)) {
+            // For FanOp::Cycling, moisture is evaporated from the cooling coil back to the air stream
             // until the fan cycle off. Assume no evaporation from the coil after the fan shuts off.
             Toff = FanDelayTime;
         } else {
-            // For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
+            // For FanOp::Continuous, moisture is evaporated from the cooling coil back to the air stream
             // for the entire heat pump off-cycle.
             Toff = 3600.0 / (4.0 * MaxONOFFCyclesperHour * RTF); // duration of cooling coil off-cycle (sec)
         }
@@ -4097,7 +4016,7 @@ namespace WaterToAirHeatPumpSimple {
     void SetSimpleWSHPData(EnergyPlusData &state,
                            int const SimpleWSHPNum,                         // Number of OA Controller
                            bool &ErrorsFound,                               // Set to true if certain errors found
-                           int const WaterCyclingMode,                      // the coil water flow mode (cycling, constant or constantondemand)
+                           HVAC::WaterFlow const WaterCyclingMode,          // the coil water flow mode (cycling, constant or constantondemand)
                            ObjexxFCL::Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
                            ObjexxFCL::Optional_int CompanionHeatingCoilNum  // Index to heating coil for cooling coil = SimpleWSHPNum
     )

@@ -234,7 +234,7 @@ TEST_F(EnergyPlusFixture, WaterManager_Fill)
 
     EXPECT_EQ(1u, state->dataWaterData->WaterStorage.size());
     int TankNum = 1;
-    EXPECT_TRUE(compare_enums(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply));
+    EXPECT_ENUM_EQ(DataWater::ControlSupplyType::WellFloatMainsBackup, state->dataWaterData->WaterStorage(TankNum).ControlSupply);
     EXPECT_EQ(0u, state->dataWaterData->WaterStorage(TankNum).NumWaterDemands);
     EXPECT_EQ(0.003, state->dataWaterData->WaterStorage(TankNum).MaxInFlowRate);
     EXPECT_EQ(0.20, state->dataWaterData->WaterStorage(TankNum).ValveOnCapacity);
@@ -371,8 +371,8 @@ TEST_F(EnergyPlusFixture, WaterManager_MainsWater_Meter_Test)
     EXPECT_EQ(state->dataOutputProcessor->meters.size(), 11u);
 
     EXPECT_EQ(state->dataOutputProcessor->meters[3]->Name, "General:WaterSystems:MainsWater");
-    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater));
-    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovEndUseCat, OutputProcessor::SOVEndUseCat::WaterSystem));
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->resource, Constant::eResource::MainsWater);
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->endUseCat, OutputProcessor::EndUseCat::WaterSystem);
     EXPECT_EQ(state->dataOutputProcessor->meters[3]->EndUseSub, "General");
-    EXPECT_TRUE(compare_enums(state->dataOutputProcessor->meters[3]->sovGroup, OutputProcessor::SOVGroup::Invalid));
+    EXPECT_ENUM_EQ(state->dataOutputProcessor->meters[3]->group, OutputProcessor::Group::Invalid);
 }

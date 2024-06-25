@@ -138,7 +138,6 @@ EnergyPlusData::EnergyPlusData()
     this->dataHVACCtrl = std::make_unique<HVACCtrlData>();
     this->dataHVACDXHeatPumpSys = std::make_unique<HVACDXHeatPumpSystemData>();
     this->dataHVACDuct = std::make_unique<HVACDuctData>();
-    this->dataHVACFan = std::make_unique<HVACFanData>();
     this->dataHVACGlobal = std::make_unique<HVACGlobalsData>();
     this->dataHVACInterfaceMgr = std::make_unique<HVACInterfaceManagerData>();
     this->dataHVACMgr = std::make_unique<HVACManagerData>();
@@ -258,7 +257,7 @@ EnergyPlusData::EnergyPlusData()
     this->dataSysAirFlowSizer = std::make_unique<SystemAirFlowSizerData>();
     this->dataSysRpts = std::make_unique<SystemReportsData>();
     this->dataSysVars = std::make_unique<SystemVarsData>();
-    this->dataSystemAvailabilityManager = std::make_unique<SystemAvailabilityManagerData>();
+    this->dataAvail = std::make_unique<SystemAvailabilityManagerData>();
     this->dataTARCOGCommon = std::make_unique<TARCOGCommonData>();
     this->dataTARCOGOutputs = std::make_unique<TARCOGOutputData>();
     this->dataThermalChimneys = std::make_unique<ThermalChimneysData>();
@@ -394,7 +393,6 @@ void EnergyPlusData::clear_state()
     this->dataHVACCtrl->clear_state();
     this->dataHVACDXHeatPumpSys->clear_state();
     this->dataHVACDuct->clear_state();
-    this->dataHVACFan->clear_state();
     this->dataHVACGlobal->clear_state();
     this->dataHVACInterfaceMgr->clear_state();
     this->dataHVACMgr->clear_state();
@@ -514,7 +512,7 @@ void EnergyPlusData::clear_state()
     this->dataSysAirFlowSizer->clear_state();
     this->dataSysRpts->clear_state();
     this->dataSysVars->clear_state();
-    this->dataSystemAvailabilityManager->clear_state();
+    this->dataAvail->clear_state();
     this->dataTARCOGCommon->clear_state();
     this->dataTARCOGOutputs->clear_state();
     this->dataThermalChimneys->clear_state();

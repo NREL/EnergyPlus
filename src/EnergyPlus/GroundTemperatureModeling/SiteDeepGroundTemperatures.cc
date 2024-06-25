@@ -108,7 +108,7 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(EnergyP
             thisModel->deepGroundTemps(i) = state.dataIPShortCut->rNumericArgs(i);
         }
 
-        state.dataEnvrn->GroundTemp_DeepObjInput = true;
+        state.dataEnvrn->GroundTempInputs[(int)DataEnvironment::GroundTempType::Deep] = true;
 
     } else if (numCurrObjects > 1) {
         ShowSevereError(state,

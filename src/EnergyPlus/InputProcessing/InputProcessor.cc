@@ -617,31 +617,32 @@ bool InputProcessor::getDefaultValue(EnergyPlusData &state, std::string const &o
     return defaultFound;
 }
 
-std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
+std::string InputProcessor::getAlphaFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName, bool uc)
 {
     // Return the value of fieldName in ep_object as a string.
     // If the field is not present in ep_object then return its default if there is one, or return an empty string
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
-    bool isDefaulted = false;
-    std::string value;
+    auto const &fprops = schema_obj_props[fieldName];
+    assert(!fprops.empty()); // Check that field name exists in the schema for this object type
+
+    uc = (fprops.find("retaincase") == fprops.end());
+
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
-        auto const &field_value = it.value();
-        if (field_value.is_string()) {
-            auto const valuePair = getObjectItemValue(field_value.get<std::string>(), schema_field_obj); // (AUTO_OK_OBJ)
-            value = valuePair.first;
-            isDefaulted = valuePair.second;
-        } else {
-            assert(false); // String value requested but field type is numeric
-        }
-    } else {
-        isDefaulted = findDefault(value, schema_field_obj);
-        if (!isDefaulted) {
-            value = "";
-        }
+        auto const &val = it.value();
+        assert(val.is_string());
+        if (!val.empty()) return uc ? Util::makeUPPER(val.get<std::string>()) : val.get<std::string>();
     }
-    return value;
+
+    auto const it2 = fprops.find("default");
+    return (it2 != fprops.end()) ? (uc ? Util::makeUPPER(it2.value().get<std::string>()) : it2.value().get<std::string>()) : std::string();
+
+#ifdef GET_OUT
+    if (default_val.is_number_integer()) {
+        i64toa(default_val.get<std::int64_t>(), s);
+    } else if (default_val.is_number()) {
+        dtoa(default_val.get<double>(), s);
+    }
+#endif // GET_OUT
 }
 
 Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
@@ -649,34 +650,32 @@ Real64 InputProcessor::getRealFieldValue(json const &ep_object, json const &sche
     // Return the value of fieldName in ep_object as a Real64.
     // If the field value is a string, then assum autosize and return Constant::AutoCalculate(-99999).
     // If the field is not present in ep_object then return its default if there is one, or return 0.0
-    auto const &schema_field_obj = schema_obj_props[fieldName];
-    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
-    bool isDefaulted = false;
-    Real64 value = 0.0;
     auto it = ep_object.find(fieldName);
     if (it != ep_object.end()) {
         auto const &field_value = it.value();
         if (field_value.is_number()) {
-            if (field_value.is_number_integer()) {
-                value = field_value.get<std::int64_t>();
-            } else {
-                value = field_value.get<double>();
-            }
-        } else {
-            bool is_empty = field_value.get<std::string>().empty();
-            if (is_empty) {
-                isDefaulted = findDefault(value, schema_field_obj);
-            } else {
-                value = Constant::AutoCalculate; // autosize and autocalculate
-            }
-        }
-    } else {
-        isDefaulted = findDefault(value, schema_field_obj);
-        if (!isDefaulted) {
-            value = 0.0;
+            return (field_value.is_number_integer()) ? field_value.get<std::int64_t>() : field_value.get<double>();
+        } else if (!field_value.get<std::string>().empty()) {
+            return Constant::AutoCalculate; // autosize and autocalculate
         }
     }
-    return value;
+
+    auto const &schema_field_obj = schema_obj_props[fieldName];
+    assert(!schema_field_obj.empty()); // Check that field name exists in the schema for this object type
+
+    auto const find_default = schema_field_obj.find("default");
+    if (find_default != schema_field_obj.end()) {
+        auto const &default_val = find_default.value();
+        if (default_val.is_string()) {
+            return (!default_val.get<std::string>().empty()) ? Constant::AutoCalculate : 0.0;
+        } else if (default_val.is_number_integer()) {
+            return default_val.get<std::int64_t>();
+        } else {
+            return default_val.get<double>();
+        }
+    } else {
+        return 0.0;
+    }
 }
 
 int InputProcessor::getIntFieldValue(json const &ep_object, json const &schema_obj_props, std::string const &fieldName)
@@ -1344,20 +1343,23 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     NumAlpha = 0;
     NumNumeric = 0;
     const json *object;
-    if (schema()["properties"].find(std::string(ObjectWord)) == schema()["properties"].end()) {
+
+    auto const &props = schema()["properties"];
+
+    if (auto found = props.find(std::string(ObjectWord)); found == props.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
             return;
         }
-        object = &schema()["properties"][tmp_umit->second];
+        object = &props[tmp_umit->second];
     } else {
-        object = &schema()["properties"][std::string(ObjectWord)];
+        object = &found.value();
     }
-    const json &legacy_idd = object->at("legacy_idd");
 
+    const json &legacy_idd = object->at("legacy_idd");
     json *objects;
-    if (epJSON.find(std::string(ObjectWord)) == epJSON.end()) {
+    if (auto found = epJSON.find(std::string(ObjectWord)); found == epJSON.end()) {
         auto tmp_umit = caseInsensitiveObjectMap.find(convertToUpper(ObjectWord));
         if (tmp_umit == caseInsensitiveObjectMap.end()) {
             ShowSevereError(state, fmt::format(R"(getObjectDefMaxArgs: Did not find object="{}" in list of objects.)", ObjectWord));
@@ -1365,7 +1367,7 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
         }
         objects = &epJSON[tmp_umit->second];
     } else {
-        objects = &epJSON[std::string(ObjectWord)];
+        objects = &found.value();
     }
 
     size_t max_size = 0;
@@ -1377,28 +1379,28 @@ void InputProcessor::getObjectDefMaxArgs(EnergyPlusData &state,
     }
 
     for (auto const &obj : *objects) {
-        if (obj.find(extension_key) != obj.end()) {
-            size_t const size = obj[extension_key].size();
+        if (auto found = obj.find(extension_key); found != obj.end()) {
+            size_t const size = found.value().size();
             if (size > max_size) max_size = size;
         }
     }
 
-    if (legacy_idd.find("alphas") != legacy_idd.end()) {
-        json const alphas = legacy_idd["alphas"];
-        if (alphas.find("fields") != alphas.end()) {
-            NumAlpha += alphas["fields"].size();
+    if (auto found = legacy_idd.find("alphas"); found != legacy_idd.end()) {
+        json const &alphas = found.value();
+        if (auto found2 = alphas.find("fields"); found2 != alphas.end()) {
+            NumAlpha += found2.value().size();
         }
-        if (alphas.find("extensions") != alphas.end()) {
-            NumAlpha += alphas["extensions"].size() * max_size;
+        if (auto found2 = alphas.find("extensions"); found2 != alphas.end()) {
+            NumAlpha += found2.value().size() * max_size;
         }
     }
-    if (legacy_idd.find("numerics") != legacy_idd.end()) {
-        json const numerics = legacy_idd["numerics"];
-        if (numerics.find("fields") != numerics.end()) {
-            NumNumeric += numerics["fields"].size();
+    if (auto found = legacy_idd.find("numerics"); found != legacy_idd.end()) {
+        json const &numerics = found.value();
+        if (auto found2 = numerics.find("fields"); found2 != numerics.end()) {
+            NumNumeric += found2.value().size();
         }
-        if (numerics.find("extensions") != numerics.end()) {
-            NumNumeric += numerics["extensions"].size() * max_size;
+        if (auto found2 = numerics.find("extensions"); found2 != numerics.end()) {
+            NumNumeric += found2.value().size() * max_size;
         }
     }
     NumArgs = NumAlpha + NumNumeric;
@@ -2127,20 +2129,20 @@ void InputProcessor::addVariablesForMonthlyReport(EnergyPlusData &state, std::st
     } else if (reportName == "WINDOWZONESUMMARYMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE");
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE");
 
     } else if (reportName == "WINDOWENERGYZONESUMMARYMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY");
         addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
-        addRecordToOutputVariableStructure(state, "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE EXTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY");
+        addRecordToOutputVariableStructure(state, "*", "ENCLOSURE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY");
 
     } else if (reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY") {
         addRecordToOutputVariableStructure(state, "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");

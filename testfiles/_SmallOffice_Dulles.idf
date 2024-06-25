@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,24.1;
+  Version,24.2;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -3570,13 +3570,13 @@
 
   Output:Variable,*,Surface Window Transmitted Solar Radiation Rate,annual;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,monthly;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,monthly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,annual;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,annual;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,monthly;
+  Output:Variable,*,Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,monthly;
 
-  Output:Variable,*,Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,annual;
+  Output:Variable,*, Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,annual;
 
   Output:Variable,*,Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area,monthly;
 
@@ -3606,9 +3606,9 @@
 
   Output:Variable,*,Surface Window Transmitted Diffuse Solar Radiation Rate,annual;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,monthly;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,monthly;
 
-  Output:Variable,*,Zone Windows Total Transmitted Solar Radiation Rate,annual;
+  Output:Variable,*,Enclosure Windows Total Transmitted Solar Radiation Rate,annual;
 
   Output:Variable,*,Zone Windows Total Heat Gain Rate,monthly;
 
@@ -5055,11 +5055,11 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Zone Windows Total Heat Loss Rate,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Zone Windows Total Transmitted Solar Radiation Rate,  !- Variable or Meter 3 Name
+    Enclosure Windows Total Transmitted Solar Radiation Rate,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Exterior Windows Total Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 4 Name
+    Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Rate,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,  !- Variable or Meter 5 Name
+    Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Rate,  !- Variable or Meter 5 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 5
 
   Output:Table:Monthly,
@@ -5069,15 +5069,15 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Zone Windows Total Heat Loss Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Zone Windows Total Transmitted Solar Radiation Energy,  !- Variable or Meter 3 Name
+    Enclosure Windows Total Transmitted Solar Radiation Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Exterior Windows Total Transmitted Beam Solar Radiation Energy,  !- Variable or Meter 4 Name
+    Enclosure Exterior Windows Total Transmitted Beam Solar Radiation Energy,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Zone Exterior Windows Total Transmitted Diffuse Solar Radiation Energy,  !- Variable or Meter 5 Name
+    Enclosure Exterior Windows Total Transmitted Diffuse Solar Radiation Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Zone Interior Windows Total Transmitted Diffuse Solar Radiation Energy,  !- Variable or Meter 6 Name
+    Enclosure Interior Windows Total Transmitted Diffuse Solar Radiation Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Zone Interior Windows Total Transmitted Beam Solar Radiation Energy,  !- Variable or Meter 7 Name
+    Enclosure Interior Windows Total Transmitted Beam Solar Radiation Energy,  !- Variable or Meter 7 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 7
 
   Output:Table:Monthly,

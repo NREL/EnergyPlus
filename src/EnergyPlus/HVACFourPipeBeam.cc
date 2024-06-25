@@ -393,19 +393,18 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Cooling Energy",
                                 Constant::Units::J,
                                 thisBeam->beamCoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisBeam->name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::CoolingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::CoolingCoils);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Cooling Rate",
                                 Constant::Units::W,
                                 thisBeam->beamCoolingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisBeam->name);
         }
         if (thisBeam->beamHeatingPresent) {
@@ -413,63 +412,62 @@ namespace FourPipeBeam {
                                 "Zone Air Terminal Beam Sensible Heating Energy",
                                 Constant::Units::J,
                                 thisBeam->beamHeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 thisBeam->name,
                                 Constant::eResource::EnergyTransfer,
-                                OutputProcessor::SOVEndUseCat::HeatingCoils,
-                                {},
-                                OutputProcessor::SOVGroup::HVAC);
+                                OutputProcessor::Group::HVAC,
+                                OutputProcessor::EndUseCat::HeatingCoils);
             SetupOutputVariable(state,
                                 "Zone Air Terminal Beam Sensible Heating Rate",
                                 Constant::Units::W,
                                 thisBeam->beamHeatingRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 thisBeam->name);
         }
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Energy",
                             Constant::Units::J,
                             thisBeam->supAirCoolingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Cooling Rate",
                             Constant::Units::W,
                             thisBeam->supAirCoolingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Energy",
                             Constant::Units::J,
                             thisBeam->supAirHeatingEnergy,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Sensible Heating Rate",
                             Constant::Units::W,
                             thisBeam->supAirHeatingRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisBeam->name);
         SetupOutputVariable(state,
                             "Zone Air Terminal Primary Air Flow Rate",
                             Constant::Units::m3_s,
                             thisBeam->primAirFlow,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisBeam->name);
 
         SetupOutputVariable(state,
                             "Zone Air Terminal Outdoor Air Volume Flow Rate",
                             Constant::Units::m3_s,
                             thisBeam->OutdoorAirFlowRate,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             thisBeam->name);
 
         airNodeFound = false;
@@ -1098,7 +1096,7 @@ namespace FourPipeBeam {
 
         NonAirSysOutput = 0.0; // initialize
 
-        if (this->mDotSystemAir < DataHVACGlobals::VerySmallMassFlow ||
+        if (this->mDotSystemAir < HVAC::VerySmallMassFlow ||
             (!this->airAvailable && !this->coolingAvailable && !this->heatingAvailable)) { // unit is off
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
@@ -1116,7 +1114,7 @@ namespace FourPipeBeam {
             return;
         }
 
-        if (this->airAvailable && this->mDotSystemAir > DataHVACGlobals::VerySmallMassFlow && !this->coolingAvailable && !this->heatingAvailable) {
+        if (this->airAvailable && this->mDotSystemAir > HVAC::VerySmallMassFlow && !this->coolingAvailable && !this->heatingAvailable) {
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
                 SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
@@ -1145,7 +1143,7 @@ namespace FourPipeBeam {
 
         this->qDotBeamReq = this->qDotZoneReq - this->qDotSystemAir;
 
-        if (this->qDotBeamReq < -DataHVACGlobals::SmallLoad && this->coolingAvailable) { // beam cooling needed
+        if (this->qDotBeamReq < -HVAC::SmallLoad && this->coolingAvailable) { // beam cooling needed
             // first calc with max chilled water flow
             this->mDotHW = 0.0;
             if (this->beamHeatingPresent) {
@@ -1154,7 +1152,7 @@ namespace FourPipeBeam {
             this->hWTempOut = this->hWTempIn;
             this->mDotCW = this->mDotDesignCW;
             this->calc(state);
-            if (this->qDotBeamCooling < (qDotBeamReq - DataHVACGlobals::SmallLoad)) {
+            if (this->qDotBeamCooling < (qDotBeamReq - HVAC::SmallLoad)) {
                 // can overcool, modulate chilled water flow rate to meet load
                 this->qDotBeamCoolingMax = this->qDotBeamCooling;
                 ErrTolerance = 0.01;
@@ -1184,7 +1182,7 @@ namespace FourPipeBeam {
                 return;
             }
 
-        } else if (qDotBeamReq > DataHVACGlobals::SmallLoad && this->heatingAvailable) { // beam heating needed
+        } else if (qDotBeamReq > HVAC::SmallLoad && this->heatingAvailable) { // beam heating needed
             // first calc with max hot water flow
             this->mDotCW = 0.0;
             if (this->beamCoolingPresent) {
@@ -1193,7 +1191,7 @@ namespace FourPipeBeam {
             this->cWTempOut = this->cWTempIn;
             this->mDotHW = this->mDotDesignHW;
             this->calc(state);
-            if (this->qDotBeamHeating > (qDotBeamReq + DataHVACGlobals::SmallLoad)) {
+            if (this->qDotBeamHeating > (qDotBeamReq + HVAC::SmallLoad)) {
                 this->qDotBeamHeatingMax = this->qDotBeamHeating;
                 // can overheat, modulate hot water flow to meet load
                 ErrTolerance = 0.01;
@@ -1275,7 +1273,7 @@ namespace FourPipeBeam {
         this->qDotBeamCooling = 0.0;
         this->qDotSystemAir = this->mDotSystemAir * ((this->cpSystemAir * this->tDBSystemAir) - (this->cpZoneAir * this->tDBZoneAirTemp));
 
-        if (this->coolingAvailable && this->mDotCW > DataHVACGlobals::VerySmallMassFlow) {
+        if (this->coolingAvailable && this->mDotCW > HVAC::VerySmallMassFlow) {
             // test chilled water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotCW, this->cWInNodeNum, this->cWOutNodeNum, this->cWplantLoc);
             fModCoolCWMdot =
@@ -1316,7 +1314,7 @@ namespace FourPipeBeam {
             this->cWTempOut = this->cWTempIn;
             this->qDotBeamCooling = 0.0;
         }
-        if (this->heatingAvailable && this->mDotHW > DataHVACGlobals::VerySmallMassFlow) {
+        if (this->heatingAvailable && this->mDotHW > HVAC::VerySmallMassFlow) {
             // test hot water flow against plant, it might not all be available
             SetComponentFlowRate(state, this->mDotHW, this->hWInNodeNum, this->hWOutNodeNum, this->hWplantLoc);
             fModHeatHWMdot =

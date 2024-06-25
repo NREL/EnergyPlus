@@ -374,89 +374,87 @@ namespace IndoorGreen {
                                 "Indoor Living Wall Plant Surface Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalSurf->SurfTempIn(ig.SurfPtr),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(
                 state,
                 "Indoor Living Wall Sensible Heat Gain Rate",
                 Constant::Units::W,
                 state.dataHeatBalSurf->SurfQConvInRep(ig.SurfPtr), // positive sign: heat loss from plants; negative sign: heat gain from plants
-                OutputProcessor::SOVTimeStepType::Zone,
-                OutputProcessor::SOVStoreType::Average,
+                OutputProcessor::TimeStepType::Zone,
+                OutputProcessor::StoreType::Average,
                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Latent Heat Gain Rate",
                                 Constant::Units::W,
                                 ig.LatentRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Evapotranspiration Rate",
                                 Constant::Units::kg_m2s,
                                 ig.ETRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area",
                                 Constant::Units::W_m2,
                                 ig.LambdaET,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall LED Operational PPFD",
                                 Constant::Units::umol_m2s,
                                 ig.LEDActualPPFD,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall PPFD",
                                 Constant::Units::umol_m2s,
                                 ig.ZPPFD,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall Vapor Pressure Deficit",
                                 Constant::Units::Pa,
                                 ig.ZVPD,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall LED Sensible Heat Gain Rate",
                                 Constant::Units::W,
                                 ig.SensibleRate,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall LED Operational Power",
                                 Constant::Units::W,
                                 ig.LEDActualEleP,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 ig.Name);
             SetupOutputVariable(state,
                                 "Indoor Living Wall LED Electricity Energy",
                                 Constant::Units::J,
                                 ig.LEDActualEleCon,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 ig.Name,
                                 Constant::eResource::Electricity,
-                                OutputProcessor::SOVEndUseCat::InteriorLights,
+                                OutputProcessor::Group::Building,
+                                OutputProcessor::EndUseCat::InteriorLights,
                                 "IndoorLivingWall", // End Use subcategory
-                                OutputProcessor::SOVGroup::Building,
                                 state.dataHeatBal->Zone(ig.ZonePtr).Name,
                                 state.dataHeatBal->Zone(ig.ZonePtr).Multiplier,
                                 state.dataHeatBal->Zone(ig.ZonePtr).ListMultiplier,
-                                {},
-                                {},
                                 state.dataHeatBal->space(ig.SpacePtr).spaceType);
         }
     }
@@ -500,7 +498,6 @@ namespace IndoorGreen {
         Real64 OutPb;       // outdoor pressure (kPa)
         Real64 vp;          // actual vapor pressure of the air (kpa)
         Real64 vpSat;       // saturated vapor pressure at air temperature (kpa)
-        std::string_view cCurrentModuleObject = "IndoorLivingWall";
         Timestep = state.dataHVACGlobal->TimeStepSysSec; // unit s
         for (int IndoorGreenNum = 1; IndoorGreenNum <= lw->NumIndoorGreen; ++IndoorGreenNum) {
             auto &ig = lw->indoorGreens(IndoorGreenNum);
@@ -599,7 +596,6 @@ namespace IndoorGreen {
         // Reference: Stanghellini, C., Transpiration of greenhouse crops: an aid to climate management, 1987, Institute of Agricultural Engineering,
         // Wageningen, The Netherlands
 
-        static constexpr std::string_view RoutineName("ETBaseFunction: ");
         Real64 hfg = Psychrometrics::PsyHfgAirFnWTdb(ZonePreHum, ZonePreTemp) / std::pow(10, 6); // Latent heat of vaporization (MJ/kg)
         Real64 slopepat =
             0.200 * std::pow((0.00738 * ZonePreTemp + 0.8072), 7) - 0.000116; // Slope of the saturation vapor pressure-temperature curve (kPa/°C)

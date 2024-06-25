@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout EnergyPlus
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install cppcheck
       shell: bash
@@ -30,7 +30,7 @@ jobs:
 
     - name: Cache cppcheck-build-directory
       id: cppcheckcache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .cppcheck-build-dir/
         key: cppcheckcache
@@ -78,7 +78,7 @@ jobs:
 
     - name: Upload cppcheck results as artifact
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: EnergyPlus-${{ github.sha }}-cppcheck_results.txt
           path: cppcheck.txt

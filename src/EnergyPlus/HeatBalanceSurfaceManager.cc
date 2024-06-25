@@ -1427,6 +1427,7 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
 
     state.dataHeatBalSurf->SurfOpaqInitialDifSolInAbs.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans.dimension(state.dataSurface->TotSurfaces, 0.0);
+    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans.dimension(state.dataSurface->TotSurfaces, 0.0);
 
     state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
     state.dataHeatBalSurf->SurfQdotRadLightsInPerArea.dimension(state.dataSurface->TotSurfaces, 0.0);
@@ -1498,15 +1499,15 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Surface Inside Face Temperature",
                             Constant::Units::C,
                             state.dataHeatBalSurf->SurfTempIn(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Interior Movable Insulation Temperature",
                             Constant::Units::C,
                             state.dataHeatBalSurf->SurfTempInMovInsRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
 
         if (surface.ExtBoundCond != DataSurfaces::KivaFoundation) {
@@ -1514,8 +1515,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Outside Face Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalSurf->SurfTempOut(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
 
@@ -1523,58 +1524,58 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Surface Inside Face Adjacent Air Temperature",
                             Constant::Units::C,
                             state.dataHeatBal->SurfTempEffBulkAir(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Transfer Coefficient",
                             Constant::Units::W_m2K,
                             state.dataHeatBalSurf->SurfHConvInt(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Gain Rate",
                             Constant::Units::W,
                             state.dataHeatBalSurf->SurfQdotConvInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBalSurf->SurfQdotConvInPerArea(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Heat Gain Energy",
                             Constant::Units::J,
                             state.dataHeatBalSurf->SurfQConvInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surface.Name);
 
         SetupOutputVariable(state,
                             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate",
                             Constant::Units::W,
                             state.dataHeatBalSurf->SurfQdotRadNetSurfInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBalSurf->SurfQdotRadNetLWInPerArea(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy",
                             Constant::Units::J,
                             state.dataHeatBalSurf->SurfQRadNetSurfInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surface.Name);
 
         if (surface.Class != DataSurfaces::SurfaceClass::Window) {
@@ -1582,44 +1583,44 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Inside Face Solar Radiation Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQdotRadSolarInRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Solar Radiation Heat Gain Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBalSurf->SurfQdotRadSolarInRepPerArea(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Solar Radiation Heat Gain Energy",
                                 Constant::Units::J,
                                 state.dataHeatBalSurf->SurfQRadSolarInRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surface.Name);
 
             SetupOutputVariable(state,
                                 "Surface Inside Face Lights Radiation Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQdotRadLightsInRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Lights Radiation Heat Gain Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBalSurf->SurfQdotRadLightsInPerArea(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Lights Radiation Heat Gain Energy",
                                 Constant::Units::J,
                                 state.dataHeatBalSurf->SurfQRadLightsInRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surface.Name);
         }
 
@@ -1627,44 +1628,44 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Surface Inside Face Internal Gains Radiation Heat Gain Rate",
                             Constant::Units::W,
                             state.dataHeatBalSurf->SurfQdotRadIntGainsInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Internal Gains Radiation Heat Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBal->SurfQdotRadIntGainsInPerArea(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Internal Gains Radiation Heat Gain Energy",
                             Constant::Units::J,
                             state.dataHeatBalSurf->SurfQRadIntGainsInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surface.Name);
 
         SetupOutputVariable(state,
                             "Surface Inside Face System Radiation Heat Gain Rate",
                             Constant::Units::W,
                             state.dataHeatBalSurf->SurfQdotRadHVACInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face System Radiation Heat Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face System Radiation Heat Gain Energy",
                             Constant::Units::J,
                             state.dataHeatBalSurf->SurfQRadHVACInRep(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Sum,
                             surface.Name);
 
         if (surface.ExtBoundCond == DataSurfaces::ExternalEnvironment || state.dataGlobal->DisplayAdvancedReportVariables) {
@@ -1672,113 +1673,113 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Outside Face Outdoor Air Drybulb Temperature",
                                 Constant::Units::C,
                                 state.dataSurface->SurfOutDryBulbTemp(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wetbulb Temperature",
                                 Constant::Units::C,
                                 state.dataSurface->SurfOutWetBulbTemp(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wind Speed",
                                 Constant::Units::m_s,
                                 state.dataSurface->SurfOutWindSpeed(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Outdoor Air Wind Direction",
                                 Constant::Units::deg,
                                 state.dataSurface->SurfOutWindDir(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQdotConvOutRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Gain Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBalSurf->SurfQdotConvOutPerArea(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Gain Energy",
                                 Constant::Units::J,
                                 state.dataHeatBalSurf->SurfQConvOutReport(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 state.dataHeatBalSurf->SurfHConvExt(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQdotRadOutRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBalSurf->SurfQdotRadOutRepPerArea(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Net Thermal Radiation Heat Gain Energy",
                                 Constant::Units::J,
                                 state.dataHeatBalSurf->SurfQRadOutReport(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 state.dataHeatBalSurf->SurfHAirExt(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Sky Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 state.dataHeatBalSurf->SurfHSkyExt(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Ground Heat Transfer Coefficient",
                                 Constant::Units::W_m2K,
                                 state.dataHeatBalSurf->SurfHGrdExt(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Thermal Radiation to Air Heat Transfer Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQAirExtReport(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Heat Emission to Air Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfQHeatEmiReport(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
 
             if (surface.Class != DataSurfaces::SurfaceClass::Window) {
@@ -1786,22 +1787,22 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                     "Surface Outside Face Solar Radiation Heat Gain Rate",
                                     Constant::Units::W,
                                     state.dataHeatBal->SurfOpaqSWOutAbsTotalReport(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Solar Radiation Heat Gain Rate per Area",
                                     Constant::Units::W_m2,
                                     state.dataHeatBalSurf->SurfOpaqQRadSWOutAbs(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Solar Radiation Heat Gain Energy",
                                     Constant::Units::J,
                                     state.dataHeatBal->SurfOpaqSWOutAbsEnergyReport(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surface.Name);
             }
         }
@@ -1813,36 +1814,36 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Inside Face Conduction Heat Transfer Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceCond(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Conduction Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceCondGainRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Conduction Heat Loss Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceCondLossRep(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Conduction Heat Transfer Rate per Area",
                                 Constant::Units::W_m2,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceCondFlux(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Inside Face Conduction Heat Transfer Energy",
                                 Constant::Units::J,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceCondEnergy(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 surface.Name);
 
             if (surface.ExtBoundCond != DataSurfaces::KivaFoundation) {
@@ -1850,108 +1851,108 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                     "Surface Outside Face Conduction Heat Transfer Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqOutFaceCond(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Gain Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqExtFaceCondGainRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Loss Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqExtFaceCondLossRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Transfer Rate per Area",
                                     Constant::Units::W_m2,
                                     state.dataHeatBalSurf->SurfOpaqOutFaceCondFlux(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Outside Face Conduction Heat Transfer Energy",
                                     Constant::Units::J,
                                     state.dataHeatBalSurf->SurfOpaqOutFaceCondEnergy(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surface.Name);
 
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqAvgFaceCond(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Gain Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqAvgFaceCondGainRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Loss Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqAvgFaceCondLossRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Rate per Area",
                                     Constant::Units::W_m2,
                                     state.dataHeatBalSurf->SurfOpaqAvgFaceCondFlux(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Average Face Conduction Heat Transfer Energy",
                                     Constant::Units::J,
                                     state.dataHeatBalSurf->SurfOpaqAvgFaceCondEnergy(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surface.Name);
 
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqStorageCond(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Gain Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqStorageCondGainRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Loss Rate",
                                     Constant::Units::W,
                                     state.dataHeatBalSurf->SurfOpaqStorageCondLossRep(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Rate per Area",
                                     Constant::Units::W_m2,
                                     state.dataHeatBalSurf->SurfOpaqStorageCondFlux(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::State,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Average,
                                     surface.Name);
                 SetupOutputVariable(state,
                                     "Surface Heat Storage Energy",
                                     Constant::Units::J,
                                     state.dataHeatBalSurf->SurfOpaqStorageCondEnergy(loop),
-                                    OutputProcessor::SOVTimeStepType::Zone,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::Zone,
+                                    OutputProcessor::StoreType::Sum,
                                     surface.Name);
             }
 
@@ -1962,8 +1963,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Inside Face Beam Solar Radiation Heat Gain Rate",
                                 Constant::Units::W,
                                 state.dataHeatBalSurf->SurfOpaqInsFaceBeamSolAbsorbed(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
         if (state.dataConstruction->Construct(surface.Construction).SourceSinkPresent) {
@@ -1971,15 +1972,15 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Internal Source Location Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalSurf->SurfTempSource(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Internal User Specified Location Temperature",
                                 Constant::Units::C,
                                 state.dataHeatBalSurf->SurfTempUserLoc(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
 
@@ -1988,22 +1989,22 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Shading Device Is On Time Fraction",
                                 Constant::Units::None,
                                 state.dataSurface->SurfWinFracTimeShadingDeviceOn(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Storm Window On Off Status",
                                 Constant::Units::None,
                                 state.dataSurface->SurfWinStormWinFlag(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Window Blind Slat Angle",
                                 Constant::Units::deg,
                                 state.dataSurface->SurfWinSlatAngThisTSDeg(loop),
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
         //    IF (DisplayAdvancedReportVariables) THEN  !CurrentModuleObject='Opaque Surfaces(Advanced)'
@@ -2011,44 +2012,44 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Surface Inside Face Convection Classification Index",
                             Constant::Units::None,
                             state.dataSurface->surfIntConv(loop).convClassRpt,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Model Equation Index",
                             Constant::Units::None,
                             state.dataSurface->surfIntConv(loop).hcModelEqRpt,
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Inside Face Convection Reference Air Index",
                             Constant::Units::None,
                             state.dataSurface->SurfTAirRefRpt(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         if (surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) {
             SetupOutputVariable(state,
                                 "Surface Outside Face Convection Classification Index",
                                 Constant::Units::None,
                                 state.dataSurface->surfExtConv(loop).convClassRpt,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Forced Convection Model Equation Index",
                                 Constant::Units::None,
                                 state.dataSurface->surfExtConv(loop).hfModelEqRpt,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
             SetupOutputVariable(state,
                                 "Surface Outside Face Natural Convection Model Equation Index",
                                 Constant::Units::None,
                                 state.dataSurface->surfExtConv(loop).hnModelEqRpt,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
 
@@ -2056,15 +2057,15 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                             "Surface Inside Face Heat Source Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBalSurf->SurfQAdditionalHeatSourceInside(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
         SetupOutputVariable(state,
                             "Surface Outside Face Heat Source Gain Rate per Area",
                             Constant::Units::W_m2,
                             state.dataHeatBalSurf->SurfQAdditionalHeatSourceOutside(loop),
-                            OutputProcessor::SOVTimeStepType::Zone,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::Zone,
+                            OutputProcessor::StoreType::Average,
                             surface.Name);
 
         //     ENDIF
@@ -2073,8 +2074,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                                 "Surface Construction Index",
                                 Constant::Units::None,
                                 surface.Construction,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 surface.Name);
         }
     }
@@ -2082,8 +2083,8 @@ void AllocateSurfaceHeatBalArrays(EnergyPlusData &state)
                         "Site Total Surface Heat Emission to Air",
                         Constant::Units::J,
                         state.dataHeatBalSurf->SumSurfaceHeatEmission,
-                        OutputProcessor::SOVTimeStepType::Zone,
-                        OutputProcessor::SOVStoreType::Summed,
+                        OutputProcessor::TimeStepType::Zone,
+                        OutputProcessor::StoreType::Sum,
                         "Environment");
 }
 
@@ -2267,9 +2268,11 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
             if ((surface.ExtBoundCond == DataSurfaces::ExternalEnvironment) || (surface.ExtBoundCond == DataSurfaces::OtherSideCondModeledExt)) {
                 state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataSurface->SurfOutDryBulbTemp(SurfNum);
             } else if (surface.ExtBoundCond == DataSurfaces::Ground) {
-                state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
+                state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) =
+                    state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface];
             } else if (surface.ExtBoundCond == DataSurfaces::GroundFCfactorMethod) {
-                state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                state.dataHeatBalSurf->SurfOutsideTempHist(CTFTermNum)(SurfNum) =
+                    state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
             }
             // Initialize the flux histories
             state.dataHeatBalSurf->SurfOutsideFluxHist(CTFTermNum)(SurfNum) =
@@ -2299,11 +2302,13 @@ void InitThermalAndFluxHistories(EnergyPlusData &state)
                 }
             } else if (surface.ExtBoundCond == DataSurfaces::Ground) {
                 for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTemp;
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) =
+                        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface];
                 }
             } else if (surface.ExtBoundCond == DataSurfaces::GroundFCfactorMethod) {
                 for (int CTFTermNum = 1; CTFTermNum <= Construction::MaxCTFTerms; ++CTFTermNum) {
-                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                    state.dataHeatBalSurf->SurfOutsideTempHistMaster(CTFTermNum)(SurfNum) =
+                        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
                 }
             }
             for (int CTFTermNum = 2; CTFTermNum <= state.dataConstruction->Construct(surface.Construction).NumCTFTerms + 1; ++CTFTermNum) {
@@ -2569,6 +2574,7 @@ void InitSolarHeatGains(EnergyPlusData &state)
                     state.dataHeatBal->SurfWinQRadSWwinAbsTotEnergy(SurfNum) = 0.0;
                     state.dataHeatBal->SurfWinSWwinAbsTotalReport(SurfNum) = 0.0;
                     state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum) = 0.0;
+                    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum) = 0.0;
                     state.dataHeatBal->SurfWinInitialDifSolInTransReport(SurfNum) = 0.0;
                 }
                 for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
@@ -5565,15 +5571,15 @@ void CalcThermalResilience(EnergyPlusData &state)
                                 "Zone Heat Index",
                                 Constant::Units::C,
                                 state.dataHeatBal->Resilience(ZoneNum).ZoneHeatIndex,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->Zone(ZoneNum).Name);
             SetupOutputVariable(state,
                                 "Zone Humidity Index",
                                 Constant::Units::None,
                                 state.dataHeatBal->Resilience(ZoneNum).ZoneHumidex,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::State,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Average,
                                 state.dataHeatBal->Zone(ZoneNum).Name);
         }
         for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
@@ -6898,7 +6904,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                 // various different boundary conditions
                 switch (Surface(SurfNum).ExtBoundCond) {
                 case DataSurfaces::Ground: { // Surface in contact with ground
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTemp;
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) =
+                        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface];
 
                     // Set the only radiant system heat balance coefficient that is non-zero for this case
                     if (thisConstruct.SourceSinkPresent)
@@ -6907,9 +6914,10 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     // start HAMT
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                         // Set variables used in the HAMT moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            Psychrometrics::PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTemp, 1.0, HBSurfManGroundHAMT);
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) =
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface];
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRh(
+                            state, state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface], 1.0, HBSurfManGroundHAMT);
                         state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
                         state.dataMstBal->HMassConvExtFD(SurfNum) =
@@ -6917,9 +6925,12 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                             ((Psychrometrics::PsyRhoAirFnPbTdbW(
                                   state,
                                   state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTemp,
-                                  Psychrometrics::PsyWFnTdbRhPb(
-                                      state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
+                                  state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface],
+                                  Psychrometrics::PsyWFnTdbRhPb(state,
+                                                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface],
+                                                                1.0,
+                                                                state.dataEnvrn->OutBaroPress,
+                                                                RoutineNameGroundTemp)) +
                               state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                              Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
 
@@ -6931,17 +6942,22 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                         // Set variables used in the FD moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTemp;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTemp, 1.0);
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) =
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface];
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRhLBnd0C(
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface], 1.0);
                         state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
                         state.dataMstBal->HMassConvExtFD(SurfNum) =
                             state.dataMstBal->HConvExtFD(SurfNum) /
                             ((Psychrometrics::PsyRhoAirFnPbTdbW(
                                   state,
                                   state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTemp,
-                                  Psychrometrics::PsyWFnTdbRhPb(
-                                      state, state.dataEnvrn->GroundTemp, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTemp)) +
+                                  state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface],
+                                  Psychrometrics::PsyWFnTdbRhPb(state,
+                                                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface],
+                                                                1.0,
+                                                                state.dataEnvrn->OutBaroPress,
+                                                                RoutineNameGroundTemp)) +
                               state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                              Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
                         state.dataMstBal->HSkyFD(SurfNum) = HSky;
@@ -6951,7 +6967,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                     // Added for FCfactor grounds
                 } break;
                 case DataSurfaces::GroundFCfactorMethod: { // Surface in contact with ground
-                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) = state.dataEnvrn->GroundTempFC;
+                    state.dataHeatBalSurf->SurfOutsideTempHist(1)(SurfNum) =
+                        state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
 
                     // Set the only radiant system heat balance coefficient that is non-zero for this case
                     if (thisConstruct.SourceSinkPresent)
@@ -6959,9 +6976,10 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::HAMT) {
                         // Set variables used in the HAMT moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) =
-                            Psychrometrics::PsyRhovFnTdbRh(state, state.dataEnvrn->GroundTempFC, 1.0, HBSurfManGroundHAMT);
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) =
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRh(
+                            state, state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod], 1.0, HBSurfManGroundHAMT);
                         state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
 
                         state.dataMstBal->HMassConvExtFD(SurfNum) =
@@ -6969,9 +6987,12 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                             ((Psychrometrics::PsyRhoAirFnPbTdbW(
                                   state,
                                   state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTempFC,
-                                  Psychrometrics::PsyWFnTdbRhPb(
-                                      state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
+                                  state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod],
+                                  Psychrometrics::PsyWFnTdbRhPb(state,
+                                                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod],
+                                                                1.0,
+                                                                state.dataEnvrn->OutBaroPress,
+                                                                RoutineNameGroundTempFC)) +
                               state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                              Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
 
@@ -6982,17 +7003,22 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
 
                     if (Surface(SurfNum).HeatTransferAlgorithm == DataSurfaces::HeatTransferModel::CondFD) {
                         // Set variables used in the FD moisture balance
-                        state.dataMstBal->TempOutsideAirFD(SurfNum) = state.dataEnvrn->GroundTempFC;
-                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRhLBnd0C(state.dataEnvrn->GroundTempFC, 1.0);
+                        state.dataMstBal->TempOutsideAirFD(SurfNum) =
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod];
+                        state.dataMstBal->RhoVaporAirOut(SurfNum) = Psychrometrics::PsyRhovFnTdbRhLBnd0C(
+                            state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod], 1.0);
                         state.dataMstBal->HConvExtFD(SurfNum) = state.dataHeatBal->HighHConvLimit;
                         state.dataMstBal->HMassConvExtFD(SurfNum) =
                             state.dataMstBal->HConvExtFD(SurfNum) /
                             ((Psychrometrics::PsyRhoAirFnPbTdbW(
                                   state,
                                   state.dataEnvrn->OutBaroPress,
-                                  state.dataEnvrn->GroundTempFC,
-                                  Psychrometrics::PsyWFnTdbRhPb(
-                                      state, state.dataEnvrn->GroundTempFC, 1.0, state.dataEnvrn->OutBaroPress, RoutineNameGroundTempFC)) +
+                                  state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod],
+                                  Psychrometrics::PsyWFnTdbRhPb(state,
+                                                                state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::FCFactorMethod],
+                                                                1.0,
+                                                                state.dataEnvrn->OutBaroPress,
+                                                                RoutineNameGroundTempFC)) +
                               state.dataMstBal->RhoVaporAirOut(SurfNum)) *
                              Psychrometrics::PsyCpAirFnW(state.dataEnvrn->OutHumRat));
                         state.dataMstBal->HSkyFD(SurfNum) = HSky;
@@ -7027,7 +7053,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT +
                          state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          ConstantTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
-                         state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                         state.dataSurface->OSC(OPtr).GroundTempCoef *
+                             state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                          state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
                              state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
@@ -7091,7 +7118,8 @@ void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                         (state.dataSurface->OSC(OPtr).ZoneAirTempCoef * state.dataZoneTempPredictorCorrector->spaceHeatBalance(spaceNum).MAT +
                          state.dataSurface->OSC(OPtr).ExtDryBulbCoef * state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).ConstTempCoef * state.dataSurface->OSC(OPtr).ConstTemp +
-                         state.dataSurface->OSC(OPtr).GroundTempCoef * state.dataEnvrn->GroundTemp +
+                         state.dataSurface->OSC(OPtr).GroundTempCoef *
+                             state.dataEnvrn->GroundTemp[(int)DataEnvironment::GroundTempType::BuildingSurface] +
                          state.dataSurface->OSC(OPtr).WindSpeedCoef * state.dataSurface->SurfOutWindSpeed(SurfNum) *
                              state.dataSurface->SurfOutDryBulbTemp(SurfNum) +
                          state.dataSurface->OSC(OPtr).TPreviousCoef * state.dataSurface->OSC(OPtr).TOutsideSurfPast);
@@ -7517,8 +7545,8 @@ void CalcHeatBalanceInsideSurf(EnergyPlusData &state,
                                 "Surface Inside Face Heat Balance Calculation Iteration Count",
                                 Constant::Units::None,
                                 state.dataHeatBal->InsideSurfIterations,
-                                OutputProcessor::SOVTimeStepType::Zone,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::Zone,
+                                OutputProcessor::StoreType::Sum,
                                 "Simulation");
         }
         // Precompute whether CTF temperature limits will be needed
@@ -8100,26 +8128,25 @@ void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
 
                 Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(SurfNum) + Constant::Kelvin));
 
-                // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                state.dataSurface->SurfWinHeatGain(SurfNum) =
-                    state.dataSurface->SurfWinTransSolar(SurfNum) +
-                    HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum)) +
-                    state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                        (Sigma_Temp_4 -
-                         (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum))) -
-                    state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                        state.dataConstruction->Construct(surface.Construction).TransDiff;
-                // Transmitted solar | Convection | IR exchange | IR
-                // Zone diffuse interior shortwave reflected back into the TDD
-
                 // fill out report vars for components of Window Heat Gain
                 state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) =
                     HConvIn_surf * surface.Area * (state.dataHeatBalSurf->SurfTempIn(SurfNum) - state.dataHeatBalSurfMgr->RefAirTemp(SurfNum));
                 state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) =
                     state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                     (Sigma_Temp_4 - (state.dataSurface->SurfWinIRfromParentZone(SurfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(SurfNum)));
-                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                                                                           state.dataConstruction->Construct(surface.Construction).TransDiff;
+                state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) =
+                    state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                        (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack) +
+                    state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(SurfNum);
+
+                // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
+                state.dataSurface->SurfWinHeatGain(SurfNum) =
+                    state.dataSurface->SurfWinTransSolar(SurfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(SurfNum) +
+                    state.dataSurface->SurfWinGainIRGlazToZoneRep(SurfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(SurfNum) -
+                    surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(SurfNum);
+                // Net transmitted solar | Convection | IR exchange | IR
+                // Zone diffuse interior shortwave reflected back into the TDD
+
             } else {                                                // Regular window
                 if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                     // Get outside convection coeff for exterior window here to avoid calling
@@ -8788,19 +8815,6 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                         state.dataHeatBalSurf->SurfTempIn(surfNum) = state.dataHeatBalSurf->SurfTempInTmp(surfNum);
                         Real64 const Sigma_Temp_4(Constant::StefanBoltzmann * pow_4(state.dataHeatBalSurf->SurfTempIn(surfNum) + Constant::Kelvin));
 
-                        // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                        state.dataSurface->SurfWinHeatGain(surfNum) =
-                            state.dataSurface->SurfWinTransSolar(surfNum) +
-                            HConvIn_surf * surface.Area *
-                                (state.dataHeatBalSurf->SurfTempIn(surfNum) - state.dataHeatBalSurfMgr->RefAirTemp(surfNum)) +
-                            state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
-                                (Sigma_Temp_4 -
-                                 (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum))) -
-                            state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
-                                state.dataConstruction->Construct(surface.Construction)
-                                    .TransDiff; // Transmitted solar | Convection | IR exchange | IR
-                        // Zone diffuse interior shortwave reflected back into the TDD
-
                         // fill out report vars for components of Window Heat Gain
                         state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) =
                             HConvIn_surf * surface.Area *
@@ -8809,9 +8823,18 @@ void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
                             state.dataConstruction->Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                             (Sigma_Temp_4 -
                              (state.dataSurface->SurfWinIRfromParentZone(surfNum) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(surfNum)));
-                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) = state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) *
-                                                                                   surface.Area *
-                                                                                   state.dataConstruction->Construct(surface.Construction).TransDiff;
+                        state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) =
+                            state.dataHeatBal->EnclSolQSWRad(surface.SolarEnclIndex) * surface.Area *
+                                (1 - state.dataConstruction->Construct(surface.Construction).ReflectSolDiffBack) +
+                            state.dataHeatBalSurf->SurfWinInitialBeamSolInTrans(surfNum);
+
+                        // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
+                        state.dataSurface->SurfWinHeatGain(surfNum) =
+                            state.dataSurface->SurfWinTransSolar(surfNum) + state.dataSurface->SurfWinGainConvGlazToZoneRep(surfNum) +
+                            state.dataSurface->SurfWinGainIRGlazToZoneRep(surfNum) - state.dataSurface->SurfWinLossSWZoneToOutWinRep(surfNum) -
+                            surface.Area * state.dataHeatBalSurf->SurfWinInitialDifSolInTrans(surfNum);
+                        // Net transmitted solar | Convection | IR exchange | IR
+                        // Zone diffuse interior shortwave reflected back into the TDD
                     } else {                                                // Regular window
                         if (state.dataHeatBal->InsideSurfIterations == 0) { // Do windows only once
                             // Get outside convection coeff for exterior window here to avoid calling

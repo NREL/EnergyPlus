@@ -72,6 +72,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
@@ -129,9 +130,9 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
     for (unsigned long i = 1; i <= state->dataHeatBal->ZoneOtherEq.size(); ++i) {
         const DataHeatBalance::ZoneEquipData &equip = state->dataHeatBal->ZoneOtherEq(i);
         if (equip.Name == "OTHEREQ1") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::None));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::None);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_TRUE(compare_enums(equip.OtherEquipFuelType, Constant::eFuel::Propane));
+            ASSERT_ENUM_EQ(equip.OtherEquipFuelType, Constant::eFuel::Propane);
         }
     }
 }
@@ -1339,6 +1340,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ZnRpt_Outputs)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     HeatBalanceManager::AllocateHeatBalArrays(*state);
     state->dataHeatBal->Zone(1).FloorArea = 20.0;
     state->dataHeatBal->space(1).FloorArea = 5.0;
@@ -1873,6 +1875,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AdjustedSupplyBadInletNode)
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
@@ -2324,6 +2327,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_FlowControlWithApproachTemperaturesB
 
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
+    ZoneEquipmentManager::GetZoneEquipment(*state);
     state->dataZoneTempPredictorCorrector->zoneHeatBalance.allocate(1);
 
     state->dataZoneTempPredictorCorrector->zoneHeatBalance(1).MAT = 24.0;
