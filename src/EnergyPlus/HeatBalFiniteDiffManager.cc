@@ -141,7 +141,7 @@ namespace HeatBalFiniteDiffManager {
         int MaterNum;                       // Counter to keep track of the material number
         int MaterialNumAlpha;               // Number of material alpha names being passed
         int MaterialNumProp;                // Number of material properties being passed
-        Array1D<Real64> MaterialProps(40);  // Temporary array to transfer material properties
+        Array1D<Real64> MaterialProps;      // Temporary array to transfer material properties (allocated based on user input)
         bool ErrorsFound(false);            // If errors detected in input
         int Loop;
         int propNum;
@@ -199,6 +199,9 @@ namespace HeatBalFiniteDiffManager {
 
         pcMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:PhaseChange");
         vcMat = state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "MaterialProperty:VariableThermalConductivity");
+
+        int numProps = setSizeMaxProperties(state);
+        MaterialProps.allocate(numProps);
 
         auto &MaterialFD = state.dataHeatBalFiniteDiffMgr->MaterialFD;
 
@@ -406,6 +409,23 @@ namespace HeatBalFiniteDiffManager {
         }
 
         InitialInitHeatBalFiniteDiff(state);
+    }
+
+    int setSizeMaxProperties(EnergyPlusData &state)
+    {
+        int numArgs;
+        int numAlphas;
+        int numNumerics;
+        int maxTotalProps = 0;
+
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(state, "MaterialProperty:PhaseChange", numArgs, numAlphas, numNumerics);
+        maxTotalProps = max(maxTotalProps, numNumerics);
+
+        state.dataInputProcessing->inputProcessor->getObjectDefMaxArgs(
+            state, "MaterialProperty:VariableThermalConductivity", numArgs, numAlphas, numNumerics);
+        maxTotalProps = max(maxTotalProps, numNumerics);
+
+        return maxTotalProps;
     }
 
     void InitHeatBalFiniteDiff(EnergyPlusData &state)
