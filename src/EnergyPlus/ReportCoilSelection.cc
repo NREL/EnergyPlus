@@ -1697,7 +1697,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         } else if (state.dataSize->TermUnitPIU) {
             auto const &thisTermUnitSizing = state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
-            Real64 MinPriFlowFrac = thisTermUnitSizing.MinFlowFrac;
+            Real64 MinPriFlowFrac = thisTermUnitSizing.MinPriFlowFrac;
             if (thisTermUnitSizing.InducesPlenumAir) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     auto const &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);

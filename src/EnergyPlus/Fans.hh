@@ -394,8 +394,7 @@ namespace Fans {
         bool isSecondaryDriver = false; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(
-            EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress);
 
         void init(EnergyPlusData &state);
 
