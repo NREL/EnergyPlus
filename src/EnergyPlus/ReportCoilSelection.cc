@@ -915,12 +915,16 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
     bool coilFound = false;
     std::string fanType;
     std::string fanName;
+    auto thisSubCoilLambda = [&c](const DataZoneEquipment::SubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+    auto thisSubFanLambda = [](const DataZoneEquipment::SubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+    auto thisSubSubCoilLambda = [&c](const DataZoneEquipment::SubSubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+    auto thisSubSubFanLambda = [](const DataZoneEquipment::SubSubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+
     for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
         // coil should be found only once, fan could be found multiple times, reset here
+        // for each type of equipment (equipLoop) only one coil and fan could be found as a pair
         bool fanFound = false;
         auto &thisSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData;
-        auto thisSubCoilLambda = [&c](const DataZoneEquipment::SubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
-        auto thisSubFanLambda = [](const DataZoneEquipment::SubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
 
         // search for coil and fan SubEquipData and return parent type/name and fan type/name for coil reports.
         auto const &coilIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda);
@@ -938,14 +942,13 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
         auto const &fanIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubFanLambda);
         if (fanIterator != thisSubEq.end()) {
             unsigned int fanIndex = fanIterator - thisSubEq.begin();
-            fanType = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].TypeOf;
-            fanName = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].Name;
+            // notice the brackets on the Array1D for [fanIndex]
+            fanType = thisSubEq[fanIndex].TypeOf;
+            fanName = thisSubEq[fanIndex].Name;
             fanFound = true;
         }
         // if coil not found in SubEquipData then maybe it's HXAssisted and in SubSubEquipData. Fan is usually already found if exists.
         if (!coilFound || !fanFound) {
-            auto thisSubSubCoilLambda = [&c](const DataZoneEquipment::SubSubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
-            auto thisSubSubFanLambda = [](const DataZoneEquipment::SubSubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
             for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
                 auto &thisSubSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData;
                 if (!coilFound) {
@@ -966,8 +969,9 @@ void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std
                     auto const &fanIterator2 = std::find_if(thisSubSubEq.begin(), thisSubSubEq.end(), thisSubSubFanLambda);
                     if (fanIterator2 != thisSubSubEq.end()) {
                         unsigned int fanIndex = fanIterator2 - thisSubSubEq.begin();
-                        fanType = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].TypeOf;
-                        fanName = zoneEquipList.EquipData(equipLoop).SubEquipData[fanIndex].Name;
+                        // notice the brackets on the Array1D for [fanIndex]
+                        fanType = thisSubSubEq[fanIndex].TypeOf;
+                        fanName = thisSubSubEq[fanIndex].Name;
                         fanFound = true;
                     }
                 }
