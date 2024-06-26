@@ -316,9 +316,13 @@ struct ConstructionData : BaseGlobalStruct
     Array1D<Construction::ConstructionProps> Construct;
     Array1D_int LayerPoint = Array1D<int>(Construction::MaxLayersInConstruct, 0);
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ConstructionData();
+        new (this) ConstructionData();
     }
 };
 

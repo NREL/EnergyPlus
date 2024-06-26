@@ -195,9 +195,13 @@ struct HeatBalFanSysData : BaseGlobalStruct
 
     EPVector<DataHeatBalFanSys::ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = HeatBalFanSysData();
+        new (this) HeatBalFanSysData();
     }
 };
 

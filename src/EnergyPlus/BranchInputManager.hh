@@ -317,9 +317,13 @@ struct BranchInputManagerData : BaseGlobalStruct
     Array1D<BranchInputManager::MixerData> Mixers;             // Mixer Data for each Mixer
     Array1D<BranchInputManager::ComponentData> BComponents;    // Component data to be returned
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = BranchInputManagerData();
+        new (this) BranchInputManagerData();
     }
 };
 

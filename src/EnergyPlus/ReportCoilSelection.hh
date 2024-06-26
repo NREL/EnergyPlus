@@ -447,6 +447,10 @@ struct ReportCoilSelectionData : BaseGlobalStruct
 
     std::unique_ptr<ReportCoilSelection> coilSelectionReportObj;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->coilSelectionReportObj.release();

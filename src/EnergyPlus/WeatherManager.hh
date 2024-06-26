@@ -929,6 +929,10 @@ struct WeatherManagerData : BaseGlobalStruct
     // ProcessEPWHeader static vars
     std::string EPWHeaderTitle = "";
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->siteShallowGroundTempsPtr.reset();

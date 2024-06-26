@@ -181,6 +181,10 @@ struct CoilCoolingDXData : BaseGlobalStruct
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
     bool stillNeedToReportStandardRatings = true; // standard ratings flag for all coils to report at the same time
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         coilCoolingDXs.clear();

@@ -2846,13 +2846,19 @@ namespace WindowComplexManager {
         nmix(nlayer + 1) = 1;      // pure air on indoor side
 
         // Simon: feed gas coefficients with air.  This is necessary for tarcog because it is used on indoor and outdoor sides
-        wght(iprop(1, 1)) = Material::GasWght[static_cast<int>(Material::GasType::Air)];
-        gama(iprop(1, 1)) = Material::GasSpecificHeatRatio[static_cast<int>(Material::GasType::Air)];
-        for (ICoeff = 1; ICoeff <= 3; ++ICoeff) {
-            gcon(ICoeff, iprop(1, 1)) = Material::GasCoeffsCon[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gvis(ICoeff, iprop(1, 1)) = Material::GasCoeffsVis[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-            gcp(ICoeff, iprop(1, 1)) = Material::GasCoeffsCp[ICoeff - 1][static_cast<int>(Material::GasType::Air)];
-        }
+        auto const &gasAir = Material::gases[(int)Material::GasType::Air];
+        wght(iprop(1, 1)) = gasAir.wght;
+        gama(iprop(1, 1)) = gasAir.specHeatRatio;
+
+        gcon(1, iprop(1, 1)) = gasAir.con.c0;
+        gcon(2, iprop(1, 1)) = gasAir.con.c1;
+        gcon(3, iprop(1, 1)) = gasAir.con.c2;
+        gvis(1, iprop(1, 1)) = gasAir.vis.c0;
+        gvis(2, iprop(1, 1)) = gasAir.vis.c1;
+        gvis(3, iprop(1, 1)) = gasAir.vis.c2;
+        gcp(1, iprop(1, 1)) = gasAir.cp.c0;
+        gcp(2, iprop(1, 1)) = gasAir.cp.c1;
+        gcp(3, iprop(1, 1)) = gasAir.cp.c2;
 
         // Fill window layer properties needed for window layer heat balance calculation
         IGlass = 0;
@@ -2920,26 +2926,34 @@ namespace WindowComplexManager {
 
                 GasPointer = thisMaterial->GasPointer;
 
-                auto const *thisMaterialGas = dynamic_cast<Material::MaterialChild *>(state.dataMaterial->Material(GasPointer));
+                auto const *thisMaterialGas = dynamic_cast<Material::MaterialGasMix const *>(state.dataMaterial->Material(GasPointer));
                 assert(thisMaterialGas != nullptr);
-                nmix(IGap + 1) = thisMaterialGas->NumberOfGasesInMixture;
+                nmix(IGap + 1) = thisMaterialGas->numGases;
                 for (IMix = 1; IMix <= nmix(IGap + 1); ++IMix) {
-                    frct(IMix, IGap + 1) = thisMaterialGas->GasFract(IMix);
+                    auto const &gas = thisMaterialGas->gases[IMix - 1];
+                    frct(IMix, IGap + 1) = thisMaterialGas->gasFracts[IMix - 1];
 
                     // Now has to build-up gas coefficients arrays. All used gasses should be stored into these arrays and
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
                     bool feedData(false);
-                    CheckGasCoefs(thisMaterialGas->GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
+                    CheckGasCoefs(gas.wght, iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
-                        wght(iprop(IMix, IGap + 1)) = thisMaterialGas->GasWght(IMix);
-                        gama(iprop(IMix, IGap + 1)) = thisMaterialGas->GasSpecHeatRatio(IMix);
-                        for (i = 1; i <= 3; ++i) {
-                            gcon(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCon(i, IMix);
-                            gvis(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasVis(i, IMix);
-                            gcp(i, iprop(IMix, IGap + 1)) = thisMaterialGas->GasCp(i, IMix);
-                        }
+                        wght(iprop(IMix, IGap + 1)) = gas.wght;
+                        gama(iprop(IMix, IGap + 1)) = gas.specHeatRatio;
+
+                        gcon(1, iprop(IMix, IGap + 1)) = gas.con.c0;
+                        gcon(2, iprop(IMix, IGap + 1)) = gas.con.c1;
+                        gcon(3, iprop(IMix, IGap + 1)) = gas.con.c2;
+
+                        gvis(1, iprop(IMix, IGap + 1)) = gas.vis.c0;
+                        gvis(2, iprop(IMix, IGap + 1)) = gas.vis.c1;
+                        gvis(3, iprop(IMix, IGap + 1)) = gas.vis.c2;
+
+                        gcp(1, iprop(IMix, IGap + 1)) = gas.cp.c0;
+                        gcp(2, iprop(IMix, IGap + 1)) = gas.cp.c1;
+                        gcp(3, iprop(IMix, IGap + 1)) = gas.cp.c2;
                     } // IF feedData THEN
                 }
             } else {

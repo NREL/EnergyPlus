@@ -158,6 +158,10 @@ struct HVACInterfaceManagerData : BaseGlobalStruct
     Array1D<HVACInterfaceManager::CommonPipeData> PlantCommonPipe;
     Array1D<Real64> TmpRealARR = Array1D<Real64>(DataConvergParams::ConvergLogStackDepth); // Tuned Made static
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->CommonPipeSetupFinished = false;
