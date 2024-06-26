@@ -2429,13 +2429,13 @@ namespace UserDefinedComponents {
 
         // fill internal variable targets
         this->Loop(LoopNum).MyLoad = MyLoad;
-        this->Loop(LoopNum).InletRho = FluidProperties::GetDensityGlycol(state,
+        this->Loop(LoopNum).InletRho = Fluid::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidName,
                                                                          state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp,
                                                                          state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidIndex,
                                                                          RoutineName);
         this->Loop(LoopNum).InletCp =
-            FluidProperties::GetSpecificHeatGlycol(state,
+            Fluid::GetSpecificHeatGlycol(state,
                                                    state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidName,
                                                    state.dataLoopNodes->Node(this->Loop(LoopNum).InletNodeNum).Temp,
                                                    state.dataPlnt->PlantLoop(this->Loop(LoopNum).plantLoc.loopNum).FluidIndex,
@@ -2498,12 +2498,12 @@ namespace UserDefinedComponents {
         }
 
         if (this->PlantIsConnected) {
-            this->Loop.InletRho = FluidProperties::GetDensityGlycol(state,
+            this->Loop.InletRho = Fluid::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum).FluidName,
                                                                     state.dataLoopNodes->Node(this->Loop.InletNodeNum).Temp,
                                                                     state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum).FluidIndex,
                                                                     RoutineName);
-            this->Loop.InletCp = FluidProperties::GetSpecificHeatGlycol(state,
+            this->Loop.InletCp = Fluid::GetSpecificHeatGlycol(state,
                                                                         state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum).FluidName,
                                                                         state.dataLoopNodes->Node(this->Loop.InletNodeNum).Temp,
                                                                         state.dataPlnt->PlantLoop(this->Loop.plantLoc.loopNum).FluidIndex,
@@ -2581,13 +2581,13 @@ namespace UserDefinedComponents {
 
         if (this->NumPlantConnections > 0) {
             for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
-                this->Loop(loop).InletRho = FluidProperties::GetDensityGlycol(state,
+                this->Loop(loop).InletRho = Fluid::GetDensityGlycol(state,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
                                                                               state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
                                                                               RoutineName);
                 this->Loop(loop).InletCp =
-                    FluidProperties::GetSpecificHeatGlycol(state,
+                    Fluid::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
                                                            state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                            state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
@@ -2663,13 +2663,13 @@ namespace UserDefinedComponents {
 
         if (this->NumPlantConnections > 0) {
             for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
-                this->Loop(loop).InletRho = FluidProperties::GetDensityGlycol(state,
+                this->Loop(loop).InletRho = Fluid::GetDensityGlycol(state,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
                                                                               state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                                               state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,
                                                                               RoutineName);
                 this->Loop(loop).InletCp =
-                    FluidProperties::GetSpecificHeatGlycol(state,
+                    Fluid::GetSpecificHeatGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidName,
                                                            state.dataLoopNodes->Node(this->Loop(loop).InletNodeNum).Temp,
                                                            state.dataPlnt->PlantLoop(this->Loop(loop).plantLoc.loopNum).FluidIndex,

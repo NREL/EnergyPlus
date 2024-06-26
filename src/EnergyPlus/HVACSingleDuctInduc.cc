@@ -620,7 +620,7 @@ namespace HVACSingleDuctInduc {
             int HotConNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWControlNode;
             if (HotConNode > 0 && !state.dataHVACSingleDuctInduc->MyPlantScanFlag(IUNum)) {
 
-                rho = FluidProperties::GetDensityGlycol(
+                rho = Fluid::GetDensityGlycol(
                     state,
                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                     Constant::HWInitConvTemp,
@@ -641,7 +641,7 @@ namespace HVACSingleDuctInduc {
 
             int ColdConNode = state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWControlNode;
             if (ColdConNode > 0) {
-                rho = FluidProperties::GetDensityGlycol(
+                rho = Fluid::GetDensityGlycol(
                     state,
                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidName,
                     Constant::CWInitConvTemp,
@@ -850,14 +850,14 @@ namespace HVACSingleDuctInduc {
                                                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).DesHeatCoilInTempTU);
                                 }
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesHeatingLoad = DesCoilLoad;
-                                Cp = FluidProperties::GetSpecificHeatGlycol(
+                                Cp = Fluid::GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                                     Constant::HWInitConvTemp,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
 
-                                rho = FluidProperties::GetDensityGlycol(
+                                rho = Fluid::GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).HWPlantLoc.loopNum).FluidName,
                                     Constant::HWInitConvTemp,
@@ -985,14 +985,14 @@ namespace HVACSingleDuctInduc {
                                                    state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum).ZoneSizThermSetPtHi);
                                 }
                                 state.dataHVACSingleDuctInduc->IndUnit(IUNum).DesCoolingLoad = DesCoilLoad;
-                                Cp = FluidProperties::GetSpecificHeatGlycol(
+                                Cp = Fluid::GetSpecificHeatGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidName,
                                     5.0,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidIndex,
                                     RoutineName);
 
-                                rho = FluidProperties::GetDensityGlycol(
+                                rho = Fluid::GetDensityGlycol(
                                     state,
                                     state.dataPlnt->PlantLoop(state.dataHVACSingleDuctInduc->IndUnit(IUNum).CWPlantLoc.loopNum).FluidName,
                                     5.0,

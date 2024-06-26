@@ -734,8 +734,8 @@ namespace FourPipeBeam {
 
         // Using
         using namespace DataSizing;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::GetDensityGlycol;
+        using Fluid::GetSpecificHeatGlycol;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using Psychrometrics::PsyCpAirFnW;
@@ -871,7 +871,7 @@ namespace FourPipeBeam {
                     this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
                     if (this->vDotDesignCWWasAutosized) {
                         this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
-                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                        Real64 const rho = Fluid::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
                                                                              Constant::CWInitConvTemp,
                                                                              state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
@@ -884,7 +884,7 @@ namespace FourPipeBeam {
                     }
                     if (vDotDesignHWWasAutosized) {
                         this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
-                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                        Real64 const rho = Fluid::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
                                                                              Constant::HWInitConvTemp,
                                                                              state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
@@ -951,7 +951,7 @@ namespace FourPipeBeam {
                     this->totBeamLength = this->vDotDesignPrimAir / this->vDotNormRatedPrimAir;
                     if (this->vDotDesignCWWasAutosized) {
                         this->vDotDesignCW = this->vDotNormRatedCW * this->totBeamLength;
-                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                        Real64 const rho = Fluid::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
                                                                              Constant::CWInitConvTemp,
                                                                              state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
@@ -964,7 +964,7 @@ namespace FourPipeBeam {
                     }
                     if (vDotDesignHWWasAutosized) {
                         this->vDotDesignHW = this->vDotNormRatedHW * this->totBeamLength;
-                        Real64 const rho = FluidProperties::GetDensityGlycol(state,
+                        Real64 const rho = Fluid::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
                                                                              Constant::HWInitConvTemp,
                                                                              state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
@@ -1034,7 +1034,7 @@ namespace FourPipeBeam {
         }
 
         if (this->beamCoolingPresent) {
-            rho = FluidProperties::GetDensityGlycol(state,
+            rho = Fluid::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidName,
                                                     Constant::CWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->cWplantLoc.loopNum).FluidIndex,
@@ -1044,7 +1044,7 @@ namespace FourPipeBeam {
             PlantUtilities::InitComponentNodes(state, 0.0, this->mDotDesignCW, this->cWInNodeNum, this->cWOutNodeNum);
         }
         if (this->beamHeatingPresent) {
-            rho = FluidProperties::GetDensityGlycol(state,
+            rho = Fluid::GetDensityGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidName,
                                                     Constant::HWInitConvTemp,
                                                     state.dataPlnt->PlantLoop(this->hWplantLoc.loopNum).FluidIndex,
@@ -1244,8 +1244,8 @@ namespace FourPipeBeam {
     {
 
         // Using/Aliasing
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::GetDensityGlycol;
+        using Fluid::GetSpecificHeatGlycol;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals

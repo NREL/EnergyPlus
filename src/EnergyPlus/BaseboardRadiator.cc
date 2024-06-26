@@ -95,8 +95,8 @@ namespace BaseboardRadiator {
 
     // Use statements for access to subroutines in other modules
     using namespace ScheduleManager;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 

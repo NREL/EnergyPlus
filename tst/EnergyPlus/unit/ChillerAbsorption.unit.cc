@@ -2022,13 +2022,13 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Autosize)
     state->dataPlnt->PlantFinalSizesOkayToReport = true;
 
     // Calculate expected values
-    Real64 rho_cw = FluidProperties::GetDensityGlycol(*state,
+    Real64 rho_cw = Fluid::GetDensityGlycol(*state,
                                                       state->dataPlnt->PlantLoop(chwLoopNum).FluidName,
                                                       Constant::CWInitConvTemp,
                                                       state->dataPlnt->PlantLoop(chwLoopNum).FluidIndex,
                                                       "ChillerAbsorption_Autosize_TEST");
 
-    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state,
+    Real64 Cp_evap = Fluid::GetSpecificHeatGlycol(*state,
                                                             state->dataPlnt->PlantLoop(chwLoopNum).FluidName,
                                                             Constant::CWInitConvTemp,
                                                             state->dataPlnt->PlantLoop(chwLoopNum).FluidIndex,
@@ -2042,13 +2042,13 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Autosize)
     Real64 const SteamInputRatNom = thisChiller.SteamLoadCoef[0] + thisChiller.SteamLoadCoef[1] + thisChiller.SteamLoadCoef[2];
     EXPECT_DOUBLE_EQ(1.0, SteamInputRatNom);
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state,
+    Real64 rho_cond = Fluid::GetDensityGlycol(*state,
                                                         state->dataPlnt->PlantLoop(cndLoopNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(cndLoopNum).FluidIndex,
                                                         "ChillerAbsorption_Autosize_TEST");
 
-    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state,
+    Real64 Cp_cond = Fluid::GetSpecificHeatGlycol(*state,
                                                             state->dataPlnt->PlantLoop(cndLoopNum).FluidName,
                                                             thisChiller.TempDesCondIn,
                                                             state->dataPlnt->PlantLoop(cndLoopNum).FluidIndex,
@@ -2058,13 +2058,13 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Autosize)
         expectedNomCap * (1.0 + SteamInputRatNom + nomCapToPumpRatio) / (rho_cond * Cp_cond * state->dataSize->PlantSizData(cndLoopNum).DeltaT);
 
     Real64 const SteamDeltaT = state->dataSize->PlantSizData(genLoopNum).DeltaT;
-    Real64 const Cp_gen = FluidProperties::GetSpecificHeatGlycol(*state,
+    Real64 const Cp_gen = Fluid::GetSpecificHeatGlycol(*state,
                                                                  state->dataPlnt->PlantLoop(genLoopNum).FluidName,
                                                                  state->dataSize->PlantSizData(genLoopNum).ExitTemp,
                                                                  state->dataPlnt->PlantLoop(genLoopNum).FluidIndex,
                                                                  "ChillerAbsorption_Autosize_TEST");
 
-    Real64 const rho_gen = FluidProperties::GetDensityGlycol(*state,
+    Real64 const rho_gen = Fluid::GetDensityGlycol(*state,
                                                              state->dataPlnt->PlantLoop(genLoopNum).FluidName,
                                                              (state->dataSize->PlantSizData(genLoopNum).ExitTemp - SteamDeltaT),
                                                              state->dataPlnt->PlantLoop(genLoopNum).FluidIndex,

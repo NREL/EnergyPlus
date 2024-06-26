@@ -267,7 +267,7 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using FluidProperties::FindRefrigerant;
+        using Fluid::FindRefrigerant;
 
         using GlobalNames::VerifyUniqueBaseboardName;
         using NodeInputManager::GetOnlySingleNode;
@@ -909,8 +909,8 @@ namespace SteamBaseboardRadiator {
         // REFERENCES:
 
         // Using/Aliasing
-        using FluidProperties::GetSatDensityRefrig;
-        using FluidProperties::GetSatEnthalpyRefrig;
+        using Fluid::GetSatDensityRefrig;
+        using Fluid::GetSatEnthalpyRefrig;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
 
@@ -1069,9 +1069,9 @@ namespace SteamBaseboardRadiator {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using FluidProperties::GetSatDensityRefrig;
-        using FluidProperties::GetSatEnthalpyRefrig;
-        using FluidProperties::GetSatSpecificHeatRefrig;
+        using Fluid::GetSatDensityRefrig;
+        using Fluid::GetSatEnthalpyRefrig;
+        using Fluid::GetSatSpecificHeatRefrig;
         using HVAC::HeatingCapacitySizing;
         using PlantUtilities::RegisterPlantCompDesignFlow;
 
@@ -1295,9 +1295,9 @@ namespace SteamBaseboardRadiator {
         // REFERENCES:
 
         // Using/Aliasing
-        using FluidProperties::GetSatDensityRefrig;
-        using FluidProperties::GetSatEnthalpyRefrig;
-        using FluidProperties::GetSatSpecificHeatRefrig;
+        using Fluid::GetSatDensityRefrig;
+        using Fluid::GetSatEnthalpyRefrig;
+        using Fluid::GetSatSpecificHeatRefrig;
         using HVAC::SmallLoad;
         using ScheduleManager::GetCurrentScheduleValue;
 

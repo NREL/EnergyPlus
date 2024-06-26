@@ -124,7 +124,6 @@ namespace VentilatedSlab {
     using HVAC::SmallAirVolFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
-    using namespace FluidProperties;
 
     static std::string const fluidNameSteam("STEAM");
     static std::string const fluidNameWater("WATER");
@@ -235,7 +234,7 @@ namespace VentilatedSlab {
         using namespace DataLoopNode;
         using namespace DataSurfaceLists;
 
-        using FluidProperties::FindRefrigerant;
+        using Fluid::FindRefrigerant;
         using OutAirNodeManager::CheckAndAddAirNodeNumber;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1493,7 +1492,7 @@ namespace VentilatedSlab {
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using FluidProperties::GetDensityGlycol;
+        using Fluid::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -1682,7 +1681,7 @@ namespace VentilatedSlab {
                 if (ventSlab.heatingCoilType == DataPlant::PlantEquipmentType::CoilSteamAirHeating &&
                     !state.dataVentilatedSlab->MyPlantScanFlag(Item)) {
                     TempSteamIn = 100.00;
-                    SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                    SteamDensity = Fluid::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                     ventSlab.MaxHotSteamFlow = SteamDensity * ventSlab.MaxVolHotSteamFlow;
                     ventSlab.MinHotSteamFlow = SteamDensity * ventSlab.MinVolHotSteamFlow;
 
@@ -1790,8 +1789,8 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using FluidProperties::GetDensityGlycol;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::GetDensityGlycol;
+        using Fluid::GetSpecificHeatGlycol;
         using HVAC::CoolingCapacitySizing;
         using HVAC::HeatingAirflowSizing;
         using HVAC::HeatingCapacitySizing;
@@ -2320,12 +2319,12 @@ namespace VentilatedSlab {
                                 }
                                 TempSteamIn = 100.00;
                                 EnthSteamInDry =
-                                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 EnthSteamOutWet =
-                                    GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                                 SteamDensity =
-                                    GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, ventSlab.heatingCoil_FluidIndex, RoutineName);
                                 Cp = GetSpecificHeatGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 rho = GetDensityGlycol(state, fluidNameWater, Constant::HWInitConvTemp, DummyWaterIndex, RoutineName);
                                 MaxVolHotSteamFlowDes =

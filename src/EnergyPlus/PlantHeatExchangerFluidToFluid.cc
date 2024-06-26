@@ -648,7 +648,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
 
     if (state.dataGlobal->BeginEnvrnFlag && this->MyEnvrnFlag && (state.dataPlnt->PlantFirstSizesOkayToFinalize)) {
 
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
+        Real64 rho = Fluid::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                        Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
@@ -660,7 +660,7 @@ void HeatExchangerStruct::initialize(EnergyPlusData &state)
                                            this->DemandSideLoop.inletNodeNum,
                                            this->DemandSideLoop.outletNodeNum);
 
-        rho = FluidProperties::GetDensityGlycol(state,
+        rho = Fluid::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                 Constant::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
@@ -807,13 +807,13 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             Real64 tmpDeltaTSupLoop = state.dataSize->PlantSizData(PltSizNumSupSide).DeltaT;
             if (tmpSupSideDesignVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
-                Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                    Constant::InitConvTemp,
                                                                    state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                    RoutineName);
 
-                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                Real64 rho = Fluid::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                Constant::InitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
@@ -901,13 +901,13 @@ void HeatExchangerStruct::size(EnergyPlusData &state)
             }
         }
 
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
+        Real64 rho = Fluid::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                        Constant::InitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                        RoutineName);
         Real64 SupSideMdot = this->SupplySideLoop.DesignVolumeFlowRate * rho;
-        rho = FluidProperties::GetDensityGlycol(state,
+        rho = Fluid::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                 Constant::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,
@@ -996,7 +996,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
                             state, mdotSupSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
                             // if supply side loop has massflow, request demand side flow
-                            Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
+                            Real64 cp = Fluid::GetSpecificHeatGlycol(state,
                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                                this->SupplySideLoop.InletTemp,
                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
@@ -1031,7 +1031,7 @@ void HeatExchangerStruct::control(EnergyPlusData &state, Real64 MyLoad, bool Fir
                         PlantUtilities::SetComponentFlowRate(
                             state, mdotSupSide, this->SupplySideLoop.inletNodeNum, this->SupplySideLoop.outletNodeNum, this->SupplySideLoop);
                         if (mdotSupSide > DataBranchAirLoopPlant::MassFlowTolerance) {
-                            Real64 cp = FluidProperties::GetSpecificHeatGlycol(state,
+                            Real64 cp = Fluid::GetSpecificHeatGlycol(state,
                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                                this->SupplySideLoop.InletTemp,
                                                                                state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
@@ -1503,14 +1503,14 @@ void HeatExchangerStruct::calculate(EnergyPlusData &state, Real64 const SupSideM
     Real64 DmdSideLoopInletTemp = state.dataLoopNodes->Node(this->DemandSideLoop.inletNodeNum).Temp;
 
     // specific heat of fluid entering from supply side loop at inlet temp
-    Real64 SupSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(state,
+    Real64 SupSideLoopInletCp = Fluid::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidName,
                                                                        SupSideLoopInletTemp,
                                                                        state.dataPlnt->PlantLoop(this->SupplySideLoop.loopNum).FluidIndex,
                                                                        RoutineName);
 
     // specific heat of fluid entering from demand side loop at inlet temp
-    Real64 DmdSideLoopInletCp = FluidProperties::GetSpecificHeatGlycol(state,
+    Real64 DmdSideLoopInletCp = Fluid::GetSpecificHeatGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidName,
                                                                        DmdSideLoopInletTemp,
                                                                        state.dataPlnt->PlantLoop(this->DemandSideLoop.loopNum).FluidIndex,

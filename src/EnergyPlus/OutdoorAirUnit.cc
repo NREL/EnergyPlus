@@ -116,7 +116,6 @@ namespace OutdoorAirUnit {
     using HVAC::SmallMassFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
-    using namespace FluidProperties;
 
     // component types addressed by this module
     constexpr static std::string_view ZoneHVACOAUnit = {"ZoneHVAC:OutdoorAirUnit"};
@@ -218,7 +217,7 @@ namespace OutdoorAirUnit {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using FluidProperties::FindRefrigerant;
+        using Fluid::FindRefrigerant;
         using NodeInputManager::GetOnlySingleNode;
         using ScheduleManager::GetScheduleIndex;
         using SteamCoils::GetCoilAirInletNode;
@@ -1116,7 +1115,7 @@ namespace OutdoorAirUnit {
 
         // Using/Aliasing
         using DataZoneEquipment::CheckZoneEquipmentList;
-        using FluidProperties::GetDensityGlycol;
+        using Fluid::GetDensityGlycol;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::ScanPlantLoopsForObject;
@@ -1286,7 +1285,7 @@ namespace OutdoorAirUnit {
                         thisOutAirUnit.OAEquip(compLoop).MaxVolWaterFlow =
                             GetCoilMaxSteamFlowRate(state, thisOutAirUnit.OAEquip(compLoop).ComponentIndex, errFlag);
                         Real64 const rho =
-                            GetSatDensityRefrig(state,
+                                Fluid::GetSatDensityRefrig(state,
                                                 state.dataPlnt->PlantLoop(thisOutAirUnit.OAEquip(compLoop).plantLoc.loopNum).FluidName,
                                                 Constant::SteamInitConvTemp,
                                                 1.0,

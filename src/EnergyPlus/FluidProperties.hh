@@ -67,7 +67,7 @@ namespace EnergyPlus {
 // Forward declarations
 struct EnergyPlusData;
 
-namespace FluidProperties {
+namespace Fluid {
 
     int constexpr EthyleneGlycolIndex = -2;
     int constexpr PropyleneGlycolIndex = -1;
@@ -622,9 +622,9 @@ namespace FluidProperties {
         Real64 superHeatedDensity(EnergyPlusData &state, Real64 temperature, Real64 pressure);
     };
 
-} // namespace FluidProperties
+} // namespace Fluid
 
-struct FluidPropertiesData : BaseGlobalStruct
+struct FluidData : BaseGlobalStruct
 {
 
     bool GetInput = true;      // Used to get the input once only
@@ -637,11 +637,11 @@ struct FluidPropertiesData : BaseGlobalStruct
     Array1D_bool RefrigUsed;
     Array1D_bool GlycolUsed;
 
-    Array1D<FluidProperties::FluidPropsRefrigerantData> RefrigData;
-    Array1D<FluidProperties::FluidPropsRefrigErrors> RefrigErrorTracking;
-    Array1D<FluidProperties::FluidPropsGlycolRawData> GlyRawData;
-    Array1D<FluidProperties::FluidPropsGlycolData> GlycolData;
-    Array1D<FluidProperties::FluidPropsGlycolErrors> GlycolErrorTracking;
+    Array1D<Fluid::FluidPropsRefrigerantData> RefrigData;
+    Array1D<Fluid::FluidPropsRefrigErrors> RefrigErrorTracking;
+    Array1D<Fluid::FluidPropsGlycolRawData> GlyRawData;
+    Array1D<Fluid::FluidPropsGlycolData> GlycolData;
+    Array1D<Fluid::FluidPropsGlycolErrors> GlycolErrorTracking;
 
     int SatErrCountGetSupHeatEnthalpyRefrig = 0;
     int SatErrCountGetSupHeatDensityRefrig = 0;
@@ -659,18 +659,18 @@ struct FluidPropertiesData : BaseGlobalStruct
     int TempRangeErrIndexGetInterpolatedSatProp = 0;
 
 #ifdef EP_cache_GlycolSpecificHeat
-    std::array<FluidProperties::cached_tsh, FluidProperties::t_sh_cache_size> cached_t_sh;
+    std::array<Fluid::cached_tsh, Fluid::t_sh_cache_size> cached_t_sh;
 #endif
 
     void init_state(EnergyPlusData &state) override
     {
-        FluidProperties::GetFluidPropertiesData(state);
+        Fluid::GetFluidPropertiesData(state);
         this->GetInput = false;
     }
 
     void clear_state() override
     {
-        new (this) FluidPropertiesData();
+        new (this) FluidData();
     }
 };
 

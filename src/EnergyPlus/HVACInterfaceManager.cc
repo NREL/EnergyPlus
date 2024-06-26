@@ -506,7 +506,7 @@ void UpdatePlantLoopInterface(EnergyPlusData &state,
     Real64 OldTankOutletTemp = state.dataLoopNodes->Node(OtherLoopSideInletNode).Temp;
 
     // calculate the specific heat
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+    Real64 Cp = Fluid::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, OldTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     // update the enthalpy
@@ -660,7 +660,7 @@ void UpdateHalfLoopInletTemp(EnergyPlusData &state, int const LoopNum, const Dat
     Real64 LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+    Real64 Cp = Fluid::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
     // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
@@ -791,7 +791,7 @@ void UpdateCommonPipe(EnergyPlusData &state,
     Real64 LastTankOutletTemp = state.dataPlnt->PlantLoop(LoopNum).LoopSide(TankOutletLoopSide).LastTempInterfaceTankOutlet;
 
     // calculate the specific heat for the capacitance calculation
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+    Real64 Cp = Fluid::GetSpecificHeatGlycol(
         state, state.dataPlnt->PlantLoop(LoopNum).FluidName, LastTankOutletTemp, state.dataPlnt->PlantLoop(LoopNum).FluidIndex, RoutineName);
 
     // set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation

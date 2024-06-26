@@ -1400,7 +1400,7 @@ namespace Dayltg {
         // REFERENCES: na
 
         // Using/Aliasing
-        using FluidProperties::FindArrayIndex; // USEd code could be copied here to eliminate dependence on FluidProperties
+        using Fluid::FindArrayIndex; // USEd code could be copied here to eliminate dependence on FluidProperties
 
         // Return value
         Real64 InterpolatePipeTransBeam;

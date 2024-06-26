@@ -137,25 +137,25 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     state->dataPlantCentralGSHP->Wrapper(1).GLHEPlantLoc.loopNum = PltSizCondNum;
 
     // Calculate expected values
-    Real64 rho_evap = FluidProperties::GetDensityGlycol(*state,
+    Real64 rho_evap = Fluid::GetDensityGlycol(*state,
                                                         state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(*state,
+    Real64 Cp_evap = Fluid::GetSpecificHeatGlycol(*state,
                                                             state->dataPlnt->PlantLoop(PltSizNum).FluidName,
                                                             Constant::CWInitConvTemp,
                                                             state->dataPlnt->PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(*state,
+    Real64 rho_cond = Fluid::GetDensityGlycol(*state,
                                                         state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,
                                                         "ChillerHeater_Autosize_TEST");
 
-    Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(*state,
+    Real64 Cp_cond = Fluid::GetSpecificHeatGlycol(*state,
                                                             state->dataPlnt->PlantLoop(PltSizCondNum).FluidName,
                                                             state->dataPlantCentralGSHP->Wrapper(1).ChillerHeater(1).TempRefCondInCooling,
                                                             state->dataPlnt->PlantLoop(PltSizCondNum).FluidIndex,

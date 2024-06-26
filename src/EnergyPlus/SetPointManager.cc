@@ -3880,7 +3880,7 @@ void SPMReturnWaterTemp::calculate(EnergyPlusData &state)
     // fluidIndex = state.dataPlnt->PlantLoop(this->plantLoopNum).FluidIndex;
     // // we don't need fluid names since we have a real index, so just pass in the temperature and get properties
     // Real64 const avgTemp = (returnNode.Temp + supplyNode.Temp) / 2;
-    // Real64 const cp = FluidProperties::GetSpecificHeatGlycol(state, "", avgTemp, fluidIndex, "ReturnWaterChWSetPointManager::calculate");
+    // Real64 const cp = Fluid::GetSpecificHeatGlycol(state, "", avgTemp, fluidIndex, "ReturnWaterChWSetPointManager::calculate");
     // Real64 const Qdemand = mdot * cp * deltaT;
 
     // check for strange conditions

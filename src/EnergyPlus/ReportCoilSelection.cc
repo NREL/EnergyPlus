@@ -807,25 +807,25 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
 
             c->plantLoopName = state.dataPlnt->PlantLoop(c->waterLoopNum).Name;
             if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
-                c->rhoFluid = FluidProperties::GetDensityGlycol(state,
+                c->rhoFluid = Fluid::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                 Constant::InitConvTemp,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::doFinalProcessingOfCoilData");
 
-                c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
+                c->cpFluid = Fluid::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                     Constant::InitConvTemp,
                                                                     state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                     "ReportCoilSelection::doFinalProcessingOfCoilData");
             } else { // steam loop
-                c->rhoFluid = FluidProperties::GetSatDensityRefrig(state,
+                c->rhoFluid = Fluid::GetSatDensityRefrig(state,
                                                                    state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                    100.0,
                                                                    1.0,
                                                                    state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                    "ReportCoilSelection::doFinalProcessingOfCoilData");
-                c->cpFluid = FluidProperties::GetSatSpecificHeatRefrig(state,
+                c->cpFluid = Fluid::GetSatSpecificHeatRefrig(state,
                                                                        state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                        100.0,
                                                                        0.0,
@@ -1080,25 +1080,25 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(EnergyPlusData &state,
 
     if (c->waterLoopNum > 0 && c->pltSizNum > 0) {
         if (state.dataSize->PlantSizData(c->pltSizNum).LoopType != DataSizing::TypeOfPlantLoop::Steam) {
-            c->rhoFluid = FluidProperties::GetDensityGlycol(state,
+            c->rhoFluid = Fluid::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                             Constant::InitConvTemp,
                                                             state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                             "ReportCoilSelection::setCoilWaterFlow");
 
-            c->cpFluid = FluidProperties::GetSpecificHeatGlycol(state,
+            c->cpFluid = Fluid::GetSpecificHeatGlycol(state,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                 Constant::InitConvTemp,
                                                                 state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                 "ReportCoilSelection::setCoilWaterFlow");
         } else { // steam loop
-            c->rhoFluid = FluidProperties::GetSatDensityRefrig(state,
+            c->rhoFluid = Fluid::GetSatDensityRefrig(state,
                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                100.0,
                                                                1.0,
                                                                state.dataPlnt->PlantLoop(c->waterLoopNum).FluidIndex,
                                                                "ReportCoilSelection::setCoilWaterFlow");
-            c->cpFluid = FluidProperties::GetSatSpecificHeatRefrig(state,
+            c->cpFluid = Fluid::GetSatSpecificHeatRefrig(state,
                                                                    state.dataPlnt->PlantLoop(c->waterLoopNum).FluidName,
                                                                    100.0,
                                                                    0.0,

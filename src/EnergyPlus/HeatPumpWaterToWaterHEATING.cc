@@ -349,7 +349,7 @@ void GetGshpInput(EnergyPlusData &state)
         ShowFatalError(state, format("Errors Found in getting {} Input", ModuleCompNameUC));
     }
 
-    state.dataHPWaterToWaterHtg->GSHPRefrigIndex = FluidProperties::FindRefrigerant(state, GSHPRefrigerant);
+    state.dataHPWaterToWaterHtg->GSHPRefrigIndex = Fluid::FindRefrigerant(state, GSHPRefrigerant);
     if (state.dataHPWaterToWaterHtg->GSHPRefrigIndex == 0) {
         ShowFatalError(state, format("Refrigerant for {} not found, should have been={}", ModuleCompName, GSHPRefrigerant));
     }
@@ -479,7 +479,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
         this->MustRun = true;
 
         this->beginEnvironFlag = false;
-        Real64 rho = FluidProperties::GetDensityGlycol(state,
+        Real64 rho = Fluid::GetDensityGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
                                                        Constant::CWInitConvTemp,
                                                        state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
@@ -488,7 +488,7 @@ void GshpPeHeatingSpecs::initialize(EnergyPlusData &state)
 
         PlantUtilities::InitComponentNodes(state, 0.0, this->LoadSideDesignMassFlow, this->LoadSideInletNodeNum, this->LoadSideOutletNodeNum);
 
-        rho = FluidProperties::GetDensityGlycol(state,
+        rho = Fluid::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
                                                 Constant::CWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
@@ -613,13 +613,13 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
     Real64 initialQLoad = 0.0;
     int IterationCount = 0;
 
-    Real64 CpSourceSide = FluidProperties::GetSpecificHeatGlycol(state,
+    Real64 CpSourceSide = Fluid::GetSpecificHeatGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidName,
                                                                  this->SourceSideWaterInletTemp,
                                                                  state.dataPlnt->PlantLoop(this->SourcePlantLoc.loopNum).FluidIndex,
                                                                  RoutineName);
 
-    Real64 CpLoadSide = FluidProperties::GetSpecificHeatGlycol(state,
+    Real64 CpLoadSide = Fluid::GetSpecificHeatGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidName,
                                                                this->LoadSideWaterInletTemp,
                                                                state.dataPlnt->PlantLoop(this->LoadPlantLoc.loopNum).FluidIndex,
@@ -640,9 +640,9 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         Real64 LoadSideTemp = this->LoadSideWaterInletTemp + initialQLoad / (LoadSideEffect * CpLoadSide * this->LoadSideWaterMassFlowRate);
 
         // Determine the evaporating and condensing pressures
-        Real64 SourceSidePressure = FluidProperties::GetSatPressureRefrig(
+        Real64 SourceSidePressure = Fluid::GetSatPressureRefrig(
             state, GSHPRefrigerant, SourceSideTemp, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameSourceSideTemp);
-        Real64 LoadSidePressure = FluidProperties::GetSatPressureRefrig(
+        Real64 LoadSidePressure = Fluid::GetSatPressureRefrig(
             state, GSHPRefrigerant, LoadSideTemp, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameLoadSideTemp);
 
         // check cutoff pressures
@@ -682,18 +682,18 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
 
         // Determine the Source Side Outlet Enthalpy
         Real64 qualOne = 1.0;
-        Real64 SourceSideOutletEnth = FluidProperties::GetSatEnthalpyRefrig(
+        Real64 SourceSideOutletEnth = Fluid::GetSatEnthalpyRefrig(
             state, GSHPRefrigerant, SourceSideTemp, qualOne, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameSourceSideTemp);
 
         // Determine Load Side Outlet Enthalpy
         Real64 qualZero = 0.0;
-        Real64 LoadSideOutletEnth = FluidProperties::GetSatEnthalpyRefrig(
+        Real64 LoadSideOutletEnth = Fluid::GetSatEnthalpyRefrig(
             state, GSHPRefrigerant, LoadSideTemp, qualZero, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameLoadSideTemp);
 
         // Determine superheated temperature of the Source Side outlet/compressor inlet
         Real64 CompressInletTemp = SourceSideTemp + this->SuperheatTemp;
         // Determine the enathalpy of the super heated fluid at Source Side outlet
-        Real64 SuperHeatEnth = FluidProperties::GetSupHeatEnthalpyRefrig(state,
+        Real64 SuperHeatEnth = Fluid::GetSupHeatEnthalpyRefrig(state,
                                                                          GSHPRefrigerant,
                                                                          CompressInletTemp,
                                                                          SourceSidePressure,
@@ -705,7 +705,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         // Determine the saturated temp at suction pressure, shoot out into the superheated region find the enthalpy
         // check that with the inlet enthalpy ( as suction loss is isenthalpic). Iterate till desired accuracy is reached
 
-        CompSuctionSatTemp = FluidProperties::GetSatTemperatureRefrig(
+        CompSuctionSatTemp = Fluid::GetSatTemperatureRefrig(
             state, GSHPRefrigerant, SuctionPr, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameSuctionPr);
 
         Real64 T110 = CompSuctionSatTemp;
@@ -716,7 +716,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         while (true) {
             CompSuctionTemp = 0.5 * (T110 + T111);
 
-            CompSuctionEnth = FluidProperties::GetSupHeatEnthalpyRefrig(
+            CompSuctionEnth = Fluid::GetSupHeatEnthalpyRefrig(
                 state, GSHPRefrigerant, CompSuctionTemp, SuctionPr, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameCompSuctionTemp);
             if (std::abs(CompSuctionEnth - SuperHeatEnth) / SuperHeatEnth < 0.0001) {
                 break;
@@ -730,7 +730,7 @@ void GshpPeHeatingSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad)
         }
 
         // Determine the Mass flow rate of refrigerant
-        CompSuctionDensity = FluidProperties::GetSupHeatDensityRefrig(
+        CompSuctionDensity = Fluid::GetSupHeatDensityRefrig(
             state, GSHPRefrigerant, CompSuctionTemp, SuctionPr, state.dataHPWaterToWaterHtg->GSHPRefrigIndex, RoutineNameCompSuctionTemp);
         Real64 MassRef = this->CompPistonDisp * CompSuctionDensity *
                          (1.0 + this->CompClearanceFactor - this->CompClearanceFactor * std::pow(DischargePr / SuctionPr, 1.0 / gamma));

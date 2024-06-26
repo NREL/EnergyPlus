@@ -97,12 +97,12 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(EnergyP
     for (int i = 1; i <= state.dataPlnt->TotNumLoops; ++i) {
         if (PlantLoopName == state.dataPlnt->PlantLoop(i).Name) { // found it
 
-            density = FluidProperties::GetDensityGlycol(state,
+            density = Fluid::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(i).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(i).FluidIndex,
                                                         "createNewCoincidentPlantAnalysisObject");
-            cp = FluidProperties::GetSpecificHeatGlycol(state,
+            cp = Fluid::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(i).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(i).FluidIndex,

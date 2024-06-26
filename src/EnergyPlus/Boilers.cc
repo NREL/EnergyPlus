@@ -507,7 +507,7 @@ void BoilerSpecs::oneTimeInit(EnergyPlusData &state)
 void BoilerSpecs::initEachEnvironment(EnergyPlusData &state)
 {
     static constexpr std::string_view RoutineName("BoilerSpecs::initEachEnvironment");
-    Real64 const rho = FluidProperties::GetDensityGlycol(state,
+    Real64 const rho = Fluid::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                          Constant::HWInitConvTemp,
                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -624,12 +624,12 @@ void BoilerSpecs::SizeBoiler(EnergyPlusData &state)
     if (PltSizNum > 0) {
         if (state.dataSize->PlantSizData(PltSizNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
 
-            Real64 const rho = FluidProperties::GetDensityGlycol(state,
+            Real64 const rho = Fluid::GetDensityGlycol(state,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                  Constant::HWInitConvTemp,
                                                                  state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
                                                                  RoutineName);
-            Real64 const Cp = FluidProperties::GetSpecificHeatGlycol(state,
+            Real64 const Cp = Fluid::GetSpecificHeatGlycol(state,
                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                      Constant::HWInitConvTemp,
                                                                      state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -815,7 +815,7 @@ void BoilerSpecs::CalcBoilerModel(EnergyPlusData &state,
     Real64 const TempUpLimitBout = this->TempUpLimitBoilerOut;  // C - boiler high temperature limit
     Real64 const BoilerMassFlowRateMax = this->DesMassFlowRate; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+    Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                        state.dataLoopNodes->Node(BoilerInletNode).Temp,
                                                        state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,

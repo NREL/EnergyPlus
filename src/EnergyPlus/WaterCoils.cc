@@ -121,8 +121,8 @@ namespace EnergyPlus::WaterCoils {
 
 using namespace DataLoopNode;
 
-using FluidProperties::GetDensityGlycol;
-using FluidProperties::GetSpecificHeatGlycol;
+using Fluid::GetDensityGlycol;
+using Fluid::GetSpecificHeatGlycol;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbRhPb;
 using Psychrometrics::PsyHFnTdbW;

@@ -685,7 +685,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_calcHeater_Fix_Test)
     bool const runflaginput = true;
     thisChillerHeater.calcHeater(*state, loadinput, runflaginput);
 
-    const Real64 CpHW = FluidProperties::GetSpecificHeatGlycol(*state, hwPlantLoop.FluidName, hwReturnTemp, hwPlantLoop.FluidIndex, "UnitTest");
+    const Real64 CpHW = Fluid::GetSpecificHeatGlycol(*state, hwPlantLoop.FluidName, hwReturnTemp, hwPlantLoop.FluidIndex, "UnitTest");
     EXPECT_EQ(4185.0, CpHW);
     const Real64 expectedHeatingLoad = (hwSupplySetpoint - hwReturnTemp) * hwMassFlow * CpHW;
 

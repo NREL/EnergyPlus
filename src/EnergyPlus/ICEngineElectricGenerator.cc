@@ -748,7 +748,7 @@ namespace ICEngineElectricGenerator {
         HRecRatio = 1.0;
 
         Real64 HeatRecInTemp = state.dataLoopNodes->Node(this->HeatRecInletNodeNum).Temp;
-        Real64 HeatRecCp = FluidProperties::GetSpecificHeatGlycol(state,
+        Real64 HeatRecCp = Fluid::GetSpecificHeatGlycol(state,
                                                                   state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                                   HeatRecInTemp,
                                                                   state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,
@@ -876,7 +876,7 @@ namespace ICEngineElectricGenerator {
         if (this->MySizeAndNodeInitFlag && (!this->MyPlantScanFlag) && this->HeatRecActive) {
 
             // size mass flow rate
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
+            Real64 rho = Fluid::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidName,
                                                            Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(this->HRPlantLoc.loopNum).FluidIndex,

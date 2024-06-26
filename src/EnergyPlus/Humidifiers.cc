@@ -721,10 +721,10 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using DataSizing::AutoSize;
-        using FluidProperties::FindGlycol;
-        using FluidProperties::FindRefrigerant;
-        using FluidProperties::GetSatEnthalpyRefrig;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::FindGlycol;
+        using Fluid::FindRefrigerant;
+        using Fluid::GetSatEnthalpyRefrig;
+        using Fluid::GetSpecificHeatGlycol;
 
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::RhoH2O;
@@ -1164,10 +1164,10 @@ namespace Humidifiers {
 
         // Using/Aliasing
         using Curve::CurveValue;
-        using FluidProperties::FindGlycol;
-        using FluidProperties::FindRefrigerant;
-        using FluidProperties::GetSatEnthalpyRefrig;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::FindGlycol;
+        using Fluid::FindRefrigerant;
+        using Fluid::GetSatEnthalpyRefrig;
+        using Fluid::GetSpecificHeatGlycol;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbRhPb;

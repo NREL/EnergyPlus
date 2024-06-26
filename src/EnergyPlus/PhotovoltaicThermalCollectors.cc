@@ -701,7 +701,7 @@ namespace PhotovoltaicThermalCollectors {
             switch (this->WorkingFluidType) {
             case WorkingFluidEnum::LIQUID: {
 
-                Real64 rho = FluidProperties::GetDensityGlycol(state,
+                Real64 rho = Fluid::GetDensityGlycol(state,
                                                                state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).FluidName,
                                                                Constant::HWInitConvTemp,
                                                                state.dataPlnt->PlantLoop(this->WPlantLoc.loopNum).FluidIndex,

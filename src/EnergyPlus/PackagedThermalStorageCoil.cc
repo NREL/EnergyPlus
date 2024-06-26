@@ -198,10 +198,10 @@ void GetTESCoilInput(EnergyPlusData &state)
     // Using/Aliasing
     using BranchNodeConnections::TestCompSet;
     using DataZoneEquipment::FindControlledZoneIndexFromSystemNodeNumberForZone;
-    using FluidProperties::CheckFluidPropertyName;
-    using FluidProperties::FindGlycol;
-    using FluidProperties::GetFluidDensityTemperatureLimits;
-    using FluidProperties::GetFluidSpecificHeatTemperatureLimits;
+    using Fluid::CheckFluidPropertyName;
+    using Fluid::FindGlycol;
+    using Fluid::GetFluidDensityTemperatureLimits;
+    using Fluid::GetFluidSpecificHeatTemperatureLimits;
     using GlobalNames::VerifyUniqueCoilName;
     using NodeInputManager::GetOnlySingleNode;
     using ScheduleManager::GetScheduleIndex;
@@ -2145,8 +2145,8 @@ void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum)
     // Using/Aliasing
     using namespace DataSizing;
     using namespace OutputReportPredefined;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("SizeTESCoil ");
@@ -2771,8 +2771,8 @@ void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIter(30);
@@ -3181,8 +3181,8 @@ void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state,
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIter(30);
@@ -3528,8 +3528,8 @@ void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum)
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("CalcTESCoilChargeOnlyMode");
@@ -3692,8 +3692,8 @@ void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, R
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     int constexpr MaxIter(30);
@@ -3994,8 +3994,8 @@ void CalcTESWaterStorageTank(EnergyPlusData &state, int const TESCoilNum)
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
     using WaterThermalTanks::WaterThermalTankData;
 
     auto &thisTESCoil = state.dataPackagedThermalStorageCoil->TESCoil(TESCoilNum);
@@ -4104,7 +4104,7 @@ void CalcTESIceStorageTank(EnergyPlusData &state, int const TESCoilNum)
 
     // Using/Aliasing
     Real64 const TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     constexpr Real64 FreezingTemp(0.0); // zero degrees C

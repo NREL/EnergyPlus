@@ -93,12 +93,12 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                     if (DesCoilLoad >= HVAC::SmallLoad) {
                         if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                             this->dataWaterCoilSizHeatDeltaT > 0.0) {
-                            Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                            Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
                                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                                Constant::HWInitConvTemp,
                                                                                state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                                this->callingRoutine);
-                            Real64 rho = FluidProperties::GetDensityGlycol(state,
+                            Real64 rho = Fluid::GetDensityGlycol(state,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                            Constant::HWInitConvTemp,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
@@ -123,12 +123,12 @@ Real64 HeatingWaterflowSizer::size(EnergyPlusData &state, Real64 _originalValue,
                 if (this->dataCapacityUsedForSizing >= HVAC::SmallLoad) {
                     if (this->dataWaterLoopNum > 0 && this->dataWaterLoopNum <= (int)state.dataPlnt->PlantLoop.size() &&
                         this->dataWaterCoilSizHeatDeltaT > 0.0) {
-                        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                        Real64 Cp = Fluid::GetSpecificHeatGlycol(state,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                            Constant::HWInitConvTemp,
                                                                            state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,
                                                                            this->callingRoutine);
-                        Real64 rho = FluidProperties::GetDensityGlycol(state,
+                        Real64 rho = Fluid::GetDensityGlycol(state,
                                                                        state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidName,
                                                                        Constant::HWInitConvTemp,
                                                                        state.dataPlnt->PlantLoop(this->dataWaterLoopNum).FluidIndex,

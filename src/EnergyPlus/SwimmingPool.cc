@@ -510,7 +510,7 @@ void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIte
         this->WaterOutletTemp = 0.0;
         this->WaterMassFlowRate = 0.0;
         this->PeopleHeatGain = 0.0;
-        Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
+        Real64 Density = Fluid::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName);
         this->WaterMass = state.dataSurface->Surface(this->SurfacePtr).Area * this->AvgDepth * Density;
         this->WaterMassFlowRateMax = this->WaterVolFlowMax * Density;
         this->initSwimmingPoolPlantNodeFlow(state);
@@ -917,7 +917,7 @@ void SwimmingPoolData::calculate(EnergyPlusData &state)
 
     // Get an estimate of the pool water specific heat
     Real64 Cp =
-        FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
+        Fluid::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex, RoutineName); // specific heat of pool water
 
     Real64 TH22 = state.dataHeatBalSurf->SurfInsideTempHist(2)(
         SurfNum);                           // inside surface temperature at the previous time step equals the old pool water temperature
@@ -1050,12 +1050,12 @@ void SwimmingPoolData::report(EnergyPlusData &state)
     this->PoolWaterTemp = state.dataHeatBalSurf->SurfInsideTempHist(1)(SurfNum);
 
     // Next calculate the amount of heating done by the plant loop
-    Real64 Cp = FluidProperties::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
+    Real64 Cp = Fluid::GetSpecificHeatGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
                                                        RoutineName); // specific heat of water
     this->HeatPower = this->WaterMassFlowRate * Cp * (this->WaterInletTemp - this->PoolWaterTemp);
 
     // Now the power consumption of miscellaneous equipment
-    Real64 Density = FluidProperties::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
+    Real64 Density = Fluid::GetDensityGlycol(state, "WATER", this->PoolWaterTemp, this->GlycolIndex,
                                                        RoutineName); // density of water
     if (Density > MinDensity) {
         this->MiscEquipPower = this->MiscPowerFactor * this->WaterMassFlowRate / Density;

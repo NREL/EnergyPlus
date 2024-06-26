@@ -114,7 +114,6 @@ using HVAC::SmallMassFlow;
 using namespace DataSizing;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyRhoAirFnPbTdbW;
-using namespace FluidProperties;
 using namespace ScheduleManager;
 using namespace SteamCoils;
 
@@ -2565,7 +2564,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
         this->MassFlowDiff = 1.0e-10 * this->AirMassFlowRateMax;
 
         if (this->HWplantLoc.loopNum > 0 && this->ReheatComp_Num != HeatingCoilType::SteamAirHeating) { // protect early calls before plant is setup
-            rho = GetDensityGlycol(state,
+            rho = Fluid::GetDensityGlycol(state,
                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidName,
                                    Constant::HWInitConvTemp,
                                    state.dataPlnt->PlantLoop(this->HWplantLoc.loopNum).FluidIndex,
@@ -2583,7 +2582,7 @@ void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, bool const FirstHVACI
 
         if (this->ReheatComp_Num == HeatingCoilType::SteamAirHeating) {
             SteamTemp = 100.0;
-            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0, this->FluidIndex, RoutineNameFull);
+            SteamDensity = Fluid::GetSatDensityRefrig(state, fluidNameSteam, SteamTemp, 1.0, this->FluidIndex, RoutineNameFull);
             this->MaxReheatSteamFlow = SteamDensity * this->MaxReheatSteamVolFlow;
             this->MinReheatSteamFlow = SteamDensity * this->MinReheatSteamVolFlow;
         }
@@ -2785,8 +2784,8 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     // Obtains flow rates from the zone or system sizing arrays.
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
     using General::SafeDivide;
     using PlantUtilities::MyPlantSizingIndex;
     using SteamCoils::GetCoilSteamInletNode;
@@ -3638,10 +3637,10 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
                                                                           (state.dataSingleDuct->ZoneDesTempSS - state.dataSingleDuct->CoilInTempSS);
                         if (state.dataSingleDuct->DesCoilLoadSS >= SmallLoad) {
                             TempSteamIn = 100.00;
-                            EnthSteamInDry = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
-                            EnthSteamOutWet = GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, this->FluidIndex, RoutineNameFull);
+                            EnthSteamInDry = Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
+                            EnthSteamOutWet = Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, this->FluidIndex, RoutineNameFull);
                             LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-                            SteamDensity = GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
+                            SteamDensity = Fluid::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, this->FluidIndex, RoutineNameFull);
 
                             Cp = GetSpecificHeatGlycol(state,
                                                        fluidNameWater,

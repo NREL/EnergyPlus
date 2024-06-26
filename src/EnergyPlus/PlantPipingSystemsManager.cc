@@ -2109,7 +2109,7 @@ namespace PlantPipingSystemsManager {
             }
 
             // Once we find ourselves on the plant loop, we can do other things
-            Real64 rho = FluidProperties::GetDensityGlycol(state,
+            Real64 rho = Fluid::GetDensityGlycol(state,
                                                            state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                            Constant::InitConvTemp,
                                                            state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
@@ -5689,22 +5689,22 @@ namespace PlantPipingSystemsManager {
 
         // retrieve fluid properties based on the circuit inlet temperature -- which varies during the simulation
         // but need to verify the value of inlet temperature during warm up, etc.
-        FluidCp = FluidProperties::GetSpecificHeatGlycol(state,
+        FluidCp = Fluid::GetSpecificHeatGlycol(state,
                                                          state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
                                                          state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
-        FluidDensity = FluidProperties::GetDensityGlycol(state,
+        FluidDensity = Fluid::GetDensityGlycol(state,
                                                          state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                          thisCircuit->InletTemperature,
                                                          state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                          RoutineName);
-        FluidConductivity = FluidProperties::GetConductivityGlycol(state,
+        FluidConductivity = Fluid::GetConductivityGlycol(state,
                                                                    state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                                    thisCircuit->InletTemperature,
                                                                    state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,
                                                                    RoutineName);
-        FluidViscosity = FluidProperties::GetViscosityGlycol(state,
+        FluidViscosity = Fluid::GetViscosityGlycol(state,
                                                              state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidName,
                                                              thisCircuit->InletTemperature,
                                                              state.dataPlnt->PlantLoop(thisCircuit->plantLoc.loopNum).FluidIndex,

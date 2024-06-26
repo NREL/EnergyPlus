@@ -183,8 +183,8 @@ namespace SurfaceGroundHeatExchanger {
 
         // Using/Aliasing
         using BranchNodeConnections::TestCompSet;
-        using FluidProperties::CheckFluidPropertyName;
-        using FluidProperties::FindGlycol;
+        using Fluid::CheckFluidPropertyName;
+        using Fluid::FindGlycol;
 
         using NodeInputManager::GetOnlySingleNode;
         using namespace DataLoopNode;
@@ -1078,7 +1078,7 @@ namespace SurfaceGroundHeatExchanger {
         // Code based loosely on code from IBLAST program (research version)
 
         // Using/Aliasing
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::GetSpecificHeatGlycol;
 
         // Return value
         Real64 CalcHXEffectTerm;
@@ -1346,7 +1346,7 @@ namespace SurfaceGroundHeatExchanger {
         // Using/Aliasing
         Real64 SysTimeElapsed = state.dataHVACGlobal->SysTimeElapsed;
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
-        using FluidProperties::GetSpecificHeatGlycol;
+        using Fluid::GetSpecificHeatGlycol;
         using PlantUtilities::SafeCopyPlantNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -1434,7 +1434,7 @@ namespace SurfaceGroundHeatExchanger {
     void SurfaceGroundHeatExchangerData::oneTimeInit_new(EnergyPlusData &state)
     {
 
-        using FluidProperties::GetDensityGlycol;
+        using Fluid::GetDensityGlycol;
         using PlantUtilities::InitComponentNodes;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using PlantUtilities::ScanPlantLoopsForObject;

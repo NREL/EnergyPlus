@@ -901,7 +901,7 @@ namespace HVACUnitaryBypassVAV {
                     thisCBVAV.CoilControlNode = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).SteamInletNodeNum;
                     thisCBVAV.MaxHeatCoilFluidFlow = state.dataSteamCoils->SteamCoil(thisCBVAV.HeatCoilIndex).MaxSteamVolFlowRate;
                     int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                    Real64 SteamDensity = FluidProperties::GetSatDensityRefrig(
+                    Real64 SteamDensity = Fluid::GetSatDensityRefrig(
                         state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, getUnitaryHeatCoolVAVChangeoverBypass);
                     if (thisCBVAV.MaxHeatCoilFluidFlow > 0.0) {
                         thisCBVAV.MaxHeatCoilFluidFlow = thisCBVAV.MaxHeatCoilFluidFlow * SteamDensity;
@@ -1382,7 +1382,7 @@ namespace HVACUnitaryBypassVAV {
                     cBVAV.MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", cBVAV.HeatCoilName, ErrorsFound);
 
                     if (cBVAV.MaxHeatCoilFluidFlow > 0.0) {
-                        Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
+                        Real64 FluidDensity = Fluid::GetDensityGlycol(state,
                                                                                 state.dataPlnt->PlantLoop(cBVAV.plantLoc.loopNum).FluidName,
                                                                                 Constant::HWInitConvTemp,
                                                                                 state.dataPlnt->PlantLoop(cBVAV.plantLoc.loopNum).FluidIndex,
@@ -1405,7 +1405,7 @@ namespace HVACUnitaryBypassVAV {
 
                     if (cBVAV.MaxHeatCoilFluidFlow > 0.0) {
                         int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
+                        Real64 FluidDensity = Fluid::GetSatDensityRefrig(
                             state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, RoutineName);
                         cBVAV.MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(state, cBVAV.HeatCoilIndex, ErrorsFound) * FluidDensity;
                     }
@@ -1480,7 +1480,7 @@ namespace HVACUnitaryBypassVAV {
                             ShowContinueError(state, format("Occurs in {} = {}", "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass", cBVAV.Name));
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
-                            Real64 FluidDensity = FluidProperties::GetDensityGlycol(state,
+                            Real64 FluidDensity = Fluid::GetDensityGlycol(state,
                                                                                     state.dataPlnt->PlantLoop(cBVAV.plantLoc.loopNum).FluidName,
                                                                                     Constant::HWInitConvTemp,
                                                                                     state.dataPlnt->PlantLoop(cBVAV.plantLoc.loopNum).FluidIndex,
@@ -1502,7 +1502,7 @@ namespace HVACUnitaryBypassVAV {
                         }
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             int SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                            Real64 FluidDensity = FluidProperties::GetSatDensityRefrig(
+                            Real64 FluidDensity = Fluid::GetSatDensityRefrig(
                                 state, fluidNameSteam, state.dataHVACUnitaryBypassVAV->TempSteamIn, 1.0, SteamIndex, RoutineName);
                             cBVAV.MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * FluidDensity;
                         }

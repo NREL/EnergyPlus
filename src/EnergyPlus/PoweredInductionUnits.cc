@@ -115,7 +115,6 @@ using namespace ScheduleManager;
 using Psychrometrics::PsyCpAirFnW;
 using Psychrometrics::PsyHFnTdbW;
 using SteamCoils::SimulateSteamCoilComponents;
-using namespace FluidProperties;
 
 constexpr const char *fluidNameSteam("STEAM");
 constexpr const char *fluidNameWater("WATER");
@@ -232,7 +231,7 @@ void GetPIUs(EnergyPlusData &state)
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
 
-    using FluidProperties::FindRefrigerant;
+    using Fluid::FindRefrigerant;
     using NodeInputManager::GetOnlySingleNode;
     using SteamCoils::GetCoilSteamInletNode;
     using WaterCoils::GetCoilWaterInletNode;
@@ -724,7 +723,7 @@ void InitPIU(EnergyPlusData &state,
         if (thisPIU.HotControlNode > 0) {
             // plant upgrade note? why no separate handling of steam coil? add it ?
             // local plant fluid density
-            Real64 const rho = GetDensityGlycol(state,
+            Real64 const rho = Fluid::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidName,
                                                 Constant::HWInitConvTemp,
                                                 state.dataPlnt->PlantLoop(thisPIU.HWplantLoc.loopNum).FluidIndex,
@@ -854,8 +853,8 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
 
     // Using/Aliasing
     using namespace DataSizing;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
     using SteamCoils::GetCoilSteamInletNode;
     using SteamCoils::GetCoilSteamOutletNode;
     using WaterCoils::GetCoilWaterInletNode;
@@ -1309,12 +1308,12 @@ void SizePIU(EnergyPlusData &state, int const PIUNum)
                             DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                             Real64 constexpr TempSteamIn = 100.00;
                             Real64 const EnthSteamInDry =
-                                GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             Real64 const EnthSteamOutWet =
-                                GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatEnthalpyRefrig(state, fluidNameSteam, TempSteamIn, 0.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             Real64 const LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
                             Real64 const SteamDensity =
-                                GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
+                                    Fluid::GetSatDensityRefrig(state, fluidNameSteam, TempSteamIn, 1.0, thisPIU.HCoil_FluidIndex, RoutineName);
                             int DummyWaterIndex = 1;
                             Real64 const Cp = GetSpecificHeatGlycol(
                                 state, fluidNameWater, state.dataSize->PlantSizData(PltSizHeatNum).ExitTemp, DummyWaterIndex, RoutineName);
@@ -1421,8 +1420,8 @@ void CalcSeriesPIU(EnergyPlusData &state,
 
     // Using/Aliasing
     using namespace DataZoneEnergyDemands;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
     using HeatingCoils::SimulateHeatingCoilComponents;
     using MixerComponent::SimAirMixer;
     using PlantUtilities::SetComponentFlowRate;

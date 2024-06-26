@@ -217,8 +217,8 @@ void GetPumpInput(EnergyPlusData &state)
     using Curve::GetCurveIndex;
     using Curve::GetCurveMinMaxValues;
     using DataSizing::AutoSize;
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSatDensityRefrig;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSatDensityRefrig;
     using NodeInputManager::GetOnlySingleNode;
     using ScheduleManager::CheckScheduleValueMinMax;
     using ScheduleManager::GetScheduleIndex;
@@ -1353,8 +1353,8 @@ void InitializePumps(EnergyPlusData &state, int const PumpNum)
     // This subroutine does one-time and begin-envrn inits for the pump
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSatDensityRefrig;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSatDensityRefrig;
 
     using PlantUtilities::InitComponentNodes;
     using PlantUtilities::ScanPlantLoopsForObject;
@@ -1579,7 +1579,7 @@ void SetupPumpMinMaxFlows(EnergyPlusData &state, int const LoopNum, int const Pu
     //  These values are also bounded by EMS overridable limit of max flow rate.
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
+    using Fluid::GetDensityGlycol;
     using PlantPressureSystem::ResolveLoopFlowVsPressure;
     using PlantUtilities::BoundValueToWithinTwoValues;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -1756,8 +1756,8 @@ void CalcPumps(EnergyPlusData &state, int const PumpNum, Real64 const FlowReques
     // Energy Calculations, ASHRAE, 1993, pp2-10 to 2-15
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     using PlantUtilities::SetComponentFlowRate;
     using ScheduleManager::GetCurrentScheduleValue;
@@ -2018,8 +2018,8 @@ void SizePump(EnergyPlusData &state, int const PumpNum)
     // Obtains flow rates from the plant sizing array.
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSatDensityRefrig;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSatDensityRefrig;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     Real64 constexpr StartTemp(100.0); // Standard Temperature across code to calculated Steam density
@@ -2325,8 +2325,8 @@ void GetRequiredMassFlowRate(EnergyPlusData &state,
                              Real64 &PumpMaxMassFlowRateVFDRange)
 {
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     using PlantPressureSystem::ResolveLoopFlowVsPressure;
     using PlantUtilities::SetComponentFlowRate;

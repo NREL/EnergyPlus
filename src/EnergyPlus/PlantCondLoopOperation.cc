@@ -102,7 +102,7 @@ namespace EnergyPlus::PlantCondLoopOperation {
 
 // Using/Aliasing
 using namespace DataPlant;
-using FluidProperties::GetSpecificHeatGlycol;
+using Fluid::GetSpecificHeatGlycol;
 using HVAC::SmallLoad;
 
 void ManagePlantLoadDistribution(EnergyPlusData &state,
@@ -3679,7 +3679,7 @@ void FindCompSPLoad(EnergyPlusData &state,
 
     // Using/Aliasing
     using DataLoopNode::SensedNodeFlagValue;
-    using FluidProperties::GetDensityGlycol;
+    using Fluid::GetDensityGlycol;
 
     // Locals
     // SUBROUTINE ARGUMENT DEFINITIONS:

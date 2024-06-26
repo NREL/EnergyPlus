@@ -985,7 +985,7 @@ void UpdateChillerComponentCondenserSide(EnergyPlusData &state,
     // update outlet conditions if needed or possible
 
     // Using/Aliasing
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateChillerComponentCondenserSide");
@@ -1079,7 +1079,7 @@ void UpdateComponentHeatRecoverySide(EnergyPlusData &state,
     // update outlet conditions if needed or possible
 
     // Using/Aliasing
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetSpecificHeatGlycol;
 
     // SUBROUTINE PARAMETER DEFINITIONS:
     static constexpr std::string_view RoutineName("UpdateComponentHeatRecoverySide");

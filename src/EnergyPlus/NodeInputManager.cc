@@ -967,10 +967,10 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
     // stored in MoreNodeInfo.
 
     // Using/Aliasing
-    using FluidProperties::GetDensityGlycol;
-    using FluidProperties::GetSatDensityRefrig;
-    using FluidProperties::GetSatEnthalpyRefrig;
-    using FluidProperties::GetSpecificHeatGlycol;
+    using Fluid::GetDensityGlycol;
+    using Fluid::GetSatDensityRefrig;
+    using Fluid::GetSatEnthalpyRefrig;
+    using Fluid::GetSpecificHeatGlycol;
     using Psychrometrics::CPCW;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
@@ -1031,7 +1031,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
 
         for (int iNode = 1; iNode <= state.dataLoopNodes->NumOfNodes; ++iNode) {
             nodeReportingStrings.push_back(std::string(NodeReportingCalc + state.dataLoopNodes->NodeID(iNode)));
-            nodeFluidNames.push_back(FluidProperties::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
+            nodeFluidNames.push_back(Fluid::GetGlycolNameByIndex(state, state.dataLoopNodes->Node(iNode).FluidIndex));
 
             for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
                 if (Util::SameString(reqVar->key, state.dataLoopNodes->NodeID(iNode)) || reqVar->key.empty()) {
@@ -1143,7 +1143,7 @@ void CalcMoreNodeInfo(EnergyPlusData &state)
         } else if (state.dataLoopNodes->Node(iNode).FluidType == DataLoopNode::NodeFluidType::Water) {
 
             if (!((state.dataLoopNodes->Node(iNode).FluidIndex > 0) &&
-                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluidProps->NumOfGlycols))) {
+                  (state.dataLoopNodes->Node(iNode).FluidIndex <= state.dataFluid->NumOfGlycols))) {
                 rho = RhoWaterStdInit;
                 rhoStd = RhoWaterStdInit;
                 Cp = CPCW(state.dataLoopNodes->Node(iNode).Temp);

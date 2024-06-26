@@ -830,7 +830,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
             // set design mass flow rates
             if (thisCP.WaterInletNode > 0) {
-                rho = FluidProperties::GetDensityGlycol(state,
+                rho = Fluid::GetDensityGlycol(state,
                                                         state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                         Constant::CWInitConvTemp,
                                                         state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
@@ -845,7 +845,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
     if (state.dataGlobal->BeginEnvrnFlag && thisCP.MyEnvrnFlag) {
         // Initialize
 
-        rho = FluidProperties::GetDensityGlycol(state,
+        rho = Fluid::GetDensityGlycol(state,
                                                 state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                 Constant::InitConvTemp,
                                                 state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
@@ -857,7 +857,7 @@ void InitCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum, int cons
 
         ThisInNode.Temp = 7.0;
 
-        Cp = FluidProperties::GetSpecificHeatGlycol(state,
+        Cp = Fluid::GetSpecificHeatGlycol(state,
                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                     ThisInNode.Temp,
                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
@@ -1032,12 +1032,12 @@ void SizeCoolingPanel(EnergyPlusData &state, int const CoolingPanelNum)
                     PlantUtilities::MyPlantSizingIndex(state, CompType, thisCP.Name, thisCP.WaterInletNode, thisCP.WaterOutletNode, ErrorsFound);
                 if (PltSizCoolNum > 0) {
                     if (DesCoilLoad >= HVAC::SmallLoad) {
-                        rho = FluidProperties::GetDensityGlycol(state,
+                        rho = Fluid::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                                 5.,
                                                                 state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
                                                                 RoutineName);
-                        Cp = FluidProperties::GetSpecificHeatGlycol(state,
+                        Cp = Fluid::GetSpecificHeatGlycol(state,
                                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidName,
                                                                     5.0,
                                                                     state.dataPlnt->PlantLoop(thisCP.plantLoc.loopNum).FluidIndex,
@@ -1290,7 +1290,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
         if (QZnReq < -HVAC::SmallLoad && !state.dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) && (CoolingPanelOn)) {
 
-            Cp = FluidProperties::GetSpecificHeatGlycol(state,
+            Cp = Fluid::GetSpecificHeatGlycol(state,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                         waterInletTemp,
                                                         state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
@@ -1375,7 +1375,7 @@ void CoolingPanelParams::CalcCoolingPanel(EnergyPlusData &state, int const Cooli
 
     if (CoolingPanelOn) {
         // Now simulate the system...
-        Cp = FluidProperties::GetSpecificHeatGlycol(state,
+        Cp = Fluid::GetSpecificHeatGlycol(state,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                     waterInletTemp,
                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidIndex,
