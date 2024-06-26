@@ -113,14 +113,15 @@ struct HeatBalSurfData : BaseGlobalStruct
     Array1D<Real64> SurfHConvExt;         // Outside Convection Coefficient
     Array1D<Real64> SurfWinCoeffAdjRatio; // Convective Coefficient Adjustment Ratio assuming highly conductive frames
                                           // Only applicable for exterior window surfaces
-    Array1D<Real64> SurfHAirExt;          // Outside Radiation Coefficient to Air
-    Array1D<Real64> SurfHSkyExt;          // Outside Radiation Coefficient to Sky
-    Array1D<Real64> SurfHGrdExt;          // Outside Radiation Coefficient to Ground
-    Array1D<Real64> SurfHConvInt;         // INSIDE CONVECTION COEFFICIENT
-    Array1D<Real64> SurfTempSource;       // Temperature at the source location for each heat transfer surface
-    Array1D<Real64> SurfTempUserLoc;      // Temperature at the user specified location for each heat transfer surface
-    Array1D<Real64> SurfTempInMovInsRep;  // Temperature of interior movable insulation on the side facing the zone
-    Array1D<Real64> SurfHSrdSurfExt;      // Outside Radiation Coefficient to Surrounding Surfaces
+
+    Array1D<Real64> SurfHAirExt;         // Outside Radiation Coefficient to Air
+    Array1D<Real64> SurfHSkyExt;         // Outside Radiation Coefficient to Sky
+    Array1D<Real64> SurfHGrdExt;         // Outside Radiation Coefficient to Ground
+    Array1D<Real64> SurfHConvInt;        // INSIDE CONVECTION COEFFICIENT
+    Array1D<Real64> SurfTempSource;      // Temperature at the source location for each heat transfer surface
+    Array1D<Real64> SurfTempUserLoc;     // Temperature at the user specified location for each heat transfer surface
+    Array1D<Real64> SurfTempInMovInsRep; // Temperature of interior movable insulation on the side facing the zone
+    Array1D<Real64> SurfHSrdSurfExt;     // Outside Radiation Coefficient to Surrounding Surfaces
 
     Array1D<Real64> SurfQConvInRep;        // Surface convection heat gain at inside face [J]
     Array1D<Real64> SurfQdotConvInRep;     // Surface convection heat transfer rate at inside face surface [W] (report)

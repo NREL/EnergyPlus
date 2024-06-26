@@ -1564,6 +1564,11 @@ struct SurfacesData : BaseGlobalStruct
     Array1D<bool> SurfWindDirEMSOverrideOn;               // if true, EMS is calling to override the outside wind direction
     Array1D<Real64> SurfWindDirEMSOverrideValue;          // value to use for EMS override of outside wind direction (deg)
 
+    Array1D<bool> SurfTInsideEMSOverrideOn;       // EMS Inside surface temperature override enable
+    Array1D<Real64> SurfTInsideEMSOverrideValue;  // EMS Inside surface temperature override value
+    Array1D<bool> SurfTOutsideEMSOverrideOn;      // EMS Outside surface temperature override enable
+    Array1D<Real64> SurfTOutsideEMSOverrideValue; // EMS Outside surface temperature override value
+
     // Surface Properties
     Array1D<int> SurfDaylightingShelfInd;        // Pointer to daylighting shelf
     Array1D<bool> SurfExtEcoRoof;                // True if the top outside construction material is of type Eco Roof
