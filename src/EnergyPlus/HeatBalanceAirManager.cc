@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -4901,7 +4902,59 @@ void ReportZoneMeanAirTemp(EnergyPlusData &state)
 
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine updates the report variables for the AirHeatBalance.
+    if (state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag) {
+        for (auto const *reqVar : state.dataOutputProcessor->reqVars) {
+            if (reqVar->name == "ZONE WETBULB GLOBE TEMPERATURE") {
+                if (reqVar->key.empty()) {
+                    for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
+                    }
+                } else {
+                    int ZoneLoop = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->Zone);
+                    if (ZoneLoop > 0) {
+                        auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                        thisZnAirRpt.ReportWBGT = true;
+                    }
+                }
+            } else if (reqVar->name == "SPACE WETBULB GLOBE TEMPERATURE") {
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                    if (reqVar->key.empty()) {
+                        for (int spaceNum = 1; spaceNum <= state.dataGlobal->numSpaces; ++spaceNum) {
+                            auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                            thisSpaceAirRpt.ReportWBGT = true;
+                        }
+                    } else {
+                        int spaceNum = Util::FindItemInList(Util::makeUPPER(reqVar->key), state.dataHeatBal->space);
+                        if (spaceNum > 0) {
+                            auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                            thisSpaceAirRpt.ReportWBGT = true;
+                        }
+                    }
+                }
+            }
+        }
 
+        // EMS sensor request WBGT check
+        for (int loop = 1; loop <= state.dataRuntimeLang->NumSensors; ++loop) {
+            if (state.dataRuntimeLang->Sensor(loop).OutputVarName == "ZONE WETBULB GLOBE TEMPERATURE") {
+                int ZoneLoop = Util::FindItemInList(state.dataRuntimeLang->Sensor(loop).UniqueKeyName, state.dataHeatBal->Zone);
+                if (ZoneLoop > 0) {
+                    auto &thisZnAirRpt = state.dataHeatBal->ZnAirRpt(ZoneLoop);
+                    thisZnAirRpt.ReportWBGT = true;
+                }
+            } else if (state.dataRuntimeLang->Sensor(loop).OutputVarName == "SPACE WETBULB GLOBE TEMPERATURE") {
+                if (state.dataHeatBal->doSpaceHeatBalanceSimulation) {
+                    int spaceNum = Util::FindItemInList(state.dataRuntimeLang->Sensor(loop).UniqueKeyName, state.dataHeatBal->space);
+                    if (spaceNum > 0) {
+                        auto &thisSpaceAirRpt = state.dataHeatBal->spaceAirRpt(spaceNum);
+                        thisSpaceAirRpt.ReportWBGT = true;
+                    }
+                }
+            }
+        }
+        state.dataHeatBalAirMgr->CalcExtraReportVarMyOneTimeFlag = false;
+    }
     for (int ZoneLoop = 1; ZoneLoop <= state.dataGlobal->NumOfZones; ++ZoneLoop) {
         auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(ZoneLoop);
         calcMeanAirTemps(state, thisZoneHB.ZTAV, thisZoneHB.airHumRatAvg, thisZoneHB.MRT, state.dataHeatBal->ZnAirRpt(ZoneLoop), ZoneLoop);
@@ -4949,6 +5002,11 @@ void calcMeanAirTemps(EnergyPlusData &state,
                 thisAirRpt.ThermOperativeTemp = (1.0 - thisMRTFraction) * ZTAV + thisMRTFraction * MRT;
             }
         }
+    }
+    if (thisAirRpt.ReportWBGT) {
+        // note that the WetBulbTemp here is for temporary verification, it will not be another added reporting variable
+        thisAirRpt.WetbulbGlobeTemp =
+            0.7 * Psychrometrics::PsyTwbFnTdbWPb(state, ZTAV, airHumRatAvg, state.dataEnvrn->OutBaroPress) + 0.3 * thisAirRpt.OperativeTemp;
     }
 }
 

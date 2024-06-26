@@ -1646,7 +1646,6 @@ bool GetStandAloneERVNodeNumber(EnergyPlusData &state, int const NodeNumber)
     for (int StandAloneERVIndex = 1; StandAloneERVIndex <= state.dataHVACStandAloneERV->NumStandAloneERVs; ++StandAloneERVIndex) {
 
         auto &StandAloneERV = state.dataHVACStandAloneERV->StandAloneERV(StandAloneERVIndex);
-        bool ErrorsFound = false;
         int SupplyFanInletNodeIndex = 0;
         int SupplyFanOutletNodeIndex = 0;
         int ExhaustFanInletNodeIndex = 0;

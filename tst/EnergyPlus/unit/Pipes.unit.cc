@@ -76,8 +76,8 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     ASSERT_TRUE(process_idf(idf_objects));
     Pipes::GetPipeInput(*state);
     EXPECT_EQ(2u, state->dataPipes->LocalPipe.size());
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type));
-    EXPECT_TRUE(compare_enums(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type));
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::Pipe, state->dataPipes->LocalPipe(1).Type);
+    EXPECT_ENUM_EQ(DataPlant::PlantEquipmentType::PipeSteam, state->dataPipes->LocalPipe(2).Type);
 }
 
 TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, CalcPipeHeatTransCoef)
     PlantUtilities::ScanPlantLoopsForObject(*state, pipe.Name, pipe.Type, pipe.plantLoc, errFlag);
     ASSERT_FALSE(errFlag);
     EXPECT_EQ(1, pipe.plantLoc.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, pipe.plantLoc.loopSideNum));
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Demand, pipe.plantLoc.loopSideNum);
     EXPECT_EQ(1, pipe.plantLoc.branchNum);
     EXPECT_EQ(1, pipe.plantLoc.compNum);
 

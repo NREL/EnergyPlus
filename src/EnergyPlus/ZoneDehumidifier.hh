@@ -160,9 +160,13 @@ struct ZoneDehumidifierData : BaseGlobalStruct
     bool GetInputFlag = true; // Set to FALSE after first time input is "gotten"
     EPVector<ZoneDehumidifier::ZoneDehumidifierParams> ZoneDehumid;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ZoneDehumidifierData();
+        new (this) ZoneDehumidifierData();
     }
 };
 

@@ -254,7 +254,7 @@ set(SRC
     ElectricPowerServiceManager.cc
     ElectricPowerServiceManager.hh
     EnergyPlus.hh
-    EnergyPlusLogger.cc 
+    EnergyPlusLogger.cc
     EnergyPlusLogger.hh
     EvaporativeCoolers.cc
     EvaporativeCoolers.hh
@@ -604,6 +604,8 @@ set(SRC
     TARCOGParams.hh
     TarcogShading.cc
     TarcogShading.hh
+    Timer.cc
+    Timer.hh
     ThermalChimney.cc
     ThermalChimney.hh
     ThermalComfort.cc

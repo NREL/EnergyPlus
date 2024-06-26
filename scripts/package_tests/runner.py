@@ -86,14 +86,14 @@ CONFIGURATIONS = {
     'ubuntu2204': {
         'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu22.04-x86_64.tar.gz', 'os_version': '22.04'
     },
+    'ubuntu2404': {
+        'os': OS.Linux, 'bitness': 'x64', 'asset_pattern': 'Linux-Ubuntu24.04-x86_64.tar.gz', 'os_version': '24.04'
+    },
     'mac11': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS11.6-x86_64.tar.gz', 'os_version': '11.6'
     },
     'mac12': {
         'os': OS.Mac, 'bitness': 'x64', 'asset_pattern': 'Darwin-macOS12.1-x86_64.tar.gz', 'os_version': '12.1'
-    },
-    'mac12-arm64': {
-        'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS12.1-arm64.tar.gz', 'os_version': '12'
     },
     'mac13-arm64': {
         'os': OS.Mac, 'bitness': 'arm64', 'asset_pattern': 'Darwin-macOS13-arm64.tar.gz', 'os_version': '13'
