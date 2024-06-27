@@ -309,6 +309,7 @@ EnergyPlusData::~EnergyPlusData() = default;
 void EnergyPlusData::clear_state()
 {
     this->ready = true;
+    this->init_state_called = false;
     this->dataAirLoop->clear_state();
     this->dataAirLoopHVACDOAS->clear_state();
     this->dataAirSystemsData->clear_state();
@@ -570,11 +571,14 @@ void EnergyPlusData::clear_state()
 
 void EnergyPlusData::init_state(EnergyPlusData &state)
 {
+    if (this->init_state_called) return;
     // The order in which we do this matters.  We're going to try to
     // do this in "topological" order meaning the first to go are the
     // objects that do not reference any other objects, like fluids,
     // schedules, curves, etc.
-    this->dataFluidProps->init_state(state);
+    this->dataFluidProps->init_state(state);        // GetFluidPropertiesData
+    this->dataSimulationManager->init_state(state); // GetProjectData
+    this->dataPsychrometrics->init_state(state);    // InitializePsychRoutines
 
     this->dataAirLoop->init_state(state);
     this->dataAirLoopHVACDOAS->init_state(state);
@@ -736,7 +740,6 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataPollution->init_state(state);
     this->dataPondGHE->init_state(state);
     this->dataPowerInductionUnits->init_state(state);
-    this->dataPsychrometrics->init_state(state);
     this->dataPsychCache->init_state(state);
     this->dataPumps->init_state(state);
     this->dataPurchasedAirMgr->init_state(state);
@@ -758,7 +761,6 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataSetPointManager->init_state(state);
     this->dataShadowComb->init_state(state);
     this->dataSimAirServingZones->init_state(state);
-    this->dataSimulationManager->init_state(state);
     this->dataSingleDuct->init_state(state);
     this->dataSize->init_state(state);
     this->dataSizingManager->init_state(state);
@@ -823,6 +825,8 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataZoneEquipmentManager->init_state(state);
     this->dataZonePlenum->init_state(state);
     this->dataZoneTempPredictorCorrector->init_state(state);
+
+    this->init_state_called = true;
 }
 
 } // namespace EnergyPlus

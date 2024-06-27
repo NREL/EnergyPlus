@@ -8282,7 +8282,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilWater)
 {
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental hot water heating coil calculation
-
+    state->init_state(*state);
     VRFTerminalUnitEquipment thisVRFTU;
 
     int VRFTUNum(1);
@@ -8402,6 +8402,7 @@ TEST_F(EnergyPlusFixture, VRFTU_CalcVRFSupplementalHeatingCoilSteam)
     // PURPOSE OF THE TEST:
     // checks VRF terminal units supplemental steam heating coil calculation
 
+    state->init_state(*state);
     VRFTerminalUnitEquipment thisVRFTU;
 
     int VRFTUNum(1);

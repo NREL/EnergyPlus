@@ -74,6 +74,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     int chWInletNodeNum = 9;
     int chWOutletNodeNum = 15;
 
+    state->init_state(*state);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "Chilled Water Loop";
@@ -228,6 +229,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_SteamCoil)
     int wInletNodeNum = 9;
     int wOutletNodeNum = 15;
 
+    state->init_state(*state);
     state->dataPlnt->TotNumLoops = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataPlnt->PlantLoop(1).Name = "Steam Loop";

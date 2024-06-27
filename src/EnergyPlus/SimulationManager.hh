@@ -99,8 +99,9 @@ struct SimulationManagerData : BaseGlobalStruct
     bool RunControlInInput = false;
     bool PreP_Fatal = false;
     bool WarningOut = true;
-    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    void init_state(EnergyPlusData &state) override
     {
+        SimulationManager::GetProjectData(state);
     }
 
     void clear_state() override

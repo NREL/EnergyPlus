@@ -57,6 +57,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 
@@ -89,6 +90,7 @@ TEST_F(EnergyPlusFixture, PlantUtilities_RegisterPlantCompDesignFlowTest1)
 
 TEST_F(EnergyPlusFixture, TestRegulateCondenserCompFlowReqOp)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     // This test captures all code paths through the RegulateCondenserCompFlowReqOp function
     // We only need a single component to check here
     state->dataPlnt->PlantLoop.allocate(1);

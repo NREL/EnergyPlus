@@ -3740,6 +3740,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -4029,6 +4030,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;
@@ -4571,6 +4573,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
+        state->dataGlobal->TimeStep = 4;
         state->dataGlobal->DayOfSim = 365;
         state->dataGlobal->DayOfSimChr = "365";
         state->dataEnvrn->Month = 12;

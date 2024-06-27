@@ -54,11 +54,13 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
 
 namespace EnergyPlus {
 
 TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletTempSizingGauntlet)
 {
+    FluidProperties::GetFluidPropertiesData(*state);
     // this global state is what would be set up by E+ currently
     state->dataSize->ZoneEqSizing.allocate(1);
     state->dataEnvrn->StdRhoAir = 1.2;

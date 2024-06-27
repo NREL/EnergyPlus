@@ -213,8 +213,6 @@ namespace SimulationManager {
 
         state.init_state(state);
 
-        GetProjectData(state);
-        Psychrometrics::InitializePsychRoutines(state);
         CheckForMisMatchedEnvironmentSpecifications(state);
         CheckForRequestedReporting(state);
         OutputReportPredefined::SetPredefinedTables(state);
