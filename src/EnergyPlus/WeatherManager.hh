@@ -789,6 +789,8 @@ struct WeatherManagerData : BaseGlobalStruct
     bool WeatherFileExists = false;        // Set to true if a weather file exists
     std::string LocationTitle = "";        // Location Title from input File
     bool LocationGathered = false;         // flag to show if Location exists on Input File (we assume one is there and correct on weather file)
+    bool keepUserSiteLocationDefinition = false;    // flag based on user input to set whether to keep the user site location definition (true)
+                                                    // or override with the site information given on weather file (false/default)
 
     Real64 WeatherFileLatitude = 0.0;
     Real64 WeatherFileLongitude = 0.0;

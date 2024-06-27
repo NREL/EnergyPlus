@@ -4232,32 +4232,37 @@ namespace Weather {
             state.dataWeather->WeatherFileExists) {
             if (state.dataWeather->LocationGathered) {
                 // See if "matching" location
-                if (std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude) > 1.0 ||
-                    std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude) > 1.0 ||
-                    std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone) > 0.0 ||
-                    std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) > 0.10) {
-                    ShowWarningError(state, "Weather file location will be used rather than entered (IDF) Location object.");
-                    ShowContinueError(state, format("..Location object={}", state.dataWeather->LocationTitle));
-                    ShowContinueError(state, format("..Weather File Location={}", state.dataEnvrn->WeatherFileLocationTitle));
-                    ShowContinueError(
-                        state,
-                        format("..due to location differences, Latitude difference=[{:.2R}] degrees, Longitude difference=[{:.2R}] degrees.",
-                               std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude),
-                               std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude)));
-                    ShowContinueError(state,
-                                      format("..Time Zone difference=[{:.1R}] hour(s), Elevation difference=[{:.2R}] percent, [{:.2R}] meters.",
-                                             std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone),
-                                             std::abs((state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) /
-                                                      max(state.dataEnvrn->Elevation, 1.0) * 100.0),
-                                             std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation)));
+                if (state.dataWeather->keepUserSiteLocationDefinition) {
+                    ShowWarningError(state, "User Entered (IDF) Site:Location object will be used rather than the weather file location.");
+                } else {
+                    if (std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude) > 1.0 ||
+                        std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude) > 1.0 ||
+                        std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone) > 0.0 ||
+                        std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) > 0.10) {
+                        ShowWarningError(state, "Weather file location will be used rather than entered (IDF) Location object.");
+                        ShowContinueError(state, format("..Location object={}", state.dataWeather->LocationTitle));
+                        ShowContinueError(state, format("..Weather File Location={}", state.dataEnvrn->WeatherFileLocationTitle));
+                        ShowContinueError(
+                            state,
+                            format("..due to location differences, Latitude difference=[{:.2R}] degrees, Longitude difference=[{:.2R}] degrees.",
+                                   std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude),
+                                   std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude)));
+                        ShowContinueError(state,
+                                          format("..Time Zone difference=[{:.1R}] hour(s), Elevation difference=[{:.2R}] percent, [{:.2R}] meters.",
+                                                 std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone),
+                                                 std::abs((state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) /
+                                                          max(state.dataEnvrn->Elevation, 1.0) * 100.0),
+                                                 std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation)));
+                    }
                 }
             }
-
-            state.dataWeather->LocationTitle = state.dataEnvrn->WeatherFileLocationTitle;
-            state.dataEnvrn->Latitude = state.dataWeather->WeatherFileLatitude;
-            state.dataEnvrn->Longitude = state.dataWeather->WeatherFileLongitude;
-            state.dataEnvrn->TimeZoneNumber = state.dataWeather->WeatherFileTimeZone;
-            state.dataEnvrn->Elevation = state.dataWeather->WeatherFileElevation;
+            if (!state.dataWeather->keepUserSiteLocationDefinition) { // Only override with weather file if this is false
+                state.dataWeather->LocationTitle = state.dataEnvrn->WeatherFileLocationTitle;
+                state.dataEnvrn->Latitude = state.dataWeather->WeatherFileLatitude;
+                state.dataEnvrn->Longitude = state.dataWeather->WeatherFileLongitude;
+                state.dataEnvrn->TimeZoneNumber = state.dataWeather->WeatherFileTimeZone;
+                state.dataEnvrn->Elevation = state.dataWeather->WeatherFileElevation;
+            }
         } else if (!state.dataWeather->LocationGathered) {
             state.dataWeather->LocationTitle = "Not Entered";
             ShowSevereError(state, "No Location given. Must have location information for simulation.");
@@ -6462,18 +6467,19 @@ namespace Weather {
             int LocNumAlpha;             // Number of alpha names being passed
             int LocNumProp;              // Number of properties being passed
             int IOStat;                  // IO Status when calling get input subroutine
-            Array1D_string LocNames(1);  // Temp Array to transfer location info
-            Array1D<Real64> LocProps(4); // Temporary array to transfer location info
+            Array1D_string LocAlphas(2); // Temporary array to transfer location info (non-numerics)
+            Array1D<Real64> LocProps(4); // Temporary array to transfer location info (numerics)
             // Call Input Get routine to retrieve Location information
             state.dataInputProcessing->inputProcessor->getObjectItem(
-                state, ipsc->cCurrentModuleObject, 1, LocNames, LocNumAlpha, LocProps, LocNumProp, IOStat);
+                state, ipsc->cCurrentModuleObject, 1, LocAlphas, LocNumAlpha, LocProps, LocNumProp, IOStat);
 
             // set latitude, longitude, and time zone number variables
-            state.dataWeather->LocationTitle = LocNames(1);
+            state.dataWeather->LocationTitle = LocAlphas(1);
             state.dataEnvrn->Latitude = LocProps(1);
             state.dataEnvrn->Longitude = LocProps(2);
             state.dataEnvrn->TimeZoneNumber = LocProps(3);
             state.dataEnvrn->Elevation = LocProps(4);
+            if (Util::SameString(LocAlphas(2),"Yes")) state.dataWeather->keepUserSiteLocationDefinition = true;
             state.dataWeather->LocationGathered = true;
         }
     }
