@@ -221,6 +221,7 @@ namespace ZoneTempPredictorCorrector {
         Real64 tempDepLoad = 0.0;
         Real64 airRelHum = 0.0;   // Zone relative humidity in percent
         Real64 AirPowerCap = 0.0; // "air power capacity"  Vol*VolMult*rho*Cp/timestep [W/degK]
+        int hmThermalMassMultErrIndex = 0;
 
         virtual ~ZoneSpaceHeatBalanceData() = default;
 
@@ -336,6 +337,14 @@ namespace ZoneTempPredictorCorrector {
                                  Real64 SumSysMCp,              // Zone sum of air system MassFlowRate*Cp
                                  Real64 SumSysMCpT,             // Zone sum of air system MassFlowRate*Cp*T
                                  Real64 AirCap                  // Formerly CoefAirrat, coef in zone temp eqn with dim of "air power capacity"rd
+    );
+
+    void processInverseModelMultpHM(EnergyPlusData &state,
+                                    Real64 &multiplierHM, // Hybrid model thermal mass multiplier
+                                    Real64 &multSumHM,    // Sum of Hybrid model thermal mass multipliers
+                                    Real64 &countSumHM,   // Count of number of points in sum
+                                    Real64 &multAvgHM,    // Average of hybrid model mass multipier
+                                    int zoneNum           // Zone number for the hybrid model
     );
 
     void InverseModelHumidity(EnergyPlusData &state,
