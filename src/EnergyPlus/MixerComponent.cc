@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -104,7 +104,7 @@ void SimAirMixer(EnergyPlusData &state, std::string_view CompName, int &CompInde
 
     // Find the correct MixerNumber
     if (CompIndex == 0) {
-        MixerNum = UtilityRoutines::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
+        MixerNum = Util::FindItemInList(CompName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
         if (MixerNum == 0) {
             ShowFatalError(state, format("SimAirLoopMixer: Mixer not found={}", CompName));
         }
@@ -211,7 +211,7 @@ void GetMixerInput(EnergyPlusData &state)
                                                                  lAlphaBlanks,
                                                                  cAlphaFields,
                                                                  cNumericFields);
-        UtilityRoutines::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
+        Util::IsNameEmpty(state, AlphArray(1), CurrentModuleObject, ErrorsFound);
 
         state.dataMixerComponent->MixerCond(MixerNum).MixerName = AlphArray(1);
 
@@ -618,7 +618,7 @@ void GetZoneMixerIndex(EnergyPlusData &state, std::string const &MixerName, int 
         state.dataMixerComponent->GetZoneMixerIndexInputFlag = false;
     }
 
-    MixerIndex = UtilityRoutines::FindItemInList(MixerName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
+    MixerIndex = Util::FindItemInList(MixerName, state.dataMixerComponent->MixerCond, &MixerConditions::MixerName);
     if (MixerIndex == 0) {
         if (!ThisObjectType.empty()) {
             ShowSevereError(state, format("{}, GetZoneMixerIndex: Zone Mixer not found={}", ThisObjectType, MixerName));

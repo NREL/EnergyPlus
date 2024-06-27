@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -195,6 +195,13 @@ namespace ZoneEquipmentManager {
                                     int const EquipPriorityNum = -1 // optional index in PrioritySimOrder for this update
     );
 
+    void adjustSystemOutputRequired(Real64 const sensibleRatio, // sensible load adjustment
+                                    Real64 const latentRatio,   // latent load adjustment
+                                    DataZoneEnergyDemands::ZoneSystemSensibleDemand &energy,
+                                    DataZoneEnergyDemands::ZoneSystemMoistureDemand &moisture,
+                                    int const equipPriorityNum // index in PrioritySimOrder
+    );
+
     void CalcZoneMassBalance(EnergyPlusData &state, bool FirstHVACIteration);
 
     void CalcZoneReturnFlows(EnergyPlusData &state,
@@ -263,9 +270,13 @@ struct ZoneEquipmentManagerData : BaseGlobalStruct
     bool InitZoneEquipmentEnvrnFlag = true;
     bool FirstPassZoneEquipFlag = true; // indicates first pass through zone equipment, used to reset selected ZoneEqSizing variables
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = ZoneEquipmentManagerData();
+        new (this) ZoneEquipmentManagerData();
     }
 };
 

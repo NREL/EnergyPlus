@@ -57,7 +57,9 @@ The ZoneHVAC:AirDistributionUnit object gives further information on what air lo
 \item
   \hyperref[airterminaldualductvavoutdoorair]{AirTerminal:DualDuct:VAV:OutdoorAir}
 \item
-  \hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat}
+  \hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat}  
+\item
+  \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}
 \item
   \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}
 \item
@@ -68,6 +70,8 @@ The ZoneHVAC:AirDistributionUnit object gives further information on what air lo
   \hyperref[airterminalsingleductparallelpiureheat]{AirTerminal:SingleDuct:ParallelPIU:Reheat}
 \item
   \hyperref[airterminalsingleductconstantvolumefourpipeinduction]{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}
+\item
+  \hyperref[airterminalsingleductconstantvolumefourpipebeam]{AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam}
 \item
   \hyperref[airterminalsingleductvavreheatvariablespeedfan]{AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan}
 \item
@@ -85,7 +89,25 @@ The ZoneHVAC:AirDistributionUnit object gives further information on what air lo
 
 Connections between the air distribution unit, the supply air duct, and the zone are specified in the input syntax for the air distribution unit and the \hyperref[airloophvaczonesplitter]{AirLoopHVAC:ZoneSplitter}. The input syntax also explicitly defines an outlet identifier. This implies a connection to a zone through a \hyperref[nodelist]{NodeList} for zone inlets (see the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} statement). Each air distribution unit is essentially a combined component-controller. Since controls are normally based on the zone thermostat, they can work in parallel or series in complex fashion. Each air distribution unit operates to meet all or part of the remaining thermostat load as specified in \hyperref[zonehvacequipmentlist]{ZoneHVAC:EquipmentList}.
 
-The Air Distribution unit also allows the user to specify leaks in the supply air duct system. These inputs are used in the EnergyPlus Simplified Duct Leakage Model (SDLM). This model simulates a specific configuration: supply leaks to a return plenum in a commercial VAV or CV system. The system must have a constant static pressure setpoint. Within these limitations SDLM allows the user to easily evaluate the energy penalty due to duct leakage.
+The Air Distribution unit also allows the user to specify leaks in the supply air duct system. These inputs are used in the EnergyPlus Simplified Duct Leakage Model (SDLM). This model simulates a specific configuration: supply leaks to a return plenum in a commercial VAV or CV system. The VAV system must have a constant static pressure setpoint, and a constant upstream air leakage flow rate is calculated using the upstream leakage fraction and design flow rate of the VAV box. For the CV system, a proportional leakage amount is calculated using the upstream leakage fraction and the maximum available air flow rate of the air terminal box. The downstream leakages are always calculated as a fraction of the current flow rate through the air terminal. Within these limitations SDLM allows the user to easily evaluate the energy penalty due to duct leakage.
+
+The Simplified Duct Leakage Model (SDLM) is currently supported for the following air terminals:
+
+\begin{itemize}
+\item
+  \hyperref[airterminalsingleductvavreheat]{AirTerminal:SingleDuct:VAV:Reheat}
+\item
+  \hyperref[airterminalsingleductvavnoreheat]{AirTerminal:SingleDuct:VAV:NoReheat}
+\item
+  \hyperref[airterminalsingleductvavheatandcoolreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat}
+\item
+  \hyperref[airterminalsingleductvavheatandcoolnoreheat]{AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat}
+\item
+  \hyperref[airterminalsingleductconstantvolumereheat]{AirTerminal:SingleDuct:ConstantVolume:Reheat}
+\item
+  \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}
+
+\end{itemize}
 
 \subsubsection{Inputs}\label{inputs-055}
 
@@ -107,7 +129,7 @@ The unique identifying component name.
 
 \paragraph{Field: Nominal Upstream Leakage Fraction}\label{field-nominal-upstream-leakage-fraction}
 
-This is the leakage upstream of the terminal unit as a fraction of the design flow rate through the unit. It is the leakage fraction at the design flow rate. It is used to calculate a leakage flow rate which is then held constant while the system air flow varies. This input is optional; the default is zero.
+This is the leakage upstream of the terminal unit as a fraction of the design flow rate or maximum available flow rate through the unit. It is the leakage fraction at the design flow rate for the VAV air terminal and at the current maximum available flow rate for the CV air terminals. For the VAV air terminal, it is used to calculate a leakage flow rate, which is then held constant while the system airflow varies. The calculated leakage rate for the CV air terminal proportionally varies with the current maximum available flow rate. This input is optional; the default is zero.
 
 \paragraph{Field: Constant Downstream Leakage Fraction}\label{field-constant-downstream-leakage-fraction}
 
@@ -366,7 +388,14 @@ Examples of this statement in an IDF are:
 \subsection{SpaceHVAC:EquipmentConnections}\label{spacehvacequipmentconnections}
 
 If HVAC equipment is modeled at the Space level for one or more zones, the SpaceHVAC:EquipmentConnections statement defines the node connections to a space. Any space modeled with SpaceHVAC:EquipmentConnections will have its own air temperature and humidity ratio, and surfaces and internal gains in the zone will interact with the space conditions.
-Note that all nodes mentioned in the SpaceHVAC:EquipmentConnections input must be unique. That is, all nodes in all the SpaceHVAC:EquipmentConnections statements referenced by the ``Space Air Inlet Nodes'', ``Space Air Exhaust Nodes'', ``Space Air Node Name'' and ``Space Return Air Node Name'' cannot have any node name appearing more than once. Unlike ZoneHVAC:EquipmentConnections, there is no equipment list. Equipment is connected to spaces using \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter}. If any space in a zone has a SpaceHVAC:EquipmentConnections object, then all spaces in that zone must have one, even if they are not served by any HVAC equipment. SpaceHVAC is only used when \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Simulation'' is Yes. 
+Note that all nodes mentioned in the SpaceHVAC:EquipmentConnections input must be unique. That is, all nodes in all the SpaceHVAC:EquipmentConnections statements referenced by the ``Space Air Inlet Nodes'', ``Space Air Exhaust Nodes'', ``Space Air Node Name'' and ``Space Return Air Node Name'' cannot have any node name appearing more than once. Unlike ZoneHVAC:EquipmentConnections, there is no equipment list. Equipment is connected to spaces using \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter} and \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer} as shown in Figure \ref{fig:space-hvac-equipment-connections}. If any space in a zone has a SpaceHVAC:EquipmentConnections object, then all spaces in that zone must have one, even if they are not served by any HVAC equipment. SpaceHVAC is only used when \hyperref[zoneairheatbalancealgorithm]{ZoneAirHeatBalanceAlgorithm} ``Do Space Heat Balance for Simulation'' is Yes.
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/SpaceHVACSchematic2.png}
+\caption{Space HVAC Equipment Connections \protect \label{fig:space-hvac-equipment-connections}}
+\end{figure}
+
 
 \subsubsection{Inputs}\label{inputs-space-1-052}
 
@@ -470,7 +499,7 @@ Fraction of this zone equipment output or airflow distributed to this space. May
 
 \paragraph{Field: Space \textless{}x\textgreater{} Supply Node Name}\label{field-seqsplitter-space-supply-node-name}
 
-The name of a SpaceHVAC:EquipmentConnections Inlet Node Name that takes a fraction of the airflow from the Zone Equipment Output Node.
+The name of a \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections} Inlet Node Name that takes a fraction of the airflow from the Zone Equipment Outlet Node.
 Not used for non-airflow zone equipment.
 
 An example of this statement in an IDF is:
@@ -530,7 +559,7 @@ Fraction of this zone equipment output or airflow distributed to this space. May
 
 \paragraph{Field: Space \textless{}x\textgreater{} Node Name}\label{field-seqmixer-space-node-name}
 
-The name of a SpaceHVAC:EquipmentConnections Exhaust Node Name that sends a fraction of the airflow to the Zone Equipment Output Node.
+The name of a \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections} Exhaust Node Name that sends a fraction of the airflow to the Zone Equipment Inlst Node.
 
 An example of this statement in an IDF is:
 

@@ -9,6 +9,7 @@ endif()
 set(test_src
     TestHelpers/IdfParser.cc
     TestHelpers/IdfParser.hh
+    TestHelpers/CustomMatchers.hh
     Fixtures/EnergyPlusFixture.cc
     Fixtures/EnergyPlusFixture.hh
     Fixtures/IdfParserFixture.hh
@@ -75,6 +76,7 @@ set(test_src
     CoolTower.unit.cc
     CrossVentMgr.unit.cc
     CurveManager.unit.cc
+    CustomMatchers.unit.cc
     DElightManager.unit.cc
     DOASEffectOnZoneSizing.unit.cc
     DXCoils.unit.cc
@@ -150,6 +152,7 @@ set(test_src
     ICSCollector.unit.cc
     IceThermalStorage.unit.cc
     IdfParser.unit.cc
+    IndoorGreen.unit.cc
     InputProcessor.unit.cc
     IntegratedHeatPump.unit.cc
     InternalHeatGains.unit.cc
@@ -172,6 +175,7 @@ set(test_src
     OutputReportTabular.unit.cc
     OutputReportTabularAnnual.unit.cc
     OutputReports.unit.cc
+    OutsideEnergySources.unit.cc
     PVWatts.unit.cc
     PackagedTerminalHeatPump.unit.cc
     Photovoltaics.unit.cc
@@ -185,6 +189,7 @@ set(test_src
     PlantComponentTemperatureSources.unit.cc
     PlantCondLoopOperation.unit.cc
     PlantHeatExchangerFluidToFluid.unit.cc
+    PlantLoadProfile.unit.cc
     PlantLoopHeatPumpEIR.unit.cc
     PlantManager.unit.cc
     PlantPipingSystemsManager.unit.cc
@@ -194,6 +199,7 @@ set(test_src
     Psychrometrics.unit.cc
     Pumps.unit.cc
     PurchasedAirManager.unit.cc
+    RefrigeratedCase.unit.cc
     ReportCoilSelection.unit.cc
     ResultsFramework.unit.cc
     RoomAirModelUserTempPattern.unit.cc
@@ -217,8 +223,8 @@ set(test_src
     SizeWaterHeatingCoil.unit.cc
     SizingAnalysisObjects.unit.cc
     SizingManager.unit.cc
+    SolarCollectors.unit.cc
     SolarShading.unit.cc
-    SortAndStringUtilities.unit.cc
     Standard621SimplifiedProcedure.unit.cc
     StandardRatings.unit.cc
     StringUtilities.unit.cc
@@ -228,11 +234,13 @@ set(test_src
     SwimmingPool.unit.cc
     SystemAvailabilityManager.unit.cc
     SystemReports.unit.cc
+    Timer.unit.cc
     ThermalChimney.unit.cc
     ThermalComfort.unit.cc
     TranspiredCollector.unit.cc
     UnitHeater.unit.cc
     UnitVentilator.unit.cc
+    UFADManager.unit.cc
     UnitaryHybridAirConditioner.unit.cc
     UnitarySystem.unit.cc
     UtilityRoutines.unit.cc
@@ -291,4 +299,7 @@ set(test_src
     CommandLineInterface.unit.cc
     main.cc
 )
+# For CommandLineInterface.unit.cc, make an in.idf / in.epw in the test directory so we can test the legacy CLI (applies to CTest which sets the current directory to this one)
+configure_file("${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" "${CMAKE_CURRENT_BINARY_DIR}/in.epw" COPYONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/Resources/UnitaryHybridUnitTest_DOSA.idf" "${CMAKE_CURRENT_BINARY_DIR}/in.idf" COPYONLY)
 create_test_targets(energyplusapi "${test_src}" "${test_dependencies}" True)

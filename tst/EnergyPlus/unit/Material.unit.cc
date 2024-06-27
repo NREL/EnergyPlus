@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -128,12 +128,12 @@ TEST_F(EnergyPlusFixture, GetMaterialDataReadVarAbsorptance)
     state->dataCurveManager->GetCurvesInputFlag = false;
     bool errors_found(false);
     Material::GetVariableAbsorptanceInput(*state, errors_found);
-    EXPECT_TRUE(compare_enums(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature));
+    EXPECT_ENUM_EQ(thisMaterial_1->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceTemperature);
     EXPECT_EQ(thisMaterial_1->absorpThermalVarFuncIdx, 1);
     EXPECT_EQ(thisMaterial_1->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation));
+    EXPECT_ENUM_EQ(thisMaterial_2->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::SurfaceReceivedSolarRadiation);
     EXPECT_EQ(thisMaterial_2->absorpSolarVarFuncIdx, 2);
-    EXPECT_TRUE(compare_enums(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled));
+    EXPECT_ENUM_EQ(thisMaterial_3->absorpVarCtrlSignal, Material::VariableAbsCtrlSignal::Scheduled);
     EXPECT_EQ(thisMaterial_3->absorpThermalVarSchedIdx, 1);
     EXPECT_EQ(thisMaterial_3->absorpSolarVarSchedIdx, 1);
 

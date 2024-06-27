@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,7 +66,6 @@
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::Psychrometrics;
@@ -241,14 +240,14 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     Real64 SensLoad(38000.0);
     Real64 LatentLoad(0.0);
     Real64 PartLoadRatio(1.0);
-    int CyclingScheme(1);
+    HVAC::FanOp fanOp = HVAC::FanOp::Cycling;
     bool FirstHVACIteration(true);
-    DataHVACGlobals::CompressorOperation CompressorOp = DataHVACGlobals::CompressorOperation::On;
+    HVAC::CompressorOp compressorOp = HVAC::CompressorOp::On;
     state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).plantLoc.loopNum = 1;
 
     InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPCooling(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPCooling(*state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);
@@ -293,7 +292,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     InitWatertoAirHP(*state, HPNum, InitFlag, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
-    CalcWatertoAirHPHeating(*state, HPNum, CyclingScheme, FirstHVACIteration, InitFlag, SensLoad, CompressorOp, PartLoadRatio);
+    CalcWatertoAirHPHeating(*state, HPNum, fanOp, FirstHVACIteration, InitFlag, SensLoad, compressorOp, PartLoadRatio);
 
     // make sure the coil is active
     EXPECT_NE(state->dataWaterToAirHeatPump->WatertoAirHP(HPNum).QSource, 0.0);

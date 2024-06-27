@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -800,7 +800,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     OperatingMode Result_WetFullOperatingMode = EvaporativeCoolers::IndirectResearchSpecialEvapCoolerOperatingMode(
         *state, EvapCoolNum, thisEvapCooler.SecInletTemp, thisEvapCooler.SecInletWetBulbTemp, TdbOutSysWetMin, TdbOutSysDryMin);
     // check operating mode
-    EXPECT_TRUE(compare_enums(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull));
+    EXPECT_ENUM_EQ(Result_WetFullOperatingMode, EvaporativeCoolers::OperatingMode::WetFull);
     // get outlet temperature in full wet operating mode
     EvaporativeCoolers::CalcIndirectRDDEvapCoolerOutletTemp(*state,
                                                             EvapCoolNum,

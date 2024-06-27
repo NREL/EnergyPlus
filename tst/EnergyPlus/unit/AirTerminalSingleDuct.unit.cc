@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -80,7 +80,6 @@
 using namespace EnergyPlus::DataAirLoop;
 using namespace EnergyPlus::DataAirSystems;
 using namespace EnergyPlus::DataEnvironment;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACSingleDuctInduc;
@@ -647,7 +646,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(1.0, state->dataSingleDuct->sd_airterminal(SysNum).MaxAirVolFlowRate);
     EXPECT_EQ(1.0, MassFlowRateMaxAvail);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", state->dataSingleDuct->sd_airterminal(SysNum).ReheatComp);
-    EXPECT_TRUE(compare_enums(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction));
+    EXPECT_ENUM_EQ(Action::Normal, state->dataSingleDuct->sd_airterminal(SysNum).DamperHeatingAction);
     EXPECT_EQ(0.2, state->dataSingleDuct->sd_airterminal(SysNum).ZoneMinAirFracDes);
 
     // set air inlet node properties
@@ -668,7 +667,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 1000.0;
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 1000.0;
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
 
     // calc min air mass flow rate for Normal Damper Heating Action
     Real64 expectedMassFlowAirReheatMin = 0.2 * MassFlowRateMaxAvail;
@@ -1031,7 +1030,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1051,8 +1050,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
-    int InletNodeNum = UtilityRoutines::FindItemInList("NODE 24", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = Util::FindItemInList("NODE 24", state->dataLoopNodes->NodeID);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
     state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
@@ -1240,7 +1239,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1248,8 +1247,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     SingleDuct::GetSysInput(*state);
     EXPECT_TRUE(compare_err_stream(""));
     // check VAV reheat air terminal inputs
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
-    int InletNodeNum = UtilityRoutines::FindItemInList("SPACE1-1 ATU IN NODE", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = Util::FindItemInList("SPACE1-1 ATU IN NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", state->dataSingleDuct->sd_airterminal(SysNum).sysType); // VAV Reheat Type
     EXPECT_EQ("VAV REHEAT VS FAN AT", state->dataSingleDuct->sd_airterminal(SysNum).SysName);                               // VAV Reheat Name
     EXPECT_TRUE(state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchExist);                              // turndown schdule exists
@@ -1416,7 +1415,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1436,8 +1435,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     Real64 SysMaxMassFlowRes = 1.0 * state->dataEnvrn->StdRhoAir;              // inputs from VAV coolheat reheat AT
 
     // test with heating load and turndown fraction schedule value set 1.0
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
-    int InletNodeNum = UtilityRoutines::FindItemInList("NODE 7", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = Util::FindItemInList("NODE 7", state->dataLoopNodes->NodeID);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     state->dataSingleDuct->sd_airterminal(SysNum).ZoneTurndownMinAirFracSchPtr = 1; //
     state->dataLoopNodes->Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
@@ -1603,7 +1602,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1615,13 +1614,13 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     auto &thisAirTerminalOutlet = state->dataSingleDuct->sd_airterminal(SysNum).sd_airterminalOutlet;
 
     // check VAV reheat VS Fan air terminal inputs
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
-    int InletNodeNum = UtilityRoutines::FindItemInList("ZONE 1 ATU IN NODE", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int InletNodeNum = Util::FindItemInList("ZONE 1 ATU IN NODE", state->dataLoopNodes->NodeID);
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.sysType);
     EXPECT_EQ("VAV RHT VS FAN AIRTERM", thisAirTerminal.SysName);
     EXPECT_EQ("COIL:HEATING:ELECTRIC", thisAirTerminal.ReheatComp);
     EXPECT_EQ("ZONE 1 REHEAT COIL", thisAirTerminal.ReheatName);
-    EXPECT_EQ("FAN:SYSTEMMODEL", thisAirTerminal.FanType);
+    EXPECT_EQ((int)HVAC::FanType::SystemModel, (int)thisAirTerminal.fanType);
     EXPECT_EQ("ZONE 1 VS FAN", thisAirTerminal.FanName);
     EXPECT_EQ(1.0, thisAirTerminal.MaxAirVolFlowRate);
     EXPECT_EQ(0.05, thisAirTerminal.ZoneMinAirFracDes);
@@ -1749,7 +1748,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -1765,7 +1764,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     EXPECT_EQ(thisHeatCoolAT.MaxAirVolFlowRate, 1.0);                                   // input from VAV HeatCool reheat air terminal
     ;
 
-    int ZoneNodeNum = UtilityRoutines::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
+    int ZoneNodeNum = Util::FindItemInList("ZONE 1 AIR NODE", state->dataLoopNodes->NodeID);
     int InletNodeNum = thisHeatCoolAT.InletNodeNum;
     state->dataZoneEquip->ZoneEquipConfig(thisHeatCoolAT.CtrlZoneNum).InletNodeAirLoopNum(thisHeatCoolAT.CtrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions

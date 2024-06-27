@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -419,7 +419,7 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataPltSizHeatNum = 0;
     state.dataSize->DataWaterLoopNum = 0;
     state.dataSize->DataCoilNum = 0;
-    state.dataSize->DataFanOpMode = 0;
+    state.dataSize->DataFanOp = HVAC::FanOp::Invalid;
     state.dataSize->DataCoilIsSuppHeater = false;
     state.dataSize->DataIsDXCoil = false;
     state.dataSize->DataAutosizable = true;
@@ -457,12 +457,12 @@ void resetHVACSizingGlobals(EnergyPlusData &state,
     state.dataSize->DataFractionUsedForSizing = 0.0;
     state.dataSize->DataNonZoneNonAirloopValue = 0.0;
     state.dataSize->DataZoneNumber = 0;
-    state.dataSize->DataFanEnumType = -1;
-    state.dataSize->DataFanIndex = -1;
+    state.dataSize->DataFanType = HVAC::FanType::Invalid;
+    state.dataSize->DataFanIndex = 0;
     state.dataSize->DataWaterCoilSizCoolDeltaT = 0.0;
     state.dataSize->DataWaterCoilSizHeatDeltaT = 0.0;
     state.dataSize->DataNomCapInpMeth = false;
-    state.dataSize->DataFanPlacement = ZoneFanPlacement::NotSet;
+    state.dataSize->DataFanPlacement = HVAC::FanPlace::Invalid;
     state.dataSize->DataDXSpeedNum = 0;
     state.dataSize->DataCoilSizingAirInTemp = 0.0;
     state.dataSize->DataCoilSizingAirInHumRat = 0.0;
@@ -547,8 +547,7 @@ void GetCoilDesFlowT(EnergyPlusData &state,
     auto &sysSizPeakDDNum = state.dataSize->SysSizPeakDDNum(SysNum);
     auto &calcSysSizing = state.dataSize->CalcSysSizing(SysNum);
 
-    int sysSizIndex =
-        UtilityRoutines::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
+    int sysSizIndex = Util::FindItemInList(finalSysSizing.AirPriLoopName, state.dataSize->SysSizInput, &SystemSizingInputData::AirPriLoopName);
     if (sysSizIndex == 0) sysSizIndex = 1;
     auto &sysSizInput = state.dataSize->SysSizInput(sysSizIndex);
 

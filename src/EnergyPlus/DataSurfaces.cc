@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,7 +74,6 @@ namespace EnergyPlus::DataSurfaces {
 //                      Dec 2006, DJS (PSU) added logical ecoroof variable
 //                      Dec 2008, TH added new properties to SurfaceWindowCalc for thermochromic windows
 //                      Jul 2011, M.J. Witte and C.O. Pedersen, add new fields to OSC for last T, max and min
-//       RE-ENGINEERED  na
 
 // Using/Aliasing
 using namespace DataVectorTypes;
@@ -84,19 +83,10 @@ using namespace DataZoneEquipment;
 using namespace DataLoopNode;
 using namespace Psychrometrics;
 using namespace DataEnvironment;
-using namespace WindowManager;
+using namespace Window;
 
 Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
-// Parameters to indicate surface classes
-// Surface Class (FLOOR, WALL, ROOF (incl's CEILING), WINDOW, DOOR, GLASSDOOR,
-// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
-// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
-// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
-// why aren't these sequential (LKL - 13 Aug 2007)
-
-// Constructor
 Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v, Vector2D const &vl, Vector2D const &vu)
     : axis(axis), vertices(v), vl(vl), vu(vu)
 {
@@ -180,7 +170,7 @@ Surface2D::Surface2D(ShapeCat const shapeCat, int const axis, Vertices const &v,
                 xt = xte;
             }
 #endif
-            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2));
+            assert((shapeCat == ShapeCat::Nonconvex) || (crossEdges.size() == 2u));
             for (auto const &edge : crossEdges) {
                 size_type const iEdge(std::get<2>(edge));
                 slab.edges.push_back(iEdge); // Add edge to slab
@@ -226,10 +216,10 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
     Real64 RefAirTemp = 0;
 
     // determine reference air temperature for this surface
-    auto &thisZoneHB = state.dataZoneTempPredictorCorrector->zoneHeatBalance(this->Zone);
+    auto &thisSpaceHB = state.dataZoneTempPredictorCorrector->spaceHeatBalance(this->spaceNum);
     switch (state.dataSurface->SurfTAirRef(t_SurfNum)) {
     case RefAirTemp::ZoneMeanAirTemp: {
-        RefAirTemp = thisZoneHB.MAT;
+        RefAirTemp = thisSpaceHB.MAT;
     } break;
     case RefAirTemp::AdjacentAirTemp: {
         RefAirTemp = state.dataHeatBal->SurfTempEffBulkAir(t_SurfNum);
@@ -248,24 +238,25 @@ Real64 SurfaceData::getInsideAirTemperature(EnergyPlusData &state, const int t_S
         // determine supply air conditions
         Real64 SumSysMCp = 0;
         Real64 SumSysMCpT = 0;
-        for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
-            Real64 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
-            Real64 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-            Real64 CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
-            SumSysMCp += MassFlowRate * CpAir;
-            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+        auto &inletNodes = (state.dataHeatBal->doSpaceHeatBalance) ? state.dataZoneEquip->spaceEquipConfig(this->spaceNum).InletNode
+                                                                   : state.dataZoneEquip->ZoneEquipConfig(Zone).InletNode;
+        for (int nodeNum : inletNodes) {
+            auto &inNode = state.dataLoopNodes->Node(nodeNum);
+            Real64 CpAir = PsyCpAirFnW(thisSpaceHB.airHumRat);
+            SumSysMCp += inNode.MassFlowRate * CpAir;
+            SumSysMCpT += inNode.MassFlowRate * CpAir * inNode.Temp;
         }
         // a weighted average of the inlet temperatures.
         if (SumSysMCp > 0.0) {
             // a weighted average of the inlet temperatures.
             RefAirTemp = SumSysMCpT / SumSysMCp;
         } else {
-            RefAirTemp = thisZoneHB.MAT;
+            RefAirTemp = thisSpaceHB.MAT;
         }
     } break;
     default: {
         // currently set to mean air temp but should add error warning here
-        RefAirTemp = thisZoneHB.MAT;
+        RefAirTemp = thisSpaceHB.MAT;
     } break;
     }
 
@@ -324,12 +315,12 @@ Real64 SurfaceData::getOutsideIR(EnergyPlusData &state, const int t_SurfNum) con
     if (ExtBoundCond > 0) {
         value = state.dataSurface->SurfWinIRfromParentZone(ExtBoundCond) + state.dataHeatBalSurf->SurfQdotRadHVACInPerArea(ExtBoundCond);
     } else {
-        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::KelvinConv;
-        value = state.dataWindowManager->sigma * pow_4(tout);
-        value = ViewFactorSkyIR *
-                    (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * state.dataWindowManager->sigma * pow_4(state.dataEnvrn->SkyTempKelvin) +
-                     (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
-                ViewFactorGroundIR * value;
+        Real64 tout = getOutsideAirTemperature(state, t_SurfNum) + Constant::Kelvin;
+        value = Constant::StefanBoltzmann * pow_4(tout);
+        value =
+            ViewFactorSkyIR * (state.dataSurface->SurfAirSkyRadSplit(t_SurfNum) * Constant::StefanBoltzmann * pow_4(state.dataEnvrn->SkyTempKelvin) +
+                               (1.0 - state.dataSurface->SurfAirSkyRadSplit(t_SurfNum)) * value) +
+            ViewFactorGroundIR * value;
     }
     return value;
 }
@@ -469,7 +460,7 @@ Surface2D SurfaceData::computed_surface2d() const
 
 Real64 SurfaceData::get_average_height(EnergyPlusData &state) const
 {
-    if (std::abs(SinTilt) < 1.e-4) {
+    if (std::abs(SinTilt) < Constant::SmallDistance) {
         return 0.0;
     }
     using Vertex2D = ObjexxFCL::Vector2<Real64>;

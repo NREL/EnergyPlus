@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -88,6 +88,8 @@ namespace RoomAir {
                   RoomAir::RoomAirModel const ZoneModelType // type of zone model; UCSDUFI = 6
     );
 
+    Real64 sumUFADConvGainPerPlume(EnergyPlusData &state, int const zoneNum, Real64 const numOccupants);
+
     void HcUFAD(EnergyPlusData &state, int const ZoneNum, Real64 const FractionHeight, UFADConvCoef &ufadCC);
 
     void CalcUFADInt(EnergyPlusData &state, int const ZoneNum); // index number for the specified zone
@@ -106,6 +108,10 @@ struct UFADManagerData : BaseGlobalStruct
 
     bool MyOneTimeFlag = true;
     Array1D_bool MySizeFlag;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

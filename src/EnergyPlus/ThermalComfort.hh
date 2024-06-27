@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,12 +63,12 @@ struct EnergyPlusData;
 
 namespace ThermalComfort {
 
-    Real64 constexpr TAbsConv = Constant::KelvinConv; // Converter for absolute temperature
-    Real64 constexpr ActLevelConv = 58.2;             // Converter for activity level (1Met = 58.2 W/m2)
-    Real64 constexpr BodySurfArea = 1.8;              // Dubois body surface area of the human body (m2)
-    Real64 constexpr BodySurfAreaPierce = 1.8258;     // Pierce two node body surface area of the human body (m2)
-    Real64 constexpr RadSurfEff = 0.72;               // Fraction of surface effective for radiation
-    Real64 constexpr StefanBoltz = 5.6697e-8;         // Stefan-Boltzmann constant (W/m2K4)
+    Real64 constexpr TAbsConv = Constant::Kelvin; // Converter for absolute temperature
+    Real64 constexpr ActLevelConv = 58.2;         // Converter for activity level (1Met = 58.2 W/m2)
+    Real64 constexpr BodySurfArea = 1.8;          // Dubois body surface area of the human body (m2)
+    Real64 constexpr BodySurfAreaPierce = 1.8258; // Pierce two node body surface area of the human body (m2)
+    Real64 constexpr RadSurfEff = 0.72;           // Fraction of surface effective for radiation
+    Real64 constexpr StefanBoltz = 5.6697e-8;     // Stefan-Boltzmann constant (W/m2K4)
 
     struct ThermalComfortDataType
     {
@@ -219,7 +219,7 @@ namespace ThermalComfort {
 
     Real64 CalcSatVapPressFromTempTorr(Real64 const Temp);
 
-    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum); // Type of MRT calculation (zone averaged or surface weighted)
+    Real64 CalcRadTemp(EnergyPlusData &state, int const PeopleListNum);
 
     void CalcThermalComfortSimpleASH55(EnergyPlusData &state);
 
@@ -298,7 +298,6 @@ struct ThermalComfortsData : BaseGlobalStruct
     int IterNum = 0;                        // Number of iteration
     Real64 LatRespHeatLoss = 0.0;           // Latent respiration heat loss
     int MaxZoneNum = 0;                     // Number of zones
-    int MRTCalcType = 0;                    // The type of MRT calculation (ZoneAveraged or SurfaceWeighted)
     Real64 OpTemp = 0.0;                    // Operative temperature
     Real64 EffTemp = 0.0;                   // Effective temperature
     int PeopleNum = 0;                      // People number
@@ -376,6 +375,10 @@ struct ThermalComfortsData : BaseGlobalStruct
     Real64 runningAverageCEN = 0.0;
     bool useEpwDataCEN = false;
     bool firstDaySet = false; // first day is set with initiate -- so do not update
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

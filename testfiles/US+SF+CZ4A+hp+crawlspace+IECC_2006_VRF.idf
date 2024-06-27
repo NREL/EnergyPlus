@@ -30,7 +30,7 @@
 !    dhw_type =
 !    TEMPLATE_PATH = template/v9.5
 
-  Version,23.2;
+  Version,24.2;
 
 ! added VRF system
 
@@ -50,7 +50,7 @@
     VRFCondAvailSched,       !- Availability Schedule Name
     VRF Heat Pump TU List,   !- Zone Terminal Unit List Name
     R410A,                   !- Refrigerant Type
-    5000,                   !- Rated Evaporative Capacity {W}
+    10023,                   !- Rated Evaporative Capacity {W}
     0.2931,                  !- Rated Compressor Power Per Unit of Rated Evaporative Capacity {dimensionless}
     -5,                      !- Minimum Outdoor Air Temperature in Cooling Mode {C}
     43,                      !- Maximum Outdoor Air Temperature in Cooling Mode {C}
@@ -477,8 +477,8 @@
     0,                       !- No Cooling Supply Air Flow Rate {m3/s}
     0.595,                   !- Heating Supply Air Flow Rate {m3/s}
     0,                       !- No Heating Supply Air Flow Rate {m3/s}
-    0,                !- Cooling Outdoor Air Flow Rate {m3/s}
-    0,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
     0,                       !- No Load Outdoor Air Flow Rate {m3/s}
     VRFFanModeSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     drawthrough,             !- Supply Air Fan Placement
@@ -2622,10 +2622,10 @@
 
   RunPeriod,
     annual,                  !- Name
-    8,                       !- Begin Month
+    1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    8,                      !- End Month
+    12,                      !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Sunday,                  !- Day of Week for Start Day
@@ -6302,12 +6302,8 @@
     0.0283168464628752,      !- Nominal Supply Air Flow Rate {m3/s}
     0.65,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}
-    0.65,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}
     0.65,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}
     0,                       !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}
-    0.65,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}
-    0,                       !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}
     outdoor air node_unit1,  !- Supply Air Inlet Node Name
     OA fan inlet node_unit1, !- Supply Air Outlet Node Name
     Zone Exhaust Node_unit1, !- Exhaust Air Inlet Node Name
@@ -6349,7 +6345,7 @@
     activity_sch,            !- Activity Level Schedule Name
     ,                        !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
-    ZoneAveraged;            !- Mean Radiant Temperature Calculation Type
+    EnclosureAveraged;       !- Mean Radiant Temperature Calculation Type
 
  !-   ===========  ALL OBJECTS IN CLASS: LIGHTS ===========
 

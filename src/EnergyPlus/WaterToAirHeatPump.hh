@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -169,12 +169,12 @@ namespace WaterToAirHeatPump {
                          std::string_view CompName,     // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
-                         int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
+                         HVAC::FanOp const fanOp,       // cycling scheme--either continuous fan/cycling compressor or
                          bool const FirstHVACIteration, // first iteration flag
                          bool const InitFlag,           // initialization flag used to suppress property routine errors
                          Real64 const SensLoad,         // sensible load
                          Real64 const LatentLoad,       // latent load
-                         DataHVACGlobals::CompressorOperation CompressorOp,
+                         HVAC::CompressorOp compressorOp,
                          Real64 const PartLoadRatio);
 
     void GetWatertoAirHPInput(EnergyPlusData &state);
@@ -189,20 +189,20 @@ namespace WaterToAirHeatPump {
 
     void CalcWatertoAirHPCooling(EnergyPlusData &state,
                                  int const HPNum,               // heat pump number
-                                 int const CyclingScheme,       // fan/compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  bool const InitFlag,           // suppress property errors if true
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation CompressorOp,
+                                 HVAC::CompressorOp compressorOp,
                                  Real64 const PartLoadRatio);
 
     void CalcWatertoAirHPHeating(EnergyPlusData &state,
                                  int const HPNum,               // heat pump number
-                                 int const CyclingScheme,       // fan/compressor cycling scheme indicator
+                                 HVAC::FanOp const fanOp,       // fan/compressor cycling scheme indicator
                                  bool const FirstHVACIteration, // first iteration flag
                                  bool const InitFlag,           // first iteration flag
                                  Real64 const SensDemand,
-                                 DataHVACGlobals::CompressorOperation CompressorOp,
+                                 HVAC::CompressorOp compressorOp,
                                  Real64 const PartLoadRatio);
 
     void UpdateWatertoAirHP(EnergyPlusData &state, int const HPNum);
@@ -210,7 +210,7 @@ namespace WaterToAirHeatPump {
     Real64 CalcEffectiveSHR(EnergyPlusData &state,
                             int const HPNum,         // Index number for cooling coil
                             Real64 const SHRss,      // Steady-state sensible heat ratio
-                            int const CyclingScheme, // fan/compressor cycling scheme indicator
+                            HVAC::FanOp const fanOp, // fan/compressor cycling scheme indicator
                             Real64 const RTF,        // Compressor run-time fraction
                             Real64 const QLatRated,  // Rated latent capacity
                             Real64 const QLatActual, // Actual latent capacity
@@ -278,6 +278,10 @@ struct WaterToAirHeatPumpData : BaseGlobalStruct
     Real64 LoadSideInletDBTemp_Init = 0.0;  // rated conditions
     Real64 LoadSideInletHumRat_Init = 0.0;  // rated conditions
     Real64 LoadSideAirInletEnth_Init = 0.0; // rated conditions
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

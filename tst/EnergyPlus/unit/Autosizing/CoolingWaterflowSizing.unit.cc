@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // uninitialized sizing type
     Real64 sizedValue = sizer.size(*this->state, inputValue, errorsFound);
     EXPECT_TRUE(errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::ErrorType2, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::ErrorType2, sizer.errorType);
     EXPECT_NEAR(0.0, sizedValue, 0.01); // unitialized sizing types always return 0
     errorsFound = false;
 
@@ -85,9 +85,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->TermUnitSizing(1).MaxCWVolFlow = 0.005;
 
     // Test #1 - Zone Equipment, no autosizing, missing input data
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;         // reset for next test
@@ -96,9 +96,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     state->dataSize->DataWaterLoopNum = 1;
     state->dataPlnt->PlantLoop.allocate(1);
     state->dataSize->DataWaterCoilSizCoolDeltaT = 10.0;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;         // reset for next test
@@ -107,9 +107,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     has_eio_output(true);
     printFlag = true;
 
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;         // reset for next test
@@ -141,9 +141,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // do sizing
     state->dataSize->ZoneSizingInput.allocate(1);
     state->dataSize->ZoneSizingInput(1).ZoneNum = 1;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000149, sizedValue, 0.000001);
     EXPECT_NEAR(1.2, state->dataEnvrn->StdRhoAir, 0.01);
@@ -157,17 +157,23 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     // Test 4 - Zone Equipment, Single Duct TU, add fan heat
-    state->dataFans->Fan.allocate(1);
-    state->dataFans->Fan(1).DeltaPress = 600.0;
-    state->dataFans->Fan(1).MotEff = 0.9;
-    state->dataFans->Fan(1).FanEff = 0.6;
-    state->dataFans->Fan(1).MotInAirFrac = 0.5;
-    state->dataFans->Fan(1).FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-    state->dataSize->DataFanIndex = 1;
-    state->dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    auto *fan1 = new Fans::FanComponent;
+
+    fan1->Name = "CONSTANT FAN 1";
+    fan1->deltaPress = 600.0;
+    fan1->motorEff = 0.9;
+    fan1->totalEff = 0.6;
+    fan1->motorInAirFrac = 0.5;
+    fan1->type = HVAC::FanType::Constant;
+
+    state->dataFans->fans.push_back(fan1);
+    state->dataFans->fanMap.insert_or_assign(fan1->Name, state->dataFans->fans.size());
+
+    state->dataSize->DataFanIndex = Fans::GetFanIndex(*state, "CONSTANT FAN 1");
+    state->dataSize->DataFanType = HVAC::FanType::Constant;
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType)); // missing Data* globals and Plant data
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType); // missing Data* globals and Plant data
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000154, sizedValue, 0.000001);
     EXPECT_GT(sizedValue, previousWaterFlow); // water flow rate is greater with fan heat than without
@@ -188,9 +194,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000154, sizedValue, 0.01);
     sizer.autoSizedValue = 0.0; // reset for next test
@@ -202,9 +208,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.005, sizedValue, 0.0001);
     EXPECT_NEAR(state->dataSize->TermUnitSizing(1).MaxCWVolFlow, sizedValue, 0.0001);
@@ -217,9 +223,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.3, sizedValue, 0.0001);
     EXPECT_NEAR(state->dataSize->ZoneEqSizing(1).MaxCWVolFlow, sizedValue, 0.0001);
@@ -232,9 +238,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.3, sizedValue, 0.0001);
     sizer.autoSizedValue = 0.0; // reset for next test
@@ -246,9 +252,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     inputValue = DataSizing::AutoSize;
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000309, sizedValue, 0.000001);
     sizer.autoSizedValue = 0.0; // reset for next test
@@ -277,9 +283,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(5.0, sizedValue, 0.01); // hard-sized value
     sizer.autoSizedValue = 0.0;         // reset for next test
@@ -298,9 +304,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
     // do sizing
     sizer.wasAutoSized = false;
     printFlag = true;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.000238, sizedValue, 0.000001);
     sizer.autoSizedValue = 0.0; // reset for next test
@@ -326,9 +332,9 @@ TEST_F(AutoSizingFixture, CoolingWaterflowSizingGauntlet)
 
     // do sizing
     sizer.wasAutoSized = false;
-    sizer.initializeWithinEP(*this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizer.initializeWithinEP(*this->state, HVAC::cAllCoilTypes(HVAC::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(*this->state, inputValue, errorsFound);
-    EXPECT_TRUE(compare_enums(AutoSizingResultType::NoError, sizer.errorType));
+    EXPECT_ENUM_EQ(AutoSizingResultType::NoError, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0002, sizedValue, 0.000001);
     sizer.autoSizedValue = 0.0; // reset for next test

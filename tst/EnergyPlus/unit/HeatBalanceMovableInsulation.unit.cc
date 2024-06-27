@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -107,7 +107,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceMovableInsulation_EvalOutsideMovableInsulat
     HeatBalanceSurfaceManager::EvalOutsideMovableInsulation(*state);
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsSolarExt(1));
     EXPECT_EQ(0.8, state->dataHeatBalSurf->SurfMovInsulHExt(1));
-    EXPECT_TRUE(compare_enums(Material::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1)));
+    EXPECT_ENUM_EQ(Material::SurfaceRoughness::VeryRough, state->dataHeatBalSurf->SurfRoughnessExt(1));
     EXPECT_EQ(0.75, state->dataHeatBalSurf->SurfAbsThermalExt(1));
 
     state->dataHeatBalSurf->SurfAbsSolarExt(1) = 0.0;
@@ -274,7 +274,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     Material::GetMaterialData(*state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(4, state->dataMaterial->TotMaterials);
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing));
+    EXPECT_ENUM_EQ(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing);
     // get construction data
     HeatBalanceManager::GetConstructData(*state, ErrorsFound);
     EXPECT_EQ(1, state->dataHeatBal->TotConstructs);
@@ -310,10 +310,10 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     state->dataSurface->Surface(1) = state->dataSurfaceGeometry->SurfaceTmp(1);
     SurfaceGeometry::GetMovableInsulationData(*state, ErrorsFound);
     // check movable insulation material
-    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");                        // base surface name
-    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                                              // index to movable insulation material
-    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SIMPLEGLAZINGSYSTEM");                                  // name of movable insulation material
-    EXPECT_TRUE(compare_enums(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing)); // invalid material group type
-    EXPECT_TRUE(ErrorsFound);                                                                                  // error found due to invalid material
+    EXPECT_EQ(state->dataSurfaceGeometry->SurfaceTmp(1).BaseSurfName, "ZN001:WALL001");            // base surface name
+    EXPECT_EQ(state->dataSurface->SurfMaterialMovInsulExt(1), 4);                                  // index to movable insulation material
+    EXPECT_EQ(state->dataMaterial->Material(4)->Name, "SIMPLEGLAZINGSYSTEM");                      // name of movable insulation material
+    EXPECT_ENUM_EQ(state->dataMaterial->Material(4)->group, Material::Group::WindowSimpleGlazing); // invalid material group type
+    EXPECT_TRUE(ErrorsFound);                                                                      // error found due to invalid material
 }
 } // namespace EnergyPlus

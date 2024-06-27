@@ -88,14 +88,13 @@
         set – see below).
     </p>
 
-    <h2>* Version Numbers *</h2>
+    <h2>* Python Ecosystem *</h2>
     <p>
-        EnergyPlus historically used version numbers that varied the major number and sometimes the minor
-        number. Starting with the March 2022 release, we moved forward with a more modern version numbering scheme.
-        The EnergyPlus version will be based on the year and the release number. The March 2022 release was
-        EnergyPlus 22.1, the Fall release was EnergyPlus 22.2, and so on. If additional major releases are created
-        for some reason, they would increment the release number further. Rare intermediate releases may be numbered
-        with a patch number such as 22.1.1.
+        While EnergyPlus will continue to provide users with current workflows and installation methods, we are pushing
+        toward a more flexible EnergyPlus that behaves like a standard Python library.  An upcoming version will allow
+        users to pip install energyplus, which will bring down the EnergyPlus native libraries plus the Python API
+        bindings, ready to be used by the user's desired Python environment.  This should make setting up EnergyPlus
+        much easier for many use cases!
     </p>
 
     <h2><a id="Whats_going_on"></a>What’s going on in V@CMAKE_VERSION_MAJOR@.@CMAKE_VERSION_MINOR@?</h2>
@@ -169,15 +168,13 @@
                     on exact object changes that you can do by hand. The updater program is described more fully in the
                     Auxiliary Programs document.
                     <ul class="list-group">
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:CurveFit:Speed</li>
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:SingleSpeed</li>
-                        <li class="list-group-item transition-object-name">Coil:Cooling:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">Coil:Heating:DX:SingleSpeed</li>
-                        <li class="list-group-item transition-object-name">Coil:Heating:DX:MultiSpeed</li>
-                        <li class="list-group-item transition-object-name">FuelFactors</li>
-                        <li class="list-group-item transition-object-name">Space</li>
-                        <li class="list-group-item transition-object-name">Coil:Cooling:WaterToAirHeatPump:EquationFit</li>
-                        <li class="list-group-item transition-object-name">Coil:Heating:WaterToAirHeatPump:EquationFit</li>
+                        <li class="list-group-item transition-object-name">AirLoopHVAC:UnitarySystem</li>
+                        <li class="list-group-item transition-object-name">ComfortViewFactorAngles</li>
+                        <li class="list-group-item transition-object-name">HeatExchanger:AirToAir:SensibleAndLatent</li>
+                        <li class="list-group-item transition-object-name">People</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:PackagedTerminalAirConditioner</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:PackagedTerminalHeatPump</li>
+                        <li class="list-group-item transition-object-name">ZoneHVAC:WaterToAirHeatPump</li>
                     </ul>
                 </div>
             </div>
@@ -249,24 +246,20 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9394">9394</a></td>
-            <td>Subdivide Heat Balance by Space</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10081">10081</a></td>
+            <td>API Enhancements</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9405">9405</a></td>
-            <td>Gas-Fired Absorption Heat Pump (GAHP) model</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10277">10277</a></td>
+            <td>Enhancement for Heat Exchanger for Variable-Speed Heat Recovery Ventilation</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9594">9594</a></td>
-            <td>NewFeature: Implement Model for Building-Integrated Photovoltaic Thermal (BIPVT)</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10363">10363</a></td>
+            <td>Add E+ API demo to the install</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9755">9755</a></td>
-            <td>Modeling Dynamic Coating for Opaque Surfaces</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9848">9848</a></td>
-            <td>Add ISO 8601 format support to native CSV and JSON output</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10385">10385</a></td>
+            <td>Indoor living wall module</td>
         </tr>
     </table>
     <h3><a id="PerformanceFeatures"></a>Runtime Performance Enhancing Developments</h3>
@@ -276,12 +269,8 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9623">9623</a></td>
-            <td>Enhance perf logging</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
-            <td>Refactor loops for zone sizing array initialization</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10231">10231</a></td>
+            <td>SetupOutputVariable wrapper to use enum type parameters (endUseCategory, ReportingFrequency, and eResouceType)</td>
         </tr>
     </table>
     <h3><a id="RefactoringEfforts"></a>Targeted Refactoring Efforts</h3>
@@ -291,68 +280,24 @@
             <th>Description</th>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9670">9670</a></td>
-            <td>Quick SolveRoot cleanup</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10281">10281</a></td>
+            <td>Initial WeatherManager refactor</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9693">9693</a></td>
-            <td>Clean up Par arrays in SolveRoot calls</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10289">10289</a></td>
+            <td>First (and only?) Pollution module refactor </td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9765">9765</a></td>
-            <td>Refactor int to enum as a follow up to previous code changes</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10347">10347</a></td>
+            <td>OutputProcessor Refactor</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9766">9766</a></td>
-            <td>Solve root cleanups continued</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10351">10351</a></td>
+            <td>DaylightingManager Refactor -- Part 2</td>
         </tr>
         <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9770">9770</a></td>
-            <td>Quick curve manager cleanup</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9779">9779</a></td>
-            <td>Curve Manager Round 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9782">9782</a></td>
-            <td>Refactor loops for zone sizing array initialization</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9812">9812</a></td>
-            <td>MaterialProperties Refactoring step 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9823">9823</a></td>
-            <td>Quick cleaning in General.cc</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9854">9854</a></td>
-            <td>Refactor in RefrigeratedCase and new unit test process_idf for string_view</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9868">9868</a></td>
-            <td>Remove Scalar Auto Refs -- Pass1</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9872">9872</a></td>
-            <td>Remove Scalar Auto Refs -- pass 2</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9886">9886</a></td>
-            <td>Fix Bad Auto: Part 3</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9892">9892</a></td>
-            <td>Fix Bad Auto 4 (with a bonus)</td>
-        </tr>
-        <tr>
-            <td><a href="https://github.com/NREL/EnergyPlus/pull/9896">9896</a></td>
-            <td>Fix Bad Auto: Part 2 (Take 2)</td>
-        </tr>
-        <tr>
-            <td>(many!)</td>
-            <td>Cleaning up CppCheck-identified issues in many files!</td>
+            <td><a href="https://github.com/NREL/EnergyPlus/pull/10404">10404</a></td>
+            <td>Heat Pump Plant Loop EIR refactoring</td>
         </tr>
     </table>
 

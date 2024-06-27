@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -333,7 +333,7 @@ namespace CondenserLoopTowers {
             }
             tower.TowerFreeConvNomCapSizingFactor = NumArray(12);
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, Util::makeUPPER(AlphArray(4))));
                 if (tower.PerformanceInputMethod_Num == PIM::Invalid) {
                     ShowSevereError(state, format("{}={}", cCurrentModuleObject, AlphArray(1)));
                     ShowContinueError(state, format("Invalid, {} = {}", state.dataIPShortCut->cAlphaFieldNames(4), AlphArray(4)));
@@ -404,7 +404,7 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, Util::makeUPPER(AlphArray(6))));
 
             tower.UserEvapLossFactor = NumArray(19);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(20) / 100.0; //  N12, \field Drift Loss Percent
@@ -412,7 +412,7 @@ namespace CondenserLoopTowers {
             tower.SizFac = NumArray(25);                    //  N17  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, Util::makeUPPER(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -457,7 +457,7 @@ namespace CondenserLoopTowers {
             if (state.dataIPShortCut->lAlphaFieldBlanks(11) || AlphArray(11).empty()) {
                 tower.CapacityControl = CapacityCtrl::FanCycling; // FanCycling
             } else {
-                tower.CapacityControl = static_cast<CapacityCtrl>(getEnumValue(CapacityCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
+                tower.CapacityControl = static_cast<CapacityCtrl>(getEnumValue(CapacityCtrlNamesUC, Util::makeUPPER(AlphArray(11))));
                 if (tower.CapacityControl == CapacityCtrl::Invalid) {
                     tower.CapacityControl = CapacityCtrl::FanCycling;
                     ShowWarningError(state,
@@ -486,7 +486,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for single speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(12)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(12))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, Util::makeUPPER(AlphArray(12))));
             }
 
             //   High speed air flow rate must be greater than free convection air flow rate.
@@ -586,12 +586,11 @@ namespace CondenserLoopTowers {
                     ErrorsFound = true;
                 }
             } else { // Tower performance input method is not specified as a valid "choice"
-                ShowSevereError(
-                    state,
-                    format("{} \"{}{}",
-                           cCurrentModuleObject,
-                           tower.Name,
-                           R"(". Tower Performance Input Method must be "UFactorTimesAreaAndDesignWaterFlowRate" or "NominalCapacity".)"));
+                ShowSevereError(state,
+                                format("{} \"{}{}",
+                                       cCurrentModuleObject,
+                                       tower.Name,
+                                       ". Tower Performance Input Method must be \"UFactorTimesAreaAndDesignWaterFlowRate\" or \"NominalCapacity\""));
                 ShowContinueError(state, format("Tower Performanace Input Method currently specified as: {}", AlphArray(4)));
                 ErrorsFound = true;
             }
@@ -645,7 +644,7 @@ namespace CondenserLoopTowers {
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
             if (NumAlphas >= 4) {
-                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, UtilityRoutines::makeUPPER(AlphArray(4))));
+                tower.PerformanceInputMethod_Num = static_cast<PIM>(getEnumValue(PIMNamesUC, Util::makeUPPER(AlphArray(4))));
             } else {
                 // Since Performance Input Method has been omitted then assume it to be UA and DESIGN WATER FLOW RATE
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
@@ -765,15 +764,14 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(6))));
-
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, Util::makeUPPER(AlphArray(6))));
             tower.UserEvapLossFactor = NumArray(27);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(28) / 100.0; //  N24, \field Drift Loss Percent
             tower.ConcentrationRatio = NumArray(29);        //  N17, \field Blowdown Concentration Ratio
             tower.SizFac = NumArray(33);                    //  N21  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(7))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, Util::makeUPPER(AlphArray(7))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(8));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(8), AlphArray(8)));
@@ -800,7 +798,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for two speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(11)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, Util::makeUPPER(AlphArray(11))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(9)) {
@@ -1042,8 +1040,7 @@ namespace CondenserLoopTowers {
                                                                            DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
-            if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined") ||
-                 UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
+            if ((Util::SameString(AlphArray(4), "CoolToolsUserDefined") || Util::SameString(AlphArray(4), "YorkCalcUserDefined")) &&
                 state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowSevereError(state,
                                 format("{}, \"{}\" a {} must be specified when {} is specified as CoolToolsUserDefined or YorkCalcUserDefined",
@@ -1052,7 +1049,7 @@ namespace CondenserLoopTowers {
                                        state.dataIPShortCut->cAlphaFieldNames(5),
                                        state.dataIPShortCut->cAlphaFieldNames(4)));
                 ErrorsFound = true;
-            } else if ((UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow") || UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) &&
+            } else if ((Util::SameString(AlphArray(4), "CoolToolsCrossFlow") || Util::SameString(AlphArray(4), "YorkCalc")) &&
                        !state.dataIPShortCut->lAlphaFieldBlanks(5)) {
                 ShowWarningError(state,
                                  format("{}, \"{}\" a Tower Model Coefficient Name is specified and the Tower Model Type is not specified as "
@@ -1080,7 +1077,7 @@ namespace CondenserLoopTowers {
 
             auto &vstower = state.dataCondenserLoopTowers->towers(tower.VSTower);
 
-            if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
+            if (Util::SameString(AlphArray(4), "CoolToolsCrossFlow")) {
                 tower.TowerModelType = ModelType::CoolToolsXFModel;
                 //     set cross-flow model coefficients
                 //       Outputs approach in C
@@ -1130,7 +1127,7 @@ namespace CondenserLoopTowers {
                 vstower.MinWaterFlowRatio = 0.75;
                 vstower.MaxWaterFlowRatio = 1.25;
 
-            } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalc")) {
+            } else if (Util::SameString(AlphArray(4), "YorkCalc")) {
                 tower.TowerModelType = ModelType::YorkCalcModel;
                 //     set counter-flow model coefficients
                 //       Outputs approach in C
@@ -1173,13 +1170,13 @@ namespace CondenserLoopTowers {
                 vstower.MaxWaterFlowRatio = 1.25;
                 vstower.MaxLiquidToGasRatio = 8.0;
 
-            } else if (UtilityRoutines::SameString(AlphArray(4), "CoolToolsUserDefined")) {
+            } else if (Util::SameString(AlphArray(4), "CoolToolsUserDefined")) {
                 tower.TowerModelType = ModelType::CoolToolsUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSCoolToolsModelCoeffs; ++VSModelCoeffNum) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:CoolTools", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
-                    if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
+                    if (!Util::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
                     vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the CoolTools model
                     if (NumNums2 != 43) {
@@ -1214,13 +1211,13 @@ namespace CondenserLoopTowers {
                                            tower.ModelCoeffObjectName));
                     ErrorsFound = true;
                 }
-            } else if (UtilityRoutines::SameString(AlphArray(4), "YorkCalcUserDefined")) {
+            } else if (Util::SameString(AlphArray(4), "YorkCalcUserDefined")) {
                 tower.TowerModelType = ModelType::YorkCalcUserDefined;
                 // Nested Get-input routines below.  Should pull out of here and read in beforehand.
                 for (VSModelCoeffNum = 1; VSModelCoeffNum <= NumVSYorkCalcModelCoeffs; ++VSModelCoeffNum) {
                     state.dataInputProcessing->inputProcessor->getObjectItem(
                         state, "CoolingTowerPerformance:YorkCalc", VSModelCoeffNum, AlphArray2, NumAlphas2, NumArray2, NumNums2, IOStat);
-                    if (!UtilityRoutines::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
+                    if (!Util::SameString(AlphArray2(1), tower.ModelCoeffObjectName)) continue;
                     vstower.FoundModelCoeff = true;
                     // verify the correct number of coefficients for the YorkCalc model
                     if (NumNums2 != 36) {
@@ -1434,15 +1431,14 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(8))));
-
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, Util::makeUPPER(AlphArray(8))));
             tower.UserEvapLossFactor = NumArray(11);        //  N11 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(12) / 100.0; //  N12, \field Drift Loss Percent
             tower.ConcentrationRatio = NumArray(13);        //  N13, \field Blowdown Concentration Ratio
             tower.SizFac = NumArray(17);                    //  N14  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(9))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, Util::makeUPPER(AlphArray(9))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(10));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(10), AlphArray(10)));
@@ -1469,7 +1465,7 @@ namespace CondenserLoopTowers {
 
             //   cell control for variable speed tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(13)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(13))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, Util::makeUPPER(AlphArray(13))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(11)) {
@@ -1551,9 +1547,9 @@ namespace CondenserLoopTowers {
                                                                            DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(state, cCurrentModuleObject, AlphArray(1), AlphArray(2), AlphArray(3), "Chilled Water Nodes");
 
-            if (UtilityRoutines::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
+            if (Util::SameString(AlphArray(4), "UFactorTimesAreaAndDesignWaterFlowRate")) {
                 tower.PerformanceInputMethod_Num = PIM::UFactor;
-            } else if (UtilityRoutines::SameString(AlphArray(4), "NominalCapacity")) {
+            } else if (Util::SameString(AlphArray(4), "NominalCapacity")) {
                 tower.PerformanceInputMethod_Num = PIM::NominalCapacity;
             } else {
                 ShowSevereError(state, format("{}={}", cCurrentModuleObject, AlphArray(1)));
@@ -1694,15 +1690,14 @@ namespace CondenserLoopTowers {
             }
 
             // begin water use and systems get input
-            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, UtilityRoutines::makeUPPER(AlphArray(10))));
-
+            tower.EvapLossMode = static_cast<EvapLoss>(getEnumValue(EvapLossNamesUC, Util::makeUPPER(AlphArray(10))));
             tower.UserEvapLossFactor = NumArray(23);        //  N23 , \field Evaporation Loss Factor
             tower.DriftLossFraction = NumArray(24) / 100.0; //  N24, \field Drift Loss Percent
             tower.ConcentrationRatio = NumArray(25);        //  N25, \field Blowdown Concentration Ratio
             tower.SizFac = NumArray(29);                    //  N29  \field Sizing Factor
             if (tower.SizFac <= 0.0) tower.SizFac = 1.0;
 
-            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, UtilityRoutines::makeUPPER(AlphArray(11))));
+            tower.BlowdownMode = static_cast<Blowdown>(getEnumValue(BlowDownNamesUC, Util::makeUPPER(AlphArray(11))));
             tower.SchedIDBlowdown = ScheduleManager::GetScheduleIndex(state, AlphArray(12));
             if ((tower.SchedIDBlowdown == 0) && (tower.BlowdownMode == Blowdown::Schedule)) {
                 ShowSevereError(state, format("Invalid, {} = \"{}\"", state.dataIPShortCut->cAlphaFieldNames(12), AlphArray(12)));
@@ -1729,7 +1724,7 @@ namespace CondenserLoopTowers {
             tower.TowerMassFlowRateMultiplier = tower.MaxFracFlowRate;
             //   cell control for variable speed Merkel tower
             if (!state.dataIPShortCut->lAlphaFieldBlanks(15)) {
-                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, UtilityRoutines::makeUPPER(AlphArray(15))));
+                tower.cellCtrl = static_cast<CellCtrl>(getEnumValue(CellCtrlNamesUC, Util::makeUPPER(AlphArray(15))));
             }
 
             if (state.dataIPShortCut->lAlphaFieldBlanks(13)) {
@@ -1871,93 +1866,91 @@ namespace CondenserLoopTowers {
         if (this->TowerType == DataPlant::PlantEquipmentType::CoolingTower_SingleSpd) {
             SetupOutputVariable(state,
                                 "Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->InletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->OutletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->WaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->Qactual,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->FanPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->FanEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Electricity",
-                                "HeatRejection",
-                                this->EndUseSubcategory,
-                                "Plant");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection,
+                                this->EndUseSubcategory);
             // Added for fluid bypass
             SetupOutputVariable(state,
                                 "Cooling Tower Bypass Fraction",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->BypassFraction,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->NumCellOn,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->FanCyclingRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::HeatRejection,
+                                    "BasinHeater");
             }
         }
 
@@ -1965,92 +1958,90 @@ namespace CondenserLoopTowers {
         if (this->TowerType == DataPlant::PlantEquipmentType::CoolingTower_TwoSpd) {
             SetupOutputVariable(state,
                                 "Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->InletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->OutletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->WaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->Qactual,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->FanPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->FanEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Electricity",
-                                "HeatRejection",
-                                this->EndUseSubcategory,
-                                "Plant");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection,
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Cycling Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->FanCyclingRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Speed Level",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->SpeedSelected,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->NumCellOn,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::HeatRejection,
+                                    "BasinHeater");
             }
         }
 
@@ -2058,92 +2049,90 @@ namespace CondenserLoopTowers {
         if (this->TowerType == DataPlant::PlantEquipmentType::CoolingTower_VarSpd) {
             SetupOutputVariable(state,
                                 "Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->InletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->OutletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->WaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->Qactual,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->FanPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->FanEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Electricity",
-                                "HeatRejection",
-                                this->EndUseSubcategory,
-                                "Plant");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection,
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Air Flow Rate Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->AirFlowRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Part Load Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->FanCyclingRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->NumCellOn,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::HeatRejection,
+                                    "BasinHeater");
             }
         }
 
@@ -2151,224 +2140,228 @@ namespace CondenserLoopTowers {
         if (this->TowerType == DataPlant::PlantEquipmentType::CoolingTower_VarSpdMerkel) {
             SetupOutputVariable(state,
                                 "Cooling Tower Inlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->InletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Outlet Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 this->OutletWaterTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 this->WaterMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Heat Transfer Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->Qactual,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 this->FanPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 this->FanEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Electricity",
-                                "HeatRejection",
-                                this->EndUseSubcategory,
-                                "Plant");
+                                Constant::eResource::Electricity,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection,
+                                this->EndUseSubcategory);
             SetupOutputVariable(state,
                                 "Cooling Tower Fan Speed Ratio",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->AirFlowRatio,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
 
             SetupOutputVariable(state,
                                 "Cooling Tower Operating Cells Count",
-                                OutputProcessor::Unit::None,
+                                Constant::Units::None,
                                 this->NumCellOn,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Rate",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->BasinHeaterPower,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Cooling Tower Basin Heater Electricity Energy",
-                                    OutputProcessor::Unit::J,
+                                    Constant::Units::J,
                                     this->BasinHeaterConsumption,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Summed,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Sum,
                                     this->Name,
-                                    {},
-                                    "Electricity",
-                                    "HeatRejection",
-                                    "BasinHeater",
-                                    "Plant");
+                                    Constant::eResource::Electricity,
+                                    OutputProcessor::Group::Plant,
+                                    OutputProcessor::EndUseCat::HeatRejection,
+                                    "BasinHeater");
             }
         }
         // setup common water reporting for all types of towers.
         if (this->SuppliedByWaterSystem) {
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->MakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->TankSupplyVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->TankSupplyVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Water",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                Constant::eResource::Water,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->StarvedMakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Starved Storage Tank Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->StarvedMakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->StarvedMakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "MainsWater",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
         } else { // tower water from mains and gets metered
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume Flow Rate",
-                                OutputProcessor::Unit::m3_s,
+                                Constant::Units::m3_s,
                                 this->MakeUpVdot,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 this->Name);
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "Water",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                Constant::eResource::Water,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
             SetupOutputVariable(state,
                                 "Cooling Tower Make Up Mains Water Volume",
-                                OutputProcessor::Unit::m3,
+                                Constant::Units::m3,
                                 this->MakeUpVol,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 this->Name,
-                                {},
-                                "MainsWater",
-                                "HeatRejection",
-                                {},
-                                "Plant");
+                                Constant::eResource::MainsWater,
+                                OutputProcessor::Group::Plant,
+                                OutputProcessor::EndUseCat::HeatRejection);
         }
 
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->EvaporationVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Cooling Tower Water Evaporation Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->EvaporationVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->DriftVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Cooling Tower Water Drift Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->DriftVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
                             this->Name);
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume Flow Rate",
-                            OutputProcessor::Unit::m3_s,
+                            Constant::Units::m3_s,
                             this->BlowdownVdot,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Cooling Tower Water Blowdown Volume",
-                            OutputProcessor::Unit::m3,
+                            Constant::Units::m3,
                             this->BlowdownVol,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Summed,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Sum,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Approach",
+                            Constant::Units::C,
+                            this->coolingTowerApproach,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
+                            this->Name);
+        SetupOutputVariable(state,
+                            "Cooling Tower Range",
+                            Constant::Units::C,
+                            this->coolingTowerRange,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
     }
 
@@ -2523,7 +2516,7 @@ namespace CondenserLoopTowers {
 
         if (this->DesignWaterFlowRateWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                     if (state.dataPlnt->PlantFirstSizesOkayToFinalize) this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                 } else {
@@ -2556,7 +2549,7 @@ namespace CondenserLoopTowers {
             // Design water flow rate is assumed to be 3 gpm per ton (SI equivalent 5.382E-8 m3/s per watt)
             this->DesignWaterFlowRate = 5.382e-8 * this->TowerNominalCapacity;
             tmpDesignWaterFlowRate = this->DesignWaterFlowRate;
-            if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:SingleSpeed")) {
+            if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:SingleSpeed")) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)],
@@ -2571,7 +2564,7 @@ namespace CondenserLoopTowers {
                                                  "Initial Design Water Flow Rate based on tower nominal capacity [m3/s]",
                                                  this->DesignWaterFlowRate);
                 }
-            } else if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
+            } else if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
                     BaseSizer::reportSizerOutput(state,
                                                  DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)],
@@ -2598,7 +2591,7 @@ namespace CondenserLoopTowers {
                 tmpHighSpeedFanPower = this->HighSpeedFanPower;
             } else {
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                              state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                              Constant::InitConvTemp,
@@ -2698,7 +2691,7 @@ namespace CondenserLoopTowers {
 
         if (this->HighSpeedTowerUAWasAutoSized) {
             if (PltSizCondNum > 0) {
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                          Constant::InitConvTemp,
@@ -2796,7 +2789,7 @@ namespace CondenserLoopTowers {
                     }
                 }
             } else {
-                if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
 
                     Real64 const rho = FluidProperties::GetDensityGlycol(state,
                                                                          state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
@@ -2915,7 +2908,7 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of delivered cooling but now is
                 // a user input
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -3096,8 +3089,8 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity &&
-            UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
+            Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:TwoSpeed")) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->TowerLowSpeedNomCap > 0.0) {
 
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now is a
                 // user input
@@ -3197,7 +3190,7 @@ namespace CondenserLoopTowers {
         }
 
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
-            if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow && this->TowerFreeConvNomCap > 0.0) {
+            if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow && this->TowerFreeConvNomCap > 0.0) {
                 // nominal capacity doesn't include compressor heat; predefined factor was 1.25 W heat rejection per W of evap cooling but now user
                 // input
                 Real64 const rho = FluidProperties::GetDensityGlycol(state,
@@ -3277,7 +3270,7 @@ namespace CondenserLoopTowers {
 
         // calibrate variable speed tower model based on user input by finding calibration water flow rate ratio that
         // yields an approach temperature that matches user input
-        if (UtilityRoutines::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
+        if (Util::SameString(DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)], "CoolingTower:VariableSpeed")) {
 
             //   check range for water flow rate ratio (make sure RegulaFalsi converges)
             Real64 MaxWaterFlowRateRatio = 0.5; // maximum water flow rate ratio which yields desired approach temp
@@ -3413,6 +3406,34 @@ namespace CondenserLoopTowers {
             OutputReportPredefined::PreDefTableEntry(
                 state, state.dataOutRptPredefined->pdchMechType, this->Name, DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)]);
             OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchMechNomCap, this->Name, this->TowerNominalCapacity);
+
+            // create std 229 new table for cooling towers and fluid coolers
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCTFCType, this->Name, DataPlant::PlantEquipTypeNames[static_cast<int>(this->TowerType)]);
+            OutputReportPredefined::PreDefTableEntry(state,
+                                                     state.dataOutRptPredefined->pdchCTFCCondLoopName,
+                                                     this->Name,
+                                                     this->plantLoc.loopNum > 0 ? state.dataPlnt->PlantLoop(this->plantLoc.loopNum).Name : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchCTFCCondLoopBranchName,
+                this->Name,
+                this->plantLoc.loopNum > 0
+                    ? state.dataPlnt->PlantLoop(plantLoc.loopNum).LoopSide(plantLoc.loopSideNum).Branch(plantLoc.branchNum).Name
+                    : "N/A");
+            OutputReportPredefined::PreDefTableEntry(
+                state,
+                state.dataOutRptPredefined->pdchCTFCFluidType,
+                this->Name,
+                state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName); // Fluid Name more reasonable than FluidType
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignRange);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCRange, this->Name, this->DesignApproach);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCTFCDesFanPwr, this->Name, this->HighSpeedFanPower); // eqival to Design Fan Power?
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCDesInletAirWBT, this->Name, this->DesInletAirWBTemp);
+            OutputReportPredefined::PreDefTableEntry(
+                state, state.dataOutRptPredefined->pdchCTFCDesWaterFlowRate, this->Name, this->DesignWaterFlowRate);
+            OutputReportPredefined::PreDefTableEntry(state, state.dataOutRptPredefined->pdchCTFCLevWaterSPTemp, this->Name, this->DesOutletWaterTemp);
         }
 
         // input error checking
@@ -3567,7 +3588,7 @@ namespace CondenserLoopTowers {
         if (this->PerformanceInputMethod_Num == PIM::NominalCapacity) {
 
             if (PltSizCondNum > 0) { // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
-                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                     rho = FluidProperties::GetDensityGlycol(state,
                                                             state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                             DesTowerExitWaterTemp,
@@ -3585,7 +3606,7 @@ namespace CondenserLoopTowers {
                 }
             } else {                                  // PltSizCondNum = 0
                 if (!this->TowerInletCondsAutoSize) { // can use design data entered into tower object
-                    if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 DesTowerExitWaterTemp,
@@ -3952,7 +3973,7 @@ namespace CondenserLoopTowers {
             if (this->DesignWaterFlowRateWasAutoSized) { // get from plant sizing
                 // UA input method using plant sizing for flow rate, whereas Nominal capacity method uses scalable sizing factor per cap
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         tmpDesignWaterFlowRate = PlantSizData(PltSizCondNum).DesVolFlowRate * this->SizFac;
                         if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                             this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
@@ -3977,7 +3998,7 @@ namespace CondenserLoopTowers {
 
                 } else {
                     if (!this->TowerInletCondsAutoSize) {
-                        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                             if (state.dataPlnt->PlantFirstSizesOkayToFinalize) {
                                 this->DesignWaterFlowRate = tmpDesignWaterFlowRate;
                                 if (state.dataPlnt->PlantFinalSizesOkayToReport) {
@@ -4011,7 +4032,7 @@ namespace CondenserLoopTowers {
             if (this->HighSpeedTowerUAWasAutoSized) {
                 // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                 if (PltSizCondNum > 0) {
-                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                    if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                         rho = FluidProperties::GetDensityGlycol(state,
                                                                 state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                 DesTowerExitWaterTemp,
@@ -4063,7 +4084,7 @@ namespace CondenserLoopTowers {
                     }
                 } else {
                     if (!this->TowerInletCondsAutoSize) {
-                        if (this->DesignWaterFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (this->DesignWaterFlowRate >= HVAC::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                     DesTowerExitWaterTemp,
@@ -4300,7 +4321,7 @@ namespace CondenserLoopTowers {
                     // need an air flow rate to find capacity from UA but flow rate is scaled off capacity
                     // get nominal capacity from PlantSizData(PltSizCondNum)%DeltaT and PlantSizData(PltSizCondNum)%DesVolFlowRate
                     if (PltSizCondNum > 0) {
-                        if (PlantSizData(PltSizCondNum).DesVolFlowRate >= DataHVACGlobals::SmallWaterVolFlow) {
+                        if (PlantSizData(PltSizCondNum).DesVolFlowRate >= HVAC::SmallWaterVolFlow) {
                             rho = FluidProperties::GetDensityGlycol(state,
                                                                     state.dataPlnt->PlantLoop(this->plantLoc.loopNum).FluidName,
                                                                     DesTowerExitWaterTemp,
@@ -5493,14 +5514,14 @@ namespace CondenserLoopTowers {
 
         WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
         // MassFlowTolerance is a parameter to indicate a no flow condition
-        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > DataHVACGlobals::SmallLoad)) {
+        if (this->WaterMassFlowRate <= DataBranchAirLoopPlant::MassFlowTolerance || (MyLoad > HVAC::SmallLoad)) {
             // for multiple cells, we assume that it's a common bassin
             CalcBasinHeaterPower(
                 state, this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             return;
         }
 
-        if (std::abs(MyLoad) <= DataHVACGlobals::SmallLoad) {
+        if (std::abs(MyLoad) <= HVAC::SmallLoad) {
             // tower doesn't need to do anything
             this->OutletWaterTemp = state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
             this->FanPower = 0.0;
@@ -5546,7 +5567,7 @@ namespace CondenserLoopTowers {
         Real64 FanPowerAdjustFac = 0.0;
         if (FullSpeedFanQdot <= std::abs(MyLoad)) { // full speed is what we want.
 
-            if ((FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
+            if ((FullSpeedFanQdot + HVAC::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
                 ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin)) {
                 // If full fan and not meeting setpoint, then increase number of cells until all are used or load is satisfied
                 bool IncrNumCellFlag = true; // set value to true to enter in the loop
@@ -5558,7 +5579,7 @@ namespace CondenserLoopTowers {
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                     this->OutletWaterTemp =
                         this->calculateSimpleTowerOutletTemp(state, WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
-                    IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
+                    IncrNumCellFlag = (FullSpeedFanQdot + HVAC::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
                                       ((this->WaterMassFlowRate / (this->NumCellOn + 1)) >= WaterMassFlowRatePerCellMin);
                 }
                 FullSpeedFanQdot =
@@ -5775,7 +5796,7 @@ namespace CondenserLoopTowers {
             DeltaTwb = std::abs(OutletAirWetBulb - InletAirWetBulb);
             // Add KelvinConv to denominator below convert OutletAirWetBulbLast to Kelvin to avoid divide by zero.
             // Wet bulb error units are delta K/K
-            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + Constant::KelvinConv));
+            WetBulbError = std::abs((OutletAirWetBulb - OutletAirWetBulbLast) / (OutletAirWetBulbLast + Constant::Kelvin));
         }
 
         if (QactualLocal >= 0.0) {
@@ -5819,18 +5840,19 @@ namespace CondenserLoopTowers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 constexpr VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver
 
-        //   determine tower outlet water temperature
+        // determine tower outlet water temperature
         Real64 Tr; // range temperature which results in an energy balance
         auto f = [&state, this, WaterFlowRateRatio, airFlowRateRatioLocal, Twb](Real64 Trange) {
             // call model to determine approach temperature given other independent variables (range temp is being varied to find balance)
             Real64 Tapproach = this->calculateVariableSpeedApproach(state, WaterFlowRateRatio, airFlowRateRatioLocal, Twb, Trange);
-            // calculate residual based on a balance where Twb + Ta + Tr = Node(WaterInletNode)%Temp
-            return (Twb + Tapproach + Trange) - state.dataLoopNodes->Node(this->WaterInletNodeNum).Temp;
+            // calculate residual based on a balance where Twb + Ta + Tr = Inlet Water Temp
+            return (Twb + Tapproach + Trange) - this->WaterTemp;
         };
         int SolFla = 0;
-        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp);
+        General::SolveRoot(state, Acc, MaxIte, SolFla, Tr, f, 0.001, max(this->MaxRangeTemp, VSTowerMaxRangeTemp));
 
-        Real64 OutletWaterTempLocal = this->WaterTemp - Tr;
+        // calculate outlet temperature
+        Real64 outletWaterTempLocal = this->WaterTemp - min(Tr, this->MaxRangeTemp);
 
         if (SolFla == -1) {
             ShowSevereError(state, "Iteration limit exceeded in calculating tower nominal capacity at minimum air flow ratio");
@@ -5838,25 +5860,32 @@ namespace CondenserLoopTowers {
                 state,
                 "Design inlet air wet-bulb or approach temperature must be modified to achieve an acceptable range at the minimum air flow rate");
             ShowContinueError(state, format("Cooling tower simulation failed to converge for tower {}", this->Name));
-            //    if SolFla = -2, Tr is returned as minimum value (0.001) and outlet temp = inlet temp - 0.001
-        } else if (SolFla == -2) {    // decide if should run at max flow
-            Real64 TempSetPoint(0.0); // local temporary for loop setpoint
-            switch (state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopDemandCalcScheme) {
-            case DataPlant::LoopDemandCalcScheme::SingleSetPoint: {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPoint;
-            } break;
-            case DataPlant::LoopDemandCalcScheme::DualSetPointDeadBand: {
-                TempSetPoint = state.dataPlnt->PlantLoop(this->plantLoc.loopNum).LoopSide(this->plantLoc.loopSideNum).TempSetPointHi;
-            } break;
-            default: {
-                assert(false);
-            } break;
-            }
-            if (this->WaterTemp > (TempSetPoint + state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp)) { // run flat out
-                OutletWaterTempLocal = this->WaterTemp - state.dataCondenserLoopTowers->towers(this->VSTower).MaxRangeTemp;
+        } else if (SolFla == -2) {
+            // bad starting value means that solution corresponds to a range that is beyond
+            // the bounds of the model; The maximum range is used here
+            outletWaterTempLocal = this->WaterTemp - this->MaxRangeTemp;
+            ++this->VSErrorCountTRCalc;
+            if (this->VSErrorCountTRCalc < 2) {
+                ShowWarningError(
+                    state,
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}.",
+                           this->Name,
+                           this->MaxRangeTemp));
+                ShowContinueError(state,
+                                  format(" ... Occurrence info = {}, {} {}",
+                                         state.dataEnvrn->EnvironmentName,
+                                         state.dataEnvrn->CurMnDy,
+                                         General::CreateSysTimeIntervalString(state)));
+            } else {
+                ShowRecurringWarningErrorAtEnd(
+                    state,
+                    format("The range for the cooling tower {} likely exceeds the bounds of the model. The maximum range of the model is used {}",
+                           this->Name,
+                           this->MaxRangeTemp),
+                    this->ErrIndexTRCalc);
             }
         }
-        return OutletWaterTempLocal;
+        return outletWaterTempLocal;
     }
 
     Real64 CoolingTower::calculateVariableSpeedApproach(EnergyPlusData &state,
@@ -6312,6 +6341,8 @@ namespace CondenserLoopTowers {
         this->TankSupplyVol = tankSupplyVdot * (state.dataHVACGlobal->TimeStepSysSec);
         this->StarvedMakeUpVdot = StarvedVdot;
         this->StarvedMakeUpVol = StarvedVdot * (state.dataHVACGlobal->TimeStepSysSec);
+        this->coolingTowerApproach = this->OutletWaterTemp - this->AirWetBulb;
+        this->coolingTowerRange = this->InletWaterTemp - this->OutletWaterTemp;
     }
 
     void CoolingTower::update(EnergyPlusData &state)

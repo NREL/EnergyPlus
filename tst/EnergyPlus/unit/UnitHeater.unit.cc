@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -82,7 +82,6 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::UnitHeater;
 using namespace EnergyPlus::DataEnvironment;
 using namespace EnergyPlus::DataHeatBalance;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataPlant;
 using namespace EnergyPlus::DataSizing;
@@ -576,7 +575,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
         "    Activity Sch,            !- Activity Level Schedule Name",
         "    3.82E-8,                 !- Carbon Dioxide Generation Rate {m3/s-W}",
         "    ,                        !- Enable ASHRAE 55 Comfort Warnings",
-        "    zoneaveraged,            !- Mean Radiant Temperature Calculation Type",
+        "    EnclosureAveraged,            !- Mean Radiant Temperature Calculation Type",
         "    ,                        !- Surface Name/Angle Factor List Name",
         "    Work Eff Sch,            !- Work Efficiency Schedule Name",
         "    ClothingInsulationSchedule,  !- Clothing Insulation Calculation Method",
@@ -1126,8 +1125,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     state->dataLoopNodes->MoreNodeInfo.allocate(20);
     state->dataHVACGlobal->TimeStepSys = state->dataGlobal->TimeStepZone;
     state->dataHVACGlobal->TimeStepSysSec = state->dataHVACGlobal->TimeStepSys * Constant::SecInHour;
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::Zone, state->dataGlobal->TimeStepZone);
-    SetupTimePointers(*state, OutputProcessor::SOVTimeStepType::HVAC, state->dataHVACGlobal->TimeStepSys);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::Zone, state->dataGlobal->TimeStepZone);
+    SetupTimePointers(*state, OutputProcessor::TimeStepType::System, state->dataHVACGlobal->TimeStepSys);
+
+    UpdateMeterReporting(*state);
 
     SizingManager::ManageSizing(*state);
 
@@ -1357,11 +1358,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     state->dataZoneEnergyDemand->CurDeadBandOrSetback.allocate(1);
     state->dataZoneEnergyDemand->CurDeadBandOrSetback(ZoneNum) = false;
 
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp = 16.6;
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
-    state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Enthalpy =
-        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).Temp,
-                                   state->dataLoopNodes->Node(state->dataFans->Fan(1).InletNodeNum).HumRat);
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Temp = 16.6;
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).HumRat = PsyWFnTdbRhPb(*state, 16.6, 0.5, 101325.0, "UnitTest");
+    state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).Temp,
+                                   state->dataLoopNodes->Node(state->dataFans->fans(1)->inletNodeNum).HumRat);
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, 101325.0, 20.0, 0.0);
 
     WCWaterInletNode = state->dataWaterCoils->WaterCoil(CoilNum).WaterInletNodeNum;

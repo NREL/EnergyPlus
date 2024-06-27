@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,14 +73,14 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
-                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                if (Util::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                     this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
-                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingAirflowSizing)) {
+                switch (this->zoneEqSizing(this->curZoneEqNum).SizingMethod(HVAC::CoolingAirflowSizing)) {
                 case DataSizing::SupplyAirFlowRate:
                 case DataSizing::None:
                 case DataSizing::FlowPerFloorArea: {
@@ -278,7 +278,7 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
         } else if (this->curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
-                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                if (Util::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                     this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
@@ -304,13 +304,13 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
                     } else if (this->unitarySysEqSizing(this->curSysNum).CoolingAirFlow) {
                         this->autoSizedValue = this->unitarySysEqSizing(this->curSysNum).CoolingAirVolFlow;
                     } else {
-                        if (this->curDuctType == DataHVACGlobals::AirDuctType::Main) {
+                        if (this->curDuctType == HVAC::AirDuctType::Main) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Cooling) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Cooling) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesCoolVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Heating) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Heating) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesHeatVolFlow;
-                        } else if (this->curDuctType == DataHVACGlobals::AirDuctType::Other) {
+                        } else if (this->curDuctType == HVAC::AirDuctType::Other) {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
                         } else {
                             this->autoSizedValue = this->finalSysSizing(this->curSysNum).DesMainVolFlow;
@@ -334,10 +334,10 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
 
         // override sizing string
         if (this->overrideSizeString) {
-            if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+            if (Util::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
                 this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
                 if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-            } else if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+            } else if (this->coilType_Num == HVAC::CoilDX_CoolingTwoSpeed) {
                 if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
                     if (this->isEpJSON) {
                         this->sizingString = "high_speed_rated_air_flow_rate [m3/s]";
@@ -390,20 +390,20 @@ Real64 CoolingAirFlowSizer::size(EnergyPlusData &state, Real64 _originalValue, b
             if (coolingFlow) {
                 if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
                     this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= state.dataEnvrn->TotDesDays) {
-                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
+                    DDNameFanPeak = state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
                     dateTimeFanPeak = format("{}/{} {}",
-                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
-                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
+                                             state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Month,
+                                             state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).DayOfMonth,
                                              state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
                                                  state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtCoolMax));
                 }
             } else if (heatingFlow) {
                 if (this->finalZoneSizing(this->curZoneEqNum).HeatDDNum > 0 &&
                     this->finalZoneSizing(this->curZoneEqNum).HeatDDNum <= state.dataEnvrn->TotDesDays) {
-                    DDNameFanPeak = state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
+                    DDNameFanPeak = state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Title;
                     dateTimeFanPeak = format("{}/{} {}",
-                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
-                                             state.dataWeatherManager->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
+                                             state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).Month,
+                                             state.dataWeather->DesDayInput(this->finalZoneSizing(this->curZoneEqNum).HeatDDNum).DayOfMonth,
                                              state.dataRptCoilSelection->coilSelectionReportObj->getTimeText(
                                                  state, this->finalZoneSizing(this->curZoneEqNum).TimeStepNumAtHeatMax));
                 }

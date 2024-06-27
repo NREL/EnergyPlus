@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -367,10 +367,10 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
     if (state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum)) {
         SetupOutputVariable(state,
                             "Room Air Zone Vertical Temperature Gradient",
-                            OutputProcessor::Unit::K_m,
+                            Constant::Units::K_m,
                             patternZoneInfo.Gradient,
-                            OutputProcessor::SOVTimeStepType::HVAC,
-                            OutputProcessor::SOVStoreType::State,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             patternZoneInfo.ZoneName);
 
         state.dataRoomAirModelTempPattern->SetupOutputFlag(ZoneNum) = false;
@@ -415,7 +415,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case UserDefinedPatternMode::SensibleCooling: {
-        Real64 CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadCoolRate;
+        Real64 CoolLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).airSysCoolRate;
         if (CoolLoad >= twoGrad.UpperBoundHeatRateScale) {
             Grad = twoGrad.HiGradient;
 
@@ -434,7 +434,7 @@ void FigureTwoGradInterpPattern(EnergyPlusData &state, int const PattrnID, int c
         }
     } break;
     case UserDefinedPatternMode::SensibleHeating: {
-        Real64 HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).ZoneSNLoadHeatRate;
+        Real64 HeatLoad = state.dataZoneEnergyDemand->ZoneSysEnergyDemand(ZoneNum).airSysHeatRate;
         if (HeatLoad >= twoGrad.UpperBoundHeatRateScale) {
             Grad = twoGrad.HiGradient;
         } else if (HeatLoad <= twoGrad.LowerBoundHeatRateScale) {
@@ -620,8 +620,8 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
     // sets values in Heat balance variables
 
     // Using/Aliasing
-    using DataHVACGlobals::RetTempMax;
-    using DataHVACGlobals::RetTempMin;
+    using HVAC::RetTempMax;
+    using HVAC::RetTempMin;
     using InternalHeatGains::SumAllReturnAirLatentGains;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
@@ -745,14 +745,14 @@ void SetSurfHBDataForTempDistModel(EnergyPlusData &state, int const ZoneNum) // 
                 state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
                 // shouldn't the HVAC term be zeroed out then?
                 Real64 SumRetAirLatentGainRate = SumAllReturnAirLatentGains(state, ZoneNum, 0);
-                zoneHeatBal.ZoneLatentGain += SumRetAirLatentGainRate;
+                zoneHeatBal.latentGain += SumRetAirLatentGainRate;
             }
         } else {
             returnNode.HumRat = zoneNode.HumRat;
             state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToZone += state.dataHeatBal->RefrigCaseCredit(ZoneNum).LatCaseCreditToHVAC;
             // shouldn't the HVAC term be zeroed out then?
 
-            zoneHeatBal.ZoneLatentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
+            zoneHeatBal.latentGain += SumAllReturnAirLatentGains(state, ZoneNum, returnNodeNum);
         }
 
         returnNode.Enthalpy = PsyHFnTdbW(returnNode.Temp, returnNode.HumRat);

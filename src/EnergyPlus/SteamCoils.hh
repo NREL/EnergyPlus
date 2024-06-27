@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -157,7 +157,7 @@ namespace SteamCoils {
                                      int &CompIndex,
                                      ObjexxFCL::Optional<Real64 const> QCoilReq = _, // coil load to be met
                                      ObjexxFCL::Optional<Real64> QCoilActual = _,    // coil load actually delivered returned to calling component
-                                     ObjexxFCL::Optional_int_const FanOpMode = _,
+                                     ObjexxFCL::Optional<HVAC::FanOp const> fanOp = _,
                                      ObjexxFCL::Optional<Real64 const> PartLoadRatio = _);
 
     void GetSteamCoilInput(EnergyPlusData &state);
@@ -168,10 +168,10 @@ namespace SteamCoils {
 
     void CalcSteamAirCoil(EnergyPlusData &state,
                           int CoilNum,
-                          Real64 QCoilRequested, // requested coil load
-                          Real64 &QCoilActual,   // coil load actually delivered
-                          int FanOpMode,         // fan operating mode
-                          Real64 PartLoadRatio   // part-load ratio of heating coil
+                          Real64 QCoilRequested,   // requested coil load
+                          Real64 &QCoilActual,     // coil load actually delivered
+                          HVAC::FanOp const fanOp, // fan operating mode
+                          Real64 PartLoadRatio     // part-load ratio of heating coil
     );
 
     void UpdateSteamCoil(EnergyPlusData &state, int CoilNum);
@@ -289,9 +289,13 @@ struct SteamCoilsData : BaseGlobalStruct
     int ErrCount = 0;
     Array1D<SteamCoils::SteamCoilEquipConditions> SteamCoil;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = SteamCoilsData();
+        new (this) SteamCoilsData();
     }
 };
 } // namespace EnergyPlus

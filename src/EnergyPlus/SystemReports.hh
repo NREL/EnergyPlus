@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,16 +63,6 @@ namespace EnergyPlus {
 struct EnergyPlusData;
 
 namespace SystemReports {
-
-    enum class EndUseType
-    {
-        Invalid = -1,
-        NoHeatNoCool,
-        CoolingOnly,
-        HeatingOnly,
-        HeatAndCool,
-        Num
-    };
 
     struct Energy
     {
@@ -406,6 +396,10 @@ struct SystemReportsData : BaseGlobalStruct
     int NumCompTypes = 0;
     Array1D<SystemReports::CompTypeError> CompTypeErrors = Array1D<SystemReports::CompTypeError>(100);
     Array1D<SystemReports::IdentifyLoop> LoopStack;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

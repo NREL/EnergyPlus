@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -134,7 +134,7 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
     // Returns the ground temperature for the Site:GroundTemperature:Undisturbed:Xing
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 tp = state.dataWeatherManager->NumDaysInYear; // Period of soil temperature cycle
+    Real64 tp = state.dataWeather->NumDaysInYear; // Period of soil temperature cycle
 
     // Inits
     Real64 Ts_1 = surfTempAmplitude_1; // Amplitude of surface temperature
@@ -169,7 +169,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, 
     // Returns ground temperature when input time is in months
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = state.dataWeatherManager->NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = state.dataWeather->NumDaysInYear / 12;
 
     depth = _depth;
 
@@ -200,8 +200,8 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
 
     simTimeInDays = seconds / Constant::SecsInDay;
 
-    if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
+    if (simTimeInDays > state.dataWeather->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeather->NumDaysInYear);
     }
 
     return getGroundTemp(state);

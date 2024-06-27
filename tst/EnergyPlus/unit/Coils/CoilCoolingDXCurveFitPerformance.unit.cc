@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput)
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilNormalMode);
+    EXPECT_EQ((int)thisPerf.maxAvailCoilMode, (int)HVAC::CoilMode::Normal);
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode)
@@ -72,5 +72,5 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode)
     CoilCoolingDXCurveFitPerformance thisPerf(*state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilEnhancedMode);
+    EXPECT_EQ((int)thisPerf.maxAvailCoilMode, (int)HVAC::CoilMode::Enhanced);
 }

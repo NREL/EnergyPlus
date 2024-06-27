@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,8 +58,11 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+
+#include <nlohmann/json.hpp>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicLifeCycleCost;
@@ -254,8 +257,8 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_TRUE(compare_enums(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
-    EXPECT_TRUE(compare_enums(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
+    EXPECT_ENUM_EQ(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
+    EXPECT_ENUM_EQ(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
     EXPECT_EQ(0, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
@@ -264,14 +267,14 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
     EXPECT_EQ(5, state->dataEconLifeCycleCost->numNonrecurringCost);
     EXPECT_EQ("RESIDUALVALUE", state->dataEconLifeCycleCost->NonrecurringCost[4].name);
     EXPECT_EQ(CostCategory::Salvage, state->dataEconLifeCycleCost->NonrecurringCost[4].category);
-    EXPECT_TRUE(compare_enums(StartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost[4].startOfCosts));
+    EXPECT_ENUM_EQ(StartCosts::BasePeriod, state->dataEconLifeCycleCost->NonrecurringCost[4].startOfCosts);
     EXPECT_EQ(-20000., state->dataEconLifeCycleCost->NonrecurringCost[4].cost);
 
     EXPECT_EQ(1, state->dataEconLifeCycleCost->numRecurringCosts);
     EXPECT_EQ("ANNUALMAINT", state->dataEconLifeCycleCost->RecurringCosts[0].name);
     EXPECT_EQ(CostCategory::Maintenance, state->dataEconLifeCycleCost->RecurringCosts[0].category);
     EXPECT_EQ(7000., state->dataEconLifeCycleCost->RecurringCosts[0].cost);
-    EXPECT_TRUE(compare_enums(StartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts[0].startOfCosts));
+    EXPECT_ENUM_EQ(StartCosts::ServicePeriod, state->dataEconLifeCycleCost->RecurringCosts[0].startOfCosts);
     EXPECT_EQ(1, state->dataEconLifeCycleCost->RecurringCosts[0].repeatPeriodYears);
 
     EXPECT_EQ(3, state->dataEconLifeCycleCost->numUsePriceEscalation);
@@ -391,8 +394,8 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
 
     GetInputForLifeCycleCost(*state);
 
-    EXPECT_TRUE(compare_enums(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention));
-    EXPECT_TRUE(compare_enums(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach));
+    EXPECT_ENUM_EQ(DiscConv::EndOfYear, state->dataEconLifeCycleCost->discountConvention);
+    EXPECT_ENUM_EQ(InflAppr::ConstantDollar, state->dataEconLifeCycleCost->inflationApproach);
     EXPECT_EQ(0.03, state->dataEconLifeCycleCost->realDiscountRate);
     EXPECT_EQ(0, state->dataEconLifeCycleCost->baseDateMonth);
     EXPECT_EQ(2012, state->dataEconLifeCycleCost->baseDateYear);
@@ -484,19 +487,19 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetMonthNumber)
 {
-    EXPECT_EQ(0, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("January")));
-    EXPECT_EQ(1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("February")));
-    EXPECT_EQ(2, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("March")));
-    EXPECT_EQ(3, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("April")));
-    EXPECT_EQ(4, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("May")));
-    EXPECT_EQ(5, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("June")));
-    EXPECT_EQ(6, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("July")));
-    EXPECT_EQ(7, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("August")));
-    EXPECT_EQ(8, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("September")));
-    EXPECT_EQ(9, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("October")));
-    EXPECT_EQ(10, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("November")));
-    EXPECT_EQ(11, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("December")));
-    EXPECT_EQ(-1, getEnumValue(UtilityRoutines::MonthNamesUC, UtilityRoutines::makeUPPER("Hexember")));
+    EXPECT_EQ(0, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("January")));
+    EXPECT_EQ(1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("February")));
+    EXPECT_EQ(2, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("March")));
+    EXPECT_EQ(3, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("April")));
+    EXPECT_EQ(4, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("May")));
+    EXPECT_EQ(5, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("June")));
+    EXPECT_EQ(6, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("July")));
+    EXPECT_EQ(7, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("August")));
+    EXPECT_EQ(8, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("September")));
+    EXPECT_EQ(9, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("October")));
+    EXPECT_EQ(10, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("November")));
+    EXPECT_EQ(11, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("December")));
+    EXPECT_EQ(-1, getEnumValue(Util::MonthNamesUC, Util::makeUPPER("Hexember")));
 }
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
@@ -584,4 +587,74 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
 
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow[CostCategory::TotGrand].yrAmount(4), 1278. + 123456., 0.001);
     EXPECT_NEAR(state->dataEconLifeCycleCost->CashFlow[CostCategory::TotGrand].yrAmount(5), 1278., 0.001);
+}
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput_EnsureFuelTypesAllRecognized)
+{
+    using json = nlohmann::json;
+    const json &lcc_useprice_props = state->dataInputProcessing->inputProcessor->getObjectSchemaProps(*state, "LifeCycleCost:UsePriceEscalation");
+    const json &resource_field = lcc_useprice_props.at("resource");
+    const json &enum_values = resource_field.at("enum");
+
+    // Should support all fuels + ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    // THIS IS BRITTLE AS HECK.  DON'T RELY ON SUBSETS OF ENUMERATIONS BEING IN SOME ORDER.
+    constexpr size_t numResources = static_cast<size_t>(Constant::eFuel::Num) + 3;
+    // Constant::eFuel::Num has 15 fuel types including "None" (which is a fuel type for "OtherEquipment")
+    // "LifeCycleCost:UsePriceEscalation" has 18 fuel types including  ElectricityXXX (Purchased, Produced, SurplusSold, Net)
+    EXPECT_EQ(numResources, enum_values.size());
+    std::string idf_objects = delimited_string({
+        "LifeCycleCost:Parameters,",
+        "  TypicalLCC,              !- Name",
+        "  EndOfYear,               !- Discounting Convention",
+        "  ConstantDollar,          !- Inflation Approach",
+        "  0.03,                    !- Real Discount Rate",
+        "  ,                        !- Nominal Discount Rate",
+        "  ,                        !- Inflation",
+        "  January,                 !- Base Date Month",
+        "  2012,                    !- Base Date Year",
+        "  January,                 !- Service Date Month",
+        "  2014,                    !- Service Date Year",
+        "  100,                     !- Length of Study Period in Years",
+        "  0,                       !- Tax rate",
+        "  ;                        !- Depreciation Method",
+    });
+    // All should be valid resources
+    for (const auto &enum_value : enum_values) {
+        const std::string enum_string = Util::makeUPPER(enum_value.get<std::string>());
+
+        const auto resource = static_cast<Constant::eResource>(getEnumValue(Constant::eResourceNamesUC, enum_string));
+        // WHY IS COMPARE ENUMS THIS WAY?
+        EXPECT_ENUM_NE(Constant::eResource::Invalid, resource);
+
+        idf_objects += fmt::format(R"idf(
+LifeCycleCost:UsePriceEscalation,
+  LCCUsePriceEscalation {0},             !- Name
+  {0},                                   !- Resource
+  2009,                                   !- Escalation Start Year
+  January,                                !- Escalation Start Month
+  1,                                      !- Year Escalation 1
+  1.01,                                   !- Year Escalation 2
+  1.02;                                   !- Year Escalation 3
+
+LifeCycleCost:UseAdjustment,
+  LCCUseAdjustment {0},              !- Name
+  {0},                               !- Resource
+  1,                                      !- Year Multiplier 1
+  1.005,                                  !- Year Multiplier 2
+  1.01;                                   !- Year Multiplier 3
+  )idf",
+                                   enum_string);
+    }
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetInputForLifeCycleCost(*state);
+
+    EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUsePriceEscalation);
+    for (const auto &lcc : state->dataEconLifeCycleCost->UsePriceEscalation) {
+        EXPECT_ENUM_NE(lcc.resource, Constant::eResource::Invalid);
+    }
+    EXPECT_EQ(numResources, state->dataEconLifeCycleCost->numUseAdjustment);
+    for (const auto &lcc : state->dataEconLifeCycleCost->UseAdjustment) {
+        EXPECT_ENUM_NE(lcc.resource, Constant::eResource::Invalid);
+    }
 }

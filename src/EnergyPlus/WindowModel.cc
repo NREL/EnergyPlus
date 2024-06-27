@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,13 +52,13 @@
 
 namespace EnergyPlus {
 
-template <> EnumParser<WindowManager::WindowsModel>::EnumParser()
+template <> EnumParser<Window::WindowsModel>::EnumParser() // LOL
 {
-    m_Map["BUILTINWINDOWSMODEL"] = WindowManager::WindowsModel::BuiltIn;
-    m_Map["EXTERNALWINDOWSMODEL"] = WindowManager::WindowsModel::External;
+    m_Map["BUILTINWINDOWSMODEL"] = Window::WindowsModel::BuiltIn;
+    m_Map["EXTERNALWINDOWSMODEL"] = Window::WindowsModel::External;
 }
 
-namespace WindowManager {
+namespace Window {
 
     /////////////////////////////////////////////////////////////////////////////////////////
     //  CWindowModel
@@ -144,6 +144,6 @@ namespace WindowManager {
         return (m_Model == WindowsOpticalModel::Simplified);
     }
 
-} // namespace WindowManager
+} // namespace Window
 
 } // namespace EnergyPlus

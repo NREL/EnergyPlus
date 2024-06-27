@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,7 +73,6 @@
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::DataHVACGlobals;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::GlobalNames;
 using namespace EnergyPlus::DataHeatBalance;
@@ -1244,7 +1243,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     state->dataSize->SysSizingRunDone = true;
     state->dataSize->CurZoneEqNum = 0;
     state->dataSize->CurSysNum = 1;
-    state->dataSize->CurDuctType = DataHVACGlobals::AirDuctType::Main;
+    state->dataSize->CurDuctType = HVAC::AirDuctType::Main;
     state->dataHeatBal->Zone(1).FloorArea = 99.16;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingCapMethod = 9;
     state->dataSize->FinalSysSizing(state->dataSize->CurSysNum).HeatingTotalCapacity = 12000.;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -301,6 +301,14 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     ElectricBaseboardRadiator::GetElectricBaseboardInput(*state);
     EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(1).ZonePtr, 1);
     EXPECT_EQ(state->dataElectBaseboardRad->ElecBaseboard(2).ZonePtr, 2);
+
+    int surfNumRight1 = Util::FindItemInList("RIGHT-1", state->dataSurface->Surface);
+    int surfNumLeft1 = Util::FindItemInList("LEFT-1", state->dataSurface->Surface);
+
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[0], surfNumRight1);
+    EXPECT_EQ(state->dataSurface->allGetsRadiantHeatSurfaceList[1], surfNumLeft1);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumRight1).getsRadiantHeat);
+    EXPECT_TRUE(state->dataSurface->surfIntConv(surfNumLeft1).getsRadiantHeat);
 }
 
 TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
@@ -609,8 +617,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 1;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(HVAC::HeatingCapacitySizing) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     // do electric baseboard sizing
@@ -627,8 +635,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 2;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(HVAC::HeatingCapacitySizing) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 2000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;
@@ -647,8 +655,8 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     CntrlZoneNum = 3;
     state->dataSize->CurZoneEqNum = CntrlZoneNum;
     FirstHVACIteration = true;
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(DataHVACGlobals::NumOfSizingTypes);
-    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing) =
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod.allocate(HVAC::NumOfSizingTypes);
+    state->dataSize->ZoneEqSizing(CntrlZoneNum).SizingMethod(HVAC::HeatingCapacitySizing) =
         state->dataElectBaseboardRad->ElecBaseboard(BaseboardNum).HeatingCapMethod;
     state->dataSize->FinalZoneSizing(CntrlZoneNum).NonAirSysDesHeatLoad = 3000.0;
     state->dataHeatBal->Zone(CntrlZoneNum).FloorArea = 100.0;

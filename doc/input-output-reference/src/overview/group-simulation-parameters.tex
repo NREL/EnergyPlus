@@ -470,10 +470,10 @@ The ZoneAir\hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} object provides
 Three choices are allowed to select which solution algorithm will be used. The \textbf{ThirdOrderBackwardDifference} selection is the default selection and uses the third order finite difference approximation to solve the zone air energy and moisture balance equations. The \textbf{AnalyticalSolution} selection uses the integration approach to solve the zone air energy and moisture balance equations. The \textbf{EulerMethod} selection uses the first order finite backward difference approximation to solve the zone air energy and moisture balance equations.
 
 \paragraph{Field: Do Space Heat Balance for Sizing}\label{field-do-space-heat-balance-sizing}
-If yes, space-level heat balance will be calculated and reported during sizing. If no, then only zone-level heat balance will be calculated. This field defaults to No. Note that space heat balance is not supported for \hyperref[inputs-hm]{HybridModel:Zone}, \hyperref[roomairmodeltype]{RoomAirModelType} other than Mixing, \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} MoisturePenetrationDepthConductionTransferFunction and CombinedHeatAndMoistureFiniteElement.
+If yes, space-level heat balance will be calculated and reported during sizing, and space sizing results will be reported along with zone sizing results. If no, then only zone-level heat balance will be calculated. This field defaults to No. For zones with more than one space, the zone sizing results are calculated for the whole zone and represent the coincident peak for the spaces in the zone. Note that space heat balance is not supported for \hyperref[inputs-hm]{HybridModel:Zone}, \hyperref[roomairmodeltype]{RoomAirModelType} other than Mixing, \hyperref[heatbalancealgorithm]{HeatBalanceAlgorithm} MoisturePenetrationDepthConductionTransferFunction and CombinedHeatAndMoistureFiniteElement.
 
 \paragraph{Field: Do Space Heat Balance for Simulation}\label{field-do-space-heat-balance-simulation}
-If yes, space-level heat balance will be calculated and reported during the simulation. If no, then only zone-level heat balance will be calculated. This field defaults to No.
+If yes, space-level heat balance will be calculated and reported during the simulation. If no, then only zone-level heat balance will be calculated. This field defaults to No. When this field is Yes, optional SpaceHVAC objects may be used to distribute zone HVAC equipment output to the spaces in the zone. See \hyperref[spacehvacequipmentconnections]{SpaceHVAC:EquipmentConnections}, \hyperref[spacehvaczoneequipmentsplitter]{SpaceHVAC:ZoneEquipmentSplitter} and \hyperref[spacehvaczoneequipmentmixer]{SpaceHVAC:ZoneEquipmentMixer}.
 
 And, a default IDF example is shown below:
 
@@ -689,25 +689,23 @@ Output:Diagnostics,
 
 \subsection{Output:DebuggingData}\label{outputdebuggingdata}
 
-There may be times when a particular input file requires additional debugging. The Output:DebuggingData object may be used to report all available node data (e.g., temperature, mass flow rate, set point, pressure, etc.). The debug data is reported to the DBG text file. The debug file first reports the node number and name, and then all available node information for each zone time step (Ref. Timestep).
-
-The 2 fields of the Output:DebuggingData object can accept either a 1 (turn on) or any other value (turn off). Only one object may be entered.
+There may be times when a particular input file requires additional debugging. The Output:DebuggingData object may be used to report all available node data (e.g., temperature, mass flow rate, set point, pressure, etc.). The debug data is reported to the DBG text file. The debug file first reports the node number and name, and then all available node information for each zone time step (Ref. Timestep). Only one object may be entered.
 
 \subsubsection{Inputs}\label{inputs-12-017}
 
 \paragraph{Field: Report Debugging Data}\label{field-report-debugging-data}
 
-This field turns on debug reporting when a value of 1 is entered. Any other value (usually 0) disables debug reporting.
+This field turns on debug reporting when ``Yes'' is entered. ``No'' (the default) disables debug reporting.
 
 \paragraph{Field: Report During Warmup}\label{field-report-during-warmup}
 
-This field allows the debug data to be reported during the warmup period. When a value of 1 is entered the data is reported at all times, even during warmup. Any other value (usually 0) disables ``reporting at all time'' and debug data is only reported for each environment (\hyperref[runperiod]{RunPeriod} or \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay}).
+This field reports the debug data during the warmup period when ``Yes'' is entered. ``No'' (the default) disables reporting during warmup.
 
 In IDF use:
 
 \begin{lstlisting}
 Output:DebuggingData,
-  1,1;
+  Yes,Yes;
 \end{lstlisting}
 
 \subsection{Output:PreprocessorMessage}\label{outputpreprocessormessage}
@@ -1237,9 +1235,9 @@ A resource type should be specified for the meter. All assignments to this meter
     \item
     OtherFuel2
     \item
-    Steam
+    DistrictHeatingSteam
     \item
-    DistrictHeating
+    DistrictHeatingWater
     \item
     DistrictCooling
     \item
@@ -1302,9 +1300,9 @@ A resource type should be specified for the meter. All assignments to this meter
     \item
     OtherFuel2
     \item
-    Steam
+    DistrictHeatingSteam
     \item
-    DistrictHeating
+    DistrictHeatingWater
     \item
     DistrictCooling
     \item

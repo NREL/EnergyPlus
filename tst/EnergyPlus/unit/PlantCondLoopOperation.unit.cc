@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -954,9 +954,6 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
     state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
     state->dataPlnt->PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
 
-    state->dataSetPointManager->NumAllSetPtMgrs = 0;
-    state->dataSetPointManager->NumSchTESSetPtMgrs = 0;
-
     bool ErrorsFound = false;
     int TESSPBO = 1;
     int LoopNum = 1;
@@ -980,7 +977,7 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         std::string compName = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).Name;
         EXPECT_EQ(compName, "CHILLER");
         auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType;
-        EXPECT_TRUE(compare_enums(CtrlTypeNum, DataPlant::CtrlType::CoolingOp));
+        EXPECT_ENUM_EQ(CtrlTypeNum, DataPlant::CtrlType::CoolingOp);
     }
 
     {
@@ -992,7 +989,7 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
         auto CtrlTypeNum = state->dataPlnt->PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).CtrlType;
 
         // Could just test this, but want to improve reporting
-        // EXPECT_TRUE(compare_enums(CtrlType, PlantCondLoopOperation::DualOp));
+        // EXPECT_ENUM_EQ(CtrlType, PlantCondLoopOperation::DualOp);
 
         std::string ctrlType = "Unknown";
         if (CtrlTypeNum == DataPlant::CtrlType::CoolingOp) {
@@ -1007,6 +1004,5 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
     }
 
     // We should now alos have two TES SPMs created, and that's all of them
-    EXPECT_EQ(state->dataSetPointManager->NumSchTESSetPtMgrs, 2);
-    EXPECT_EQ(state->dataSetPointManager->NumAllSetPtMgrs, 2);
+    EXPECT_EQ(state->dataSetPointManager->spms.size(), 2);
 }

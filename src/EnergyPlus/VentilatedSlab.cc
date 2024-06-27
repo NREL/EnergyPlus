@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -77,7 +77,6 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -122,8 +121,7 @@ namespace VentilatedSlab {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataHVACGlobals::ContFanCycCoil;
-    using DataHVACGlobals::SmallAirVolFlow;
+    using HVAC::SmallAirVolFlow;
     using namespace ScheduleManager;
     using namespace Psychrometrics;
     using namespace FluidProperties;
@@ -165,7 +163,7 @@ namespace VentilatedSlab {
 
         // Find the correct VentilatedSlabInput
         if (CompIndex == 0) {
-            Item = UtilityRoutines::FindItemInList(CompName, state.dataVentilatedSlab->VentSlab);
+            Item = Util::FindItemInList(CompName, state.dataVentilatedSlab->VentSlab);
             if (Item == 0) {
                 ShowFatalError(state, format("SimVentilatedSlab: system not found={}", CompName));
             }
@@ -225,6 +223,7 @@ namespace VentilatedSlab {
         // Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
         // Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
+        static constexpr std::string_view routineName = "GetVentilatedSlabInput";
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using NodeInputManager::GetOnlySingleNode;
@@ -323,9 +322,11 @@ namespace VentilatedSlab {
                                                                      cAlphaFields,
                                                                      cNumericFields);
 
+            ErrorObjectHeader eoh{routineName, CurrentModuleObject, state.dataIPShortCut->cAlphaArgs(1)};
+
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames.allocate(NumNumbers);
             state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames = cNumericFields;
-            UtilityRoutines::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
+            Util::IsNameEmpty(state, state.dataIPShortCut->cAlphaArgs(1), CurrentModuleObject, ErrorsFound);
             auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
             ventSlab.Name = state.dataIPShortCut->cAlphaArgs(1);
@@ -341,7 +342,7 @@ namespace VentilatedSlab {
                 ErrorsFound = true;
             }
 
-            ventSlab.ZonePtr = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
+            ventSlab.ZonePtr = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(3), state.dataHeatBal->Zone);
             if (ventSlab.ZonePtr == 0) {
                 if (lAlphaBlanks(3)) {
                     ShowSevereError(
@@ -359,9 +360,9 @@ namespace VentilatedSlab {
 
             ventSlab.SurfListName = state.dataIPShortCut->cAlphaArgs(4);
             SurfListNum = 0;
-            //    IF (NumOfSlabLists > 0) SurfListNum = UtilityRoutines::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
+            //    IF (NumOfSlabLists > 0) SurfListNum = Util::FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
             if (state.dataSurfLists->NumOfSurfListVentSlab > 0)
-                SurfListNum = UtilityRoutines::FindItemInList(ventSlab.SurfListName, state.dataSurfLists->SlabList);
+                SurfListNum = Util::FindItemInList(ventSlab.SurfListName, state.dataSurfLists->SlabList);
             if (SurfListNum > 0) { // Found a valid surface list
                 ventSlab.NumOfSurfaces = state.dataSurfLists->SlabList(SurfListNum).NumOfSurfaces;
                 ventSlab.ZName.allocate(ventSlab.NumOfSurfaces);
@@ -397,7 +398,7 @@ namespace VentilatedSlab {
                 ventSlab.SurfaceFlowFrac.allocate(ventSlab.NumOfSurfaces);
                 state.dataVentilatedSlab->MaxCloNumOfSurfaces = max(state.dataVentilatedSlab->MaxCloNumOfSurfaces, ventSlab.NumOfSurfaces);
                 ventSlab.SurfaceName(1) = ventSlab.SurfListName;
-                ventSlab.SurfacePtr(1) = UtilityRoutines::FindItemInList(ventSlab.SurfaceName(1), state.dataSurface->Surface);
+                ventSlab.SurfacePtr(1) = Util::FindItemInList(ventSlab.SurfaceName(1), state.dataSurface->Surface);
                 ventSlab.SurfaceFlowFrac(1) = 1.0;
                 // Error checking for single surfaces
                 if (ventSlab.SurfacePtr(1) == 0) {
@@ -485,8 +486,8 @@ namespace VentilatedSlab {
             ventSlab.MinOutAirVolFlow = state.dataIPShortCut->rNumericArgs(2);
             ventSlab.OutAirVolFlow = state.dataIPShortCut->rNumericArgs(3);
 
-            ventSlab.outsideAirControlType = static_cast<OutsideAirControlType>(
-                getEnumValue(OutsideAirControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
+            ventSlab.outsideAirControlType =
+                static_cast<OutsideAirControlType>(getEnumValue(OutsideAirControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(5))));
 
             switch (ventSlab.outsideAirControlType) {
             case OutsideAirControlType::VariablePercent: {
@@ -563,8 +564,8 @@ namespace VentilatedSlab {
             }
 
             // System Configuration:
-            ventSlab.SysConfg = static_cast<VentilatedSlabConfig>(
-                getEnumValue(VentilatedSlabConfigNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
+            ventSlab.SysConfg =
+                static_cast<VentilatedSlabConfig>(getEnumValue(VentilatedSlabConfigNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(8))));
 
             if (ventSlab.SysConfg == VentilatedSlabConfig::Invalid) {
                 ShowSevereError(
@@ -579,7 +580,7 @@ namespace VentilatedSlab {
             ventSlab.CoreLength = state.dataIPShortCut->rNumericArgs(5);
             ventSlab.CoreNumbers = state.dataIPShortCut->rNumericArgs(6);
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(4)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Diameter is not needed for the series slabs configuration- ignored.",
@@ -589,7 +590,7 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(5)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Length is not needed for the series slabs configuration- ignored.",
@@ -599,7 +600,7 @@ namespace VentilatedSlab {
                 }
             }
 
-            if (UtilityRoutines::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
+            if (Util::SameString(state.dataIPShortCut->cAlphaArgs(8), "SurfaceListNames")) {
                 if (!lNumericBlanks(6)) {
                     ShowWarningError(state,
                                      format("{}=\"{}\"  Core Numbers is not needed for the series slabs configuration- ignored.",
@@ -610,8 +611,7 @@ namespace VentilatedSlab {
             }
 
             // Process the temperature control type
-            ventSlab.controlType =
-                static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
+            ventSlab.controlType = static_cast<ControlType>(getEnumValue(ControlTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(9))));
 
             if (ventSlab.controlType == ControlType::Invalid) {
                 ShowSevereError(
@@ -956,20 +956,20 @@ namespace VentilatedSlab {
             // Fan information:
             ventSlab.FanName = state.dataIPShortCut->cAlphaArgs(25);
 
-            if (HVACFan::checkIfFanNameIsAFanSystem(state, ventSlab.FanName)) {
-                ventSlab.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                state.dataHVACFan->fanObjs.emplace_back(new HVACFan::FanSystem(state, ventSlab.FanName));
-                ventSlab.Fan_Index = HVACFan::getFanObjectVectorIndex(state, ventSlab.FanName);
+            if ((ventSlab.Fan_Index = Fans::GetFanIndex(state, ventSlab.FanName)) == 0) {
+                ShowSevereItemNotFound(state, eoh, state.dataIPShortCut->cAlphaFieldNames(25), state.dataIPShortCut->cAlphaArgs(25));
+                ErrorsFound = true;
             } else {
-                bool isNotOkay(false);
-                ValidateComponent(state, "FAN:CONSTANTVOLUME", ventSlab.FanName, isNotOkay, "GetPIUs");
-                if (isNotOkay) {
-                    ShowContinueError(state, format("In {} = {}", CurrentModuleObject, ventSlab.Name));
+                ventSlab.fanType = state.dataFans->fans(ventSlab.Fan_Index)->type;
+                if (ventSlab.fanType != HVAC::FanType::Constant && ventSlab.fanType != HVAC::FanType::SystemModel) {
+                    ShowSevereCustomMessage(state,
+                                            eoh,
+                                            format("Only fans of type Fan:ConstantVolume and Fan:SystemModel are supported.  {} is of type {}",
+                                                   ventSlab.FanName,
+                                                   HVAC::fanTypeNames[(int)ventSlab.fanType]));
                     ErrorsFound = true;
                 }
-                ventSlab.FanType_Num = DataHVACGlobals::FanType_SimpleConstVolume;
             }
-
             if (ventSlab.outsideAirControlType == OutsideAirControlType::FixedOAControl) {
                 ventSlab.OutAirVolFlow = ventSlab.MinOutAirVolFlow;
                 ventSlab.MaxOASchedPtr = ventSlab.MinOASchedPtr;
@@ -986,8 +986,7 @@ namespace VentilatedSlab {
 
             // Coil options assign
 
-            ventSlab.coilOption =
-                static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
+            ventSlab.coilOption = static_cast<CoilType>(getEnumValue(CoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(26))));
 
             if (ventSlab.coilOption == CoilType::Invalid) {
                 ShowSevereError(
@@ -1015,8 +1014,8 @@ namespace VentilatedSlab {
                     ventSlab.heatingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(27);
                     errFlag = false;
 
-                    ventSlab.hCoilType = static_cast<HeatingCoilType>(
-                        getEnumValue(HeatingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
+                    ventSlab.hCoilType =
+                        static_cast<HeatingCoilType>(getEnumValue(HeatingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(27))));
 
                     switch (ventSlab.hCoilType) {
 
@@ -1131,9 +1130,8 @@ namespace VentilatedSlab {
                     ventSlab.coolingCoilTypeCh = state.dataIPShortCut->cAlphaArgs(30);
                     errFlag = false;
 
-                    ventSlab.cCoilType = static_cast<CoolingCoilType>(
-                        getEnumValue(CoolingCoilTypeNamesUC, UtilityRoutines::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
-
+                    ventSlab.cCoilType =
+                        static_cast<CoolingCoilType>(getEnumValue(CoolingCoilTypeNamesUC, Util::makeUPPER(state.dataIPShortCut->cAlphaArgs(30))));
                     switch (ventSlab.cCoilType) {
                     case CoolingCoilType::WaterCooling: {
                         ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
@@ -1152,9 +1150,9 @@ namespace VentilatedSlab {
                                              ErrorsFound,
                                              ventSlab.coolingCoilPlantType,
                                              ventSlab.coolingCoilPlantName);
-                        if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water")) {
+                        if (Util::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterCooling;
-                        } else if (UtilityRoutines::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
+                        } else if (Util::SameString(ventSlab.coolingCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
                             ventSlab.coolingCoilType = DataPlant::PlantEquipmentType::CoilWaterDetailedFlatCooling;
                         } else {
                             ShowSevereError(state, format("GetVentilatedSlabInput: {}=\"{}\", invalid", CurrentModuleObject, ventSlab.Name));
@@ -1235,7 +1233,7 @@ namespace VentilatedSlab {
 
             ventSlab.HVACSizingIndex = 0;
             if (!lAlphaBlanks(34)) {
-                ventSlab.HVACSizingIndex = UtilityRoutines::FindItemInList(state.dataIPShortCut->cAlphaArgs(34), state.dataSize->ZoneHVACSizing);
+                ventSlab.HVACSizingIndex = Util::FindItemInList(state.dataIPShortCut->cAlphaArgs(34), state.dataSize->ZoneHVACSizing);
                 if (ventSlab.HVACSizingIndex == 0) {
                     ShowSevereError(state, format("{} = {} not found.", cAlphaFields(34), state.dataIPShortCut->cAlphaArgs(34)));
                     ShowContinueError(state, format("Occurs in {} = {}", cMO_VentilatedSlab, ventSlab.Name));
@@ -1319,151 +1317,151 @@ namespace VentilatedSlab {
             auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.RadHeatingPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.RadHeatingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.RadCoolingPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Radiant Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.RadCoolingEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Heating Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.HeatCoilPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Heating Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.HeatCoilEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Total Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.TotCoolCoilPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Total Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.TotCoolCoilEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Sensible Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.SensCoolCoilPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Sensible Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.SensCoolCoilEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Latent Cooling Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.LateCoolCoilPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Coil Latent Cooling Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.LateCoolCoilEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Air Mass Flow Rate",
-                                OutputProcessor::Unit::kg_s,
+                                Constant::Units::kg_s,
                                 ventSlab.AirMassFlowRate,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Electricity Rate",
-                                OutputProcessor::Unit::W,
+                                Constant::Units::W,
                                 ventSlab.ElecFanPower,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Electricity Energy",
-                                OutputProcessor::Unit::J,
+                                Constant::Units::J,
                                 ventSlab.ElecFanEnergy,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Summed,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Sum,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Inlet Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ventSlab.SlabInTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Outlet Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ventSlab.SlabOutTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Zone Inlet Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ventSlab.ZoneInletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Return Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ventSlab.ReturnAirTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Outlet Air Temperature",
-                                OutputProcessor::Unit::C,
+                                Constant::Units::C,
                                 ventSlab.FanOutletTemp,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
             SetupOutputVariable(state,
                                 "Zone Ventilated Slab Fan Availability Status",
-                                OutputProcessor::Unit::None,
-                                ventSlab.AvailStatus,
-                                OutputProcessor::SOVTimeStepType::System,
-                                OutputProcessor::SOVStoreType::Average,
+                                Constant::Units::None,
+                                (int &)ventSlab.availStatus,
+                                OutputProcessor::TimeStepType::System,
+                                OutputProcessor::StoreType::Average,
                                 ventSlab.Name);
         }
     }
@@ -1492,7 +1490,6 @@ namespace VentilatedSlab {
         // na
 
         // Using/Aliasing
-        auto &ZoneComp = state.dataHVACGlobal->ZoneComp;
         auto &ventSlab = state.dataVentilatedSlab->VentSlab(Item);
 
         using DataZoneEquipment::CheckZoneEquipmentList;
@@ -1515,7 +1512,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int RadNum;         // Number of the radiant system (DO loop counter)
-        int RadSurfNum;     // Number of the radiant system surface (DO loop counter)
         int SurfNum;        // Intermediate variable for keeping track of the surface number
         int ZoneNum;        // Intermediate variable for keeping track of the zone number
         int AirRelNode;     // relief air node number in Ventilated Slab loop
@@ -1539,19 +1535,18 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MySizeFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyPlantScanFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
             state.dataVentilatedSlab->MyZoneEqFlag.allocate(state.dataVentilatedSlab->NumOfVentSlabs);
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf.dimension(state.dataGlobal->NumOfZones, 0.0);
-            state.dataVentilatedSlab->QRadSysSrcAvg.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastQRadSysSrc.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastSysTimeElapsed.dimension(state.dataSurface->TotSurfaces, 0.0);
-            state.dataVentilatedSlab->LastTimeStepSys.dimension(state.dataSurface->TotSurfaces, 0.0);
 
-            // Initialize total areas for all radiant systems
-            for (RadNum = 1; RadNum <= state.dataVentilatedSlab->NumOfVentSlabs; ++RadNum) {
-                state.dataVentilatedSlab->VentSlab(RadNum).TotalSurfaceArea = 0.0;
-                for (SurfNum = 1; SurfNum <= state.dataVentilatedSlab->VentSlab(RadNum).NumOfSurfaces; ++SurfNum) {
-                    state.dataVentilatedSlab->VentSlab(RadNum).TotalSurfaceArea +=
-                        state.dataSurface->Surface(state.dataVentilatedSlab->VentSlab(RadNum).SurfacePtr(SurfNum)).Area;
+            // Initialize total areas for all radiant systems and dimension record keeping arrays
+            for (auto &thisVentSlab : state.dataVentilatedSlab->VentSlab) {
+                thisVentSlab.TotalSurfaceArea = 0.0;
+                int numRadSurfs = thisVentSlab.NumOfSurfaces;
+                for (SurfNum = 1; SurfNum <= numRadSurfs; ++SurfNum) {
+                    thisVentSlab.TotalSurfaceArea += state.dataSurface->Surface(thisVentSlab.SurfacePtr(SurfNum)).Area;
                 }
+                thisVentSlab.QRadSysSrcAvg.dimension(numRadSurfs, 0.0);
+                thisVentSlab.LastQRadSysSrc.dimension(numRadSurfs, 0.0);
+                thisVentSlab.LastSysTimeElapsed = 0.0;
+                thisVentSlab.LastTimeStepSys = 0.0;
             }
             state.dataVentilatedSlab->MyEnvrnFlag = true;
             state.dataVentilatedSlab->MySizeFlag = true;
@@ -1560,14 +1555,14 @@ namespace VentilatedSlab {
             state.dataVentilatedSlab->MyOneTimeFlag = false;
         }
 
-        if (allocated(ZoneComp)) {
-            auto &availMgr = ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
+        if (allocated(state.dataAvail->ZoneComp)) {
+            auto &availMgr = state.dataAvail->ZoneComp(DataZoneEquipment::ZoneEquipType::VentilatedSlab).ZoneCompAvailMgrs(Item);
             if (state.dataVentilatedSlab->MyZoneEqFlag(Item)) { // initialize the name of each availability manager list and zone number
                 availMgr.AvailManagerListName = ventSlab.AvailManagerListName;
                 availMgr.ZoneNum = VentSlabZoneNum;
                 state.dataVentilatedSlab->MyZoneEqFlag(Item) = false;
             }
-            ventSlab.AvailStatus = availMgr.AvailStatus;
+            ventSlab.availStatus = availMgr.availStatus;
         }
 
         if (state.dataVentilatedSlab->MyPlantScanFlag(Item) && allocated(state.dataPlnt->PlantLoop)) {
@@ -1631,18 +1626,17 @@ namespace VentilatedSlab {
             OutsideAirNode = ventSlab.OutsideAirNode;
             RhoAir = state.dataEnvrn->StdRhoAir;
 
-            // Radiation Panel Part
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf = 0.0;
-            state.dataVentilatedSlab->QRadSysSrcAvg = 0.0;
-            state.dataVentilatedSlab->LastQRadSysSrc = 0.0;
-            state.dataVentilatedSlab->LastSysTimeElapsed = 0.0;
-            state.dataVentilatedSlab->LastTimeStepSys = 0.0;
             if (state.dataVentilatedSlab->NumOfVentSlabs > 0) {
                 for (auto &e : state.dataVentilatedSlab->VentSlab) {
+                    e.ZeroVentSlabSourceSumHATsurf = 0.0;
                     e.RadHeatingPower = 0.0;
                     e.RadHeatingEnergy = 0.0;
                     e.RadCoolingPower = 0.0;
                     e.RadCoolingEnergy = 0.0;
+                    e.QRadSysSrcAvg = 0.0;
+                    e.LastQRadSysSrc = 0.0;
+                    e.LastSysTimeElapsed = 0.0;
+                    e.LastTimeStepSys = 0.0;
                 }
             }
 
@@ -1768,18 +1762,12 @@ namespace VentilatedSlab {
 
             // The first pass through in a particular time step
             ZoneNum = ventSlab.ZonePtr;
-            state.dataVentilatedSlab->ZeroSourceSumHATsurf(ZoneNum) =
+            ventSlab.ZeroVentSlabSourceSumHATsurf =
                 state.dataHeatBal->Zone(ZoneNum).sumHATsurf(state); // Set this to figure what part of the load the radiant system meets
-            for (RadSurfNum = 1; RadSurfNum <= ventSlab.NumOfSurfaces; ++RadSurfNum) {
-                SurfNum = ventSlab.SurfacePtr(RadSurfNum);
-                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-                state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-                state.dataVentilatedSlab->LastTimeStepSys(SurfNum) =
-                    0.0; // At the start of a time step, reset to zero so average calculation can begin again
-            }
+            ventSlab.QRadSysSrcAvg = 0.0;                           // Initialize this variable to zero (radiant system defaults to off)
+            ventSlab.LastQRadSysSrc = 0.0;     // At the start of a time step, reset to zero so average calculation can begin again
+            ventSlab.LastSysTimeElapsed = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+            ventSlab.LastTimeStepSys = 0.0;    // At the start of a time step, reset to zero so average calculation can begin again
         }
     }
 
@@ -1802,11 +1790,11 @@ namespace VentilatedSlab {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::HeatingAirflowSizing;
-        using DataHVACGlobals::HeatingCapacitySizing;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using HVAC::CoolingCapacitySizing;
+        using HVAC::HeatingAirflowSizing;
+        using HVAC::HeatingCapacitySizing;
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;
@@ -1897,14 +1885,10 @@ namespace VentilatedSlab {
         CompType = cMO_VentilatedSlab;
         CompName = ventSlab.Name;
         state.dataSize->DataZoneNumber = ventSlab.ZonePtr;
-        if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataSize->DataFanEnumType = DataAirSystems::ObjectVectorOOFanSystemModel;
-        } else {
-            state.dataSize->DataFanEnumType = DataAirSystems::StructArrayLegacyFanModels;
-        }
+        state.dataSize->DataFanType = ventSlab.fanType;
         state.dataSize->DataFanIndex = ventSlab.Fan_Index;
         // ventilated slab unit is always blow thru
-        state.dataSize->DataFanPlacement = DataSizing::ZoneFanPlacement::BlowThru;
+        state.dataSize->DataFanPlacement = HVAC::FanPlace::BlowThru;
 
         if (ventSlab.HVACSizingIndex > 0) {
             zoneHVACIndex = ventSlab.HVACSizingIndex;
@@ -1913,7 +1897,7 @@ namespace VentilatedSlab {
             PrintFlag = true;
             SizingString = state.dataVentilatedSlab->VentSlabNumericFields(Item).FieldNames(FieldNum) + " [m3/s]";
             if (state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
-                SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+                SizingMethod = HVAC::CoolingAirflowSizing;
                 SAFMethod = state.dataSize->ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                 ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
@@ -2795,11 +2779,11 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::MeanRadTemp: {
-            SetPointTemp = state.dataHeatBal->ZoneMRT(ZoneNum);
+            SetPointTemp = thisZoneHB.MRT;
             break;
         }
         case ControlType::OperativeTemp: {
-            SetPointTemp = 0.5 * (thisZoneHB.MAT + state.dataHeatBal->ZoneMRT(ZoneNum));
+            SetPointTemp = 0.5 * (thisZoneHB.MAT + thisZoneHB.MRT);
             break;
         }
         case ControlType::OutdoorDryBulbTemp: {
@@ -2815,8 +2799,8 @@ namespace VentilatedSlab {
             break;
         }
         case ControlType::DewPointTemp: {
-            SetPointTemp = PsyTdpFnWPb(
-                state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZonePtr).ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+            SetPointTemp =
+                PsyTdpFnWPb(state, state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZonePtr).airHumRat, state.dataEnvrn->OutBaroPress);
             break;
         }
         default: {              // Should never get here
@@ -3121,11 +3105,7 @@ namespace VentilatedSlab {
 
                     SimVentSlabOAMixer(state, Item);
 
-                    if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-                    } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-                    }
+                    state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
                     QZnReq =
@@ -3391,11 +3371,7 @@ namespace VentilatedSlab {
                     state.dataVentilatedSlab->HCoilOn = false;
 
                     SimVentSlabOAMixer(state, Item);
-                    if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-                    } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-                    }
+                    state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
 
                     CpFan = PsyCpAirFnW(state.dataLoopNodes->Node(FanOutletNode).HumRat);
                     QZnReq =
@@ -3430,12 +3406,8 @@ namespace VentilatedSlab {
         // Resimulate fans if AirMassFlow is zero and FanElecPower is > 0, indicating that load or condensation controls shut off the ventilated slab
         // in CalcVentilatedSlabRadComps
         AirMassFlow = state.dataLoopNodes->Node(OutletNode).MassFlowRate;
-        Real64 locFanElecPower = 0.0;
-        if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            locFanElecPower = state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->fanPower();
-        } else {
-            locFanElecPower = Fans::GetFanPower(state, ventSlab.Fan_Index);
-        }
+        Real64 locFanElecPower = state.dataFans->fans(ventSlab.Fan_Index)->totalPower;
+
         if ((AirMassFlow <= 0.0) && (locFanElecPower > 0.0)) {
             state.dataLoopNodes->Node(MixoutNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(MixoutNode).MassFlowRateMaxAvail = 0.0;
@@ -3443,11 +3415,7 @@ namespace VentilatedSlab {
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRate = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMaxAvail = 0.0;
             state.dataLoopNodes->Node(FanOutletNode).MassFlowRateMinAvail = 0.0;
-            if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-            } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-            }
+            state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
         }
 
         CalcVentilatedSlabCoilOutput(state, Item, PowerMet, LatOutputProvided);
@@ -3498,20 +3466,17 @@ namespace VentilatedSlab {
         // unused1208  REAL(r64)           :: RadInTemp       ! Set temperature for "Slab In Node"
 
         SimVentSlabOAMixer(state, Item);
-        if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->simulate(state, _, _);
-        } else if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-            Fans::SimulateFanComponents(state, ventSlab.FanName, FirstHVACIteration, ventSlab.Fan_Index, _);
-        }
+        state.dataFans->fans(ventSlab.Fan_Index)->simulate(state, FirstHVACIteration, _, _);
+
         if ((ventSlab.coolingCoilPresent) && (ventSlab.coolingCoilSchedValue >= 0.0)) {
             if (ventSlab.cCoilType == CoolingCoilType::HXAssisted) {
                 SimHXAssistedCoolingCoil(state,
                                          ventSlab.coolingCoilName,
                                          FirstHVACIteration,
-                                         DataHVACGlobals::CompressorOperation::On,
+                                         HVAC::CompressorOp::On,
                                          0.0,
                                          ventSlab.coolingCoil_Index,
-                                         ContFanCycCoil);
+                                         HVAC::FanOp::Continuous);
             } else {
                 SimulateWaterCoilComponents(state, ventSlab.coolingCoilName, FirstHVACIteration, ventSlab.coolingCoil_Index);
             }
@@ -3621,11 +3586,8 @@ namespace VentilatedSlab {
         ventSlab.SensCoolCoilPower = std::abs(min(0.0, QUnitOut));
         ventSlab.TotCoolCoilPower = std::abs(min(0.0, QTotUnitOut));
         ventSlab.LateCoolCoilPower = ventSlab.TotCoolCoilPower - ventSlab.SensCoolCoilPower;
-        if (ventSlab.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            ventSlab.ElecFanPower = state.dataHVACFan->fanObjs[ventSlab.Fan_Index]->fanPower();
-        } else {
-            ventSlab.ElecFanPower = Fans::GetFanPower(state, ventSlab.Fan_Index);
-        }
+        ventSlab.ElecFanPower = (ventSlab.Fan_Index == 0) ? 0.0 : state.dataFans->fans(ventSlab.Fan_Index)->totalPower;
+
         ventSlab.AirMassFlowRate = AirMassFlow;
 
         SpecHumOut = state.dataLoopNodes->Node(OutletNode).HumRat;
@@ -3915,7 +3877,7 @@ namespace VentilatedSlab {
                     // conditions.
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
-                        DewPointTemp = PsyTdpFnWPb(state, thisZoneHB.ZoneAirHumRat, state.dataEnvrn->OutBaroPress);
+                        DewPointTemp = PsyTdpFnWPb(state, thisZoneHB.airHumRat, state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
                                 // Condensation warning--must shut off radiant system
@@ -4168,7 +4130,7 @@ namespace VentilatedSlab {
 
                     if (state.dataVentilatedSlab->OperatingMode == CoolingMode) {
                         DewPointTemp = PsyTdpFnWPb(state,
-                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZPtr(RadSurfNum)).ZoneAirHumRat,
+                                                   state.dataZoneTempPredictorCorrector->zoneHeatBalance(ventSlab.ZPtr(RadSurfNum)).airHumRat,
                                                    state.dataEnvrn->OutBaroPress);
                         for (RadSurfNum2 = 1; RadSurfNum2 <= ventSlab.NumOfSurfaces; ++RadSurfNum2) {
                             if (state.dataHeatBalSurf->SurfInsideTempHist(1)(ventSlab.SurfacePtr(RadSurfNum2)) < (DewPointTemp + CondDeltaTemp)) {
@@ -4482,22 +4444,17 @@ namespace VentilatedSlab {
 
             SurfNum = ventSlab.SurfacePtr(RadSurfNum);
 
-            if (state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) == SysTimeElapsed) {
-                // Still iterating or reducing system time step, so subtract old values which were
-                // not valid
-                state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) -= state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) *
-                                                                    state.dataVentilatedSlab->LastTimeStepSys(SurfNum) /
-                                                                    state.dataGlobal->TimeStepZone;
+            if (ventSlab.LastSysTimeElapsed == SysTimeElapsed) {
+                // Still iterating or reducing system time step, so subtract old values which were not valid
+                ventSlab.QRadSysSrcAvg(RadSurfNum) -= ventSlab.LastQRadSysSrc(RadSurfNum) * ventSlab.LastTimeStepSys / state.dataGlobal->TimeStepZone;
             }
 
             // Update the running average and the "last" values with the current values of the appropriate variables
-            state.dataVentilatedSlab->QRadSysSrcAvg(SurfNum) +=
-                state.dataHeatBalFanSys->QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
-
-            state.dataVentilatedSlab->LastQRadSysSrc(SurfNum) = state.dataHeatBalFanSys->QRadSysSource(SurfNum);
-            state.dataVentilatedSlab->LastSysTimeElapsed(SurfNum) = SysTimeElapsed;
-            state.dataVentilatedSlab->LastTimeStepSys(SurfNum) = TimeStepSys;
+            ventSlab.QRadSysSrcAvg(RadSurfNum) += state.dataHeatBalFanSys->QRadSysSource(SurfNum) * TimeStepSys / state.dataGlobal->TimeStepZone;
+            ventSlab.LastQRadSysSrc(RadSurfNum) = state.dataHeatBalFanSys->QRadSysSource(SurfNum);
         }
+        ventSlab.LastSysTimeElapsed = SysTimeElapsed;
+        ventSlab.LastTimeStepSys = TimeStepSys;
 
         // First sum up all of the heat sources/sinks associated with this system
         TotalHeatSource = 0.0;

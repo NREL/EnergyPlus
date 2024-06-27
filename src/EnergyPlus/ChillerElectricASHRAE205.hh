@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,15 +72,15 @@ namespace ChillerElectricASHRAE205 {
         Num,
     };
 
-    void tk205ErrCallback(tk205::MsgSeverity message_type, const std::string &message, void *context_ptr);
-
     void getChillerASHRAE205Input(EnergyPlusData &state);
 
     struct ASHRAE205ChillerSpecs : ChillerElectricEIR::ElectricEIRChillerSpecs
     {
         static constexpr std::string_view ObjectType{"Chiller:Electric:ASHRAE205"};
         std::shared_ptr<tk205::rs0001_ns::RS0001> Representation; // ASHRAE205 representation instance
-        Btwxt::Method InterpolationType{Btwxt::Method::LINEAR};
+        std::pair<EnergyPlusData *, std::string> LoggerContext;
+
+        Btwxt::InterpolationMethod InterpolationType{Btwxt::InterpolationMethod::linear};
         int MinSequenceNumber{1};
         int MaxSequenceNumber{1};
 
@@ -150,9 +150,13 @@ struct ChillerElectricASHRAE205Data : BaseGlobalStruct
     bool getInputFlag = true;
     Array1D<ChillerElectricASHRAE205::ASHRAE205ChillerSpecs> Electric205Chiller;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+
     void clear_state() override
     {
-        *this = ChillerElectricASHRAE205Data();
+        new (this) ChillerElectricASHRAE205Data();
     }
 };
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,10 +59,13 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/ExhaustAirSystemManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/SystemReports.hh>
 
 namespace EnergyPlus {
@@ -205,33 +208,12 @@ namespace DataZoneEquipment {
     enum class SpaceEquipSizingBasis
     {
         Invalid = -1,
-        DesignLoad,
+        DesignCoolingLoad,
+        DesignHeatingLoad,
         FloorArea,
         Volume,
         PerimeterLength,
         Num
-    };
-
-    struct EquipMeterData
-    {
-        // Members
-        std::string ReportVarName;
-        OutputProcessor::Unit ReportVarUnits;
-        Constant::eResource ResourceType = Constant::eResource::Invalid;
-        std::string EndUse;
-        SystemReports::EndUseType EndUse_CompMode;
-        std::string Group;
-        int ReportVarIndex;
-        OutputProcessor::TimeStepType ReportVarIndexType;
-        OutputProcessor::VariableType ReportVarType;
-        Real64 CurMeterReading;
-
-        // Default Constructor
-        EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), EndUse_CompMode(SystemReports::EndUseType::NoHeatNoCool), ReportVarIndex(0),
-              ReportVarIndexType(OutputProcessor::TimeStepType::Zone), ReportVarType(OutputProcessor::VariableType::NotFound), CurMeterReading(0.0)
-        {
-        }
     };
 
     struct SubSubEquipmentData // data for an individual component
@@ -244,9 +226,9 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar; // Index of energy output report data
-        int EnergyTransComp;                // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;               // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >=0 index to ZoneEqToPlant array
         int OpMode;
         Real64 Capacity;
         Real64 Efficiency;
@@ -274,10 +256,10 @@ namespace DataZoneEquipment {
         int InletNodeNum;
         int OutletNodeNum;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;           // Index of energy output report data
-        Array1D<SubSubEquipmentData> SubSubEquipData; // Component list
-        int EnergyTransComp;                          // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;                         // 0=No plant loop connection, >0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        Array1D<SubSubEquipmentData> SubSubEquipData;   // Component list
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         int OpMode;
         Real64 Capacity;
         Real64 Efficiency;
@@ -383,6 +365,10 @@ namespace DataZoneEquipment {
         }
 
         void setTotalInletFlows(EnergyPlusData &state);
+
+        void beginEnvirnInit(EnergyPlusData &state);
+
+        void hvacTimeStepInit(EnergyPlusData &state, bool FirstHVACIteration);
     };
 
     struct EquipmentData // data for an individual component
@@ -398,10 +384,10 @@ namespace DataZoneEquipment {
         Array1D_int InletNodeNums;
         Array1D_int OutletNodeNums;
         int NumMeteredVars;
-        Array1D<EquipMeterData> MeteredVar;     // Index of energy output report data
-        Array1D<SubEquipmentData> SubEquipData; // Component list
-        int EnergyTransComp;                    // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
-        int ZoneEqToPlantPtr;                   // 0=No plant loop connection, >0 index to ZoneEqToPlant array
+        Array1D<OutputProcessor::MeterData> MeteredVar; // Index of energy output report data
+        Array1D<SubEquipmentData> SubEquipData;         // Component list
+        int EnergyTransComp;                            // 1=EnergyTransfer, 0=No EnergyTransfer  Flag needed for reporting
+        int ZoneEqToPlantPtr;                           // 0=No plant loop connection, >0 index to ZoneEqToPlant array
         Real64 TotPlantSupplyElec;
         Real64 TotPlantSupplyGas;
         Real64 TotPlantSupplyPurch;
@@ -452,29 +438,49 @@ namespace DataZoneEquipment {
 
     struct ZoneEquipSplitterMixerSpace
     {
-        int spaceIndex = 0;          // Index to a space
-        Real64 outputFraction = 0.0; // Fraction of equipment output (either flow or heating/cooling) to this space
-        int spaceNodeNum = 0;        // Space Inlet Node number (zero if not airflow equipment)
+        int spaceIndex = 0;    // Index to a space
+        Real64 fraction = 0.0; // Fraction of equipment output or flow for this space
+        int spaceNodeNum = 0;  // Space Inlet Node number (zero if not airflow equipment)
     };
 
-    struct ZoneEquipmentSplitter
+    struct ZoneEquipmentSplitterMixer
     {
         std::string Name;
-        DataZoneEquipment::ZoneEquipType equipType = DataZoneEquipment::ZoneEquipType::Invalid;
-        std::string equipName;
+        DataLoopNode::ConnectionObjectType spaceEquipType = DataLoopNode::ConnectionObjectType::Invalid;
+        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
+        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+
+        void size(EnergyPlusData &state);
+    };
+
+    struct ZoneEquipmentSplitter : ZoneEquipmentSplitterMixer
+    {
+        DataZoneEquipment::ZoneEquipType zoneEquipType = DataZoneEquipment::ZoneEquipType::Invalid;
+        std::string zoneEquipName;
         int zoneEquipOutletNodeNum = 0;
         DataZoneEquipment::ZoneEquipTstatControl tstatControl = DataZoneEquipment::ZoneEquipTstatControl::Invalid;
-        int controlSpaceIndex = 0;
-        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
-        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+        int controlSpaceIndex = 0;                                                 // Index to a space for the thermostat control space
+        int controlSpaceNumber = 0;                                                // Control space number within the zone equipment splitter list
+        DataZoneEnergyDemands::ZoneSystemSensibleDemand saveZoneSysSensibleDemand; // Save unadjusted zone sensible loads
+        DataZoneEnergyDemands::ZoneSystemMoistureDemand saveZoneSysMoistureDemand; // Save unadjusted zone moisture loads
+
+        void distributeOutput(EnergyPlusData &state,
+                              int const zoneNum,
+                              Real64 const sysOutputProvided,
+                              Real64 const latOutputProvided,
+                              Real64 const nonAirSysOutput,
+                              int const equipTypeNum);
+
+        void adjustLoads(EnergyPlusData &state, int zoneNum, int equipTypeNum);
     };
 
-    struct ZoneEquipmentMixer
+    struct ZoneEquipmentMixer : ZoneEquipmentSplitterMixer
     {
-        std::string Name;
         int zoneEquipInletNodeNum = 0;
-        DataZoneEquipment::SpaceEquipSizingBasis spaceSizingBasis = DataZoneEquipment::SpaceEquipSizingBasis::Invalid;
-        std::vector<ZoneEquipSplitterMixerSpace> spaces;
+
+        void setOutletConditions(EnergyPlusData &state);
+
+        void setInletFlows(EnergyPlusData &state);
     };
 
     struct ControlList
@@ -606,7 +612,7 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     bool ZoneEquipInputsFilled = false;
     bool ZoneEquipSimulatedOnce = false;
     int NumOfZoneEquipLists = 0;
-    Array1D_int ZoneEquipAvail;
+    Array1D<Avail::Status> ZoneEquipAvail;
     Array1D<DataZoneEquipment::EquipConfiguration> ZoneEquipConfig;
     EPVector<DataZoneEquipment::EquipConfiguration> spaceEquipConfig;
     std::unordered_set<std::string> UniqueZoneEquipListNames;
@@ -617,6 +623,10 @@ struct DataZoneEquipmentData : BaseGlobalStruct
     Array1D<ExhaustAirSystemManager::ZoneExhaustControl> ZoneExhaustControlSystem; // 2022-01: maybe a better name?
     std::vector<DataZoneEquipment::ZoneEquipmentSplitter> zoneEquipSplitter;
     std::vector<DataZoneEquipment::ZoneEquipmentMixer> zoneEquipMixer;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

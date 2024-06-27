@@ -10,7 +10,7 @@ Each internal gains object has a field for ``\hyperref[zone]{Zone} or  \hyperref
   \item[Space Name] will result in one instance of the internal gain, named \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to the Space using the design level, space floor area, or space occupancy as appropriate.
   \item[SpaceList Name] will result in one instance of the internal gain for each Space in the SpaceList, named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be applied to each Space in the SpaceList using the design level, space floor area, or space occupancy as appropriate.
   \item[Zone Name] will result in one instance of the internal gain for each Space in the Zone. If there is only one Space in the Zone, then the single instance will be named \textless{}Object Name\textgreater{}. If there is more than one Space in the Zone, then each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. The full magnitude of the gain will be split between the Spaces in the Zone apportioned by the Space floor area or occupancy depending on the input method.
-  \item[ZoneList Name] will result in one instance of the internal gain for each Space in each Zone in the ZoneList. Each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}. 
+  \item[ZoneList Name] will result in one instance of the internal gain for each Space in each Zone in the ZoneList. Each instance will be named \textless{}Space Name\textgreater{} \textless{}Object Name\textgreater{}.
   The full magnitude of the gain will be applied to each Zone in the ZoneList then split between the Spaces in each Zone apportioned by the Space floor area or occupancy depending on the input method.
 \end{description}
 
@@ -91,10 +91,10 @@ This field is the name of the schedule (ref: Schedules) that modifies the number
 This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal number of occupants (people) in the Zone. The key/choices are:
 
 \begin{description}
-	
+
 \item[People] With this choice, the method used will be a straight insertion of the number of occupants (people).~ (The Number of People field should be filled.)
 
-\item[People/Area] With this choice, the method used will be a factor per floor area of the zone. (The People per Zone Floor Area field should be filled).
+\item[People/Area] With this choice, the method used will be a factor per floor area of the zone or space. (The People per Zone Floor Area field should be filled).
 
 \item[Area/Person] With this choice, the method used will be a factor of floor area per person. (The Zone Floor Area per Person field should be filled).
 
@@ -104,13 +104,13 @@ This field is a key/choice field that tells which of the next three fields are f
 
 This field is used to represent the maximum number of people in a zone that is then multiplied by a schedule fraction (see schedule field). In EnergyPlus, this is slightly more flexible in that the number of people could be a ``diversity factor'' applied to a schedule of real numbers. Note that while the schedule value can vary from hour to hour, the number of people field is constant for all simulation environments.
 
-\paragraph{Field: People per Zone Floor Area}\label{field-people-per-zone-floor-area}
+\paragraph{Field: People per Floor Area}\label{field-people-per-zone-floor-area}
 
-This factor (person/m\(^{2}\)) is used, along with the Zone Floor Area to determine the maximum number of people as described in the Number of People field. The choice from the method field should be ``people/area''.
+This factor (person/m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum number of people as described in the Number of People field. The choice from the method field should be ``people/area''.
 
-\paragraph{Field: Zone Floor Area per Person}\label{field-zone-floor-area-per-person}
+\paragraph{Field: Floor Area per Person}\label{field-zone-floor-area-per-person}
 
-This factor (m\(^{2}\)/person) is used, along with the Zone Floor Area to determine the maximum number of people as described in the Number of People field. The choice from the method field should be ``area/person''.
+This factor (m\(^{2}\)/person) is used, along with the Zone or Space Floor Area to determine the maximum number of people as described in the Number of People field. The choice from the method field should be ``area/person''.
 
 \paragraph{Field: Fraction Radiant}\label{field-fraction-radiant}
 
@@ -204,13 +204,13 @@ Wrestling, competitive & 738 to 909 & 410 to 505 & 7.0 to 8.7 \tabularnewline
 
 \paragraph{Field: Mean Radiant Temperature Calculation Type}\label{field-mean-radiant-temperature-calculation-type}
 
-This field specifies the type of Mean Radiant Temperature (MRT) calculation the user wishes to use for the thermal comfort model. At the present time, there are three options for MRT calculation type: zone averaged, surface weighted, and a list of angle factors. The default calculation is ``ZoneAveraged'' and is used if field is left blank. In the zone averaged MRT calculation, the MRT used for the thermal comfort calculations is for an ``average'' point in the zone. MRT is calculated based on an area-emissivity weighted average of all of the surfaces in the zone. In cases where the emissivity of all of the surfaces are sufficiently small (near zero), the mean radiant temperature will be set to the mean air temperature of the space to avoid divide by zero errors. The other MRT calculation type is ``SurfaceWeighted''. The goal of this calculation type is to estimate a person in the space close to a particular surface without having to define exact view factors for all of the surfaces and the location of the person in the space. The MRT used in the thermal comfort calculations when the ``surface weighted'' calculation type is selected is actually the average of the temperature of the surface to which the person is closest (defined by the next field ``Surface Name'') and the zone averaged MRT (defined above). The surface temperature alone is not used because in theory the maximum view factor from a person to any flat surface is roughly 0.5. In the ``surfaceweighted'' calculation, the surface in question actually gets slightly more weighting than 50\% since the surface selected is still a part of the zone average MRT calculation. Again, this simplification was made to avoid the specification of view factors and the exact location of the person.
+This field specifies the type of Mean Radiant Temperature (MRT) calculation the user wishes to use for the thermal comfort model. At the present time, there are three options for MRT calculation type: enclosure averaged, surface weighted, and a list of angle factors. The default calculation is ``EnclosureAveraged'' and is used if field is left blank. In the enclosure averaged MRT calculation, the MRT used for the thermal comfort calculations is for an ``average'' point in the zone. MRT is calculated based on an area-emissivity weighted average of all of the surfaces in the same radiant enclosure (one or more \hyperref[space]{Spaces}). In cases where the emissivity of all of the surfaces are sufficiently small (near zero), the mean radiant temperature will be set to the mean air temperature of the space to avoid divide by zero errors. The other MRT calculation type is ``SurfaceWeighted''. The goal of this calculation type is to estimate a person in the space close to a particular surface without having to define exact view factors for all of the surfaces and the location of the person in the space. The MRT used in the thermal comfort calculations when the ``surface weighted'' calculation type is selected is actually the average of the temperature of the surface to which the person is closest (defined by the next field ``Surface Name'') and the enclosure averaged MRT (defined above). The surface temperature alone is not used because in theory the maximum view factor from a person to any flat surface is roughly 0.5. In the ``surfaceweighted'' calculation, the surface in question actually gets slightly more weighting than 50\% since the surface selected is still a part of the zone average MRT calculation. Again, this simplification was made to avoid the specification of view factors and the exact location of the person.
 
-A third option is to use ``AngleFactor''. This option allows for more explicit positioning of the person within the space by defining the angle factors from the person to the various surfaces in the zone. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} object (see next object description) is intended to give the user this opportunity.
+A third option is to use ``AngleFactor''. This option allows for more explicit positioning of the person within the space by defining the angle factors from the person to the various surfaces in the enclosure. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} object (see next object description) is intended to give the user this opportunity.
 
 \paragraph{Field: Surface Name/Angle Factor List Name}\label{field-surface-nameangle-factor-list-name}
 
-This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFactor'' for the MRT calculation type (see the previous input field description). In the case of ``SurfaceWeighted'', the field is the name of a surface within the zone the people are residing. This surface will be used in the MRT calculation as defined above to come up with a more representative MRT for a person near a particular surface. The MRT used for thermal comfort calculations using the ``SurfaceWeighted'' MRT calculation method is the average of the temperature of the surface specified in this field and the ``zone averaged'' MRT (see the Mean Radiant Temperature calculation type field above). In the case of ``AngleFactor'', the field is the name of a \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} input object defined elsewhere. This field is required when the previous field is set to ``SurfaceWeighted'' or ``AngleFactor'' and is set to run one of the following thermal comfort models: Fanger, Pierce, KSU, CoolingEffectASH55 or AnkleDraftASH55.
+This field is only valid when the user selects ``SurfaceWeighted'' or ``AngleFactor'' for the MRT calculation type (see the previous input field description). In the case of ``SurfaceWeighted'', the field is the name of a surface within the enclosure the people are residing. This surface will be used in the MRT calculation as defined above to come up with a more representative MRT for a person near a particular surface. The MRT used for thermal comfort calculations using the ``SurfaceWeighted'' MRT calculation method is the average of the temperature of the surface specified in this field and the ``zone averaged'' MRT (see the Mean Radiant Temperature calculation type field above). In the case of ``AngleFactor'', the field is the name of a \hyperref[comfortviewfactorangles]{ComfortViewFactorAngles} input object defined elsewhere. This field is required when the previous field is set to ``SurfaceWeighted'' or ``AngleFactor'' and is set to run one of the following thermal comfort models: Fanger, Pierce, KSU, CoolingEffectASH55 or AnkleDraftASH55.
 
 \paragraph{Field: Work Efficiency Schedule Name}\label{field-work-efficiency-schedule-name}
 
@@ -256,7 +256,7 @@ This field specifies which clothing insulation method (ClothingInsulationSchedul
 
 \paragraph{Field: Clothing Insulation Schedule Name}\label{field-clothing-insulation-schedule-name}
 
-This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or www.cbe.berkeley.edu/comforttool/. This field is required to run one of the following thermal comfort models: Fanger, Pierce, KSU, CoolingEffectASH55 or AnkleDraftASH55. If a schedule is listed here but no thermal comfort model is selected, then a warning message will be produced and this schedule will be listed as unused in the error file.
+This field is the name of the schedule that defines the amount of clothing being worn by a typical zone occupant during various times in the simulation period. The choice from the Clothing Insulation Calculation Method field should be ``\textbf{ClothingInsulationSchedule}''. This parameter must be a positive real number and has units of Clo. Typical values for Clo can be seen in the ASHRAE 2009 HOF Table 7, page 9.8 (for clothing ensembles) and Table~\ref{table:window-modeling-options}, page 9.9 (for garment values) ) or \url{https://comfort.cbe.berkeley.edu/}. This field is required to run one of the following thermal comfort models: Fanger, Pierce, KSU, CoolingEffectASH55 or AnkleDraftASH55. If a schedule is listed here but no thermal comfort model is selected, then a warning message will be produced and this schedule will be listed as unused in the error file.
 
 \paragraph{Field: Air Velocity Schedule Name}\label{field-air-velocity-schedule-name}
 
@@ -267,32 +267,32 @@ This field is the name of the schedule that approximates the amount of air movem
 The final one to five fields are optional and are intended to trigger various thermal comfort models within EnergyPlus. By entering the keywords Fanger, Pierce, KSU, AdaptiveASH55, AdaptiveCEN15251, CoolingEffectASH55, and AnkleDraftASH55, the user can request the Fanger, Pierce Two-Node, Kansas State UniversityTwo-Node, the adaptive comfort models of the ASHRAE Standard 55 and CEN Standard 15251, ASHRAE Standard 55 Elevated Air Cooling Effect model, and ASHRAE Standard 55 Ankle Draft Risk model results for this particular people statement. Detailed descriptions and requirements of the seven models as listed below.
 
 \begin{description}
-  \item[Fanger] 
+  \item[Fanger]
   Fanger’s Comfort model is applied to calculate related thermal comfort metrics. Fanger Model PMV, PPD, and Clothing Surface Temperature are calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[Pierce] 
+  \item[Pierce]
   The Pierce Two-Node model is applied to calculate related thermal comfort metrics. Pierce Model Effective Temperature PMV, Standard Effective Temperature PMV, Discomfort Index, Thermal Sensation Index, and Standard Effective Temperature are calculated and reported as each time step.Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[KSU] 
+  \item[KSU]
   The KSU Two-Node Model is applied to calculate related thermal comfort metrics. KSU Model Thermal Sensation Vote is calculated and reported as each time step. Note that the KSU model is computationally intensive and may noticeably increase the execution time of the simulation. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[AdaptiveASH55] 
+  \item[AdaptiveASH55]
   Adaptive Comfort Model Based on ASHRAE Standard 55-2010 is applied to calculate related thermal comfort metrics. ASHRAE 55 Adaptive Model 90\% Acceptability Status, 80\% Acceptability Status, Running Average Outdoor Air Temperature, and the Adaptive Model Temperature are calculated and reported as each time step. AdaptiveASH55 is only applicable when the running average outdoor air temperature for the past 7 days is between 10.0 and 33.5C.
 
-  \item[AdaptiveCEN15251] 
+  \item[AdaptiveCEN15251]
   Adaptive Comfort Model Based on European Standard EN15251-2007 is applied to calculate related thermal comfort metrics. CEN 15251 Adaptive Model Category I/II/II Status, Running Average Outdoor Air Temperature, and the Adaptive Model Temperature are calculated and reported as each time step. AdaptiveCEN15251 is only applicable when the running average outdoor air temperature for the past 30 days is between 10.0 and 30.0C.
 
-  \item[CoolingEffectASH55] 
+  \item[CoolingEffectASH55]
   ASHRAE 55-2017 Elevated Air Speed Cooling Effect Model is applied to calculate related thermal comfort metrics. Elevated Air Speed Cooling Effect, Cooling Effect Adjusted PMV, and Cooling Effect Adjusted PPD are calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, and Air Velocity Schedule Name.
 
-  \item[AnkleDraftASH55] 
+  \item[AnkleDraftASH55]
   ASHRAE 55-2017 Ankle Draft Risk Model is applied to calculate related thermal comfort metrics. Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD is calculated and reported as each time step. Apart from existing required fields in People object, extra fields required for this model include Surface Name/Angle Factor List Name, Work Efficiency Schedule Name, Clothing Insulation Schedule Name, Air Velocity Schedule Name, and Ankle Level Air Velocity Schedule Name. Ankle draft PPD calculations are only applicable for relative air velocity is below 0.2 m/s, and the subject’s metabolic rate and clothing level should be kept below 1.3 met and 0.7 clo. PPD at ankle draft will be set to -1.0 if if these conditions are not met.
 
 \end{description}
 
  For descriptions of the thermal comfort calculations, see the Engineering Reference document.
 
- Note that since up to seven models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all seven models if desired. 
+ Note that since up to seven models may be specified, the user may opt to have EnergyPlus calculate the thermal comfort for people identified with this people statement using all seven models if desired.
 
 
 \paragraph{Field: Ankle Level Air Velocity Schedule Name}\label{field-ankle-level-air-velocity-schedule-name}
@@ -314,7 +314,7 @@ People,
   ACTIVITY_SCH,         !- Activity Level Schedule Name
   3.82E-8,              !- Carbon Dioxide Generation Rate {m3/s-W}
   No,                   !- Enable ASHRAE 55 Comfort Warnings
-  ZoneAveraged,         !- Mean Radiant Temperature Calculation Type
+  EnclosureAveraged,    !- Mean Radiant Temperature Calculation Type
   ,                     !- Surface Name/Angle Factor List Name
   WORK_EFF_SCH,         !- Work Efficiency Schedule Name
   ClothingInsulationSchedule, !- Clothing Insulation Calculation Method
@@ -367,8 +367,8 @@ People,
   OCCUPY-1,             !- Number of People Schedule Name
   People/Area,          !- Number of People Calculation Method
   ,                     !- Number of People
-  .11,                  !- People per Zone Floor Area {person/m2}
-  ,                     !- Zone Floor Area per Person {m2/person}
+  .11,                  !- People per Floor Area {person/m2}
+  ,                     !- Floor Area per Person {m2/person}
   0.3,                  !- Fraction Radiant
   ,                     !- Sensible Heat Fraction
   ActSchd,              !- Activity Level Schedule Name
@@ -681,15 +681,15 @@ This field is the calculated Cooling Effect of the elevated air speed in degree 
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PMV}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-pmv}
 
-This field is the ``predicted mean vote'' (PMV) calculated using the Fanger PMV model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PMV for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+This field is the ``predicted mean vote'' (PMV) calculated using the Fanger PMV model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PMV for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s).
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Elevated Air Speed Cooling Effect Adjusted PPD}\label{zone-thermal-comfort-ashrae55-elevated-air-speed-cooling-effect-adjusted-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger PMV-PPD model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s). 
+This field is the ``predicted percentage of dissatisfied'' (PPD) calculated using the Fanger PMV-PPD model, adjusted by the ASHRAE 55 Elevated Air Speed Cooling Effect. The Cooling Effect adjusted PPD for an environment with elevated average air speed is calculated using the adjusted average air temperature, the adjusted radiant temperature, and still air (0.1 m/s).
 
 \paragraph{Zone Thermal Comfort ASHRAE 55 Ankle Draft PPD}\label{zone-thermal-comfort-ashrae55-ankle-draft-ppd}
 
-This field is the ``predicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m). 
+This field is the ``predicted percentage of dissatisfied'' (PPD) on draft at ankle level. It is used as the metric to evaluate the ankle draft risk as a function of PMV and air speed at the ankle level (0.1 m).
 
 \subsubsection{Outputs}\label{outputs-1-014}
 
@@ -813,9 +813,9 @@ Following are some suggestions that might be applicable:
 
 \subsection{ComfortViewFactorAngles}\label{comfortviewfactorangles}
 
-When requesting EnergyPlus to do a thermal comfort calculation, the program user has three options for defining how the mean radiant temperature will be calculated. The user may select ``zoneaveraged'' which results in a mean radiant temperature that is characteristic of an ``average'' location near the center of the zone. The user may also elect to place the person near a particular surface by selecting ``surfaceweighted'' in the \hyperref[people]{People} statement. This takes the average of the enclosure mean radiant temperature and the temperature of the surface that the person is near and uses this value as the mean radiant temperature when calculating thermal comfort.
+When requesting EnergyPlus to do a thermal comfort calculation, the program user has three options for defining how the mean radiant temperature will be calculated. The user may select ``EnclosureAveraged'' which results in a mean radiant temperature that is characteristic of an ``average'' location near the center of the enclosure  (one or more \hyperref[space]{Spaces}). The user may also elect to place the person near a particular surface by selecting ``SurfaceWeighted'' in the \hyperref[people]{People} statement. This takes the average of the enclosure mean radiant temperature and the temperature of the surface that the person is near and uses this value as the mean radiant temperature when calculating thermal comfort.
 
-The third option is for the user to more explicitly position the person within the space by defining the angle factors from the person to the various surfaces in the same radiant enclosure. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface. The AngleFactorList input line is intended to give the user this opportunity.
+The third option is for the user to more explicitly position the person within the space by defining the angle factors from the person to the various surfaces in the same radiant enclosure. This option requires the user to list the surfaces that the person can see from a radiation standpoint and also define the angle (or view) factor for each surface.
 
 \subsubsection{Inputs}\label{inputs-1-023}
 
@@ -823,13 +823,9 @@ The third option is for the user to more explicitly position the person within t
 
 This field is an unique user assigned name for the list of surfaces that can be seen radiantly by the person for whom thermal comfort is to be evaluated. Any reference to this list by a \hyperref[people]{People} statement will use this name.
 
-\paragraph{Field: Zone Name}\label{field-zone-name-007}
-
-Zone name is ignored.
-
 \paragraph{Field: Surface \textless{}\#\textgreater{} Name}\label{field-surface-name-002}
 
-This field is the name of a surface in the radiant enclosure seen by the person. All surfaces listed should be in the same radiant enclosure. This should also be the same radiant enclosure as the People instance which references this ComfortViewFactorAngles object. If not, a warning will be issued, but the simulation will proceed with the specified surfaces.
+This field is the name of a surface in the radiant enclosure seen by the person. All surfaces listed should be in the same radiant enclosure (one or more \hyperref[space]{Spaces}). This should also be the same radiant enclosure as the People instance which references this ComfortViewFactorAngles object. If not, a warning will be issued, but the simulation will proceed with the specified surfaces.
 
 \paragraph{Field: Angle Factor \textless{}\#\textgreater{}}\label{field-angle-factor}
 
@@ -842,7 +838,6 @@ An example IDF with an electric low temperature radiant system is shown below.
 \begin{lstlisting}
 ComfortViewFactorAngles,
   South Zone Angle Factors, !- name of angle factor list
-  ,                     !- Zone Name
   Zn001:Flr001,         !- Surface name 1
   0.75,                 !- Angle factor for surface 1
   Zn001:Wall001,        !- Surface name 2
@@ -876,10 +871,10 @@ The name of the schedule that modifies the lighting power design level (see Desi
 This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal lighting level in the Zone. The key/choice options are:
 
 \begin{description}
-	
+
 \item[LightingLevel] With this choice, the method used will be a straight insertion of the lighting level (Watts) for the Zone.~ (The Lighting Level field should be filled.)
 
-\item[Watts/Area] With this choice, the method used will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+\item[Watts/Area] With this choice, the method used will be a factor per floor area of the zone or space. (The Watts per Floor Area field should be filled).
 
 \item[Watts/Person] With this choice, the method used will be a factor of lighting level (watts) per person. (The Watts per person field should be filled).
 
@@ -889,9 +884,9 @@ This field is a key/choice field that tells which of the next three fields are f
 
 This is typically the maximum electrical power input (in Watts) to lighting in a zone, including ballasts, if present. This value is multiplied by a schedule fraction (see previous field) to get the lighting power in a particular timestep. In EnergyPlus, this is slightly more flexible in that the lighting design level could be a ``diversity factor'' applied to a schedule of real numbers.
 
-\paragraph{Field: Watts per Zone Floor Area}\label{field-watts-per-zone-floor-area}
+\paragraph{Field: Watts per Floor Area}\label{field-watts-per-zone-floor-area}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Floor Area to determine the maximum lighting level as described in the Lighting Level field. The choice from the method field should be ``watts/area''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum lighting level as described in the Lighting Level field. The choice from the method field should be ``watts/area''.
 
 \paragraph{Field: Watts per Person}\label{field-watts-per-person}
 
@@ -1029,6 +1024,8 @@ Lights,
   Office Lighting,      !- SCHEDULE Name
   LightingLevel,        !- Design Level calculation method
   1039.706,             !- Lighting Level {W}
+  ,                     !- Watts per Floor Area {W/m2}
+  ,                     !- Watts per Person {W/person}
   0.0000000E+00,        !- Return Air Fraction
   0.4000000,            !- Fraction Radiant
   0.2000000,            !- Fraction Visible
@@ -1249,7 +1246,7 @@ This field is the name of the schedule that modifies the design level parameter 
 
 \paragraph{Field: Design Level Calculation Method}\label{field-design-level-calculation-method-1}
 
-This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal electric equipment level in the Zone. The key/choices are:
+This field is a key/choice field that tells which of the next three fields are filled and is descriptive of the method for calculating the nominal electric equipment level in the Zone or Space. The key/choices are:
 
 \begin{itemize}
 \tightlist
@@ -1265,7 +1262,7 @@ With this choice, the method used will be a straight insertion of the electric e
   Watts/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone or space. (The Watts per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1279,9 +1276,9 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 This field (in Watts) is typically used to represent the maximum electrical input to equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the electric equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
-\paragraph{Field: Watts per Zone Floor Area}\label{field-watts-per-zone-floor-area-1}
+\paragraph{Field: Watts per Floor Area}\label{field-watts-per-zone-floor-area-1}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``Watts/Area''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Floor Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``Watts/Area''.
 
 \paragraph{Field: Watts per Person}\label{field-watts-per-person-1}
 
@@ -1385,7 +1382,7 @@ With this choice, the method used will be a straight insertion of the gas equipm
   Watts/Area or Power/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Power per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone or space. (The Power per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1399,9 +1396,9 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 This field (in Watts) is typically used to represent the maximum energy input to gas equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the gas equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
-\paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area}
+\paragraph{Field: Power per Floor Area}\label{field-power-per-zone-floor-area}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person}
 
@@ -1446,7 +1443,7 @@ GasEquipment,
   Gas Eq Sch,                           !-Schedule Name
   EquipmentLevel,                       !- Design Level Calculation Method
   29287.51,                             !- Design Level {W}
-  ,                                     !- Power per Zone Floor Area {W/m2}
+  ,                                     !- Power per Floor Area {W/m2}
   ,                                     !- Power per Person {W/Person}
   0,                                    !- Fraction Latent
   0.3,                                  !- Fraction Radiant
@@ -1466,7 +1463,7 @@ GasEquipment,
   Gas Eq Sch,                           !- Schedule Name
   Watts/Area,                           !- Design Level Calculation Method
   ,                                     !- Design Level {W}
-  197,                                  !- Power per Zone Floor Area {W/m2}
+  197,                                  !- Power per Floor Area {W/m2}
   ,                                     !- Power per Person {W/Person}
   0.0000000E+00,                        !- Fraction Latent
   0.3000000,                            !- Fraction Radiant
@@ -1509,7 +1506,7 @@ With this choice, the method used will be a straight insertion of the hot water 
   Watts/Area or Power/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Power per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone or space. (The Power per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1523,9 +1520,9 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 This field (in Watts) is typically used to represent the maximum energy input to hot water equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the hot water equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
-\paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area-1}
+\paragraph{Field: Power per Floor Area}\label{field-power-per-zone-floor-area-1}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person-1}
 
@@ -1566,7 +1563,7 @@ HotWaterEquipment,
   EQUIP-1,            !- SCHEDULE Name
   EquipmentLevel,     !- Design Level calculation method
   300,                !- Design Level {W}
-  ,                   !- Power per Zone Floor Area {watts/m2}
+  ,                   !- Power per Floor Area {watts/m2}
   ,                   !- Power per Person {watts/person}
   0.2,                !- Fraction Latent
   0.1,                !- Fraction Radiant
@@ -1585,7 +1582,7 @@ HotWaterEquipment,
   HotWater Eq Sch,                    !- Schedule Name
   Watts/Area,                         !- Design Level Calculation Method
   ,                                   !- Design Level {W}
-  50,                                 !- Power per Zone Floor Area {W/m2}
+  50,                                 !- Power per Floor Area {W/m2}
   ,                                   !- Power per Person {W/Person}
   0.0000000E+00,                      !- Fraction Latent
   0.3000000,                          !- Fraction Radiant
@@ -1628,7 +1625,7 @@ With this choice, the method used will be a straight insertion of the steam equi
   Watts/Area or Power/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Power per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Power per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1642,9 +1639,9 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 This field (in Watts) is typically used to represent the maximum energy input to steam equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the steam equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
-\paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area-2}
+\paragraph{Field: Power per Floor Area}\label{field-power-per-zone-floor-area-2}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Area to determine the maximum equipment level as described in the Design Level field. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person-2}
 
@@ -1686,7 +1683,7 @@ SteamEquipment,
   EQUIP-1,           !- SCHEDULE Name
   EquipmentLevel,    !- Design Level calculation method
   1050,              !- Design Level {W}
-  ,                  !- Power per Zone Floor Area {watts/m2}
+  ,                  !- Power per Floor Area {watts/m2}
   ,                  !- Power per Person {watts/person}
   0.5,               !- Fraction Latent
   0.3,               !- Fraction Radiant
@@ -1706,7 +1703,7 @@ The name of the OtherEquipment object.
 
 \paragraph{Field: Fuel Type}\label{field-fuel-use-type}
 
-This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
+This field designates the appropriate meter for the equipment. Valid fuel types are: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, DistrictHeatingSteam, \hyperref[districtheating]{DistrictHeatingWater}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters. If the None fuel type is selected (the default if left blank), no end uses will be associated with the object, only the zone gains.
 
 \paragraph{Field: Zone or ZoneList or Space or SpaceList Name}\label{othereq-field-zone-or-zonelist-name-000}
 
@@ -1726,7 +1723,7 @@ This field is a key/choice field that tells which of the next three fields are f
   EquipmentLevel
 \end{itemize}
 
-With this choice, the method used will be a straight insertion of the other equipment level (Watts) for the Zone.~ (The Design Level field should be filled.)
+With this choice, the method used will be a straight insertion of the other equipment level (Watts) for the Zone. (The Design Level field should be filled.)
 
 \begin{itemize}
 \tightlist
@@ -1734,7 +1731,7 @@ With this choice, the method used will be a straight insertion of the other equi
   Watts/Area or Power/Area
 \end{itemize}
 
-With this choice, the method used will be a factor per floor area of the zone. (The Power per Zone Floor Area field should be filled).
+With this choice, the method used will be a factor per floor area of the zone. (The Power per Floor Area field should be filled).
 
 \begin{itemize}
 \tightlist
@@ -1748,9 +1745,9 @@ With this choice, the method used will be a factor of equipment level (watts) pe
 
 This field (in Watts) is typically used to represent the maximum energy input to other equipment in a zone that is then multiplied by a schedule fraction (see previous field). In EnergyPlus, this is slightly more flexible in that the other equipment design level could be a ``diversity factor'' applied to a schedule of real numbers. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. Note that while the schedule value can vary from hour to hour, the design level field is constant for all simulation environments.
 
-\paragraph{Field: Power per Zone Floor Area}\label{field-power-per-zone-floor-area-3}
+\paragraph{Field: Power per Floor Area}\label{field-power-per-zone-floor-area-3}
 
-This factor (watts/m\(^{2}\)) is used, along with the Zone Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
+This factor (watts/m\(^{2}\)) is used, along with the Zone or Space Area to determine the maximum equipment level as described in the Design Level field. This value can be negative to denote a loss if the None fuel type is selected, otherwise this must be positive. The choice from the method field should be ``\textbf{Watts/Area}'' or ``\textbf{Power/Area}''.
 
 \paragraph{Field: Power per Person}\label{field-power-per-person-3}
 
@@ -1797,7 +1794,7 @@ OtherEquipment,
 	ALWAYSON, !- SCHEDULE Name
 	EquipmentLevel, !- Design Level calculation method
 	6766., !- Design Level {W}
-	, !- Power per Zone Floor Area {watts/m2}
+	, !- Power per Floor Area {watts/m2}
 	, !- Power per Person {watts/person}
 	0, !- Fraction Latent
 	0.3, !- Fraction Radiant
@@ -2243,16 +2240,16 @@ InteriorEquipment:NaturalGas:SpaceType:<Space Type Name>
 The hot water equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Hot Water Equipment District Heating Energy is added to the following district heating meters:
 
 \begin{lstlisting}
-DistrictHeating:Facility
-DistrictHeating:Building
-DistrictHeating:Zone:<Zone Name>
-DistrictHeating:SpaceType:<Space Type Name>
-InteriorEquipment:DistrictHeating
-InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+DistrictHeatingWater:Facility
+DistrictHeatingWater:Building
+DistrictHeatingWater:Zone:<Zone Name>
+DistrictHeatingWater:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeatingWater
+InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
 \end{lstlisting}
 
 \paragraph{Steam Equipment District Heating Rate {[}W{]}}\label{steam-equipment-district-heating-rate-w}
@@ -2266,16 +2263,16 @@ InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
 The steam equipment district heating consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. Steam Equipment District Heating Energy is added to the following:
 
 \begin{lstlisting}
-DistrictHeating:Facility
-DistrictHeating:Building
-DistrictHeating:Zone:<Zone Name>
-DistrictHeating:SpaceType:<Space Type Name>
-InteriorEquipment:DistrictHeating
-InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:Zone:<Zone Name>
-<End-Use Subcategory>:InteriorEquipment:DistrictHeating:SpaceType:<Space Type Name>
+DistrictHeatingWater:Facility
+DistrictHeatingWater:Building
+DistrictHeatingWater:Zone:<Zone Name>
+DistrictHeatingWater:SpaceType:<Space Type Name>
+InteriorEquipment:DistrictHeatingWater
+InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:Zone:<Zone Name>
+<End-Use Subcategory>:InteriorEquipment:DistrictHeatingWater:SpaceType:<Space Type Name>
 \end{lstlisting}
 
 \paragraph{Other Equipment Fuel Rate {[}W{]}}\label{otherequip-fuel-rate}
@@ -2351,6 +2348,104 @@ The amount of energy input to the equipment that is removed (exhausted) and does
 
 The total heat gain from equipment. It is the sum of the following components: Total Heat Gain = Radiant Heat Gain + Convective Heat Gain + Latent Heat Gain. It is also equal to the power input to the equipment minus any Lost Heat.
 
+\subsection{IndoorLivingWall}\label{indoorlivingwall}
+
+Indoor greenery systems such as indoor living walls are panels of plants, which grow hydroponically or soil-based. The living wall structures can be either free-standing or attached to walls. This IndoorLivingWall object simulates the thermal performance of indoor living wall in the built environment. The IndoorLivingWall directly connects with the inside surface heat balance, zone air heat balance, and zone air moisture balance in EnergyPlus.
+
+\subsubsection{Inputs}\label{inputs-indoorlivingwall}
+
+\paragraph{Field: Name}\label{field-name-indoorlivingwall}
+
+The name of the IndoorLivingWall object, which must be unique across all IndoorLivingWall objects.
+
+\paragraph{Field: Schedule Name}\label{field-schedule-name-indoorlivingwall}
+
+This field is the name of the schedule (ref: \hyperref[group-schedules]{Schedules}) that modifies the presence of indoor living walls. The schedule values can be zero or one. Zero represents the scenario that the indoor living wall was removed from the thermal zone while one represents the scenario that the indoor living wall is in the presence of the thermal zone.
+
+\paragraph{Field: ET Calculation Method}\label{field-et-calculation-method-indoorlivingwall}
+
+This field lists two choices of calculation methods for evapotranspiration (ET) including Penman-Monteith model and Stanghellini model. Users can also develop a customize ET function to override ET rates of indoor living walls through Energy Management System (EMS) objects, Python PlugIns objects, and Python API.
+
+\paragraph{Field: Lighting Method}\label{field-lighting-method-indoorlivingwall}
+
+This field lists three different methods to obtain net radiation for indoor living walls. They are artificial grow lights only (LED), daylighting only (Daylight), and artificial lights and daylight (LED-Daylight). If the LED lighting method is selected,  the field LED Intensity Schedule Name should be used to define the LED lighting intensity level. If the Daylight or LED-Daylight method is selected, the field Daylighting Reference Point Name should be used to determine the daylighting sensor location. If the LED-Daylight method is selected, a targeted lighting intensity schedule should be defined. Based on the available daylighting, the required LED lighting level and power will be automatically adjusted to meet the targeted LED intensity level.
+
+\paragraph{Field: LED Schedule Name}\label{field-LED-schedule-name-indoorlivingwall}
+
+This field is the name of the schedule (ref: Schedules) that defines the fraction of LED nominal intensity level for indoor living walls. The scheduled value can be any fractional value between 0 and 1.
+
+\paragraph{Field: Daylighting Control Name}\label{field-daylighting-control-name-indoorlivingwall}
+
+If daylighting is used in the selected lighting methods (Daylight or LED-Daylight), users should define an object of Daylighting:Control to obtain the daylighting illuminance level and an object for Daylighing:ReferencePoint for the daylighting sensor location in the thermal zone. The name of the object of Daylighting:Controls should be specified in this field.
+
+\paragraph{Field: LED-Daylight Targeted Lighting Intensity Schedule Name}\label{field-led-daylight-targeted-lighting-intensity-schedule-name-indoorlivingwall}
+
+This field is the name of the schedule for the targeted LED intensity levels. The schedule values can be any positive number representing the targeted photosynthetic photon flux density (PPFD) in the unit of \si{\umolperAreaperSecond}.
+
+\paragraph{Field: Total Leaf Area}\label{field-total-leaf-area-indoorlivingwall}
+
+This field is the estimated one-sided leaf area {[}\si{\area}{]} of an indoor living wall. Based on the users’ input, leaf area index (LAI) is calculated as the ratio of the total leaf area and the partition wall area. Typical LAIs are 1.0 for grass and 3.0 for bushes and shrubs. The maximum LAI is 2.0 for the IndoorLivingWall module in EnergyPlus. If the calculated LAI is greater than 2.0, the maximum value of 2.0 is used for LAI in the simulation.
+
+\paragraph{Field: LED Nominal Intensity}\label{field-led-nominal-intensity-indoorlivingwall}
+
+This field defines the nominal LED intensity level for indoor living wall systems. The value represents the photosynthetic photon flux density (PPFD) of LED grow light. PPFD is measured in \si{\umolperAreaperSecond} which establishes exactly how many photosynthetically active radiation (PAR) photons are landing on a specific area.
+
+\paragraph{Field: LED Nominal Power}\label{field-led-nominal-power-indoorlivingwall}
+
+This field defines the nominal total LED power {[}\si{\watt}{]} for the indoor living wall system.
+
+\paragraph{Field: Radiant Fraction of LED Lights}\label{field-radiant-fraction-of-led-lights-indoorlivingwall}
+
+This field defines the radiant fraction of the LED lighting power input. The remaining power input is dissipated by convection and contributes to the zone air heat balance.
+
+An IDF example:
+
+\begin{lstlisting}
+IndoorLivingWall,
+  Space1-1IndoorLivingWall,   !-Name
+  SPACE1-1SouthPartition,     !-Surface Name
+  AlwaysOn,                   !-Schedule Name
+  Penman-Monteith,            !-ET Calculation Method
+  LED,                        !-Lighting Method
+  AlwaysOff,                  !-LED Intensity Schedule Name
+  ,                           !-Daylighting Control Name
+  ,                           !-LED - Daylight Targeted Lighting Intensity Schedule Name
+  30,                         !- Total Leaf Area {m2}
+  32.5,                       !- LED Nominal Intensity {umol/m2-s}
+  640,                        !- LED Nominal Power {W}
+  0.6;                        !- Radiant Fraction of LED Lights
+\end{lstlisting}
+
+\subsubsection{Outputs}\label{outputs-indoorlivingwall}
+
+IndoorLivingWall objects have output variables for individual objects. The following outputs are available:
+
+\begin{itemize}
+\tightlist
+\item
+  Zone,Average,Indoor Living Wall Plant Surface Temperature {[}C{]}
+\item
+  Zone,Average,Indoor Living Wall Sensible Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall Latent Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall Evapotranspiration Rate {[}\si{\evapotranspirationRate}{]}
+\item
+  Zone,Average,Indoor Living Wall Energy Required For Evapotranspiration Per Unit Area {[}\si{\watt\per\area}{]}
+\item
+  Zone,Average,Indoor Living Wall LED Operational PPFD {[}\si{\umolperAreaperSecond}{]}
+\item
+  Zone,Average,Indoor Living Wall PPFD {[}\si{\umolperAreaperSecond}{]}
+\item
+  Zone,Average,Indoor Living Wall Vapor Pressure Deficit {[}Pa{]}
+\item
+  Zone,Average,Indoor Living Wall LED Sensible Heat Gain Rate {[}W{]}
+\item
+  Zone,Average,Indoor Living Wall LED Operational Power {[}W{]}
+\item
+  Zone,Sum,Indoor Living Wall LED Electricity Energy {[}J{]}
+\end{itemize}
+
 
 \subsection{ElectricEquipment:ITE:AirCooled}\label{electricequipmentiteaircooled}
 
@@ -2382,8 +2477,8 @@ This field is a key/choice field that tells which of the next two fields are fil
 
 \begin{description}
 	\item[Watts/Unit:] With this choice, the design power input will be the product of Design Level per Unit and Number of Units. (Both of these fields should be filled.) This is the default.
-	
-	\item[Watts/Area:] With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Zone Floor Area field should be filled).
+
+	\item[Watts/Area:] With this choice, the design power input will be a factor per floor area of the zone. (The Watts per Floor Area field should be filled).
 \end{description}
 
 \paragraph{Field: Watts per Unit}\label{field-watts-per-unit}
@@ -2394,7 +2489,7 @@ This field (in Watts) is typically used to represent the design electrical power
 
 This field is multiplied times the Design Level per Unit to determine the design electrical power input to this ITE object when fully loaded and the entering air temperature is at the specified design value. This field is used if the choice from the method field is ``EquipmentLevel''. The default is 1.
 
-\paragraph{Field: Watts per Zone Floor Area}\label{field-watts-per-zone-floor-area-2}
+\paragraph{Field: Watts per Floor Area}\label{field-watts-per-zone-floor-area-2}
 
 This factor (Watts/m2) is used, along with the Zone Area to determine the design electrical power input as described in the Design Level field above. This field is used if the choice from the method field is ``Watts/Area''.
 
@@ -2436,7 +2531,7 @@ Specifies the entering air temperature in $^\circ$C at design conditions. The de
 
 Specifies the allowable operating conditions for the air inlet conditions. The available inputs are A1, A2, A3, A4, B, C, H1, or None. This is used to report the ``ITE Air Inlet Operating Range Exceeded Time.'' If None is specified (the default), then no reporting of time outside allowable conditions will be done.
 
-The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}: 
+The related reporting variables (such as ``ITE Air Inlet Operating Range Exceeded Time'') are based on the following limits\footnote{Sources: [1]. ASHRAE, 2021. ``Thermal Guidelines for Data Processing Environments (5$^{\textrm{th}}$ Edition),'' Peachtree Corners: ASHRAE; [2]. Quirk, Davidson, and Schmidt, 2022. ``ASHRAE's Data Center Thermal Guidelines---Air-Cooled Evolution,'' ASHRAE Journal, May 2022.} on the air inlet temperature and humidity conditions shown in Table \ref{table:ite-aircooled-air-inlet-code-specification-limits}:
 
 \begin{longtable}[c]{@{}lrrrrrrr@{}}
 	\caption{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \label{table:ite-aircooled-air-inlet-code-specification-limits} \tabularnewline
@@ -2444,13 +2539,13 @@ The related reporting variables (such as ``ITE Air Inlet Operating Range Exceede
 	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
 	\midrule
 	\endfirsthead
-	
+
 	\caption[]{ElectricEquipment:ITE:AirCooled Air Inlet Limiting Temperature and Humidity Levels} \tabularnewline
 	\toprule
 	Environmental Class $\rightarrow$ &  A1 &  A2 &  A3 &  A4 &  B &  C &  H1 \tabularnewline
 	\midrule
 	\endhead
-	
+
 	Dry-Bulb$_{min}$ [$^{\circ}$C]    &  15 &  10 &   5 &   5 &  5 &  5 &   5 \tabularnewline
 	Dry-Bulb$_{max}$ [$^{\circ}$C]    &  32 &  35 &  40 &  45 & 35 & 40 &  25 \tabularnewline
 	Dew-Point$_{min}$ [$^{\circ}$C]   & -12 & -12 & -12 & -12 & -- & -- & -12 \tabularnewline
@@ -2467,9 +2562,9 @@ Specifies the type of connection between the zone and the ITE air inlet node. Th
 
 \begin{description}
 	\item[AdjustedSupply:] This option is used to apply a recirculation adjustment to the ITE inlet conditions. If this option is specified, then the Supply Air Node Name is required and the air inlet temperature to the ITE will be the current supply air node temperature adjusted by the current recirculation fraction. All heat output is added to the zone air heat balance as a convective gain. AdjustedSupply is the default.
-	
+
 	\item[ZoneAirNode:] This option is used if there is no containment and the ITE air inlet node is at the average zone condition. All heat output is added to the zone air heat balance as a convective gain.
-	
+
 	\item[RoomAirModel:] This option connects the ITE air inlet and outlet nodes to a room air model (Ref. \hyperref[roomairmodeltype]{RoomAirModelType} and \hyperref[roomairnode]{RoomAir:Node}).  Currently in EnergyPlus, this option has not been fully implemented.  If the user chooses this option, the program will issue a warning message and this field will be adjusted to ZoneAirNode.
 \end{description}
 
@@ -2542,11 +2637,11 @@ An IDF example:
 ElectricEquipment:ITE:AirCooled,
   Data Center Servers,     !- Name
   Main Zone,               !- Zone or Space Name
-  FlowFromSystem,      !- Air Flow Calculation Method
+  FlowFromSystem,          !- Air Flow Calculation Method
   Watts/Unit,              !- Design Power Input Calculation Method
   500,                     !- Watts per Unit {W}
   200,                     !- Number of Units
-  ,                        !- Watts per Zone Floor Area {W/m2}
+  ,                        !- Watts per Floor Area {W/m2}
   Data Center Operation Schedule,  !- Design Power Input Schedule Name
   Data Center CPU Loading Schedule,  !- CPU Loading  Schedule Name
   Model 5250 Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
@@ -2580,7 +2675,7 @@ Another IDF example when Air Flow Calculation Method = FlowControlWithApproachTe
     Watts/Area,                      !- Design Power Input Calculation Method
     ,                                !- Watts per Unit {W}
     ,                                !- Number of Units
-    430.556416668389,                !- Watts per Zone Floor Area {W/m2}
+    430.556416668389,                !- Watts per Floor Area {W/m2}
     Data Center Operation Schedule,  !- Design Power Input Schedule Name
     DataCenter Equipment_SCH,  !- CPU Loading  Schedule Name
     Data Center Servers Power fLoadTemp,  !- CPU Power Input Function of Loading and Air Temperature Curve Name
@@ -3132,11 +3227,11 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
   Zone,Average,Zone Baseboard Total Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w-2}
 
 This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
 
-\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j-2}
 
 The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. This energy is included in the following meters:
 \begin{lstlisting}
@@ -3152,47 +3247,47 @@ InteriorEquipment:Electricity:SpaceType:<Space Type Name>
 <End-Use Subcategory>:InteriorEquipment:Electricity:SpaceType:<Space Type Name>
 \end{lstlisting}
 
-\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w}
+\paragraph{Baseboard Radiant Heating Rate {[}W{]}}\label{baseboard-radiant-heating-rate-w-2a}
 
-\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j}
+\paragraph{Baseboard Radiant Heating Energy {[}J{]}}\label{baseboard-radiant-heating-energy-j-2a}
 
 These output variables are the amount of radiant heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w}
+\paragraph{Baseboard Convective Heating Rate {[}W{]}}\label{baseboard-convective-heating-rate-w-2a}
 
-\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j}
+\paragraph{Baseboard Convective Heating Energy {[}J{]}}\label{baseboard-convective-heating-energy-j-2a}
 
 These output variables are the amount of convective heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the zone air heat balance directly.
 
-\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w}
+\paragraph{Baseboard Total Heating Rate {[}W{]}}\label{baseboard-total-heating-rate-w-2a}
 
-\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j}
+\paragraph{Baseboard Total Heating Energy {[}J{]}}\label{baseboard-total-heating-energy-j-2a}
 
 These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
-\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
+\paragraph{Space or Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w-2}
 
 This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts.
 
-\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+\paragraph{Space or Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j-2}
 
-The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. 
+The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
 
-\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w}
+\paragraph{Space or Zone Baseboard Radiant Heating Rate {[}W{]}}\label{zone-baseboard-radiant-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j}
+\paragraph{Space or Zone Baseboard Radiant Heating Energy {[}J{]}}\label{zone-baseboard-radiant-heating-energy-j-2}
 
 These output variables are the amount of radiant heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in the input. The radiant gains (long wavelength) are distributed to the surfaces using an area weighting scheme.
 
-\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w}
+\paragraph{Space or Zone Baseboard Convective Heating Rate {[}W{]}}\label{zone-baseboard-convective-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j}
+\paragraph{Space or Zone Baseboard Convective Heating Energy {[}J{]}}\label{zone-baseboard-convective-heating-energy-j-2}
 
 These output variables are the amount of convective heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the current heat gain from the heater to the space or zone and the ``Fraction Radiant'' specified in input (1-FractionRadiant = FractionConvected). The convective heat gain is added to the space or zone air heat balance directly.
 
-\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w}
+\paragraph{Space or Zone Baseboard Total Heating Rate {[}W{]}}\label{zone-baseboard-total-heating-rate-w-2}
 
-\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j}
+\paragraph{Space or Zone Baseboard Total Heating Energy {[}J{]}}\label{zone-baseboard-total-heating-energy-j-2}
 
 These output variables are the amount of heat gain for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the space or zone in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 

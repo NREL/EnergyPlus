@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -229,14 +229,13 @@ namespace MixedAir {
         Real64 MechVentOAMassFlowRequest = 0.0; // outside air mass flow rate calculated by mechanical ventilation object [kg/s]
         bool EMSOverrideOARate = false;         // if true, EMS is calling to override OA rate
         Real64 EMSOARateValue = 0.0;            // Value EMS is directing to use. [kg/s]
-        int HeatRecoveryBypassControlType =
-            DataHVACGlobals::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
-        DataHVACGlobals::EconomizerStagingType EconomizerStagingType =
-            DataHVACGlobals::EconomizerStagingType::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
-        bool ManageDemand = false;                                                    // Used by demand manager to manage ventilation
-        Real64 DemandLimitFlowRate = 0.0;                                             // Current demand limit if demand manager is ON
-        Real64 MaxOAFracBySetPoint = 0.0;                                             // The maximum OA fraction due to freezing cooling coil check
-        int MixedAirSPMNum = 0;                                                       // index of mixed air setpoint manager
+        int HeatRecoveryBypassControlType = HVAC::BypassWhenWithinEconomizerLimits; // User input selects type of heat recovery optimization
+        HVAC::EconomizerStagingType EconomizerStagingType =
+            HVAC::EconomizerStagingType::InterlockedWithMechanicalCooling; // User input select type of economizer staging operation
+        bool ManageDemand = false;                                         // Used by demand manager to manage ventilation
+        Real64 DemandLimitFlowRate = 0.0;                                  // Current demand limit if demand manager is ON
+        Real64 MaxOAFracBySetPoint = 0.0;                                  // The maximum OA fraction due to freezing cooling coil check
+        int MixedAirSPMNum = 0;                                            // index of mixed air setpoint manager
         bool CoolCoilFreezeCheck = false;                        // if true, cooling coil freezing is prevented by recalculating the amount of OA
         bool EconoActive = false;                                // if true economizer is active
         bool HighHumCtrlActive = false;                          // if true high humidity control is active
@@ -286,6 +285,7 @@ namespace MixedAir {
         DataSizing::OAFlowCalcMethod ZoneOAFlowMethod = DataSizing::OAFlowCalcMethod::PerPerson; // OA flow method for each zone
         int ZoneOASchPtr = 0;              // Index to the outdoor air schedule for each zone (from DesignSpecification:OutdoorAir or default)
         Real64 OAPropCtlMinRateSchPtr = 0; // Outdoor design OA flow rate schedule from DesignSpecification:OutdoorAir
+        EPVector<int> peopleIndexes; // List of People objects in this zone (for SystemOAMethod == DataSizing::SysOAMethod::ProportionalControlDesOcc)
     };
 
     struct VentilationMechanicalProps // Derived type for Ventilation:Mechanical data
@@ -561,6 +561,10 @@ struct MixedAirData : BaseGlobalStruct
     Array1D_bool OAControllerMyEnvrnFlag;
     Array1D_bool OAControllerMySizeFlag;
     Array1D_bool MechVentCheckFlag;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

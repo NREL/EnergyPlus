@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -299,6 +299,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
+    int pdchDXCoolCoilType2 = 0;      // DX cooling coil type
     int pdchDXCoolCoilNetCapSIA = 0;  // Standard Rated (Net) Cooling Capacity [W], Test A
     int pdchDXCoolCoilElecPowerA = 0; // Standard Rated Electric Power [W], Test A
     int pdchDXCoolCoilNetCapSIB = 0;  // Standard Rated (Net) Cooling Capacity [W], Test B
@@ -339,28 +340,26 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     int pdchVAVDXCoolCoilEER_D_IP = 0;
     int pdchVAVDXCoolCoilMdotD = 0;
 
-    // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable
-    int pdstDXHeatCoil;
-    int pdchDXHeatCoilType; // DX Heating coil type
-    int pdchDXHeatCoilHighCap;
-    int pdchDXHeatCoilLowCap;
-    int pdchDXHeatCoilHSPFSI;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXHeatCoilHSPFIP;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
-    int pdchDXHeatCoilRegionNum; // Region number for which HSPF is calculated
+    int pdstDXHeatCoil = 0;
+    int pdchDXHeatCoilType = 0; // DX Heating coil type
+    int pdchDXHeatCoilHighCap = 0;
+    int pdchDXHeatCoilLowCap = 0;
+    int pdchDXHeatCoilHSPFSI = 0;    // HSPF value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXHeatCoilHSPFIP = 0;    // HSPF value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
+    int pdchDXHeatCoilRegionNum = 0; // Region number for which HSPF is calculated
     // Standard 229 Predef outputs for DX Heating Coils
-    int pdchDXHeatCoilMinOADBTforCompOp;
-    int pdchDXHeatCoilAirloopName;
+    int pdchDXHeatCoilMinOADBTforCompOp = 0;
+    int pdchDXHeatCoilAirloopName = 0;
 
-    // TODO: As not inlcuded in clearState() , Confirm and update
     // DX Heating Coil subtable| AHRI std. 210/240 2023 conditions
-    int pdstDXHeatCoil_2023;
-    int pdchDXHeatCoilType_2023; // DX Heating coil type
-    int pdchDXHeatCoilHighCap_2023;
-    int pdchDXHeatCoilLowCap_2023;
-    int pdchDXHeatCoilHSPF2SI_2023;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXHeatCoilHSPF2IP_2023;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
-    int pdchDXHeatCoilRegionNum_2023; // Region number for which HSPF is calculated
+    int pdstDXHeatCoil_2023 = 0;
+    int pdchDXHeatCoilType_2023 = 0; // DX Heating coil type
+    int pdchDXHeatCoilHighCap_2023 = 0;
+    int pdchDXHeatCoilLowCap_2023 = 0;
+    int pdchDXHeatCoilHSPF2SI_2023 = 0;   // HSPF2 value in SI unit at AHRI std. 340/360 conditions [W/W]
+    int pdchDXHeatCoilHSPF2IP_2023 = 0;   // HSPF2 value in IP unit at AHRI std. 340/360 conditions [Btu/W-hr]
+    int pdchDXHeatCoilRegionNum_2023 = 0; // Region number for which HSPF is calculated
 
     // Heating Coil subtable
     int pdstHeatCoil = 0;
@@ -1460,9 +1459,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
     Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutputReportPredefinedData();
+        new (this) OutputReportPredefinedData();
     }
 };
 

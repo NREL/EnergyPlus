@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -96,25 +96,29 @@ struct OutputsData : BaseGlobalStruct
 
     int MaxConsideredOutputVariables = 0; // Max Array size for OutputVariable pre-scanned
     int NumConsideredOutputVariables = 0; // Number of variables - pre-scanned, allowed for output
-    int iNumberOfRecords;                 // Number of records in input
-    int iNumberOfDefaultedFields;         // number of defaulted fields
-    int iTotalFieldsWithDefaults;         // number of fields that can be defaulted
-    int iNumberOfAutoSizedFields;         // number of autosized fields
-    int iTotalAutoSizableFields;          // number of fields that can be autosized
-    int iNumberOfAutoCalcedFields;        // number of autocalculated fields
-    int iTotalAutoCalculatableFields;     // number of fields that can be autocalculated
+    int iNumberOfRecords = 0;             // Number of records in input
+    int iNumberOfDefaultedFields = 0;     // number of defaulted fields
+    int iTotalFieldsWithDefaults = 0;     // number of fields that can be defaulted
+    int iNumberOfAutoSizedFields = 0;     // number of autosized fields
+    int iTotalAutoSizableFields = 0;      // number of fields that can be autosized
+    int iNumberOfAutoCalcedFields = 0;    // number of autocalculated fields
+    int iTotalAutoCalculatableFields = 0; // number of fields that can be autocalculated
     std::map<std::string,
              std::map<std::string,
                       DataOutputs::OutputReportingVariables,
-                      // UtilityRoutines::case_insensitive_hasher,
-                      UtilityRoutines::case_insensitive_comparator>,
-             // UtilityRoutines::case_insensitive_hasher,
-             UtilityRoutines::case_insensitive_comparator>
+                      // Util::case_insensitive_hasher,
+                      Util::case_insensitive_comparator>,
+             // Util::case_insensitive_hasher,
+             Util::case_insensitive_comparator>
         OutputVariablesForSimulation;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
 
     void clear_state() override
     {
-        *this = OutputsData();
+        new (this) OutputsData();
     }
 };
 

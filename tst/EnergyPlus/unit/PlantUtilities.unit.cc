@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -461,7 +461,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType)
     // test simple searching first
     PlantUtilities::ScanPlantLoopsForObject(*state, "comp_name", DataPlant::PlantEquipmentType::Boiler_Simple, plantLoc, errorFlag);
     EXPECT_EQ(1, plantLoc.loopNum);
-    EXPECT_TRUE(compare_enums(DataPlant::LoopSideLocation::Demand, plantLoc.loopSideNum));
+    EXPECT_ENUM_EQ(DataPlant::LoopSideLocation::Demand, plantLoc.loopSideNum);
     EXPECT_EQ(1, plantLoc.branchNum);
     EXPECT_EQ(1, plantLoc.compNum);
     EXPECT_FALSE(errorFlag);

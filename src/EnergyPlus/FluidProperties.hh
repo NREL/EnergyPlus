@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -661,6 +661,12 @@ struct FluidPropertiesData : BaseGlobalStruct
 #ifdef EP_cache_GlycolSpecificHeat
     std::array<FluidProperties::cached_tsh, FluidProperties::t_sh_cache_size> cached_t_sh;
 #endif
+
+    void init_state(EnergyPlusData &state) override
+    {
+        FluidProperties::GetFluidPropertiesData(state);
+        this->GetInput = false;
+    }
 
     void clear_state() override
     {

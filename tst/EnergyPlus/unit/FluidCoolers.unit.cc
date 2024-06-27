@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -324,7 +324,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
     // test input error check, if the nominal capacity specified and UA value is not zero, then it does not fatal out
     bool testResult = thisFluidCooler.validateSingleSpeedInputs(*state, cCurrentModuleObject, AlphArray, cNumericFieldNames, cAlphaFieldNames);
     EXPECT_FALSE(testResult); // no error message triggered
-    EXPECT_TRUE(compare_enums(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY));
+    EXPECT_ENUM_EQ(thisFluidCooler.PerformanceInputMethod_Num, PerfInputMethod::NOMINAL_CAPACITY);
     // UA value is reset to zero if nominal capacity is specified and input method is "NOMINAL_CAPACITY"
     EXPECT_EQ(thisFluidCooler.HighSpeedFluidCoolerUA, 0.0);
 }

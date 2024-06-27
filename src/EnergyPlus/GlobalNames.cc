@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -155,7 +155,7 @@ void VerifyUniqueChillerName(
         ShowContinueError(state, format("...Current entry is Chiller Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->ChillerNames.emplace(NameToVerify, UtilityRoutines::makeUPPER(TypeToVerify));
+        state.dataGlobalNames->ChillerNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumChillers = static_cast<int>(state.dataGlobalNames->ChillerNames.size());
     }
 }
@@ -183,7 +183,7 @@ void VerifyUniqueBaseboardName(EnergyPlusData &state,
         ShowContinueError(state, format("...Current entry is Baseboard Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, UtilityRoutines::makeUPPER(TypeToVerify));
+        state.dataGlobalNames->BaseboardNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumBaseboards = static_cast<int>(state.dataGlobalNames->BaseboardNames.size());
     }
 }
@@ -208,7 +208,7 @@ void VerifyUniqueBoilerName(
         ShowContinueError(state, format("...Current entry is Boiler Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->BoilerNames.emplace(NameToVerify, UtilityRoutines::makeUPPER(TypeToVerify));
+        state.dataGlobalNames->BoilerNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumBoilers = static_cast<int>(state.dataGlobalNames->BoilerNames.size());
     }
 }
@@ -240,7 +240,7 @@ void VerifyUniqueCoilName(
         ShowContinueError(state, format("...Current entry is Coil Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->CoilNames.emplace(NameToVerify, UtilityRoutines::makeUPPER(TypeToVerify));
+        state.dataGlobalNames->CoilNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->NumCoils = static_cast<int>(state.dataGlobalNames->CoilNames.size());
     }
 }
@@ -254,7 +254,7 @@ void VerifyUniqueADUName(
         ShowContinueError(state, format("...Current entry is Air Distribution Unit Type=\"{}\".", TypeToVerify));
         ErrorsFound = true;
     } else {
-        state.dataGlobalNames->aDUNames.emplace(NameToVerify, UtilityRoutines::makeUPPER(TypeToVerify));
+        state.dataGlobalNames->aDUNames.emplace(NameToVerify, Util::makeUPPER(TypeToVerify));
         state.dataGlobalNames->numAirDistUnits = static_cast<int>(state.dataGlobalNames->aDUNames.size());
     }
 }

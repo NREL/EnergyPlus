@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,10 +50,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <ObjexxFCL/Optional.hh>
-
 #include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
@@ -71,7 +69,7 @@ namespace ExhaustAirSystemManager {
         int AvailScheduleNum = ScheduleManager::ScheduleAlwaysOn;
         std::string ZoneMixerName = "";
         int ZoneMixerIndex = 0;
-        int CentralFanTypeNum = 0;
+        HVAC::FanType centralFanType = HVAC::FanType::Invalid;
         std::string CentralFanName = "";
         int CentralFanIndex = 0;
 
@@ -133,7 +131,7 @@ namespace ExhaustAirSystemManager {
 
     void SimZoneHVACExhaustControls(EnergyPlusData &state);
 
-    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, ObjexxFCL::Optional<bool const> FlowRatio);
+    void CalcZoneHVACExhaustControl(EnergyPlusData &state, int const ZoneHVACExhaustControlNum, Real64 const FlowRatio = -1.0);
 
     void SizeExhaustSystem(EnergyPlusData &state, int const exhSysNum);
 
@@ -151,6 +149,11 @@ struct ExhaustAirSystemMgr : BaseGlobalStruct
     bool GetInputFlag = true;
     std::map<int, int> mixerIndexMap;
     bool mappingDone = false;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) ExhaustAirSystemMgr();
@@ -161,6 +164,10 @@ struct ExhaustControlSystemMgr : BaseGlobalStruct
 {
 
     bool GetInputFlag = true;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

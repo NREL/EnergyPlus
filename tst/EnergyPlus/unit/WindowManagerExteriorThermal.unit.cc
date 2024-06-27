@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -72,7 +72,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
-using namespace EnergyPlus::WindowManager;
+using namespace EnergyPlus::Window;
 
 TEST_F(EnergyPlusFixture, test_overallUfactorFromFilmsAndCond)
 {
@@ -228,15 +228,15 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
 
     // outside
     auto typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::NoShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::NoShade);
 
     state->dataMaterial->Material(materialOutside)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::ExtShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtShade);
 
     state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::ExtBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::ExtBlind);
 
     // reset the outside to glass
     state->dataMaterial->Material(materialOutside)->group = Material::Group::WindowGlass;
@@ -244,11 +244,11 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
     // inside
     state->dataMaterial->Material(materialInside)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::IntShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntShade);
 
     state->dataMaterial->Material(materialInside)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, simpleCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::IntBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::IntBlind);
 
     // reset the outside to glass
     state->dataMaterial->Material(materialInside)->group = Material::Group::WindowGlass;
@@ -270,11 +270,11 @@ TEST_F(EnergyPlusFixture, test_getShadeType)
 
     state->dataMaterial->Material(materialShade)->group = Material::Group::Shade;
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::BGShade));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGShade);
 
     state->dataMaterial->Material(materialShade)->group = Material::Group::WindowBlind;
     typeOfShade = aFactory.getShadeType(*state, betweenCons);
-    EXPECT_TRUE(compare_enums(typeOfShade, DataSurfaces::WinShadingType::BGBlind));
+    EXPECT_ENUM_EQ(typeOfShade, DataSurfaces::WinShadingType::BGBlind);
 }
 
 TEST_F(EnergyPlusFixture, test_getActiveConstructionNumber)
@@ -739,9 +739,9 @@ TEST_F(EnergyPlusFixture, test_GetWindowAssemblyNfrcForReport_withIDF)
     double shgcRep{0.};
     double vtRep{0.};
 
-    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
+    int windowSurfNum = Util::FindItemInList("ZN001:WALL-SOUTH:WIN001", state->dataSurface->Surface);
     EXPECT_TRUE(windowSurfNum > 0);
-    int constructNum = UtilityRoutines::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
+    int constructNum = Util::FindItemInList("DOUBLE PANE HW WINDOW", state->dataConstruction->Construct);
     EXPECT_TRUE(constructNum > 0);
 
     GetWindowAssemblyNfrcForReport(

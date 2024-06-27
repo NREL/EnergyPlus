@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -511,8 +511,6 @@ namespace RoomAir {
         Real64 TimeStepSys = state.dataHVACGlobal->TimeStepSys;
         Real64 TimeStepSysSec = state.dataHVACGlobal->TimeStepSysSec;
 
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
-        using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -603,26 +601,30 @@ namespace RoomAir {
             }
         }
 
-        ConvGainsOccupiedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+        ConvGainsOccupiedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
 
         ConvGainsOccupiedSubzone += 0.5 * thisZoneHB.SysDepZoneLoadsLagged;
 
         // Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
         // low or zero)
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesOccupied);
             ConvGainsOccupiedSubzone += RetAirGain;
         }
 
-        ConvGainsMixedSubzone = SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+        ConvGainsMixedSubzone = InternalHeatGains::SumInternalConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
         ConvGainsMixedSubzone += state.dataHeatBalFanSys->SumConvHTRadSys(ZoneNum) + state.dataHeatBalFanSys->SumConvPool(ZoneNum) +
                                  0.5 * thisZoneHB.SysDepZoneLoadsLagged;
         if (zone.NoHeatToReturnAir) {
-            RetAirGain = SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
+            RetAirGain = InternalHeatGains::SumReturnAirConvectionGainsByTypes(state, ZoneNum, IntGainTypesMixedSubzone);
             ConvGainsMixedSubzone += RetAirGain;
         }
 
         ConvGains = ConvGainsOccupiedSubzone + ConvGainsMixedSubzone;
+
+        // Make sure all types of internal gains have been gathered
+        assert((int)(size(IntGainTypesOccupied) + size(IntGainTypesMixedSubzone) + size(ExcludedIntGainTypes)) ==
+               (int)DataHeatBalance::IntGainType::Num);
 
         //=================== Entering air system temperature and flow====================
         SumSysMCp = 0.0;
@@ -633,7 +635,7 @@ namespace RoomAir {
             for (int NodeNum = 1; NodeNum <= state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                 NodeTemp = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = state.dataLoopNodes->Node(state.dataZoneEquip->ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnW(thisZoneHB.ZoneAirHumRat);
+                CpAir = PsyCpAirFnW(thisZoneHB.airHumRat);
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
@@ -734,17 +736,17 @@ namespace RoomAir {
                 state.dataRoomAir->AIRRATFloor(ZoneNum) =
                     zone.Volume * min(state.dataRoomAir->HeightTransition(ZoneNum), state.dataDispVentMgr->HeightFloorSubzoneTop) / CeilingHeight *
                     zone.ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATFloor(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATFloor(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
                 state.dataRoomAir->AIRRATOC(ZoneNum) =
                     zone.Volume * (state.dataRoomAir->HeightTransition(ZoneNum) - min(state.dataRoomAir->HeightTransition(ZoneNum), 0.2)) /
                     CeilingHeight * zone.ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATOC(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
                 state.dataRoomAir->AIRRATMX(ZoneNum) =
                     zone.Volume * (CeilingHeight - state.dataRoomAir->HeightTransition(ZoneNum)) / CeilingHeight * zone.ZoneVolCapMultpSens *
-                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.ZoneAirHumRat) *
-                    PsyCpAirFnW(thisZoneHB.ZoneAirHumRat) / TimeStepSysSec;
+                    PsyRhoAirFnPbTdbW(state, state.dataEnvrn->OutBaroPress, state.dataRoomAir->MATMX(ZoneNum), thisZoneHB.airHumRat) *
+                    PsyCpAirFnW(thisZoneHB.airHumRat) / TimeStepSysSec;
 
                 if (state.dataHVACGlobal->UseZoneTimeStepHistory) {
                     state.dataRoomAir->ZTMFloor(ZoneNum)[2] = state.dataRoomAir->XMATFloor(ZoneNum)[2];
@@ -887,7 +889,7 @@ namespace RoomAir {
             state.dataRoomAir->AvgTempGrad(ZoneNum) = 0.0;
             state.dataRoomAir->MaxTempGrad(ZoneNum) = 0.0;
             state.dataRoomAir->AirModel(ZoneNum).SimAirModel = false;
-            Real64 const thisZoneT1 = thisZoneHB.ZoneT1;
+            Real64 const thisZoneT1 = thisZoneHB.T1;
             Real64 AirCap = thisZoneHB.AirPowerCap;
             TempHistTerm = AirCap * (3.0 * thisZoneHB.ZTM[0] - (3.0 / 2.0) * thisZoneHB.ZTM[1] + OneThird * thisZoneHB.ZTM[2]);
 

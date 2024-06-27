@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,46 +74,46 @@ namespace DataPlant {
 
         SetupOutputVariable(state,
                             "Supervisory Plant Heat Pump Operation Mode",
-                            OutputProcessor::Unit::unknown,
+                            Constant::Units::unknown,
                             this->Report.AirSourcePlant_OpMode,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         SetupOutputVariable(state,
                             "Supervisory Plant Auxiliary Boiler Mode",
-                            OutputProcessor::Unit::unknown,
+                            Constant::Units::unknown,
                             this->Report.BoilerAux_OpMode,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Polled Building Heating Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.BuildingPolledHeatingLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Polled Building Cooling Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.BuildingPolledCoolingLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Primary Plant Heating Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.PrimaryPlantHeatingLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
         SetupOutputVariable(state,
                             "Supervisory Plant Operation Primary Plant Cooling Load",
-                            OutputProcessor::Unit::W,
+                            Constant::Units::W,
                             this->Report.PrimaryPlantCoolingLoad,
-                            OutputProcessor::SOVTimeStepType::System,
-                            OutputProcessor::SOVStoreType::Average,
+                            OutputProcessor::TimeStepType::System,
+                            OutputProcessor::StoreType::Average,
                             this->Name);
 
         // routine for setup of chiller heater supervisory plant operation scheme
@@ -294,8 +294,8 @@ namespace DataPlant {
                 for (int compNum = 1; compNum <= NumComps; ++compNum) {
                     auto &this_equip(this->CoolingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
-                    DataPlant::PlantEquipmentType Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    DataPlant::PlantEquipmentType Type =
+                        static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -381,8 +381,7 @@ namespace DataPlant {
                     auto &this_equip(this->HeatingOnlyEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -471,8 +470,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolCoolingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -560,8 +558,7 @@ namespace DataPlant {
                     auto &this_equip(this->SimultHeatCoolHeatingEquipList(equipListNum).Comp(compNum));
                     PlantLocation compLoc;
                     DataPlant::PlantEquipmentType Type;
-                    Type = static_cast<DataPlant::PlantEquipmentType>(
-                        getEnumValue(PlantEquipTypeNamesUC, UtilityRoutines::makeUPPER(this_equip.TypeOf)));
+                    Type = static_cast<DataPlant::PlantEquipmentType>(getEnumValue(PlantEquipTypeNamesUC, Util::makeUPPER(this_equip.TypeOf)));
                     bool errFlag1(false);
                     int NumSearchResults(0);
                     PlantUtilities::ScanPlantLoopsForObject(state, this_equip.Name, Type, compLoc, errFlag1, _, _, NumSearchResults);
@@ -676,9 +673,9 @@ namespace DataPlant {
             bool founditCooling = false;
             bool founditHeating = false;
             for (auto &thisHP : state.dataEIRPlantLoopHeatPump->heatPumps) {
-                std::string const thisPLHPName = UtilityRoutines::makeUPPER(thisHP.name);
+                std::string const thisPLHPName = Util::makeUPPER(thisHP.name);
                 // find cooling side heat pump
-                std::string const targetDedHRCoolName = UtilityRoutines::makeUPPER(this->DedicatedHR_ChWRetControl_Name);
+                std::string const targetDedHRCoolName = Util::makeUPPER(this->DedicatedHR_ChWRetControl_Name);
                 if (thisPLHPName == targetDedHRCoolName) {  // found it
                     this->DedicatedHR_CoolingPLHP = thisHP; // store pointer to cooling side of heat pump
                     founditCooling = true;
@@ -725,7 +722,7 @@ namespace DataPlant {
                 }
 
                 // find heating side heat pump
-                std::string const targetDedHRHeatName = UtilityRoutines::makeUPPER(this->DedicatedHR_HWRetControl_Name);
+                std::string const targetDedHRHeatName = Util::makeUPPER(this->DedicatedHR_HWRetControl_Name);
                 if (thisPLHPName == targetDedHRHeatName) {  // found it
                     this->DedicatedHR_HeatingPLHP = thisHP; // store pointer to heating side of heat pump
                     founditHeating = true;
@@ -789,24 +786,24 @@ namespace DataPlant {
                 this->PlantOps.DedicatedHR_Present = true;
                 SetupOutputVariable(state,
                                     "Supervisory Plant Heat Recovery Operation Mode",
-                                    OutputProcessor::Unit::unknown,
+                                    Constant::Units::unknown,
                                     this->Report.DedicHR_OpMode,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Supervisory Plant Operation Secondary Plant Heating Load",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->Report.SecondaryPlantHeatingLoad,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
                 SetupOutputVariable(state,
                                     "Supervisory Plant Operation Secondary Plant Cooling Load",
-                                    OutputProcessor::Unit::W,
+                                    Constant::Units::W,
                                     this->Report.SecondaryPlantCoolingLoad,
-                                    OutputProcessor::SOVTimeStepType::System,
-                                    OutputProcessor::SOVStoreType::Average,
+                                    OutputProcessor::TimeStepType::System,
+                                    OutputProcessor::StoreType::Average,
                                     this->Name);
             }
         }
@@ -855,9 +852,9 @@ namespace DataPlant {
             Real64 retAir_Tdb = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).Temp;
             Real64 retAir_w = state.dataLoopNodes->Node(state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(1)).HumRat;
             Real64 ventLoad = outAirMdot * (Psychrometrics::PsyHFnTdbW(retAir_Tdb, retAir_w) - outAir_H); // negative is cooling
-            if (ventLoad > DataHVACGlobals::SmallLoad) {                                                  // add to heating
+            if (ventLoad > HVAC::SmallLoad) {                                                             // add to heating
                 sumAirSysVentHeatingLoad += ventLoad;
-            } else if (ventLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) { // add to cooling
+            } else if (ventLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) { // add to cooling
                 sumAirSysVentCoolingLoad += ventLoad;
             }
         }
@@ -928,19 +925,19 @@ namespace DataPlant {
         this->PlantOps.SimultaneousHeatingCoolingWithHeatingDominant = false;
 
         // step 2, process logic based on poll results for building loads.
-        if (this->Report.BuildingPolledHeatingLoad < DataHVACGlobals::SmallLoad &&
-            this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+        if (this->Report.BuildingPolledHeatingLoad < HVAC::SmallLoad &&
+            this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) {
             this->PlantOps.AirSourcePlantCoolingOnly = true;
-        } else if (this->Report.BuildingPolledCoolingLoad > DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad &&
-                   this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad) {
+        } else if (this->Report.BuildingPolledCoolingLoad > DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad &&
+                   this->Report.BuildingPolledHeatingLoad > HVAC::SmallLoad) {
             this->PlantOps.AirSourcePlantHeatingOnly = true;
 
             if (state.dataEnvrn->OutDryBulbTemp < this->TempReset.LowOutdoorTemp) { // too cold for airsource HPs so
                 this->PlantOps.AirSourcePlantHeatingOnly = false;
             }
 
-        } else if ((this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) &&
-                   (this->Report.BuildingPolledHeatingLoad > DataHVACGlobals::SmallLoad)) {
+        } else if ((this->Report.BuildingPolledCoolingLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) &&
+                   (this->Report.BuildingPolledHeatingLoad > HVAC::SmallLoad)) {
             this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling = true;
             if (this->Report.BuildingPolledHeatingLoad > abs(this->Report.BuildingPolledCoolingLoad)) {
                 this->PlantOps.SimultaneousHeatingCoolingWithHeatingDominant = true;
@@ -967,7 +964,7 @@ namespace DataPlant {
 
         // step 3, revise control decision based on current loads on primary plant loops
         if (this->PlantOps.AirSourcePlantHeatingOnly &&
-            this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+            this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) {
             // polled building loads indicate all heating, but cooling plant has cooling load, try to switch to simultaneous cooling and heating with
             // heating dominant
             if (this->PlantOps.SimultHeatCoolOpAvailable) {
@@ -977,7 +974,7 @@ namespace DataPlant {
             }
         }
 
-        if (this->PlantOps.AirSourcePlantCoolingOnly && this->Report.PrimaryPlantHeatingLoad > DataHVACGlobals::SmallLoad &&
+        if (this->PlantOps.AirSourcePlantCoolingOnly && this->Report.PrimaryPlantHeatingLoad > HVAC::SmallLoad &&
             state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
             // polled building loads indicate all cooling, but heating plant has heating load, and outdoor air is warm enough for heat pump, try to
             // switch to simultaneous cooling and heating with cooling dominant
@@ -991,16 +988,37 @@ namespace DataPlant {
         // do we need to turn on cooling-only if in off mode but PrimaryPlantCoolingLoad is loaded?
         if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
-            if (this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) {
+            if (this->Report.PrimaryPlantCoolingLoad < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) {
                 this->PlantOps.AirSourcePlantCoolingOnly = true;
+            }
+        }
+
+        // override reset AirSourcePlantHeatingOnly to false and AirSourcePlantCoolingOnly to true if the plant cooling load is higher
+        // the plant heating load and the plant heating load is small.
+        if (!this->PlantOps.AirSourcePlantCoolingOnly && this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (std::abs(this->Report.PrimaryPlantCoolingLoad) > this->Report.PrimaryPlantHeatingLoad &&
+                this->Report.PrimaryPlantHeatingLoad < HVAC::SmallLoad) {
+                this->PlantOps.AirSourcePlantCoolingOnly = true;
+                this->PlantOps.AirSourcePlantHeatingOnly = false;
+            }
+        }
+
+        // override reset AirSourcePlantHeatingOnly to true and AirSourcePlantCoolingOnly to false if the plant heating load is higher
+        // the plant cooling load and the plant cooling load is small.
+        if (this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
+            !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
+            if (this->Report.PrimaryPlantHeatingLoad > std::abs(this->Report.PrimaryPlantCoolingLoad) &&
+                this->Report.PrimaryPlantCoolingLoad > DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) {
+                this->PlantOps.AirSourcePlantHeatingOnly = true;
+                this->PlantOps.AirSourcePlantCoolingOnly = false;
             }
         }
 
         // do we need to turn on heating-only if in off mode but PrimaryPlantHeatingLoad is loaded?
         if (!this->PlantOps.AirSourcePlantCoolingOnly && !this->PlantOps.AirSourcePlantHeatingOnly &&
             !this->PlantOps.AirSourcePlantSimultaneousHeatingAndCooling) { // all off
-            if (this->Report.PrimaryPlantHeatingLoad > DataHVACGlobals::SmallLoad &&
-                state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
+            if (this->Report.PrimaryPlantHeatingLoad > HVAC::SmallLoad && state.dataEnvrn->OutDryBulbTemp >= this->TempReset.LowOutdoorTemp) {
                 this->PlantOps.AirSourcePlantHeatingOnly = true;
             }
         }
@@ -1345,7 +1363,7 @@ namespace DataPlant {
 
         bool flowInEach = false;
         // need flow in both returns.
-        if (CW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow || HW_RetMdot <= DataHVACGlobals::SmallWaterVolFlow) {
+        if (CW_RetMdot <= HVAC::SmallWaterVolFlow || HW_RetMdot <= HVAC::SmallWaterVolFlow) {
             flowInEach = false;
         } else {
             flowInEach = true;
@@ -1378,14 +1396,13 @@ namespace DataPlant {
         bool CoolLedNeed = false;
         bool HeatLedNeed = false;
 
-        if (this->PlantOps.AirSourcePlantHeatingOnly && (CW_Qdot < DataPrecisionGlobals::constant_minusone * DataHVACGlobals::SmallLoad) &&
-            flowInEach) {
+        if (this->PlantOps.AirSourcePlantHeatingOnly && (CW_Qdot < DataPrecisionGlobals::constant_minusone * HVAC::SmallLoad) && flowInEach) {
             // polled building loads are heating only, but secondary ChW plant has some cooling load and there is mass flow in each. So turn dedicated
             // HR on in cooling lead mode
             CoolLedNeed = true;
         }
 
-        if (this->PlantOps.AirSourcePlantCoolingOnly && (HW_Qdot > DataHVACGlobals::SmallLoad) && flowInEach) {
+        if (this->PlantOps.AirSourcePlantCoolingOnly && (HW_Qdot > HVAC::SmallLoad) && flowInEach) {
             // polled building loads are cooling only, but secondary HW plant has some heating load and there is mass flow in each. So turn dedicated
             // HR on in heating lead mode
             HeatLedNeed = true;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -114,7 +114,7 @@ namespace HeatBalanceSurfaceManager {
 
     void ComputeIntSWAbsorpFactors(EnergyPlusData &state);
 
-    void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state, int NumberOfEnclosures); // Number of solar enclosures
+    void ComputeDifSolExcZonesWIZWindows(EnergyPlusData &state);
 
     void InitEMSControlledSurfaceProperties(EnergyPlusData &state);
 
@@ -168,7 +168,7 @@ namespace HeatBalanceSurfaceManager {
     CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
                                ObjexxFCL::Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    Real64 GetSurfQdotRadHVACInPerArea(EnergyPlusData &state, int SurfNum);
+    void sumSurfQdotRadHVAC(EnergyPlusData &state);
 
     Real64 GetQdotConvOutPerArea(EnergyPlusData &state, const int SurfNum);
 
@@ -194,7 +194,7 @@ namespace HeatBalanceSurfaceManager {
 
     void CalcOutsideSurfTemp(EnergyPlusData &state,
                              int SurfNum,      // Surface number DO loop counter
-                             int ZoneNum,      // Zone number the current surface is attached to
+                             int spaceNum,     // Space number the current surface is attached to
                              int ConstrNum,    // Construction index for the current surface
                              Real64 HMovInsul, // "Convection" coefficient of movable insulation
                              Real64 TempExt,   // Exterior temperature boundary condition
@@ -266,6 +266,10 @@ struct HeatBalSurfMgr : BaseGlobalStruct
         Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
     Array1D<Real64> AbsDiffWinSky =
         Array1D<Real64>(DataWindowEquivalentLayer::CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

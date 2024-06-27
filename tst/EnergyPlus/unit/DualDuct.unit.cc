@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2023, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2024, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -298,9 +298,9 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 //		DualDuct::GetDualDuctInput(*state);
 //
 //		EXPECT_EQ(3u, dd_airterminal.size());
-//		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType ));
-//		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_VariableVolume, dd_airterminal( 2 ).dd_airterminalType )); // AT SD VAV HeatCool Reheat
-// Type 		EXPECT_TRUE(compare_enums( DualDuct::DualDuct_OutdoorAir, dd_airterminal( 3 ).dd_airterminalType )); // AT SD VAV HeatCool
+//		EXPECT_ENUM_EQ( DualDuct::DualDuct_ConstantVolume, dd_airterminal( 1 ).dd_airterminalType );
+//		EXPECT_ENUM_EQ( DualDuct::DualDuct_VariableVolume, dd_airterminal( 2 ).dd_airterminalType ); // AT SD VAV HeatCool Reheat
+// Type 		EXPECT_ENUM_EQ( DualDuct::DualDuct_OutdoorAir, dd_airterminal( 3 ).dd_airterminalType ); // AT SD VAV HeatCool
 // Reheat Type
 //
 //
@@ -350,11 +350,11 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
     DualDuct::GetDualDuctInput(*state);
 
     // dual duct  VAV air terminal get input test
-    EXPECT_TRUE(compare_enums(state->dataDualDuct->dd_airterminal(1).DamperType, DualDuctDamper::VariableVolume)); // dual duct VAV Type
-    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).Name, "VAV DUAL DUCT AT");                                    // dual duct VAV Name
-    EXPECT_TRUE(state->dataDualDuct->dd_airterminal(1).ZoneTurndownMinAirFracSchExist);                            // turndown schdule exists
-    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).ZoneTurndownMinAirFrac, 1.0); // turndown fraction initialized to 1.0
-    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).ZoneMinAirFracDes, 0.3);      // design minimum flow fraction
+    EXPECT_ENUM_EQ(state->dataDualDuct->dd_airterminal(1).DamperType, DualDuctDamper::VariableVolume); // dual duct VAV Type
+    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).Name, "VAV DUAL DUCT AT");                        // dual duct VAV Name
+    EXPECT_TRUE(state->dataDualDuct->dd_airterminal(1).ZoneTurndownMinAirFracSchExist);                // turndown schdule exists
+    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).ZoneTurndownMinAirFrac, 1.0);                     // turndown fraction initialized to 1.0
+    EXPECT_EQ(state->dataDualDuct->dd_airterminal(1).ZoneMinAirFracDes, 0.3);                          // design minimum flow fraction
 }
 
 TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
@@ -442,7 +442,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     ScheduleManager::UpdateScheduleValues(*state);
     state->dataZoneEnergyDemand->ZoneSysEnergyDemand.allocate(1);
     state->dataHeatBalFanSys->TempControlType.allocate(1);
-    state->dataHeatBalFanSys->TempControlType(1) = DataHVACGlobals::ThermostatType::DualSetPointWithDeadBand;
+    state->dataHeatBalFanSys->TempControlType(1) = HVAC::ThermostatType::DualSetPointWithDeadBand;
     HeatBalanceManager::GetZoneData(*state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData(*state);
@@ -452,11 +452,11 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     auto &thisDDAirTerminal = state->dataDualDuct->dd_airterminal(DDNum);
 
     // dual duct  VAV air terminal get input test
-    EXPECT_TRUE(compare_enums(thisDDAirTerminal.DamperType, DualDuctDamper::VariableVolume)); // dual duct VAV Type
-    EXPECT_EQ(thisDDAirTerminal.Name, "VAV DUAL DUCT AT");                                    // dual duct VAV Name
-    EXPECT_TRUE(thisDDAirTerminal.ZoneTurndownMinAirFracSchExist);                            // turndown schdule exists
-    EXPECT_EQ(thisDDAirTerminal.ZoneTurndownMinAirFrac, 1.0);                                 // turndown fraction initialized to 1.0
-    EXPECT_EQ(thisDDAirTerminal.ZoneMinAirFracDes, 0.3);                                      // design minimum flow fraction
+    EXPECT_ENUM_EQ(thisDDAirTerminal.DamperType, DualDuctDamper::VariableVolume); // dual duct VAV Type
+    EXPECT_EQ(thisDDAirTerminal.Name, "VAV DUAL DUCT AT");                        // dual duct VAV Name
+    EXPECT_TRUE(thisDDAirTerminal.ZoneTurndownMinAirFracSchExist);                // turndown schdule exists
+    EXPECT_EQ(thisDDAirTerminal.ZoneTurndownMinAirFrac, 1.0);                     // turndown fraction initialized to 1.0
+    EXPECT_EQ(thisDDAirTerminal.ZoneMinAirFracDes, 0.3);                          // design minimum flow fraction
 
     int OutNode = thisDDAirTerminal.OutletNodeNum;
     int HotInNode = thisDDAirTerminal.HotAirInletNodeNum;
