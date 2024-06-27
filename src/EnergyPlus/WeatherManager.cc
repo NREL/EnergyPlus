@@ -4238,7 +4238,8 @@ namespace Weather {
                     if (std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude) > 1.0 ||
                         std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude) > 1.0 ||
                         std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone) > 0.0 ||
-                        std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) > 0.10) {
+                        std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation) / max(state.dataEnvrn->Elevation, 1.0) >
+                            0.10) {
                         ShowWarningError(state, "Weather file location will be used rather than entered (IDF) Location object.");
                         ShowContinueError(state, format("..Location object={}", state.dataWeather->LocationTitle));
                         ShowContinueError(state, format("..Weather File Location={}", state.dataEnvrn->WeatherFileLocationTitle));
@@ -6479,7 +6480,7 @@ namespace Weather {
             state.dataEnvrn->Longitude = LocProps(2);
             state.dataEnvrn->TimeZoneNumber = LocProps(3);
             state.dataEnvrn->Elevation = LocProps(4);
-            if (Util::SameString(LocAlphas(2),"Yes")) state.dataWeather->keepUserSiteLocationDefinition = true;
+            if (Util::SameString(LocAlphas(2), "Yes")) state.dataWeather->keepUserSiteLocationDefinition = true;
             state.dataWeather->LocationGathered = true;
         }
     }
