@@ -4232,9 +4232,7 @@ namespace Weather {
             state.dataWeather->WeatherFileExists) {
             if (state.dataWeather->LocationGathered) {
                 // See if "matching" location
-                if (state.dataWeather->keepUserSiteLocationDefinition) {
-                    ShowWarningError(state, "User Entered (IDF) Site:Location object will be used rather than the weather file location.");
-                } else {
+                if (!state.dataWeather->keepUserSiteLocationDefinition) {
                     if (std::abs(state.dataEnvrn->Latitude - state.dataWeather->WeatherFileLatitude) > 1.0 ||
                         std::abs(state.dataEnvrn->Longitude - state.dataWeather->WeatherFileLongitude) > 1.0 ||
                         std::abs(state.dataEnvrn->TimeZoneNumber - state.dataWeather->WeatherFileTimeZone) > 0.0 ||

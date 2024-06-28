@@ -2,16 +2,17 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAirCooled.idf
+! 5ZoneAirCooledKeepSiteLocation.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.
+!                          outside air stream controlled to preheat and precool setpoints.  Keeps Site:Location definition
+!                          rather than allowing the weather file information to overwrite it.  
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
 !
-! Location:                Chicago, IL
+! Location:                Chicago, IL (at a fictitious, high altitude)
 !
 ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C

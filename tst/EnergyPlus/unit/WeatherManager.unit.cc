@@ -2531,8 +2531,6 @@ TEST_F(EnergyPlusFixture, WeatherManager_GetAndResolveLocationInfoTest)
     state->dataWeather->Environment(state->dataWeather->NumOfEnvrn).KindOfEnvrn = Constant::KindOfSim::RunPeriodWeather;
     state->dataWeather->WeatherFileExists = true;
     state->dataWeather->LocationGathered = true;
-    std::string const error_text2A =
-        delimited_string({"   ** Warning ** User Entered (IDF) Site:Location object will be used rather than the weather file location."});
     Weather::ResolveLocationInformation(*state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
     EXPECT_EQ(state->dataWeather->LocationTitle, "SKYHIGHCHICAGO");
@@ -2541,7 +2539,6 @@ TEST_F(EnergyPlusFixture, WeatherManager_GetAndResolveLocationInfoTest)
     EXPECT_NEAR(state->dataEnvrn->TimeZoneNumber, expectedTZ, allowedTolerance);
     EXPECT_NEAR(state->dataEnvrn->Elevation, expectedElevationIDF, allowedTolerance);
     EXPECT_TRUE(state->dataWeather->keepUserSiteLocationDefinition);
-    EXPECT_TRUE(compare_err_stream(error_text2A, true));
 
     // Test 2B: ResolveLocationInformation Test B--location swap to EPW info (change in data)
     state->dataWeather->keepUserSiteLocationDefinition = false;
