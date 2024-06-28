@@ -4255,14 +4255,12 @@ namespace Weather {
                                                           max(state.dataEnvrn->Elevation, 1.0) * 100.0),
                                                  std::abs(state.dataEnvrn->Elevation - state.dataWeather->WeatherFileElevation)));
                     }
+                    state.dataWeather->LocationTitle = state.dataEnvrn->WeatherFileLocationTitle;
+                    state.dataEnvrn->Latitude = state.dataWeather->WeatherFileLatitude;
+                    state.dataEnvrn->Longitude = state.dataWeather->WeatherFileLongitude;
+                    state.dataEnvrn->TimeZoneNumber = state.dataWeather->WeatherFileTimeZone;
+                    state.dataEnvrn->Elevation = state.dataWeather->WeatherFileElevation;
                 }
-            }
-            if (!state.dataWeather->keepUserSiteLocationDefinition) { // Only override with weather file if this is false
-                state.dataWeather->LocationTitle = state.dataEnvrn->WeatherFileLocationTitle;
-                state.dataEnvrn->Latitude = state.dataWeather->WeatherFileLatitude;
-                state.dataEnvrn->Longitude = state.dataWeather->WeatherFileLongitude;
-                state.dataEnvrn->TimeZoneNumber = state.dataWeather->WeatherFileTimeZone;
-                state.dataEnvrn->Elevation = state.dataWeather->WeatherFileElevation;
             }
         } else if (!state.dataWeather->LocationGathered) {
             state.dataWeather->LocationTitle = "Not Entered";
