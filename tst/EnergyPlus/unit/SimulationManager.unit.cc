@@ -238,7 +238,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDebuggingData)
 
         EXPECT_FALSE(state->dataReportFlag->DebugOutput);
         EXPECT_TRUE(state->dataReportFlag->EvenDuringWarmup);
-
     }
 }
 
@@ -377,7 +376,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
     EXPECT_FALSE(state->dataEnvrn->DisplayWeatherMissingDataWarnings);
     EXPECT_FALSE(state->dataSysVars->ReportDetailedWarmupConvergence);
     EXPECT_FALSE(state->dataSysVars->ReportDuringHVACSizingSimulation);
-
 }
 
 TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)

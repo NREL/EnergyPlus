@@ -61,7 +61,8 @@ void initializeFunctionalAPI(EnergyPlusState state)
     if (!thisState->dataInputProcessing->inputProcessor) {
         thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
     }
-    EnergyPlus::Psychrometrics::InitializePsychRoutines(*thisState);
+    thisState->init_state(*thisState);
+    // this next line can be removed once InitializeGlycRoutines is added to init_state
     EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
