@@ -247,7 +247,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_DefaultState)
         "  Output:Diagnostics;",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
@@ -282,7 +281,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_SimpleCase)
         "    DisplayAdvancedReportVariables;    !- Key 2",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
@@ -321,7 +319,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_AllKeys)
         "    ReportDuringHVACSizingSimulation;",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_TRUE(state->dataGlobal->DisplayAllWarnings);
@@ -351,7 +348,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_Unicity)
         "    DisplayAllWarnings;      !- Key 1",
     });
 
-    state->init_state_called = false;
     compare_err_stream_substring("", true);
     // Input processor will throw a severe, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
@@ -389,7 +385,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_UndocumentedFlags)
         "    TimingFlag;",
     });
 
-    state->init_state_called = false;
     // This will throw a warning in InputProcessor since these aren't supported keys, so do not use assertions
     EXPECT_FALSE(process_idf(idf_objects, false));
     const std::string expected_warning = delimited_string({
@@ -439,7 +434,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_OutputDiagnostics_HasEmpty)
         "    DisplayAdvancedReportVariables;    !- Key 2",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_FALSE(state->dataGlobal->DisplayAllWarnings);
@@ -476,7 +470,6 @@ TEST_F(EnergyPlusFixture, SimulationManager_HVACSizingSimulationChoiceTest)
         "    Yes;                     !- Do HVAC Sizing Simulation for Sizing Periods",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_TRUE(state->dataGlobal->DoHVACSizingSimulation);
@@ -498,7 +491,6 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_ZeroSimulation)
         "  1;                        !- Maximum Number of HVAC Sizing Simulation Passes",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     ASSERT_THROW(SimulationManager::CheckForMisMatchedEnvironmentSpecifications(*state), std::runtime_error);
@@ -529,7 +521,6 @@ TEST_F(EnergyPlusFixture, Test_SimulationControl_PureLoadCalc)
         "  1;                        !- Maximum Number of HVAC Sizing Simulation Passes",
     });
 
-    state->init_state_called = false;
     EXPECT_TRUE(process_idf(idf_objects));
 
     EXPECT_NO_THROW(SimulationManager::CheckForMisMatchedEnvironmentSpecifications(*state));

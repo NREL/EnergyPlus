@@ -52,7 +52,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/state.h>
 

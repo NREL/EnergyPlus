@@ -572,6 +572,7 @@ void EnergyPlusData::clear_state()
 void EnergyPlusData::init_state(EnergyPlusData &state)
 {
     if (this->init_state_called) return;
+    this->init_state_called = true;
     // The order in which we do this matters.  We're going to try to
     // do this in "topological" order meaning the first to go are the
     // objects that do not reference any other objects, like fluids,
@@ -825,8 +826,6 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     this->dataZoneEquipmentManager->init_state(state);
     this->dataZonePlenum->init_state(state);
     this->dataZoneTempPredictorCorrector->init_state(state);
-
-    this->init_state_called = true;
 }
 
 } // namespace EnergyPlus
