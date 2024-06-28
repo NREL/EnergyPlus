@@ -142,8 +142,9 @@ namespace ZoneEquipmentManager {
 
     void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneSizingData const &zsCalcSizing);
 
-    void
-    updateZoneSizingEndZoneSizingCalc2(DataSizing::ZoneSizingData &zsCalcSizing, int const timeStepIndex, int const hourPrint, int const minutes);
+    void updateZoneSizingEndZoneSizingCalc2(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing);
+
+    std::string sizingPeakTimeStamp(EnergyPlusData &state, int timeStepIndex);
 
     void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
                                             Array2D<DataSizing::ZoneSizingData> &zsCalcSizing,

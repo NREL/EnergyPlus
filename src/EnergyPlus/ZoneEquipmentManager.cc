@@ -1178,6 +1178,7 @@ void fillZoneSizingFromInput(EnergyPlusData &state,
         zoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
         zoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
         zoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+        zoneSizing.spaceConcurrence = zoneSizingInput.spaceConcurrence;
         zoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
         zoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
         zoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
@@ -1210,6 +1211,7 @@ void fillZoneSizingFromInput(EnergyPlusData &state,
         calcZoneSizing.DOASControlStrategy = zoneSizingInput.DOASControlStrategy;
         calcZoneSizing.DOASLowSetpoint = zoneSizingInput.DOASLowSetpoint;
         calcZoneSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
+        calcZoneSizing.spaceConcurrence = zoneSizingInput.spaceConcurrence;
         calcZoneSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
         calcZoneSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
         calcZoneSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
@@ -1262,6 +1264,7 @@ void fillZoneSizingFromInput(EnergyPlusData &state,
     zsFinalSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
     zsFinalSizing.ZoneSecondaryRecirculation = zoneSizingInput.ZoneSecondaryRecirculation;
     zsFinalSizing.ZoneVentilationEff = zoneSizingInput.ZoneVentilationEff;
+    zsFinalSizing.spaceConcurrence = zoneSizingInput.spaceConcurrence;
     zsFinalSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
     zsFinalSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
     zsFinalSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
@@ -1302,6 +1305,7 @@ void fillZoneSizingFromInput(EnergyPlusData &state,
     zsCalcFinalSizing.DOASHighSetpoint = zoneSizingInput.DOASHighSetpoint;
     zsCalcFinalSizing.ZoneADEffCooling = zoneSizingInput.ZoneADEffCooling;
     zsCalcFinalSizing.ZoneADEffHeating = zoneSizingInput.ZoneADEffHeating;
+    zsCalcFinalSizing.spaceConcurrence = zoneSizingInput.spaceConcurrence;
     zsCalcFinalSizing.zoneSizingMethod = zoneSizingInput.zoneSizingMethod;
     zsCalcFinalSizing.zoneLatentSizing = zoneSizingInput.zoneLatentSizing;
     zsCalcFinalSizing.zoneRHDehumidifySetPoint = zoneSizingInput.zoneRHDehumidifySetPoint;
@@ -1958,21 +1962,27 @@ void updateZoneSizingEndZoneSizingCalc1(EnergyPlusData &state, DataSizing::ZoneS
     }
 }
 
-void updateZoneSizingEndZoneSizingCalc2(DataSizing::ZoneSizingData &zsCalcSizing, int const timeStepIndex, int const hourPrint, int const minutes)
+void updateZoneSizingEndZoneSizingCalc2(EnergyPlusData &state, DataSizing::ZoneSizingData &zsCalcSizing)
 {
-    // SpaceSizing TODO: There's gotta be a better place to set these timestamps
-    if (timeStepIndex == zsCalcSizing.TimeStepNumAtHeatMax) {
-        zsCalcSizing.HeatPeakDateHrMin = zsCalcSizing.cHeatDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
-    }
-    if (timeStepIndex == zsCalcSizing.TimeStepNumAtCoolMax) {
-        zsCalcSizing.CoolPeakDateHrMin = zsCalcSizing.cCoolDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
-    }
-    if (timeStepIndex == zsCalcSizing.TimeStepNumAtLatentHeatMax) {
-        zsCalcSizing.LatHeatPeakDateHrMin = zsCalcSizing.cLatentHeatDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
-    }
-    if (timeStepIndex == zsCalcSizing.TimeStepNumAtLatentCoolMax) {
-        zsCalcSizing.LatCoolPeakDateHrMin = zsCalcSizing.cLatentCoolDDDate + ' ' + format(PeakHrMinFmt, hourPrint, minutes);
-    }
+    zsCalcSizing.HeatPeakDateHrMin = zsCalcSizing.cHeatDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtHeatMax);
+
+    zsCalcSizing.CoolPeakDateHrMin = zsCalcSizing.cCoolDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtCoolMax);
+
+    zsCalcSizing.LatHeatPeakDateHrMin = zsCalcSizing.cLatentHeatDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtLatentHeatMax);
+
+    zsCalcSizing.LatCoolPeakDateHrMin = zsCalcSizing.cLatentCoolDDDate + ' ' + sizingPeakTimeStamp(state, zsCalcSizing.TimeStepNumAtLatentCoolMax);
+}
+
+std::string sizingPeakTimeStamp(EnergyPlusData &state, int timeStepIndex)
+{
+    int constexpr minToSec = 60;
+    int hour = 0;
+    int minute = 0;
+    Real64 second = 0;
+
+    Real64 timeInSeconds = timeStepIndex * state.dataGlobal->MinutesPerTimeStep * minToSec;
+    General::ParseTime(timeInSeconds, hour, minute, second);
+    return format(PeakHrMinFmt, hour, minute);
 }
 
 void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalSizing,
@@ -2096,6 +2106,7 @@ void updateZoneSizingEndZoneSizingCalc3(DataSizing::ZoneSizingData &zsCalcFinalS
 }
 void updateZoneSizingEndZoneSizingCalc4(DataSizing::ZoneSizingData &zsSizing, DataSizing::ZoneSizingData const &zsCalcSizing)
 {
+    // Move data from Calc arrays to user modified arrays
     zsSizing.CoolDesDay = zsCalcSizing.CoolDesDay;
     zsSizing.HeatDesDay = zsCalcSizing.HeatDesDay;
     zsSizing.DesHeatDens = zsCalcSizing.DesHeatDens;
@@ -2131,6 +2142,7 @@ void updateZoneSizingEndZoneSizingCalc4(DataSizing::ZoneSizingData &zsSizing, Da
 
 void updateZoneSizingEndZoneSizingCalc5(DataSizing::ZoneSizingData &zsFinalSizing, DataSizing::ZoneSizingData const &zsCalcFinalSizing)
 {
+    // Move data from CalcFinal arrays to user modified final arrays
     // SpaceSizing TODO: This is essentially the same as updateZoneSizingEndZoneSizingCalc4, except there are two extra fields copied here
     zsFinalSizing.CoolDesDay = zsCalcFinalSizing.CoolDesDay;
     zsFinalSizing.HeatDesDay = zsCalcFinalSizing.HeatDesDay;
@@ -2765,6 +2777,16 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                       ":Cooling Zone Relative Humidity [%]");
             }
 
+            for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
+                if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
+                updateZoneSizingEndZoneSizingCalc2(state, state.dataSize->CalcFinalZoneSizing(CtrlZoneNum));
+                if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
+                    for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
+                        updateZoneSizingEndZoneSizingCalc2(state, state.dataSize->CalcFinalSpaceSizing(spaceNum));
+                    }
+                }
+            }
+
             print(state.files.zsz, "\n");
             //      HourFrac = 0.0
             int Minutes = 0;
@@ -2778,16 +2800,6 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
                         Minutes = 0;
                         HourPrint = HourCounter;
                     }
-                    for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
-                        if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-                        updateZoneSizingEndZoneSizingCalc2(state.dataSize->CalcFinalZoneSizing(CtrlZoneNum), TimeStepIndex, HourPrint, Minutes);
-                        if (state.dataHeatBal->doSpaceHeatBalanceSizing) {
-                            for (int spaceNum : state.dataHeatBal->Zone(CtrlZoneNum).spaceIndexes) {
-                                updateZoneSizingEndZoneSizingCalc2(state.dataSize->CalcFinalSpaceSizing(spaceNum), TimeStepIndex, HourPrint, Minutes);
-                            }
-                        }
-                    }
-
                     static constexpr std::string_view ZSizeFmt20("{:02}:{:02}:00");
                     print(state.files.zsz, ZSizeFmt20, HourPrint, Minutes);
                     for (int I = 1; I <= state.dataGlobal->NumOfZones; ++I) {
@@ -2986,7 +2998,7 @@ void UpdateZoneSizing(EnergyPlusData &state, Constant::CallIndicator const CallI
 
         for (int CtrlZoneNum = 1; CtrlZoneNum <= state.dataGlobal->NumOfZones; ++CtrlZoneNum) {
             if (!state.dataZoneEquip->ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
-            // Yes, call updateZoneSizingEndZoneSizingCalc6 again here to copyd the same fields
+            // Yes, call updateZoneSizingEndZoneSizingCalc6 again here to copy the same fields
             updateZoneSizingEndZoneSizingCalc6(state.dataSize->FinalZoneSizing(CtrlZoneNum),
                                                state.dataSize->CalcFinalZoneSizing(CtrlZoneNum),
                                                state.dataZoneEquipmentManager->NumOfTimeStepInDay);
