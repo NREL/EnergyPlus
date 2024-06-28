@@ -231,7 +231,22 @@ void SimDXCoil(EnergyPlusData &state,
         CalcDXHeatingCoil(state, DXCoilNum, PartLoadRatio, fanOp, AirFlowRatio, MaxCap);
     } break;
     case HVAC::CoilVRF_FluidTCtrl_Cooling: {
-        CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, PartLoadRatio, fanOp, CompCycRatio, _, _, MaxCap);
+        // fixme: this redefines the MaxCap, how should I go about changing it from optional arg to non-optional?
+        if (present(MaxCap)) {
+            CalcVRFCoolingCoil_FluidTCtrl(
+                state, DXCoilNum, HVAC::CompressorOp::On, FirstHVACIteration, PartLoadRatio, fanOp, CompCycRatio, MaxCap, _, _);
+        } else {
+            CalcVRFCoolingCoil_FluidTCtrl(state,
+                                          DXCoilNum,
+                                          HVAC::CompressorOp::On,
+                                          FirstHVACIteration,
+                                          PartLoadRatio,
+                                          fanOp,
+                                          CompCycRatio,
+                                          HVACVariableRefrigerantFlow::MaxCap,
+                                          _,
+                                          _);
+        }
     } break;
     case HVAC::CoilVRF_FluidTCtrl_Heating: {
         CalcVRFHeatingCoil_FluidTCtrl(state, compressorOp, DXCoilNum, PartLoadRatio, fanOp, _, MaxCap);
@@ -6871,7 +6886,8 @@ void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the cur
             } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilVRF_Cooling) {
                 CalcVRFCoolingCoil(state, DXCoilNum, HVAC::CompressorOp::On, false, 1.0, HVAC::FanOp::Cycling, 1.0, _, _, _);
             } else if (thisDXCoil.DXCoilType_Num == HVAC::CoilVRF_FluidTCtrl_Cooling) {
-                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, HVAC::CompressorOp::On, false, 1.0, HVAC::FanOp::Cycling, 1.0, _, _, _);
+                CalcVRFCoolingCoil_FluidTCtrl(
+                    state, DXCoilNum, HVAC::CompressorOp::On, false, 1.0, HVAC::FanOp::Cycling, 1.0, HVACVariableRefrigerantFlow::MaxCap, _, _);
             }
 
             // coil outlets
@@ -16509,9 +16525,9 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
                                    Real64 const PartLoadRatio,             // sensible cooling load / full load sensible cooling capacity
                                    HVAC::FanOp const fanOp,                // Allows parent object to control fan operation
                                    Real64 const CompCycRatio,              // cycling ratio of VRF condenser
+                                   Real64 MaxCoolCap,                      // maximum allowed cooling capacity
                                    ObjexxFCL::Optional_int_const PerfMode, // Performance mode for MultiMode DX coil; Always 1 for other coil types
-                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
-                                   ObjexxFCL::Optional<Real64 const> MaxCoolCap         // maximum allowed cooling capacity
+                                   ObjexxFCL::Optional<Real64 const> OnOffAirFlowRatio // ratio of compressor on airflow to compressor off airflow
 )
 {
     // SUBROUTINE INFORMATION:
@@ -16736,11 +16752,7 @@ void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
             ShowFatalError(state, format("{} \"{}\" - Rated total cooling capacity is zero or less.", thisDXCoil.DXCoilType, thisDXCoil.Name));
         }
 
-        if (present(MaxCoolCap)) {
-            TotCap = min(MaxCoolCap, thisDXCoil.RatedTotCap(Mode));
-        } else {
-            TotCap = thisDXCoil.RatedTotCap(Mode);
-        }
+        TotCap = min(MaxCoolCap, thisDXCoil.RatedTotCap(Mode));
 
         QCoilReq = -PartLoadRatio * TotCap;
         if (PartLoadRatio == 0.0) {
