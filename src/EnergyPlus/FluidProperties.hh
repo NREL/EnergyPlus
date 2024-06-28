@@ -344,8 +344,6 @@ namespace FluidProperties {
         }
     };
 
-    void InitializeGlycRoutines();
-
     void GetFluidPropertiesData(EnergyPlusData &state);
 
     template <size_t NumOfTemps, size_t NumOfConcs>

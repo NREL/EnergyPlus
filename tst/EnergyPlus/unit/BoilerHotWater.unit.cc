@@ -71,7 +71,7 @@ using namespace EnergyPlus::Psychrometrics;
 
 TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 {
-    state->init_state(*state);
+    state->dataFluidProps->init_state(*state);
     // unit test for autosizing boiler nominal capacity in Boiler:HotWater
     state->dataBoilers->Boiler.allocate(1);
     // Hardsized Hot Water Boiler
@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWaterSizingTest)
 }
 TEST_F(EnergyPlusFixture, Boiler_HotWaterAutoSizeTempTest)
 {
-    state->init_state(*state);
+    state->dataFluidProps->init_state(*state);
     // unit test for checking hot water temperature for autosizing
     // boiler nominal capacity in Boiler:HotWater
     state->dataBoilers->Boiler.allocate(1);

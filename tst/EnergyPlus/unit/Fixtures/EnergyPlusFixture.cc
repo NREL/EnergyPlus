@@ -118,7 +118,6 @@ void EnergyPlusFixture::SetUp()
     state->dataUtilityRoutines->outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines(*state);
-    FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj(*state);
 }
 

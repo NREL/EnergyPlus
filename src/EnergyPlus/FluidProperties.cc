@@ -102,11 +102,6 @@ namespace FluidProperties {
     // supplying the same data for concentrations of 0.0 and 1.0 only.
     // Temperature data has to be supplied in ascending order only.
 
-    void InitializeGlycRoutines()
-    {
-        // TODO: Delete this, the cache is now part of state and initialized with the state constructor
-    }
-
     void GetFluidPropertiesData(EnergyPlusData &state)
     {
 
@@ -659,8 +654,6 @@ namespace FluidProperties {
         Numbers = 0.0;
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
-
-        InitializeGlycRoutines();
 
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
