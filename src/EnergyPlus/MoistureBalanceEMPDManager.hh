@@ -116,6 +116,10 @@ struct MoistureBalanceEMPDManagerData : BaseGlobalStruct
     int ErrCount = 0;
     bool OneTimeFlag = true;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->EMPDReportVars.deallocate();

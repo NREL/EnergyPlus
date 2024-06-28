@@ -954,9 +954,6 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
     state->dataPlnt->PlantLoop(1).OpScheme.allocate(1);
     state->dataPlnt->PlantLoop(1).OpScheme(1).Name = "TEST PLANTOP SCHEME";
 
-    state->dataSetPointManager->NumAllSetPtMgrs = 0;
-    state->dataSetPointManager->NumSchTESSetPtMgrs = 0;
-
     bool ErrorsFound = false;
     int TESSPBO = 1;
     int LoopNum = 1;
@@ -1007,6 +1004,5 @@ TEST_F(EnergyPlusFixture, ThermalEnergyStorageWithIceForceDualOp)
     }
 
     // We should now alos have two TES SPMs created, and that's all of them
-    EXPECT_EQ(state->dataSetPointManager->NumSchTESSetPtMgrs, 2);
-    EXPECT_EQ(state->dataSetPointManager->NumAllSetPtMgrs, 2);
+    EXPECT_EQ(state->dataSetPointManager->spms.size(), 2);
 }

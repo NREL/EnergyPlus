@@ -436,6 +436,10 @@ struct SingleDuctData : BaseGlobalStruct
     Real64 MinMassAirFlowSDAT = 0.0;                // the air flow rate during heating for normal acting damper
     Real64 QZoneMax2SDAT = 0.0;                     // temporary variable
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         new (this) SingleDuctData();

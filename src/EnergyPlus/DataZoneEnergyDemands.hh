@@ -72,6 +72,8 @@ namespace DataZoneEnergyDemands {
         int StageNum = 0; // The stage number when staged thermostate is used:
         // 0 no load, >0 Heating stage, <0 Cooling stage
 
+        virtual ~ZoneSystemDemandData() = default;
+
         virtual void beginEnvironmentInit() = 0;
 
         virtual void setUpOutputVars(
@@ -169,6 +171,10 @@ struct DataZoneEnergyDemandsData : BaseGlobalStruct
     EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> ZoneSysMoistureDemand;
     EPVector<DataZoneEnergyDemands::ZoneSystemSensibleDemand> spaceSysEnergyDemand;
     EPVector<DataZoneEnergyDemands::ZoneSystemMoistureDemand> spaceSysMoistureDemand;
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

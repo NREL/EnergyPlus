@@ -657,8 +657,6 @@ namespace HVACMultiSpeedHeatPump {
             }
 
             // Get supply fan data
-            bool errFound = false;
-
             thisMSHP.FanNum = Fans::GetFanIndex(state, Alphas(7));
             if (thisMSHP.FanNum == 0) {
                 ShowSevereItemNotFound(state, eoh, cAlphaFields(7), Alphas(7));

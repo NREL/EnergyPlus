@@ -395,8 +395,7 @@ namespace Fans {
         bool isSecondaryDriver = false; // true if this fan is used to augment flow and may pass air when off.
 
         // FEI
-        static Real64 report_fei(
-            EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress, Real64 inletRhoAir);
+        static Real64 report_fei(EnergyPlusData &state, Real64 const designFlowRate, Real64 const designElecPower, Real64 const designDeltaPress);
 
         void init(EnergyPlusData &state);
 
@@ -456,9 +455,13 @@ struct FansData : BaseGlobalStruct
     Array1D<Fans::FanBase *> fans;
     std::map<std::string, int> fanMap;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        for (int i = 1; i <= fans.size(); ++i)
+        for (int i = 1; i <= (int)fans.size(); ++i)
             delete fans(i);
 
         fans.clear();

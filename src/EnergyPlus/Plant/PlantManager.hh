@@ -176,6 +176,10 @@ struct PlantMgrData : BaseGlobalStruct
     int newCallingIndex = 0;
     PlantManager::EmptyPlantComponent dummyPlantComponent;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->GetCompSizFac = true;

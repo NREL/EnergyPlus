@@ -300,6 +300,7 @@ struct OutputReportPredefinedData : BaseGlobalStruct
 
     // DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
     int pdstDXCoolCoil2 = 0;
+    int pdchDXCoolCoilType2 = 0;      // DX cooling coil type
     int pdchDXCoolCoilNetCapSIA = 0;  // Standard Rated (Net) Cooling Capacity [W], Test A
     int pdchDXCoolCoilElecPowerA = 0; // Standard Rated Electric Power [W], Test A
     int pdchDXCoolCoilNetCapSIB = 0;  // Standard Rated (Net) Cooling Capacity [W], Test B
@@ -1534,9 +1535,13 @@ struct OutputReportPredefinedData : BaseGlobalStruct
     Array1D<OutputReportPredefined::CompSizeTableEntryType> CompSizeTableEntry;
     Array1D<OutputReportPredefined::ShadowRelateType> ShadowRelate;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = OutputReportPredefinedData();
+        new (this) OutputReportPredefinedData();
     }
 };
 
