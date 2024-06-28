@@ -209,8 +209,6 @@ namespace SimulationManager {
              state.dataInputProcessing->inputProcessor->getNumObjectsFound(state, "RunPeriod:CustomRange") > 0 || state.dataSysVars->FullAnnualRun);
         state.dataErrTracking->AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles(state);
-
         state.init_state(state);
 
         CheckForMisMatchedEnvironmentSpecifications(state);

@@ -576,8 +576,8 @@ void EnergyPlusData::init_state(EnergyPlusData &state)
     // do this in "topological" order meaning the first to go are the
     // objects that do not reference any other objects, like fluids,
     // schedules, curves, etc.
-    this->dataFluidProps->init_state(state);        // GetFluidPropertiesData
     this->dataSimulationManager->init_state(state); // GetProjectData
+    this->dataFluidProps->init_state(state);        // GetFluidPropertiesData
     this->dataPsychrometrics->init_state(state);    // InitializePsychRoutines
 
     this->dataAirLoop->init_state(state);

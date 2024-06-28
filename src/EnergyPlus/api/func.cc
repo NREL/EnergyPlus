@@ -52,6 +52,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/state.h>
 
@@ -62,8 +63,6 @@ void initializeFunctionalAPI(EnergyPlusState state)
         thisState->dataInputProcessing->inputProcessor = EnergyPlus::InputProcessor::factory();
     }
     thisState->init_state(*thisState);
-    // this next line can be removed once InitializeGlycRoutines is added to init_state
-    EnergyPlus::FluidProperties::InitializeGlycRoutines();
 }
 
 const char *apiVersionFromEPlus(EnergyPlusState)

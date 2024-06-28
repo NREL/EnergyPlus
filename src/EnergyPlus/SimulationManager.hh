@@ -101,6 +101,7 @@ struct SimulationManagerData : BaseGlobalStruct
     bool WarningOut = true;
     void init_state(EnergyPlusData &state) override
     {
+        SimulationManager::OpenOutputFiles(state);
         SimulationManager::GetProjectData(state);
     }
 
