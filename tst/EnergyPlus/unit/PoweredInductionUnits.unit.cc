@@ -3037,7 +3037,6 @@ TEST_F(EnergyPlusFixture, VSSeriesPIUCool)
     EXPECT_EQ(state->dataLoopNodes->Node(thisPIU.OutAirNode).MassFlowRate, thisPIU.MaxTotAirMassFlow);
 }
 
-
 TEST_F(EnergyPlusFixture, PIU_reportTerminalUnit)
 {
     using namespace EnergyPlus::OutputReportPredefined;
