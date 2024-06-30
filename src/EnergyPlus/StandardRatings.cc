@@ -6266,6 +6266,9 @@ namespace StandardRatings {
         Real64 e_sum(0.0);
         Real64 rh_sum(0.0);
 
+        // The minimum temperature below which the compressor is turned off
+        OATempCompressorOff = MinOATCompressor;
+
         // Equation 11.111 AHRI-2023
         Real64 t_ob = 7.22; //  temperature at which frosting influence on full stage performance begins 7.22 C (45 F)
         for (BinNum2023 = 0; BinNum2023 < 18; ++BinNum2023) { // NumOfOATempBins
