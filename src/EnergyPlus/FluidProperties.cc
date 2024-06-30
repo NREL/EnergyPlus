@@ -157,8 +157,8 @@ namespace FluidProperties {
         //   Array initializer only takes one argument.  std::bind is used to convert the
         //   actual initializer into a function of one argument.
 
-        if (state.dataFluidProps->GetFluidPropertiesData_called) return;
-        state.dataFluidProps->GetFluidPropertiesData_called = true;
+        state.dataFluidProps->NumOfRefrigerants = 0;
+        state.dataFluidProps->NumOfGlycols = 0;
 
         // For default "glycol" fluids of Water, Ethylene Glycol, and Propylene Glycol
 

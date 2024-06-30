@@ -625,9 +625,8 @@ namespace FluidProperties {
 struct FluidPropertiesData : BaseGlobalStruct
 {
 
-    bool GetFluidPropertiesData_called = false; // Used to get the input once only
-    int NumOfRefrigerants = 0;                  // Total number of refrigerants input by user
-    int NumOfGlycols = 0;                       // Total number of glycols input by user
+    int NumOfRefrigerants = 0; // Total number of refrigerants input by user
+    int NumOfGlycols = 0;      // Total number of glycols input by user
     bool DebugReportGlycols = false;
     bool DebugReportRefrigerants = false;
     int GlycolErrorLimitTest = 1;      // how many times error is printed with details before recurring called

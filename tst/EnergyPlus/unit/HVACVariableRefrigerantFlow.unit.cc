@@ -2353,9 +2353,16 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     state->dataEnvrn->StdRhoAir = PsyRhoAirFnPbTdbW(*state, state->dataEnvrn->OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput(*state);                    // read schedules
-    Curve::GetCurveInput(*state);                    // read curves
+    ProcessScheduleInput(*state); // read schedules
+    Curve::GetCurveInput(*state); // read curves
+    // test consecutive call to fluid properties getInput
     FluidProperties::GetFluidPropertiesData(*state); // read refrigerant properties
+    EXPECT_EQ(2, state->dataFluidProps->NumOfRefrigerants);
+    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
+
+    FluidProperties::GetFluidPropertiesData(*state); // should never happen but if it does it's safe
+    EXPECT_EQ(2, state->dataFluidProps->NumOfRefrigerants);
+    EXPECT_EQ(1, state->dataFluidProps->NumOfGlycols);
 
     // set up ZoneEquipConfig data
     state->dataGlobal->NumOfZones = 1;
