@@ -6646,8 +6646,8 @@ namespace StandardRatings {
                                                                                                             RatedCOP,
                                                                                                             RegionNum,
                                                                                                             MinOATCompressor,
-                                                                                                            OATempCompressorOnOffBlank,
                                                                                                             OATempCompressorOn,
+                                                                                                            OATempCompressorOnOffBlank,
                                                                                                             DefrostControl);
 
         StandardRatingsResult["NetHeatingCapRatedHighTemp"] = NetHeatingCapRatedHighTemp;
