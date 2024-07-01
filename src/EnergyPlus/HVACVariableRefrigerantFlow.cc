@@ -1493,8 +1493,8 @@ void GetVRFInputData(EnergyPlusData &state, bool &ErrorsFound)
             state.dataHVACVarRefFlow->MaxHeatingCapacity.allocate(state.dataHVACVarRefFlow->NumVRFCond);
             state.dataHVACVarRefFlow->CoolCombinationRatio.allocate(state.dataHVACVarRefFlow->NumVRFCond);
             state.dataHVACVarRefFlow->HeatCombinationRatio.allocate(state.dataHVACVarRefFlow->NumVRFCond);
-            state.dataHVACVarRefFlow->MaxCoolingCapacity = MaxCap;
-            state.dataHVACVarRefFlow->MaxHeatingCapacity = MaxCap;
+            state.dataHVACVarRefFlow->MaxCoolingCapacity = Constant::MaxCap;
+            state.dataHVACVarRefFlow->MaxHeatingCapacity = Constant::MaxCap;
             state.dataHVACVarRefFlow->CoolCombinationRatio = 1.0;
             state.dataHVACVarRefFlow->HeatCombinationRatio = 1.0;
         }
@@ -6608,8 +6608,8 @@ void InitVRF(EnergyPlusData &state, int const VRFTUNum, int const ZoneNum, bool 
     // terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
     if (CurrentEndTime > state.dataHVACVarRefFlow->CurrentEndTimeLast || TimeStepSysLast > state.dataHVACGlobal->TimeStepSys ||
         (FirstHVACIteration && state.dataHVACVarRefFlow->MyBeginTimeStepFlag(VRFCond))) {
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap;
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap;
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap;
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = Constant::MaxCap;
         state.dataHVACVarRefFlow->MyBeginTimeStepFlag(VRFCond) = false;
     }
 
@@ -10596,7 +10596,7 @@ void LimitCoilCapacity(int const NumTUInList,           // Number of terminal un
 
     // sort TU capacity from lowest to highest
     for (TempTUIndex = 1; TempTUIndex <= NumTUInList; ++TempTUIndex) {
-        MinOutput = MaxCap;
+        MinOutput = Constant::MaxCap;
         for (NumTU = 1; NumTU <= NumTUInList; ++NumTU) {
             if (Temp2(NumTU) < MinOutput) {
                 MinOutput = Temp2(NumTU);
@@ -10604,7 +10604,7 @@ void LimitCoilCapacity(int const NumTUInList,           // Number of terminal un
                 MinOutputIndex = NumTU;
             }
         }
-        Temp2(MinOutputIndex) = MaxCap;
+        Temp2(MinOutputIndex) = Constant::MaxCap;
     }
 
     // find limit of "terminal unit" capacity so that sum of all TU's does not exceed condenser capacity
@@ -11784,7 +11784,7 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 0.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap; // for report . yujie: might be wrong here too, should be MaxCap = 1e+20
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap; // for report
 
         this->OUCondHeatRate = 0;
         this->OUEvapHeatRate = Q_c_OU;
@@ -12031,13 +12031,13 @@ void VRFCondenserEquipment::CalcVRFCondenser_FluidTCtrl(EnergyPlusData &state)
         this->OUFanPower = 0.0;
         this->VRFCondCyclingRatio = 0.0;
 
-        this->HeatingCapacity = 0.0;                                    // Include the piping loss
-        this->PipingCorrectionHeating = 1.0;                            // 1 means no piping loss
-        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
+        this->HeatingCapacity = 0.0;                                              // Include the piping loss
+        this->PipingCorrectionHeating = 1.0;                                      // 1 means no piping loss
+        state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) = Constant::MaxCap; // yujie: default value is MaxCap = 1e+20, not 0
 
         this->CoolingCapacity = 0.0; // Include the piping loss
         this->PipingCorrectionCooling = 1.0;
-        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = MaxCap; // for report
+        state.dataHVACVarRefFlow->MaxCoolingCapacity(VRFCond) = Constant::MaxCap; // for report
 
         this->CondensingTemp = state.dataEnvrn->OutDryBulbTemp;
         this->EvaporatingTemp = state.dataEnvrn->OutDryBulbTemp;
@@ -12774,7 +12774,7 @@ void VRFTerminalUnitEquipment::CalcVRF_FluidTCtrl(EnergyPlusData &state,
         state.dataHVACVarRefFlow->CompOffMassFlow = state.dataHVACVarRefFlow->OACompOffMassFlow;
     } else {
         // identify the air flow rate corresponding to the coil load
-        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < MaxCap) {
+        if (this->HeatingCoilPresent && state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond) < Constant::MaxCap) {
             // Only fix heating only mode for now
             state.dataHVACVarRefFlow->CompOnMassFlow = CalVRFTUAirFlowRate_FluidTCtrl(
                 state, VRFTUNum, PartLoadRatio, FirstHVACIteration, state.dataHVACVarRefFlow->MaxHeatingCapacity(VRFCond));

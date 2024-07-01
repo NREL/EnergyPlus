@@ -106,8 +106,6 @@ namespace HVACVariableRefrigerantFlow {
         Num
     };
 
-    constexpr Real64 MaxCap(1.0e+20); // limit of zone terminal unit capacity
-
     // VRF Algorithm Type
     enum class AlgorithmType
     {
