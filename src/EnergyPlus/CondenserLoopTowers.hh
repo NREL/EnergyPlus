@@ -439,9 +439,13 @@ struct CondenserLoopTowersData : BaseGlobalStruct
     bool GetInput = true;
     Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
 
+    void init_state([[maybe_unused]] EnergyPlusData &state)
+    {
+    }
+
     void clear_state() override
     {
-        *this = CondenserLoopTowersData();
+        new (this) CondenserLoopTowersData();
     }
 };
 

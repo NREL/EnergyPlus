@@ -625,45 +625,7 @@ void ReportCoilSelection::doZoneEqSetup(EnergyPlusData &state, int const coilVec
     }
 
     if (c->zoneEqNum > 0) {
-        c->coilLocation = "Unknown";
-        c->typeHVACname = "Unknown";
-        c->userNameforHVACsystem = "Unknown";
-        // now search equiment
-        if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-            c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(1);
-            c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(1);
-            c->coilLocation = "Zone Equipment";
-            c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(1);
-            c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(1);
-        } else if (state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes > 1) {
-            bool foundOne(false);
-            for (int equipLoop = 1; equipLoop <= state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).NumOfEquipTypes; ++equipLoop) {
-                // go with the first ZoneHVAC device in the list
-                DataZoneEquipment::ZoneEquipType equipType = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                if (equipType == DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal ||
-                    equipType == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator ||
-                    equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil || equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
-                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
-                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
-                    equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
-                    equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
-                    equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
-                    equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
-                    equipType == DataZoneEquipment::ZoneEquipType::DehumidifierDX) {
-                    if (!foundOne) {
-                        c->typeHVACname = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
-                        c->userNameforHVACsystem = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
-                        foundOne = true;
-                        c->coilLocation = "Zone Equipment";
-                        c->zoneHVACTypeNum = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipType(equipLoop);
-                        c->zoneHVACIndex = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipIndex(equipLoop);
-                    } else { // or may have found another
-                        c->typeHVACname += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipTypeName(equipLoop);
-                        c->userNameforHVACsystem += " or " + state.dataZoneEquip->ZoneEquipList(c->zoneEqNum).EquipName(equipLoop);
-                    }
-                }
-            }
-        }
+        associateZoneCoilWithParent(state, c);
     }
 }
 
@@ -675,44 +637,8 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
         // mine final/hard values from coil models
 
         if (c->zoneEqNum > 0) {
-            c->coilLocation = "Unknown";
-            c->typeHVACname = "Unknown";
-            c->userNameforHVACsystem = "Unknown";
-            // now search equipment
-            auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
-            if (zoneEquipList.NumOfEquipTypes == 1) { // this must be it, fill strings for type and name
-                c->typeHVACname = zoneEquipList.EquipTypeName(1);
-                c->userNameforHVACsystem = zoneEquipList.EquipName(1);
-                c->coilLocation = "Zone Equipment";
-            } else if (zoneEquipList.NumOfEquipTypes > 1) {
-                bool foundOne(false);
-                for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
-                    // go with the first ZoneHVAC device in the list
-                    DataZoneEquipment::ZoneEquipType equipType = zoneEquipList.EquipType(equipLoop);
-                    if (equipType == DataZoneEquipment::ZoneEquipType::VariableRefrigerantFlowTerminal ||
-                        equipType == DataZoneEquipment::ZoneEquipType::EnergyRecoveryVentilator ||
-                        equipType == DataZoneEquipment::ZoneEquipType::FourPipeFanCoil ||
-                        equipType == DataZoneEquipment::ZoneEquipType::OutdoorAirUnit ||
-                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalAirConditioner ||
-                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPump ||
-                        equipType == DataZoneEquipment::ZoneEquipType::UnitHeater || equipType == DataZoneEquipment::ZoneEquipType::UnitVentilator ||
-                        equipType == DataZoneEquipment::ZoneEquipType::VentilatedSlab ||
-                        equipType == DataZoneEquipment::ZoneEquipType::PackagedTerminalHeatPumpWaterToAir ||
-                        equipType == DataZoneEquipment::ZoneEquipType::WindowAirConditioner ||
-                        equipType == DataZoneEquipment::ZoneEquipType::DehumidifierDX) {
-                        if (!foundOne) {
-                            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
-                            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
-                            foundOne = true;
-                            c->coilLocation = "Zone Equipment";
-                        } else { // or may have found another
-                            c->typeHVACname += " or " + zoneEquipList.EquipTypeName(equipLoop);
-                            c->userNameforHVACsystem += " or " + zoneEquipList.EquipName(equipLoop);
-                        }
-                    }
-                } // for (equipLoop)
-            }     // if (zoneEquipList.numOfEquipTypes > 0)
-        }         // if (c->ZoneEqNum > 0)
+            associateZoneCoilWithParent(state, c);
+        }
 
         if (c->airloopNum > state.dataHVACGlobal->NumPrimaryAirSys && c->oASysNum > 0) {
             c->coilLocation = "DOAS AirLoop";
@@ -977,6 +903,94 @@ int ReportCoilSelection::getIndexForOrCreateDataObjFromCoilName(EnergyPlusData &
         ShowFatalError(state, format("getIndexForOrCreateDataObjFromCoilName: Developer error - not a coil: {} = {}", coilType, coilName));
     }
     return index;
+}
+
+void ReportCoilSelection::associateZoneCoilWithParent(EnergyPlusData &state, std::unique_ptr<CoilSelectionData> &c)
+{
+    c->coilLocation = "Unknown";
+    c->typeHVACname = "Unknown";
+    c->userNameforHVACsystem = "Unknown";
+    // now search equipment
+    auto const &zoneEquipList = state.dataZoneEquip->ZoneEquipList(c->zoneEqNum);
+    bool coilFound = false;
+    std::string fanType;
+    std::string fanName;
+    auto thisSubCoilLambda = [&c](const DataZoneEquipment::SubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+    auto thisSubFanLambda = [](const DataZoneEquipment::SubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+    auto thisSubSubCoilLambda = [&c](const DataZoneEquipment::SubSubEquipmentData &myCoil) { return myCoil.Name == c->coilName_; };
+    auto thisSubSubFanLambda = [](const DataZoneEquipment::SubSubEquipmentData &myFan) { return myFan.TypeOf.rfind("FAN:", 0) == 0; };
+
+    for (int equipLoop = 1; equipLoop <= zoneEquipList.NumOfEquipTypes; ++equipLoop) {
+        // coil should be found only once, fan could be found multiple times, reset here
+        // for each type of equipment (equipLoop) only one coil and fan could be found as a pair
+        bool fanFound = false;
+        auto &thisSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData;
+
+        // search for coil and fan SubEquipData and return parent type/name and fan type/name for coil reports.
+        auto const &coilIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda);
+        if (std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubCoilLambda) != thisSubEq.end()) {
+            c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+            c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+            c->coilLocation = "Zone Equipment";
+            int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
+            if (c->zoneNum.empty()) c->zoneNum.resize(1);
+            c->zoneNum[0] = zoneEqListIndex;
+            if (c->zoneName.empty()) c->zoneName.resize(1);
+            c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
+            coilFound = true;
+        }
+        auto const &fanIterator = std::find_if(thisSubEq.begin(), thisSubEq.end(), thisSubFanLambda);
+        if (fanIterator != thisSubEq.end()) {
+            unsigned int fanIndex = fanIterator - thisSubEq.begin();
+            // notice the brackets on the Array1D for [fanIndex]
+            fanType = thisSubEq[fanIndex].TypeOf;
+            fanName = thisSubEq[fanIndex].Name;
+            fanFound = true;
+        }
+        // if coil not found in SubEquipData then maybe it's HXAssisted and in SubSubEquipData. Fan is usually already found if exists.
+        if (!coilFound || !fanFound) {
+            for (int subEq = 1; subEq <= zoneEquipList.EquipData(equipLoop).NumSubEquip; ++subEq) {
+                auto &thisSubSubEq = zoneEquipList.EquipData(equipLoop).SubEquipData(subEq).SubSubEquipData;
+                if (!coilFound) {
+                    auto const &coilIterator2 = std::find_if(thisSubSubEq.begin(), thisSubSubEq.end(), thisSubSubCoilLambda);
+                    if (coilIterator2 != thisSubSubEq.end()) {
+                        c->typeHVACname = zoneEquipList.EquipTypeName(equipLoop);
+                        c->userNameforHVACsystem = zoneEquipList.EquipName(equipLoop);
+                        c->coilLocation = "Zone Equipment";
+                        int zoneEqListIndex = Util::FindItemInList(zoneEquipList.Name, state.dataZoneEquip->ZoneEquipList);
+                        if (c->zoneNum.empty()) c->zoneNum.resize(1);
+                        c->zoneNum[0] = zoneEqListIndex;
+                        if (c->zoneName.empty()) c->zoneName.resize(1);
+                        c->zoneName[0] = state.dataHeatBal->Zone(zoneEqListIndex).Name;
+                        coilFound = true;
+                    }
+                }
+                if (!fanFound) {
+                    auto const &fanIterator2 = std::find_if(thisSubSubEq.begin(), thisSubSubEq.end(), thisSubSubFanLambda);
+                    if (fanIterator2 != thisSubSubEq.end()) {
+                        unsigned int fanIndex = fanIterator2 - thisSubSubEq.begin();
+                        // notice the brackets on the Array1D for [fanIndex]
+                        fanType = thisSubSubEq[fanIndex].TypeOf;
+                        fanName = thisSubSubEq[fanIndex].Name;
+                        fanFound = true;
+                    }
+                }
+                if (coilFound && fanFound) break;
+            }
+        }
+        if (coilFound) {
+            if (fanFound) {
+                c->fanTypeName = fanType;
+                c->fanAssociatedWithCoilName = fanName;
+            }
+            break;
+        }
+
+    } // for (equipLoop)
+
+    if (c->typeHVACname == "Unknown") {
+        ShowWarningError(state, format("Parent object not found for zone coil = {}", c->coilName_));
+    }
 }
 
 void ReportCoilSelection::setRatedCoilConditions(EnergyPlusData &state,
@@ -1687,7 +1701,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
             }
         } else if (state.dataSize->TermUnitPIU) {
             auto const &thisTermUnitSizing = state.dataSize->TermUnitSizing(state.dataSize->CurTermUnitSizingNum);
-            Real64 MinPriFlowFrac = thisTermUnitSizing.MinFlowFrac;
+            Real64 MinPriFlowFrac = thisTermUnitSizing.MinPriFlowFrac;
             if (thisTermUnitSizing.InducesPlenumAir) {
                 if (c->coilDesEntTemp == -999.0) { // don't overwrite if already set directly by setCoilEntAirTemp
                     auto const &termUnitFinalZoneSizing = state.dataSize->TermUnitFinalZoneSizing(state.dataSize->CurTermUnitSizingNum);
@@ -1973,6 +1987,20 @@ void ReportCoilSelection::setCoilSupplyFanInfo(EnergyPlusData &state,
     c->supFanType = fanType;
     c->supFanNum = fanIndex;
     if (c->supFanNum == 0) c->supFanNum = Fans::GetFanIndex(state, fanName);
+}
+
+void ReportCoilSelection::setCoilEqNum(EnergyPlusData &state,
+                                       std::string const &coilName,
+                                       std::string const &coilType,
+                                       int const curSysNum,
+                                       int const curOASysNum,
+                                       int const curZoneEqNum)
+{
+    int index = getIndexForOrCreateDataObjFromCoilName(state, coilName, coilType);
+    auto &c(coilSelectionDataObjs[index]);
+    c->airloopNum = curSysNum;
+    c->oASysNum = curOASysNum;
+    c->zoneEqNum = curZoneEqNum;
 }
 
 std::string ReportCoilSelection::getTimeText(EnergyPlusData &state, int const timeStepAtPeak)

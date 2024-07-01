@@ -1411,7 +1411,7 @@ namespace DataSurfaces {
 
     // Clears the global data in DataSurfaces.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    // void clear_state() override;
 
     void SetSurfaceOutBulbTempAt(EnergyPlusData &state);
 
@@ -1807,6 +1807,10 @@ struct SurfacesData : BaseGlobalStruct
     EPVector<DataSurfaces::GroundSurfacesProperty> GroundSurfsProperty;
 
     int actualMaxSlatAngs = Material::MaxSlatAngs; // If there are no blinds in the model, then this is changed to 1 (used for shades)
+
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
 
     void clear_state() override
     {

@@ -145,9 +145,13 @@ struct DefineEquipData : BaseGlobalStruct
 {
     Array1D<DataDefineEquip::ZoneAirEquip> AirDistUnit; // Used to specify zone related
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
-        *this = DefineEquipData();
+        new (this) DefineEquipData();
     }
 };
 

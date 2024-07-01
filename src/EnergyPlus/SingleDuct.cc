@@ -3698,7 +3698,7 @@ void SingleDuctAirTerminal::SizeSys(EnergyPlusData &state)
     }
 
     if (state.dataSize->CurTermUnitSizingNum > 0) {
-        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinFlowFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
+        TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MinPriFlowFrac = this->ZoneMinAirFracDes * this->ZoneTurndownMinAirFrac;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxHWVolFlow = this->MaxReheatWaterVolFlow;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).MaxSTVolFlow = this->MaxReheatSteamVolFlow;
         TermUnitSizing(state.dataSize->CurTermUnitSizingNum).DesHeatingLoad = state.dataSingleDuct->DesCoilLoadSS; // Coil Summary report

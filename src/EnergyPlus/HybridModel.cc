@@ -472,7 +472,15 @@ namespace HybridModel {
                                             OutputProcessor::StoreType::Average,
                                             state.dataHeatBal->Zone(ZonePtr).Name);
                     }
-
+                    if (state.dataHybridModel->HybridModelZone(ZonePtr).InternalThermalMassCalc_T) {
+                        SetupOutputVariable(state,
+                                            "Zone Hybrid Model Thermal Mass Multiplier",
+                                            Constant::Units::None,
+                                            state.dataHeatBal->Zone(ZonePtr).ZoneVolCapMultpSensHM,
+                                            OutputProcessor::TimeStepType::Zone,
+                                            OutputProcessor::StoreType::Average,
+                                            state.dataHeatBal->Zone(ZonePtr).Name);
+                    }
                 } else {
                     ShowSevereError(
                         state,

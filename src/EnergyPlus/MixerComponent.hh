@@ -162,6 +162,10 @@ struct MixerComponentData : BaseGlobalStruct
     Array1D_bool CheckEquipName;
     EPVector<MixerComponent::MixerConditions> MixerCond;
 
+    void init_state([[maybe_unused]] EnergyPlusData &state) override
+    {
+    }
+
     void clear_state() override
     {
         this->NumMixers = 0;
